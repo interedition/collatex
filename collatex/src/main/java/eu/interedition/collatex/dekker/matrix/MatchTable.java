@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,8 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayTable;
+import com.google.common.collect.DiscreteDomains;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Range;
+import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
@@ -58,16 +62,11 @@ public class MatchTable {
   }
 
   private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
-    // ik heb een Integer range nodig..
-    // dit is best een stupid way om het te doen
-    // ik moet een georderde set hebben
     graph.rank();
-    Set<Integer> ranks = Sets.newLinkedHashSet();
-    Iterator<VariantGraphVertex> vertices = graph.vertices().iterator();
-    while (vertices.hasNext()) {
-      ranks.add(vertices.next().getRank());
-    }
-    return new MatchTable(witness, ranks);
+    // -3 === ignore the start and the end vertex
+    Range<Integer> range = Ranges.closed(0, Math.max(0, Iterables.size(graph.vertices())-3));
+    ImmutableList<Integer> set = range.asSet(DiscreteDomains.integers()).asList();
+    return new MatchTable(witness, set);
   }
 
   // remove static; move parameters into fields
@@ -95,15 +94,14 @@ public class MatchTable {
     table.put(token, rank, variantGraphVertex);
   }
 
-  // code taken from MatchMatrix class
+  // Since the coordinates in allMatches are ordered from upper left to lower right, 
+  // we don't need to check the lower right neighbor.
   public Set<Island> getIslands() {
     Map<Coordinate, Island> coordinateMapper = Maps.newHashMap();
     List<Coordinate> allMatches = allMatches();
     for (Coordinate c : allMatches) {
       //      LOG.info("coordinate {}", c);
       addToIslands(coordinateMapper, c, -1);
-      // Since the coordinates in allMatches are ordered from upper left to lower right, we don't need to check the lower right neighbor.
-      //      addToIslands(coordinateMapper, c, 1);
     }
     Set<Coordinate> smallestIslandsCoordinates = Sets.newHashSet(allMatches);
     smallestIslandsCoordinates.removeAll(coordinateMapper.keySet());
@@ -113,28 +111,6 @@ public class MatchTable {
       coordinateMapper.put(coordinate, island);
     }
     return Sets.newHashSet(coordinateMapper.values());
-
-    //      //			System.out.println("next coordinate: "+c);
-    //      boolean found = false;
-    //      while (!found) {
-    //        for (Island alc : islands) {
-    //          //					System.out.println("inspect island");
-    //          if (alc.neighbour(c)) {
-    //            alc.add(c);
-    //            found = true;
-    //            break;
-    //          }
-    //        }
-    //        if (!found) {
-    //          //					System.out.println("new island");
-    //          Island island = new Island();
-    //          island.add(c);
-    //          islands.add(island);
-    //        }
-    //        found = true;
-    //      }
-    //    }
-    //    return islands;
   }
 
   private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c, int diff) {
@@ -164,7 +140,7 @@ public class MatchTable {
   // might be simpler to work from the cellSet
   // problem there is that a token does not have to have a position
   // but a Cell Object might have one?
-  private List<Coordinate> allMatches() {
+  List<Coordinate> allMatches() {
     List<Coordinate> pairs = Lists.newArrayList();
     int rows = table.rowKeySet().size();
     int cols = table.columnKeySet().size();

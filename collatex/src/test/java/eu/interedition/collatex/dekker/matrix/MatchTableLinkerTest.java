@@ -48,4 +48,24 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertTrue(tokensAsString.contains("C:8:'stomer'"));
   }
 
+  //  String newLine = System.getProperty("line.separator");
+
+  @Test
+  public void test1() {
+    SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
+    VariantGraph vg = collate(sw[0]);
+    MatchTableLinker linker = new MatchTableLinker();
+    Map<Token, VariantGraphVertex> linkedTokens = linker.link(vg, sw[1], new EqualityTokenComparator());
+
+    Set<Token> tokens = linkedTokens.keySet();
+    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    for (Token token : tokens) {
+      tokensAsString.add(token.toString());
+    }
+    assertTrue(tokensAsString.contains("B:0:'a'"));
+    assertTrue(tokensAsString.contains("B:1:'b'"));
+    assertTrue(tokensAsString.contains("B:2:'c'"));
+    assertTrue(tokensAsString.contains("B:3:'a'"));
+    assertTrue(tokensAsString.contains("B:4:'b'"));
+  }
 }

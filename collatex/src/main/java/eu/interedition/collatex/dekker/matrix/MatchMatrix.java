@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker.matrix;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,7 +20,7 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.Matches;
 
 @Deprecated
-public class MatchMatrix implements Iterable<Coordinate> {
+public class MatchMatrix {
   static Logger LOG = LoggerFactory.getLogger(MatchMatrix.class);
   private final ArrayTable<VariantGraphVertex, Token, Boolean> sparseMatrix;
 
@@ -211,28 +209,6 @@ public class MatchMatrix implements Iterable<Coordinate> {
       }
     }
     return islands;
-  }
-
-  @Override
-  public Iterator<Coordinate> iterator() {
-    return new AbstractIterator<Coordinate>() {
-      private int row = 0;
-      private final static int col = 0;
-      private final int rows = rowNum();
-      private int cols = colNum();
-
-      @Override
-      protected Coordinate computeNext() {
-        while (row < rows) {
-          // huh?
-          if (cols++ < cols) {
-            return new Coordinate(row, col);
-          }
-          ++row;
-        }
-        return endOfData();
-      }
-    };
   }
 
   @Override
