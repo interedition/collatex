@@ -165,7 +165,7 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
 
     testWitnessCollation(witnesses);
-    VariantGraph vg = collate(witnesses);
+    //    VariantGraph vg = collate(witnesses);
   }
 
   @Test

@@ -177,21 +177,35 @@ public class ArchipelagoWithVersions extends Archipelago {
     return true;
   }
 
-  private boolean islandIsNoOutlier(Archipelago result, Island isl) {
-    if (isl.size() > 0) {
+  private boolean islandIsNoOutlier(Archipelago a, Island isl) {
+    if (isl.size() > 1) {
+      // must limit on size, so not all islands will be outliers
       return true;
+
     } else {
+      //      ArrayList<Island> iterator = a.iterator();
+      //      for (Island island : iterator) {
+      //        if (islandsAreOnTheSameVector(island, isl)) return true;
+      //      }
       Coordinate leftEnd = isl.getLeftEnd();
-      double y2 = 0;
-      double x2 = 0;
-      double y1 = 1;
-      double x1 = 1;
-      double px = leftEnd.row;
-      double py = leftEnd.column;
-      double ptLineDistSq = Line2D.ptLineDistSq(x1, y1, x2, y2, px, py);
-      return ptLineDistSq == 0.0;
+      return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
     }
-    //    return deviation(result, isl) < 10;
+  }
+
+  private boolean islandsAreOnTheSameVector(Island island, Island isl) {
+    Coordinate leftEnd = island.getLeftEnd();
+    double x1 = leftEnd.row;
+    double y1 = leftEnd.column;
+
+    Coordinate rightEnd = island.getRightEnd();
+    double x2 = rightEnd.row;
+    double y2 = rightEnd.column;
+
+    Coordinate leftEndToMatch = isl.getLeftEnd();
+    double px = leftEndToMatch.row;
+    double py = leftEndToMatch.column;
+    double ptLineDistSq = Line2D.ptLineDistSq(x1, y1, x2, y2, px, py);
+    return ptLineDistSq == 0.0;
   }
 
   private double deviation(Archipelago archipelago, Island isl) {

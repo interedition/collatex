@@ -2,17 +2,20 @@ package eu.interedition.collatex.dekker.matrix;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class Archipelago {
   Logger LOG = LoggerFactory.getLogger(Archipelago.class);
 
   private ArrayList<Island> islands;
+  private final Set<Integer> islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
 
   public Archipelago() {
     setIslands(new ArrayList<Island>());
@@ -41,6 +44,8 @@ public class Archipelago {
     //        } catch (Exception e) {}
     //    }
     getIslands().add(island);
+    Coordinate leftEnd = island.getLeftEnd();
+    islandvectors.add(leftEnd.row - leftEnd.column);
   }
 
   // this is not a real iterator implementation but it works...
@@ -254,5 +259,9 @@ public class Archipelago {
     double result = 0.0;
     result = Math.sqrt((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
     return result;
+  }
+
+  public Set<Integer> getIslandVectors() {
+    return islandvectors;
   }
 }
