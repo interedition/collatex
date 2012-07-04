@@ -381,6 +381,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   //    return result;
   //  }
 
+  @Deprecated
   private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol, ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels, ArrayList<String> rowLabels) {
     String result = "<xml>\n";
     int rowCount = 0;
