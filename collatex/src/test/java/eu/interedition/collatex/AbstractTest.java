@@ -47,7 +47,7 @@ public abstract class AbstractTest {
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
   protected static GraphFactory graphFactory;
-  protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+  protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator());
   private Transaction transaction;
 
   @BeforeClass

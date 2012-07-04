@@ -39,6 +39,14 @@ public class MatchTableTest extends AbstractTest {
   }
   
   @Test
+  public void testTableCreationVariationDoesNotCauseExtraColumns() {
+    SimpleWitness[] witnesses = createWitnesses("a", "b", "c", "d");
+    VariantGraph graph = collate(witnesses[0], witnesses[1], witnesses[2]);
+    MatchTable table = MatchTable.create(graph, witnesses[3]);
+    assertEquals(1, table.columnList().size());
+  }
+  
+  @Test
   public void testTableCreationAbAcAbc() {
     SimpleWitness[] witnesses = createWitnesses("a b", "a c", "a b c");
     VariantGraph graph = collate(witnesses[0], witnesses[1]);

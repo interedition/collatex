@@ -29,15 +29,16 @@ public class MatchTableLinkerTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9, textDMD1);
 
     VariantGraph graph = collate(witnesses[0], witnesses[1]);
-    
+
     MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraphVertex> linkedTokens = linker.link(graph, witnesses[2], new EqualityTokenComparator());
-    
+
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
+    System.out.println(tokensAsString);
     assertTrue(tokensAsString.contains("C:0:'over'"));
     assertTrue(tokensAsString.contains("C:1:'de'"));
     assertTrue(tokensAsString.contains("C:2:'atlantische'"));

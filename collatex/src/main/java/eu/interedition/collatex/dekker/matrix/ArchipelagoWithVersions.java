@@ -1,6 +1,5 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import java.awt.geom.Line2D;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,18 +70,22 @@ public class ArchipelagoWithVersions extends Archipelago {
 
       } else if (islands.size() > 1) {
         Set<Island> competingIslands = getCompetingIslands(islands, archipelago);
-
-        Multimap<Double, Island> distanceMap = makeDistanceMap(competingIslands, archipelago);
-        //          LOG.info("distanceMap = {}", distanceMap);
-
-        for (Double d : shortestToLongestDistances(distanceMap)) {
-          // TODO: find a better way to determine the best choice of island
-          for (Island ci : distanceMap.get(d)) {
-            if (islandIsPossible(ci, fixedIslandCoordinates)) {
-              fixedIslandCoordinates = addIslandToResult(ci, fixedIslandCoordinates, archipelago);
-            }
+        Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
+        Set<Island> otherCompetingIslands = Sets.newHashSet();
+        for (Island island : competingIslands) {
+          Coordinate leftEnd = island.getLeftEnd();
+          if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+            competingIslandsOnIdealLine.add(island);
+          } else {
+            otherCompetingIslands.add(island);
           }
+
         }
+        Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
+        fixedIslandCoordinates = addBestOfCompeting(archipelago, fixedIslandCoordinates, distanceMap1);
+
+        Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
+        fixedIslandCoordinates = addBestOfCompeting(archipelago, fixedIslandCoordinates, distanceMap2);
 
         for (Island i : getNonCompetingIslands(islands, competingIslands)) {
           fixedIslandCoordinates = addIslandToResult(i, fixedIslandCoordinates, archipelago);
@@ -91,6 +94,19 @@ public class ArchipelagoWithVersions extends Archipelago {
     }
     //    }
     return archipelago;
+  }
+
+  private Map<Integer, Integer> addBestOfCompeting(Archipelago archipelago, Map<Integer, Integer> fixedIslandCoordinates, Multimap<Double, Island> distanceMap1) {
+    List<Double> shortestToLongestDistances = shortestToLongestDistances(distanceMap1);
+    for (Double d : shortestToLongestDistances) {
+      // TODO: find a better way to determine the best choice of island
+      for (Island ci : distanceMap1.get(d)) {
+        if (islandIsPossible(ci, fixedIslandCoordinates)) {
+          fixedIslandCoordinates = addIslandToResult(ci, fixedIslandCoordinates, archipelago);
+        }
+      }
+    }
+    return fixedIslandCoordinates;
   }
 
   private Multimap<Double, Island> makeDistanceMap(Set<Island> competingIslands, Archipelago archipelago) {
@@ -151,15 +167,15 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private Map<Integer, Integer> addIslandToResult(Island isl, Map<Integer, Integer> fixedIslandCoordinates, Archipelago result) {
-    if (islandIsNoOutlier(result, isl)) {
-      LOG.info("adding island: '{}'", isl);
-      result.add(isl);
-      return fixIslandCoordinates(isl, fixedIslandCoordinates);
-
-    } else {
-      LOG.info("island: '{}' is an outlier, not added", isl);
-      return fixedIslandCoordinates;
-    }
+    //    if (islandIsNoOutlier(result, isl)) {
+    //      LOG.info("adding island: '{}'", isl);
+    result.add(isl);
+    return fixIslandCoordinates(isl, fixedIslandCoordinates);
+    //
+    //    } else {
+    //      LOG.info("island: '{}' is an outlier, not added", isl);
+    //      return fixedIslandCoordinates;
+    //    }
   }
 
   private Map<Integer, Integer> fixIslandCoordinates(Island isl, Map<Integer, Integer> fixedIslandCoordinates) {
@@ -180,43 +196,50 @@ public class ArchipelagoWithVersions extends Archipelago {
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {
     if (isl.size() > 1) {
       // must limit on size, so not all islands will be outliers
+      // TODO find the right size to limit on.
       return true;
 
     } else {
-      //      ArrayList<Island> iterator = a.iterator();
-      //      for (Island island : iterator) {
-      //        if (islandsAreOnTheSameVector(island, isl)) return true;
-      //      }
       Coordinate leftEnd = isl.getLeftEnd();
       return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
     }
+
+    //    if (a.size() == 0) return true;
+    //    Coordinate leftEnd = isl.getLeftEnd();
+    //    int v = leftEnd.row - leftEnd.column;
+    //    Set<Integer> islandVectors = a.getIslandVectors();
+    //    int minimumDistanceToExistingVectors = 10000;
+    //    for (Integer iv : islandVectors) {
+    //      minimumDistanceToExistingVectors = Math.min(minimumDistanceToExistingVectors, Math.abs(v - iv));
+    //    }
+    //    return minimumDistanceToExistingVectors <= isl.size();
   }
 
-  private boolean islandsAreOnTheSameVector(Island island, Island isl) {
-    Coordinate leftEnd = island.getLeftEnd();
-    double x1 = leftEnd.row;
-    double y1 = leftEnd.column;
-
-    Coordinate rightEnd = island.getRightEnd();
-    double x2 = rightEnd.row;
-    double y2 = rightEnd.column;
-
-    Coordinate leftEndToMatch = isl.getLeftEnd();
-    double px = leftEndToMatch.row;
-    double py = leftEndToMatch.column;
-    double ptLineDistSq = Line2D.ptLineDistSq(x1, y1, x2, y2, px, py);
-    return ptLineDistSq == 0.0;
-  }
-
-  private double deviation(Archipelago archipelago, Island isl) {
-    if (archipelago.size() == 0) return 0;
-
-    double smallestDistance = archipelago.smallestDistance(isl);
-    int islandSize = isl.size();
-    double deviation = smallestDistance / islandSize;
-    LOG.info("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
-    return deviation;
-  }
+  //  private boolean islandsAreOnTheSameVector(Island island, Island isl) {
+  //    Coordinate leftEnd = island.getLeftEnd();
+  //    double x1 = leftEnd.row;
+  //    double y1 = leftEnd.column;
+  //
+  //    Coordinate rightEnd = island.getRightEnd();
+  //    double x2 = rightEnd.row;
+  //    double y2 = rightEnd.column;
+  //
+  //    Coordinate leftEndToMatch = isl.getLeftEnd();
+  //    double px = leftEndToMatch.row;
+  //    double py = leftEndToMatch.column;
+  //    double ptLineDistSq = Line2D.ptLineDistSq(x1, y1, x2, y2, px, py);
+  //    return ptLineDistSq == 0.0;
+  //  }
+  //
+  //  private double deviation(Archipelago archipelago, Island isl) {
+  //    if (archipelago.size() == 0) return 0;
+  //
+  //    double smallestDistance = archipelago.smallestDistance(isl);
+  //    int islandSize = isl.size();
+  //    double deviation = smallestDistance / islandSize;
+  //    LOG.info("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
+  //    return deviation;
+  //  }
 
   // these methods are only used in tests. remove?
   //  private Integer[] isl2;
@@ -233,9 +256,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     //    }
 
     nonConflVersions = new ArrayList<Archipelago>();
-    //    int tel = 0;
     for (Island island : getIslands()) {
-      //      tel++;
       //      if(tel>22)
       debug = false;
       //        System.out.println("nonConflVersions.size(): "+nonConflVersions.size());
@@ -356,177 +377,6 @@ public class ArchipelagoWithVersions extends Archipelago {
       }
     }
     nonConflVersions.add(version);
-  }
-
-  //  public Archipelago createFirstVersion1() {
-  //    Archipelago result = new Archipelago();
-  //    for (Island isl : getIslands()) {
-  //      int i = 0;
-  //      int res_size = result.size();
-  //      boolean confl = false;
-  //      for (i = 0; i < res_size; i++) {
-  //        if (result.get(i).isCompetitor(isl)) {
-  //          confl = true;
-  //          //          System.out.println("confl: "+isl+" with: "+i+" : "+result.get(i));
-  //          break;
-  //        }
-  //      }
-  //      if (!confl)
-  //        result.add(isl);
-  //      else {
-  //        Island island1 = result.get(i);
-  //        if (island1.size() <= isl.size()) {
-  //          double tot_d_1 = 0.0;
-  //          double tot_d_2 = 0.0;
-  //          for (int j = 0; j < i; j++) {
-  //            Island island2 = result.get(j);
-  //            tot_d_1 += distance(island2, island1);
-  //            tot_d_2 += distance(island2, isl);
-  //          }
-  //          System.out.println("tot_d_1: " + tot_d_1);
-  //          System.out.println("tot_d_2: " + tot_d_2);
-  //          if (tot_d_2 < tot_d_1) {
-  //            result.remove(i);
-  //            result.add(isl);
-  //          }
-  //        }
-  //      }
-  //    }
-  //    return result;
-  //  }
-
-  @Deprecated
-  private String doeiets(PrintWriter output, ArrayList<Integer[]> listOrderedByCol, ArrayList<Integer[]> listOrderedByRow, ArrayList<String> columnLabels, ArrayList<String> rowLabels) {
-    String result = "<xml>\n";
-    int rowCount = 0;
-    int colCount = 0;
-    int lastCol = -1;
-    int lastRow = -1;
-    //    boolean sprong = false;
-    boolean finished = false;
-
-    while (!finished) {
-      System.out.println("col: " + colCount + " (" + drukAfArray(listOrderedByCol.get(colCount)) + ") - row: " + rowCount + " (" + drukAfArray(listOrderedByRow.get(rowCount)) + ")");
-      String lem = "";
-      String rdg = "";
-      if (colCount > lastCol) {
-        int a = -1;
-        try {
-          a = listOrderedByCol.get(lastCol)[3];
-        } catch (ArrayIndexOutOfBoundsException excep) {}
-        int b = listOrderedByCol.get(colCount)[1];
-        if ((b - a) > 1) lem = getTekst(columnLabels, (a + 1), (b - 1));
-        lastCol = colCount;
-      }
-      if (rowCount > lastRow) {
-        int a = -1;
-        try {
-          a = listOrderedByRow.get(lastRow)[4];
-        } catch (ArrayIndexOutOfBoundsException excep) {}
-        int b = listOrderedByRow.get(rowCount)[2];
-        if ((b - a) > 1) rdg = getTekst(rowLabels, (a + 1), (b - 1));
-        lastRow = rowCount;
-      }
-
-      String app = printApp(output, lem, rdg);
-      result += app;
-      System.out.println(app);
-
-      int colIslNo = listOrderedByCol.get(colCount)[0];
-      int rowIslNo = listOrderedByRow.get(rowCount)[0];
-      if (colIslNo == rowIslNo) {
-        String tekst = getTekst(columnLabels, listOrderedByCol.get(colCount)[1], listOrderedByCol.get(colCount)[3]);
-        result += tekst;
-        System.out.println(tekst);
-        output.println(tekst);
-        rowCount++;
-        colCount++;
-      } else if (colIslNo > rowIslNo) {
-        String message = "<!-- er is iets mis -->";
-        output.println(message);
-        result += message + "\n";
-        System.out.println("!!! colIslNo (" + colIslNo + ") > rowIslNo (" + rowIslNo + ")");
-        lem = "";
-        rdg = "";
-        if (listOrderedByCol.get(colCount + 1)[0] < colIslNo) {
-          lem = getTekst(columnLabels, listOrderedByCol.get(colCount)[1], listOrderedByCol.get(colCount)[3]);
-          rdg = "[VERPLAATST" + colIslNo + "]";
-          colCount++;
-        } else {
-          lem = "[VERPLAATST" + rowIslNo + "]";
-          rdg = getTekst(rowLabels, listOrderedByRow.get(rowCount)[2], listOrderedByRow.get(rowCount)[4]);
-          rowCount++;
-        }
-        app = printApp(output, lem, rdg);
-        result += app;
-        System.out.println(app);
-      } else if (colIslNo < rowIslNo) {
-        //        System.out.println("colIslNo (" +colIslNo + ") < rowIslNo ("+ rowIslNo + ")");
-        lem = "";
-        rdg = "";
-        if (listOrderedByRow.get(rowCount + 1)[0] < rowIslNo) {
-          lem = "[VERPLAATST" + rowIslNo + "]";
-          rdg = getTekst(rowLabels, listOrderedByRow.get(rowCount)[2], listOrderedByRow.get(rowCount)[4]);
-          rowCount++;
-        } else {
-          lem = getTekst(columnLabels, listOrderedByCol.get(colCount)[1], listOrderedByCol.get(colCount)[3]);
-          rdg = "[VERPLAATST" + colIslNo + "]";
-          colCount++;
-        }
-        app = printApp(output, lem, rdg);
-        result += app;
-        System.out.println(app);
-      }
-      //      for(Integer[] a : listOrderedByCol) {
-      //        if((a[0]-lastCol)>1)
-      //          sprong  = true;
-      //        if(!sprong)
-      //          while(listOrderedByRow.get(rowCount)[0]<a[0]) {
-      //            rowCount++;
-      //          }
-      //        else {
-      //          String lem = "";
-      //          for(int i=a[1];i<=a[3];i++)
-      //            lem += " " + columnLabels.get(i);
-      //          result += printApp(output,lem,"[VERPLAATST?"+a[0]+"]");
-      //          sprong = false;
-      //        }
-      //      }
-      if (rowCount >= listOrderedByRow.size() || colCount >= listOrderedByCol.size()) finished = true;
-    }
-    output.println("</xml>");
-    output.flush();
-    return result + "</xml>";
-  }
-
-  private String drukAfArray(Integer[] integers) {
-    String result = "[";
-    for (Integer i : integers) {
-      result += "," + i;
-    }
-    return result.replace("[,", "[") + "]";
-  }
-
-  private String getTekst(ArrayList<String> rowLabels, Integer start, Integer einde) {
-    String result = "";
-    for (int i = start; i <= einde; i++) {
-      result += " " + rowLabels.get(i);
-    }
-    return result.trim();
-  }
-
-  private String printApp(PrintWriter output, String lem, String rdg) {
-    String result = "";
-    if (!(lem.isEmpty() && rdg.isEmpty())) {
-      if (lem.isEmpty()) lem = "[WEGGELATEN]";
-      if (rdg.isEmpty()) rdg = "[WEGGELATEN]";
-      result += "  <app>" + newLine;
-      result += "    <lem>" + lem.trim() + "</lem>" + newLine;
-      result += "    <rdg>" + rdg.trim() + "</rdg>" + newLine;
-      result += "  </app>" + newLine;
-      output.print(result);
-    }
-    return result;
   }
 
 }
