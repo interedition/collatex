@@ -199,7 +199,7 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
 
   @Override
   public String toString() {
-    return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
+    return MessageFormat.format("Island ({0}-{1}) size: {2} direction: {3}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size(), direction());
     //      return Iterables.toString(islandCoordinates);
   }
 

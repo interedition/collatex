@@ -1,7 +1,9 @@
 package eu.interedition.collatex.dekker.matrix;
 
+import java.awt.geom.Line2D;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     * that Archipelago will have a high value if it contains the largest
     * possible islands
     */
-  public Archipelago createNonConflictingVersion(Archipelago result) {
+  public Archipelago createNonConflictingVersion(Archipelago archipelago) {
     Map<Integer, Integer> fixedIslandCoordinates = Maps.newHashMap();
     Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
     for (Island isl : getIslands()) {
@@ -61,37 +63,42 @@ public class ArchipelagoWithVersions extends Archipelago {
     Collections.sort(keySet);
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
-      if (islandSize > 0) { // limitation to prevent false transpositions
-        List<Island> islands = possibleIslands(fixedIslandCoordinates, islandMultimap, islandSize);
+      //      if (islandSize > 0) { // limitation to prevent false transpositions
+      List<Island> islands = possibleIslands(islandMultimap.get(islandSize), fixedIslandCoordinates);
 
-        if (islands.size() == 1) {
-          fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, islands.get(0));
+      if (islands.size() == 1) {
+        fixedIslandCoordinates = addIslandToResult(islands.get(0), fixedIslandCoordinates, archipelago);
 
-        } else if (islands.size() > 1) {
-          Set<Island> competingIslands = getCompetingIslands(result, islands);
+      } else if (islands.size() > 1) {
+        Set<Island> competingIslands = getCompetingIslands(islands, archipelago);
 
-          Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
-          for (Island isl : competingIslands) {
-            distanceMap.put(result.smallestDistance(isl), isl);
-          }
-          //          LOG.info("distanceMap = {}", distanceMap);
+        Multimap<Double, Island> distanceMap = makeDistanceMap(competingIslands, archipelago);
+        //          LOG.info("distanceMap = {}", distanceMap);
 
-          for (Double d : shortestToLongestDistances(distanceMap)) {
-            // TODO: find a better way to determine the best choice of island
-            for (Island ci : distanceMap.get(d)) {
-              if (islandIsPossible(ci, fixedIslandCoordinates)) {
-                fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, ci);
-              }
+        for (Double d : shortestToLongestDistances(distanceMap)) {
+          // TODO: find a better way to determine the best choice of island
+          for (Island ci : distanceMap.get(d)) {
+            if (islandIsPossible(ci, fixedIslandCoordinates)) {
+              fixedIslandCoordinates = addIslandToResult(ci, fixedIslandCoordinates, archipelago);
             }
           }
+        }
 
-          for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-            fixedIslandCoordinates = addIslandToResult(fixedIslandCoordinates, result, i);
-          }
+        for (Island i : getNonCompetingIslands(islands, competingIslands)) {
+          fixedIslandCoordinates = addIslandToResult(i, fixedIslandCoordinates, archipelago);
         }
       }
     }
-    return result;
+    //    }
+    return archipelago;
+  }
+
+  private Multimap<Double, Island> makeDistanceMap(Set<Island> competingIslands, Archipelago archipelago) {
+    Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
+    for (Island isl : competingIslands) {
+      distanceMap.put(archipelago.smallestDistance(isl), isl);
+    }
+    return distanceMap;
   }
 
   public Archipelago createNonConflictingVersion() {
@@ -118,7 +125,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     return nonCompetingIslands;
   }
 
-  private Set<Island> getCompetingIslands(Archipelago result, List<Island> islands) {
+  private Set<Island> getCompetingIslands(List<Island> islands, Archipelago result) {
     Set<Island> competingIslands = Sets.newHashSet();
     for (int i = 0; i < islands.size(); i++) {
       Island i1 = islands.get(i);
@@ -133,9 +140,9 @@ public class ArchipelagoWithVersions extends Archipelago {
     return competingIslands;
   }
 
-  private List<Island> possibleIslands(Map<Integer, Integer> fixedIslandCoordinates, Multimap<Integer, Island> islandMultimap, Integer size) {
+  private List<Island> possibleIslands(Collection<Island> islandsOfSize, Map<Integer, Integer> fixedIslandCoordinates) {
     List<Island> islands = Lists.newArrayList();
-    for (Island island : islandMultimap.get(size)) {
+    for (Island island : islandsOfSize) {
       if (islandIsPossible(island, fixedIslandCoordinates)) {
         islands.add(island);
       }
@@ -143,10 +150,16 @@ public class ArchipelagoWithVersions extends Archipelago {
     return islands;
   }
 
-  private Map<Integer, Integer> addIslandToResult(Map<Integer, Integer> fixedIslandCoordinates, Archipelago result, Island isl) {
-    //    LOG.info("adding island: '{}'", isl);
-    result.add(isl);
-    return fixIslandCoordinates(isl, fixedIslandCoordinates);
+  private Map<Integer, Integer> addIslandToResult(Island isl, Map<Integer, Integer> fixedIslandCoordinates, Archipelago result) {
+    if (islandIsNoOutlier(result, isl)) {
+      LOG.info("adding island: '{}'", isl);
+      result.add(isl);
+      return fixIslandCoordinates(isl, fixedIslandCoordinates);
+
+    } else {
+      LOG.info("island: '{}' is an outlier, not added", isl);
+      return fixedIslandCoordinates;
+    }
   }
 
   private Map<Integer, Integer> fixIslandCoordinates(Island isl, Map<Integer, Integer> fixedIslandCoordinates) {
@@ -157,16 +170,28 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private boolean islandIsPossible(Island island, Map<Integer, Integer> fixedIslandCoordinates) {
-    boolean possible = true;
     for (Coordinate coordinates : island) {
       if (fixedIslandCoordinates.containsKey(coordinates.row) || //
           fixedIslandCoordinates.containsValue(coordinates.column)) return false;
     }
-    return possible;
+    return true;
   }
 
   private boolean islandIsNoOutlier(Archipelago result, Island isl) {
-    return deviation(result, isl) < 10;
+    if (isl.size() > 0) {
+      return true;
+    } else {
+      Coordinate leftEnd = isl.getLeftEnd();
+      double y2 = 0;
+      double x2 = 0;
+      double y1 = 1;
+      double x1 = 1;
+      double px = leftEnd.row;
+      double py = leftEnd.column;
+      double ptLineDistSq = Line2D.ptLineDistSq(x1, y1, x2, y2, px, py);
+      return ptLineDistSq == 0.0;
+    }
+    //    return deviation(result, isl) < 10;
   }
 
   private double deviation(Archipelago archipelago, Island isl) {
@@ -194,9 +219,9 @@ public class ArchipelagoWithVersions extends Archipelago {
     //    }
 
     nonConflVersions = new ArrayList<Archipelago>();
-    int tel = 0;
+    //    int tel = 0;
     for (Island island : getIslands()) {
-      tel++;
+      //      tel++;
       //      if(tel>22)
       debug = false;
       //        System.out.println("nonConflVersions.size(): "+nonConflVersions.size());
@@ -299,6 +324,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     }
   }
 
+  @Deprecated
   public String createXML(MatchMatrix mat, PrintWriter output) {
     String result = "";
     ArrayList<String> columnLabels = mat.columnLabels();
