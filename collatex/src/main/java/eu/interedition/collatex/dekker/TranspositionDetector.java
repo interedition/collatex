@@ -19,55 +19,93 @@
  */
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.Collections;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.graph.VariantGraph;
 
 public class TranspositionDetector {
 
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
+  private static final int MAX_RELATIVE_RANKDIFF = 2;
 
-  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
+  public Tuple<List<List<Match>>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     //rank the variant graph
     base.rank();
 
     // gather matched ranks into a list ordered by their natural order
-    final List<Integer> ranks = Lists.newArrayList();
+    final List<Integer> matchingBaseRanks = Lists.newArrayList();
+    final List<Integer> expandedWitnessMatchRanks = Lists.newArrayList();
     for (List<Match> phraseMatch : phraseMatches) {
-      ranks.add(phraseMatch.get(0).vertex.getRank());
+      matchingBaseRanks.add(phraseMatchRank(phraseMatch));
+      for (Match match : phraseMatch) {
+        expandedWitnessMatchRanks.add(match.vertex.getRank());
+      }
     }
-    Collections.sort(ranks);
+    LOG.info("witnessRanks={}", matchingBaseRanks);
+    Collections.sort(matchingBaseRanks);
+    List<Integer> expandedMatchingBaseRanks = Lists.newArrayList(expandedWitnessMatchRanks);
+    Collections.sort(expandedMatchingBaseRanks);
+    LOG.info("matching base ranks={}", matchingBaseRanks);
+    LOG.info("expanded baseRanks={}", expandedMatchingBaseRanks);
+    LOG.info("expanded witnessRanks={}", expandedWitnessMatchRanks);
 
     // detect transpositions
     final List<List<Match>> transpositions = Lists.newArrayList();
-    int previousRank = 0;
+    final List<List<Match>> rejectedTranspositions = Lists.newArrayList();
+    int baseRankIndex = 0;
     Tuple<Integer> previous = new Tuple<Integer>(0, 0);
-    
+
     for (List<Match> phraseMatch : phraseMatches) {
-      VariantGraphVertex baseToken = phraseMatch.get(0).vertex;
-      int rank = baseToken.getRank();
-      int expectedRank = ranks.get(previousRank);
+      int rank = phraseMatchRank(phraseMatch);
+      int expectedRank = matchingBaseRanks.get(baseRankIndex);
       Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
+      LOG.info("expectedRank={}, rank={}", expectedRank, rank);
       if (expectedRank != rank && !isMirrored(previous, current)) {
-        transpositions.add(phraseMatch);
+        int diff = Math.abs(expandedMatchingBaseRanks.indexOf(rank) - expandedWitnessMatchRanks.indexOf(rank));
+        int relDiff = diff / phraseMatch.size();
+        LOG.info("base rank: {}, witness rank: {}, rank diff: {} (relativeDiff={}) for {} (size {})", new Object[] { expectedRank, rank, diff, relDiff, phraseMatch, phraseMatch.size() });
+        if (relDiff < MAX_RELATIVE_RANKDIFF) {
+          LOG.info("!! accepted transposition !!");
+          transpositions.add(phraseMatch);
+        } else {
+          LOG.info("!! rejected transposition !!");
+          rejectedTranspositions.add(phraseMatch);
+          matchingBaseRanks.remove(Integer.valueOf(rank));
+          for (int i = rank; i < rank + phraseMatch.size(); i++) {
+            expandedMatchingBaseRanks.remove(Integer.valueOf(i));
+            expandedWitnessMatchRanks.remove(Integer.valueOf(i));
+          }
+          LOG.info("ranks={}", matchingBaseRanks);
+          LOG.info("expanded baseRanks={}", expandedMatchingBaseRanks);
+          LOG.info("expanded witnessRanks={}", expandedWitnessMatchRanks);
+        }
       }
-      previousRank ++;
+      baseRankIndex++;
       previous = current;
     }
     if (LOG.isTraceEnabled()) {
       for (List<Match> transposition : transpositions) {
         LOG.trace("Detected transposition: {}", Iterables.toString(transposition));
       }
+      for (List<Match> transposition : rejectedTranspositions) {
+        LOG.trace("Rejected transposition: {}", Iterables.toString(transposition));
+      }
     }
-    return transpositions;
+    return new Tuple<List<List<Match>>>(transpositions, rejectedTranspositions);
   }
 
-  private boolean isMirrored(Tuple previousTuple, Tuple tuple) { 
+  private int phraseMatchRank(List<Match> phraseMatch) {
+    return phraseMatch.get(0).vertex.getRank();
+  }
+
+  private boolean isMirrored(Tuple previousTuple, Tuple tuple) {
     return previousTuple.left.equals(tuple.right) && previousTuple.right.equals(tuple.left);
   }
 }
