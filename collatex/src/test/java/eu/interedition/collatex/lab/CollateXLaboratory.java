@@ -56,9 +56,6 @@ public class CollateXLaboratory extends JFrame {
   private final VariantGraphModel variantGraphModel = new VariantGraphModel();
   private final VariantGraphPanel variantGraphPanel;
 
-  private final EditGraphModel editGraphModel = new EditGraphModel();
-  private final EditGraphPanel editGraphPanel;
-
   private final JTable matchMatrixTable = new JTable();
 
   private final SuffixTreePanel suffixTreePanel;
@@ -77,7 +74,6 @@ public class CollateXLaboratory extends JFrame {
 
     this.tabbedPane = new JTabbedPane();
     this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(variantGraphModel));
-    this.tabbedPane.addTab("Edit Graph", editGraphPanel = new EditGraphPanel(editGraphModel));
     this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
     this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -98,7 +94,6 @@ public class CollateXLaboratory extends JFrame {
     toolBar.add(new AddWitnessAction());
     toolBar.add(new RemoveWitnessesAction());
     toolBar.add(new CollateAction());
-    toolBar.add(new TokenLinkAction());
     toolBar.add(new SuffixTreeAction());
     toolBar.add(new MatchMatrixAction());
     add(toolBar, BorderLayout.NORTH);
@@ -174,38 +169,6 @@ public class CollateXLaboratory extends JFrame {
     }
   }
 
-  private class TokenLinkAction extends AbstractAction {
-
-    private TokenLinkAction() {
-      super("Link");
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      final List<SimpleWitness> w = witnessPanel.getWitnesses();
-
-      if (w.size() < 2) {
-        return;
-      }
-
-      final Transaction transaction = graphFactory.getDatabase().beginTx();
-      try {
-        final EqualityTokenComparator comparator = new EqualityTokenComparator();
-        final VariantGraph pvg = graphFactory.newVariantGraph();
-
-        CollationAlgorithmFactory.dekker(comparator).collate(pvg, w.get(0));
-
-        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, w.get(1), comparator));
-      } finally {
-        transaction.finish();
-      }
-
-      editGraphPanel.getModel().setGraphLayout(new SugiyamaLayout(editGraphModel));
-      tabbedPane.setSelectedIndex(1);
-    }
-  }
-
   private class SuffixTreeAction extends AbstractAction {
 
     private SuffixTreeAction() {
@@ -222,7 +185,7 @@ public class CollateXLaboratory extends JFrame {
       }
 
       final SimpleWitness witness = w.get(0);
-      tabbedPane.setSelectedIndex(2);
+      tabbedPane.setSelectedIndex(1);
       final SuffixTreeModel treeModel = new SuffixTreeModel(SuffixTree.create(witness, new EqualityTokenComparator()));
       suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
     }
@@ -263,7 +226,7 @@ public class CollateXLaboratory extends JFrame {
           columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
         }
 
-        tabbedPane.setSelectedIndex(3);
+        tabbedPane.setSelectedIndex(2);
       } finally {
         transaction.finish();
       }
