@@ -49,7 +49,7 @@ public class MatchTable {
     // step 1: build the MatchTable
     MatchTable table = createEmptyTable(graph, witness);
     // step 2: do the matching and fill the table
-    fillTableWithMatches(graph, witness, table, comparator);
+    table.fillTableWithMatches(graph, witness, comparator);
     return table;
   }
 
@@ -73,21 +73,16 @@ public class MatchTable {
     return new MatchTable(witness, set);
   }
 
-  // remove static; move parameters into fields
-  private static void fillTableWithMatches(VariantGraph graph, Iterable<Token> witness, MatchTable table, Comparator<Token> comparator) {
+  // move parameters into fields?
+  private void fillTableWithMatches(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
     Matches matches = Matches.between(graph.vertices(), witness, comparator);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
     for (Token t : witness) {
-      List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
-      //TODO: dit kan simpeler! zie de duplicatie
-      if (unique.contains(t)) {
-        table.set(t, matchingVertices.get(0).getRank() - 1, matchingVertices.get(0));
-      } else {
-        if (ambiguous.contains(t)) {
-          for (VariantGraphVertex vgv : matchingVertices) {
-            table.set(t, vgv.getRank() - 1, vgv);
-          }
+      if (unique.contains(t) || ambiguous.contains(t)) {
+        List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
+	for (VariantGraphVertex vgv : matchingVertices) {
+	  set(t, vgv.getRank() - 1, vgv);
         }
       }
     }
@@ -155,5 +150,4 @@ public class MatchTable {
     }
     return pairs;
   }
-
 }
