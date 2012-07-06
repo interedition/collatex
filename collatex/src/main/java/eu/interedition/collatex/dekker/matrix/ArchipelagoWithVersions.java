@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,22 +12,26 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
+import eu.interedition.collatex.graph.VariantGraphVertex;
 
 public class ArchipelagoWithVersions extends Archipelago {
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
   private ArrayList<Archipelago> nonConflVersions;
+  private final MatchTable table;
+  Set<Integer> fixedRows = Sets.newHashSet();
+  Set<VariantGraphVertex> fixedVertices = Sets.newHashSet();
 
-  public ArchipelagoWithVersions() {
+  public ArchipelagoWithVersions(MatchTable table) {
+    this.table = table;
     setIslands(new ArrayList<Island>());
     nonConflVersions = new ArrayList<Archipelago>();
   }
 
-  public ArchipelagoWithVersions(Island isl) {
-    setIslands(new ArrayList<Island>());
-    nonConflVersions = new ArrayList<Archipelago>();
+  public ArchipelagoWithVersions(Island isl, MatchTable table) {
+    this(table);
     add(isl);
   }
 
@@ -39,7 +42,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   @Override
   public ArchipelagoWithVersions copy() {
-    ArchipelagoWithVersions result = new ArchipelagoWithVersions();
+    ArchipelagoWithVersions result = new ArchipelagoWithVersions(this.table);
     for (Island isl : getIslands()) {
       result.add(new Island(isl));
     }
@@ -53,7 +56,8 @@ public class ArchipelagoWithVersions extends Archipelago {
     * possible islands
     */
   public Archipelago createNonConflictingVersion(Archipelago archipelago) {
-    Map<Integer, Integer> fixedIslandCoordinates = Maps.newHashMap();
+    fixedRows = Sets.newHashSet();
+    fixedVertices = Sets.newHashSet();
     Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
     for (Island isl : getIslands()) {
       islandMultimap.put(isl.size(), isl);
@@ -63,10 +67,10 @@ public class ArchipelagoWithVersions extends Archipelago {
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
       //      if (islandSize > 0) { // limitation to prevent false transpositions
-      List<Island> islands = possibleIslands(islandMultimap.get(islandSize), fixedIslandCoordinates);
+      List<Island> islands = possibleIslands(islandMultimap.get(islandSize));
 
       if (islands.size() == 1) {
-        fixedIslandCoordinates = addIslandToResult(islands.get(0), fixedIslandCoordinates, archipelago);
+        addIslandToResult(islands.get(0), archipelago);
 
       } else if (islands.size() > 1) {
         Set<Island> competingIslands = getCompetingIslands(islands, archipelago);
@@ -82,13 +86,13 @@ public class ArchipelagoWithVersions extends Archipelago {
 
         }
         Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
-        fixedIslandCoordinates = addBestOfCompeting(archipelago, fixedIslandCoordinates, distanceMap1);
+        addBestOfCompeting(archipelago, distanceMap1);
 
         Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
-        fixedIslandCoordinates = addBestOfCompeting(archipelago, fixedIslandCoordinates, distanceMap2);
+        addBestOfCompeting(archipelago, distanceMap2);
 
         for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-          fixedIslandCoordinates = addIslandToResult(i, fixedIslandCoordinates, archipelago);
+          addIslandToResult(i, archipelago);
         }
       }
     }
@@ -96,17 +100,16 @@ public class ArchipelagoWithVersions extends Archipelago {
     return archipelago;
   }
 
-  private Map<Integer, Integer> addBestOfCompeting(Archipelago archipelago, Map<Integer, Integer> fixedIslandCoordinates, Multimap<Double, Island> distanceMap1) {
+  private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
     List<Double> shortestToLongestDistances = shortestToLongestDistances(distanceMap1);
     for (Double d : shortestToLongestDistances) {
       // TODO: find a better way to determine the best choice of island
       for (Island ci : distanceMap1.get(d)) {
-        if (islandIsPossible(ci, fixedIslandCoordinates)) {
-          fixedIslandCoordinates = addIslandToResult(ci, fixedIslandCoordinates, archipelago);
+        if (islandIsPossible(ci)) {
+          addIslandToResult(ci, archipelago);
         }
       }
     }
-    return fixedIslandCoordinates;
   }
 
   private Multimap<Double, Island> makeDistanceMap(Set<Island> competingIslands, Archipelago archipelago) {
@@ -156,21 +159,29 @@ public class ArchipelagoWithVersions extends Archipelago {
     return competingIslands;
   }
 
-  private List<Island> possibleIslands(Collection<Island> islandsOfSize, Map<Integer, Integer> fixedIslandCoordinates) {
+  @Override
+  public boolean islandsCompete(Island i1, Island i2) {
+    return false;
+  };
+
+  private List<Island> possibleIslands(Collection<Island> islandsOfSize) {
     List<Island> islands = Lists.newArrayList();
     for (Island island : islandsOfSize) {
-      if (islandIsPossible(island, fixedIslandCoordinates)) {
+      if (islandIsPossible(island)) {
         islands.add(island);
       }
     }
     return islands;
   }
 
-  private Map<Integer, Integer> addIslandToResult(Island isl, Map<Integer, Integer> fixedIslandCoordinates, Archipelago result) {
+  private void addIslandToResult(Island isl, Archipelago result) {
     //    if (islandIsNoOutlier(result, isl)) {
     //      LOG.info("adding island: '{}'", isl);
     result.add(isl);
-    return fixIslandCoordinates(isl, fixedIslandCoordinates);
+    for (Coordinate coordinate : isl) {
+      fixedRows.add(coordinate.row);
+      fixedVertices.add(table.at(coordinate.row, coordinate.column));
+    }
     //
     //    } else {
     //      LOG.info("island: '{}' is an outlier, not added", isl);
@@ -178,42 +189,35 @@ public class ArchipelagoWithVersions extends Archipelago {
     //    }
   }
 
-  private Map<Integer, Integer> fixIslandCoordinates(Island isl, Map<Integer, Integer> fixedIslandCoordinates) {
-    for (Coordinate coordinates : isl) {
-      fixedIslandCoordinates.put(coordinates.row, coordinates.column);
-    }
-    return fixedIslandCoordinates;
-  }
-
-  private boolean islandIsPossible(Island island, Map<Integer, Integer> fixedIslandCoordinates) {
-    for (Coordinate coordinates : island) {
-      if (fixedIslandCoordinates.containsKey(coordinates.row) || //
-          fixedIslandCoordinates.containsValue(coordinates.column)) return false;
+  private boolean islandIsPossible(Island island) {
+    for (Coordinate coordinate : island) {
+      if (fixedRows.contains(coordinate.row) || //
+          fixedVertices.contains(table.at(coordinate.row, coordinate.column))) return false;
     }
     return true;
   }
 
-  private boolean islandIsNoOutlier(Archipelago a, Island isl) {
-    if (isl.size() > 1) {
-      // must limit on size, so not all islands will be outliers
-      // TODO find the right size to limit on.
-      return true;
-
-    } else {
-      Coordinate leftEnd = isl.getLeftEnd();
-      return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
-    }
-
-    //    if (a.size() == 0) return true;
-    //    Coordinate leftEnd = isl.getLeftEnd();
-    //    int v = leftEnd.row - leftEnd.column;
-    //    Set<Integer> islandVectors = a.getIslandVectors();
-    //    int minimumDistanceToExistingVectors = 10000;
-    //    for (Integer iv : islandVectors) {
-    //      minimumDistanceToExistingVectors = Math.min(minimumDistanceToExistingVectors, Math.abs(v - iv));
-    //    }
-    //    return minimumDistanceToExistingVectors <= isl.size();
-  }
+  //  private boolean islandIsNoOutlier(Archipelago a, Island isl) {
+  //    if (isl.size() > 1) {
+  //      // must limit on size, so not all islands will be outliers
+  //      // TODO find the right size to limit on.
+  //      return true;
+  //
+  //    } else {
+  //      Coordinate leftEnd = isl.getLeftEnd();
+  //      return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
+  //    }
+  //
+  //    //    if (a.size() == 0) return true;
+  //    //    Coordinate leftEnd = isl.getLeftEnd();
+  //    //    int v = leftEnd.row - leftEnd.column;
+  //    //    Set<Integer> islandVectors = a.getIslandVectors();
+  //    //    int minimumDistanceToExistingVectors = 10000;
+  //    //    for (Integer iv : islandVectors) {
+  //    //      minimumDistanceToExistingVectors = Math.min(minimumDistanceToExistingVectors, Math.abs(v - iv));
+  //    //    }
+  //    //    return minimumDistanceToExistingVectors <= isl.size();
+  //  }
 
   //  private boolean islandsAreOnTheSameVector(Island island, Island isl) {
   //    Coordinate leftEnd = island.getLeftEnd();
@@ -339,15 +343,6 @@ public class ArchipelagoWithVersions extends Archipelago {
         }
       }
     }
-    //    int tel_version = 0;
-    //    for(Archipelago arch : nonConflVersions) {
-    //      logging.println("arch version ("+(tel_version++)+"): " + arch);
-    //    }
-    //    tel_version = 0;
-    //    for(Archipelago arch : nonConflVersions) {
-    //      logging.println("version "+(tel_version++)+": " + arch.value());
-    //    }
-    //    logging.close();
   }
 
   public Archipelago getVersion(int i) {

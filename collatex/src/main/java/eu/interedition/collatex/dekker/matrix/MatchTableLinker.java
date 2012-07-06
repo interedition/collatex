@@ -30,7 +30,7 @@ public class MatchTableLinker implements TokenLinker {
 
     LOG.info("create Archipelago data structure");
     // create Archipelago data structure and fill it with all the islands
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(table);
     LOG.info("fill it with all the islands");
     for (Island isl : islands) {
       archipelago.add(isl);

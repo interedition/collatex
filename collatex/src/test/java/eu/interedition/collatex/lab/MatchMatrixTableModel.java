@@ -76,7 +76,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     // detect islands
     Set<Island> islands = matchTable.getIslands();
     // prepare
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
     for (Island isl : islands) {
       archipelago.add(isl);
     }

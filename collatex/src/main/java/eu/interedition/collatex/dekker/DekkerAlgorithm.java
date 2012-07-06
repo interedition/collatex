@@ -82,9 +82,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
 
     LOG.debug("{} + {}: Detect transpositions", graph, witness);
-    Tuple<List<List<Match>>> tuple = transpositionDetector.detect(phraseMatches, graph);
-    List<List<Match>> transpositions = tuple.left;
-    List<List<Match>> rejections = tuple.right;
+    transpositions = transpositionDetector.detect(phraseMatches, graph);
     if (LOG.isTraceEnabled()) {
       for (List<Match> transposition : transpositions) {
         LOG.trace("{} + {}: Transposition: {}", new Object[] { graph, witness, Iterables.toString(transposition) });
@@ -93,12 +91,6 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
     LOG.debug("{} + {}: Determine aligned tokens by filtering transpositions", graph, witness);
     alignments = Maps.newHashMap(tokenLinks);
-
-    for (List<Match> transposedPhrase : rejections) {
-      for (Match match : transposedPhrase) {
-        alignments.remove(match.token);
-      }
-    }
 
     for (List<Match> transposedPhrase : transpositions) {
       for (Match match : transposedPhrase) {
