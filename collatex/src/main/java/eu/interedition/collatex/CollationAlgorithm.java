@@ -1,18 +1,20 @@
 package eu.interedition.collatex;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -66,9 +68,14 @@ public interface CollationAlgorithm {
       }
       into.connect(last, into.getEnd(), witnessSet);
 
+      into.rank();
       LOG.debug("{}: Registering transpositions", into);
       for (Token token : transpositions.keySet()) {
-        into.transpose(transpositions.get(token), witnessTokenVertices.get(token));
+        VariantGraphVertex from = transpositions.get(token);
+        VariantGraphVertex to = witnessTokenVertices.get(token);
+        LOG.info("from={}, rank={}", from, from.getRank());
+        LOG.info("to={}");
+        into.transpose(from, to);
       }
     }
   }
