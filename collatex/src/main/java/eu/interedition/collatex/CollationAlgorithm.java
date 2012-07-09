@@ -73,9 +73,17 @@ public interface CollationAlgorithm {
       for (Token token : transpositions.keySet()) {
         VariantGraphVertex from = transpositions.get(token);
         VariantGraphVertex to = witnessTokenVertices.get(token);
-        LOG.info("from={}, rank={}", from, from.getRank());
-        LOG.info("to={}");
-        into.transpose(from, to);
+        int fromRank = from.getRank();
+        //        LOG.info("from={}, rank={}", from, fromRank);
+        int toRank = to.getRank();
+        //        LOG.info("to={}, rank={}", to, toRank);
+        int diff = Math.abs(toRank - fromRank);
+        LOG.info("diff={}, from={}, to={}", new Object[] { diff, from, to });
+
+        boolean acceptTransposition = diff < 5;
+        if (acceptTransposition) {
+          into.transpose(from, to);
+        }
       }
     }
   }
