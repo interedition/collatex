@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
@@ -29,6 +31,7 @@ public interface CollationAlgorithm {
 
   abstract class Base implements CollationAlgorithm {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    private Map<Token, VariantGraphVertex> witnessTokenVertices;
 
     @Override
     public void collate(VariantGraph against, Iterable<Token>... witnesses) {
@@ -43,12 +46,12 @@ public interface CollationAlgorithm {
       }
     }
 
-    protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraphVertex> alignments, Map<Token, VariantGraphVertex> transpositions) {
+    protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraphVertex> alignments) {
       Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
       final Witness witness = Iterables.getFirst(witnessTokens, null).getWitness();
 
       LOG.debug("{} + {}: Merge comparand into graph", into, witness);
-      final Map<Token, VariantGraphVertex> witnessTokenVertices = Maps.newHashMap();
+      witnessTokenVertices = Maps.newHashMap();
       VariantGraphVertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
       for (Token token : witnessTokens) {
@@ -67,23 +70,48 @@ public interface CollationAlgorithm {
         last = matchingVertex;
       }
       into.connect(last, into.getEnd(), witnessSet);
+    }
 
+    protected List<List<Match>> filterOutlierTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       into.rank();
       LOG.debug("{}: Registering transpositions", into);
-      for (Token token : transpositions.keySet()) {
-        VariantGraphVertex from = transpositions.get(token);
+      List<List<Match>> filteredTranspositions = Lists.newArrayList(transpositions);
+      for (List<Match> transposedPhrase : transpositions) {
+        Match firstMatch = transposedPhrase.get(0);
+        VariantGraphVertex from = firstMatch.vertex;
+        Token token = firstMatch.token;
         VariantGraphVertex to = witnessTokenVertices.get(token);
+        LOG.info("matchPhrase={}", transposedPhrase);
         int fromRank = from.getRank();
         //        LOG.info("from={}, rank={}", from, fromRank);
         int toRank = to.getRank();
         //        LOG.info("to={}, rank={}", to, toRank);
         int diff = Math.abs(toRank - fromRank);
-        LOG.info("diff={}, from={}, to={}", new Object[] { diff, from, to });
+        int size = transposedPhrase.size();
 
-        boolean acceptTransposition = diff < 5;
+        int relDiff = diff / size;
+        boolean acceptTransposition = relDiff < 5;
+        LOG.info("accept={}, relDiff={}, size={}, diff={}, from={}, to={}\n", new Object[] { acceptTransposition, relDiff, size, diff, from, to });
         if (acceptTransposition) {
-          into.transpose(from, to);
+          for (Match match : transposedPhrase) {
+            into.transpose(match.vertex, witnessTokenVertices.get(match.token));
+          }
+        } else {
+          filteredTranspositions.remove(transposedPhrase);
         }
+      }
+      return filteredTranspositions;
+    }
+
+    protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
+      final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
+      for (List<Match> transposedPhrase : transpositions) {
+        for (Match match : transposedPhrase) {
+          transposedTokens.put(match.token, match.vertex);
+        }
+      }
+      for (Token token : transposedTokens.keySet()) {
+        into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token));
       }
     }
   }

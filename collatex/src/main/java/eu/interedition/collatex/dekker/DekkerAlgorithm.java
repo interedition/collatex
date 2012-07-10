@@ -103,14 +103,8 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       }
     }
 
-    final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
-    for (List<Match> transposedPhrase : transpositions) {
-      for (Match match : transposedPhrase) {
-        transposedTokens.put(match.token, match.vertex);
-      }
-    }
-
-    merge(graph, tokens, alignments, transposedTokens);
+    merge(graph, tokens, alignments);
+    mergeTranspositions(graph, filterOutlierTranspositions(graph, transpositions));
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("!{}: {}", graph, Iterables.toString(graph.vertices()));
