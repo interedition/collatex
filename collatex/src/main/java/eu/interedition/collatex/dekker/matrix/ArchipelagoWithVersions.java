@@ -175,18 +175,17 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private void addIslandToResult(Island isl, Archipelago result) {
-    //    if (islandIsNoOutlier(result, isl)) {
-    //      LOG.info("adding island: '{}'", isl);
-    result.add(isl);
-    for (Coordinate coordinate : isl) {
-      fixedRows.add(coordinate.row);
-      fixedVertices.add(table.at(coordinate.row, coordinate.column));
+    if (islandIsNoOutlier(result, isl)) {
+      LOG.info("adding island: '{}'", isl);
+      result.add(isl);
+      for (Coordinate coordinate : isl) {
+        fixedRows.add(coordinate.row);
+        fixedVertices.add(table.at(coordinate.row, coordinate.column));
+      }
+
+    } else {
+      LOG.info("island: '{}' is an outlier, not added", isl);
     }
-    //
-    //    } else {
-    //      LOG.info("island: '{}' is an outlier, not added", isl);
-    //      return fixedIslandCoordinates;
-    //    }
   }
 
   private boolean islandIsPossible(Island island) {
@@ -197,27 +196,31 @@ public class ArchipelagoWithVersions extends Archipelago {
     return true;
   }
 
-  //  private boolean islandIsNoOutlier(Archipelago a, Island isl) {
-  //    if (isl.size() > 1) {
-  //      // must limit on size, so not all islands will be outliers
-  //      // TODO find the right size to limit on.
-  //      return true;
-  //
-  //    } else {
-  //      Coordinate leftEnd = isl.getLeftEnd();
-  //      return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
-  //    }
-  //
-  //    //    if (a.size() == 0) return true;
-  //    //    Coordinate leftEnd = isl.getLeftEnd();
-  //    //    int v = leftEnd.row - leftEnd.column;
-  //    //    Set<Integer> islandVectors = a.getIslandVectors();
-  //    //    int minimumDistanceToExistingVectors = 10000;
-  //    //    for (Integer iv : islandVectors) {
-  //    //      minimumDistanceToExistingVectors = Math.min(minimumDistanceToExistingVectors, Math.abs(v - iv));
-  //    //    }
-  //    //    return minimumDistanceToExistingVectors <= isl.size();
-  //  }
+  private boolean islandIsNoOutlier(Archipelago a, Island isl) {
+    double smallestDistance = a.smallestDistance(isl);
+    LOG.info("island {}, distance={}", isl, smallestDistance);
+    return (!(a.size() > 0 && isl.size() == 1 && smallestDistance >= 5));
+
+    //    if (isl.size() > 1) {
+    //      // must limit on size, so not all islands will be outliers
+    //      // TODO find the right size to limit on.
+    //      return true;
+    //
+    //    } else {
+    //      Coordinate leftEnd = isl.getLeftEnd();
+    //      return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
+    //    }
+    //
+    //    //    if (a.size() == 0) return true;
+    //    //    Coordinate leftEnd = isl.getLeftEnd();
+    //    //    int v = leftEnd.row - leftEnd.column;
+    //    //    Set<Integer> islandVectors = a.getIslandVectors();
+    //    //    int minimumDistanceToExistingVectors = 10000;
+    //    //    for (Integer iv : islandVectors) {
+    //    //      minimumDistanceToExistingVectors = Math.min(minimumDistanceToExistingVectors, Math.abs(v - iv));
+    //    //    }
+    //    //    return minimumDistanceToExistingVectors <= isl.size();
+  }
 
   //  private boolean islandsAreOnTheSameVector(Island island, Island isl) {
   //    Coordinate leftEnd = island.getLeftEnd();

@@ -104,7 +104,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
 
     merge(graph, tokens, alignments);
-    mergeTranspositions(graph, filterOutlierTranspositions(graph, transpositions));
+    mergeTranspositions(graph, transpositions);
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("!{}: {}", graph, Iterables.toString(graph.vertices()));
