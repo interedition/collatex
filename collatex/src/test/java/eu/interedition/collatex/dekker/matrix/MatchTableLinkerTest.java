@@ -2,6 +2,8 @@ package eu.interedition.collatex.dekker.matrix;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +11,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.AbstractTest;
@@ -16,6 +19,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchTableLinkerTest extends AbstractTest {
@@ -68,5 +72,29 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertTrue(tokensAsString.contains("B:2:'c'"));
     assertTrue(tokensAsString.contains("B:3:'a'"));
     assertTrue(tokensAsString.contains("B:4:'b'"));
+  }
+
+  @Test
+  public void testOverDeAtlantischeOceaan() {
+    String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
+    String textDMD1 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>\nOp sommige dekken van de stomer lagen mensen in de zon, op andere dekken werd getennist, op nog andere liepen de passagiers heen en weer en praatten. Wie over de reling hing en recht naar beneden keek, kon vaststellen dat het schip vorderde; of draaide alleen de aarde er onderdoor?<p/>\nOp de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.<p/>";
+    SimpleWitness[] sw = createWitnesses(textD9, textDMD1);
+    VariantGraph vg = collate(sw[0]);
+    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker().link(vg, sw[1], new StrictEqualityTokenComparator());
+
+    Set<Token> tokens = linkedTokens.keySet();
+    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    for (Token token : tokens) {
+      tokensAsString.add(token.toString());
+    }
+    List<String> l = Lists.newArrayList(tokensAsString);
+    Collections.sort(l);
+    LOG.info("tokensAsString={}", l);
+    assertTrue(tokensAsString.contains("B:75:'onder'"));
+    assertTrue(tokensAsString.contains("B:0:'Over'"));
+    assertTrue(tokensAsString.contains("B:1:'de'"));
+    assertTrue(tokensAsString.contains("B:2:'Atlantische'"));
+    assertTrue(tokensAsString.contains("B:3:'Oceaan'"));
+    assertTrue(tokensAsString.contains("B:4:'voer'"));
   }
 }
