@@ -197,7 +197,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {
-    double smallestDistance = a.smallestDistance(isl);
+    double smallestDistance = a.smallestDistanceToIdealLine(isl);
     LOG.info("island {}, distance={}", isl, smallestDistance);
     return (!(a.size() > 0 && isl.size() == 1 && smallestDistance >= 5));
 

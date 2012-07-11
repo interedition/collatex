@@ -1,7 +1,6 @@
 package eu.interedition.collatex.lab;
 
-import static eu.interedition.collatex.CollationAlgorithmFactory.dekker;
-import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch;
+import static eu.interedition.collatex.CollationAlgorithmFactory.*;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -36,6 +35,7 @@ import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 
@@ -207,17 +207,17 @@ public class CollateXLaboratory extends JFrame {
 
       final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
-        final EqualityTokenComparator comparator = new EqualityTokenComparator();
+        final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
         final VariantGraph vg = graphFactory.newVariantGraph();
 
-        for (int i =0; i <= w.size()-2; i++) {
+        for (int i = 0; i <= w.size() - 2; i++) {
           SimpleWitness witness = w.get(i);
-	  LOG.debug("Collating: {}", witness.getSigil());
+          LOG.debug("Collating: {}", witness.getSigil());
           CollationAlgorithmFactory.dekkerMatchMatrix(comparator).collate(vg, witness);
         }
 
-        SimpleWitness lastWitness = w.get(w.size()-1);
-	LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
+        SimpleWitness lastWitness = w.get(w.size() - 1);
+        LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
         matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness));
 
         final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
@@ -245,7 +245,7 @@ public class CollateXLaboratory extends JFrame {
       }
       MatchTableCell cell = (MatchTableCell) value;
       MatchMatrixCellStatus status = cell.getStatus();
-      
+
       switch (status) {
         case PREFERRED_MATCH:
           label.setBackground(isSelected ? Color.GREEN : Color.GREEN.darker());

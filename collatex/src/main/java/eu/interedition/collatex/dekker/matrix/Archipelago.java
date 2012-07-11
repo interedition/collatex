@@ -184,14 +184,6 @@ public class Archipelago {
     return closest;
   }
 
-  public double smallestDistance(Island isl) {
-    double minimum = 10000;
-    for (Island fixedIsland : getIslands()) {
-      minimum = Math.min(minimum, distance(isl, fixedIsland));
-    }
-    return minimum;
-  }
-
   protected void remove(int i) {
     getIslands().remove(i);
   }
@@ -263,5 +255,33 @@ public class Archipelago {
 
   public Set<Integer> getIslandVectors() {
     return islandvectors;
+  }
+
+  public double smallestDistance(Island isl) {
+    double minimum = 10000;
+    for (Island fixedIsland : getIslands()) {
+      minimum = Math.min(minimum, distance(isl, fixedIsland));
+    }
+    return minimum;
+  }
+
+  public double smallestDistanceToIdealLine(Island isl) {
+    double minimum = 10000;
+    Island closestIsland = null;
+    for (Island fixedIsland : getIslands()) {
+      double prev = minimum;
+      minimum = Math.min(minimum, distance(isl, fixedIsland));
+      if (prev > minimum) {
+        closestIsland = fixedIsland;
+      }
+    }
+    if (closestIsland == null) {
+      return minimum;
+    }
+    Coordinate leftEnd = isl.getLeftEnd();
+    int islandVector = leftEnd.row - leftEnd.column;
+    Coordinate leftEnd0 = closestIsland.getLeftEnd();
+    int closestIslandVector = leftEnd0.row - leftEnd0.column;
+    return Math.abs(islandVector - closestIslandVector);
   }
 }
