@@ -108,7 +108,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
     VariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions islands = new ArchipelagoWithVersions(table);
+    ArchipelagoWithVersions islands = new ArchipelagoWithVersions(table, 1);
     for (Island isl : table.getIslands()) {
       islands.add(isl);
     }
@@ -260,7 +260,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses("A B E F C D G H", "A B C D E F G H");
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -283,7 +283,7 @@ public class IslandTest extends AbstractTest {
     sw = createWitnesses("A J K D E F L M I", "A B C D E F G H I");
     vg = collate(sw[0]);
     matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    archipelago = new ArchipelagoWithVersions(matchTable);
+    archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -307,7 +307,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses("Op den Atlantischen Oceaan voer een groote stoomer. Onder de", "Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de");
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -334,7 +334,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses("Op den Atlantischen Oceaan voer een groote stoomer. Onder de velen aan boojrd bevond zich een bruine, korte dikke man. <i>JSg</i> werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels", "op de  atlantische oceaan  voer  een ontzaggelijk  zeekasteel  onder de  vele  passagiers  aan boord bevond  zich  een bruine  korte dikke man hij werd  nooit zonder  sigaar  gezien  zijn  pantalon  had lijnrechte  vouwen  in  de  pijpen  maar  zat toch  altijd  vol rimpels");
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -363,7 +363,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(tekstD1, tekstD9);
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -408,7 +408,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(tekstD1, tekstD9);
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -435,7 +435,7 @@ public class IslandTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(tekstD1, tekstD9);
     VariantGraph vg = collate(sw[0]);
     MatchTable buildMatrix = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(buildMatrix);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(buildMatrix, 1);
     for (Island isl : buildMatrix.getIslands()) {
       archipelago.add(isl);
     }

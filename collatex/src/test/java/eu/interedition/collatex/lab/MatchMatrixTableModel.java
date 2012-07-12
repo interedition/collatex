@@ -28,8 +28,10 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   private final String[] rowNames;
   private final String[] columnNames;
   private final MatchTableCell[][] data;
+  private final int outlierTranspositionsSizeLimit;
 
-  public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness) {
+  public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness, int outlierTranspositionsSizeLimit) {
+    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
     List<Token> rowList = matchTable.rowList();
     List<Integer> columnList = matchTable.columnList();
 
@@ -76,7 +78,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     // detect islands
     Set<Island> islands = matchTable.getIslands();
     // prepare
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, outlierTranspositionsSizeLimit);
     for (Island isl : islands) {
       archipelago.add(isl);
     }

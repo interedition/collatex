@@ -21,8 +21,8 @@ public class CollationAlgorithmFactory {
     return new DekkerAlgorithm(comparator, new EditGraphTokenLinker(graphFactory));
   }
 
-  public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator) {
-    return new DekkerAlgorithm(comparator, new MatchTableLinker());
+  public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
+    return new DekkerAlgorithm(comparator, new MatchTableLinker(outlierTranspositionsSizeLimit));
   }
 
   public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {

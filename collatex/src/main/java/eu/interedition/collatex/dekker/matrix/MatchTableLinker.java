@@ -17,6 +17,12 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 //Note: This class is intended to be the replacement for the MatchMatrixLinker class
 public class MatchTableLinker implements TokenLinker {
   static Logger LOG = LoggerFactory.getLogger(MatchTableLinker.class);
+  private final int outlierTranspositionsSizeLimit;
+
+  public MatchTableLinker(int outlierTranspositionsSizeLimit) {
+    super();
+    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
+  }
 
   @Override
   public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
@@ -30,7 +36,7 @@ public class MatchTableLinker implements TokenLinker {
 
     LOG.info("create Archipelago data structure");
     // create Archipelago data structure and fill it with all the islands
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(table);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(table, outlierTranspositionsSizeLimit);
     LOG.info("fill it with all the islands");
     for (Island isl : islands) {
       archipelago.add(isl);

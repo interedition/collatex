@@ -43,7 +43,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincentWithMatchMatrixLinker() {
-    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator()));
+    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 1));
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");

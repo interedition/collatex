@@ -18,21 +18,19 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
 public class ArchipelagoWithVersions extends Archipelago {
+  private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
   private ArrayList<Archipelago> nonConflVersions;
   private final MatchTable table;
   Set<Integer> fixedRows = Sets.newHashSet();
   Set<VariantGraphVertex> fixedVertices = Sets.newHashSet();
+  private final int outlierTranspositionsSizeLimit;
 
-  public ArchipelagoWithVersions(MatchTable table) {
+  public ArchipelagoWithVersions(MatchTable table, int outlierTranspositionsSizeLimit) {
     this.table = table;
+    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
     setIslands(new ArrayList<Island>());
     nonConflVersions = new ArrayList<Archipelago>();
-  }
-
-  public ArchipelagoWithVersions(Island isl, MatchTable table) {
-    this(table);
-    add(isl);
   }
 
   @Override
@@ -42,7 +40,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   @Override
   public ArchipelagoWithVersions copy() {
-    ArchipelagoWithVersions result = new ArchipelagoWithVersions(this.table);
+    ArchipelagoWithVersions result = new ArchipelagoWithVersions(this.table, outlierTranspositionsSizeLimit);
     for (Island isl : getIslands()) {
       result.add(new Island(isl));
     }
@@ -106,6 +104,11 @@ public class ArchipelagoWithVersions extends Archipelago {
       for (Island ci : distanceMap1.get(d)) {
         if (islandIsPossible(ci)) {
           addIslandToResult(ci, archipelago);
+          //        } else {
+          //          removeConflictingEndCoordinates(ci);
+          //          if (ci.size() > 1) {
+          //            addIslandToResult(ci, archipelago);
+          //          }
         }
       }
     }
@@ -235,7 +238,8 @@ public class ArchipelagoWithVersions extends Archipelago {
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {
     double smallestDistance = a.smallestDistanceToIdealLine(isl);
     LOG.info("island {}, distance={}", isl, smallestDistance);
-    return (!(a.size() > 0 && isl.size() == 1 && smallestDistance >= 5));
+    int islandSize = isl.size();
+    return (!(a.size() > 0 && islandSize <= outlierTranspositionsSizeLimit && smallestDistance >= islandSize * MINIMUM_OUTLIER_DISTANCE_FACTOR));
 
     //    if (isl.size() > 1) {
     //      // must limit on size, so not all islands will be outliers

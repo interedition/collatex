@@ -29,7 +29,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 public class HermansTest extends AbstractTest {
   @Before
   public void setUp() {
-    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new StrictEqualityTokenComparator()));
+    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new StrictEqualityTokenComparator(), 1));
   }
 
   @Test
@@ -50,7 +50,7 @@ public class HermansTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     // System.out.println(buildMatrix.toHtml());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -109,7 +109,7 @@ public class HermansTest extends AbstractTest {
     // e.printStackTrace();
     // }
     // System.out.println(buildMatrix.toHtml());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
@@ -196,7 +196,7 @@ public class HermansTest extends AbstractTest {
 
     VariantGraph base = collate(witnesses[0]);
     MatchTable matchTable = MatchTable.create(base, witnesses[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions creator = new ArchipelagoWithVersions(matchTable);
+    ArchipelagoWithVersions creator = new ArchipelagoWithVersions(matchTable, 1);
     for (Island island : matchTable.getIslands()) {
       creator.add(island);
     }
@@ -277,6 +277,14 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(textMZ_DJ233, textD4F);
     testWitnessCollation(sw);
   }
+
+  //  @Test
+  //  public void testHermansText4() throws XMLStreamException {
+  //    String textMZ_DJ233 = "Werumeus Buning maakt artikelen van vijf pagina&APO+s over de geologie van de diepzee, die hij uit Engelse boeken overschrijft, wat hij pas in de laatste regel vermeldt, omdat hij zo goed kan koken.<p/>\nJ. W. Hofstra kan niet lezen en nauwelijks stotteren, laat staan schrijven. Hij oefent het ambt van litterair criticus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\nZo nu en dan koopt Elsevier een artikel van een echte professor wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\nEdouard Bouquin is het olijke culturele geweten. Bouquin betekent: 1) oud boek van geringe waarde, 2) oude bok, 3) mannetjeskonijn. Ik kan het ook niet helpen, het staat in Larousse.<p/>\nDe politiek van dit blad wordt geschreven door een der leeuwen uit het Nederlandse wapen (ik geloof de rechtse) op een krakerige gerechtszaaltoon in zeer korte zinnetjes, omdat hij tot zijn spijt de syntaxis onvoldoende beheerst.<p/>\nAldus de artikelen van Werumeus Buning";
+  //    String textD4F = "Werumeus  Buning maakt machtigmooie artikelen van vijf pagina&APO+s  over de  geologie van de  diepzee, die  hij uit Engelse  boeken overschrijft,   wat hij  pas in de laatste  regel  vermeldt,   omdat hij   zo  goed kan koken.<p/>\nJ. W.Hofstra kan niet lezen en nauwelijks stotteren,   laat staan schrijven.   Hij  oefent het ambt van literair kritikus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\nEdouard  Bouquin is  het olijke  culturele  geweten.   Bouquin betekent:   1)  oud boek  van geringe  waarde,   2)  oude bok,   3)  mannetjeskonijn.   Ik kan het ook niet helpen,   het staat in Larousse.<p/>\nNu en dan koopt Elsevier een artikel van een echte professor, wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n\nDe politiek van dit blad  wordt geschreven door een der leeuwen uit het nederlandse wapen (ik geloof de   rechtse)  op een krakerige  gerechtszaaltoon in zeer korte  zinnetjes, omdat hij  tot zijn  spijt  de  syntaxis  onvoldoende  beheerst. <p/>Volgens de stukjes van Werumeus Buning";
+  //    SimpleWitness[] sw = createWitnesses(textMZ_DJ233, textD4F);
+  //    testWitnessCollation(sw);
+  //  }
 
   private String generateTEI(VariantGraph vg) throws XMLStreamException, FactoryConfigurationError {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);

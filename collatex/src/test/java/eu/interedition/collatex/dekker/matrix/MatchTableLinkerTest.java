@@ -35,7 +35,7 @@ public class MatchTableLinkerTest extends AbstractTest {
 
     VariantGraph graph = collate(witnesses[0], witnesses[1]);
 
-    MatchTableLinker linker = new MatchTableLinker();
+    MatchTableLinker linker = new MatchTableLinker(1);
     Map<Token, VariantGraphVertex> linkedTokens = linker.link(graph, witnesses[2], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
@@ -60,7 +60,7 @@ public class MatchTableLinkerTest extends AbstractTest {
   public void test1() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
     VariantGraph vg = collate(sw[0]);
-    MatchTableLinker linker = new MatchTableLinker();
+    MatchTableLinker linker = new MatchTableLinker(1);
     Map<Token, VariantGraphVertex> linkedTokens = linker.link(vg, sw[1], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
@@ -77,12 +77,13 @@ public class MatchTableLinkerTest extends AbstractTest {
 
   @Test
   public void testOverDeAtlantischeOceaan() {
-    collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new StrictEqualityTokenComparator());
+    int outlierTranspositionsSizeLimit = 1;
+    collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new StrictEqualityTokenComparator(), outlierTranspositionsSizeLimit);
     String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
     String textDMD1 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>\nOp sommige dekken van de stomer lagen mensen in de zon, op andere dekken werd getennist, op nog andere liepen de passagiers heen en weer en praatten. Wie over de reling hing en recht naar beneden keek, kon vaststellen dat het schip vorderde; of draaide alleen de aarde er onderdoor?<p/>\nOp de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.<p/>";
     SimpleWitness[] sw = createWitnesses(textD9, textDMD1);
     VariantGraph vg = collate(sw[0]);
-    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker().link(vg, sw[1], new StrictEqualityTokenComparator());
+    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
