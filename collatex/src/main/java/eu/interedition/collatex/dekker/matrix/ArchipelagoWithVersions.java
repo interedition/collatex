@@ -194,7 +194,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     }
     goOn = true;
     while (goOn) {
-      Coordinate rightEnd = island.getLeftEnd();
+      Coordinate rightEnd = island.getRightEnd();
       if (coordinateOverlapsWithFixed(rightEnd)) {
         island.removeCoordinate(rightEnd);
         if (island.size() == 0) {
