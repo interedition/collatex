@@ -101,8 +101,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   }
 
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
-    List<Double> shortestToLongestDistances = shortestToLongestDistances(distanceMap1);
-    for (Double d : shortestToLongestDistances) {
+    for (Double d : shortestToLongestDistances(distanceMap1)) {
       // TODO: find a better way to determine the best choice of island
       for (Island ci : distanceMap1.get(d)) {
         if (islandIsPossible(ci)) {
@@ -169,9 +168,54 @@ public class ArchipelagoWithVersions extends Archipelago {
     for (Island island : islandsOfSize) {
       if (islandIsPossible(island)) {
         islands.add(island);
+
+      } else {
+        removeConflictingEndCoordinates(island);
+        if (island.size() > 1) {
+          islands.add(island);
+        }
       }
     }
     return islands;
+  }
+
+  private void removeConflictingEndCoordinates(Island island) {
+    boolean goOn = true;
+    while (goOn) {
+      Coordinate leftEnd = island.getLeftEnd();
+      if (coordinateOverlapsWithFixed(leftEnd)) {
+        island.removeCoordinate(leftEnd);
+        if (island.size() == 0) {
+          return;
+        }
+      } else {
+        goOn = false;
+      }
+    }
+    goOn = true;
+    while (goOn) {
+      Coordinate rightEnd = island.getLeftEnd();
+      if (coordinateOverlapsWithFixed(rightEnd)) {
+        island.removeCoordinate(rightEnd);
+        if (island.size() == 0) {
+          return;
+        }
+      } else {
+        goOn = false;
+      }
+    }
+  }
+
+  private boolean islandIsPossible(Island island) {
+    for (Coordinate coordinate : island) {
+      if (coordinateOverlapsWithFixed(coordinate)) return false;
+    }
+    return true;
+  }
+
+  private boolean coordinateOverlapsWithFixed(Coordinate coordinate) {
+    return fixedRows.contains(coordinate.row) || //
+        fixedVertices.contains(table.at(coordinate.row, coordinate.column));
   }
 
   private void addIslandToResult(Island isl, Archipelago result) {
@@ -186,14 +230,6 @@ public class ArchipelagoWithVersions extends Archipelago {
     } else {
       LOG.info("island: '{}' is an outlier, not added", isl);
     }
-  }
-
-  private boolean islandIsPossible(Island island) {
-    for (Coordinate coordinate : island) {
-      if (fixedRows.contains(coordinate.row) || //
-          fixedVertices.contains(table.at(coordinate.row, coordinate.column))) return false;
-    }
-    return true;
   }
 
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {

@@ -93,10 +93,10 @@ public class MatchTableLinkerTest extends AbstractTest {
     Collections.sort(l);
     LOG.info("tokensAsString={}", l);
     assertTrue(tokensAsString.contains("B:75:'onder'"));
-    assertTrue(tokensAsString.contains("B:0:'Over'"));
+    assertTrue(tokensAsString.contains("B:0:'over'"));
     assertTrue(tokensAsString.contains("B:1:'de'"));
-    assertTrue(tokensAsString.contains("B:2:'Atlantische'"));
-    assertTrue(tokensAsString.contains("B:3:'Oceaan'"));
+    assertTrue(tokensAsString.contains("B:2:'atlantische'"));
+    assertTrue(tokensAsString.contains("B:3:'oceaan'"));
     assertTrue(tokensAsString.contains("B:4:'voer'"));
   }
 }

@@ -74,6 +74,10 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
     return result;
   }
 
+  public void removeCoordinate(Coordinate c) {
+    islandCoordinates.remove(c);
+  }
+
   public Coordinate getCoorOnRow(int row) {
     for (Coordinate coor : islandCoordinates) {
       if (coor.getRow() == row) return coor;
