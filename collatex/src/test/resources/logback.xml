@@ -3,8 +3,7 @@
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%-20.30(%d{HH:mm:ss.SSS} %-5level) [%50.50logger] -
-        %msg%n</pattern>
+      <pattern>%-20.30(%d{HH:mm:ss.SSS} %-5level) [%50.50logger] - %msg%n</pattern>
     </encoder>
   </appender>
   <logger name="eu.interedition" level="INFO" />

@@ -68,7 +68,7 @@ public class MatchTable {
   private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
     graph.rank();
     // -2 === ignore the start and the end vertex
-    Range<Integer> range = Ranges.closed(0, Math.max(0, graph.getEnd().getRank()-2));
+    Range<Integer> range = Ranges.closed(0, Math.max(0, graph.getEnd().getRank() - 2));
     ImmutableList<Integer> set = range.asSet(DiscreteDomains.integers()).asList();
     return new MatchTable(witness, set);
   }
@@ -81,8 +81,8 @@ public class MatchTable {
     for (Token t : witness) {
       if (unique.contains(t) || ambiguous.contains(t)) {
         List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
-	for (VariantGraphVertex vgv : matchingVertices) {
-	  set(t, vgv.getRank() - 1, vgv);
+        for (VariantGraphVertex vgv : matchingVertices) {
+          set(t, vgv.getRank() - 1, vgv);
         }
       }
     }
@@ -100,7 +100,7 @@ public class MatchTable {
     List<Coordinate> allMatches = allMatches();
     for (Coordinate c : allMatches) {
       //      LOG.info("coordinate {}", c);
-      addToIslands(coordinateMapper, c, -1);
+      addToIslands(coordinateMapper, c);
     }
     Set<Coordinate> smallestIslandsCoordinates = Sets.newHashSet(allMatches);
     smallestIslandsCoordinates.removeAll(coordinateMapper.keySet());
@@ -112,7 +112,8 @@ public class MatchTable {
     return Sets.newHashSet(coordinateMapper.values());
   }
 
-  private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c, int diff) {
+  private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c) {
+    int diff = -1;
     Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff);
     VariantGraphVertex neighbor = null;
     try {

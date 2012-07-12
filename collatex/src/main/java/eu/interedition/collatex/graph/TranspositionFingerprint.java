@@ -10,8 +10,8 @@ public class TranspositionFingerprint {
 
   TranspositionFingerprint(VariantGraphVertex v) {
     Iterable<VariantGraphTransposition> transpositions = v.transpositions();
-    hasTranspositions = !Iterables.isEmpty(transpositions);
     transpositionSize = Iterables.size(transpositions);
+    hasTranspositions = transpositionSize > 0;
   }
 
   @Override

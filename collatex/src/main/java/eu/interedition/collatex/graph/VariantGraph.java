@@ -277,7 +277,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       for (VariantGraphTransposition vgt : transpositions) {
         VariantGraphVertex from = vgt.from();
         VariantGraphVertex to = vgt.to();
-        //        LOG.info("v {}, from {}, to {}", new Object[] { v, from, to });
+        LOG.info("\nv {},\n from {},\n to {}", new Object[] { v, from, to });
         if (from.equals(v)) {
           addNullVertex(v, from, to);
         } else if (to.equals(v)) {
