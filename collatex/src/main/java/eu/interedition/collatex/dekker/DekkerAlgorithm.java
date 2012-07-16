@@ -31,6 +31,7 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
@@ -45,9 +46,8 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private List<List<Match>> transpositions;
   private Map<Token, VariantGraphVertex> alignments;
 
-  @Deprecated
   public DekkerAlgorithm(Comparator<Token> comparator) {
-    this(comparator, new DefaultTokenLinker());
+    this(comparator, new MatchTableLinker(3));
   }
 
   public DekkerAlgorithm(Comparator<Token> comparator, TokenLinker tokenLinker) {

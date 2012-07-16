@@ -26,7 +26,7 @@ import static com.google.common.collect.Lists.reverse;
 /**
  * 
  * @author Ronald Haentjens Dekker
- * This class provided the linker phase of the algorithm in CollateX 0.9, 1.0, 1.1, 1.2
+ * This class provided the linker phase of the Dekker algorithm in CollateX 0.9, 1.0, 1.1, 1.2
  * It is superseded by the MatchTableLinker class.
  * This class is only still here to compare the output of the old and the new
  * implementation to each other.
