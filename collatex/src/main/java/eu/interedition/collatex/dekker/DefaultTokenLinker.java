@@ -23,6 +23,16 @@ import java.util.Map;
 
 import static com.google.common.collect.Lists.reverse;
 
+/**
+ * 
+ * @author Ronald Haentjens Dekker
+ * This class provided the linker phase of the algorithm in CollateX 0.9, 1.0, 1.1, 1.2
+ * It is superseded by the MatchTableLinker class.
+ * This class is only still here to compare the output of the old and the new
+ * implementation to each other.
+ *
+ */
+@Deprecated
 public class DefaultTokenLinker implements TokenLinker {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTokenLinker.class);
 

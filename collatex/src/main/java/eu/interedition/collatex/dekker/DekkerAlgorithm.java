@@ -45,6 +45,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private List<List<Match>> transpositions;
   private Map<Token, VariantGraphVertex> alignments;
 
+  @Deprecated
   public DekkerAlgorithm(Comparator<Token> comparator) {
     this(comparator, new DefaultTokenLinker());
   }
