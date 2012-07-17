@@ -89,7 +89,7 @@ public class MatchTable {
   }
 
   private void set(Token token, int rank, VariantGraphVertex variantGraphVertex) {
-    //    LOG.info("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
+    //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
     table.put(token, rank, variantGraphVertex);
   }
 
@@ -99,7 +99,7 @@ public class MatchTable {
     Map<Coordinate, Island> coordinateMapper = Maps.newHashMap();
     List<Coordinate> allMatches = allMatches();
     for (Coordinate c : allMatches) {
-      //      LOG.info("coordinate {}", c);
+      //      LOG.debug("coordinate {}", c);
       addToIslands(coordinateMapper, c);
     }
     Set<Coordinate> smallestIslandsCoordinates = Sets.newHashSet(allMatches);
@@ -122,14 +122,14 @@ public class MatchTable {
     if (neighbor != null) {
       Island island = coordinateMapper.get(neighborCoordinate);
       if (island == null) {
-        //        LOG.info("new island");
+        //        LOG.debug("new island");
         Island island0 = new Island();
         island0.add(neighborCoordinate);
         island0.add(c);
         coordinateMapper.put(neighborCoordinate, island0);
         coordinateMapper.put(c, island0);
       } else {
-        //        LOG.info("add to existing island");
+        //        LOG.debug("add to existing island");
         island.add(c);
         coordinateMapper.put(c, island);
       }

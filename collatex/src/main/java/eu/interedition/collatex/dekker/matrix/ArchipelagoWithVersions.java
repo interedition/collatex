@@ -223,7 +223,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   private void addIslandToResult(Island isl, Archipelago result) {
     if (islandIsNoOutlier(result, isl)) {
-      LOG.info("adding island: '{}'", isl);
+      LOG.debug("adding island: '{}'", isl);
       result.add(isl);
       for (Coordinate coordinate : isl) {
         fixedRows.add(coordinate.row);
@@ -231,13 +231,13 @@ public class ArchipelagoWithVersions extends Archipelago {
       }
 
     } else {
-      LOG.info("island: '{}' is an outlier, not added", isl);
+      LOG.debug("island: '{}' is an outlier, not added", isl);
     }
   }
 
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {
     double smallestDistance = a.smallestDistanceToIdealLine(isl);
-    LOG.info("island {}, distance={}", isl, smallestDistance);
+    LOG.debug("island {}, distance={}", isl, smallestDistance);
     int islandSize = isl.size();
     return (!(a.size() > 0 && islandSize <= outlierTranspositionsSizeLimit && smallestDistance >= islandSize * MINIMUM_OUTLIER_DISTANCE_FACTOR));
 
@@ -284,7 +284,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   //    double smallestDistance = archipelago.smallestDistance(isl);
   //    int islandSize = isl.size();
   //    double deviation = smallestDistance / islandSize;
-  //    LOG.info("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
+  //    LOG.debug("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
   //    return deviation;
   //  }
 

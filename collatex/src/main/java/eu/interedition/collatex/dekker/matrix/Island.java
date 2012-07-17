@@ -37,7 +37,7 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
     Coordinate newCoordinate = first;
     while (!newCoordinate.equals(last)) {
       newCoordinate = new Coordinate(newCoordinate.getRow() + 1, newCoordinate.getColumn() + 1);
-      //        LOG.info("{}", newCoordinate);
+      //        LOG.debug("{}", newCoordinate);
       add(newCoordinate);
     }
   }

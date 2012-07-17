@@ -217,7 +217,7 @@ public class VariantGraphTest extends AbstractTest {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
     StringWriter writer = new StringWriter();
     s.toDot(graph, writer);
-    LOG.info("dot={}", writer.toString());
+    LOG.debug("dot={}", writer.toString());
 
     final VariantGraphVertex voorVertex1 = vertexWith(graph, "voor", w[0]);
     final VariantGraphVertex zoVertex = vertexWith(graph, "zo", w[0]);

@@ -52,7 +52,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
 
     // fill the cells with colors
     Archipelago preferred = preferred(matchTable);
-    //LOG.info(matchMatrix.toHtml(preferred));
+    //LOG.debug(matchMatrix.toHtml(preferred));
     data = new MatchTableCell[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {

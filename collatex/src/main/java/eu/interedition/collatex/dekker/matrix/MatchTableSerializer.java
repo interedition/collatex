@@ -110,7 +110,7 @@ public class MatchTableSerializer {
       String token = t.toString();
       int pos = token.indexOf(":'");
       if (pos > -1) {
-        //        LOG.info("token={{}}, pos={}", token, pos);
+        //        LOG.debug("token={{}}, pos={}", token, pos);
         labels.add(token.substring(pos + 2, token.length() - 1));
       }
     }

@@ -221,11 +221,11 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
-        //        LOG.info("vertex={}, candidatevertex={}", vertex, joinCandidateVertex);
-        //        LOG.info("tfp={}, candidate tfp={}, equals={}", new Object[] { tfp, joinCandidateVertex.getTranspositionFingerprint(), tfp.equals(joinCandidateVertex.getTranspositionFingerprint()) });
+        //        LOG.info("\n  vertex={}, candidatevertex={}\n  tfp={}, candidate tfp={}, equals={}", new Object[] { vertex, joinCandidateVertex, tfp, joinCandidateVertex.getTranspositionFingerprint(), tfp.equals(joinCandidateVertex.getTranspositionFingerprint()) });
+        TranspositionFingerprint transpositionFingerprint = joinCandidateVertex.getTranspositionFingerprint();
         boolean canJoin = !end.equals(joinCandidateVertex) && //
             Iterables.size(joinCandidateVertex.incoming()) == 1 && //
-            tfp.equals(joinCandidateVertex.getTranspositionFingerprint());
+            tfp.equals(transpositionFingerprint);
         if (canJoin) {
           vertex.add(joinCandidateVertex.tokens());
           for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
@@ -242,7 +242,6 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
           joinCandidateEdge.delete();
           joinCandidateVertex.delete();
           queue.push(vertex);
-          tfp = vertex.getTranspositionFingerprint();
           continue;
         }
       }
@@ -277,7 +276,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       for (VariantGraphTransposition vgt : transpositions) {
         VariantGraphVertex from = vgt.from();
         VariantGraphVertex to = vgt.to();
-        LOG.info("\nv {},\n from {},\n to {}", new Object[] { v, from, to });
+        //        LOG.debug("\nv {},\n from {},\n to {}", new Object[] { v, from, to });
         if (from.equals(v)) {
           addNullVertex(v, from, to);
         } else if (to.equals(v)) {

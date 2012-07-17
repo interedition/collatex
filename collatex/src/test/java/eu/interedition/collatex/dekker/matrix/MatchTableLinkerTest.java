@@ -92,7 +92,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     }
     List<String> l = Lists.newArrayList(tokensAsString);
     Collections.sort(l);
-    LOG.info("tokensAsString={}", l);
+    LOG.debug("tokensAsString={}", l);
     assertTrue(tokensAsString.contains("B:75:'onder'"));
     assertTrue(tokensAsString.contains("B:0:'over'"));
     assertTrue(tokensAsString.contains("B:1:'de'"));

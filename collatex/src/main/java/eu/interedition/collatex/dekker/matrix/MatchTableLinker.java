@@ -27,26 +27,26 @@ public class MatchTableLinker implements TokenLinker {
   @Override
   public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     // create MatchTable and fill it with matches
-    LOG.info("create MatchTable and fill it with matches");
+    LOG.debug("create MatchTable and fill it with matches");
     MatchTable table = MatchTable.create(base, witness, comparator);
 
     // the MatchTable getIslands() method does the pattern finding
-    LOG.info("getIslands()");
+    LOG.debug("getIslands()");
     Set<Island> islands = table.getIslands();
 
-    LOG.info("create Archipelago data structure");
+    LOG.debug("create Archipelago data structure");
     // create Archipelago data structure and fill it with all the islands
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(table, outlierTranspositionsSizeLimit);
-    LOG.info("fill it with all the islands");
+    LOG.debug("fill it with all the islands");
     for (Island isl : islands) {
       archipelago.add(isl);
     }
 
     // The archipelago with version createNonConflictingVersion() method
     // selects the optimal islands
-    LOG.info("select the optimal islands");
+    LOG.debug("select the optimal islands");
     Archipelago preferredIslands = archipelago.createNonConflictingVersion();
-    LOG.info("Number of preferred Islands: {}", preferredIslands.size());
+    LOG.debug("Number of preferred Islands: {}", preferredIslands.size());
 
     // Here the result is put in a map
     Map<Token, VariantGraphVertex> map = Maps.newHashMap();

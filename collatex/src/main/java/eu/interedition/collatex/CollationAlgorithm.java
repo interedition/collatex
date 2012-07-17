@@ -81,17 +81,17 @@ public interface CollationAlgorithm {
         VariantGraphVertex from = firstMatch.vertex;
         Token token = firstMatch.token;
         VariantGraphVertex to = witnessTokenVertices.get(token);
-        LOG.info("matchPhrase={}", transposedPhrase);
+        LOG.debug("matchPhrase={}", transposedPhrase);
         int fromRank = from.getRank();
-        //        LOG.info("from={}, rank={}", from, fromRank);
+        //        LOG.debug("from={}, rank={}", from, fromRank);
         int toRank = to.getRank();
-        //        LOG.info("to={}, rank={}", to, toRank);
+        //        LOG.debug("to={}, rank={}", to, toRank);
         int diff = Math.abs(toRank - fromRank);
         int size = transposedPhrase.size();
 
         int relDiff = diff / size;
         boolean acceptTransposition = relDiff < 5;
-        LOG.info("accept={}, relDiff={}, size={}, diff={}, from={}, to={}\n", new Object[] { acceptTransposition, relDiff, size, diff, from, to });
+        LOG.debug("accept={}, relDiff={}, size={}, diff={}, from={}, to={}\n", new Object[] { acceptTransposition, relDiff, size, diff, from, to });
         if (acceptTransposition) {
           for (Match match : transposedPhrase) {
             into.transpose(match.vertex, witnessTokenVertices.get(match.token));

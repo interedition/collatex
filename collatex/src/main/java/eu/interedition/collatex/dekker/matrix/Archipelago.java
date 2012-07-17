@@ -178,7 +178,7 @@ public class Archipelago {
     } else if (minimum2 < minimum1) {
       closest = island2;
     } else {
-      LOG.info("{} -> {}", island1, island2);
+      LOG.debug("{} -> {}", island1, island2);
       throw new RuntimeException("no minimum found, help!");
     }
     return closest;
