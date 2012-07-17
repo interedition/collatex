@@ -1,19 +1,28 @@
 package eu.interedition.collatex.dekker;
 
+import java.util.Comparator;
+import java.util.Map;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.EditGraph;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedSet;
-
+/**
+ * 
+ * @author Ronald Haentjens Dekker
+ * This class is the result of a failed experiment.
+ * It will be removed in the future.
+ * I have to move over the unit tests first.
+ *
+ */
+@Deprecated
 public class EditGraphTokenLinker implements TokenLinker {
 
   private final GraphFactory graphFactory;
 
+  @Deprecated
   public EditGraphTokenLinker(GraphFactory graphFactory) {
     this.graphFactory = graphFactory;
   }

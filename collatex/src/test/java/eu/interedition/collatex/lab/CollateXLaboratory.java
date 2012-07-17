@@ -210,7 +210,7 @@ public class CollateXLaboratory extends JFrame {
         final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
         final VariantGraph vg = graphFactory.newVariantGraph();
 
-        int outlierTranspositionsSizeLimit = 1;
+        int outlierTranspositionsSizeLimit = 3;
         for (int i = 0; i <= w.size() - 2; i++) {
           SimpleWitness witness = w.get(i);
           LOG.debug("Collating: {}", witness.getSigil());
