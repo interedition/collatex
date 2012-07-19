@@ -68,6 +68,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
     LOG.debug("{} + {}: Match and link tokens", graph, witness);
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
+    //    new SimpleVariantGraphSerializer(graph).toDot(graph, writer);
     if (LOG.isTraceEnabled()) {
       for (Map.Entry<Token, VariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
         LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
@@ -127,4 +128,5 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   public Map<Token, VariantGraphVertex> getAlignments() {
     return Collections.unmodifiableMap(alignments);
   }
+
 }

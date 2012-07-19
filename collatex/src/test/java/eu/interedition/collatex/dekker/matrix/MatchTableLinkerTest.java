@@ -100,4 +100,31 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertTrue(tokensAsString.contains("B:3:'oceaan'"));
     assertTrue(tokensAsString.contains("B:4:'voer'"));
   }
+
+  @Test
+  public void testHermansAllesIsBtrekkelijk1() throws XMLStreamException {
+    int outlierTranspositionsSizeLimit = 1;
+    String textD1 = "natuurlijk is alles betrekkelijk";
+    String textD9 = "Natuurlijk, alles mag relatief zijn";
+    String textDmd1 = "Natuurlijk, alles is betrekkelijk";
+    SimpleWitness[] sw = createWitnesses(textD1, textD9, textDmd1);
+    VariantGraph vg = collate(sw[0], sw[1]);
+    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
+
+    Set<Token> tokens = linkedTokens.keySet();
+    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    for (Token token : tokens) {
+      tokensAsString.add(token.toString());
+    }
+    List<String> l = Lists.newArrayList(tokensAsString);
+    Collections.sort(l);
+    LOG.debug("tokensAsString={}", l);
+    //    assertTrue(tokensAsString.contains("B:75:'onder'"));
+    //    assertTrue(tokensAsString.contains("B:0:'over'"));
+    //    assertTrue(tokensAsString.contains("B:1:'de'"));
+    //    assertTrue(tokensAsString.contains("B:2:'atlantische'"));
+    //    assertTrue(tokensAsString.contains("B:3:'oceaan'"));
+    //    assertTrue(tokensAsString.contains("B:4:'voer'"));
+  }
+
 }

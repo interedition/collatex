@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
@@ -21,6 +22,7 @@ import org.junit.Test;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphTransposition;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
@@ -278,6 +280,47 @@ public class HermansTest extends AbstractTest {
     testWitnessCollation(sw);
   }
 
+  @Test
+  public void testTEI() throws XMLStreamException, FactoryConfigurationError {
+    String text1 = "voor Zo nu en dan zin2 na voor";
+    String text2 = "voor zin2 Nu en dan voor";
+    SimpleWitness[] sw = createWitnesses(text1, text2);
+    testWitnessCollation(sw);
+  }
+
+  @Test
+  public void testHermansAllesIsBtrekkelijk() throws XMLStreamException {
+    String textD1 = "Zij had gelijk; natuurlijk is alles betrekkelijk en het hangt er van af hoe men het gewend is.";
+    String textD9 = "Zij had gelijk. Natuurlijk, alles is&KOP+betrekkelijk en het hangt er alleen van af\n |P 46|\nhoe men het gewend is.";
+    String textDmd1 = "Zij had gelijk. Natuurlijk, alles is betrekkelijk en het hangt er alleen van af\n&WR+\n46<p/>\nhoe men het gewend is.";
+    String textDmd9 = "Zij had gelijk. Natuurlijk, alles is&KOP+betrekkelijk en het hangt er alleen van af\n |P 46|\nhoe men het gewend is.";
+    SimpleWitness[] sw = createWitnesses(textD1, textD9, textDmd1, textDmd9);
+    testWitnessCollation(sw);
+  }
+
+  @Test
+  public void testHermansAllesIsBtrekkelijk1() throws XMLStreamException {
+    String textD1 = "natuurlijk is alles betrekkelijk";
+    String textD9 = "Natuurlijk, alles mag relatief zijn";
+    String textDmd1 = "Natuurlijk, alles is betrekkelijk";
+    SimpleWitness[] sw = createWitnesses(textD1, textD9, textDmd1);
+    testWitnessCollation(sw);
+  }
+
+  @Test
+  public void testNoLoops() throws XMLStreamException {
+    String w1 = "a b c d";
+    String w2 = "e c f g";
+    String w3 = "e c b d";
+    SimpleWitness[] sw = createWitnesses(w1, w2, w3);
+    VariantGraph vg = collate(sw);
+    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    assertEquals(1, transpositions.size());
+    VariantGraphTransposition t = transpositions.iterator().next();
+    assertEquals("C:2:'b'", t.from().toString());
+    assertEquals("A:1:'b'", t.to().toString());
+  }
+
   //  @Test
   //  public void testHermansText4() throws XMLStreamException {
   //    String textMZ_DJ233 = "Werumeus Buning maakt artikelen van vijf pagina&APO+s over de geologie van de diepzee, die hij uit Engelse boeken overschrijft, wat hij pas in de laatste regel vermeldt, omdat hij zo goed kan koken.<p/>\nJ. W. Hofstra kan niet lezen en nauwelijks stotteren, laat staan schrijven. Hij oefent het ambt van litterair criticus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\nZo nu en dan koopt Elsevier een artikel van een echte professor wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\nEdouard Bouquin is het olijke culturele geweten. Bouquin betekent: 1) oud boek van geringe waarde, 2) oude bok, 3) mannetjeskonijn. Ik kan het ook niet helpen, het staat in Larousse.<p/>\nDe politiek van dit blad wordt geschreven door een der leeuwen uit het Nederlandse wapen (ik geloof de rechtse) op een krakerige gerechtszaaltoon in zeer korte zinnetjes, omdat hij tot zijn spijt de syntaxis onvoldoende beheerst.<p/>\nAldus de artikelen van Werumeus Buning";
@@ -290,16 +333,10 @@ public class HermansTest extends AbstractTest {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
     s.toDot(vg.join(), writer);
+    LOG.info(writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);
     return writer.toString();
   }
 
-  @Test
-  public void testTEI() throws XMLStreamException, FactoryConfigurationError {
-    String text1 = "voor Zo nu en dan zin2 na voor";
-    String text2 = "voor zin2 Nu en dan voor";
-    SimpleWitness[] sw = createWitnesses(text1, text2);
-    testWitnessCollation(sw);
-  }
 }

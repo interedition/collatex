@@ -6,7 +6,7 @@
       <pattern>%-20.30(%d{HH:mm:ss.SSS} %-5level) [%50.50logger] - %msg%n</pattern>
     </encoder>
   </appender>
-  <logger name="eu.interedition" level="INFO" />
+  <logger name="eu.interedition" level="DEBUG" />
   <logger name="freemarker" level="INFO" />
   <logger name="java.awt" level="INFO" />
   <logger name="javax.swing" level="INFO" />

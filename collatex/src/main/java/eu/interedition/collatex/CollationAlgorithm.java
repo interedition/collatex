@@ -1,5 +1,9 @@
 package eu.interedition.collatex;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +21,7 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -55,6 +60,10 @@ public interface CollationAlgorithm {
       VariantGraphVertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
       for (Token token : witnessTokens) {
+        if (token.toString().contains("uurlijk")) {
+          LOG.info("token={}; into.vertices.size={}; into.edges.size={}", new Object[] { token, Iterables.size(into.vertices()), Iterables.size(into.edges()) });
+          LOG.info("");
+        }
         VariantGraphVertex matchingVertex = alignments.get(token);
         if (matchingVertex == null) {
           matchingVertex = into.add(token);
@@ -68,6 +77,7 @@ public interface CollationAlgorithm {
 
         into.connect(last, matchingVertex, witnessSet);
         last = matchingVertex;
+        //        toDotFile("inmerge", into);
       }
       into.connect(last, into.getEnd(), witnessSet);
     }
@@ -114,5 +124,18 @@ public interface CollationAlgorithm {
         into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token));
       }
     }
+
+    void toDotFile(String filename, VariantGraph vg) {
+      try {
+        PrintWriter writer = new PrintWriter(new File("out/" + filename + ".dot"), "UTF-8");
+        new SimpleVariantGraphSerializer(vg).toDot(vg, writer);
+        writer.close();
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+    }
   }
+
 }
