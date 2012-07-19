@@ -317,8 +317,10 @@ public class HermansTest extends AbstractTest {
     Set<VariantGraphTransposition> transpositions = vg.transpositions();
     assertEquals(1, transpositions.size());
     VariantGraphTransposition t = transpositions.iterator().next();
-    assertEquals("C:2:'b'", t.from().toString());
-    assertEquals("A:1:'b'", t.to().toString());
+    String string = t.from().toString();
+    assertTrue(string.contains("A:2:'c'"));
+    assertTrue(string.contains("B:1:'c'"));
+    assertEquals("[C:1:'c']", t.to().toString());
   }
 
   //  @Test

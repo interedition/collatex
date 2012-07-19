@@ -60,10 +60,6 @@ public interface CollationAlgorithm {
       VariantGraphVertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
       for (Token token : witnessTokens) {
-        if (token.toString().contains("uurlijk")) {
-          LOG.info("token={}; into.vertices.size={}; into.edges.size={}", new Object[] { token, Iterables.size(into.vertices()), Iterables.size(into.edges()) });
-          LOG.info("");
-        }
         VariantGraphVertex matchingVertex = alignments.get(token);
         if (matchingVertex == null) {
           matchingVertex = into.add(token);

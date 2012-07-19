@@ -19,17 +19,20 @@
  */
 package eu.interedition.collatex.dekker;
 
+import java.util.List;
+import java.util.Map;
+
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.GraphRelationshipType;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-import java.util.List;
-import java.util.Map;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 /**
  *
@@ -42,7 +45,7 @@ public class PhraseMatchDetector {
     List<VariantGraphVertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
     VariantGraphVertex previous = base.getStart();
- 
+
     for (Token token : tokens) {
       if (!linkedTokens.containsKey(token)) {
         continue;
@@ -51,8 +54,9 @@ public class PhraseMatchDetector {
       // requirements:
       // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
+      boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
-      boolean isNear = directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
+      boolean isNear = sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
       if (!isNear) {
         if (!basePhrase.isEmpty()) {
           phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
