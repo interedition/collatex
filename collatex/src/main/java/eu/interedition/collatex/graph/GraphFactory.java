@@ -1,13 +1,14 @@
 package eu.interedition.collatex.graph;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.io.Files;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleTokenMapper;
-import eu.interedition.collatex.simple.SimpleWitnessMapper;
+import static eu.interedition.collatex.graph.GraphRelationshipType.EDIT_GRAPH;
+import static eu.interedition.collatex.graph.GraphRelationshipType.VARIANT_GRAPH;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -16,13 +17,15 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.io.Files;
 
-import static eu.interedition.collatex.graph.GraphRelationshipType.*;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleTokenMapper;
+import eu.interedition.collatex.simple.SimpleWitnessMapper;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -147,6 +150,7 @@ public class GraphFactory {
     return graph;
   }
 
+  @Deprecated
   public EditGraph newEditGraph(VariantGraph vg) {
     final Node startNode = database.createNode();
     final Node endNode = database.createNode();

@@ -1,5 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -17,6 +18,8 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.dekker.PhraseMatchDetector;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -25,6 +28,46 @@ import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchTableLinkerTest extends AbstractTest {
 
+  @Test
+  public void testUsecase1() {
+    final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
+    final VariantGraph graph = collate(w[0]);
+    MatchTableLinker linker = new MatchTableLinker(3);
+    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
+    assertEquals(3, link.size());
+  }
+  
+  @Test
+  public void testGapsEverythingEqual() {
+    // All the witness are equal
+    // There are choices to be made however, since there is duplication of tokens
+    // Optimal alignment has no gaps
+    final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
+    final VariantGraph graph = collate(w[0]);
+    MatchTableLinker linker = new MatchTableLinker(3);
+    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
+    PhraseMatchDetector detector = new PhraseMatchDetector();
+    List<List<Match>> phraseMatches = detector.detect(link, graph, w[1]);
+    assertEquals(1, phraseMatches.size());
+  }
+
+  @Test
+  public void testGapsOmission() {
+    // There is an omission
+    // Optimal alignment has 1 gap
+    // Note: there are two paths here that contain 1 gap
+    final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
+    final VariantGraph graph = collate(w[0]);
+    MatchTableLinker linker = new MatchTableLinker(3);
+    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
+    PhraseMatchDetector detector = new PhraseMatchDetector();
+    List<List<Match>> phraseMatches = detector.detect(link, graph, w[1]);
+    assertEquals(1, phraseMatches.size());
+  }
+
+
+
+  
   @Test
   //Note: test taken from HermansTest
   public void testHermansText2c() throws XMLStreamException {
