@@ -130,8 +130,10 @@ public class AlignmentTest extends AbstractTest {
     VariantGraph graph = collate(w[0], w[1]);
     collate(graph, w[2]);
     List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
-    assertEquals("hello nice", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
-    assertEquals("cruel world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
+    assertEquals("hello", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
+    assertEquals("nice", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
+    assertEquals("cruel", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));
+    assertEquals("world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(3))));
     List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
     assertEquals(0, transpositions.size());
   }

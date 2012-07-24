@@ -52,6 +52,7 @@ public class PhraseMatchDetector {
       }
       VariantGraphVertex baseVertex = linkedTokens.get(token);
       // requirements:
+      // - previous and base vertex should have the same witnesses
       // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
       boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());

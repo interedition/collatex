@@ -20,7 +20,7 @@ public class SimpleWitnessTeiBuilderTest {
     SimpleWitnessTeiBuilder builder = new SimpleWitnessTeiBuilder();
     SimpleWitness w = builder.read(resourceAsStream);
     for (Token t : w) {
-      System.out.print(((SimpleToken)t).getContent()+" ");
+      System.out.print(((SimpleToken) t).getContent() + " ");
     }
     System.out.println();
     InputStream stream1767 = getClass().getResourceAsStream("/matenadaran_1767.xml");
@@ -28,7 +28,7 @@ public class SimpleWitnessTeiBuilderTest {
     builder = new SimpleWitnessTeiBuilder();
     SimpleWitness w2 = builder.read(stream1767);
     for (Token t : w2) {
-      System.out.print(((SimpleToken)t).getContent()+" ");
+      System.out.print(((SimpleToken) t).getContent() + " ");
     }
   }
 }

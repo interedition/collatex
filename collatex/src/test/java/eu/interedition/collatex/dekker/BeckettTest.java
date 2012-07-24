@@ -184,7 +184,7 @@ public class BeckettTest extends AbstractTest {
     assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));
     assertEquals("among others", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(3))));
     assertEquals("once died", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(4))));
-    assertEquals("left him .", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(5))));
+    assertEquals("left him", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(5))));
     assertEquals(1, transpositions.size());
     assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(transpositions.get(0))));
   }
