@@ -1,53 +1,24 @@
 package eu.interedition.collatex.graph;
 
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.dekker.EditGraphTokenLinker;
-import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Ignore;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import org.junit.Test;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
+
 public class EditGraphTest extends AbstractTest {
 
-  @Test
-  public void testUsecase1() {
-    final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
-    final VariantGraph graph = collate(w[0]);
-    EditGraphTokenLinker linker = new EditGraphTokenLinker(graphFactory);
-    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
-    assertEquals(3, link.size());
-  }
-
-  @Test
-  public void testGapsEverythingEqual() {
-    // All the witness are equal
-    // There are choices to be made however, since there is duplication of tokens
-    // Optimal alignment has no gaps
-    final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
-    final VariantGraph graph = collate(w[0]);
-    assertNumberOfGaps(0, graphFactory.newEditGraph(graph).build(graph, w[1], new EqualityTokenComparator()));
-  }
-
-  @Test
-  public void testGapsOmission() {
-    // There is an omission
-    // Optimal alignment has 1 gap
-    // Note: there are two paths here that contain 1 gap
-    final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
-    final VariantGraph graph = collate(w[0]);
-    assertNumberOfGaps(1, graphFactory.newEditGraph(graph).build(graph, w[1], new EqualityTokenComparator()));
-  }
 
   //TODO: rename test!
   //TODO: do scoring in reverse!
