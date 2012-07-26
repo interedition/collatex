@@ -30,14 +30,14 @@ public class SimpleWitnessTeiBuilder {
     while ((event = reader.peek()) != null && numberOfParagraphs < 10) {
       // System.out.println(event.toString());
       if (event.isStartElement() && event.asStartElement().getName().equals(w)) {
-	tokenContents.add(handleWElement(reader));
+        tokenContents.add(handleWElement(reader));
       } else if (event.isStartElement() && event.asStartElement().getName().equals(seg)) {
-	tokenContents.add(handleSegElement(reader));
+        tokenContents.add(handleSegElement(reader));
       } else if (event.isStartElement() && event.asStartElement().getName().equals(p)) {
-	reader.next();
-	numberOfParagraphs++;
+        reader.next();
+        numberOfParagraphs++;
       } else {
-	reader.next();
+        reader.next();
       }
     }
     witness.setTokenContents(tokenContents);
@@ -52,16 +52,16 @@ public class SimpleWitnessTeiBuilder {
     StringBuffer textBuffer = new StringBuffer();
     while ((event = reader.peek()) != null) {
       if (event.isEndElement() && event.asEndElement().getName().equals(w)) {
-	// Do what you need to do at the end, e.g. add data
-	// collected from sub elements, etc.
-	event = reader.nextEvent();
-	break;
+        // Do what you need to do at the end, e.g. add data
+        // collected from sub elements, etc.
+        event = reader.nextEvent();
+        break;
       } else {
-	// Do what you need to do for start or child elements, e.g.
-	// dispatch to another handler function
-	event = reader.nextEvent();
-	textBuffer.append(event.toString());
-	// System.out.println("Text :"+event.toString());
+        // Do what you need to do for start or child elements, e.g.
+        // dispatch to another handler function
+        event = reader.nextEvent();
+        textBuffer.append(event.toString());
+        // System.out.println("Text :"+event.toString());
       }
     }
     return textBuffer.toString();
@@ -75,17 +75,17 @@ public class SimpleWitnessTeiBuilder {
     StringBuffer textBuffer = new StringBuffer();
     while ((event = reader.peek()) != null) {
       if (event.isEndElement() && event.asEndElement().getName().equals(seg)) {
-	// Do what you need to do at the end, e.g. add data
-	// collected from sub elements, etc.
-	event = reader.nextEvent();
-	break;
+        // Do what you need to do at the end, e.g. add data
+        // collected from sub elements, etc.
+        event = reader.nextEvent();
+        break;
       } else {
-	// Do what you need to do for start or child elements, e.g.
-	// dispatch to another handler function
-	event = reader.nextEvent();
-	if (event.getEventType() == XMLEvent.CHARACTERS) {
-	  textBuffer.append(event.toString().trim());
-	}
+        // Do what you need to do for start or child elements, e.g.
+        // dispatch to another handler function
+        event = reader.nextEvent();
+        if (event.getEventType() == XMLEvent.CHARACTERS) {
+          textBuffer.append(event.toString().trim());
+        }
       }
     }
     return textBuffer.toString();

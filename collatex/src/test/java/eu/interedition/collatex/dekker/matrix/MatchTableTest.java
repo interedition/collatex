@@ -1,8 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +27,6 @@ public class MatchTableTest extends AbstractTest {
     assertEquals(rightColumn, rightEnd.getColumn());
   }
 
-  
   @Test
   public void testTableCreationEmptyGraph() {
     final VariantGraph graph = graphFactory.newVariantGraph();
@@ -37,7 +34,7 @@ public class MatchTableTest extends AbstractTest {
     MatchTable table = MatchTable.create(graph, witnesses[0]);
     assertEquals(1, table.columnList().size());
   }
-  
+
   @Test
   public void testTableCreationVariationDoesNotCauseExtraColumns() {
     SimpleWitness[] witnesses = createWitnesses("a", "b", "c", "d");
@@ -45,7 +42,7 @@ public class MatchTableTest extends AbstractTest {
     MatchTable table = MatchTable.create(graph, witnesses[3]);
     assertEquals(1, table.columnList().size());
   }
-  
+
   @Test
   public void testTableCreationAbAcAbc() {
     SimpleWitness[] witnesses = createWitnesses("a b", "a c", "a b c");
@@ -67,7 +64,7 @@ public class MatchTableTest extends AbstractTest {
     assertVertexEquals("a", table.at(1, 3));
     assertVertexEquals("b", table.at(2, 4));
   }
-  
+
   @Test
   public void testTableCreationAbcabAbcab() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
@@ -101,7 +98,7 @@ public class MatchTableTest extends AbstractTest {
     assertVertexEquals("b", table.at(4, 1));
     assertVertexEquals("b", table.at(4, 3));
   }
-  
+
   @Test
   public void testRowLabels() {
     String textD1 = "de het een";
@@ -123,9 +120,9 @@ public class MatchTableTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     List<Integer> labels = table.columnList();
-    assertEquals((Integer)0, labels.get(0));
-    assertEquals((Integer)1, labels.get(1));
-    assertEquals((Integer)2, labels.get(2));
+    assertEquals((Integer) 0, labels.get(0));
+    assertEquals((Integer) 1, labels.get(1));
+    assertEquals((Integer) 2, labels.get(2));
   }
 
   @Test
@@ -138,7 +135,6 @@ public class MatchTableTest extends AbstractTest {
     assertTrue(allTrue.contains(new Coordinate(0, 0)));
     assertFalse(allTrue.contains(new Coordinate(0, 1)));
   }
-
 
   @Test
   public void testIslandDetectionAbcabCab() {

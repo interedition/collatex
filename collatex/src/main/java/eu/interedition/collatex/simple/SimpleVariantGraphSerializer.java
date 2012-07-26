@@ -263,10 +263,14 @@ public class SimpleVariantGraphSerializer {
   }
 
   private String toLabel(VariantGraphEdge e) {
-    return VariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
+    return escapeLabel(VariantGraphEdge.TO_CONTENTS.apply(e));
   }
 
   private String toLabel(VariantGraphVertex v) {
-    return VariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
+    return escapeLabel(VariantGraphVertex.TO_CONTENTS.apply(v));
+  }
+
+  String escapeLabel(String string) {
+    return string.replaceAll("\"", "\\\"").replaceAll("\n", "[LB]");
   }
 }

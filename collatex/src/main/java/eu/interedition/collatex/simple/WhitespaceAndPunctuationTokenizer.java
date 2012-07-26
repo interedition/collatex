@@ -11,7 +11,7 @@ public class WhitespaceAndPunctuationTokenizer implements Function<String, List<
   @Override
   public List<String> apply(String input) {
     final List<String> tokens = Lists.newArrayList();
-    final StringTokenizer tokenizer = new StringTokenizer(input, " ,.-[]()¿?¡!;:\n", true);
+    final StringTokenizer tokenizer = new StringTokenizer(input, " ,.-[]()¿?¡!;:\n#<>|+", true);
     while (tokenizer.hasMoreTokens()) {
       final String token = tokenizer.nextToken().trim();
       if (token.length() > 0) {

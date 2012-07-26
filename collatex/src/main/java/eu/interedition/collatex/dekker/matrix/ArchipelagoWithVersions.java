@@ -84,9 +84,11 @@ public class ArchipelagoWithVersions extends Archipelago {
 
         }
         Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
+        LOG.debug("addBestOfCompeting with competingIslandsOnIdealLine");
         addBestOfCompeting(archipelago, distanceMap1);
 
         Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
+        LOG.debug("addBestOfCompeting with otherCompetingIslands");
         addBestOfCompeting(archipelago, distanceMap2);
 
         for (Island i : getNonCompetingIslands(islands, competingIslands)) {
