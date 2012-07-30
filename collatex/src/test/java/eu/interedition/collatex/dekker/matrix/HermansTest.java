@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -19,10 +20,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
@@ -260,6 +264,7 @@ public class HermansTest extends AbstractTest {
 
   private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {
     VariantGraph vg = collate(sw);
+    List<VariantGraphVertex> v = Lists.newArrayList(vg.vertices());
     String teiMM = generateTEI(vg);
     assertNotNull(teiMM);
     LOG.info(teiMM);
@@ -299,7 +304,7 @@ public class HermansTest extends AbstractTest {
   }
 
   @Test
-  public void testHermansAllesIsBtrekkelijk1() throws XMLStreamException {
+  public void testHermansAllesIsBetrekkelijk1() throws XMLStreamException {
     String textD1 = "natuurlijk is alles betrekkelijk";
     String textD9 = "Natuurlijk, alles mag relatief zijn";
     String textDmd1 = "Natuurlijk, alles is betrekkelijk";

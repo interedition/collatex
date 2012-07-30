@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     assertEquals(3, link.size());
   }
-  
+
   @Test
   public void testGapsEverythingEqual() {
     // All the witness are equal
@@ -65,9 +64,6 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertEquals(1, phraseMatches.size());
   }
 
-
-
-  
   @Test
   //Note: test taken from HermansTest
   public void testHermansText2c() throws XMLStreamException {
@@ -145,7 +141,7 @@ public class MatchTableLinkerTest extends AbstractTest {
   }
 
   @Test
-  public void testHermansAllesIsBtrekkelijk1() throws XMLStreamException {
+  public void testHermansAllesIsBetrekkelijk1() throws XMLStreamException {
     int outlierTranspositionsSizeLimit = 1;
     String textD1 = "natuurlijk is alles betrekkelijk";
     String textD9 = "Natuurlijk, alles mag relatief zijn";
@@ -168,6 +164,27 @@ public class MatchTableLinkerTest extends AbstractTest {
     //    assertTrue(tokensAsString.contains("B:2:'atlantische'"));
     //    assertTrue(tokensAsString.contains("B:3:'oceaan'"));
     //    assertTrue(tokensAsString.contains("B:4:'voer'"));
+  }
+
+  @Test
+  public void testSuscepto() throws XMLStreamException {
+    int outlierTranspositionsSizeLimit = 1;
+    String a = "Et sumpno suscepto tribus diebus morte morietur et deinde ab inferis regressus ad lucem veniet.";
+    String b = "Et mortem sortis finiet post tridui somnum et morte morietur tribus diebus somno suscepto et tunc ab inferis regressus ad lucem veniet.";
+    String c = "Et sortem mortis tribus diebus sompno suscepto et tunc ab inferis regressus ad lucem veniet.";
+    SimpleWitness[] sw = createWitnesses(a, b, c);
+    VariantGraph vg = collate(sw[0], sw[1]);
+    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
+
+    Set<Token> tokens = linkedTokens.keySet();
+    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    for (Token token : tokens) {
+      tokensAsString.add(token.toString());
+    }
+    List<String> l = Lists.newArrayList(tokensAsString);
+    Collections.sort(l);
+    LOG.debug("tokensAsString={}", l);
+    assertTrue(tokensAsString.contains("C:6:'suscepto'"));
   }
 
 }

@@ -85,6 +85,15 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
     LOG.debug("{} + {}: Detect transpositions", graph, witness);
     transpositions = transpositionDetector.detect(phraseMatches, graph);
+    Map<Object, Integer> mapper = Maps.newHashMap();
+    for (List<Match> transposition : transpositions) {
+      int transpositionHash = transposition.hashCode();
+      for (Match match : transposition) {
+        mapper.put(match.token, transpositionHash);
+        mapper.put(match.vertex, transpositionHash);
+        match.vertex.setTranspositionId(transpositionHash);
+      }
+    }
     if (LOG.isTraceEnabled()) {
       for (List<Match> transposition : transpositions) {
         LOG.trace("{} + {}: Transposition: {}", new Object[] { graph, witness, Iterables.toString(transposition) });

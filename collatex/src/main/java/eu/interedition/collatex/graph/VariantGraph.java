@@ -45,6 +45,7 @@ import eu.interedition.collatex.simple.SimpleToken;
  */
 public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   private static final Logger LOG = LoggerFactory.getLogger(VariantGraph.class);
+  Map<Token, Integer> transpositionId = Maps.newHashMap();
 
   private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
 
@@ -168,6 +169,23 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     Preconditions.checkArgument(!from.tokens().isEmpty());
     Preconditions.checkArgument(!to.tokens().isEmpty());
 
+    int to_transpositionId = to.getTranspositionId();
+    int from_transpositionId = from.getTranspositionId();
+    if (to_transpositionId == 0 && from_transpositionId != 0) {
+      to.setTranspositionId(from_transpositionId);
+    } else if (from_transpositionId == 0 && to_transpositionId != 0) {
+      from.setTranspositionId(to_transpositionId);
+    }
+
+    if (to_transpositionId != 0 || from_transpositionId != 0) {
+      LOG.info("from {} {} to {} {}", new Object[] { from, from.getTranspositionId(), to, to.getTranspositionId() });
+      for (Token t : from.tokens()) {
+        transpositionId.put(t, from_transpositionId);
+      }
+      for (Token t : to.tokens()) {
+        transpositionId.put(t, to_transpositionId);
+      }
+    }
     for (VariantGraphTransposition t : from.transpositions()) {
       if (t.other(from).equals(to)) {
         return t;
@@ -214,20 +232,39 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
     while (!queue.isEmpty()) {
       final VariantGraphVertex vertex = queue.pop();
-      TranspositionFingerprint tfp = vertex.getTranspositionFingerprint();
+      //      TranspositionFingerprint tfp = vertex.getTranspositionFingerprint();
       //      LOG.info("tfp={}", tfp);
-
+      Set<Token> tokens1 = vertex.tokens();
+      Integer transpositionId1 = null;
+      if (!tokens1.isEmpty()) {
+        Token t1 = tokens1.iterator().next();
+        transpositionId1 = transpositionId.get(t1);
+        if (transpositionId1 != null && transpositionId1 != 0) {
+          LOG.info("vertex {} token {} transpositionId={}", new Object[] { vertex, t1, transpositionId1 });
+        }
+      }
       final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
+        Set<Token> tokens = joinCandidateVertex.tokens();
+        Integer transpositionId2 = null;
+        if (!tokens.isEmpty()) {
+          Token t2 = tokens.iterator().next();
+          transpositionId2 = transpositionId.get(t2);
+          if (transpositionId2 != null && transpositionId2 != 0) {
+            LOG.info("candidatevertex {} token {} transpositionId={}", new Object[] { vertex, t2, transpositionId2 });
+          }
+        }
+
         //        LOG.info("\n  vertex={}, candidatevertex={}\n  tfp={}, candidate tfp={}, equals={}", new Object[] { vertex, joinCandidateVertex, tfp, joinCandidateVertex.getTranspositionFingerprint(), tfp.equals(joinCandidateVertex.getTranspositionFingerprint()) });
-        TranspositionFingerprint transpositionFingerprint = joinCandidateVertex.getTranspositionFingerprint();
+        //        TranspositionFingerprint transpositionFingerprint = joinCandidateVertex.getTranspositionFingerprint();
+        //        LOG.info("candidate {} transpositionId={}", joinCandidateVertex, joinCandidateVertex.getTranspositionId());
         boolean canJoin = !end.equals(joinCandidateVertex) && //
             Iterables.size(joinCandidateVertex.incoming()) == 1 && //
-            tfp.equals(transpositionFingerprint);
+            Objects.equal(transpositionId1, transpositionId2);
         if (canJoin) {
-          vertex.add(joinCandidateVertex.tokens());
+          vertex.add(tokens);
           for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
             final VariantGraphVertex other = t.other(joinCandidateVertex);
             t.delete();
