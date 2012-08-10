@@ -78,19 +78,24 @@ public class MatchTable {
     Matches matches = Matches.between(graph.vertices(), witness, comparator);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
+    int rowIndex=0;
     for (Token t : witness) {
       if (unique.contains(t) || ambiguous.contains(t)) {
         List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
         for (VariantGraphVertex vgv : matchingVertices) {
-          set(t, vgv.getRank() - 1, vgv);
+          set(rowIndex, vgv.getRank() - 1, t, vgv);
         }
       }
+      rowIndex++;
     }
   }
 
-  private void set(Token token, int rank, VariantGraphVertex variantGraphVertex) {
+  private void set(int rowIndex, int columnIndex, Token token, VariantGraphVertex variantGraphVertex) {
     //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
-    table.put(token, rank, variantGraphVertex);
+    table.put(token, columnIndex, variantGraphVertex);
+    if (at(rowIndex, columnIndex)!=variantGraphVertex) {
+      throw new RuntimeException("WRONG!");
+    }
   }
 
   // Since the coordinates in allMatches are ordered from upper left to lower right, 
