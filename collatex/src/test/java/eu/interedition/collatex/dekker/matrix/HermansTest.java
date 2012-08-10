@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -20,13 +19,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
@@ -264,7 +260,7 @@ public class HermansTest extends AbstractTest {
 
   private void testWitnessCollation(SimpleWitness[] sw) throws XMLStreamException, FactoryConfigurationError {
     VariantGraph vg = collate(sw);
-    List<VariantGraphVertex> v = Lists.newArrayList(vg.vertices());
+    //    List<VariantGraphVertex> v = Lists.newArrayList(vg.vertices());
     String teiMM = generateTEI(vg);
     assertNotNull(teiMM);
     LOG.info(teiMM);
@@ -283,6 +279,23 @@ public class HermansTest extends AbstractTest {
     String textD4F = "Werumeus  Buning maakt machtigmooie artikelen van vijf pagina&APO+s  over de  geologie van de  diepzee, die  hij uit Engelse  boeken overschrijft,   wat hij  pas in de laatste  regel  vermeldt,   omdat hij   zo  goed kan koken.<p/>\nJ. W.Hofstra kan niet lezen en nauwelijks stotteren,   laat staan schrijven.   Hij  oefent het ambt van literair kritikus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\nEdouard  Bouquin is  het olijke  culturele  geweten.   Bouquin betekent:   1)  oud boek  van geringe  waarde,   2)  oude bok,   3)  mannetjeskonijn.   Ik kan het ook niet helpen,   het staat in Larousse.<p/>\nNu en dan koopt Elsevier een artikel van een echte professor, wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n\nDe politiek van dit blad  wordt geschreven door een der leeuwen uit het nederlandse wapen (ik geloof de   rechtse)  op een krakerige  gerechtszaaltoon in zeer korte  zinnetjes, omdat hij  tot zijn  spijt  de  syntaxis  onvoldoende  beheerst. <p/>Volgens de stukjes van Werumeus Buning";
     SimpleWitness[] sw = createWitnesses(textMZ_DJ233, textD4F);
     testWitnessCollation(sw);
+  }
+
+  @Test
+  public void testHermansText3aJoinedTranspositions2() throws XMLStreamException {
+    String textD1 = "Over hem waakten de @Dochters Zions# naar Micha 4:13 of ook genaamd de @Zonen van Dan (Gen. 49:17)";
+    String textD9 = "Over hem waakte een garde, genaamd de @Dochter Zions# naar Micha 4 13, of ook de ,,/onen van Dan#<b> Gen</b> 49 17";
+    String textDMD1 = "Over hem waakte een garde, genaamd de ,,Dochter Zions# naar Micha 4 : 13, of ook de @zonen van Dan# Gen. 49 : 17.";
+    String textDMD5 = "Over hem waakte een garde, genaamd de @Dochter Zions# naar Micha 4 . 13, of ook de @zonen van Dan# Gen 49 17";
+
+    SimpleWitness[] sw = createWitnesses(textD1, textD9, textDMD1, textDMD5);
+    testWitnessCollation(sw);
+
+    VariantGraph vg = collate(sw).join();
+    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    assertEquals(5, transpositions.size());
+    VariantGraphTransposition transposition = transpositions.iterator().next();
+    assertEquals("genaamd de", transposition.from().toString());
   }
 
   @Test
