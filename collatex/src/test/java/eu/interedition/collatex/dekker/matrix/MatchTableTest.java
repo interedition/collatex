@@ -51,9 +51,9 @@ public class MatchTableTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses("a b", "a c", "a b c");
     VariantGraph graph = collate(witnesses[0], witnesses[1]);
     MatchTable table = MatchTable.create(graph, witnesses[2]);
-    assertVertexEquals("a", table.at(0, 0));
-    assertVertexEquals("b", table.at(1, 1));
-    assertVertexEquals("c", table.at(2, 1));
+    assertVertexEquals("a", table.vertexAt(0, 0));
+    assertVertexEquals("b", table.vertexAt(1, 1));
+    assertVertexEquals("c", table.vertexAt(2, 1));
   }
 
   @Test
@@ -61,11 +61,11 @@ public class MatchTableTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses("a b c a b", "c a b");
     VariantGraph graph = collate(witnesses[0]);
     MatchTable table = MatchTable.create(graph, witnesses[1]);
-    assertVertexEquals("a", table.at(1, 0));
-    assertVertexEquals("b", table.at(2, 1));
-    assertVertexEquals("c", table.at(0, 2));
-    assertVertexEquals("a", table.at(1, 3));
-    assertVertexEquals("b", table.at(2, 4));
+    assertVertexEquals("a", table.vertexAt(1, 0));
+    assertVertexEquals("b", table.vertexAt(2, 1));
+    assertVertexEquals("c", table.vertexAt(0, 2));
+    assertVertexEquals("a", table.vertexAt(1, 3));
+    assertVertexEquals("b", table.vertexAt(2, 4));
   }
   
   @Test
@@ -75,15 +75,15 @@ public class MatchTableTest extends AbstractTest {
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     assertEquals(5, table.columnList().size());
     assertEquals(5, table.rowList().size());
-    assertVertexEquals("a", table.at(0, 0));
-    assertVertexEquals("a", table.at(0, 3));
-    assertVertexEquals("b", table.at(1, 1));
-    assertVertexEquals("b", table.at(1, 4));
-    assertVertexEquals("c", table.at(2, 2));
-    assertVertexEquals("a", table.at(3, 0));
-    assertVertexEquals("a", table.at(3, 3));
-    assertVertexEquals("b", table.at(4, 1));
-    assertVertexEquals("b", table.at(4, 4));
+    assertVertexEquals("a", table.vertexAt(0, 0));
+    assertVertexEquals("a", table.vertexAt(0, 3));
+    assertVertexEquals("b", table.vertexAt(1, 1));
+    assertVertexEquals("b", table.vertexAt(1, 4));
+    assertVertexEquals("c", table.vertexAt(2, 2));
+    assertVertexEquals("a", table.vertexAt(3, 0));
+    assertVertexEquals("a", table.vertexAt(3, 3));
+    assertVertexEquals("b", table.vertexAt(4, 1));
+    assertVertexEquals("b", table.vertexAt(4, 4));
   }
 
   @Test
@@ -91,15 +91,15 @@ public class MatchTableTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
     VariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    assertVertexEquals("a", table.at(0, 0));
-    assertVertexEquals("a", table.at(0, 2));
-    assertVertexEquals("b", table.at(1, 1));
-    assertVertexEquals("b", table.at(1, 3));
-    assertVertexEquals("c", table.at(2, 4));
-    assertVertexEquals("a", table.at(3, 0));
-    assertVertexEquals("a", table.at(3, 2));
-    assertVertexEquals("b", table.at(4, 1));
-    assertVertexEquals("b", table.at(4, 3));
+    assertVertexEquals("a", table.vertexAt(0, 0));
+    assertVertexEquals("a", table.vertexAt(0, 2));
+    assertVertexEquals("b", table.vertexAt(1, 1));
+    assertVertexEquals("b", table.vertexAt(1, 3));
+    assertVertexEquals("c", table.vertexAt(2, 4));
+    assertVertexEquals("a", table.vertexAt(3, 0));
+    assertVertexEquals("a", table.vertexAt(3, 2));
+    assertVertexEquals("b", table.vertexAt(4, 1));
+    assertVertexEquals("b", table.vertexAt(4, 3));
   }
   
   @Test

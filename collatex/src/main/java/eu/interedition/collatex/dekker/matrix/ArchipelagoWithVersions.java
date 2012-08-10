@@ -218,7 +218,7 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   private boolean coordinateOverlapsWithFixed(Coordinate coordinate) {
     return fixedRows.contains(coordinate.row) || //
-        fixedVertices.contains(table.at(coordinate.row, coordinate.column));
+        fixedVertices.contains(table.vertexAt(coordinate.row, coordinate.column));
   }
 
   private void addIslandToResult(Island isl, Archipelago result) {
@@ -227,7 +227,7 @@ public class ArchipelagoWithVersions extends Archipelago {
       result.add(isl);
       for (Coordinate coordinate : isl) {
         fixedRows.add(coordinate.row);
-        fixedVertices.add(table.at(coordinate.row, coordinate.column));
+        fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
       }
 
     } else {

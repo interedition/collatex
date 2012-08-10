@@ -56,7 +56,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     data = new MatchTableCell[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {
-        VariantGraphVertex at = matchTable.at(row, col);
+        VariantGraphVertex at = matchTable.vertexAt(row, col);
         MatchMatrixCellStatus status;
         if (at != null) {
           status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;

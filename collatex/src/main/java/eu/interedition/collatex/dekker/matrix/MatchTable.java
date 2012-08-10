@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
@@ -33,10 +34,12 @@ import eu.interedition.collatex.matching.Matches;
 //TODO: work with it requires work
 public class MatchTable {
   static Logger LOG = LoggerFactory.getLogger(MatchTable.class);
-  private final ArrayTable<Token, Integer, VariantGraphVertex> table;
-
-  public MatchTable(Iterable<Token> tokens, Iterable<Integer> ranks) {
-    this.table = ArrayTable.create(tokens, ranks);
+  private final ArrayTable<Integer, Integer, MatchTableCell> table;
+  private final Iterable<Token> witness;
+  
+  public MatchTable(Iterable<Token> tokens, Iterable<Integer> tokensInteger, Iterable<Integer> ranks) {
+    this.table = ArrayTable.create(tokensInteger, ranks);
+    this.witness = tokens;
   }
 
   // assumes default token comparator
@@ -53,12 +56,21 @@ public class MatchTable {
     return table;
   }
 
-  public VariantGraphVertex at(int rowIndex, int columnIndex) {
-    return table.at(rowIndex, columnIndex);
+  public VariantGraphVertex vertexAt(int rowIndex, int columnIndex) {
+    MatchTableCell cell = table.at(rowIndex, columnIndex);
+    return cell==null ? null : cell.variantGraphVertex;
+  }
+  
+  public Token tokenAt(int rowIndex, int columnIndex) {
+    MatchTableCell cell = table.at(rowIndex, columnIndex);
+    return cell==null ? null : cell.token;
   }
 
+  // Warning: this method reiterates the witness!
+  // This method is only meant for the user interface and serialization classes!
+  // Use the tokenAt method in all other cases.
   public List<Token> rowList() {
-    return table.rowKeyList();
+    return Lists.newArrayList(witness);
   }
 
   public List<Integer> columnList() {
@@ -68,9 +80,11 @@ public class MatchTable {
   private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
     graph.rank();
     // -2 === ignore the start and the end vertex
-    Range<Integer> range = Ranges.closed(0, Math.max(0, graph.getEnd().getRank() - 2));
-    ImmutableList<Integer> set = range.asSet(DiscreteDomains.integers()).asList();
-    return new MatchTable(witness, set);
+    Range<Integer> ranksRange = Ranges.closed(0, Math.max(0, graph.getEnd().getRank() - 2));
+    ImmutableList<Integer> ranksSet = ranksRange.asSet(DiscreteDomains.integers()).asList();
+    Range<Integer> tokensRange = Ranges.closed(0, Iterables.size(witness)-1);
+    ImmutableList<Integer> tokensSet = tokensRange.asSet(DiscreteDomains.integers()).asList();
+    return new MatchTable(witness, tokensSet, ranksSet);
   }
 
   // move parameters into fields?
@@ -91,11 +105,9 @@ public class MatchTable {
   }
 
   private void set(int rowIndex, int columnIndex, Token token, VariantGraphVertex variantGraphVertex) {
-    //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, rank, variantGraphVertex });
-    table.put(token, columnIndex, variantGraphVertex);
-    if (at(rowIndex, columnIndex)!=variantGraphVertex) {
-      throw new RuntimeException("WRONG!");
-    }
+    //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, columnIndex, variantGraphVertex });
+    MatchTableCell cell = new MatchTableCell(token, variantGraphVertex);
+    table.put(rowIndex, columnIndex, cell);
   }
 
   // Since the coordinates in allMatches are ordered from upper left to lower right, 
@@ -122,7 +134,7 @@ public class MatchTable {
     Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff);
     VariantGraphVertex neighbor = null;
     try {
-      neighbor = table.at(c.row + diff, c.column + diff);
+      neighbor = vertexAt(c.row + diff, c.column + diff);
     } catch (IndexOutOfBoundsException e) {}
     if (neighbor != null) {
       Island island = coordinateMapper.get(neighborCoordinate);
@@ -141,10 +153,10 @@ public class MatchTable {
     }
   }
 
-  // Note; code taken from MatchMatrix class
+  // Note: code taken from MatchMatrix class
   // might be simpler to work from the cellSet
   // problem there is that a token does not have to have a position
-  // but a Cell Object might have one?
+  // but a Cell Object might have one? Upd: does not seem so
   List<Coordinate> allMatches() {
     List<Coordinate> pairs = Lists.newArrayList();
     int rows = table.rowKeySet().size();
@@ -155,5 +167,15 @@ public class MatchTable {
       }
     }
     return pairs;
+  }
+  
+  private class MatchTableCell {
+    public final Token token;
+    public final VariantGraphVertex variantGraphVertex;
+
+    public MatchTableCell(Token token, VariantGraphVertex variantGraphVertex) {
+      this.token = token;
+      this.variantGraphVertex = variantGraphVertex;
+    }
   }
 }
