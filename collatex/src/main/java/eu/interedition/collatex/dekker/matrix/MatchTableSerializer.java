@@ -33,7 +33,7 @@ public class MatchTableSerializer {
     for (String label : rLabels) {
       result.append("<tr><td>").append(label).append("</td>");
       for (int col = 0; col < colNum; col++)
-        if (sparseMatrix.at(row, col)!=null)
+        if (sparseMatrix.vertexAt(row, col)!=null)
           result.append("<td BGCOLOR=\"lightgreen\">M</td>");
         else
           result.append("<td></td>");
@@ -86,7 +86,7 @@ public class MatchTableSerializer {
     for (String label : rLabels) {
       result.append(label);
       for (int col = 0; col < colNum; col++)
-        result.append(" ").append(sparseMatrix.at(row++, col)!=null);
+        result.append(" ").append(sparseMatrix.vertexAt(row++, col)!=null);
       result.append("\n");
     }
     return result.toString();
