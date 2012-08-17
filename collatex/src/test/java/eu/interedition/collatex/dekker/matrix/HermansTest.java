@@ -8,6 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -19,16 +23,21 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class HermansTest extends AbstractTest {
+
   @Before
   public void setUp() {
     setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new StrictEqualityTokenComparator(), 1));
@@ -274,6 +283,45 @@ public class HermansTest extends AbstractTest {
   }
 
   @Test
+  public void test4JoinedTranspositions2witnesses() throws XMLStreamException {
+    String a = "a1 a2 a3 b1 b2 b3 c1 c2 c3 d1 d2 d3";
+    String b = "d1 d2 d3 a1 a2 a3 c1 c2 c3 b1 b2 b3";
+    SimpleWitness[] sw = createWitnesses(a, b);
+    //    testWitnessCollation(sw);
+
+    VariantGraph vg = collate(sw).join();
+    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    LOG.info("{} transpositions", transpositions.size());
+    for (VariantGraphTransposition t : transpositions) {
+      // all joined vertices should be size 3
+      LOG.info("transposition {}", t);
+      assertEquals(showTransposition(t), 3, t.from().tokens().size());
+      assertEquals(showTransposition(t), 3, t.to().tokens().size());
+    }
+    assertEquals(4, transpositions.size());
+  }
+
+  @Test
+  public void test4JoinedTranspositions3witnesses() throws XMLStreamException {
+    String a = "a1 a2 a3 b1 b2 b3 c1 c2 c3 d1 d2 d3";
+    String b = "d1 d2 d3 a1 a2 a3 c1 c2 c3 b1 b2 b3";
+    String c = "c1 c2 c3 b1 b2 b3 d1 d2 d3 a1 a2 a3";
+    SimpleWitness[] sw = createWitnesses(a, b, c);
+    //    testWitnessCollation(sw);
+
+    VariantGraph vg = collate(sw).join();
+    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    LOG.info("{} transpositions", transpositions.size());
+    for (VariantGraphTransposition t : transpositions) {
+      // all joined vertices should be size 3
+      LOG.info("transposition {}", t);
+      assertEquals(showTransposition(t), 3, t.from().tokens().size());
+      assertEquals(showTransposition(t), 3, t.to().tokens().size());
+    }
+    assertEquals(4, transpositions.size());
+  }
+
+  @Test
   public void testHermansText3aJoinedTranspositions() throws XMLStreamException {
     String textMZ_DJ233 = "Werumeus Buning maakt artikelen van vijf pagina&APO+s over de geologie van de diepzee, die hij uit Engelse boeken overschrijft, wat hij pas in de laatste regel vermeldt, omdat hij zo goed kan koken.<p/>\nJ. W. Hofstra kan niet lezen en nauwelijks stotteren, laat staan schrijven. Hij oefent het ambt van litterair criticus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\nZo nu en dan koopt Elsevier een artikel van een echte professor wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\nEdouard Bouquin is het olijke culturele geweten. Bouquin betekent: 1) oud boek van geringe waarde, 2) oude bok, 3) mannetjeskonijn. Ik kan het ook niet helpen, het staat in Larousse.<p/>\nDe politiek van dit blad wordt geschreven door een der leeuwen uit het Nederlandse wapen (ik geloof de rechtse) op een krakerige gerechtszaaltoon in zeer korte zinnetjes, omdat hij tot zijn spijt de syntaxis onvoldoende beheerst.<p/>\nAldus de artikelen van Werumeus Buning";
     String textD4F = "Werumeus  Buning maakt machtigmooie artikelen van vijf pagina&APO+s  over de  geologie van de  diepzee, die  hij uit Engelse  boeken overschrijft,   wat hij  pas in de laatste  regel  vermeldt,   omdat hij   zo  goed kan koken.<p/>\nJ. W.Hofstra kan niet lezen en nauwelijks stotteren,   laat staan schrijven.   Hij  oefent het ambt van literair kritikus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\nEdouard  Bouquin is  het olijke  culturele  geweten.   Bouquin betekent:   1)  oud boek  van geringe  waarde,   2)  oude bok,   3)  mannetjeskonijn.   Ik kan het ook niet helpen,   het staat in Larousse.<p/>\nNu en dan koopt Elsevier een artikel van een echte professor, wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n\nDe politiek van dit blad  wordt geschreven door een der leeuwen uit het nederlandse wapen (ik geloof de   rechtse)  op een krakerige  gerechtszaaltoon in zeer korte  zinnetjes, omdat hij  tot zijn  spijt  de  syntaxis  onvoldoende  beheerst. <p/>Volgens de stukjes van Werumeus Buning";
@@ -359,4 +407,18 @@ public class HermansTest extends AbstractTest {
     return writer.toString();
   }
 
+  private static final Comparator<Token> ON_ORDER = new Comparator<Token>() {
+    @Override
+    public int compare(Token t1, Token t2) {
+      return ((SimpleToken) t1).getIndex() - ((SimpleToken) t2).getIndex();
+    }
+  };
+
+  private String showTransposition(VariantGraphTransposition t) {
+    List<Token> ftokens = Lists.newArrayList(t.from().tokens());
+    List<Token> ttokens = Lists.newArrayList(t.to().tokens());
+    Collections.sort(ftokens, ON_ORDER);
+    Collections.sort(ttokens, ON_ORDER);
+    return MessageFormat.format("{0} -> {1}", ftokens, ttokens);
+  }
 }
