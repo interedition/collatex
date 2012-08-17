@@ -288,13 +288,18 @@ public class HermansTest extends AbstractTest {
     String b = "d1 d2 d3 a1 a2 a3 c1 c2 c3 b1 b2 b3";
     SimpleWitness[] sw = createWitnesses(a, b);
     //    testWitnessCollation(sw);
+    VariantGraph vg = collate(sw);
+    Set<VariantGraphTransposition> transpositions0 = vg.transpositions();
+    for (VariantGraphTransposition t : transpositions0) {
+      LOG.info("transposition {}", showTransposition(t));
+    }
 
-    VariantGraph vg = collate(sw).join();
+    vg.join();
     Set<VariantGraphTransposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraphTransposition t : transpositions) {
       // all joined vertices should be size 3
-      LOG.info("transposition {}", t);
+      LOG.info("transposition {}", showTransposition(t));
       assertEquals(showTransposition(t), 3, t.from().tokens().size());
       assertEquals(showTransposition(t), 3, t.to().tokens().size());
     }
@@ -308,13 +313,14 @@ public class HermansTest extends AbstractTest {
     String c = "c1 c2 c3 b1 b2 b3 d1 d2 d3 a1 a2 a3";
     SimpleWitness[] sw = createWitnesses(a, b, c);
     //    testWitnessCollation(sw);
+    VariantGraph vg = collate(sw);
 
-    VariantGraph vg = collate(sw).join();
+    vg.join();
     Set<VariantGraphTransposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraphTransposition t : transpositions) {
       // all joined vertices should be size 3
-      LOG.info("transposition {}", t);
+      LOG.info("transposition {}", showTransposition(t));
       assertEquals(showTransposition(t), 3, t.from().tokens().size());
       assertEquals(showTransposition(t), 3, t.to().tokens().size());
     }
@@ -329,7 +335,7 @@ public class HermansTest extends AbstractTest {
     testWitnessCollation(sw);
   }
 
-  @Test
+  //  @Test
   public void testHermansText3aJoinedTranspositions2() throws XMLStreamException {
     String textD1 = "Over hem waakten de @Dochters Zions# naar Micha 4:13 of ook genaamd de @Zonen van Dan (Gen. 49:17)";
     String textD9 = "Over hem waakte een garde, genaamd de @Dochter Zions# naar Micha 4 13, of ook de ,,/onen van Dan#<b> Gen</b> 49 17";

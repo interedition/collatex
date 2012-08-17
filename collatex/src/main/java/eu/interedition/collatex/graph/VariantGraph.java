@@ -292,12 +292,12 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       Token t = tokens.iterator().next();
       tid = transpositionId.get(t);
       if (tid != null && tid != 0) {
-        LOG.info("token {} transpositionId={}", new Object[] { t, tid });
+        LOG.info("token {} ; transpositionId={}", new Object[] { t, tid });
       }
       Iterator<Token> i = tokens.iterator();
       while (i.hasNext()) {
         Token token = i.next();
-        LOG.info("token {} ; transpositionId {}", token, transpositionId.get(token));
+        LOG.info("token {} ; transpositionId={}", token, transpositionId.get(token));
       }
     }
     return tid;
