@@ -253,6 +253,10 @@ public class SimpleVariantGraphSerializer {
         out.println(";");
       }
 
+      out.print(indent + "v" + graph.getStart().getNode().getId() + connector + "v" + graph.getEnd().getNode().getId());
+      out.print(" [color =  \"white\"]");
+      out.println(";");
+
       out.println("}");
 
       out.flush();
