@@ -249,7 +249,7 @@ public class SimpleVariantGraphSerializer {
 
       for (VariantGraphTransposition t : graph.transpositions()) {
         out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
-        out.print(" [color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.print(" [label = \"" + t.getId() + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
       }
 

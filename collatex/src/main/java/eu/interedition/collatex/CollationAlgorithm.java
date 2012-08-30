@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.dekker.Match;
@@ -78,46 +78,48 @@ public interface CollationAlgorithm {
       into.connect(last, into.getEnd(), witnessSet);
     }
 
-    protected List<List<Match>> filterOutlierTranspositions(VariantGraph into, List<List<Match>> transpositions) {
-      into.rank();
-      LOG.debug("{}: Registering transpositions", into);
-      List<List<Match>> filteredTranspositions = Lists.newArrayList(transpositions);
-      for (List<Match> transposedPhrase : transpositions) {
-        Match firstMatch = transposedPhrase.get(0);
-        VariantGraphVertex from = firstMatch.vertex;
-        Token token = firstMatch.token;
-        VariantGraphVertex to = witnessTokenVertices.get(token);
-        LOG.debug("matchPhrase={}", transposedPhrase);
-        int fromRank = from.getRank();
-        //        LOG.debug("from={}, rank={}", from, fromRank);
-        int toRank = to.getRank();
-        //        LOG.debug("to={}, rank={}", to, toRank);
-        int diff = Math.abs(toRank - fromRank);
-        int size = transposedPhrase.size();
-
-        int relDiff = diff / size;
-        boolean acceptTransposition = relDiff < 5;
-        LOG.debug("accept={}, relDiff={}, size={}, diff={}, from={}, to={}\n", new Object[] { acceptTransposition, relDiff, size, diff, from, to });
-        if (acceptTransposition) {
-          for (Match match : transposedPhrase) {
-            into.transpose(match.vertex, witnessTokenVertices.get(match.token));
-          }
-        } else {
-          filteredTranspositions.remove(transposedPhrase);
-        }
-      }
-      return filteredTranspositions;
-    }
+    //    protected List<List<Match>> filterOutlierTranspositions(VariantGraph into, List<List<Match>> transpositions) {
+    //      into.rank();
+    //      LOG.debug("{}: Registering transpositions", into);
+    //      List<List<Match>> filteredTranspositions = Lists.newArrayList(transpositions);
+    //      for (List<Match> transposedPhrase : transpositions) {
+    //        Match firstMatch = transposedPhrase.get(0);
+    //        VariantGraphVertex from = firstMatch.vertex;
+    //        Token token = firstMatch.token;
+    //        VariantGraphVertex to = witnessTokenVertices.get(token);
+    //        LOG.debug("matchPhrase={}", transposedPhrase);
+    //        int fromRank = from.getRank();
+    //        //        LOG.debug("from={}, rank={}", from, fromRank);
+    //        int toRank = to.getRank();
+    //        //        LOG.debug("to={}, rank={}", to, toRank);
+    //        int diff = Math.abs(toRank - fromRank);
+    //        int size = transposedPhrase.size();
+    //
+    //        int relDiff = diff / size;
+    //        boolean acceptTransposition = relDiff < 5;
+    //        LOG.debug("accept={}, relDiff={}, size={}, diff={}, from={}, to={}\n", new Object[] { acceptTransposition, relDiff, size, diff, from, to });
+    //        if (acceptTransposition) {
+    //          for (Match match : transposedPhrase) {
+    //            into.transpose(match.vertex, witnessTokenVertices.get(match.token));
+    //          }
+    //        } else {
+    //          filteredTranspositions.remove(transposedPhrase);
+    //        }
+    //      }
+    //      return filteredTranspositions;
+    //    }
 
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
-      final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
       for (List<Match> transposedPhrase : transpositions) {
+        int transpositionId = RandomUtils.nextInt(327680000);//transposedPhrase.hashCode();
+        final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
+        LOG.info("transposition: {}, hash={}", transposedPhrase, transpositionId);
         for (Match match : transposedPhrase) {
           transposedTokens.put(match.token, match.vertex);
         }
-      }
-      for (Token token : transposedTokens.keySet()) {
-        into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token));
+        for (Token token : transposedTokens.keySet()) {
+          into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token), transpositionId);
+        }
       }
     }
 

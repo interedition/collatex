@@ -53,11 +53,13 @@ public class PhraseMatchDetector {
       VariantGraphVertex baseVertex = linkedTokens.get(token);
       // requirements:
       // - previous and base vertex should have the same witnesses
+      // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
       // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
+      boolean sameTranspositions = previous.getTranspositionIds().equals(baseVertex.getTranspositionIds());
       boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
-      boolean isNear = sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
+      boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
       if (!isNear) {
         if (!basePhrase.isEmpty()) {
           phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));

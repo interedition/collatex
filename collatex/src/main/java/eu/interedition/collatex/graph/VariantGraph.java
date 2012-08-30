@@ -164,39 +164,19 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return new VariantGraphEdge(this, from, to, witnesses);
   }
 
-  public VariantGraphTransposition transpose(VariantGraphVertex from, VariantGraphVertex to) {
+  public VariantGraphTransposition transpose(VariantGraphVertex from, VariantGraphVertex to, int transpId) {
     Preconditions.checkArgument(!from.equals(to));
     Preconditions.checkArgument(!from.tokens().isEmpty());
     Preconditions.checkArgument(!to.tokens().isEmpty());
 
-    updateTranspositionIds(from, to);
+    //    updateTranspositionIds(from, to);
     for (VariantGraphTransposition t : from.transpositions()) {
       if (t.other(from).equals(to)) {
         return t;
       }
     }
 
-    return new VariantGraphTransposition(this, from, to);
-  }
-
-  private void updateTranspositionIds(VariantGraphVertex from, VariantGraphVertex to) {
-    int to_transpositionId = to.getTranspositionId();
-    int from_transpositionId = from.getTranspositionId();
-    if (to_transpositionId == 0 && from_transpositionId != 0) {
-      to.setTranspositionId(from_transpositionId);
-    } else if (from_transpositionId == 0 && to_transpositionId != 0) {
-      from.setTranspositionId(to_transpositionId);
-    }
-
-    if (to_transpositionId != 0 || from_transpositionId != 0) {
-      LOG.info("from {} {} to {} {}", new Object[] { from, from.getTranspositionId(), to, to.getTranspositionId() });
-      for (Token t : from.tokens()) {
-        transpositionId.put(t, from_transpositionId);
-      }
-      for (Token t : to.tokens()) {
-        transpositionId.put(t, to_transpositionId);
-      }
-    }
+    return new VariantGraphTransposition(this, from, to, transpId);
   }
 
   public boolean isNear(VariantGraphVertex a, VariantGraphVertex b) {
@@ -236,28 +216,24 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
     while (!queue.isEmpty()) {
       final VariantGraphVertex vertex = queue.pop();
-      //      TranspositionFingerprint tfp = vertex.getTranspositionFingerprint();
-      //      LOG.info("tfp={}", tfp);
-      Integer transpositionId1 = vertex.getTranspositionId();
+      Set<Integer> transpositionIds1 = vertex.getTranspositionIds();
       final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
-        Set<Token> candidateTtokens = joinCandidateVertex.tokens();
-        Integer transpositionId2 = joinCandidateVertex.getTranspositionId();
+        Set<Token> candidateTokens = joinCandidateVertex.tokens();
+        Set<Integer> transpositionIds2 = joinCandidateVertex.getTranspositionIds();
 
-        //        LOG.info("\n  vertex={}, candidatevertex={}\n  tfp={}, candidate tfp={}, equals={}", new Object[] { vertex, joinCandidateVertex, tfp, joinCandidateVertex.getTranspositionFingerprint(), tfp.equals(joinCandidateVertex.getTranspositionFingerprint()) });
-        //        TranspositionFingerprint transpositionFingerprint = joinCandidateVertex.getTranspositionFingerprint();
-        //        LOG.info("candidate {} transpositionId={}", joinCandidateVertex, joinCandidateVertex.getTranspositionId());
         boolean canJoin = !end.equals(joinCandidateVertex) && //
             Iterables.size(joinCandidateVertex.incoming()) == 1 && //
-            Objects.equal(transpositionId1, transpositionId2);
+            transpositionIds1.equals(transpositionIds2);
         if (canJoin) {
-          vertex.add(candidateTtokens);
+          vertex.add(candidateTokens);
           for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
             final VariantGraphVertex other = t.other(joinCandidateVertex);
+            int id = t.getId();
             t.delete();
-            transpose(vertex, other);
+            transpose(vertex, other, id);
           }
           for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
             final VariantGraphVertex to = e.to();
@@ -285,24 +261,6 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return this;
   }
 
-  private Integer getTranspositionId(Set<Token> tokens) {
-    //    Set<Token> tokens = v.tokens();
-    Integer tid = null;
-    if (!tokens.isEmpty()) {
-      Token t = tokens.iterator().next();
-      tid = transpositionId.get(t);
-      if (tid != null && tid != 0) {
-        LOG.info("token {} ; transpositionId={}", new Object[] { t, tid });
-      }
-      Iterator<Token> i = tokens.iterator();
-      while (i.hasNext()) {
-        Token token = i.next();
-        LOG.info("token {} ; transpositionId={}", token, transpositionId.get(token));
-      }
-    }
-    return tid;
-  }
-
   public VariantGraph rank() {
     for (VariantGraphVertex v : vertices()) {
       int rank = -1;
@@ -320,7 +278,6 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       for (VariantGraphTransposition vgt : transpositions) {
         VariantGraphVertex from = vgt.from();
         VariantGraphVertex to = vgt.to();
-        //        LOG.debug("\nv {},\n from {},\n to {}", new Object[] { v, from, to });
         if (from.equals(v)) {
           addNullVertex(v, from, to);
         } else if (to.equals(v)) {

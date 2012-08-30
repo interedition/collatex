@@ -7,6 +7,8 @@ import static org.neo4j.graphdb.Direction.*;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -30,7 +32,6 @@ import eu.interedition.collatex.simple.SimpleToken;
 public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   private static final String TOKEN_REFERENCE_KEY = "tokenReferences";
   private static final String RANK_KEY = "rank";
-  private static final String TRANSPOSITIONID_KEY = "transpositionId";
 
   //  private int transpositionId;
 
@@ -128,14 +129,6 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     node.setProperty(RANK_KEY, rank);
   }
 
-  public int getTranspositionId() {
-    return node.hasProperty(TRANSPOSITIONID_KEY) ? (Integer) node.getProperty(TRANSPOSITIONID_KEY) : 0;
-  }
-
-  public void setTranspositionId(int transpositionId) {
-    node.setProperty(TRANSPOSITIONID_KEY, transpositionId);
-  }
-
   public int[] getTokenReferences() {
     return (int[]) node.getProperty(TOKEN_REFERENCE_KEY);
   }
@@ -179,9 +172,14 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
       return input.getRank();
     }
   };
+  private static final Function<VariantGraphTransposition, Integer> TRANSPOSITION_ID = new Function<VariantGraphTransposition, Integer>() {
+    @Override
+    public Integer apply(@Nullable VariantGraphTransposition t) {
+      return t.getId();
+    }
+  };
 
-  //  public TranspositionFingerprint getTranspositionFingerprint() {
-  //    return new TranspositionFingerprint(this);
-  //  }
-
+  public Set<Integer> getTranspositionIds() {
+    return Sets.newHashSet(Iterables.transform(transpositions(), TRANSPOSITION_ID));
+  }
 }
