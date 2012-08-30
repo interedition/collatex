@@ -30,6 +30,7 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphTransposition;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -294,6 +295,10 @@ public class HermansTest extends AbstractTest {
       LOG.info("transposition {}", showTransposition(t));
     }
 
+    Iterable<VariantGraphVertex> vertices = vg.vertices();
+    for (VariantGraphVertex v : vertices) {
+      LOG.info("vertex:{}, transpositionid:{}", v, v.getTranspositionId());
+    }
     vg.join();
     Set<VariantGraphTransposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
@@ -303,7 +308,7 @@ public class HermansTest extends AbstractTest {
       assertEquals(showTransposition(t), 3, t.from().tokens().size());
       assertEquals(showTransposition(t), 3, t.to().tokens().size());
     }
-    assertEquals(4, transpositions.size());
+    assertEquals(3, transpositions.size());
   }
 
   @Test

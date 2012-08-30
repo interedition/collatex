@@ -30,7 +30,9 @@ import eu.interedition.collatex.simple.SimpleToken;
 public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   private static final String TOKEN_REFERENCE_KEY = "tokenReferences";
   private static final String RANK_KEY = "rank";
-  private int transpositionId;
+  private static final String TRANSPOSITIONID_KEY = "transpositionId";
+
+  //  private int transpositionId;
 
   public VariantGraphVertex(VariantGraph graph, Node node) {
     super(graph, node);
@@ -126,6 +128,14 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
     node.setProperty(RANK_KEY, rank);
   }
 
+  public int getTranspositionId() {
+    return node.hasProperty(TRANSPOSITIONID_KEY) ? (Integer) node.getProperty(TRANSPOSITIONID_KEY) : 0;
+  }
+
+  public void setTranspositionId(int transpositionId) {
+    node.setProperty(TRANSPOSITIONID_KEY, transpositionId);
+  }
+
   public int[] getTokenReferences() {
     return (int[]) node.getProperty(TOKEN_REFERENCE_KEY);
   }
@@ -173,13 +183,5 @@ public class VariantGraphVertex extends GraphVertex<VariantGraph> {
   //  public TranspositionFingerprint getTranspositionFingerprint() {
   //    return new TranspositionFingerprint(this);
   //  }
-
-  public void setTranspositionId(int hashCode) {
-    transpositionId = hashCode;
-  }
-
-  public int getTranspositionId() {
-    return transpositionId;
-  }
 
 }

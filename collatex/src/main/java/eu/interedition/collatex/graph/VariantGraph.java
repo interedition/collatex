@@ -238,13 +238,13 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       final VariantGraphVertex vertex = queue.pop();
       //      TranspositionFingerprint tfp = vertex.getTranspositionFingerprint();
       //      LOG.info("tfp={}", tfp);
-      Integer transpositionId1 = getTranspositionId(vertex.tokens());
+      Integer transpositionId1 = vertex.getTranspositionId();
       final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
         Set<Token> candidateTtokens = joinCandidateVertex.tokens();
-        Integer transpositionId2 = getTranspositionId(candidateTtokens);
+        Integer transpositionId2 = joinCandidateVertex.getTranspositionId();
 
         //        LOG.info("\n  vertex={}, candidatevertex={}\n  tfp={}, candidate tfp={}, equals={}", new Object[] { vertex, joinCandidateVertex, tfp, joinCandidateVertex.getTranspositionFingerprint(), tfp.equals(joinCandidateVertex.getTranspositionFingerprint()) });
         //        TranspositionFingerprint transpositionFingerprint = joinCandidateVertex.getTranspositionFingerprint();
