@@ -36,7 +36,8 @@ import eu.interedition.collatex.graph.VariantGraphVertex;
 
 /**
  *
- * @author Ronald
+ * @author Ronald Haentjens Dekker
+ * @author Bram Buitendijk
  */
 public class PhraseMatchDetector {
 
@@ -48,6 +49,7 @@ public class PhraseMatchDetector {
 
     for (Token token : tokens) {
       if (!linkedTokens.containsKey(token)) {
+	addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
         continue;
       }
       VariantGraphVertex baseVertex = linkedTokens.get(token);
@@ -61,11 +63,7 @@ public class PhraseMatchDetector {
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
       boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
       if (!isNear) {
-        if (!basePhrase.isEmpty()) {
-          phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
-          basePhrase.clear();
-          witnessPhrase.clear();
-        }
+        addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
       }
       basePhrase.add(baseVertex);
       witnessPhrase.add(token);
@@ -75,6 +73,14 @@ public class PhraseMatchDetector {
       phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
     }
     return phraseMatches;
+  }
+
+  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraphVertex> basePhrase, List<Token> witnessPhrase) {
+    if (!basePhrase.isEmpty()) {
+      phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
+      basePhrase.clear();
+      witnessPhrase.clear();
+    }
   }
 
   private boolean directedEdgeBetween(VariantGraphVertex a, VariantGraphVertex b) {

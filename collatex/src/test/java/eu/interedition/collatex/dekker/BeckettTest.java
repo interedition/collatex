@@ -89,7 +89,7 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     VariantGraph graph = collate(w);
-    assertPhraseMatches("its soft light", "any light he could remember from the days", "nights when day followed night", "vice versa");
+    assertPhraseMatches("its soft","light", "any light he could remember from the days", "nights when day followed", "night", "vice versa");
     assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
 

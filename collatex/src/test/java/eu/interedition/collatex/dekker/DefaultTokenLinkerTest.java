@@ -106,7 +106,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
         "very happy is the cat", // 
         "very delitied and happy is the cat");
     VariantGraph graph = collate(w);
-    assertPhraseMatches("very happy", "is", "the cat");
+    assertPhraseMatches("very","happy", "is", "the cat");
     assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
 
