@@ -78,37 +78,6 @@ public interface CollationAlgorithm {
       into.connect(last, into.getEnd(), witnessSet);
     }
 
-    //    protected List<List<Match>> filterOutlierTranspositions(VariantGraph into, List<List<Match>> transpositions) {
-    //      into.rank();
-    //      LOG.debug("{}: Registering transpositions", into);
-    //      List<List<Match>> filteredTranspositions = Lists.newArrayList(transpositions);
-    //      for (List<Match> transposedPhrase : transpositions) {
-    //        Match firstMatch = transposedPhrase.get(0);
-    //        VariantGraphVertex from = firstMatch.vertex;
-    //        Token token = firstMatch.token;
-    //        VariantGraphVertex to = witnessTokenVertices.get(token);
-    //        LOG.debug("matchPhrase={}", transposedPhrase);
-    //        int fromRank = from.getRank();
-    //        //        LOG.debug("from={}, rank={}", from, fromRank);
-    //        int toRank = to.getRank();
-    //        //        LOG.debug("to={}, rank={}", to, toRank);
-    //        int diff = Math.abs(toRank - fromRank);
-    //        int size = transposedPhrase.size();
-    //
-    //        int relDiff = diff / size;
-    //        boolean acceptTransposition = relDiff < 5;
-    //        LOG.debug("accept={}, relDiff={}, size={}, diff={}, from={}, to={}\n", new Object[] { acceptTransposition, relDiff, size, diff, from, to });
-    //        if (acceptTransposition) {
-    //          for (Match match : transposedPhrase) {
-    //            into.transpose(match.vertex, witnessTokenVertices.get(match.token));
-    //          }
-    //        } else {
-    //          filteredTranspositions.remove(transposedPhrase);
-    //        }
-    //      }
-    //      return filteredTranspositions;
-    //    }
-
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
         int transpositionId = RandomUtils.nextInt(327680000);//transposedPhrase.hashCode();
