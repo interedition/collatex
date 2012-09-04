@@ -20,6 +20,7 @@
 package eu.interedition.collatex.dekker;
 
 import java.util.Collections;
+
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,6 +32,10 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
+/**
+*
+* @author Ronald Haentjens Dekker
+*/
 public class TranspositionDetector {
 
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
@@ -70,7 +75,7 @@ public class TranspositionDetector {
     return transpositions;
   }
 
-  private boolean isMirrored(Tuple previousTuple, Tuple tuple) {
+  private boolean isMirrored(Tuple<Integer> previousTuple, Tuple<Integer> tuple) {
     return previousTuple.left.equals(tuple.right) && previousTuple.right.equals(tuple.left);
   }
 }

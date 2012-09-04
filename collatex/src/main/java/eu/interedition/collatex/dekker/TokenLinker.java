@@ -1,12 +1,11 @@
 package eu.interedition.collatex.dekker;
 
+import java.util.Comparator;
+import java.util.Map;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.graph.VariantGraphVertex;
-
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedSet;
 
 
 public interface TokenLinker {
