@@ -31,15 +31,18 @@ import com.google.common.collect.Iterables;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix;
+import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Bram Buitendijk
+ * @author Ronald Haentjens Dekker
  */
 @SuppressWarnings("serial")
 public class CollateXLaboratory extends JFrame {
@@ -52,9 +55,6 @@ public class CollateXLaboratory extends JFrame {
 
   private final VariantGraphModel variantGraphModel = new VariantGraphModel();
   private final VariantGraphPanel variantGraphPanel;
-
-  private final EditGraphModel editGraphModel = new EditGraphModel();
-  private final EditGraphPanel editGraphPanel;
 
   private final JTable matchMatrixTable = new JTable();
 
@@ -74,9 +74,8 @@ public class CollateXLaboratory extends JFrame {
 
     this.tabbedPane = new JTabbedPane();
     this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(variantGraphModel));
-    this.tabbedPane.addTab("Edit Graph", editGraphPanel = new EditGraphPanel(editGraphModel));
     this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
-    this.tabbedPane.addTab("Match Matrix", new JScrollPane(matchMatrixTable));
+    this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     matchMatrixTable.setShowGrid(true);
     matchMatrixTable.setGridColor(new Color(0, 0, 0, 32));
@@ -95,7 +94,6 @@ public class CollateXLaboratory extends JFrame {
     toolBar.add(new AddWitnessAction());
     toolBar.add(new RemoveWitnessesAction());
     toolBar.add(new CollateAction());
-    toolBar.add(new TokenLinkAction());
     toolBar.add(new SuffixTreeAction());
     toolBar.add(new MatchMatrixAction());
     add(toolBar, BorderLayout.NORTH);
@@ -171,38 +169,6 @@ public class CollateXLaboratory extends JFrame {
     }
   }
 
-  private class TokenLinkAction extends AbstractAction {
-
-    private TokenLinkAction() {
-      super("Link");
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      final List<SimpleWitness> w = witnessPanel.getWitnesses();
-
-      if (w.size() < 2) {
-        return;
-      }
-
-      final Transaction transaction = graphFactory.getDatabase().beginTx();
-      try {
-        final EqualityTokenComparator comparator = new EqualityTokenComparator();
-        final VariantGraph pvg = graphFactory.newVariantGraph();
-
-        CollationAlgorithmFactory.dekker(comparator).collate(pvg, w.get(0));
-
-        editGraphModel.update(graphFactory.newEditGraph(pvg).build(pvg, w.get(1), comparator));
-      } finally {
-        transaction.finish();
-      }
-
-      editGraphPanel.getModel().setGraphLayout(new SugiyamaLayout(editGraphModel));
-      tabbedPane.setSelectedIndex(1);
-    }
-  }
-
   private class SuffixTreeAction extends AbstractAction {
 
     private SuffixTreeAction() {
@@ -219,7 +185,7 @@ public class CollateXLaboratory extends JFrame {
       }
 
       final SimpleWitness witness = w.get(0);
-      tabbedPane.setSelectedIndex(2);
+      tabbedPane.setSelectedIndex(1);
       final SuffixTreeModel treeModel = new SuffixTreeModel(SuffixTree.create(witness, new EqualityTokenComparator()));
       suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
     }
@@ -228,7 +194,7 @@ public class CollateXLaboratory extends JFrame {
   private class MatchMatrixAction extends AbstractAction {
 
     private MatchMatrixAction() {
-      super("Match Matrix");
+      super("Match Table");
     }
 
     @Override
@@ -241,13 +207,19 @@ public class CollateXLaboratory extends JFrame {
 
       final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
-        final EqualityTokenComparator comparator = new EqualityTokenComparator();
+        final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
         final VariantGraph vg = graphFactory.newVariantGraph();
 
-        CollationAlgorithmFactory.dekker(comparator).collate(vg, w.get(0));
-        final SimpleWitness witness = w.get(1);
+        int outlierTranspositionsSizeLimit = 3;
+        for (int i = 0; i <= w.size() - 2; i++) {
+          SimpleWitness witness = w.get(i);
+          LOG.debug("Collating: {}", witness.getSigil());
+          CollationAlgorithmFactory.dekkerMatchMatrix(comparator, outlierTranspositionsSizeLimit).collate(vg, witness);
+        }
 
-        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchMatrix.create(vg, witness, comparator), vg, witness));
+        SimpleWitness lastWitness = w.get(w.size() - 1);
+        LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
+        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness, outlierTranspositionsSizeLimit));
 
         final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
         columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
@@ -255,7 +227,7 @@ public class CollateXLaboratory extends JFrame {
           columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
         }
 
-        tabbedPane.setSelectedIndex(3);
+        tabbedPane.setSelectedIndex(2);
       } finally {
         transaction.finish();
       }
@@ -272,17 +244,23 @@ public class CollateXLaboratory extends JFrame {
         label.setOpaque(true);
         label.getInsets().set(5, 5, 5, 5);
       }
-      switch ((MatchMatrixCellStatus) value) {
+      MatchTableCell cell = (MatchTableCell) value;
+      MatchMatrixCellStatus status = cell.getStatus();
+
+      switch (status) {
         case PREFERRED_MATCH:
           label.setBackground(isSelected ? Color.GREEN : Color.GREEN.darker());
+          label.setText(cell.getText());
           break;
 
         case OPTIONAL_MATCH:
           label.setBackground(isSelected ? Color.YELLOW : Color.YELLOW.darker());
+          label.setText(cell.getText());
           break;
 
         case EMPTY:
           label.setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+          label.setText("");
           break;
 
         default:

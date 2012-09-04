@@ -34,7 +34,7 @@ public abstract class GraphVertex<G extends Graph> {
   @Override
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof GraphVertex) {
-      return node.equals(((GraphVertex)obj).node);
+      return node.equals(((GraphVertex) obj).node);
     }
     return super.equals(obj);
   }

@@ -19,21 +19,25 @@
  */
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.GraphRelationshipType;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.List;
 import java.util.Map;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.graph.GraphRelationshipType;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+
 /**
  *
- * @author Ronald
+ * @author Ronald Haentjens Dekker
+ * @author Bram Buitendijk
  */
 public class PhraseMatchDetector {
 
@@ -42,23 +46,24 @@ public class PhraseMatchDetector {
     List<VariantGraphVertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
     VariantGraphVertex previous = base.getStart();
- 
+
     for (Token token : tokens) {
       if (!linkedTokens.containsKey(token)) {
+	addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
         continue;
       }
       VariantGraphVertex baseVertex = linkedTokens.get(token);
       // requirements:
+      // - previous and base vertex should have the same witnesses
+      // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
       // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
+      boolean sameTranspositions = previous.getTranspositionIds().equals(baseVertex.getTranspositionIds());
+      boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
-      boolean isNear = directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
+      boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
       if (!isNear) {
-        if (!basePhrase.isEmpty()) {
-          phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
-          basePhrase.clear();
-          witnessPhrase.clear();
-        }
+        addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
       }
       basePhrase.add(baseVertex);
       witnessPhrase.add(token);
@@ -68,6 +73,14 @@ public class PhraseMatchDetector {
       phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
     }
     return phraseMatches;
+  }
+
+  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraphVertex> basePhrase, List<Token> witnessPhrase) {
+    if (!basePhrase.isEmpty()) {
+      phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
+      basePhrase.clear();
+      witnessPhrase.clear();
+    }
   }
 
   private boolean directedEdgeBetween(VariantGraphVertex a, VariantGraphVertex b) {

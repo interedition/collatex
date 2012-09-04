@@ -153,7 +153,7 @@ public class VariantGraphTest extends AbstractTest {
   //    //    assertEquals(2, Iterables.size(vertices));
   //    Iterator<VariantGraphVertex> iterator = vertices.iterator();
   //    for (VariantGraphVertex variantGraphVertex : vertices) {
-  //      LOG.info("{}", variantGraphVertex);
+  //      LOG.debug("{}", variantGraphVertex);
   //    }
   //    assertEquals("[]", iterator.next().toString());
   //    assertEquals("[A:0:'pre', B:0:'pre']", iterator.next().toString());

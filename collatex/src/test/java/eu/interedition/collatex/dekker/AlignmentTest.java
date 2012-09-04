@@ -19,7 +19,6 @@
  */
 package eu.interedition.collatex.dekker;
 
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringWriter;
@@ -41,11 +40,17 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceAndPunctuationTokenizer;
 
+/**
+ * 
+ * @author Ronald Haentjens Dekker
+ * 
+ * This test class tests the PhraseMatchDetector and
+ * the TranspositionDetector
+ */
 public class AlignmentTest extends AbstractTest {
 
   @Test
@@ -127,11 +132,8 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void testOrderIndependence() {
     final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
-    VariantGraph graph = collate(w[0], w[1]);
-    collate(graph, w[2]);
-    List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
-    assertEquals("hello nice", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
-    assertEquals("cruel world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
+    collate(w[0], w[1], w[2]);
+    assertPhraseMatches("hello","nice","cruel","world");
     List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
     assertEquals(0, transpositions.size());
   }
@@ -139,21 +141,17 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void testPhraseMatchingShouldNotIgnoreDeletions() {
     final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello world");
-    VariantGraph graph = collate(w);
-    List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
-    assertEquals("hello", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
-    assertEquals("world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
+    collate(w);
+    assertPhraseMatches("hello", "world");
     List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
     assertEquals(0, transpositions.size());
   }
 
-  //TODO: check this is still ok!
   @Test
-  public void testPhraseMatchingShouldIgnoreAdditions() {
+  public void testPhraseMatchingShouldNotIgnoreAdditions() {
     final SimpleWitness[] w = createWitnesses("Hello world", "Hello cruel world");
-    VariantGraph graph = collate(w);
-    List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
-    assertEquals("hello world", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
+    collate(w);
+    assertPhraseMatches("hello", "world");
     List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
     assertEquals(0, transpositions.size());
   }

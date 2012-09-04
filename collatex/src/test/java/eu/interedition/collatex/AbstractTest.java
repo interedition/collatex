@@ -47,7 +47,7 @@ public abstract class AbstractTest {
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
   protected static GraphFactory graphFactory;
-  protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+  protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
   private Transaction transaction;
 
   @BeforeClass
@@ -81,14 +81,14 @@ public abstract class AbstractTest {
     return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
-  protected void collate(VariantGraph graph, SimpleWitness... witnesses) {
-    collationAlgorithm.collate(graph, witnesses);
-  }
-
   protected VariantGraph collate(SimpleWitness... witnesses) {
     final VariantGraph graph = graphFactory.newVariantGraph();
     collate(graph, witnesses);
     return graph;
+  }
+
+  protected void collate(VariantGraph graph, SimpleWitness... witnesses) {
+    collationAlgorithm.collate(graph, witnesses);
   }
 
   protected VariantGraph collate(String... witnesses) {
@@ -129,6 +129,10 @@ public abstract class AbstractTest {
 
   protected static void assertVertexEquals(String expected, VariantGraphVertex vertex) {
     assertEquals(expected, ((SimpleToken) Iterables.getFirst(vertex.tokens(), null)).getNormalized());
+  }
+
+  protected static void assertTokenEquals(String expected, Token token) {
+    assertEquals(expected, ((SimpleToken) token).getContent());
   }
 
   protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, Witness in) {

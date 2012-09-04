@@ -42,16 +42,16 @@ public class MatchesTest extends AbstractTest {
 
   private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
     Set<Token> unmatched = matches.getUnmatched();
-    LOG.info("unmatched: {}", unmatched);
+    LOG.debug("unmatched: {}", unmatched);
 
     Set<Token> unique = matches.getUnique();
-    LOG.info("unique: {}", unique);
+    LOG.debug("unique: {}", unique);
 
     Set<Token> ambiguous = matches.getAmbiguous();
-    LOG.info("ambiguous: {}", ambiguous);
+    LOG.debug("ambiguous: {}", ambiguous);
 
     ListMultimap<Token,VariantGraphVertex> all = matches.getAll();
-    LOG.info("all: {}", all);
+    LOG.debug("all: {}", all);
 
     assertEquals(expected_unmatched, unmatched.size());
     assertEquals(expected_unique, unique.size());

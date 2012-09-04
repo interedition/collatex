@@ -43,7 +43,7 @@ public class BeckettTest extends AbstractTest {
 
   @Test
   public void dirkVincentWithMatchMatrixLinker() {
-    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator()));
+    setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 1));
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
@@ -89,7 +89,7 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     VariantGraph graph = collate(w);
-    assertPhraseMatches("its soft light", "any light he could remember from the days", "nights when day followed night", "vice versa");
+    assertPhraseMatches("its soft","light", "any light he could remember from the days", "nights when day followed", "night", "vice versa");
     assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
 
@@ -184,7 +184,7 @@ public class BeckettTest extends AbstractTest {
     assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));
     assertEquals("among others", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(3))));
     assertEquals("once died", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(4))));
-    assertEquals("left him .", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(5))));
+    assertEquals("left him", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(5))));
     assertEquals(1, transpositions.size());
     assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(transpositions.get(0))));
   }

@@ -2,50 +2,54 @@ package eu.interedition.collatex.dekker.matrix;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
-
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix.Island;
+import com.google.common.collect.Sets;
 
 public class Archipelago {
   Logger LOG = LoggerFactory.getLogger(Archipelago.class);
 
-  private ArrayList<MatchMatrix.Island> islands;
+  private ArrayList<Island> islands;
+  private final Set<Integer> islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
 
   public Archipelago() {
-    setIslands(new ArrayList<MatchMatrix.Island>());
+    setIslands(new ArrayList<Island>());
   }
 
-  public Archipelago(MatchMatrix.Island isl) {
-    setIslands(new ArrayList<MatchMatrix.Island>());
+  public Archipelago(Island isl) {
+    setIslands(new ArrayList<Island>());
     getIslands().add(isl);
   }
 
-  public void add(MatchMatrix.Island island) {
-    for (MatchMatrix.Island i : getIslands()) {
-      if (island.size() > i.size()) {
-        getIslands().add(getIslands().indexOf(i), island);
-        return;
-      } else
-        try {
-          MatchMatrix.Island disl = island;
-          MatchMatrix.Island di = i;
-          if (island.size() > i.size() && disl.direction() > di.direction()) {
-            getIslands().add(getIslands().indexOf(i), island);
-            return;
-          }
-        } catch (Exception e) {}
-    }
+  public void add(Island island) {
+    // islands on the archipelago are sorted on size (large -> small) and direction
+    //    for (Island i : getIslands()) {
+    //      if (island.size() > i.size()) {
+    //        getIslands().add(getIslands().indexOf(i), island);
+    //        return;
+    //
+    //      } else
+    //        try {
+    //          Island disl = island;
+    //          Island di = i;
+    //          if (island.size() > i.size() && disl.direction() > di.direction()) {
+    //            getIslands().add(getIslands().indexOf(i), island);
+    //            return;
+    //          }
+    //        } catch (Exception e) {}
+    //    }
     getIslands().add(island);
+    Coordinate leftEnd = island.getLeftEnd();
+    islandvectors.add(leftEnd.row - leftEnd.column);
   }
 
   // this is not a real iterator implementation but it works...
-  public ArrayList<MatchMatrix.Island> iterator() {
+  public ArrayList<Island> iterator() {
     return getIslands();
   }
 
@@ -82,20 +86,20 @@ public class Archipelago {
     return result;
   }
 
-  public MatchMatrix.Island get(int i) {
+  public Island get(int i) {
     return getIslands().get(i);
   }
 
   public Archipelago copy() {
     Archipelago result = new Archipelago();
-    for (MatchMatrix.Island isl : getIslands()) {
-      result.add(new MatchMatrix.Island(isl));
+    for (Island isl : getIslands()) {
+      result.add(new Island(isl));
     }
     return result;
   }
 
-  public boolean conflictsWith(MatchMatrix.Island island) {
-    for (MatchMatrix.Island isl : getIslands()) {
+  public boolean conflictsWith(Island island) {
+    for (Island isl : getIslands()) {
       if (isl.isCompetitor(island)) return true;
     }
     return false;
@@ -103,29 +107,29 @@ public class Archipelago {
 
   public int value() {
     int result = 0;
-    for (MatchMatrix.Island isl : getIslands()) {
+    for (Island isl : getIslands()) {
       result += isl.value();
     }
     return result;
   }
 
-  public ArrayList<MatchMatrix.Coordinate> findGaps() {
-    ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
+  public ArrayList<Coordinate> findGaps() {
+    ArrayList<Coordinate> list = new ArrayList<Coordinate>();
     return findGaps(list);
   }
 
-  public ArrayList<MatchMatrix.Coordinate> findGaps(MatchMatrix.Coordinate begin, MatchMatrix.Coordinate end) {
-    ArrayList<MatchMatrix.Coordinate> list = new ArrayList<MatchMatrix.Coordinate>();
+  public ArrayList<Coordinate> findGaps(Coordinate begin, Coordinate end) {
+    ArrayList<Coordinate> list = new ArrayList<Coordinate>();
     list.add(begin);
     list.add(end);
     return findGaps(list);
   }
 
-  public ArrayList<MatchMatrix.Coordinate> findGaps(ArrayList<MatchMatrix.Coordinate> list) {
-    ArrayList<MatchMatrix.Coordinate> result = new ArrayList<MatchMatrix.Coordinate>(list);
-    for (MatchMatrix.Island isl : getIslands()) {
-      MatchMatrix.Coordinate left = isl.getLeftEnd();
-      MatchMatrix.Coordinate right = isl.getRightEnd();
+  public ArrayList<Coordinate> findGaps(ArrayList<Coordinate> list) {
+    ArrayList<Coordinate> result = new ArrayList<Coordinate>(list);
+    for (Island isl : getIslands()) {
+      Coordinate left = isl.getLeftEnd();
+      Coordinate right = isl.getRightEnd();
       boolean found = false;
       for (int i = 0; i < result.size(); i++) {
         if (left.column < result.get(i).column || (left.column == result.get(i).column && left.row < result.get(i).row)) {
@@ -153,11 +157,11 @@ public class Archipelago {
     return i1.isCompetitor(i2);
   }
 
-  public void setIslands(ArrayList<MatchMatrix.Island> islands) {
+  public void setIslands(ArrayList<Island> islands) {
     this.islands = islands;
   }
 
-  public ArrayList<MatchMatrix.Island> getIslands() {
+  public ArrayList<Island> getIslands() {
     return islands;
   }
 
@@ -174,18 +178,10 @@ public class Archipelago {
     } else if (minimum2 < minimum1) {
       closest = island2;
     } else {
-      LOG.info("{} -> {}", island1, island2);
+      LOG.debug("{} -> {}", island1, island2);
       throw new RuntimeException("no minimum found, help!");
     }
     return closest;
-  }
-
-  public double smallestDistance(Island isl) {
-    double minimum = 10000;
-    for (Island fixedIsland : getIslands()) {
-      minimum = Math.min(minimum, distance(isl, fixedIsland));
-    }
-    return minimum;
   }
 
   protected void remove(int i) {
@@ -195,7 +191,7 @@ public class Archipelago {
   @Override
   public String toString() {
     String result = "";
-    for (MatchMatrix.Island island : getIslands()) {
+    for (Island island : getIslands()) {
       if (result.isEmpty())
         result = "[ " + island;
       else
@@ -231,7 +227,7 @@ public class Archipelago {
     return map;
   }
 
-  private double distance(MatchMatrix.Island isl1, MatchMatrix.Island isl2) {
+  private double distance(Island isl1, Island isl2) {
     double result = 0.0;
     int isl1_L_x = isl1.getLeftEnd().column;
     int isl1_L_y = isl1.getLeftEnd().row;
@@ -255,5 +251,37 @@ public class Archipelago {
     double result = 0.0;
     result = Math.sqrt((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
     return result;
+  }
+
+  public Set<Integer> getIslandVectors() {
+    return islandvectors;
+  }
+
+  public double smallestDistance(Island isl) {
+    double minimum = 10000;
+    for (Island fixedIsland : getIslands()) {
+      minimum = Math.min(minimum, distance(isl, fixedIsland));
+    }
+    return minimum;
+  }
+
+  public double smallestDistanceToIdealLine(Island isl) {
+    double minimum = 10000;
+    Island closestIsland = null;
+    for (Island fixedIsland : getIslands()) {
+      double prev = minimum;
+      minimum = Math.min(minimum, distance(isl, fixedIsland));
+      if (prev > minimum) {
+        closestIsland = fixedIsland;
+      }
+    }
+    if (closestIsland == null) {
+      return minimum;
+    }
+    Coordinate leftEnd = isl.getLeftEnd();
+    int islandVector = leftEnd.row - leftEnd.column;
+    Coordinate leftEnd0 = closestIsland.getLeftEnd();
+    int closestIslandVector = leftEnd0.row - leftEnd0.column;
+    return Math.abs(islandVector - closestIslandVector);
   }
 }

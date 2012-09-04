@@ -1,23 +1,25 @@
 package eu.interedition.collatex.lab;
 
-import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
 import org.slf4j.Logger;
 
-import com.google.common.collect.Iterables;
-
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
-import eu.interedition.collatex.dekker.matrix.MatchMatrix;
+import eu.interedition.collatex.dekker.matrix.Island;
+import eu.interedition.collatex.dekker.matrix.MatchTable;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Bram Buitendijk
+ * @author Ronald Haentjens Dekker
  */
 @SuppressWarnings("serial")
 public class MatchMatrixTableModel extends AbstractTableModel {
@@ -25,48 +27,62 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   Logger LOG = org.slf4j.LoggerFactory.getLogger(MatchMatrixTableModel.class);
   private final String[] rowNames;
   private final String[] columnNames;
-  private final MatchMatrixCellStatus[][] data;
+  private final MatchTableCell[][] data;
+  private final int outlierTranspositionsSizeLimit;
 
-  public MatchMatrixTableModel(MatchMatrix matchMatrix, VariantGraph vg, Iterable<Token> witness) {
+  public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness, int outlierTranspositionsSizeLimit) {
+    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
+    List<Token> rowList = matchTable.rowList();
+    List<Integer> columnList = matchTable.columnList();
 
-    final int rowNum = matchMatrix.rowNum();
-    final int colNum = matchMatrix.colNum();
+    final int rowNum = rowList.size();
+    final int colNum = columnList.size();
 
-    final Iterator<VariantGraphVertex> vertexIt = vg.vertices().iterator();
-    vertexIt.next(); // skip start vertex
+    // set the row labels
     rowNames = new String[rowNum];
     for (int row = 0; row < rowNum; row++) {
-      rowNames[row] = ((SimpleToken) Iterables.getFirst(vertexIt.next().tokens(), null)).getContent();
+      rowNames[row] = ((SimpleToken) rowList.get(row)).getContent();
     }
 
+    // set the column labels
     columnNames = new String[colNum];
-    final Iterator<Token> witnessIt = witness.iterator();
     for (int col = 0; col < colNum; col++) {
-      columnNames[col] = ((SimpleToken) witnessIt.next()).getContent();
+      columnNames[col] = Integer.toString(columnList.get(col) + 1);
     }
 
-    Archipelago preferred = preferred(matchMatrix);
-    LOG.info(matchMatrix.toHtml(preferred));
-    data = new MatchMatrixCellStatus[rowNum][colNum];
+    // fill the cells with colors
+    Archipelago preferred = preferred(matchTable);
+    //LOG.debug(matchMatrix.toHtml(preferred));
+    data = new MatchTableCell[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {
-        Boolean at = matchMatrix.at(row, col);
-        MatchMatrixCellStatus cell;
-        if (at) {
-          cell = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
+        VariantGraphVertex at = matchTable.vertexAt(row, col);
+        MatchMatrixCellStatus status;
+        if (at != null) {
+          status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
         } else {
-          cell = MatchMatrixCellStatus.EMPTY;
+          status = MatchMatrixCellStatus.EMPTY;
         }
-        data[row][col] = cell;
+        String text;
+        if (at != null) {
+          text = ((SimpleToken) at.tokens().iterator().next()).getContent();
+        } else {
+          text = null;
+        }
+        data[row][col] = new MatchTableCell(status, text);
       }
     }
   }
 
-  private Archipelago preferred(MatchMatrix matchMatrix) {
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions();
-    for (MatchMatrix.Island isl : matchMatrix.getIslands()) {
+  private Archipelago preferred(MatchTable matchTable) {
+    // detect islands
+    Set<Island> islands = matchTable.getIslands();
+    // prepare
+    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, outlierTranspositionsSizeLimit);
+    for (Island isl : islands) {
       archipelago.add(isl);
     }
+    // find preferred islands
     Archipelago preferred = archipelago.createNonConflictingVersion();
     return preferred;
   }

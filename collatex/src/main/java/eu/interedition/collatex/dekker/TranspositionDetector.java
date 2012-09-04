@@ -19,15 +19,23 @@
  */
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
 import java.util.Collections;
+
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+
+/**
+*
+* @author Ronald Haentjens Dekker
+*/
 public class TranspositionDetector {
 
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
@@ -47,7 +55,7 @@ public class TranspositionDetector {
     final List<List<Match>> transpositions = Lists.newArrayList();
     int previousRank = 0;
     Tuple<Integer> previous = new Tuple<Integer>(0, 0);
-    
+
     for (List<Match> phraseMatch : phraseMatches) {
       VariantGraphVertex baseToken = phraseMatch.get(0).vertex;
       int rank = baseToken.getRank();
@@ -56,7 +64,7 @@ public class TranspositionDetector {
       if (expectedRank != rank && !isMirrored(previous, current)) {
         transpositions.add(phraseMatch);
       }
-      previousRank ++;
+      previousRank++;
       previous = current;
     }
     if (LOG.isTraceEnabled()) {
@@ -67,7 +75,7 @@ public class TranspositionDetector {
     return transpositions;
   }
 
-  private boolean isMirrored(Tuple previousTuple, Tuple tuple) { 
+  private boolean isMirrored(Tuple<Integer> previousTuple, Tuple<Integer> tuple) {
     return previousTuple.left.equals(tuple.right) && previousTuple.right.equals(tuple.left);
   }
 }

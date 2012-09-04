@@ -217,21 +217,21 @@ public class VariantGraphTest extends AbstractTest {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
     StringWriter writer = new StringWriter();
     s.toDot(graph, writer);
-    LOG.info("dot={}", writer.toString());
+    LOG.debug("dot={}", writer.toString());
 
     final VariantGraphVertex voorVertex1 = vertexWith(graph, "voor", w[0]);
     final VariantGraphVertex zoVertex = vertexWith(graph, "zo", w[0]);
     final VariantGraphVertex nuendanVertex = vertexWith(graph, "nu en dan", w[0]);
-    final VariantGraphVertex zin2AVertex = vertexWith(graph, "zin2", w[0]);
+    //    final VariantGraphVertex zin2AVertex = vertexWith(graph, "zin2", w[0]);
     final VariantGraphVertex zin2BVertex = vertexWith(graph, "zin2", w[1]);
-    final VariantGraphVertex naVertex = vertexWith(graph, "na", w[0]);
+    //    final VariantGraphVertex naVertex = vertexWith(graph, "na", w[0]);
     //    final VariantGraphVertex voorVertex2 = vertexWith(graph, "voor", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), voorVertex1), w[0], w[1]);
     assertHasWitnesses(edgeBetween(voorVertex1, zoVertex), w[0]);
     assertHasWitnesses(edgeBetween(zoVertex, nuendanVertex), w[0]);
-    assertHasWitnesses(edgeBetween(nuendanVertex, zin2AVertex), w[0]);
-    assertHasWitnesses(edgeBetween(zin2AVertex, naVertex), w[0]);
+    //    assertHasWitnesses(edgeBetween(nuendanVertex, zin2AVertex), w[0]);
+    //    assertHasWitnesses(edgeBetween(zin2AVertex, naVertex), w[0]);
     //    assertHasWitnesses(edgeBetween(naVertex, voorVertex2), w[0]);
     //    assertHasWitnesses(edgeBetween(voorVertex2, graph.getEnd()), w[0], w[1]);
 

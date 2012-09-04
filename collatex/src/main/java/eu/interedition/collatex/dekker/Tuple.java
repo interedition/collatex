@@ -1,7 +1,5 @@
 package eu.interedition.collatex.dekker;
 
-import com.google.common.base.Function;
-
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */

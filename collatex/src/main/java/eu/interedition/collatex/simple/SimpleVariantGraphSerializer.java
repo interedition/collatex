@@ -249,9 +249,13 @@ public class SimpleVariantGraphSerializer {
 
       for (VariantGraphTransposition t : graph.transpositions()) {
         out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
-        out.print(" [color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.print(" [label = \"" + t.getId() + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
       }
+
+      out.print(indent + "v" + graph.getStart().getNode().getId() + connector + "v" + graph.getEnd().getNode().getId());
+      out.print(" [color =  \"white\"]");
+      out.println(";");
 
       out.println("}");
 
@@ -263,10 +267,14 @@ public class SimpleVariantGraphSerializer {
   }
 
   private String toLabel(VariantGraphEdge e) {
-    return VariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
+    return escapeLabel(VariantGraphEdge.TO_CONTENTS.apply(e));
   }
 
   private String toLabel(VariantGraphVertex v) {
-    return VariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
+    return escapeLabel(VariantGraphVertex.TO_CONTENTS.apply(v));
+  }
+
+  String escapeLabel(String string) {
+    return string.replaceAll("\"", "\\\"").replaceAll("\n", "[LB]");
   }
 }
