@@ -17,6 +17,12 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.graph.VariantGraphVertex;
 
+/**
+ * 
+ * @author Ronald Haentjens Dekker
+ * @author Bram Buitendijk
+ * @author Meindert Kroesse
+ */
 public class ArchipelagoWithVersions extends Archipelago {
   private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
@@ -69,7 +75,6 @@ public class ArchipelagoWithVersions extends Archipelago {
 
       if (islands.size() == 1) {
         addIslandToResult(islands.get(0), archipelago);
-
       } else if (islands.size() > 1) {
         Set<Island> competingIslands = getCompetingIslands(islands, archipelago);
         Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
@@ -81,7 +86,6 @@ public class ArchipelagoWithVersions extends Archipelago {
           } else {
             otherCompetingIslands.add(island);
           }
-
         }
         Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
         LOG.debug("addBestOfCompeting with competingIslandsOnIdealLine");
@@ -96,21 +100,15 @@ public class ArchipelagoWithVersions extends Archipelago {
         }
       }
     }
-    //    }
     return archipelago;
   }
 
+  // TODO: find a better way to determine the best choice of island
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
-      // TODO: find a better way to determine the best choice of island
       for (Island ci : distanceMap1.get(d)) {
         if (islandIsPossible(ci)) {
           addIslandToResult(ci, archipelago);
-          //        } else {
-          //          removeConflictingEndCoordinates(ci);
-          //          if (ci.size() > 1) {
-          //            addIslandToResult(ci, archipelago);
-          //          }
         }
       }
     }
@@ -231,7 +229,6 @@ public class ArchipelagoWithVersions extends Archipelago {
         fixedRows.add(coordinate.row);
         fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
       }
-
     } else {
       LOG.debug("island: '{}' is an outlier, not added", isl);
     }
@@ -242,57 +239,9 @@ public class ArchipelagoWithVersions extends Archipelago {
     LOG.debug("island {}, distance={}", isl, smallestDistance);
     int islandSize = isl.size();
     return (!(a.size() > 0 && islandSize <= outlierTranspositionsSizeLimit && smallestDistance >= islandSize * MINIMUM_OUTLIER_DISTANCE_FACTOR));
-
-    //    if (isl.size() > 1) {
-    //      // must limit on size, so not all islands will be outliers
-    //      // TODO find the right size to limit on.
-    //      return true;
-    //
-    //    } else {
-    //      Coordinate leftEnd = isl.getLeftEnd();
-    //      return a.getIslandVectors().contains(leftEnd.row - leftEnd.column);
-    //    }
-    //
-    //    //    if (a.size() == 0) return true;
-    //    //    Coordinate leftEnd = isl.getLeftEnd();
-    //    //    int v = leftEnd.row - leftEnd.column;
-    //    //    Set<Integer> islandVectors = a.getIslandVectors();
-    //    //    int minimumDistanceToExistingVectors = 10000;
-    //    //    for (Integer iv : islandVectors) {
-    //    //      minimumDistanceToExistingVectors = Math.min(minimumDistanceToExistingVectors, Math.abs(v - iv));
-    //    //    }
-    //    //    return minimumDistanceToExistingVectors <= isl.size();
   }
 
-  //  private boolean islandsAreOnTheSameVector(Island island, Island isl) {
-  //    Coordinate leftEnd = island.getLeftEnd();
-  //    double x1 = leftEnd.row;
-  //    double y1 = leftEnd.column;
-  //
-  //    Coordinate rightEnd = island.getRightEnd();
-  //    double x2 = rightEnd.row;
-  //    double y2 = rightEnd.column;
-  //
-  //    Coordinate leftEndToMatch = isl.getLeftEnd();
-  //    double px = leftEndToMatch.row;
-  //    double py = leftEndToMatch.column;
-  //    double ptLineDistSq = Line2D.ptLineDistSq(x1, y1, x2, y2, px, py);
-  //    return ptLineDistSq == 0.0;
-  //  }
-  //
-  //  private double deviation(Archipelago archipelago, Island isl) {
-  //    if (archipelago.size() == 0) return 0;
-  //
-  //    double smallestDistance = archipelago.smallestDistance(isl);
-  //    int islandSize = isl.size();
-  //    double deviation = smallestDistance / islandSize;
-  //    LOG.debug("size={}, smallestDistance={}, deviation={}", new Object[] { islandSize, smallestDistance, deviation });
-  //    return deviation;
-  //  }
-
-  // these methods are only used in tests. remove?
-  //  private Integer[] isl2;
-  private static final String newLine = System.getProperty("line.separator");
+  //TODO: these methods are only used in tests. remove?
 
   public void createNonConflictingVersions() {
     boolean debug = false;
