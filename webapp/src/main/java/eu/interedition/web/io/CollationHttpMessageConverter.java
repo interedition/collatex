@@ -149,7 +149,7 @@ public class CollationHttpMessageConverter extends AbstractHttpMessageConverter<
       if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
         collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
       } else if ("dekker-experimental".equalsIgnoreCase(collationAlgorithmValue)) {
-        collationAlgorithm = CollationAlgorithmFactory.dekkerExperimental(tokenComparator, graphFactory);
+        collationAlgorithm = CollationAlgorithmFactory.dekkerPreviousVersion(tokenComparator);
       }
     }
     if (collationAlgorithm == null) {
