@@ -1,6 +1,5 @@
 package eu.interedition.collatex.graph;
 
-import static eu.interedition.collatex.graph.GraphRelationshipType.EDIT_GRAPH;
 import static eu.interedition.collatex.graph.GraphRelationshipType.VARIANT_GRAPH;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -23,7 +22,6 @@ import com.google.common.io.Files;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenMapper;
 import eu.interedition.collatex.simple.SimpleWitnessMapper;
 
@@ -38,7 +36,6 @@ public class GraphFactory {
   private EntityMapper<Token> tokenMapper = new SimpleTokenMapper();
   private GraphDatabaseService database;
   private Node variantGraphs;
-  private Node editGraphs;
 
   public static GraphFactory create(File dbStorageDirectory, final boolean deleteAfterUsage) throws IOException {
     final File dbDirectory = dbStorageDirectory.getCanonicalFile();
@@ -92,13 +89,6 @@ public class GraphFactory {
       } else {
         variantGraphs = vgRel.getEndNode();
       }
-
-      final Relationship egRel = referenceNode.getSingleRelationship(EDIT_GRAPH, OUTGOING);
-      if (egRel == null) {
-        referenceNode.createRelationshipTo(editGraphs = database.createNode(), EDIT_GRAPH);
-      } else {
-        editGraphs = egRel.getEndNode();
-      }
       tx.success();
     } finally {
       tx.finish();
@@ -122,15 +112,6 @@ public class GraphFactory {
     });
   }
   
-  public Iterable<EditGraph> editGraphs() {
-    return Iterables.transform(editGraphs.getRelationships(EDIT_GRAPH, OUTGOING), new Function<Relationship, EditGraph>() {
-      @Override
-      public EditGraph apply(Relationship input) {
-        return wrapEditGraph(input);
-      }
-    });
-  }
-  
   public VariantGraph newVariantGraph() {
     final Node startNode = database.createNode();
     final Node endNode = database.createNode();
@@ -150,54 +131,17 @@ public class GraphFactory {
     return graph;
   }
 
-  @Deprecated
-  public EditGraph newEditGraph(VariantGraph vg) {
-    final Node startNode = database.createNode();
-    final Node endNode = database.createNode();
-
-    final Relationship startRel = editGraphs.createRelationshipTo(startNode, EDIT_GRAPH);
-    startRel.setProperty(CREATED_KEY, System.currentTimeMillis());
-    
-    startNode.createRelationshipTo(endNode, EDIT_GRAPH);
-    startNode.createRelationshipTo(vg.getStart().getNode(), VARIANT_GRAPH);
-
-    final EditGraph graph = wrapEditGraph(startNode, endNode);
-    final EditGraphVertex start = graph.getStart();
-    final EditGraphVertex end = graph.getEnd();
-
-    start.setBase(vg.getStart());
-    start.setWitness(SimpleToken.START);
-    start.setWitnessIndex(-1);
-
-    end.setBase(vg.getEnd());
-    end.setWitness(SimpleToken.END);
-    end.setWitnessIndex(Integer.MAX_VALUE);
-
-    return graph;
-  }
-
+  
   public void deleteGraphsOlderThan(long timestamp) {
     for (Relationship vgRel : variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING)) {
       if (((Long) vgRel.getProperty(CREATED_KEY)) < timestamp) {
         delete(wrapVariantGraph(vgRel));
       }
     }
-    for (Relationship egRel : editGraphs.getRelationships(EDIT_GRAPH, OUTGOING)) {
-      if (((Long) egRel.getProperty(CREATED_KEY)) < timestamp) {
-        delete(wrapEditGraph(egRel));
-      }
-    }
   }
 
   public void delete(VariantGraph vg) {
     final Node startNode = vg.getStart().getNode();
-    for (Relationship rel : startNode.getRelationships(VARIANT_GRAPH, INCOMING)) {
-      final Node relStart = rel.getStartNode();
-      if (!relStart.equals(variantGraphs)) {
-        delete(wrapEditGraph(relStart, relStart.getSingleRelationship(EDIT_GRAPH, OUTGOING).getEndNode()));
-      }
-    }
-
     startNode.getSingleRelationship(VARIANT_GRAPH, INCOMING).delete();
     startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
     for (VariantGraphVertex v : vg.vertices()) {
@@ -211,20 +155,6 @@ public class GraphFactory {
     }
   }
   
-  public void delete(EditGraph eg) {
-    final Node startNode = eg.getStart().getNode();
-    startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
-    startNode.getSingleRelationship(EDIT_GRAPH, INCOMING).delete();
-    startNode.getSingleRelationship(EDIT_GRAPH, OUTGOING).delete();
-
-    for (EditGraphVertex v : eg.vertices()) {
-      for (EditGraphEdge e : v.incoming()) {
-        e.delete();
-      }
-      v.delete();
-    }
-  }
-
   protected VariantGraph wrapVariantGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
     return wrapVariantGraph(startNode, startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).getEndNode());
@@ -235,17 +165,4 @@ public class GraphFactory {
     graph.init(VariantGraphVertex.createWrapper(graph), VariantGraphEdge.createWrapper(graph), start, end);
     return graph;
   }
-
-  protected EditGraph wrapEditGraph(Relationship startEndRel) {
-    final Node startNode = startEndRel.getEndNode();
-    return wrapEditGraph(startNode, startNode.getSingleRelationship(EDIT_GRAPH, OUTGOING).getEndNode());
-  }
-
-  protected EditGraph wrapEditGraph(Node start, Node end) {
-    final VariantGraph vg = wrapVariantGraph(start.getSingleRelationship(VARIANT_GRAPH, OUTGOING));
-    final EditGraph graph = new EditGraph(database, witnessMapper, tokenMapper, vg.getVertexWrapper());
-    graph.init(EditGraphVertex.createWrapper(graph), EditGraphEdge.createWrapper(graph), start, end);
-    return graph;
-  }
-
 }
