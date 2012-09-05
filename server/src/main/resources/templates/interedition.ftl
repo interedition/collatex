@@ -9,21 +9,26 @@
 
   <link rel="shortcut icon" href="${cp}/static/interedition/interedition_logo.ico" />
 
-  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssfonts/fonts-min.css">
-  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssreset/reset-min.css">
-  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssgrids/grids-min.css">
-  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.4.1/build/cssbase/base-min.css">
-  <link rel="stylesheet" type="text/css" href="${cp}/static/webapp.css">
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.6.0/build/cssfonts/cssfonts-min.css&3.6.0/build/cssgrids/cssgrids-min.css&3.6.0/build/cssreset/cssreset-min.css&3.6.0/build/cssbase/cssbase-min.css&3.6.0/build/cssbutton/cssbutton-min.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/interedition/interedition.css">
+  <link rel="stylesheet" type="text/css" href="${cp}/static/webapp.css">
 
-  <script type="text/javascript" src="${cp}/static/yui-3.4.1/build/yui/yui-min.js"></script>
-  <script type="text/javascript">YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.4.1/build/' };</script>
-
+  <script type="text/javascript">var cp = "${cp?js_string}";</script>
+  <script type="text/javascript" src="http://yui.yahooapis.com/combo?3.6.0/build/yui/yui-min.js"></script>
+  <script type="text/javascript">
+    YUI.applyConfig({
+      debug: true,
+      combine: true,
+      modules: {
+        'interedition-collate': {
+          fullpath: cp + '/static/api/collate.js',
+          requires: ["base", "io", "json", "node", "array-extras", "escape", "dump"]
+        }
+      }
+    });
+  </script>
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
   <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.behavior.min.js"></script>
-  <script type="text/javascript" src="${cp}/static/api/collate.js"></script>
-  <script type="text/javascript" src="${cp}/static/api/text.js"></script>
-  <script type="text/javascript">var cp = "${cp?js_string}";</script>
 
 ${header}
 </head>
@@ -33,18 +38,8 @@ ${header}
     <div class="yui3-menu-content">
         <ul>
           <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/">Introduction</a></li>
-          <li>
-            <span class="yui3-menu-label"><em>CollateX</em></span>
-            <div class="yui3-menu">
-              <div class="yui3-menu-content">
-                <ul>
-                  <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/console">Console</a></li>
-                  <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/apidocs">API Documentation</a></li>
-                </ul>
-              </div>
-            </div>
-          </li>
-          <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/text">Text Repository</a></li>
+          <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/console">Console</a></li>
+          <li class="yui3-menuitem"><a class="yui3-menuitem-content" href="${cp}/collate/apidocs">API Documentation</a></li>
         </ul>
     </div>
 </div>
@@ -54,22 +49,9 @@ ${header}
       this.plug(Y.Plugin.NodeMenuNav, { autoSubmenuDisplay: true, mouseOutHideDelay: 0 });
       this.removeClass("hidden");
     }, "#main-menu");
-  <#--
-  Y.on("domready", function() {
-      Y.one("#query").focus();
-  });
-  -->
   });
 </script>
-<#--
-<div style="text-align: right; margin: 1em 0">
-    <form id="quick-search-form" action="${cp}/search/">
-        <input type="text" name="query" id="query" style="width: 10em" value="${searchQuery!''?html}">
-        <input type="submit" value="Search…">
-    </form>
-</div>
--->
-<#nested />
+<#nested>
 <div id="footer" class="color12">
   Copyright &copy; 2011, 2012 The Interedition Development Group. All rights reserved. See the <a href="http://www.interedition.eu/" title="Interedition Homepage">Interedition Homepage</a> for further information.
 </div>

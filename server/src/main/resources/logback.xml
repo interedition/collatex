@@ -13,7 +13,7 @@
     <logger name="net.sf.ehcache" level="INFO"/>
     <logger name="org.hibernate" level="INFO"/>
     <logger name="org.restlet" level="INFO"/>
-    <logger name="org.restlet.ServerApplication.Directory" level="WARN"/>
+    <logger name="org.restlet.component.InternalRouter.ServerApplication.Directory" level="WARN"/>
     <logger name="org.springframework" level="INFO"/>
     <logger name="sun.awt" level="INFO"/>
     <root>
