@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.interedition</groupId>
   <artifactId>parent</artifactId>
@@ -10,20 +10,31 @@
   <description>Modules developed by a European-funded development collective whose aim it is to promote the
     interoperability of the tools and methodology we use in the field of digital scholarly editing and research.
   </description>
+
   <url>http://www.interedition.eu/</url>
   <organization>
     <name>The Interedition Development Group</name>
     <url>http://www.interedition.eu/</url>
   </organization>
+
   <inceptionYear>2010</inceptionYear>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.licenseName>gpl_v3</license.licenseName>
+    <spring.version>3.1.0.RELEASE</spring.version>
+    <slf4j.version>1.6.4</slf4j.version>
+    <jung.version>2.0.1</jung.version>
+    <restlet.version>2.0.12</restlet.version>
+  </properties>
+
   <modules>
     <module>collatex</module>
     <module>collatex-cocoon</module>
-    <module>text</module>
     <module>style</module>
-    <module>webapp</module>
     <module>server</module>
   </modules>
+
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -57,8 +68,10 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <dependencyManagement>
     <dependencies>
+
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
@@ -71,6 +84,7 @@
         <version>1.5.0</version>
         <scope>provided</scope>
       </dependency>
+
       <dependency>
         <groupId>eu.interedition</groupId>
         <artifactId>collatex</artifactId>
@@ -78,14 +92,15 @@
       </dependency>
       <dependency>
         <groupId>eu.interedition</groupId>
-        <artifactId>text</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <artifactId>server</artifactId>
+        <version>1.3-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>eu.interedition</groupId>
         <artifactId>style</artifactId>
         <version>1.0</version>
       </dependency>
+
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
@@ -129,30 +144,11 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring-webmvc</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
         <version>${spring.version}</version>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-core</artifactId>
-        <version>3.3.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-highlighter</artifactId>
-        <version>3.3.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kohsuke.rngom</groupId>
-        <artifactId>rngom</artifactId>
-        <version>20100718</version>
-      </dependency>
+
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
@@ -194,42 +190,6 @@
         <groupId>cglib</groupId>
         <artifactId>cglib</artifactId>
         <version>2.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>4.1.2.Final</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-ehcache</artifactId>
-        <version>4.1.2.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.5.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.jolbox</groupId>
-        <artifactId>bonecp</artifactId>
-        <version>0.7.1.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>1.3.162</version>
-      </dependency>
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.14</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
@@ -276,22 +236,24 @@
         <artifactId>jung-visualization</artifactId>
         <version>${jung.version}</version>
       </dependency>
+
+
       <dependency>
-        <groupId>net.tomp2p</groupId>
-        <artifactId>TomP2P</artifactId>
-        <version>4.0.7</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet</artifactId>
+        <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>6.1.26</version>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet.ext.freemarker</artifactId>
+        <version>${restlet.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet.ext.simple</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.freedesktop.tango</groupId>
         <artifactId>tango-icon-theme</artifactId>
@@ -316,16 +278,8 @@
       <url>http://maven.springframework.org/milestone</url>
     </repository>
     <repository>
-      <id>jboss-releases</id>
-      <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
-    </repository>
-    <repository>
-      <id>tomp2p.net</id>
-      <url>http://tomp2p.net/dev/mvn/</url>
-    </repository>
-    <repository>
-      <id>gregor-middell-releases</id>
-      <url>http://gregor.middell.net/maven/content/repositories/releases</url>
+      <id>restlet</id>
+      <url>http://maven.restlet.org</url>
     </repository>
   </repositories>
   <build>
@@ -393,6 +347,7 @@
       </extension>
     </extensions>
   </build>
+
   <developers>
     <developer>
       <name>Ronald Haentjens Dekker</name>
@@ -445,6 +400,7 @@
       <organization>Huygens Instituut</organization>
     </developer>
   </developers>
+
   <distributionManagement>
     <repository>
       <id>interedition-releases</id>
@@ -459,6 +415,7 @@
     <system>GitHub</system>
     <url>https://github.com/interedition/microservices/issues</url>
   </issueManagement>
+
   <licenses>
     <license>
       <name>Apache 2</name>
@@ -471,11 +428,4 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.licenseName>gpl_v3</license.licenseName>
-    <spring.version>3.1.0.RELEASE</spring.version>
-    <slf4j.version>1.6.4</slf4j.version>
-    <jung.version>2.0.1</jung.version>
-  </properties>
 </project>
