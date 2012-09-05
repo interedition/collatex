@@ -7,10 +7,9 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <title>${title} :: Interedition Microservices</title>
 
-  <link rel="shortcut icon" href="${cp}/static/interedition/interedition_logo.ico" />
-
+  <link rel="shortcut icon" href="${cp}/static/interedition_logo.ico" type="image/x-icon">
   <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.6.0/build/cssfonts/cssfonts-min.css&3.6.0/build/cssgrids/cssgrids-min.css&3.6.0/build/cssreset/cssreset-min.css&3.6.0/build/cssbase/cssbase-min.css&3.6.0/build/cssbutton/cssbutton-min.css">
-  <link rel="stylesheet" type="text/css" href="${cp}/static/interedition/interedition.css">
+  <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/webapp.css">
 
   <script type="text/javascript">var cp = "${cp?js_string}";</script>

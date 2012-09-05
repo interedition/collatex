@@ -60,7 +60,6 @@ public class ServerApplication extends Application implements InitializingBean {
     router.attach("/collate/apidocs", new TemplateResourceFinder(freemarkerConfiguration, "collate/apidocs.ftl"), MODE_EQUALS);
     router.attach("/collate/console", new TemplateResourceFinder(freemarkerConfiguration, "collate/console.ftl"), MODE_EQUALS);
     router.attach("/collate/darwin", new TemplateResourceFinder(freemarkerConfiguration, "collate/darwin-example.ftl"), MODE_EQUALS);
-    router.attach("/static/interedition", new Directory(context.createChildContext(), "clap://class/eu/interedition/style"));
     router.attach("/static", new Directory(context.createChildContext(), environment.getRequiredProperty("interedition.static")));
     return router;
   }

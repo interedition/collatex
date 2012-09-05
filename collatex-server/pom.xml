@@ -40,10 +40,6 @@
       <artifactId>collatex-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>eu.interedition.collatex</groupId>
-      <artifactId>interedition-style</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-asl</artifactId>
     </dependency>
