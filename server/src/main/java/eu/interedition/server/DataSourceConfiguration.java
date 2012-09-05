@@ -6,6 +6,8 @@ import eu.interedition.collatex.simple.SimpleWitnessMapper;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.transaction.SpringTransactionManager;
 import org.neo4j.kernel.impl.transaction.UserTransactionImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import java.io.IOException;
  */
 @Configuration
 public class DataSourceConfiguration {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceConfiguration.class);
 
   @Autowired
   private Environment environment;
@@ -38,11 +41,10 @@ public class DataSourceConfiguration {
 
   @Bean(destroyMethod = "shutdown")
   public EmbeddedGraphDatabase graphDatabase() throws IOException {
-    return new EmbeddedGraphDatabase(new File(dataDirectory(), "graphs").getCanonicalPath());
-  }
-
-
-  protected File dataDirectory() {
-    return environment.getRequiredProperty("interedition.data", File.class);
+    final File graphDirectory = new File(environment.getRequiredProperty("interedition.data", File.class), "graphs");
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Starting graph database in {}", graphDirectory);
+    }
+    return new EmbeddedGraphDatabase(graphDirectory.getCanonicalPath());
   }
 }

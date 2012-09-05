@@ -8,10 +8,13 @@ import org.restlet.engine.resource.VariantInfo;
 import org.restlet.representation.Representation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.UniformResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +27,7 @@ import java.util.List;
  */
 @Component
 public class VariantGraphConverter extends ConverterHelper implements InitializingBean {
+  private static final Logger LOGGER = LoggerFactory.getLogger(VariantGraphConverter.class);
 
   private static final VariantInfo VARIANT_SVG = new VariantInfo(MediaType.IMAGE_SVG);
   private static final VariantInfo VARIANT_TEXT = new VariantInfo(MediaType.TEXT_PLAIN);
@@ -33,11 +37,10 @@ public class VariantGraphConverter extends ConverterHelper implements Initializi
   @Autowired
   AbstractApplicationContext applicationContext;
 
-  String dotPath;
+  @Autowired
+  private Environment environment;
 
-  public void setDotPath(File dotPath) {
-    this.dotPath = (dotPath != null && dotPath.canExecute() ? dotPath.getPath() : null);
-  }
+  String dotPath;
 
   public boolean isSvgAvailable() {
     return (dotPath != null);
@@ -101,6 +104,17 @@ public class VariantGraphConverter extends ConverterHelper implements Initializi
 
   @Override
   public void afterPropertiesSet() throws Exception {
+    final File dot = environment.getProperty("interedition.dot", File.class);
+    if (dot == null && LOGGER.isWarnEnabled()) {
+      LOGGER.warn("GraphViz 'dot' not available; cannot generate SVG serializations of variant graphs");
+    } else if (!dot.canExecute() && LOGGER.isErrorEnabled()) {
+      LOGGER.error("{} is not executable; cannot generate SVG serializations of variant graphs", dot);
+    } else {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("Using {} for generating SVG serializations of variant graphs", dot);
+      }
+      this.dotPath = dot.getPath();
+    }
     Engine.getInstance().getRegisteredConverters().add(this);
   }
 

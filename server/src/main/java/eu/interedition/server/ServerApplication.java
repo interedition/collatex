@@ -2,12 +2,12 @@ package eu.interedition.server;
 
 import eu.interedition.server.collatex.VariantGraphResource;
 import eu.interedition.server.io.ComboResourceFinder;
-import eu.interedition.server.ui.ServerConsole;
 import freemarker.template.Configuration;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.data.CharacterSet;
+import org.restlet.data.Protocol;
 import org.restlet.resource.Directory;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
@@ -24,9 +24,6 @@ import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -86,17 +83,7 @@ public class ServerApplication extends Application implements InitializingBean {
     return new ApplicationContextFinder<T>(getContext().createChildContext(), applicationContext, resourceType);
   }
 
-  /**
-   * Entry point to the application.
-   * <p/>
-   * Upon start, the security manager is set to <code>null</code>, so Java Web Start's sandbox does not interfere with
-   * classloading.
-   *
-   * @param args command line arguments (ignored)
-   */
   public static void main(String... args) {
-    System.setSecurityManager(null);
-
     final Logger logger = Logger.getLogger("");
     for (Handler handler : logger.getHandlers()) {
       if (ConsoleHandler.class.isAssignableFrom(handler.getClass())) {
@@ -108,53 +95,40 @@ public class ServerApplication extends Application implements InitializingBean {
     try {
       final ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(new String[]{"/application-context.xml"}, false);
 
-      final Properties config = new Properties();
-      config.put("interedition.data", dataDirectory());
-
       final MutablePropertySources envProps = ctx.getEnvironment().getPropertySources();
       envProps.addLast(new PropertiesPropertySource("system", System.getProperties()));
-      envProps.addLast(new PropertiesPropertySource("detected", config));
+      envProps.addLast(new DetectingConfigurationPropertySource("detected"));
       envProps.addLast(new ResourcePropertySource(new ClassPathResource("/config.properties", ServerApplication.class)));
 
       ctx.registerShutdownHook();
       ctx.refresh();
-      ctx.getBean(ServerConsole.class).setVisible(true);
-    } catch (IOException e) {
+
+      final ServerApplication application = ctx.getBean(ServerApplication.class);
+
+      final org.restlet.Component component = new org.restlet.Component();
+      component.getClients().add(Protocol.CLAP);
+      component.getClients().add(Protocol.FILE);
+      component.getLogService().setEnabled(false);
+      component.getDefaultHost().attach(application);
+      component.getServers().add(Protocol.HTTP, ctx.getEnvironment().getRequiredProperty("interedition.port", Integer.class)).getContext().getParameters().set("maxThreads", "512");
+
+      Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        @Override
+        public void run() {
+          if (component.isStarted()) {
+            try {
+              component.stop();
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }));
+
+      component.start();
+    } catch (Exception e) {
+      e.printStackTrace();
       System.exit(1);
     }
   }
-
-
-  /**
-   * Platform-dependent setup of the filesystem location where this application stores its data.
-   *
-   * @return the data directory file
-   * @throws IOException in case the data directory cannot be created or accessed
-   */
-  protected static File dataDirectory() throws IOException {
-    final File userHome = new File(System.getProperty("user.home"));
-    final String osName = System.getProperty("os.name").toLowerCase();
-
-    File dataDirectory;
-    if (osName.contains("mac os x")) {
-      dataDirectory = new File(userHome, "Library/Application Support/Interedition");
-    } else if (osName.contains("windows")) {
-      dataDirectory = new File(userHome, "Application Data/Interedition");
-    } else {
-      dataDirectory = new File(userHome, ".interedition");
-    }
-
-    if (!dataDirectory.isDirectory() && !dataDirectory.mkdirs()) {
-      throw ServerConsole.error(null, new IOException("Cannot create data directory " + dataDirectory.getPath()), null);
-    }
-
-    try {
-      dataDirectory = dataDirectory.getCanonicalFile();
-    } catch (IOException e) {
-      throw ServerConsole.error(null, e, "Cannot determine canonical path of " + dataDirectory.getPath());
-    }
-
-    return dataDirectory;
-  }
-
 }
