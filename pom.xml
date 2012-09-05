@@ -22,7 +22,6 @@
     <module>text</module>
     <module>style</module>
     <module>webapp</module>
-    <module>image-transform</module>
     <module>server</module>
   </modules>
   <dependencies>
