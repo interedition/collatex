@@ -2,7 +2,6 @@ package eu.interedition.server.collatex;
 
 import eu.interedition.collatex.graph.VariantGraph;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import eu.interedition.text.xml.XML;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.WriterRepresentation;
@@ -27,7 +26,11 @@ import java.nio.channels.WritableByteChannel;
 public class VariantGraphTEIRepresentation extends WriterRepresentation implements VariantGraphRepresentation {
   static final MediaType APPLICATION_TEI_XML = new MediaType("application/tei+xml");
 
-  private static final XMLOutputFactory XML_OUTPUT_FACTORY = XML.createXMLOutputFactory();
+  private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
+
+  static {
+    XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+  }
 
   private VariantGraph graph;
 
@@ -62,7 +65,10 @@ public class VariantGraphTEIRepresentation extends WriterRepresentation implemen
     } catch (XMLStreamException e) {
       throw new IOException(e.getMessage(), e);
     } finally {
-      XML.closeQuietly(xml);
+      try {
+        xml.close();
+      } catch (XMLStreamException e) {
+      }
     }
   }
 }

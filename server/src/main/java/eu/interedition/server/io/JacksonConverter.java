@@ -1,8 +1,6 @@
 package eu.interedition.server.io;
 
-import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.server.collatex.CollateXModule;
-import eu.interedition.text.json.map.TextModule;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.data.MediaType;
@@ -32,9 +30,6 @@ public class JacksonConverter extends ConverterHelper implements InitializingBea
   private static final VariantInfo VARIANT_JSON = new VariantInfo(MediaType.APPLICATION_JSON);
 
   @Autowired
-  private AbstractApplicationContext applicationContext;
-
-  @Autowired
   private CollateXModule collateXModule;
 
   private ObjectMapper objectMapper;
@@ -43,7 +38,6 @@ public class JacksonConverter extends ConverterHelper implements InitializingBea
   public void afterPropertiesSet() throws Exception {
     this.objectMapper = new ObjectMapper();
     this.objectMapper.getJsonFactory().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-    this.objectMapper.registerModule(new TextModule());
     this.objectMapper.registerModule(collateXModule);
 
     Engine.getInstance().getRegisteredConverters().add(this);
