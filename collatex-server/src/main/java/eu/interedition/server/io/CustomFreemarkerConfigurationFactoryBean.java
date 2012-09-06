@@ -31,7 +31,7 @@ public class CustomFreemarkerConfigurationFactoryBean extends AbstractFactoryBea
   @Override
   protected Configuration createInstance() throws Exception {
     final Map<String,Object> shared = Maps.newHashMap();
-    shared.put("cp", "");
+    shared.put("cp", environment.getRequiredProperty("interedition.context_path"));
 
     final Properties settings = new Properties();
     settings.put("auto_include", "/header.ftl");

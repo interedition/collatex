@@ -54,13 +54,14 @@ public class ServerApplication extends Application implements InitializingBean {
   public Restlet createInboundRoot() {
     final Context context = getContext();
 
+    final String contextPath = environment.getRequiredProperty("interedition.context_path");
     final Router router = new Router(context);
-    router.attach("/", new TemplateResourceFinder(freemarkerConfiguration, "index.ftl"), MODE_EQUALS);
-    router.attach("/collate", transactional(newFinder(VariantGraphResource.class)), MODE_EQUALS);
-    router.attach("/collate/apidocs", new TemplateResourceFinder(freemarkerConfiguration, "collate/apidocs.ftl"), MODE_EQUALS);
-    router.attach("/collate/console", new TemplateResourceFinder(freemarkerConfiguration, "collate/console.ftl"), MODE_EQUALS);
-    router.attach("/collate/darwin", new TemplateResourceFinder(freemarkerConfiguration, "collate/darwin-example.ftl"), MODE_EQUALS);
-    router.attach("/static", new Directory(context.createChildContext(), environment.getRequiredProperty("interedition.static")));
+    router.attach(contextPath + "/", new TemplateResourceFinder(freemarkerConfiguration, "index.ftl"), MODE_EQUALS);
+    router.attach(contextPath + "/collate", transactional(newFinder(VariantGraphResource.class)), MODE_EQUALS);
+    router.attach(contextPath + "/collate/apidocs", new TemplateResourceFinder(freemarkerConfiguration, "collate/apidocs.ftl"), MODE_EQUALS);
+    router.attach(contextPath + "/collate/console", new TemplateResourceFinder(freemarkerConfiguration, "collate/console.ftl"), MODE_EQUALS);
+    router.attach(contextPath + "/collate/darwin", new TemplateResourceFinder(freemarkerConfiguration, "collate/darwin-example.ftl"), MODE_EQUALS);
+    router.attach(contextPath + "/static", new Directory(context.createChildContext(), environment.getRequiredProperty("interedition.static")));
     return router;
   }
 
