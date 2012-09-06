@@ -20,7 +20,7 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 
-public class DefaultTokenLinkerTest extends AbstractTest {
+public class DeprecatedTokenLinkerTest extends AbstractTest {
 
   @Test
   public void testDirkVincent4() {
@@ -66,7 +66,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final DefaultTokenLinker linker = new DefaultTokenLinker();
+    final DeprecatedTokenLinker linker = new DeprecatedTokenLinker();
     Map<Token, VariantGraphVertex> links = linkTokens(linker, w[0], w[1]);
 
     assertTrue(links.containsKey(w[1].getTokens().get(0))); // its
@@ -234,7 +234,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
-    final DefaultTokenLinker linker = new DefaultTokenLinker();
+    final DeprecatedTokenLinker linker = new DeprecatedTokenLinker();
     linkTokens(linker, w[0], w[1]);
 
     final Token soft = w[1].getTokens().get(1);
@@ -256,7 +256,7 @@ public class DefaultTokenLinkerTest extends AbstractTest {
         "the cat very happy is very happy the cat",//
         "very delitied and happy is the cat");
 
-    final DefaultTokenLinker linker = new DefaultTokenLinker();
+    final DeprecatedTokenLinker linker = new DeprecatedTokenLinker();
     linkTokens(linker, w[0], w[1]);
 
     final List<List<Token>> rightExpandingPhrases = linker.getRightExpandingPhrases();
@@ -272,21 +272,21 @@ public class DefaultTokenLinkerTest extends AbstractTest {
     assertEquals("cat #", SimpleToken.toString(leftExpandingPhrases.get(3)));
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, SimpleWitness base, SimpleWitness witness) {
+  private Map<Token, VariantGraphVertex> linkTokens(DeprecatedTokenLinker linker, SimpleWitness base, SimpleWitness witness) {
     final VariantGraph graph = collate(base);
     return linker.link(graph, witness, new EqualityTokenComparator());
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(DefaultTokenLinker linker, VariantGraph base, SimpleWitness witness) {
+  private Map<Token, VariantGraphVertex> linkTokens(DeprecatedTokenLinker linker, VariantGraph base, SimpleWitness witness) {
     return linker.link(base, witness, new EqualityTokenComparator());
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(SimpleWitness base, SimpleWitness witness) {
-    return linkTokens(new DefaultTokenLinker(), base, witness);
+    return linkTokens(new DeprecatedTokenLinker(), base, witness);
   }
 
   private Map<Token, VariantGraphVertex> linkTokens(VariantGraph base, SimpleWitness witness) {
-    return linkTokens(new DefaultTokenLinker(), base, witness);
+    return linkTokens(new DeprecatedTokenLinker(), base, witness);
   }
 
   private static void assertLink(String left, String right, Map.Entry<Token, VariantGraphVertex> match) {

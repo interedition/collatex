@@ -7,7 +7,6 @@
               <div class="yui3-u form-input">
                 <select id="algorithm" name="algorithm" style="width: 40em">
                   <option value="dekker">Dekker</option>
-                  <option value="dekker-experimental">Dekker-Experimental</option>
                   <option value="needleman-wunsch">Needleman-Wunsch</option>
                 </select>
               </div>

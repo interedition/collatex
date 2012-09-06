@@ -2,7 +2,7 @@ package eu.interedition.collatex;
 
 import java.util.Comparator;
 
-import eu.interedition.collatex.dekker.DefaultTokenLinker;
+import eu.interedition.collatex.dekker.DeprecatedTokenLinker;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
@@ -27,6 +27,6 @@ public class CollationAlgorithmFactory {
 
   @Deprecated
   public static CollationAlgorithm dekkerPreviousVersion(Comparator<Token> comparator) {
-   return new DekkerAlgorithm(comparator, new DefaultTokenLinker());
+   return new DekkerAlgorithm(comparator, new DeprecatedTokenLinker());
   }
 }
