@@ -9,8 +9,8 @@
   </parent>
   <artifactId>collatex-server</artifactId>
   <version>1.3-SNAPSHOT</version>
-  <name>Interedition Standalone Server</name>
-  <description>Interedition Standalone Server for RESTful web services.</description>
+  <name>CollateX Server</name>
+  <description>CollateX as a RESTful web service</description>
   <licenses>
     <license>
       <name>GNU General Public License</name>

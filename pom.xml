@@ -6,10 +6,8 @@
   <artifactId>collatex</artifactId>
   <version>1.3-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Interedition Microservices</name>
-  <description>Modules developed by a European-funded development collective whose aim it is to promote the
-    interoperability of the tools and methodology we use in the field of digital scholarly editing and research.
-  </description>
+  <name>CollateX</name>
+  <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
 
   <url>http://www.interedition.eu/</url>
   <organization>
