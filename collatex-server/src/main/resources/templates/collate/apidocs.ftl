@@ -21,7 +21,7 @@
         <p>
           The CollateX service is callable via
           <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" title="RFC">HTTP POST requests</a> to
-          <a href="${endpoint!'/'}" title="REST-API Endpoint">${endpoint!'/'?html}</a>.</p>
+          <a href="${cp}/collate" title="REST-API Endpoint">${cp}/collate</a>.</p>
 
         <h3>Input</h3>
 
@@ -243,7 +243,7 @@
         <pre class="prettyprint">&lt;script type="text/javascript"
   src="[ROOT]/static/yui-3.4.1/build/yui/yui-min.js"&gt;&lt;/script&gt;
 &lt;script type="text/javascript"
-  src="[ROOT]/static/api/collate.js"&gt;&lt;/script&gt;</pre>
+  src="[ROOT]/static/collate.js"&gt;&lt;/script&gt;</pre>
         
         <p>Substitute URL prefix <code>[ROOT]</code> with the base URL of your installation, e.g.
           <a href="${cp}/" title="Base URL">this one</a> for the installation you are currently looking at …</p>

@@ -20,15 +20,12 @@
       combine: true,
       modules: {
         'interedition-collate': {
-          fullpath: cp + '/static/api/collate.js',
+          fullpath: cp + '/static/collate.js',
           requires: ["base", "io", "json", "node", "array-extras", "escape", "dump"]
         }
       }
     });
   </script>
-  <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.min.js"></script>
-  <script type="text/javascript" src="${cp}/static/d3-1.29.6/d3.behavior.min.js"></script>
-
 ${header}
 </head>
 <body class="yui3-skin-sam">

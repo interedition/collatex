@@ -20,48 +20,28 @@
   </licenses>
   <dependencies>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
-    </dependency>
-    <dependency>
       <groupId>eu.interedition.collatex</groupId>
       <artifactId>collatex-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-asl</artifactId>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-grizzly2</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.freemarker</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.simple</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.freedesktop.tango</groupId>
-      <artifactId>tango-icon-theme</artifactId>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -86,7 +66,7 @@
           <extraJvmArguments>-Xmx512m</extraJvmArguments>
           <programs>
             <program>
-              <mainClass>eu.interedition.server.ServerApplication</mainClass>
+              <mainClass>eu.interedition.collatex.Server</mainClass>
               <name>collatex-server</name>
             </program>
           </programs>

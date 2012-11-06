@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import eu.interedition.collatex.util.Logging;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,7 +52,8 @@ public abstract class AbstractTest {
   private Transaction transaction;
 
   @BeforeClass
-  public static void createVariantGraphFactory() throws IOException {
+  public static void init() throws IOException {
+    Logging.configureLogging();
     graphFactory = GraphFactory.create();
   }
 

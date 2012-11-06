@@ -1,5 +1,15 @@
 package eu.interedition.collatex;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -9,19 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang.math.RandomUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-
-import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
-import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -37,6 +35,7 @@ public interface CollationAlgorithm {
   abstract class Base implements CollationAlgorithm {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
     private Map<Token, VariantGraphVertex> witnessTokenVertices;
+    private AtomicInteger transpositionIdSource = new AtomicInteger();
 
     @Override
     public void collate(VariantGraph against, Iterable<Token>... witnesses) {
@@ -80,9 +79,11 @@ public interface CollationAlgorithm {
 
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
-        int transpositionId = RandomUtils.nextInt(327680000);//transposedPhrase.hashCode();
+        int transpositionId = transpositionIdSource.addAndGet(1);
         final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
-        LOG.info("transposition: {}, hash={}", transposedPhrase, transpositionId);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("transposition: {}, hash={}", transposedPhrase, transpositionId);
+        }
         for (Match match : transposedPhrase) {
           transposedTokens.put(match.token, match.vertex);
         }

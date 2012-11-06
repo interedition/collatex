@@ -1,42 +1,55 @@
-package eu.interedition.server;
+package eu.interedition.collatex;
 
 import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.env.EnumerablePropertySource;
+import com.google.inject.AbstractModule;
+import com.google.inject.ProvisionException;
+import com.google.inject.name.Names;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class DetectingConfigurationPropertySource extends EnumerablePropertySource<Object> {
-
-  private static final String[] PROPERTY_NAMES = new String[] { "interedition.data", "interedition.dot" };
-  private static final Logger LOGGER = LoggerFactory.getLogger(DetectingConfigurationPropertySource.class);
-
-  public DetectingConfigurationPropertySource(String name) {
-    super(name, new Object());
-  }
+public class ConfigurationModule extends AbstractModule {
+  private final Logger LOG = Logger.getLogger(getClass().getName());
 
   @Override
-  public String[] getPropertyNames() {
-    return PROPERTY_NAMES;
+  protected void configure() {
+    Names.bindProperties(binder(), readConfiguration());
   }
 
-  @Override
-  public Object getProperty(String name) {
-    if ("interedition.data".equals(name)) {
+  protected Properties readConfiguration() {
+    final Properties configuration = new Properties();
+    InputStream inputStream = null;
+    try {
+      configuration.load(inputStream = getClass().getResourceAsStream("/config.properties"));
+      configuration.putAll(System.getProperties());
+      detectConfigurationSettings(configuration);
+
+      return configuration;
+    } catch (IOException e) {
+      throw new ProvisionException("I/O error while reading configuration", e);
+    } finally {
+      Closeables.closeQuietly(inputStream);
+    }
+  }
+
+  protected void detectConfigurationSettings(Properties configuration) {
+    if (!configuration.containsKey("interedition.data")) {
+      String dataDirectoryPath;
+
       final File userHome = new File(System.getProperty("user.home"));
       final String osName = System.getProperty("os.name").toLowerCase();
 
-      String dataDirectoryPath;
       if (osName.contains("mac os x")) {
         dataDirectoryPath = new File(userHome, "Library/Application Support/Interedition").getAbsolutePath();
       } else if (osName.contains("windows")) {
@@ -47,13 +60,18 @@ public class DetectingConfigurationPropertySource extends EnumerablePropertySour
 
       final File dataDirectory = new File(dataDirectoryPath);
       if (!dataDirectory.isDirectory() && !dataDirectory.mkdirs()) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Cannot create data directory " + dataDirectory.getPath());
+        if (LOG.isLoggable(Level.WARNING)) {
+          LOG.warning("Cannot create data directory " + dataDirectory.getPath());
         }
-        return null;
+      } else {
+        if (LOG.isLoggable(Level.INFO)) {
+          LOG.info("Auto-detected data directory " + dataDirectory);
+        }
+        configuration.put("interedition.data", dataDirectory.getPath());
       }
-      return dataDirectory;
-    } else if ("interedition.dot".equals(name)) {
+    }
+
+    if (!configuration.containsKey("interedition.dot")) {
       InputStream stream = null;
       String dotPath = null;
       try {
@@ -83,8 +101,12 @@ public class DetectingConfigurationPropertySource extends EnumerablePropertySour
         dotPath = dotPath.split("[\r\n]+")[0].trim();
       }
 
-      return (Strings.isNullOrEmpty(dotPath) ? null : dotPath);
+      if (!Strings.isNullOrEmpty(dotPath)) {
+        if (LOG.isLoggable(Level.INFO)) {
+          LOG.info("Auto-detected GraphViz dot at " + dotPath);
+        }
+      }
+      configuration.put("interedition.dot", Strings.nullToEmpty(dotPath));
     }
-    return null;
   }
 }

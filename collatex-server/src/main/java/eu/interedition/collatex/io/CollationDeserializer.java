@@ -1,10 +1,9 @@
-package eu.interedition.server.collatex;
+package eu.interedition.collatex.io;
 
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.GraphFactory;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -14,8 +13,6 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -24,11 +21,7 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Component
 public class CollationDeserializer extends JsonDeserializer<Collation> {
-
-  @Autowired
-  private GraphFactory graphFactory;
 
   @Override
   public Collation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
@@ -131,8 +124,6 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
       final String collationAlgorithmValue = collationAlgorithmNode.getTextValue();
       if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
         collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
-      } else if ("dekker-experimental".equalsIgnoreCase(collationAlgorithmValue)) {
-        collationAlgorithm = CollationAlgorithmFactory.dekkerPreviousVersion(tokenComparator);
       }
     }
     if (collationAlgorithm == null) {

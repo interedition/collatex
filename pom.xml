@@ -20,10 +20,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <license.licenseName>gpl_v3</license.licenseName>
-    <spring.version>3.1.0.RELEASE</spring.version>
     <slf4j.version>1.6.4</slf4j.version>
     <jung.version>2.0.1</jung.version>
-    <restlet.version>2.0.12</restlet.version>
+    <jersey.version>1.15</jersey.version>
   </properties>
 
   <modules>
@@ -45,23 +44,13 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
+      <artifactId>slf4j-jdk14</artifactId>
       <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.1</version>
+      <version>4.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -73,12 +62,6 @@
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.5</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.jnlp</groupId>
-        <artifactId>jnlp-api</artifactId>
-        <version>1.5.0</version>
         <scope>provided</scope>
       </dependency>
 
@@ -94,127 +77,68 @@
       </dependency>
 
       <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>${spring.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context-support</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-orm</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-oxm</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>${spring.version}</version>
-        <scope>test</scope>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>3.0</version>
       </dependency>
 
       <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>1.4</version>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey.version}</version>
       </dependency>
       <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.2.1</version>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-grizzly2</artifactId>
+        <version>${jersey.version}</version>
       </dependency>
+
       <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.0.1</version>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.6</version>
       </dependency>
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>3.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.woodstox</groupId>
-        <artifactId>woodstox-core-asl</artifactId>
-        <version>4.1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib</artifactId>
-        <version>2.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>1.8.2</version>
-      </dependency>
+
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.8.2</version>
+        <version>1.9.10</version>
       </dependency>
+
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
-        <version>2.3.16</version>
+        <version>2.3.19</version>
       </dependency>
-      <dependency>
-        <groupId>joda-time</groupId>
-        <artifactId>joda-time</artifactId>
-        <version>2.0</version>
-      </dependency>
+
       <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j</artifactId>
-        <version>1.5</version>
+        <version>1.8</version>
         <exclusions>
           <exclusion>
             <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-udc</artifactId>
+            <artifactId>neo4j-cypher</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-cypher</artifactId>
+            <artifactId>neo4j-graph-matching</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-graph-algo</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-jmx</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-lucene-index</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-udc</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -229,28 +153,6 @@
         <version>${jung.version}</version>
       </dependency>
 
-
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet.ext.freemarker</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet.ext.simple</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.freedesktop.tango</groupId>
-        <artifactId>tango-icon-theme</artifactId>
-        <version>0.8.90</version>
-      </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
@@ -263,15 +165,6 @@
     <repository>
       <id>interedition-releases</id>
       <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
-    </repository>
-    <repository>
-      <id>spring-maven-milestone</id>
-      <name>Springframework Maven Repository</name>
-      <url>http://maven.springframework.org/milestone</url>
-    </repository>
-    <repository>
-      <id>restlet</id>
-      <url>http://maven.restlet.org</url>
     </repository>
   </repositories>
   <build>

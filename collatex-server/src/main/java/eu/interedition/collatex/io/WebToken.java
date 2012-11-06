@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.server.collatex;
+package eu.interedition.collatex.io;
 
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
