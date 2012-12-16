@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.cocoon.ProcessingException;
@@ -138,11 +137,11 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
 
-    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
-      final Set<VariantGraphVertex> row = rowIt.next();
+    for (Iterator<Set<VariantGraph.Vertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
+      final Set<VariantGraph.Vertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
-      for (VariantGraphVertex v : row) {
+      for (VariantGraph.Vertex v : row) {
         for (Token token : v.tokens()) {
           tokenIndex.put(token.getWitness(), token);
         }

@@ -34,7 +34,7 @@ public interface CollationAlgorithm {
 
   abstract class Base implements CollationAlgorithm {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
-    private Map<Token, VariantGraphVertex> witnessTokenVertices;
+    private Map<Token, VariantGraph.Vertex> witnessTokenVertices;
     private AtomicInteger transpositionIdSource = new AtomicInteger();
 
     @Override
@@ -50,7 +50,7 @@ public interface CollationAlgorithm {
       }
     }
 
-    protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraphVertex> alignments) {
+    protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
       Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
       final Witness witness = Iterables.getFirst(witnessTokens, null).getWitness();
 
@@ -80,7 +80,7 @@ public interface CollationAlgorithm {
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
         int transpositionId = transpositionIdSource.addAndGet(1);
-        final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
+        final Map<Token, VariantGraph.Vertex> transposedTokens = Maps.newHashMap();
         if (LOG.isDebugEnabled()) {
           LOG.debug("transposition: {}, hash={}", transposedPhrase, transpositionId);
         }

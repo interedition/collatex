@@ -1,6 +1,6 @@
 package eu.interedition.collatex.neo4j;
 
-import eu.interedition.collatex.VariantGraphTransposition;
+import eu.interedition.collatex.VariantGraph;
 import org.neo4j.graphdb.Relationship;
 
 import com.google.common.base.Function;
@@ -9,7 +9,7 @@ import com.google.common.base.Objects;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Neo4jVariantGraphTransposition implements VariantGraphTransposition {
+public class Neo4jVariantGraphTransposition implements VariantGraph.Transposition {
 
   private static final String TRANSPOSITIONID_KEY = "transpositionId";
   private final Neo4jVariantGraph graph;
@@ -57,7 +57,7 @@ public class Neo4jVariantGraphTransposition implements VariantGraphTransposition
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraphTransposition) {
+    if (obj != null && obj instanceof VariantGraph.Transposition) {
       return relationship.equals(((Neo4jVariantGraphTransposition) obj).relationship);
     }
     return super.equals(obj);
@@ -68,10 +68,10 @@ public class Neo4jVariantGraphTransposition implements VariantGraphTransposition
     return Objects.toStringHelper(this).addValue(from()).addValue(to()).toString();
   }
 
-  public static Function<Relationship, VariantGraphTransposition> createWrapper(final Neo4jVariantGraph in) {
-    return new Function<Relationship, VariantGraphTransposition>() {
+  public static Function<Relationship, VariantGraph.Transposition> createWrapper(final Neo4jVariantGraph in) {
+    return new Function<Relationship, VariantGraph.Transposition>() {
       @Override
-      public VariantGraphTransposition apply(Relationship input) {
+      public VariantGraph.Transposition apply(Relationship input) {
         return new Neo4jVariantGraphTransposition(in, input);
       }
     };

@@ -10,9 +10,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphEdge;
-import eu.interedition.collatex.VariantGraphTransposition;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -33,7 +30,7 @@ import eu.interedition.collatex.simple.SimpleToken;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Neo4jVariantGraphVertex implements VariantGraphVertex {
+public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   private static final String TOKEN_REFERENCE_KEY = "tokenReferences";
   private static final String RANK_KEY = "rank";
   protected final Neo4jVariantGraph graph;
@@ -52,34 +49,34 @@ public class Neo4jVariantGraphVertex implements VariantGraphVertex {
   }
 
   @Override
-  public Iterable<VariantGraphEdge> incoming() {
+  public Iterable<VariantGraph.Edge> incoming() {
     return incoming(null);
   }
 
   @Override
-  public Iterable<VariantGraphEdge> incoming(Set<Witness> witnesses) {
+  public Iterable<VariantGraph.Edge> incoming(Set<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, INCOMING), graph.getEdgeWrapper()), Neo4jVariantGraphEdge.createTraversableFilter(witnesses));
   }
 
   @Override
-  public Iterable<VariantGraphEdge> outgoing() {
+  public Iterable<VariantGraph.Edge> outgoing() {
     return outgoing(null);
   }
 
   @Override
-  public Iterable<VariantGraphEdge> outgoing(Set<Witness> witnesses) {
+  public Iterable<VariantGraph.Edge> outgoing(Set<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(GraphRelationshipType.PATH, OUTGOING), graph.getEdgeWrapper()), Neo4jVariantGraphEdge.createTraversableFilter(witnesses));
   }
 
   @Override
-  public Iterable<VariantGraphTransposition> transpositions() {
+  public Iterable<VariantGraph.Transposition> transpositions() {
     return transform(node.getRelationships(GraphRelationshipType.TRANSPOSITION), graph.getTranspositionWrapper());
   }
 
   @Override
-  public Iterable<VariantGraphVertex> vertices(final Neo4jVariantGraphVertex to) {
+  public Iterable<VariantGraph.Vertex> vertices(final Neo4jVariantGraphVertex to) {
     final int[] witnesses = graph.getWitnessMapper().map(witnesses());
-    final Function<Relationship, VariantGraphEdge> edgeWrapper = graph.getEdgeWrapper();
+    final Function<Relationship, VariantGraph.Edge> edgeWrapper = graph.getEdgeWrapper();
     return Iterables.transform(Traversal.description().breadthFirst().relationships(GraphRelationshipType.PATH, Direction.OUTGOING).evaluator(new Evaluator() {
       @Override
       public Evaluation evaluate(Path path) {
@@ -164,18 +161,18 @@ public class Neo4jVariantGraphVertex implements VariantGraphVertex {
     return Iterables.toString(tokens());
   }
 
-  public static Function<Node, VariantGraphVertex> createWrapper(final Neo4jVariantGraph in) {
-    return new Function<Node, VariantGraphVertex>() {
+  public static Function<Node, VariantGraph.Vertex> createWrapper(final Neo4jVariantGraph in) {
+    return new Function<Node, VariantGraph.Vertex>() {
       @Override
-      public VariantGraphVertex apply(Node input) {
+      public VariantGraph.Vertex apply(Node input) {
         return new Neo4jVariantGraphVertex(in, input);
       }
     };
   }
 
-  public static final Function<VariantGraphVertex, String> TO_CONTENTS = new Function<VariantGraphVertex, String>() {
+  public static final Function<VariantGraph.Vertex, String> TO_CONTENTS = new Function<VariantGraph.Vertex, String>() {
     @Override
-    public String apply(VariantGraphVertex input) {
+    public String apply(VariantGraph.Vertex input) {
       final Set<Witness> witnesses = input.witnesses();
       if (witnesses.isEmpty()) {
         return "";
@@ -188,15 +185,15 @@ public class Neo4jVariantGraphVertex implements VariantGraphVertex {
     }
   };
 
-  public static final Function<VariantGraphVertex, Integer> TO_RANK = new Function<VariantGraphVertex, Integer>() {
+  public static final Function<VariantGraph.Vertex, Integer> TO_RANK = new Function<VariantGraph.Vertex, Integer>() {
     @Override
-    public Integer apply(VariantGraphVertex input) {
+    public Integer apply(VariantGraph.Vertex input) {
       return input.getRank();
     }
   };
-  private static final Function<VariantGraphTransposition, Integer> TRANSPOSITION_ID = new Function<VariantGraphTransposition, Integer>() {
+  private static final Function<VariantGraph.Transposition, Integer> TRANSPOSITION_ID = new Function<VariantGraph.Transposition, Integer>() {
     @Override
-    public Integer apply(@Nullable VariantGraphTransposition t) {
+    public Integer apply(@Nullable VariantGraph.Transposition t) {
       return t.getId();
     }
   };
@@ -226,7 +223,7 @@ public class Neo4jVariantGraphVertex implements VariantGraphVertex {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraphVertex) {
+    if (obj != null && obj instanceof VariantGraph.Vertex) {
       return node.equals(((Neo4jVariantGraphVertex) obj).node);
     }
     return super.equals(obj);

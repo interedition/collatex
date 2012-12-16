@@ -101,13 +101,13 @@ public abstract class AbstractTest {
   }
 
   protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
-    for (VariantGraphVertex v : graph.vertices(Collections.singleton(witness))) {
+    for (VariantGraph.Vertex v : graph.vertices(Collections.singleton(witness))) {
       phrases.add(toString(v, witness));
     }
     return phrases;
   }
 
-  protected static String toString(VariantGraphVertex vertex, Witness... witnesses) {
+  protected static String toString(VariantGraph.Vertex vertex, Witness... witnesses) {
     final Multimap<Witness, Token> tokens = Multimaps.index(vertex.tokens(Sets.newHashSet(Arrays.asList(witnesses))), Token.TO_WITNESS);
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
     for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
@@ -118,17 +118,17 @@ public abstract class AbstractTest {
     return Joiner.on(' ').join(tokenContents);
   }
 
-  protected static void assertHasWitnesses(VariantGraphEdge edge, Witness... witnesses) {
+  protected static void assertHasWitnesses(VariantGraph.Edge edge, Witness... witnesses) {
     assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.witnesses());
   }
 
-  protected static VariantGraphEdge edgeBetween(Neo4jVariantGraphVertex start, Neo4jVariantGraphVertex end) {
-    final VariantGraphEdge edge = start.getGraph().edgeBetween(start, end);
+  protected static VariantGraph.Edge edgeBetween(Neo4jVariantGraphVertex start, Neo4jVariantGraphVertex end) {
+    final VariantGraph.Edge edge = start.getGraph().edgeBetween(start, end);
     Assert.assertNotNull(String.format("No edge between %s and %s", start, end), edge);
     return edge;
   }
 
-  protected static void assertVertexEquals(String expected, VariantGraphVertex vertex) {
+  protected static void assertVertexEquals(String expected, VariantGraph.Vertex vertex) {
     assertEquals(expected, ((SimpleToken) Iterables.getFirst(vertex.tokens(), null)).getNormalized());
   }
 
@@ -136,12 +136,12 @@ public abstract class AbstractTest {
     assertEquals(expected, ((SimpleToken) token).getContent());
   }
 
-  protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, Witness in) {
+  protected static void assertVertexHasContent(VariantGraph.Vertex vertex, String content, Witness in) {
     Assert.assertEquals(String.format("%s does not has expected content for %s", vertex, in), content, toString(vertex, in));
   }
 
   protected static Neo4jVariantGraphVertex vertexWith(VariantGraph graph, String content, Witness in) {
-    for (VariantGraphVertex v : graph.vertices(Collections.singleton(in))) {
+    for (VariantGraph.Vertex v : graph.vertices(Collections.singleton(in))) {
       if (content.equals(toString(v, in))) {
         return (Neo4jVariantGraphVertex) v;
       }

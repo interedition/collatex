@@ -5,7 +5,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.VariantGraphEdge;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import org.neo4j.graphdb.Relationship;
 
@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Neo4jVariantGraphEdge implements VariantGraphEdge {
+public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
   private static final String WITNESS_REFERENCE_KEY = "witnessReferences";
   protected final Neo4jVariantGraph graph;
   protected final Relationship relationship;
@@ -51,7 +51,7 @@ public class Neo4jVariantGraphEdge implements VariantGraphEdge {
   }
 
   @Override
-  public VariantGraphEdge add(Set<Witness> witnesses) {
+  public VariantGraph.Edge add(Set<Witness> witnesses) {
     setWitnessReferences(graph.getWitnessMapper().map(Sets.union(witnesses(), witnesses)));
     return this;
   }
@@ -69,21 +69,21 @@ public class Neo4jVariantGraphEdge implements VariantGraphEdge {
     relationship.setProperty(WITNESS_REFERENCE_KEY, references);
   }
 
-  public static Function<Relationship, VariantGraphEdge> createWrapper(final Neo4jVariantGraph in) {
-    return new Function<Relationship, VariantGraphEdge>() {
+  public static Function<Relationship, VariantGraph.Edge> createWrapper(final Neo4jVariantGraph in) {
+    return new Function<Relationship, VariantGraph.Edge>() {
       @Override
-      public VariantGraphEdge apply(Relationship input) {
+      public VariantGraph.Edge apply(Relationship input) {
         return new Neo4jVariantGraphEdge(in, input);
       }
     };
   }
 
-  public static Predicate<VariantGraphEdge> createTraversableFilter(final Set<Witness> witnesses) {
-    return new Predicate<VariantGraphEdge>() {
+  public static Predicate<VariantGraph.Edge> createTraversableFilter(final Set<Witness> witnesses) {
+    return new Predicate<VariantGraph.Edge>() {
       private int[] witnessReferences;
 
       @Override
-      public boolean apply(VariantGraphEdge input) {
+      public boolean apply(VariantGraph.Edge input) {
         if (witnessReferences == null) {
           witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : input.getGraph().getWitnessMapper().map(witnesses));
         }
@@ -92,9 +92,9 @@ public class Neo4jVariantGraphEdge implements VariantGraphEdge {
     };
   }
 
-  public static final Function<VariantGraphEdge, String> TO_CONTENTS = new Function<VariantGraphEdge, String>() {
+  public static final Function<VariantGraph.Edge, String> TO_CONTENTS = new Function<VariantGraph.Edge, String>() {
     @Override
-    public String apply(VariantGraphEdge input) {
+    public String apply(VariantGraph.Edge input) {
       return Joiner.on(", ").join(Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(input.witnesses()));
     }
   };
@@ -126,7 +126,7 @@ public class Neo4jVariantGraphEdge implements VariantGraphEdge {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraphEdge) {
+    if (obj != null && obj instanceof VariantGraph.Edge) {
       return relationship.equals(((Neo4jVariantGraphEdge) obj).relationship);
     }
     return super.equals(obj);

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
@@ -29,8 +28,8 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
     final VariantGraph graph = collate(w[0]);
-    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
-    final Map<Token, VariantGraphVertex> links = linkTokens(graph, w[1]);
+    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
+    final Map<Token, VariantGraph.Vertex> links = linkTokens(graph, w[1]);
 
     assertEquals(vertices.get(1), links.get(w[1].getTokens().get(0))); // 'its'
     assertEquals(vertices.get(3), links.get(w[1].getTokens().get(3))); // 'light'
@@ -44,7 +43,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
         "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
 
-    final Map<Token, VariantGraphVertex> links = linkTokens(collate(w[0], w[1]), w[2]);
+    final Map<Token, VariantGraph.Vertex> links = linkTokens(collate(w[0], w[1]), w[2]);
 
     final List<Token> unlinked = Lists.newArrayList();
     for (Token witnessToken : w[2].getTokens()) {
@@ -67,7 +66,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
 
     final DeprecatedTokenLinker linker = new DeprecatedTokenLinker();
-    Map<Token, VariantGraphVertex> links = linkTokens(linker, w[0], w[1]);
+    Map<Token, VariantGraph.Vertex> links = linkTokens(linker, w[0], w[1]);
 
     assertTrue(links.containsKey(w[1].getTokens().get(0))); // its
     assertTrue(links.containsKey(w[1].getTokens().get(1))); // soft
@@ -84,7 +83,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
         "So on to no purpose till finally at a stand again to his ears just audible oh how and here some word he could not catch it would be to end somewhere he had never been.",//
         "The next he knew he was stuck still again & to his ears just audible Oh how and here a word he could not catch it were to end where never been.");
 
-    final Map<Token, VariantGraphVertex> links = linkTokens(collate(w[0]), w[1]);
+    final Map<Token, VariantGraph.Vertex> links = linkTokens(collate(w[0]), w[1]);
     assertTrue(!links.containsKey(w[1].getTokens().get(0)));
     assertTrue(!links.containsKey(w[1].getTokens().get(1)));
     assertTrue(!links.containsKey(w[1].getTokens().get(2)));
@@ -115,7 +114,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("a", "a a");
 
     final VariantGraph graph = collate(w[0]);
-    final Map<Token, VariantGraphVertex> links = linkTokens(graph, w[1]);
+    final Map<Token, VariantGraph.Vertex> links = linkTokens(graph, w[1]);
 
     assertEquals(1, links.size());
     assertEquals(vertexWith(graph, "a", w[0]), links.get(w[1].getTokens().get(0)));
@@ -125,7 +124,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
   public void everythingIsUnique() {
     final SimpleWitness[] w = createWitnesses("everything is unique should be no problem", "everything is unique");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("everything", "everything", Iterables.get(matches, 0));
@@ -140,7 +139,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
         "this one very different",//
         "everything is different");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
     assertEquals("everything", ((SimpleToken) getFirst(Iterables.get(matches, 0).getValue().tokens(), null)).getContent());
@@ -155,7 +154,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
         "this one is different",//
         "everything is different");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0], w[1]), w[2]).entrySet();
 
     assertEquals(3, matches.size());
     assertEquals("everything", ((SimpleToken) getFirst(Iterables.get(matches, 0).getValue().tokens(), null)).getContent());
@@ -167,7 +166,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
   public void getMatchesUsingWitnessIndex() {
     final SimpleWitness[] w = createWitnesses("The big black cat and the big black rat", "The big black");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("the", "the", Iterables.get(matches, 0));
@@ -179,7 +178,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
   public void getMatchesUsingWitnessIndexWithOverlapping() {
     final SimpleWitness[] w = createWitnesses("the big black cat and the big black rat", "the big black cat");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(4, matches.size());
     assertLink("cat", "cat", Iterables.get(matches, 0));
@@ -192,7 +191,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
   public void overlappingMatches2() {
     final SimpleWitness[] w = createWitnesses("the black cat and the black mat", "the black dog and the black mat");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(6, matches.size());
     assertLink("and", "and", Iterables.get(matches, 0));
@@ -207,7 +206,7 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
   public void matchesWithIndex() {
     final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
 
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(collate(w[0]), w[1]).entrySet();
 
     assertEquals(3, matches.size());
     assertLink("the", "the", Iterables.get(matches, 0));
@@ -220,10 +219,10 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("a a", "a");
 
     final VariantGraph graph = collate(w[0]);
-    final Set<Map.Entry<Token, VariantGraphVertex>> matches = linkTokens(graph, w[1]).entrySet();
+    final Set<Map.Entry<Token, VariantGraph.Vertex>> matches = linkTokens(graph, w[1]).entrySet();
 
     assertEquals(1, matches.size());
-    final Map.Entry<Token, VariantGraphVertex> match = Iterables.get(matches, 0);
+    final Map.Entry<Token, VariantGraph.Vertex> match = Iterables.get(matches, 0);
     assertEquals(vertexWith(graph, "a", w[0]), match.getValue());
     assertEquals(((SimpleToken) getFirst(vertexWith(graph, "a", w[0]).tokens(), null)).getNormalized(), ((SimpleToken) match.getKey()).getNormalized());
   }
@@ -272,24 +271,24 @@ public class DeprecatedTokenLinkerTest extends AbstractTest {
     assertEquals("cat #", SimpleToken.toString(leftExpandingPhrases.get(3)));
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(DeprecatedTokenLinker linker, SimpleWitness base, SimpleWitness witness) {
+  private Map<Token, VariantGraph.Vertex> linkTokens(DeprecatedTokenLinker linker, SimpleWitness base, SimpleWitness witness) {
     final VariantGraph graph = collate(base);
     return linker.link(graph, witness, new EqualityTokenComparator());
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(DeprecatedTokenLinker linker, VariantGraph base, SimpleWitness witness) {
+  private Map<Token, VariantGraph.Vertex> linkTokens(DeprecatedTokenLinker linker, VariantGraph base, SimpleWitness witness) {
     return linker.link(base, witness, new EqualityTokenComparator());
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(SimpleWitness base, SimpleWitness witness) {
+  private Map<Token, VariantGraph.Vertex> linkTokens(SimpleWitness base, SimpleWitness witness) {
     return linkTokens(new DeprecatedTokenLinker(), base, witness);
   }
 
-  private Map<Token, VariantGraphVertex> linkTokens(VariantGraph base, SimpleWitness witness) {
+  private Map<Token, VariantGraph.Vertex> linkTokens(VariantGraph base, SimpleWitness witness) {
     return linkTokens(new DeprecatedTokenLinker(), base, witness);
   }
 
-  private static void assertLink(String left, String right, Map.Entry<Token, VariantGraphVertex> match) {
+  private static void assertLink(String left, String right, Map.Entry<Token, VariantGraph.Vertex> match) {
     final SimpleToken token = (SimpleToken) match.getKey();
     assertEquals(left, token.getNormalized());
     for (SimpleToken vertexToken : Iterables.filter(match.getValue().tokens(), SimpleToken.class)) {

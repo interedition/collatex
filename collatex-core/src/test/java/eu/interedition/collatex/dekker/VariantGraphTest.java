@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -87,7 +86,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
     final VariantGraph graph = collate(w);
 
-    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
+    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
     assertEquals(9, vertices.size());
     assertEquals(12, Iterables.size(graph.edges()));
 

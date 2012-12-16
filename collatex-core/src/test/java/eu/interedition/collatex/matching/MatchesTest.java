@@ -9,7 +9,6 @@ import com.google.common.collect.ListMultimap;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class MatchesTest extends AbstractTest {
     Set<Token> ambiguous = matches.getAmbiguous();
     LOG.debug("ambiguous: {}", ambiguous);
 
-    ListMultimap<Token,VariantGraphVertex> all = matches.getAll();
+    ListMultimap<Token,VariantGraph.Vertex> all = matches.getAll();
     LOG.debug("all: {}", all);
 
     assertEquals(expected_unmatched, unmatched.size());

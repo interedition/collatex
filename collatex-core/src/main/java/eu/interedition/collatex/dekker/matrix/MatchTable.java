@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +49,9 @@ public class MatchTable {
     return table;
   }
 
-  public VariantGraphVertex vertexAt(int rowIndex, int columnIndex) {
+  public VariantGraph.Vertex vertexAt(int rowIndex, int columnIndex) {
     MatchTableCell cell = table.get(rowIndex, columnIndex);
-    return cell==null ? null : cell.variantGraphVertex;
+    return cell==null ? null : cell.vertex;
   }
   
   public Token tokenAt(int rowIndex, int columnIndex) {
@@ -112,8 +111,8 @@ public class MatchTable {
     int rowIndex=0;
     for (Token t : witness) {
       if (unique.contains(t) || ambiguous.contains(t)) {
-        List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
-        for (VariantGraphVertex vgv : matchingVertices) {
+        List<VariantGraph.Vertex> matchingVertices = matches.getAll().get(t);
+        for (VariantGraph.Vertex vgv : matchingVertices) {
           set(rowIndex, vgv.getRank() - 1, t, vgv);
         }
       }
@@ -121,16 +120,16 @@ public class MatchTable {
     }
   }
 
-  private void set(int rowIndex, int columnIndex, Token token, VariantGraphVertex variantGraphVertex) {
+  private void set(int rowIndex, int columnIndex, Token token, VariantGraph.Vertex vertex) {
     //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, columnIndex, variantGraphVertex });
-    MatchTableCell cell = new MatchTableCell(token, variantGraphVertex);
+    MatchTableCell cell = new MatchTableCell(token, vertex);
     table.put(rowIndex, columnIndex, cell);
   }
 
   private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c) {
     int diff = -1;
     Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff);
-    VariantGraphVertex neighbor = null;
+    VariantGraph.Vertex neighbor = null;
     try {
       neighbor = vertexAt(c.row + diff, c.column + diff);
     } catch (IndexOutOfBoundsException e) {}
@@ -168,11 +167,11 @@ public class MatchTable {
   
   private class MatchTableCell {
     public final Token token;
-    public final VariantGraphVertex variantGraphVertex;
+    public final VariantGraph.Vertex vertex;
 
-    public MatchTableCell(Token token, VariantGraphVertex variantGraphVertex) {
+    public MatchTableCell(Token token, VariantGraph.Vertex vertex) {
       this.token = token;
-      this.variantGraphVertex = variantGraphVertex;
+      this.vertex = vertex;
     }
   }
 }

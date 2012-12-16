@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphEdge;
-import eu.interedition.collatex.VariantGraphTransposition;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,7 +57,7 @@ public class VariantGraphTest extends AbstractTest {
     final VariantGraph graph = graphFactory.newVariantGraph();
     final Neo4jVariantGraphVertex helloVertex = graph.add(witness.getTokens().get(0));
     final Neo4jVariantGraphVertex worldVertex = graph.add(witness.getTokens().get(1));
-    final VariantGraphEdge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
+    final VariantGraph.Edge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
 
     Assert.assertEquals(1, edge.witnesses().size());
 
@@ -72,7 +69,7 @@ public class VariantGraphTest extends AbstractTest {
   public void getTokens() {
     final SimpleWitness[] w = createWitnesses("a b c d");
     final VariantGraph graph = collate(w);
-    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness> asList(w))));
+    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness> asList(w))));
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
     assertVertexEquals("a", vertices.get(1));
@@ -105,7 +102,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
     final VariantGraph graph = collate(w);
     final Set<Witness> witnessSet = Collections.<Witness> singleton(w[0]);
-    final List<VariantGraphVertex> path = Lists.newArrayList(graph.vertices(witnessSet));
+    final List<VariantGraph.Vertex> path = Lists.newArrayList(graph.vertices(witnessSet));
 
     assertEquals(8, path.size());
     assertEquals(graph.getStart(), path.get(0));
@@ -126,7 +123,7 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(2, graph.transpositions().size());
 
     collate(graph, w[2]);
-    final Set<VariantGraphTransposition> transposed = graph.transpositions();
+    final Set<VariantGraph.Transposition> transposed = graph.transpositions();
     assertEquals(2, transposed.size());
   }
 
@@ -143,7 +140,7 @@ public class VariantGraphTest extends AbstractTest {
     final VariantGraph graph = collate(w);
 
     // There should be two vertices for cat in the graph
-    VariantGraphEdge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
+    VariantGraph.Edge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
     assertHasWitnesses(edge, w[0]);
     edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
     assertHasWitnesses(edge, w[1], w[2]);

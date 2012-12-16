@@ -14,27 +14,27 @@ public interface VariantGraph {
 
   Neo4jVariantGraphVertex getEnd();
 
-  Set<VariantGraphTransposition> transpositions();
+  Set<Transposition> transpositions();
 
-  Iterable<VariantGraphVertex> vertices();
+  Iterable<Vertex> vertices();
 
-  Iterable<VariantGraphVertex> vertices(Set<Witness> witnesses);
+  Iterable<Vertex> vertices(Set<Witness> witnesses);
 
-  Iterable<VariantGraphEdge> edges();
+  Iterable<Edge> edges();
 
-  Iterable<VariantGraphEdge> edges(Set<Witness> witnesses);
+  Iterable<Edge> edges(Set<Witness> witnesses);
 
   Neo4jVariantGraphVertex add(Token token);
 
-  VariantGraphEdge connect(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses);
+  Edge connect(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses);
 
-  VariantGraphTransposition transpose(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, int transpId);
+  Transposition transpose(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, int transpId);
 
   boolean isNear(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
 
   boolean verticesAreAdjacent(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
 
-  VariantGraphEdge edgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
+  Edge edgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
 
   Set<Witness> witnesses();
 
@@ -44,9 +44,78 @@ public interface VariantGraph {
 
   VariantGraph adjustRanksForTranspositions();
 
-  Iterable<Set<VariantGraphVertex>> ranks();
+  Iterable<Set<Vertex>> ranks();
 
-  Iterable<Set<VariantGraphVertex>> ranks(Set<Witness> witnesses);
+  Iterable<Set<Vertex>> ranks(Set<Witness> witnesses);
 
   RowSortedTable<Integer, Witness, Set<Token>> toTable();
+
+  /**
+   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+   */
+  interface Edge {
+    boolean traversableWith(Set<Witness> witnesses);
+
+    Edge add(Set<Witness> witnesses);
+
+    Set<Witness> witnesses();
+
+    Neo4jVariantGraph getGraph();
+
+    Neo4jVariantGraphVertex from();
+
+    Neo4jVariantGraphVertex to();
+
+    void delete();
+  }
+
+  /**
+   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+   */
+  interface Vertex {
+    Iterable<Edge> incoming();
+
+    Iterable<Edge> incoming(Set<Witness> witnesses);
+
+    Iterable<Edge> outgoing();
+
+    Iterable<Edge> outgoing(Set<Witness> witnesses);
+
+    Iterable<Transposition> transpositions();
+
+    Iterable<Vertex> vertices(Neo4jVariantGraphVertex to);
+
+    Set<Token> tokens();
+
+    Set<Token> tokens(Set<Witness> witnesses);
+
+    Set<Witness> witnesses();
+
+    void add(Iterable<Token> tokens);
+
+    void setTokens(Set<Token> tokens);
+
+    int getRank();
+
+    void setRank(int rank);
+
+    VariantGraph getGraph();
+
+    void delete();
+  }
+
+  /**
+   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+   */
+  interface Transposition {
+    Neo4jVariantGraphVertex from();
+
+    Neo4jVariantGraphVertex to();
+
+    Neo4jVariantGraphVertex other(Neo4jVariantGraphVertex vertex);
+
+    void delete();
+
+    int getId();
+  }
 }

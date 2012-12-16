@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class TranspositionDetector {
     Tuple<Integer> previous = new Tuple<Integer>(0, 0);
 
     for (List<Match> phraseMatch : phraseMatches) {
-      VariantGraphVertex baseToken = phraseMatch.get(0).vertex;
+      VariantGraph.Vertex baseToken = phraseMatch.get(0).vertex;
       int rank = baseToken.getRank();
       int expectedRank = ranks.get(previousRank);
       Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);

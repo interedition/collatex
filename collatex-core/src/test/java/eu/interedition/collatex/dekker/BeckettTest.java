@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class BeckettTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = collate(w[0]);
-    final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
+    final ListMultimap<Token, VariantGraph.Vertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -49,7 +48,7 @@ public class BeckettTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = collate(w[0]);
-    final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
+    final ListMultimap<Token, VariantGraph.Vertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'

@@ -2,9 +2,6 @@ package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphEdge;
-import eu.interedition.collatex.VariantGraphTransposition;
-import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphEdge;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
@@ -51,19 +48,19 @@ public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Varia
 
         out.println("digraph G {");
 
-        for (VariantGraphVertex v : graph.vertices()) {
+        for (VariantGraph.Vertex v : graph.vertices()) {
           out.print(indent + "v" + ((Neo4jVariantGraphVertex) v).getNode().getId());
           out.print(" [label = \"" + toLabel(v) + "\"]");
           out.println(";");
         }
 
-        for (VariantGraphEdge e : graph.edges()) {
+        for (VariantGraph.Edge e : graph.edges()) {
           out.print(indent + "v" + e.from().getNode().getId() + connector + "v" + e.to().getNode().getId());
           out.print(" [label = \"" + toLabel(e) + "\"]");
           out.println(";");
         }
 
-        for (VariantGraphTransposition t : graph.transpositions()) {
+        for (VariantGraph.Transposition t : graph.transpositions()) {
           out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
           out.print(" [color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
           out.println(";");
@@ -78,11 +75,11 @@ public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Varia
     }
   }
 
-  private String toLabel(VariantGraphEdge e) {
+  private String toLabel(VariantGraph.Edge e) {
     return Neo4jVariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
   }
 
-  private String toLabel(VariantGraphVertex v) {
+  private String toLabel(VariantGraph.Vertex v) {
     return Neo4jVariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
   }
 

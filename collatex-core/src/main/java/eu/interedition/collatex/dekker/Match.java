@@ -6,7 +6,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 
 import java.util.Iterator;
 import java.util.List;
@@ -15,10 +14,10 @@ import java.util.List;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Match {
-  public final VariantGraphVertex vertex;
+  public final VariantGraph.Vertex vertex;
   public final Token token;
 
-  public Match(VariantGraphVertex vertex, Token token) {
+  public Match(VariantGraph.Vertex vertex, Token token) {
     this.vertex = vertex;
     this.token = token;
   }
@@ -42,9 +41,9 @@ public class Match {
     return new StringBuilder("{").append(vertex).append("; ").append(token).append("}").toString();
   }
 
-  public static List<Match> createPhraseMatch(List<VariantGraphVertex> vertices, List<Token> tokens) {
+  public static List<Match> createPhraseMatch(List<VariantGraph.Vertex> vertices, List<Token> tokens) {
     final List<Match> phraseMatch = Lists.newArrayListWithExpectedSize(vertices.size());
-    final Iterator<VariantGraphVertex> vertexIt = vertices.iterator();
+    final Iterator<VariantGraph.Vertex> vertexIt = vertices.iterator();
     final Iterator<Token> tokenIt = tokens.iterator();
     while (vertexIt.hasNext() && tokenIt.hasNext()) {
       phraseMatch.add(new Match(vertexIt.next(), tokenIt.next()));

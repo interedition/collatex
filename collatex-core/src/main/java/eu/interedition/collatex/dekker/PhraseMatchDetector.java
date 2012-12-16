@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -42,9 +41,9 @@ import eu.interedition.collatex.neo4j.GraphRelationshipType;
  */
 public class PhraseMatchDetector {
 
-  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
+  public List<List<Match>> detect(Map<Token, VariantGraph.Vertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
     List<List<Match>> phraseMatches = Lists.newArrayList();
-    List<VariantGraphVertex> basePhrase = Lists.newArrayList();
+    List<VariantGraph.Vertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
     Neo4jVariantGraphVertex previous = base.getStart();
 
@@ -76,7 +75,7 @@ public class PhraseMatchDetector {
     return phraseMatches;
   }
 
-  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraphVertex> basePhrase, List<Token> witnessPhrase) {
+  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraph.Vertex> basePhrase, List<Token> witnessPhrase) {
     if (!basePhrase.isEmpty()) {
       phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
       basePhrase.clear();

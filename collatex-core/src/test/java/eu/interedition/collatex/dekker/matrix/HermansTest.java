@@ -20,10 +20,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphTransposition;
-import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphTransposition;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -293,19 +290,19 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(a, b);
     //    testWitnessCollation(sw);
     VariantGraph vg = collate(sw);
-    Set<VariantGraphTransposition> transpositions0 = vg.transpositions();
-    for (VariantGraphTransposition t : transpositions0) {
+    Set<VariantGraph.Transposition> transpositions0 = vg.transpositions();
+    for (VariantGraph.Transposition t : transpositions0) {
       LOG.info("transposition {}", showTransposition(t));
     }
 
-    Iterable<VariantGraphVertex> vertices = vg.vertices();
-    for (VariantGraphVertex v : vertices) {
+    Iterable<VariantGraph.Vertex> vertices = vg.vertices();
+    for (VariantGraph.Vertex v : vertices) {
       LOG.info("vertex:{}, transpositionids:{}", v, ((Neo4jVariantGraphVertex) v).getTranspositionIds());
     }
     vg.join();
-    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
-    for (VariantGraphTransposition t : transpositions) {
+    for (VariantGraph.Transposition t : transpositions) {
       // all joined vertices should be size 3
       LOG.info("transposition {}", showTransposition(t));
       assertEquals(showTransposition(t), 3, t.from().tokens().size());
@@ -323,8 +320,8 @@ public class HermansTest extends AbstractTest {
     //    testWitnessCollation(sw);
     Neo4jVariantGraph vg = collate(sw);
 
-    Iterable<VariantGraphVertex> vertices = vg.vertices();
-    for (VariantGraphVertex v : vertices) {
+    Iterable<VariantGraph.Vertex> vertices = vg.vertices();
+    for (VariantGraph.Vertex v : vertices) {
       LOG.info("vertex:{}, transpositionids:{}", v, ((Neo4jVariantGraphVertex) v).getTranspositionIds());
     }
 
@@ -334,9 +331,9 @@ public class HermansTest extends AbstractTest {
     LOG.info(writer.toString());
 
     vg.join();
-    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
-    for (VariantGraphTransposition t : transpositions) {
+    for (VariantGraph.Transposition t : transpositions) {
       String showTransposition = showTransposition(t);
       LOG.info("transposition {}", showTransposition);
       boolean transpositionOfA = showTransposition.contains("a");
@@ -370,9 +367,9 @@ public class HermansTest extends AbstractTest {
     testWitnessCollation(sw);
 
     VariantGraph vg = collate(sw).join();
-    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     assertEquals(5, transpositions.size());
-    VariantGraphTransposition transposition = transpositions.iterator().next();
+    VariantGraph.Transposition transposition = transpositions.iterator().next();
     //    assertEquals("genaamd de", transposition.from().toString());
   }
 
@@ -410,9 +407,9 @@ public class HermansTest extends AbstractTest {
     String w3 = "e c b d";
     SimpleWitness[] sw = createWitnesses(w1, w2, w3);
     VariantGraph vg = collate(sw);
-    Set<VariantGraphTransposition> transpositions = vg.transpositions();
+    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     assertEquals(1, transpositions.size());
-    VariantGraphTransposition t = transpositions.iterator().next();
+    VariantGraph.Transposition t = transpositions.iterator().next();
     String string = t.from().toString();
     assertTrue(string.contains("A:2:'c'"));
     assertTrue(string.contains("B:1:'c'"));
@@ -444,7 +441,7 @@ public class HermansTest extends AbstractTest {
     }
   };
 
-  private String showTransposition(VariantGraphTransposition t) {
+  private String showTransposition(VariantGraph.Transposition t) {
     List<Token> ftokens = Lists.newArrayList(t.from().tokens());
     List<Token> ttokens = Lists.newArrayList(t.to().tokens());
     Collections.sort(ftokens, ON_ORDER);

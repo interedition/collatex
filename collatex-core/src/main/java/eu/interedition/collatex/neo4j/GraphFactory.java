@@ -9,9 +9,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphEdge;
-import eu.interedition.collatex.VariantGraphTransposition;
-import eu.interedition.collatex.VariantGraphVertex;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -148,11 +145,11 @@ public class GraphFactory {
     final Node startNode = vg.getStart().getNode();
     startNode.getSingleRelationship(VARIANT_GRAPH, INCOMING).delete();
     startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
-    for (VariantGraphVertex v : vg.vertices()) {
-      for (VariantGraphEdge e : v.incoming()) {
+    for (VariantGraph.Vertex v : vg.vertices()) {
+      for (VariantGraph.Edge e : v.incoming()) {
         e.delete();
       }
-      for (VariantGraphTransposition t : v.transpositions()) {
+      for (VariantGraph.Transposition t : v.transpositions()) {
         t.delete();
       }
       v.delete();

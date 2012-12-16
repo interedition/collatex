@@ -1,7 +1,7 @@
 package eu.interedition.collatex.needlemanwunsch;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
 
 import java.util.Set;
 
@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public interface NeedlemanWunschScorer {
 
-  float score(Set<VariantGraphVertex> vertices, Token token);
+  float score(Set<VariantGraph.Vertex> vertices, Token token);
 
   float gap();
 }

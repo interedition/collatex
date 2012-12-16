@@ -31,7 +31,6 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
 
@@ -41,10 +40,10 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
-  private Map<Token, VariantGraphVertex> tokenLinks;
+  private Map<Token, VariantGraph.Vertex> tokenLinks;
   private List<List<Match>> phraseMatches;
   private List<List<Match>> transpositions;
-  private Map<Token, VariantGraphVertex> alignments;
+  private Map<Token, VariantGraph.Vertex> alignments;
 
   public DekkerAlgorithm(Comparator<Token> comparator) {
     this(comparator, new MatchTableLinker(3));
@@ -70,7 +69,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
     //    new SimpleVariantGraphSerializer(graph).toDot(graph, writer);
     if (LOG.isTraceEnabled()) {
-      for (Map.Entry<Token, VariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
+      for (Map.Entry<Token, VariantGraph.Vertex> tokenLink : tokenLinks.entrySet()) {
         LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
       }
     }
@@ -101,7 +100,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       }
     }
     if (LOG.isTraceEnabled()) {
-      for (Map.Entry<Token, VariantGraphVertex> alignment : alignments.entrySet()) {
+      for (Map.Entry<Token, VariantGraph.Vertex> alignment : alignments.entrySet()) {
         LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
       }
     }
@@ -114,7 +113,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
   }
 
-  public Map<Token, VariantGraphVertex> getTokenLinks() {
+  public Map<Token, VariantGraph.Vertex> getTokenLinks() {
     return tokenLinks;
   }
 
@@ -126,7 +125,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     return Collections.unmodifiableList(transpositions);
   }
 
-  public Map<Token, VariantGraphVertex> getAlignments() {
+  public Map<Token, VariantGraph.Vertex> getAlignments() {
     return Collections.unmodifiableMap(alignments);
   }
 
