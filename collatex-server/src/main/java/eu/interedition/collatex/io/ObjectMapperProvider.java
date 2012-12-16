@@ -1,10 +1,7 @@
 package eu.interedition.collatex.io;
 
 import com.google.inject.Provider;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.io.Collation;
-import eu.interedition.collatex.io.CollationDeserializer;
-import eu.interedition.collatex.io.VariantGraphSerializer;
+import eu.interedition.collatex.neo4j.VariantGraph;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;

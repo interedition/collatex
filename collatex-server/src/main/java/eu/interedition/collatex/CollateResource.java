@@ -1,8 +1,8 @@
 package eu.interedition.collatex;
 
 import com.google.inject.Inject;
-import eu.interedition.collatex.graph.GraphFactory;
-import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.neo4j.GraphFactory;
+import eu.interedition.collatex.neo4j.VariantGraph;
 import eu.interedition.collatex.io.Collation;
 import freemarker.template.Configuration;
 import freemarker.template.Template;

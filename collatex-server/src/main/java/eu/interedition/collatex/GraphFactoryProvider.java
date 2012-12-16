@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.ProvisionException;
 import com.google.inject.name.Named;
-import eu.interedition.collatex.graph.GraphFactory;
+import eu.interedition.collatex.neo4j.GraphFactory;
 import eu.interedition.collatex.simple.SimpleTokenMapper;
 import eu.interedition.collatex.simple.SimpleWitnessMapper;
 import org.neo4j.kernel.EmbeddedGraphDatabase;

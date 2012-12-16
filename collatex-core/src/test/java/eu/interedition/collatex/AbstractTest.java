@@ -31,10 +31,10 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.graph.GraphFactory;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.GraphFactory;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphEdge;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;

@@ -2,7 +2,7 @@ package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraph;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package eu.interedition.collatex.graph;
+package eu.interedition.collatex.neo4j;
 
 import org.neo4j.graphdb.Node;
 

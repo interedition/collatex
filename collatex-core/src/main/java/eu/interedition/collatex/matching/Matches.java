@@ -7,7 +7,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.Collection;

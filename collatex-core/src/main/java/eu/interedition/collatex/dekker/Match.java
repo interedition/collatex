@@ -5,8 +5,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 import java.util.Iterator;
 import java.util.List;

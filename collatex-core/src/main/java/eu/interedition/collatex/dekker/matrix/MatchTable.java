@@ -18,8 +18,8 @@ import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 

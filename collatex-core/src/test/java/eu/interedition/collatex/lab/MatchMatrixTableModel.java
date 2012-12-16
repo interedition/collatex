@@ -12,8 +12,8 @@ import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 
 /**

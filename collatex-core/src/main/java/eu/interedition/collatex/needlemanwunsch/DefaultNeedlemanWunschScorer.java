@@ -3,11 +3,10 @@ package eu.interedition.collatex.needlemanwunsch;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 import java.util.Comparator;
 import java.util.Set;
-import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

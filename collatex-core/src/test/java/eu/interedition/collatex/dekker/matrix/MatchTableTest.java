@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 

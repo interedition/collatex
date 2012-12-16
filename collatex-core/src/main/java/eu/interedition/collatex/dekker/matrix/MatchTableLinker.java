@@ -11,8 +11,8 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.TokenLinker;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 //Note: This class is intended to be the replacement for the MatchMatrixLinker class
 public class MatchTableLinker implements TokenLinker {

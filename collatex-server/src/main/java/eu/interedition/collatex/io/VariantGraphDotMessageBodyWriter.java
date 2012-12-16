@@ -1,10 +1,10 @@
 package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
-import eu.interedition.collatex.graph.VariantGraphTransposition;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphEdge;
+import eu.interedition.collatex.neo4j.VariantGraphTransposition;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.Produces;

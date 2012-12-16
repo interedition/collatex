@@ -1,7 +1,7 @@
 package eu.interedition.collatex.needlemanwunsch;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 import java.util.Set;
 

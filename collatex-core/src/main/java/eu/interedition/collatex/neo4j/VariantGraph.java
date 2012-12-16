@@ -1,7 +1,7 @@
-package eu.interedition.collatex.graph;
+package eu.interedition.collatex.neo4j;
 
 import static com.google.common.collect.Iterables.transform;
-import static eu.interedition.collatex.graph.GraphRelationshipType.PATH;
+import static eu.interedition.collatex.neo4j.GraphRelationshipType.PATH;
 import static java.util.Collections.singleton;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 

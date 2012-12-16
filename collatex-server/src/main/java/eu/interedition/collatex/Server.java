@@ -8,7 +8,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import eu.interedition.collatex.graph.GraphFactory;
+import eu.interedition.collatex.neo4j.GraphFactory;
 import eu.interedition.collatex.io.ObjectMapperMessageBodyReaderWriter;
 import eu.interedition.collatex.io.ObjectMapperProvider;
 import eu.interedition.collatex.io.TemplateConfigurationProvider;

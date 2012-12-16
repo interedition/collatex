@@ -29,8 +29,8 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 public class VariantGraphRankerTest extends AbstractTest {
 

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.graph;
+package eu.interedition.collatex.neo4j;
 
 import static org.junit.Assert.assertEquals;
 

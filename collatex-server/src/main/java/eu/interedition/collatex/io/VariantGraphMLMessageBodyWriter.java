@@ -1,7 +1,7 @@
 package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraph;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import org.neo4j.graphdb.Transaction;
 

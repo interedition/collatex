@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.EntityMapper;
+import eu.interedition.collatex.neo4j.EntityMapper;
 
 import java.util.Map;
 import java.util.Set;

@@ -4,10 +4,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
-import eu.interedition.collatex.graph.VariantGraphTransposition;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphEdge;
+import eu.interedition.collatex.neo4j.VariantGraphTransposition;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 import java.util.Collections;
 import java.util.Map;

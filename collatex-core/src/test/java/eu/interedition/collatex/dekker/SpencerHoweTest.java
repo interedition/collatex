@@ -25,8 +25,8 @@ import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 

@@ -5,7 +5,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import com.google.inject.Inject;
-import eu.interedition.collatex.graph.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraph;
 
 import javax.inject.Named;
 import javax.ws.rs.Produces;

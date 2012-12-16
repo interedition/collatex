@@ -21,10 +21,10 @@ import com.google.common.collect.SetMultimap;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphEdge;
-import eu.interedition.collatex.graph.VariantGraphTransposition;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphEdge;
+import eu.interedition.collatex.neo4j.VariantGraphTransposition;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

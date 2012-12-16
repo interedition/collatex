@@ -1,4 +1,4 @@
-package eu.interedition.collatex.graph;
+package eu.interedition.collatex.neo4j;
 
 import static com.google.common.collect.Iterables.*;
 import static java.util.Collections.singleton;

@@ -11,8 +11,8 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.graph.VariantGraph;
-import eu.interedition.collatex.graph.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
