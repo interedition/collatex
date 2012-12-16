@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.cocoon.ProcessingException;
@@ -29,7 +30,6 @@ import com.google.common.collect.SetMultimap;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.neo4j.GraphFactory;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -47,7 +47,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     ALIGNMENT_TABLE, TEI_APPARATUS
   }
 
-  private GraphFactory graphFactory;
+  private Neo4jVariantGraphFactory graphFactory;
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
   private final List<Iterable<Token>> witnesses = Lists.newArrayList();
   private String sigil;
@@ -57,7 +57,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     super.configure(configuration);
     this.defaultNamespaceURI = COLLATEX_NS;
     try {
-      this.graphFactory = GraphFactory.create();
+      this.graphFactory = Neo4jVariantGraphFactory.create();
     } catch (IOException e) {
       throw new ConfigurationException("I/O error while creating variant graph factory", configuration, e);
     }

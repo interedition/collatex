@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.util.Logging;
 import org.junit.After;
@@ -33,7 +34,6 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.neo4j.GraphFactory;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -46,14 +46,14 @@ public abstract class AbstractTest {
   protected final Logger LOG = LoggerFactory.getLogger(getClass());
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
-  protected static GraphFactory graphFactory;
+  protected static Neo4jVariantGraphFactory graphFactory;
   protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
   private Transaction transaction;
 
   @BeforeClass
   public static void init() throws IOException {
     Logging.configureLogging();
-    graphFactory = GraphFactory.create();
+    graphFactory = Neo4jVariantGraphFactory.create();
   }
 
   @Before

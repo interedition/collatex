@@ -1,6 +1,6 @@
 package eu.interedition.collatex.neo4j;
 
-import static eu.interedition.collatex.neo4j.GraphRelationshipType.VARIANT_GRAPH;
+import static eu.interedition.collatex.neo4j.Neo4jGraphRelationships.VARIANT_GRAPH;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -29,8 +29,8 @@ import eu.interedition.collatex.simple.SimpleWitnessMapper;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class GraphFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(GraphFactory.class);
+public class Neo4jVariantGraphFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(Neo4jVariantGraphFactory.class);
   public static final String CREATED_KEY = "created";
 
   private EntityMapper<Witness> witnessMapper = new SimpleWitnessMapper();
@@ -38,7 +38,7 @@ public class GraphFactory {
   private GraphDatabaseService database;
   private Node variantGraphs;
 
-  public static GraphFactory create(File dbStorageDirectory, final boolean deleteAfterUsage) throws IOException {
+  public static Neo4jVariantGraphFactory create(File dbStorageDirectory, final boolean deleteAfterUsage) throws IOException {
     final File dbDirectory = dbStorageDirectory.getCanonicalFile();
 
     LOG.debug("Creating variant graph database in {} (deleteAfterUsage = {})", dbDirectory, deleteAfterUsage);
@@ -65,19 +65,19 @@ public class GraphFactory {
       }
     }));
     
-    return new GraphFactory(database);
+    return new Neo4jVariantGraphFactory(database);
   }
 
-  public static GraphFactory create(File dbStorageDirectory) throws IOException {
+  public static Neo4jVariantGraphFactory create(File dbStorageDirectory) throws IOException {
     return create(dbStorageDirectory, false);    
   }
 
-  public static GraphFactory create() throws IOException {
+  public static Neo4jVariantGraphFactory create() throws IOException {
     return create(Files.createTempDir());
   }
 
   
-  public GraphFactory(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
+  public Neo4jVariantGraphFactory(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
     this.database = database;
     this.witnessMapper = witnessMapper;
     this.tokenMapper = tokenMapper;
@@ -96,7 +96,7 @@ public class GraphFactory {
     }
   }
 
-  public GraphFactory(EmbeddedGraphDatabase database) {
+  public Neo4jVariantGraphFactory(EmbeddedGraphDatabase database) {
     this(database, new SimpleWitnessMapper(), new SimpleTokenMapper());
   }
   
@@ -155,15 +155,13 @@ public class GraphFactory {
       v.delete();
     }
   }
-  
+
   protected VariantGraph wrapVariantGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
     return wrapVariantGraph(startNode, startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).getEndNode());
   }
 
   protected Neo4jVariantGraph wrapVariantGraph(Node start, Node end) {
-    final Neo4jVariantGraph graph = new Neo4jVariantGraph(database, witnessMapper, tokenMapper);
-    graph.init(Neo4jVariantGraphVertex.createWrapper(graph), Neo4jVariantGraphEdge.createWrapper(graph), start, end);
-    return graph;
+    return new Neo4jVariantGraph(database, start, end, witnessMapper, tokenMapper);
   }
 }

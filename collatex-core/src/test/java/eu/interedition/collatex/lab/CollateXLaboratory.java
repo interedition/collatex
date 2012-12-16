@@ -23,6 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,6 @@ import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.neo4j.GraphFactory;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -50,7 +50,7 @@ public class CollateXLaboratory extends JFrame {
   public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
   public static final BasicStroke SOLID_STROKE = new BasicStroke(1.5f);
 
-  private final GraphFactory graphFactory;
+  private final Neo4jVariantGraphFactory graphFactory;
   private final WitnessPanel witnessPanel = new WitnessPanel();
 
   private final VariantGraphModel variantGraphModel = new VariantGraphModel();
@@ -63,7 +63,7 @@ public class CollateXLaboratory extends JFrame {
   private final JComboBox algorithm;
   private final JTabbedPane tabbedPane;
 
-  public CollateXLaboratory(GraphFactory graphFactory) {
+  public CollateXLaboratory(Neo4jVariantGraphFactory graphFactory) {
     super("CollateX Laboratory");
     this.graphFactory = graphFactory;
 
@@ -106,7 +106,7 @@ public class CollateXLaboratory extends JFrame {
   }
 
   public static void main(String[] args) throws Exception {
-    new CollateXLaboratory(GraphFactory.create()).setVisible(true);
+    new CollateXLaboratory(Neo4jVariantGraphFactory.create()).setVisible(true);
   }
 
   private class AddWitnessAction extends AbstractAction {

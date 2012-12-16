@@ -1,7 +1,7 @@
 package eu.interedition.collatex.neo4j;
 
 import static com.google.common.collect.Iterables.transform;
-import static eu.interedition.collatex.neo4j.GraphRelationshipType.PATH;
+import static eu.interedition.collatex.neo4j.Neo4jGraphRelationships.PATH;
 import static java.util.Collections.singleton;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -47,29 +47,20 @@ import eu.interedition.collatex.simple.SimpleToken;
  */
 public class Neo4jVariantGraph implements VariantGraph {
   private static final Logger LOG = LoggerFactory.getLogger(Neo4jVariantGraph.class);
-  protected final GraphDatabaseService database;
-  protected final EntityMapper<Witness> witnessMapper;
-  protected final EntityMapper<Token> tokenMapper;
-  protected Function<Node, Vertex> vertexWrapper;
-  protected Function<Relationship, Edge> edgeWrapper;
-  protected Neo4jVariantGraphVertex start;
-  protected Neo4jVariantGraphVertex end;
-  Map<Token, Integer> transpositionId = Maps.newHashMap();
 
-  private Function<Relationship, Transposition> transpositionWrapper;
+  final GraphDatabaseService database;
+  final EntityMapper<Witness> witnessMapper;
+  final EntityMapper<Token> tokenMapper;
 
-  public Neo4jVariantGraph(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
+  final Neo4jVariantGraphVertex start;
+  final Neo4jVariantGraphVertex end;
+
+  public Neo4jVariantGraph(GraphDatabaseService database, Node start, Node end, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
     this.database = database;
     this.witnessMapper = witnessMapper;
     this.tokenMapper = tokenMapper;
-  }
-
-  public void init(Function<Node, Vertex> vertexWrapper, Function<Relationship, Edge> edgeWrapper, Node start, Node end) {
-    this.vertexWrapper = vertexWrapper;
-    this.edgeWrapper = edgeWrapper;
-    this.start = (start == null ? null : (Neo4jVariantGraphVertex) vertexWrapper.apply(start));
-    this.end = (end == null ? null : (Neo4jVariantGraphVertex) vertexWrapper.apply(end));
-    this.transpositionWrapper = Neo4jVariantGraphTransposition.createWrapper(this);
+    this.start = (Neo4jVariantGraphVertex) vertexWrapper.apply(start);
+    this.end = (Neo4jVariantGraphVertex) vertexWrapper.apply(end);
   }
 
   public Transaction newTransaction() {
@@ -88,14 +79,6 @@ public class Neo4jVariantGraph implements VariantGraph {
   @Override
   public Neo4jVariantGraphVertex getEnd() {
     return end;
-  }
-
-  public EntityMapper<Witness> getWitnessMapper() {
-    return witnessMapper;
-  }
-
-  public Function<Relationship, Transposition> getTranspositionWrapper() {
-    return transpositionWrapper;
   }
 
   @Override
@@ -156,7 +139,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public Iterable<Edge> edges(final Set<Witness> witnesses) {
-    final int[] witnessReferences = (witnesses == null || witnesses.isEmpty()) ? null : getWitnessMapper().map(witnesses);
+    final int[] witnessReferences = (witnesses == null || witnesses.isEmpty()) ? null : witnessMapper.map(witnesses);
     return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
 
       @Override
@@ -418,23 +401,6 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public String toString() {
-    return Iterables.toString(witnesses());
-  }
-
-  public EntityMapper<Token> getTokenMapper() {
-    return tokenMapper;
-  }
-
-  public Function<Node, Vertex> getVertexWrapper() {
-    return vertexWrapper;
-  }
-
-  public Function<Relationship, Edge> getEdgeWrapper() {
-    return edgeWrapper;
-  }
-
-  @Override
   public boolean equals(Object obj) {
     if (start != null && obj != null && obj instanceof VariantGraph) {
       return start.equals(((Neo4jVariantGraph) obj).start);
@@ -446,4 +412,30 @@ public class Neo4jVariantGraph implements VariantGraph {
   public int hashCode() {
     return (start == null ? super.hashCode() : start.hashCode());
   }
+
+  @Override
+  public String toString() {
+    return Iterables.toString(witnesses());
+  }
+
+  final Function<Node, Vertex> vertexWrapper = new Function<Node, VariantGraph.Vertex>() {
+    @Override
+    public VariantGraph.Vertex apply(Node input) {
+      return new Neo4jVariantGraphVertex(Neo4jVariantGraph.this, input);
+    }
+  };
+
+  final Function<Relationship, Edge> edgeWrapper = new Function<Relationship, VariantGraph.Edge>() {
+    @Override
+    public VariantGraph.Edge apply(Relationship input) {
+      return new Neo4jVariantGraphEdge(Neo4jVariantGraph.this, input);
+    }
+  };
+
+  final Function<Relationship, Transposition> transpositionWrapper = new Function<Relationship, VariantGraph.Transposition>() {
+    @Override
+    public VariantGraph.Transposition apply(Relationship input) {
+      return new Neo4jVariantGraphTransposition(Neo4jVariantGraph.this, input);
+    }
+  };
 }

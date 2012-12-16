@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.ProvisionException;
 import com.google.inject.name.Named;
-import eu.interedition.collatex.neo4j.GraphFactory;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.simple.SimpleTokenMapper;
 import eu.interedition.collatex.simple.SimpleWitnessMapper;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class GraphFactoryProvider implements Provider<GraphFactory> {
+public class GraphFactoryProvider implements Provider<Neo4jVariantGraphFactory> {
   private Logger LOG = Logger.getLogger(getClass().getName());
   private final File graphDirectory;
 
@@ -26,7 +26,7 @@ public class GraphFactoryProvider implements Provider<GraphFactory> {
     this.graphDirectory = new File(dataDirectory, "graphs");
   }
 
-  public GraphFactory get() {
+  public Neo4jVariantGraphFactory get() {
     try {
       if (LOG.isLoggable(Level.INFO)) {
         LOG.info("Starting graph database in " + graphDirectory);
@@ -43,7 +43,7 @@ public class GraphFactoryProvider implements Provider<GraphFactory> {
         }
       }));
 
-      return new GraphFactory(graphDatabase, new SimpleWitnessMapper(), new SimpleTokenMapper());
+      return new Neo4jVariantGraphFactory(graphDatabase, new SimpleWitnessMapper(), new SimpleTokenMapper());
     } catch (IOException e) {
       throw new ProvisionException("I/O error while starting graph database in " + graphDirectory, e);
     }

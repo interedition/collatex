@@ -1,7 +1,7 @@
 package eu.interedition.collatex;
 
 import com.google.inject.Inject;
-import eu.interedition.collatex.neo4j.GraphFactory;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.io.Collation;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -23,10 +23,10 @@ import java.io.IOException;
 public class CollateResource {
 
   private final Configuration templates;
-  private final GraphFactory graphFactory;
+  private final Neo4jVariantGraphFactory graphFactory;
 
   @Inject
-  public CollateResource(Configuration templates, GraphFactory graphFactory) {
+  public CollateResource(Configuration templates, Neo4jVariantGraphFactory graphFactory) {
     this.templates = templates;
     this.graphFactory = graphFactory;
   }

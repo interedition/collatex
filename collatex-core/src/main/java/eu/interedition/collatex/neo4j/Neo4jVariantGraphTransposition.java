@@ -3,7 +3,6 @@ package eu.interedition.collatex.neo4j;
 import eu.interedition.collatex.VariantGraph;
 import org.neo4j.graphdb.Relationship;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 
 /**
@@ -27,7 +26,7 @@ public class Neo4jVariantGraphTransposition implements VariantGraph.Transpositio
   }
 
   public Neo4jVariantGraphTransposition(Neo4jVariantGraph graph, Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, int transpositionId) {
-    this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.TRANSPOSITION), transpositionId);
+    this(graph, from.getNode().createRelationshipTo(to.getNode(), Neo4jGraphRelationships.TRANSPOSITION), transpositionId);
   }
 
   @Override
@@ -66,15 +65,6 @@ public class Neo4jVariantGraphTransposition implements VariantGraph.Transpositio
   @Override
   public String toString() {
     return Objects.toStringHelper(this).addValue(from()).addValue(to()).toString();
-  }
-
-  public static Function<Relationship, VariantGraph.Transposition> createWrapper(final Neo4jVariantGraph in) {
-    return new Function<Relationship, VariantGraph.Transposition>() {
-      @Override
-      public VariantGraph.Transposition apply(Relationship input) {
-        return new Neo4jVariantGraphTransposition(in, input);
-      }
-    };
   }
 
   @Override

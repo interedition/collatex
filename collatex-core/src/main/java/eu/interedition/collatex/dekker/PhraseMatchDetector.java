@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jGraphRelationships;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -32,7 +33,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.GraphRelationshipType;
 
 /**
  *
@@ -86,7 +86,7 @@ public class PhraseMatchDetector {
   private boolean directedEdgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
     final Node aNode = a.getNode();
     final Node bNode = b.getNode();
-    for (Relationship r : aNode.getRelationships(Direction.OUTGOING, GraphRelationshipType.PATH)) {
+    for (Relationship r : aNode.getRelationships(Direction.OUTGOING, Neo4jGraphRelationships.PATH)) {
       if (r.getEndNode().equals(bNode)) {
         return true;
       }

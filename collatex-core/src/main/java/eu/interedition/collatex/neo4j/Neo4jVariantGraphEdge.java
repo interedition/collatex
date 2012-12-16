@@ -25,13 +25,13 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
   }
 
   public Neo4jVariantGraphEdge(Neo4jVariantGraph graph, Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses) {
-    this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.PATH));
-    setWitnessReferences(this.graph.getWitnessMapper().map(witnesses));
+    this(graph, from.getNode().createRelationshipTo(to.getNode(), Neo4jGraphRelationships.PATH));
+    setWitnessReferences(this.graph.witnessMapper.map(witnesses));
   }
 
   @Override
   public boolean traversableWith(Set<Witness> witnesses) {
-    return (witnesses == null || witnesses.isEmpty() || traversableWith(graph.getWitnessMapper().map(witnesses)));
+    return (witnesses == null || witnesses.isEmpty() || traversableWith(graph.witnessMapper.map(witnesses)));
   }
 
   public boolean traversableWith(int[] witnesses) {
@@ -52,13 +52,13 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
 
   @Override
   public VariantGraph.Edge add(Set<Witness> witnesses) {
-    setWitnessReferences(graph.getWitnessMapper().map(Sets.union(witnesses(), witnesses)));
+    setWitnessReferences(graph.witnessMapper.map(Sets.union(witnesses(), witnesses)));
     return this;
   }
 
   @Override
   public Set<Witness> witnesses() {
-    return graph.getWitnessMapper().map(getWitnessReferences());
+    return graph.witnessMapper.map(getWitnessReferences());
   }
 
   public int[] getWitnessReferences() {
@@ -69,15 +69,6 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
     relationship.setProperty(WITNESS_REFERENCE_KEY, references);
   }
 
-  public static Function<Relationship, VariantGraph.Edge> createWrapper(final Neo4jVariantGraph in) {
-    return new Function<Relationship, VariantGraph.Edge>() {
-      @Override
-      public VariantGraph.Edge apply(Relationship input) {
-        return new Neo4jVariantGraphEdge(in, input);
-      }
-    };
-  }
-
   public static Predicate<VariantGraph.Edge> createTraversableFilter(final Set<Witness> witnesses) {
     return new Predicate<VariantGraph.Edge>() {
       private int[] witnessReferences;
@@ -85,7 +76,7 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
       @Override
       public boolean apply(VariantGraph.Edge input) {
         if (witnessReferences == null) {
-          witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : input.getGraph().getWitnessMapper().map(witnesses));
+          witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : input.getGraph().witnessMapper.map(witnesses));
         }
         return ((Neo4jVariantGraphEdge) input).traversableWith(witnessReferences);
       }
@@ -106,12 +97,12 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
 
   @Override
   public Neo4jVariantGraphVertex from() {
-    return (Neo4jVariantGraphVertex) graph.getVertexWrapper().apply(relationship.getStartNode());
+    return (Neo4jVariantGraphVertex) graph.vertexWrapper.apply(relationship.getStartNode());
   }
 
   @Override
   public Neo4jVariantGraphVertex to() {
-    return (Neo4jVariantGraphVertex) graph.getVertexWrapper().apply(relationship.getEndNode());
+    return (Neo4jVariantGraphVertex) graph.vertexWrapper.apply(relationship.getEndNode());
   }
 
   @Override
