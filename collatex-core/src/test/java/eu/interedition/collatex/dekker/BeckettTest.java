@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,8 +35,8 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final Neo4jVariantGraph graph = collate(w[0]);
-    final ListMultimap<Token, Neo4jVariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
+    final VariantGraph graph = collate(w[0]);
+    final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -47,8 +48,8 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final Neo4jVariantGraph graph = collate(w[0]);
-    final ListMultimap<Token, Neo4jVariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
+    final VariantGraph graph = collate(w[0]);
+    final ListMultimap<Token, VariantGraphVertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -57,7 +58,7 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void dirkVincent5() {
     final SimpleWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     vertexWith(graph, "its", w[0]);
     vertexWith(graph, "soft", w[0]);
@@ -70,7 +71,7 @@ public class BeckettTest extends AbstractTest {
   public void dirkVincent6() {
     final SimpleWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     final Neo4jVariantGraphVertex itsVertex = vertexWith(graph, "its", w[0]);
     final Neo4jVariantGraphVertex softVertex = vertexWith(graph, "soft", w[0]);
@@ -88,7 +89,7 @@ public class BeckettTest extends AbstractTest {
   public void testDirkVincent7() {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    Neo4jVariantGraph graph = collate(w);
+    VariantGraph graph = collate(w);
     assertPhraseMatches("its soft","light", "any light he could remember from the days", "nights when day followed", "night", "vice versa");
     assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
@@ -99,7 +100,7 @@ public class BeckettTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
         "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    final Neo4jVariantGraph graph = collate(w[0], w[1]);
+    final VariantGraph graph = collate(w[0], w[1]);
     final Matches matches = Matches.between(graph.vertices(), w[2].getTokens(), new EqualityTokenComparator());
 
     final Set<Token> unmatchedTokens = matches.getUnmatched();
@@ -119,7 +120,7 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.",//
         "Its faint unchanging light unlike any light he could remember from the days & nights when day followed on night & night on day.");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     vertexWith(graph, "its", w[0]);
     vertexWith(graph, "soft", w[0]);
@@ -166,7 +167,7 @@ public class BeckettTest extends AbstractTest {
         "The same as when among others Darly once died & left him.",//
         "The same as when Darly among others once died and left him.");
 
-    final Neo4jVariantGraph graph = collate(w[0], w[1]);
+    final VariantGraph graph = collate(w[0], w[1]);
     assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died", ".");
 
     collate(graph, w[2]);
@@ -189,7 +190,7 @@ public class BeckettTest extends AbstractTest {
     assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(transpositions.get(0))));
   }
 
-  private static void assertGraphContains(Neo4jVariantGraph graph, String... expected) {
+  private static void assertGraphContains(VariantGraph graph, String... expected) {
     SortedSet<String> contents = Sets.newTreeSet();
     for (Witness witness : graph.witnesses()) {
       extractPhrases(contents, graph, witness);

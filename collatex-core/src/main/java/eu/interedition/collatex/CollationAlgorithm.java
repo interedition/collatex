@@ -26,31 +26,31 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public interface CollationAlgorithm {
 
-  void collate(Neo4jVariantGraph against, Iterable<Token> witness);
+  void collate(VariantGraph against, Iterable<Token> witness);
 
-  void collate(Neo4jVariantGraph against, Iterable<Token>... witnesses);
+  void collate(VariantGraph against, Iterable<Token>... witnesses);
 
-  void collate(Neo4jVariantGraph against, List<Iterable<Token>> witnesses);
+  void collate(VariantGraph against, List<Iterable<Token>> witnesses);
 
   abstract class Base implements CollationAlgorithm {
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
-    private Map<Token, Neo4jVariantGraphVertex> witnessTokenVertices;
+    private Map<Token, VariantGraphVertex> witnessTokenVertices;
     private AtomicInteger transpositionIdSource = new AtomicInteger();
 
     @Override
-    public void collate(Neo4jVariantGraph against, Iterable<Token>... witnesses) {
+    public void collate(VariantGraph against, Iterable<Token>... witnesses) {
       collate(against, Arrays.asList(witnesses));
     }
 
     @Override
-    public void collate(Neo4jVariantGraph against, List<Iterable<Token>> witnesses) {
+    public void collate(VariantGraph against, List<Iterable<Token>> witnesses) {
       for (Iterable<Token> witness : witnesses) {
         LOG.debug("heap space: {}/{}", Runtime.getRuntime().totalMemory(), Runtime.getRuntime().maxMemory());
         collate(against, witness);
       }
     }
 
-    protected void merge(Neo4jVariantGraph into, Iterable<Token> witnessTokens, Map<Token, Neo4jVariantGraphVertex> alignments) {
+    protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraphVertex> alignments) {
       Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
       final Witness witness = Iterables.getFirst(witnessTokens, null).getWitness();
 
@@ -59,7 +59,7 @@ public interface CollationAlgorithm {
       Neo4jVariantGraphVertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
       for (Token token : witnessTokens) {
-        Neo4jVariantGraphVertex matchingVertex = alignments.get(token);
+        Neo4jVariantGraphVertex matchingVertex = (Neo4jVariantGraphVertex) alignments.get(token);
         if (matchingVertex == null) {
           matchingVertex = into.add(token);
         } else {
@@ -77,10 +77,10 @@ public interface CollationAlgorithm {
       into.connect(last, into.getEnd(), witnessSet);
     }
 
-    protected void mergeTranspositions(Neo4jVariantGraph into, List<List<Match>> transpositions) {
+    protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
         int transpositionId = transpositionIdSource.addAndGet(1);
-        final Map<Token, Neo4jVariantGraphVertex> transposedTokens = Maps.newHashMap();
+        final Map<Token, VariantGraphVertex> transposedTokens = Maps.newHashMap();
         if (LOG.isDebugEnabled()) {
           LOG.debug("transposition: {}, hash={}", transposedPhrase, transpositionId);
         }
@@ -88,7 +88,7 @@ public interface CollationAlgorithm {
           transposedTokens.put(match.token, match.vertex);
         }
         for (Token token : transposedTokens.keySet()) {
-          into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token), transpositionId);
+          into.transpose((Neo4jVariantGraphVertex) transposedTokens.get(token), (Neo4jVariantGraphVertex) witnessTokenVertices.get(token), transpositionId);
         }
       }
     }

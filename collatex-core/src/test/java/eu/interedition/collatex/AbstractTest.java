@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphEdge;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.util.Logging;
 import org.junit.After;
@@ -89,26 +88,26 @@ public abstract class AbstractTest {
     return graph;
   }
 
-  protected void collate(Neo4jVariantGraph graph, SimpleWitness... witnesses) {
+  protected void collate(VariantGraph graph, SimpleWitness... witnesses) {
     collationAlgorithm.collate(graph, witnesses);
   }
 
-  protected Neo4jVariantGraph collate(String... witnesses) {
+  protected VariantGraph collate(String... witnesses) {
     return collate(createWitnesses(witnesses));
   }
 
-  protected static SortedSet<String> extractPhrases(Neo4jVariantGraph graph, Witness witness) {
+  protected static SortedSet<String> extractPhrases(VariantGraph graph, Witness witness) {
     return extractPhrases(Sets.<String> newTreeSet(), graph, witness);
   }
 
-  protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, Neo4jVariantGraph graph, Witness witness) {
-    for (Neo4jVariantGraphVertex v : graph.vertices(Collections.singleton(witness))) {
+  protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
+    for (VariantGraphVertex v : graph.vertices(Collections.singleton(witness))) {
       phrases.add(toString(v, witness));
     }
     return phrases;
   }
 
-  protected static String toString(Neo4jVariantGraphVertex vertex, Witness... witnesses) {
+  protected static String toString(VariantGraphVertex vertex, Witness... witnesses) {
     final Multimap<Witness, Token> tokens = Multimaps.index(vertex.tokens(Sets.newHashSet(Arrays.asList(witnesses))), Token.TO_WITNESS);
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
     for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
@@ -119,17 +118,17 @@ public abstract class AbstractTest {
     return Joiner.on(' ').join(tokenContents);
   }
 
-  protected static void assertHasWitnesses(Neo4jVariantGraphEdge edge, Witness... witnesses) {
+  protected static void assertHasWitnesses(VariantGraphEdge edge, Witness... witnesses) {
     assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.witnesses());
   }
 
-  protected static Neo4jVariantGraphEdge edgeBetween(Neo4jVariantGraphVertex start, Neo4jVariantGraphVertex end) {
-    final Neo4jVariantGraphEdge edge = start.getGraph().edgeBetween(start, end);
+  protected static VariantGraphEdge edgeBetween(Neo4jVariantGraphVertex start, Neo4jVariantGraphVertex end) {
+    final VariantGraphEdge edge = start.getGraph().edgeBetween(start, end);
     Assert.assertNotNull(String.format("No edge between %s and %s", start, end), edge);
     return edge;
   }
 
-  protected static void assertVertexEquals(String expected, Neo4jVariantGraphVertex vertex) {
+  protected static void assertVertexEquals(String expected, VariantGraphVertex vertex) {
     assertEquals(expected, ((SimpleToken) Iterables.getFirst(vertex.tokens(), null)).getNormalized());
   }
 
@@ -137,14 +136,14 @@ public abstract class AbstractTest {
     assertEquals(expected, ((SimpleToken) token).getContent());
   }
 
-  protected static void assertVertexHasContent(Neo4jVariantGraphVertex vertex, String content, Witness in) {
+  protected static void assertVertexHasContent(VariantGraphVertex vertex, String content, Witness in) {
     Assert.assertEquals(String.format("%s does not has expected content for %s", vertex, in), content, toString(vertex, in));
   }
 
-  protected static Neo4jVariantGraphVertex vertexWith(Neo4jVariantGraph graph, String content, Witness in) {
-    for (Neo4jVariantGraphVertex v : graph.vertices(Collections.singleton(in))) {
+  protected static Neo4jVariantGraphVertex vertexWith(VariantGraph graph, String content, Witness in) {
+    for (VariantGraphVertex v : graph.vertices(Collections.singleton(in))) {
       if (content.equals(toString(v, in))) {
-        return v;
+        return (Neo4jVariantGraphVertex) v;
       }
     }
     fail(String.format("No vertex with content '%s' in witness %s", content, in));

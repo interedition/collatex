@@ -11,8 +11,8 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -21,7 +21,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
 
   private final Comparator<Token> comparator;
   private float[][] matrix;
-  private List<Set<Neo4jVariantGraphVertex>> unlinkedVertices;
+  private List<Set<VariantGraphVertex>> unlinkedVertices;
   private List<Token> unlinkedTokens;
 
   public NeedlemanWunschAlgorithm(Comparator<Token> comparator) {
@@ -32,7 +32,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
     return matrix;
   }
 
-  public List<Set<Neo4jVariantGraphVertex>> getUnlinkedVertices() {
+  public List<Set<VariantGraphVertex>> getUnlinkedVertices() {
     return unlinkedVertices;
   }
 
@@ -41,13 +41,13 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
   }
 
   @Override
-  public void collate(Neo4jVariantGraph against, Iterable<Token> witness) {
+  public void collate(VariantGraph against, Iterable<Token> witness) {
     final DefaultNeedlemanWunschScorer scorer = new DefaultNeedlemanWunschScorer(comparator);
 
-    final List<Set<Neo4jVariantGraphVertex>> vertexList = Lists.newArrayList(against.rank().ranks());
+    final List<Set<VariantGraphVertex>> vertexList = Lists.newArrayList(against.rank().ranks());
     final List<Token> tokenList = Lists.newArrayList(witness);
 
-    final Map<Token, Neo4jVariantGraphVertex> alignments = Maps.newHashMap();
+    final Map<Token, VariantGraphVertex> alignments = Maps.newHashMap();
     matrix = new float[vertexList.size() + 1][tokenList.size() + 1];
     unlinkedVertices = Lists.newArrayListWithCapacity(vertexList.size());
     unlinkedTokens = Lists.newArrayListWithCapacity(tokenList.size());
@@ -62,7 +62,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
     }
 
     ac = 1;
-    for (Set<Neo4jVariantGraphVertex> vertices : vertexList) {
+    for (Set<VariantGraphVertex> vertices : vertexList) {
       bc = 1;
       for (Token token : tokenList) {
         final float k = matrix[ac - 1][bc - 1] + scorer.score(vertices, token);
@@ -84,7 +84,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
       if (score == scoreDiag + scorer.score(vertexList.get(ac - 1), tokenList.get(bc - 1))) {
         // match
         final Token matchedToken = tokenList.get(bc - 1);
-        for (Neo4jVariantGraphVertex vertex : vertexList.get(ac - 1)) {
+        for (VariantGraphVertex vertex : vertexList.get(ac - 1)) {
           if (comparator.compare(Iterables.getFirst(vertex.tokens(), null), matchedToken) == 0) {
             if (LOG.isTraceEnabled()) {
               LOG.trace("Matched {} and {}", matchedToken, vertex);

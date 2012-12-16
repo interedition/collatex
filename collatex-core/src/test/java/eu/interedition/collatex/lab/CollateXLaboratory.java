@@ -22,7 +22,7 @@ import javax.swing.JToolBar;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.VariantGraph;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +148,7 @@ public class CollateXLaboratory extends JFrame {
       Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
         final EqualityTokenComparator comparator = new EqualityTokenComparator();
-        final Neo4jVariantGraph pvg = graphFactory.newVariantGraph();
+        final VariantGraph pvg = graphFactory.newVariantGraph();
 
         final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem()) ? dekker(comparator) : needlemanWunsch(comparator);
         for (SimpleWitness witness : w) {
@@ -208,7 +208,7 @@ public class CollateXLaboratory extends JFrame {
       final Transaction transaction = graphFactory.getDatabase().beginTx();
       try {
         final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
-        final Neo4jVariantGraph vg = graphFactory.newVariantGraph();
+        final VariantGraph vg = graphFactory.newVariantGraph();
 
         int outlierTranspositionsSizeLimit = 3;
         for (int i = 0; i <= w.size() - 2; i++) {

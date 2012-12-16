@@ -22,7 +22,8 @@ package eu.interedition.collatex.dekker;
 import java.util.List;
 import java.util.Map;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -41,9 +42,9 @@ import eu.interedition.collatex.neo4j.GraphRelationshipType;
  */
 public class PhraseMatchDetector {
 
-  public List<List<Match>> detect(Map<Token, Neo4jVariantGraphVertex> linkedTokens, Neo4jVariantGraph base, Iterable<Token> tokens) {
+  public List<List<Match>> detect(Map<Token, VariantGraphVertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
     List<List<Match>> phraseMatches = Lists.newArrayList();
-    List<Neo4jVariantGraphVertex> basePhrase = Lists.newArrayList();
+    List<VariantGraphVertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
     Neo4jVariantGraphVertex previous = base.getStart();
 
@@ -52,7 +53,7 @@ public class PhraseMatchDetector {
 	addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
         continue;
       }
-      Neo4jVariantGraphVertex baseVertex = linkedTokens.get(token);
+      Neo4jVariantGraphVertex baseVertex = (Neo4jVariantGraphVertex) linkedTokens.get(token);
       // requirements:
       // - previous and base vertex should have the same witnesses
       // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
@@ -75,7 +76,7 @@ public class PhraseMatchDetector {
     return phraseMatches;
   }
 
-  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<Neo4jVariantGraphVertex> basePhrase, List<Token> witnessPhrase) {
+  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraphVertex> basePhrase, List<Token> witnessPhrase) {
     if (!basePhrase.isEmpty()) {
       phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
       basePhrase.clear();

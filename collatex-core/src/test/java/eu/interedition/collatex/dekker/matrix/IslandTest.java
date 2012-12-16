@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.VariantGraph;
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
@@ -85,7 +85,7 @@ public class IslandTest extends AbstractTest {
   @Test
   public void testArchipelagoRivalIslands() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
-    Neo4jVariantGraph vg = collate(sw[0]);
+    VariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     Archipelago archipelago = new Archipelago();
     for (Island isl : table.getIslands()) {
@@ -98,7 +98,7 @@ public class IslandTest extends AbstractTest {
   @Test
   public void testIslands() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
-    Neo4jVariantGraph vg = collate(sw[0]);
+    VariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     ArchipelagoWithVersions islands = new ArchipelagoWithVersions(table, 1);
     for (Island isl : table.getIslands()) {

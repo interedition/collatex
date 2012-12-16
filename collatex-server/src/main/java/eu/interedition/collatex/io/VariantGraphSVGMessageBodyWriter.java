@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import com.google.inject.Inject;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 
 import javax.inject.Named;
@@ -32,7 +33,7 @@ import java.util.concurrent.Future;
  */
 @Provider
 @Produces("image/svg+xml")
-public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Neo4jVariantGraph> {
+public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
 
   private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -50,12 +51,12 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Neo4j
   }
 
   @Override
-  public long getSize(Neo4jVariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+  public long getSize(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     return -1;
   }
 
   @Override
-  public void writeTo(final Neo4jVariantGraph variantGraph, final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+  public void writeTo(final VariantGraph variantGraph, final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     final Process dotProc = Runtime.getRuntime().exec(dotPath.getAbsolutePath() + " -Grankdir=LR -Gid=VariantGraph -Tsvg");
 
     final Future<Void> inputTask = threadPool.submit(new Callable<Void>() {

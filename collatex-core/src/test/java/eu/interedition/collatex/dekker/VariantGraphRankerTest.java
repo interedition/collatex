@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -36,8 +36,8 @@ public class VariantGraphRankerTest extends AbstractTest {
 
   @Test
   public void ranking() {
-    final Neo4jVariantGraph graph = collate("The black cat", "The black and white cat", "The black and green cat").rank();
-    final List<Neo4jVariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
+    final VariantGraph graph = collate("The black cat", "The black and white cat", "The black and green cat").rank();
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("the", vertices.get(1));
     assertEquals(1, vertices.get(1).getRank());
@@ -55,8 +55,8 @@ public class VariantGraphRankerTest extends AbstractTest {
 
   @Test
   public void agastTranspositionHandling() {
-    final Neo4jVariantGraph graph = collate("He was agast, so", "He was agast", "So he was agast").rank();
-    final List<Neo4jVariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
+    final VariantGraph graph = collate("He was agast, so", "He was agast", "So he was agast").rank();
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("so", vertices.get(1));
     assertEquals(1, vertices.get(1).getRank());

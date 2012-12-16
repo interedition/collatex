@@ -28,6 +28,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphEdge;
+import eu.interedition.collatex.VariantGraphTransposition;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,7 +48,7 @@ public class VariantGraphTest extends AbstractTest {
 
   @Test
   public void emptyGraph() {
-    final Neo4jVariantGraph graph = collate(createWitnesses());
+    final VariantGraph graph = collate(createWitnesses());
     assertEquals(0, graph.witnesses().size());
     assertEquals(2, Iterables.size(graph.vertices()));
     assertEquals(1, Iterables.size(graph.edges()));
@@ -53,10 +57,10 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void reconnectingVerticesYieldsSameEdge() {
     final SimpleWitness witness = createWitnesses("hello world")[0];
-    final Neo4jVariantGraph graph = graphFactory.newVariantGraph();
+    final VariantGraph graph = graphFactory.newVariantGraph();
     final Neo4jVariantGraphVertex helloVertex = graph.add(witness.getTokens().get(0));
     final Neo4jVariantGraphVertex worldVertex = graph.add(witness.getTokens().get(1));
-    final Neo4jVariantGraphEdge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
+    final VariantGraphEdge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
 
     Assert.assertEquals(1, edge.witnesses().size());
 
@@ -67,8 +71,8 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void getTokens() {
     final SimpleWitness[] w = createWitnesses("a b c d");
-    final Neo4jVariantGraph graph = collate(w);
-    final List<Neo4jVariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness> asList(w))));
+    final VariantGraph graph = collate(w);
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness> asList(w))));
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
     assertVertexEquals("a", vertices.get(1));
@@ -81,7 +85,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void oneWitness() {
     final SimpleWitness[] w = createWitnesses("only one witness");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(5, Iterables.size(graph.vertices()));
     assertEquals(4, Iterables.size(graph.edges()));
@@ -99,9 +103,9 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void getPathForWitness() {
     final SimpleWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
     final Set<Witness> witnessSet = Collections.<Witness> singleton(w[0]);
-    final List<Neo4jVariantGraphVertex> path = Lists.newArrayList(graph.vertices(witnessSet));
+    final List<VariantGraphVertex> path = Lists.newArrayList(graph.vertices(witnessSet));
 
     assertEquals(8, path.size());
     assertEquals(graph.getStart(), path.get(0));
@@ -117,18 +121,18 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void transpositions() {
     final SimpleWitness[] w = createWitnesses("the black and white cat", "the white and black cat", "the black and black cat");
-    final Neo4jVariantGraph graph = collate(w[0], w[1]);
+    final VariantGraph graph = collate(w[0], w[1]);
 
     assertEquals(2, graph.transpositions().size());
 
     collate(graph, w[2]);
-    final Set<Neo4jVariantGraphTransposition> transposed = graph.transpositions();
+    final Set<VariantGraphTransposition> transposed = graph.transpositions();
     assertEquals(2, transposed.size());
   }
 
   @Test
   public void transpositions1() {
-    final Neo4jVariantGraph graph = collate("the nice black and white cat", "the friendly white and black cat");
+    final VariantGraph graph = collate("the nice black and white cat", "the friendly white and black cat");
     assertEquals(12, Iterables.size(graph.edges()));
     assertEquals(12, Iterables.size(graph.edges()));
   }
@@ -136,10 +140,10 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void transpositions2() {
     final SimpleWitness[] w = createWitnesses("The black dog chases a red cat.", "A red cat chases the black dog.", "A red cat chases the yellow dog");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     // There should be two vertices for cat in the graph
-    Neo4jVariantGraphEdge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
+    VariantGraphEdge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
     assertHasWitnesses(edge, w[0]);
     edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
     assertHasWitnesses(edge, w[1], w[2]);
@@ -151,7 +155,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoIdenticalWitnesses() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
-    final Neo4jVariantGraph graph = collate(w).join();
+    final VariantGraph graph = collate(w).join();
 
     assertEquals(3, Iterables.size(graph.vertices()));
     assertEquals(2, Iterables.size(graph.edges()));
@@ -165,7 +169,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses() {
     final SimpleWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
-    final Neo4jVariantGraph graph = collate(w).join();
+    final VariantGraph graph = collate(w).join();
 
     final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
     final Neo4jVariantGraphVertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
@@ -191,7 +195,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses2() {
     final SimpleWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
-    final Neo4jVariantGraph graph = collate(w).join();
+    final VariantGraph graph = collate(w).join();
 
     final Neo4jVariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);
     final Neo4jVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[1]);

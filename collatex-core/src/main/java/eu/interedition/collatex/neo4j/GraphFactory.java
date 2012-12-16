@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphEdge;
+import eu.interedition.collatex.VariantGraphTransposition;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -103,10 +107,10 @@ public class GraphFactory {
     return database;
   }
 
-  public Iterable<Neo4jVariantGraph> variantGraphs() {
-    return Iterables.transform(variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING), new Function<Relationship, Neo4jVariantGraph>() {
+  public Iterable<VariantGraph> variantGraphs() {
+    return Iterables.transform(variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING), new Function<Relationship, VariantGraph>() {
       @Override
-      public Neo4jVariantGraph apply(Relationship input) {
+      public VariantGraph apply(Relationship input) {
         return wrapVariantGraph(input);
       }
     });
@@ -140,22 +144,22 @@ public class GraphFactory {
     }
   }
 
-  public void delete(Neo4jVariantGraph vg) {
+  public void delete(VariantGraph vg) {
     final Node startNode = vg.getStart().getNode();
     startNode.getSingleRelationship(VARIANT_GRAPH, INCOMING).delete();
     startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
-    for (Neo4jVariantGraphVertex v : vg.vertices()) {
-      for (Neo4jVariantGraphEdge e : v.incoming()) {
+    for (VariantGraphVertex v : vg.vertices()) {
+      for (VariantGraphEdge e : v.incoming()) {
         e.delete();
       }
-      for (Neo4jVariantGraphTransposition t : v.transpositions()) {
+      for (VariantGraphTransposition t : v.transpositions()) {
         t.delete();
       }
       v.delete();
     }
   }
   
-  protected Neo4jVariantGraph wrapVariantGraph(Relationship startEndRel) {
+  protected VariantGraph wrapVariantGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
     return wrapVariantGraph(startNode, startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).getEndNode());
   }

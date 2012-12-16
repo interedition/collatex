@@ -1,5 +1,6 @@
 package eu.interedition.collatex.neo4j;
 
+import eu.interedition.collatex.VariantGraphTransposition;
 import org.neo4j.graphdb.Relationship;
 
 import com.google.common.base.Function;
@@ -8,7 +9,7 @@ import com.google.common.base.Objects;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Neo4jVariantGraphTransposition {
+public class Neo4jVariantGraphTransposition implements VariantGraphTransposition {
 
   private static final String TRANSPOSITIONID_KEY = "transpositionId";
   private final Neo4jVariantGraph graph;
@@ -29,18 +30,22 @@ public class Neo4jVariantGraphTransposition {
     this(graph, from.getNode().createRelationshipTo(to.getNode(), GraphRelationshipType.TRANSPOSITION), transpositionId);
   }
 
+  @Override
   public Neo4jVariantGraphVertex from() {
     return new Neo4jVariantGraphVertex(graph, relationship.getStartNode());
   }
 
+  @Override
   public Neo4jVariantGraphVertex to() {
     return new Neo4jVariantGraphVertex(graph, relationship.getEndNode());
   }
 
+  @Override
   public Neo4jVariantGraphVertex other(Neo4jVariantGraphVertex vertex) {
     return new Neo4jVariantGraphVertex(graph, relationship.getOtherNode(vertex.getNode()));
   }
 
+  @Override
   public void delete() {
     relationship.delete();
   }
@@ -52,7 +57,7 @@ public class Neo4jVariantGraphTransposition {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Neo4jVariantGraphTransposition) {
+    if (obj != null && obj instanceof VariantGraphTransposition) {
       return relationship.equals(((Neo4jVariantGraphTransposition) obj).relationship);
     }
     return super.equals(obj);
@@ -63,15 +68,16 @@ public class Neo4jVariantGraphTransposition {
     return Objects.toStringHelper(this).addValue(from()).addValue(to()).toString();
   }
 
-  public static Function<Relationship, Neo4jVariantGraphTransposition> createWrapper(final Neo4jVariantGraph in) {
-    return new Function<Relationship, Neo4jVariantGraphTransposition>() {
+  public static Function<Relationship, VariantGraphTransposition> createWrapper(final Neo4jVariantGraph in) {
+    return new Function<Relationship, VariantGraphTransposition>() {
       @Override
-      public Neo4jVariantGraphTransposition apply(Relationship input) {
+      public VariantGraphTransposition apply(Relationship input) {
         return new Neo4jVariantGraphTransposition(in, input);
       }
     };
   }
 
+  @Override
   public int getId() {
     return (Integer) relationship.getProperty(TRANSPOSITIONID_KEY, 0);
   }

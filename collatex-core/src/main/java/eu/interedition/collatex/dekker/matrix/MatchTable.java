@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,12 +37,12 @@ public class MatchTable {
   private final List<Integer> ranks;
   
   // assumes default token comparator
-  public static MatchTable create(Neo4jVariantGraph graph, Iterable<Token> witness) {
+  public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
     Comparator<Token> comparator = new EqualityTokenComparator();
     return MatchTable.create(graph, witness, comparator);
   }
 
-  public static MatchTable create(Neo4jVariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
+  public static MatchTable create(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
     // step 1: build the MatchTable
     MatchTable table = createEmptyTable(graph, witness);
     // step 2: do the matching and fill the table
@@ -50,7 +50,7 @@ public class MatchTable {
     return table;
   }
 
-  public Neo4jVariantGraphVertex vertexAt(int rowIndex, int columnIndex) {
+  public VariantGraphVertex vertexAt(int rowIndex, int columnIndex) {
     MatchTableCell cell = table.get(rowIndex, columnIndex);
     return cell==null ? null : cell.variantGraphVertex;
   }
@@ -96,7 +96,7 @@ public class MatchTable {
     this.ranks = ranks;
   }
 
-  private static MatchTable createEmptyTable(Neo4jVariantGraph graph, Iterable<Token> witness) {
+  private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
     graph.rank();
     // -2 === ignore the start and the end vertex
     Range<Integer> ranksRange = Ranges.closed(0, Math.max(0, graph.getEnd().getRank() - 2));
@@ -105,15 +105,15 @@ public class MatchTable {
   }
 
   // move parameters into fields?
-  private void fillTableWithMatches(Neo4jVariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
+  private void fillTableWithMatches(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
     Matches matches = Matches.between(graph.vertices(), witness, comparator);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
     int rowIndex=0;
     for (Token t : witness) {
       if (unique.contains(t) || ambiguous.contains(t)) {
-        List<Neo4jVariantGraphVertex> matchingVertices = matches.getAll().get(t);
-        for (Neo4jVariantGraphVertex vgv : matchingVertices) {
+        List<VariantGraphVertex> matchingVertices = matches.getAll().get(t);
+        for (VariantGraphVertex vgv : matchingVertices) {
           set(rowIndex, vgv.getRank() - 1, t, vgv);
         }
       }
@@ -121,7 +121,7 @@ public class MatchTable {
     }
   }
 
-  private void set(int rowIndex, int columnIndex, Token token, Neo4jVariantGraphVertex variantGraphVertex) {
+  private void set(int rowIndex, int columnIndex, Token token, VariantGraphVertex variantGraphVertex) {
     //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, columnIndex, variantGraphVertex });
     MatchTableCell cell = new MatchTableCell(token, variantGraphVertex);
     table.put(rowIndex, columnIndex, cell);
@@ -130,7 +130,7 @@ public class MatchTable {
   private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c) {
     int diff = -1;
     Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff);
-    Neo4jVariantGraphVertex neighbor = null;
+    VariantGraphVertex neighbor = null;
     try {
       neighbor = vertexAt(c.row + diff, c.column + diff);
     } catch (IndexOutOfBoundsException e) {}
@@ -168,9 +168,9 @@ public class MatchTable {
   
   private class MatchTableCell {
     public final Token token;
-    public final Neo4jVariantGraphVertex variantGraphVertex;
+    public final VariantGraphVertex variantGraphVertex;
 
-    public MatchTableCell(Token token, Neo4jVariantGraphVertex variantGraphVertex) {
+    public MatchTableCell(Token token, VariantGraphVertex variantGraphVertex) {
       this.token = token;
       this.variantGraphVertex = variantGraphVertex;
     }

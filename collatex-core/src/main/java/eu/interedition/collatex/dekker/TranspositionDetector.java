@@ -23,8 +23,8 @@ import java.util.Collections;
 
 import java.util.List;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class TranspositionDetector {
 
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
 
-  public List<List<Match>> detect(List<List<Match>> phraseMatches, Neo4jVariantGraph base) {
+  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     //rank the variant graph
     base.rank();
 
@@ -56,7 +56,7 @@ public class TranspositionDetector {
     Tuple<Integer> previous = new Tuple<Integer>(0, 0);
 
     for (List<Match> phraseMatch : phraseMatches) {
-      Neo4jVariantGraphVertex baseToken = phraseMatch.get(0).vertex;
+      VariantGraphVertex baseToken = phraseMatch.get(0).vertex;
       int rank = baseToken.getRank();
       int expectedRank = ranks.get(previousRank);
       Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);

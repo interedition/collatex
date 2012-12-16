@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
   private final MatchTable table;
   Set<Integer> fixedRows = Sets.newHashSet();
-  Set<Neo4jVariantGraphVertex> fixedVertices = Sets.newHashSet();
+  Set<VariantGraphVertex> fixedVertices = Sets.newHashSet();
   private final int outlierTranspositionsSizeLimit;
 
   public ArchipelagoWithVersions(MatchTable table, int outlierTranspositionsSizeLimit) {

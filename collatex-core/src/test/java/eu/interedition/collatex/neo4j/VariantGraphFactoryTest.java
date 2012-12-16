@@ -2,6 +2,7 @@ package eu.interedition.collatex.neo4j;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.VariantGraph;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ public class VariantGraphFactoryTest extends AbstractTest {
   
   @Test
   public void purgeGraphs() {
-    final Neo4jVariantGraph vg = graphFactory.newVariantGraph();
+    final VariantGraph vg = graphFactory.newVariantGraph();
     graphFactory.deleteGraphsOlderThan(Long.MAX_VALUE);
     Assert.assertEquals(0, Iterables.size(graphFactory.variantGraphs()));
   }

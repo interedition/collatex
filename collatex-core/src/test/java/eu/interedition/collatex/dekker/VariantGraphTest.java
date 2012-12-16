@@ -24,7 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void twoWitnesses() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(5, Iterables.size(graph.vertices()));
     assertEquals(4, Iterables.size(graph.edges()));
@@ -61,7 +62,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void addition1() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white and black cat");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(7, Lists.newArrayList(graph.vertices()).size());
     assertEquals(7, Iterables.size(graph.edges()));
@@ -84,9 +85,9 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void variant() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
-    final List<Neo4jVariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
+    final List<VariantGraphVertex> vertices = Lists.newArrayList(graph.vertices());
     assertEquals(9, vertices.size());
     assertEquals(12, Iterables.size(graph.edges()));
 
@@ -115,7 +116,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void doubleTransposition2() {
     final SimpleWitness[] w = createWitnesses("a b", "b a");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     assertEquals(5, Iterables.size(graph.vertices()));
 
@@ -126,7 +127,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void mirroredTranspositionsWithMatchInBetween() {
     final SimpleWitness[] w = createWitnesses("the black and white cat", "the white and black cat");
-    final Neo4jVariantGraph graph = collate(w);
+    final VariantGraph graph = collate(w);
 
     Assert.assertEquals(9, Iterables.size(graph.vertices()));
 

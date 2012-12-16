@@ -7,6 +7,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -17,15 +18,15 @@ import java.util.Set;
 
 public class Matches {
 
-  private final ListMultimap<Token, Neo4jVariantGraphVertex> all;
+  private final ListMultimap<Token, VariantGraphVertex> all;
   private final Set<Token> unmatched;
   private final Set<Token> ambiguous;
   private final Set<Token> unique;
 
-  public static Matches between(final Iterable<Neo4jVariantGraphVertex> vertices, final Iterable<Token> witnessTokens, Comparator<Token> comparator) {
+  public static Matches between(final Iterable<VariantGraphVertex> vertices, final Iterable<Token> witnessTokens, Comparator<Token> comparator) {
 
-    final ListMultimap<Token, Neo4jVariantGraphVertex> all = ArrayListMultimap.create();
-    for (Neo4jVariantGraphVertex vertex : vertices) {
+    final ListMultimap<Token, VariantGraphVertex> all = ArrayListMultimap.create();
+    for (VariantGraphVertex vertex : vertices) {
       final Set<Token> tokens = vertex.tokens();
       if (tokens.isEmpty()) {
         continue;
@@ -52,16 +53,16 @@ public class Matches {
         ambiguous.add(witnessToken);
       }
     }
-    Multiset<Neo4jVariantGraphVertex> bag = ImmutableMultiset.copyOf(all.values());
-    Set<Neo4jVariantGraphVertex> unsureBaseTokens = Sets.newLinkedHashSet();
-    for (Neo4jVariantGraphVertex baseToken : vertices) {
+    Multiset<VariantGraphVertex> bag = ImmutableMultiset.copyOf(all.values());
+    Set<VariantGraphVertex> unsureBaseTokens = Sets.newLinkedHashSet();
+    for (VariantGraphVertex baseToken : vertices) {
       int count = bag.count(baseToken);
       if (count > 1) {
         unsureBaseTokens.add(baseToken);
       }
     }
-    Collection<Map.Entry<Token, Neo4jVariantGraphVertex>> entries = all.entries();
-    for (Map.Entry<Token, Neo4jVariantGraphVertex> entry : entries) {
+    Collection<Map.Entry<Token, VariantGraphVertex>> entries = all.entries();
+    for (Map.Entry<Token, VariantGraphVertex> entry : entries) {
       if (unsureBaseTokens.contains(entry.getValue())) {
         ambiguous.add(entry.getKey());
       }
@@ -82,14 +83,14 @@ public class Matches {
     return new Matches(all, unmatched, ambiguous, unique);
   }
 
-  private Matches(ListMultimap<Token, Neo4jVariantGraphVertex> all, Set<Token> unmatched, Set<Token> ambiguous, Set<Token> unique) {
+  private Matches(ListMultimap<Token, VariantGraphVertex> all, Set<Token> unmatched, Set<Token> ambiguous, Set<Token> unique) {
     this.all = all;
     this.unmatched = unmatched;
     this.ambiguous = ambiguous;
     this.unique = unique;
   }
 
-  public ListMultimap<Token, Neo4jVariantGraphVertex> getAll() {
+  public ListMultimap<Token, VariantGraphVertex> getAll() {
     return all;
   }
 

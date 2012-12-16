@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.VariantGraph;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -112,7 +112,7 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void witnessReorder() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black and white cat", "the black not very special cat", "the black very special cat");
-    Neo4jVariantGraph variantgraph = collate(w);
+    VariantGraph variantgraph = collate(w);
     final RowSortedTable<Integer, Witness, Set<Token>> table = variantgraph.toTable();
     assertEquals("|the|black| | | |cat|", toString(table, w[0]));
     assertEquals("|the|black|and|white| |cat|", toString(table, w[1]));

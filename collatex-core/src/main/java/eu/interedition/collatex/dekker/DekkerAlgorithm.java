@@ -30,10 +30,10 @@ import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
@@ -41,10 +41,10 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private final TokenLinker tokenLinker;
   private final PhraseMatchDetector phraseMatchDetector;
   private final TranspositionDetector transpositionDetector;
-  private Map<Token, Neo4jVariantGraphVertex> tokenLinks;
+  private Map<Token, VariantGraphVertex> tokenLinks;
   private List<List<Match>> phraseMatches;
   private List<List<Match>> transpositions;
-  private Map<Token, Neo4jVariantGraphVertex> alignments;
+  private Map<Token, VariantGraphVertex> alignments;
 
   public DekkerAlgorithm(Comparator<Token> comparator) {
     this(comparator, new MatchTableLinker(3));
@@ -58,7 +58,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   }
 
   @Override
-  public void collate(Neo4jVariantGraph graph, Iterable<Token> tokens) {
+  public void collate(VariantGraph graph, Iterable<Token> tokens) {
     Preconditions.checkArgument(!Iterables.isEmpty(tokens), "Empty witness");
     final Witness witness = Iterables.getFirst(tokens, null).getWitness();
 
@@ -70,7 +70,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
     //    new SimpleVariantGraphSerializer(graph).toDot(graph, writer);
     if (LOG.isTraceEnabled()) {
-      for (Map.Entry<Token, Neo4jVariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
+      for (Map.Entry<Token, VariantGraphVertex> tokenLink : tokenLinks.entrySet()) {
         LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
       }
     }
@@ -101,7 +101,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       }
     }
     if (LOG.isTraceEnabled()) {
-      for (Map.Entry<Token, Neo4jVariantGraphVertex> alignment : alignments.entrySet()) {
+      for (Map.Entry<Token, VariantGraphVertex> alignment : alignments.entrySet()) {
         LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
       }
     }
@@ -114,7 +114,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
   }
 
-  public Map<Token, Neo4jVariantGraphVertex> getTokenLinks() {
+  public Map<Token, VariantGraphVertex> getTokenLinks() {
     return tokenLinks;
   }
 
@@ -126,7 +126,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     return Collections.unmodifiableList(transpositions);
   }
 
-  public Map<Token, Neo4jVariantGraphVertex> getAlignments() {
+  public Map<Token, VariantGraphVertex> getAlignments() {
     return Collections.unmodifiableMap(alignments);
   }
 

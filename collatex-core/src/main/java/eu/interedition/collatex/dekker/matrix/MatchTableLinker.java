@@ -4,8 +4,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class MatchTableLinker implements TokenLinker {
   }
 
   @Override
-  public Map<Token, Neo4jVariantGraphVertex> link(Neo4jVariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     // create MatchTable and fill it with matches
     LOG.debug("create MatchTable and fill it with matches");
     MatchTable table = MatchTable.create(base, witness, comparator);
@@ -49,7 +49,7 @@ public class MatchTableLinker implements TokenLinker {
     LOG.debug("Number of preferred Islands: {}", preferredIslands.size());
 
     // Here the result is put in a map
-    Map<Token, Neo4jVariantGraphVertex> map = Maps.newHashMap();
+    Map<Token, VariantGraphVertex> map = Maps.newHashMap();
     for (Island island : preferredIslands.iterator()) {
       for (Coordinate c : island) {
         map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));

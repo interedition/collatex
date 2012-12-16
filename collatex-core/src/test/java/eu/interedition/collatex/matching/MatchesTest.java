@@ -8,8 +8,8 @@ import com.google.common.collect.ListMultimap;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraphVertex;
 
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
@@ -19,7 +19,7 @@ public class MatchesTest extends AbstractTest {
   @Test
   public void test1() {
     final SimpleWitness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
-    final Neo4jVariantGraph graph = collate(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
     int expected_unmatched = 0;
@@ -31,7 +31,7 @@ public class MatchesTest extends AbstractTest {
   @Test
   public void test2() {
     final SimpleWitness[] w = createWitnesses("the white cat", "the black cat");
-    final Neo4jVariantGraph graph = collate(w[0]);
+    final VariantGraph graph = collate(w[0]);
     final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
     int expected_unmatched = 1; // black
@@ -50,7 +50,7 @@ public class MatchesTest extends AbstractTest {
     Set<Token> ambiguous = matches.getAmbiguous();
     LOG.debug("ambiguous: {}", ambiguous);
 
-    ListMultimap<Token,Neo4jVariantGraphVertex> all = matches.getAll();
+    ListMultimap<Token,VariantGraphVertex> all = matches.getAll();
     LOG.debug("all: {}", all);
 
     assertEquals(expected_unmatched, unmatched.size());

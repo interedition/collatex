@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -20,11 +21,11 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphSerializer extends JsonSerializer<Neo4jVariantGraph> {
+public class VariantGraphSerializer extends JsonSerializer<VariantGraph> {
 
   @Override
-  public void serialize(Neo4jVariantGraph graph, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-    final Transaction tx = graph.getDatabase().beginTx();
+  public void serialize(VariantGraph graph, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    final Transaction tx = ((Neo4jVariantGraph)graph).getDatabase().beginTx();
     try {
       final List<Witness> witnesses = Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses());
       final RowSortedTable<Integer,Witness,Set<Token>> table = graph.toTable();
