@@ -10,6 +10,10 @@ import java.util.SortedMap;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphEdge;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphTransposition;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.neo4j.graphdb.Transaction;
 
 import com.google.common.collect.HashMultimap;
@@ -21,10 +25,6 @@ import com.google.common.collect.SetMultimap;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphEdge;
-import eu.interedition.collatex.neo4j.VariantGraphTransposition;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -40,9 +40,9 @@ public class SimpleVariantGraphSerializer {
    */
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
-  private final VariantGraph graph;
+  private final Neo4jVariantGraph graph;
 
-  public SimpleVariantGraphSerializer(VariantGraph graph) {
+  public SimpleVariantGraphSerializer(Neo4jVariantGraph graph) {
     this.graph = graph;
   }
 
@@ -54,11 +54,11 @@ public class SimpleVariantGraphSerializer {
     xml.writeNamespace("cx", COLLATEX_NS);
     xml.writeNamespace("", TEI_NS);
 
-    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().adjustRanksForTranspositions().ranks().iterator(); rowIt.hasNext();) {
-      final Set<VariantGraphVertex> row = rowIt.next();
+    for (Iterator<Set<Neo4jVariantGraphVertex>> rowIt = graph.join().rank().adjustRanksForTranspositions().ranks().iterator(); rowIt.hasNext();) {
+      final Set<Neo4jVariantGraphVertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
-      for (VariantGraphVertex v : row) {
+      for (Neo4jVariantGraphVertex v : row) {
         for (Token token : v.tokens()) {
           tokenIndex.put(token.getWitness(), token);
         }
@@ -123,30 +123,30 @@ public class SimpleVariantGraphSerializer {
     xml.writeAttribute(PARSEEDGEIDS_ATT, PARSEEDGEIDS_DEFAULT_VALUE);
     xml.writeAttribute(PARSEORDER_ATT, PARSEORDER_DEFAULT_VALUE);
 
-    final Map<VariantGraphVertex, String> vertexToId = Maps.newHashMap();
+    final Map<Neo4jVariantGraphVertex, String> vertexToId = Maps.newHashMap();
     int vertexNumber = 0;
-    for (VariantGraphVertex vertex : graph.vertices()) {
+    for (Neo4jVariantGraphVertex vertex : graph.vertices()) {
       final String vertexNodeID = "n" + vertexNumber;
       xml.writeStartElement(GRAPHML_NS, NODE_TAG);
       xml.writeAttribute(ID_ATT, vertexNodeID);
       GraphMLProperty.NODE_NUMBER.write(Integer.toString(vertexNumber++), xml);
-      GraphMLProperty.NODE_TOKEN.write(VariantGraphVertex.TO_CONTENTS.apply(vertex), xml);
+      GraphMLProperty.NODE_TOKEN.write(Neo4jVariantGraphVertex.TO_CONTENTS.apply(vertex), xml);
       xml.writeEndElement();
       vertexToId.put(vertex, vertexNodeID);
     }
 
     int edgeNumber = 0;
-    for (VariantGraphEdge edge : graph.edges()) {
+    for (Neo4jVariantGraphEdge edge : graph.edges()) {
       xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
       xml.writeAttribute(ID_ATT, "e" + edgeNumber);
       xml.writeAttribute(SOURCE_ATT, vertexToId.get(edge.from()));
       xml.writeAttribute(TARGET_ATT, vertexToId.get(edge.to()));
       GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
       GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
-      GraphMLProperty.EDGE_WITNESSES.write(VariantGraphEdge.TO_CONTENTS.apply(edge), xml);
+      GraphMLProperty.EDGE_WITNESSES.write(Neo4jVariantGraphEdge.TO_CONTENTS.apply(edge), xml);
       xml.writeEndElement();
     }
-    for (VariantGraphTransposition transposition : graph.transpositions()) {
+    for (Neo4jVariantGraphTransposition transposition : graph.transpositions()) {
       xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
       xml.writeAttribute(ID_ATT, "e" + edgeNumber);
       xml.writeAttribute(SOURCE_ATT, vertexToId.get(transposition.from()));
@@ -226,7 +226,7 @@ public class SimpleVariantGraphSerializer {
     }
   }
 
-  public void toDot(VariantGraph graph, Writer writer) {
+  public void toDot(Neo4jVariantGraph graph, Writer writer) {
     final Transaction tx = graph.newTransaction();
     try {
       final PrintWriter out = new PrintWriter(writer);
@@ -235,19 +235,19 @@ public class SimpleVariantGraphSerializer {
 
       out.println("digraph G {");
 
-      for (VariantGraphVertex v : graph.vertices()) {
+      for (Neo4jVariantGraphVertex v : graph.vertices()) {
         out.print(indent + "v" + v.getNode().getId());
         out.print(" [label = \"" + toLabel(v) + "\"]");
         out.println(";");
       }
 
-      for (VariantGraphEdge e : graph.edges()) {
+      for (Neo4jVariantGraphEdge e : graph.edges()) {
         out.print(indent + "v" + e.from().getNode().getId() + connector + "v" + e.to().getNode().getId());
         out.print(" [label = \"" + toLabel(e) + "\"]");
         out.println(";");
       }
 
-      for (VariantGraphTransposition t : graph.transpositions()) {
+      for (Neo4jVariantGraphTransposition t : graph.transpositions()) {
         out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
         out.print(" [label = \"" + t.getId() + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
@@ -266,12 +266,12 @@ public class SimpleVariantGraphSerializer {
     }
   }
 
-  private String toLabel(VariantGraphEdge e) {
-    return escapeLabel(VariantGraphEdge.TO_CONTENTS.apply(e));
+  private String toLabel(Neo4jVariantGraphEdge e) {
+    return escapeLabel(Neo4jVariantGraphEdge.TO_CONTENTS.apply(e));
   }
 
-  private String toLabel(VariantGraphVertex v) {
-    return escapeLabel(VariantGraphVertex.TO_CONTENTS.apply(v));
+  private String toLabel(Neo4jVariantGraphVertex v) {
+    return escapeLabel(Neo4jVariantGraphVertex.TO_CONTENTS.apply(v));
   }
 
   String escapeLabel(String string) {

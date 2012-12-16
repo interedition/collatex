@@ -30,6 +30,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import org.junit.Test;
 
 import com.google.common.collect.RowSortedTable;
@@ -38,7 +39,6 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.neo4j.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -166,7 +166,7 @@ public class AlignmentTest extends AbstractTest {
     witnesses.add(new SimpleWitness("w3", "Y A X ", tokenizer));
 
     setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
-    VariantGraph graph = graphFactory.newVariantGraph();
+    Neo4jVariantGraph graph = graphFactory.newVariantGraph();
     collationAlgorithm.collate(graph, witnesses.toArray(new SimpleWitness[0]));
 
     StringWriter writer = new StringWriter();

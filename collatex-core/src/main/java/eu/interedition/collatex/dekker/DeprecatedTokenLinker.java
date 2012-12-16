@@ -8,8 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.matching.Matches;
 import org.slf4j.Logger;
@@ -41,10 +41,10 @@ public class DeprecatedTokenLinker implements TokenLinker {
   private List<List<Token>> rightExpandingPhrases;
   private List<Integer> ranks;
   private List<List<Match>> phraseMatches;
-  private Map<Token, VariantGraphVertex> tokenLinks;
+  private Map<Token, Neo4jVariantGraphVertex> tokenLinks;
 
   @Override
-  public Map<Token, VariantGraphVertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+  public Map<Token, Neo4jVariantGraphVertex> link(Neo4jVariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     Preconditions.checkArgument(!Iterables.isEmpty(witness), "Empty witness");
 
     base.rank();
@@ -72,14 +72,14 @@ public class DeprecatedTokenLinker implements TokenLinker {
     }
 
     LOG.trace("Find matches in the base");
-    List<VariantGraphVertex> baseMatches = Lists.newArrayList(Iterables.filter(base.vertices(), Predicates.in(matches.getAll().values())));
+    List<Neo4jVariantGraphVertex> baseMatches = Lists.newArrayList(Iterables.filter(base.vertices(), Predicates.in(matches.getAll().values())));
 
     LOG.trace("Find all the ranks of the vertices of the VG that are matched against");
     // NOTE: Not all ranks are actually in use (because of ommissions)
     // gather matched ranks into a set ordered by their natural order
     // Turn it into a List so that distance between matched ranks can be called
     // Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
-    ranks = Lists.newArrayList(Sets.newTreeSet(Iterables.transform(baseMatches, VariantGraphVertex.TO_RANK)));
+    ranks = Lists.newArrayList(Sets.newTreeSet(Iterables.transform(baseMatches, Neo4jVariantGraphVertex.TO_RANK)));
     if (LOG.isTraceEnabled()) {
       LOG.trace("Base: {}", baseMatches);
       LOG.trace("Ranks: {}", ranks);
@@ -88,13 +88,13 @@ public class DeprecatedTokenLinker implements TokenLinker {
     // try and find matches in the base for each sequence in the witness
     phraseMatches = Lists.newArrayList();
     for (List<Token> phrase : rightExpandingPhrases) {
-      final List<VariantGraphVertex> matchingPhrase = matchPhrase(phrase, 1);
+      final List<Neo4jVariantGraphVertex> matchingPhrase = matchPhrase(phrase, 1);
       if (!matchingPhrase.isEmpty()) {        
         phraseMatches.add(Match.createPhraseMatch(matchingPhrase, phrase));
       }
     }
     for (List<Token> phrase : leftExpandingPhrases) {
-      final List<VariantGraphVertex> matchingPhrase = reverse(matchPhrase(reverse(phrase), -1));
+      final List<Neo4jVariantGraphVertex> matchingPhrase = reverse(matchPhrase(reverse(phrase), -1));
       if (!matchingPhrase.isEmpty()) {
         phraseMatches.add(Match.createPhraseMatch(matchingPhrase, phrase));
       }
@@ -104,7 +104,7 @@ public class DeprecatedTokenLinker implements TokenLinker {
     filterAlternativePhraseMatches(base, phraseMatches);
 
     // do the matching
-    final ListMultimap<Token, VariantGraphVertex> allMatches = matches.getAll();
+    final ListMultimap<Token, Neo4jVariantGraphVertex> allMatches = matches.getAll();
 
     tokenLinks = Maps.newLinkedHashMap();
 
@@ -141,7 +141,7 @@ public class DeprecatedTokenLinker implements TokenLinker {
     return phraseMatches;
   }
 
-  public Map<Token, VariantGraphVertex> getTokenLinks() {
+  public Map<Token, Neo4jVariantGraphVertex> getTokenLinks() {
     return tokenLinks;
   }
 
@@ -161,16 +161,16 @@ public class DeprecatedTokenLinker implements TokenLinker {
     return result;
   }
 
-  private void filterAlternativePhraseMatches(VariantGraph graph, List<List<Match>> phraseMatches) {
-    final Map<Token, VariantGraphVertex> previousMatches = Maps.newHashMap();
-    final Map<VariantGraphVertex, Token> invertedPreviousMatches = Maps.newHashMap();
+  private void filterAlternativePhraseMatches(Neo4jVariantGraph graph, List<List<Match>> phraseMatches) {
+    final Map<Token, Neo4jVariantGraphVertex> previousMatches = Maps.newHashMap();
+    final Map<Neo4jVariantGraphVertex, Token> invertedPreviousMatches = Maps.newHashMap();
 
     for (Iterator<List<Match>> phraseMatchIt = phraseMatches.iterator(); phraseMatchIt.hasNext(); ) {
       final List<Match> phraseMatch = phraseMatchIt.next();
       boolean foundAlternative = false;
 
       for (Match match : Iterables.filter(phraseMatch, Match.createNoBoundaryMatchPredicate(graph))) {
-        final VariantGraphVertex matchingVertex = previousMatches.get(match.token);
+        final Neo4jVariantGraphVertex matchingVertex = previousMatches.get(match.token);
         if (matchingVertex != null && !matchingVertex.equals(match.vertex)) {
           foundAlternative = true;
         } else {
@@ -191,13 +191,13 @@ public class DeprecatedTokenLinker implements TokenLinker {
     }
   }
 
-  private List<VariantGraphVertex> matchPhrase(List<Token> phrase, int expectedDirection) {
-    final List<VariantGraphVertex> matchedPhrase = Lists.newArrayList();
+  private List<Neo4jVariantGraphVertex> matchPhrase(List<Token> phrase, int expectedDirection) {
+    final List<Neo4jVariantGraphVertex> matchedPhrase = Lists.newArrayList();
     if (LOG.isTraceEnabled()) {
       LOG.trace("Trying to find phrase: {}", phrase);
     }
        
-    VariantGraphVertex lastMatch = null;
+    Neo4jVariantGraphVertex lastMatch = null;
     int lastMatchIndex = 0;
     for (Token token : phrase) {
       if (lastMatch == null) {
@@ -207,7 +207,7 @@ public class DeprecatedTokenLinker implements TokenLinker {
         continue;
       }
       boolean tokenMatched = false;
-      for (VariantGraphVertex match : matches.getAll().get(token)) {
+      for (Neo4jVariantGraphVertex match : matches.getAll().get(token)) {
         final int matchIndex = ranks.indexOf(match.getRank());
         int direction = matchIndex - lastMatchIndex;
         if (direction == expectedDirection) {

@@ -25,8 +25,8 @@ import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
@@ -61,14 +61,14 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void graph() {
     final SimpleWitness[] w = createWitnesses("a", "b", "a b");
-    final VariantGraph graph = collate(w);
+    final Neo4jVariantGraph graph = collate(w);
     assertEquals(4, Iterables.size(graph.vertices()));
     assertEquals(5, Iterables.size(graph.edges()));
 
-    final VariantGraphVertex startVertex = graph.getStart();
-    final VariantGraphVertex aVertex = vertexWith(graph, "a", w[0]);
-    final VariantGraphVertex bVertex = vertexWith(graph, "b", w[1]);
-    final VariantGraphVertex endVertex = graph.getEnd();
+    final Neo4jVariantGraphVertex startVertex = graph.getStart();
+    final Neo4jVariantGraphVertex aVertex = vertexWith(graph, "a", w[0]);
+    final Neo4jVariantGraphVertex bVertex = vertexWith(graph, "b", w[1]);
+    final Neo4jVariantGraphVertex endVertex = graph.getEnd();
 
     assertHasWitnesses(edgeBetween(startVertex, aVertex), w[0], w[2]);
     assertHasWitnesses(edgeBetween(aVertex, endVertex), w[0]);

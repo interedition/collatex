@@ -1,7 +1,7 @@
 package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import org.neo4j.graphdb.Transaction;
 
@@ -24,22 +24,22 @@ import java.lang.reflect.Type;
  */
 @Provider
 @Produces("application/graphml+xml")
-public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
+public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<Neo4jVariantGraph> {
 
   private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    return VariantGraph.class.isAssignableFrom(type);
+    return Neo4jVariantGraph.class.isAssignableFrom(type);
   }
 
   @Override
-  public long getSize(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+  public long getSize(Neo4jVariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     return -1;
   }
 
   @Override
-  public void writeTo(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+  public void writeTo(Neo4jVariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     final Transaction tx = variantGraph.getDatabase().beginTx();
     try {
       XMLStreamWriter xml = null;

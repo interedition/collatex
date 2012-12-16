@@ -17,6 +17,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.kernel.Traversal;
@@ -43,54 +44,85 @@ import eu.interedition.collatex.simple.SimpleToken;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
-  private static final Logger LOG = LoggerFactory.getLogger(VariantGraph.class);
+public class Neo4jVariantGraph {
+  private static final Logger LOG = LoggerFactory.getLogger(Neo4jVariantGraph.class);
+  protected final GraphDatabaseService database;
+  protected final EntityMapper<Witness> witnessMapper;
+  protected final EntityMapper<Token> tokenMapper;
+  protected Function<Node, Neo4jVariantGraphVertex> vertexWrapper;
+  protected Function<Relationship, Neo4jVariantGraphEdge> edgeWrapper;
+  protected Neo4jVariantGraphVertex start;
+  protected Neo4jVariantGraphVertex end;
   Map<Token, Integer> transpositionId = Maps.newHashMap();
 
-  private Function<Relationship, VariantGraphTransposition> transpositionWrapper;
+  private Function<Relationship, Neo4jVariantGraphTransposition> transpositionWrapper;
 
-  public VariantGraph(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
-    super(database, witnessMapper, tokenMapper);
+  public Neo4jVariantGraph(GraphDatabaseService database, EntityMapper<Witness> witnessMapper, EntityMapper<Token> tokenMapper) {
+    this.database = database;
+    this.witnessMapper = witnessMapper;
+    this.tokenMapper = tokenMapper;
   }
 
-  @Override
-  public void init(Function<Node, VariantGraphVertex> vertexWrapper, Function<Relationship, VariantGraphEdge> edgeWrapper, Node start, Node end) {
-    super.init(vertexWrapper, edgeWrapper, start, end);
-    this.transpositionWrapper = VariantGraphTransposition.createWrapper(this);
+  public void init(Function<Node, Neo4jVariantGraphVertex> vertexWrapper, Function<Relationship, Neo4jVariantGraphEdge> edgeWrapper, Node start, Node end) {
+    this.vertexWrapper = vertexWrapper;
+    this.edgeWrapper = edgeWrapper;
+    this.start = (start == null ? null : vertexWrapper.apply(start));
+    this.end = (end == null ? null : vertexWrapper.apply(end));
+    this.transpositionWrapper = Neo4jVariantGraphTransposition.createWrapper(this);
   }
 
-  public Function<Relationship, VariantGraphTransposition> getTranspositionWrapper() {
+  public Transaction newTransaction() {
+    return database.beginTx();
+  }
+
+  public GraphDatabaseService getDatabase() {
+    return database;
+  }
+
+  public Neo4jVariantGraphVertex getStart() {
+    return start;
+  }
+
+  public Neo4jVariantGraphVertex getEnd() {
+    return end;
+  }
+
+  public EntityMapper<Witness> getWitnessMapper() {
+    return witnessMapper;
+  }
+
+  public Function<Relationship, Neo4jVariantGraphTransposition> getTranspositionWrapper() {
     return transpositionWrapper;
   }
 
-  public Set<VariantGraphTransposition> transpositions() {
-    final Set<VariantGraphTransposition> transpositions = Sets.newHashSet();
-    for (VariantGraphVertex v : vertices()) {
+  public Set<Neo4jVariantGraphTransposition> transpositions() {
+    final Set<Neo4jVariantGraphTransposition> transpositions = Sets.newHashSet();
+    for (Neo4jVariantGraphVertex v : vertices()) {
       Iterables.addAll(transpositions, v.transpositions());
     }
     return transpositions;
   }
 
-  public Iterable<VariantGraphVertex> vertices() {
+  public Iterable<Neo4jVariantGraphVertex> vertices() {
     return vertices(null);
   }
 
-  public Iterable<VariantGraphVertex> vertices(final Set<Witness> witnesses) {
-    return new Iterable<VariantGraphVertex>() {
+  public Iterable<Neo4jVariantGraphVertex> vertices(final Set<Witness> witnesses) {
+    return new Iterable<Neo4jVariantGraphVertex>() {
       @Override
-      public Iterator<VariantGraphVertex> iterator() {
-        return new AbstractIterator<VariantGraphVertex>() {
+      public Iterator<Neo4jVariantGraphVertex> iterator() {
+        return new AbstractIterator<Neo4jVariantGraphVertex>() {
           private final Map<Long, Integer> encountered = Maps.newHashMap();
-          private final Queue<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>(singleton(getStart()));
+          private final Queue<Neo4jVariantGraphVertex> queue = new ArrayDeque<Neo4jVariantGraphVertex>(singleton(getStart()));
 
           @Override
-          protected VariantGraphVertex computeNext() {
+          protected Neo4jVariantGraphVertex computeNext() {
             if (queue.isEmpty()) {
               return endOfData();
             }
-            final VariantGraphVertex next = queue.remove();
-            for (VariantGraphEdge edge : next.outgoing(witnesses)) {
-              final VariantGraphVertex end = edge.to();
+            final Neo4jVariantGraphVertex next = queue.remove();
+            for (Neo4jVariantGraphEdge edge : next.outgoing(witnesses)) {
+              final Neo4jVariantGraphVertex end = edge.to();
               final long endId = end.getNode().getId();
 
               final int endEncountered = Objects.firstNonNull(encountered.get(endId), 0);
@@ -111,11 +143,11 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     };
   }
 
-  public Iterable<VariantGraphEdge> edges() {
+  public Iterable<Neo4jVariantGraphEdge> edges() {
     return edges(null);
   }
 
-  public Iterable<VariantGraphEdge> edges(final Set<Witness> witnesses) {
+  public Iterable<Neo4jVariantGraphEdge> edges(final Set<Witness> witnesses) {
     final int[] witnessReferences = (witnesses == null || witnesses.isEmpty()) ? null : getWitnessMapper().map(witnesses);
     return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
 
@@ -135,64 +167,64 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     }).traverse(start.getNode()).relationships(), edgeWrapper);
   }
 
-  public VariantGraphVertex add(Token token) {
+  public Neo4jVariantGraphVertex add(Token token) {
     if (LOG.isTraceEnabled()) {
       LOG.trace("Creating new vertex with {}", token);
     }
-    return new VariantGraphVertex(this, singleton(token));
+    return new Neo4jVariantGraphVertex(this, singleton(token));
   }
 
-  public VariantGraphEdge connect(VariantGraphVertex from, VariantGraphVertex to, Set<Witness> witnesses) {
+  public Neo4jVariantGraphEdge connect(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
     if (LOG.isTraceEnabled()) {
-      LOG.trace("Connected {} and {} with {}", new Object[] { from, to, witnesses });
+      LOG.trace("Connected {} and {} with {}", new Object[]{from, to, witnesses});
     }
 
     if (from.equals(start)) {
-      final VariantGraphEdge startEndEdge = edgeBetween(start, end);
+      final Neo4jVariantGraphEdge startEndEdge = edgeBetween(start, end);
       if (startEndEdge != null) {
         startEndEdge.delete();
       }
     }
 
-    for (VariantGraphEdge e : from.outgoing()) {
+    for (Neo4jVariantGraphEdge e : from.outgoing()) {
       if (to.equals(e.to())) {
         return e.add(witnesses);
       }
     }
-    return new VariantGraphEdge(this, from, to, witnesses);
+    return new Neo4jVariantGraphEdge(this, from, to, witnesses);
   }
 
-  public VariantGraphTransposition transpose(VariantGraphVertex from, VariantGraphVertex to, int transpId) {
+  public Neo4jVariantGraphTransposition transpose(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, int transpId) {
     Preconditions.checkArgument(!from.equals(to));
     Preconditions.checkArgument(!from.tokens().isEmpty());
     Preconditions.checkArgument(!to.tokens().isEmpty());
 
     //    updateTranspositionIds(from, to);
-    for (VariantGraphTransposition t : from.transpositions()) {
+    for (Neo4jVariantGraphTransposition t : from.transpositions()) {
       if (t.other(from).equals(to)) {
         return t;
       }
     }
 
-    return new VariantGraphTransposition(this, from, to, transpId);
+    return new Neo4jVariantGraphTransposition(this, from, to, transpId);
   }
 
-  public boolean isNear(VariantGraphVertex a, VariantGraphVertex b) {
+  public boolean isNear(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
     return verticesAreAdjacent(a, b) && (Iterables.size(a.outgoing()) == 1 || Iterables.size(b.incoming()) == 1);
   }
 
-  public boolean verticesAreAdjacent(VariantGraphVertex a, VariantGraphVertex b) {
+  public boolean verticesAreAdjacent(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
     return (edgeBetween(a, b) != null);
   }
 
-  public VariantGraphEdge edgeBetween(VariantGraphVertex a, VariantGraphVertex b) {
+  public Neo4jVariantGraphEdge edgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
     final Node aNode = a.getNode();
     final Node bNode = b.getNode();
     for (Relationship r : aNode.getRelationships(PATH)) {
       if (r.getOtherNode(aNode).equals(bNode)) {
-        return new VariantGraphEdge(this, r);
+        return new Neo4jVariantGraphEdge(this, r);
       }
     }
     return null;
@@ -200,43 +232,43 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
   public Set<Witness> witnesses() {
     final Set<Witness> witnesses = Sets.newHashSet();
-    for (VariantGraphEdge e : start.outgoing()) {
+    for (Neo4jVariantGraphEdge e : start.outgoing()) {
       witnesses.addAll(e.witnesses());
     }
     return witnesses;
   }
 
-  public VariantGraph join() {
+  public Neo4jVariantGraph join() {
     final Set<Long> processed = Sets.newHashSet();
 
-    final Deque<VariantGraphVertex> queue = new ArrayDeque<VariantGraphVertex>();
-    for (VariantGraphEdge startingEdges : start.outgoing()) {
+    final Deque<Neo4jVariantGraphVertex> queue = new ArrayDeque<Neo4jVariantGraphVertex>();
+    for (Neo4jVariantGraphEdge startingEdges : start.outgoing()) {
       queue.push(startingEdges.to());
     }
 
     while (!queue.isEmpty()) {
-      final VariantGraphVertex vertex = queue.pop();
+      final Neo4jVariantGraphVertex vertex = queue.pop();
       Set<Integer> transpositionIds1 = vertex.getTranspositionIds();
-      final List<VariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
+      final List<Neo4jVariantGraphEdge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
-        final VariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
-        final VariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
+        final Neo4jVariantGraphEdge joinCandidateEdge = outgoingEdges.get(0);
+        final Neo4jVariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
         Set<Token> candidateTokens = joinCandidateVertex.tokens();
         Set<Integer> transpositionIds2 = joinCandidateVertex.getTranspositionIds();
 
         boolean canJoin = !end.equals(joinCandidateVertex) && //
-            Iterables.size(joinCandidateVertex.incoming()) == 1 && //
-            transpositionIds1.equals(transpositionIds2);
+                Iterables.size(joinCandidateVertex.incoming()) == 1 && //
+                transpositionIds1.equals(transpositionIds2);
         if (canJoin) {
           vertex.add(candidateTokens);
-          for (VariantGraphTransposition t : joinCandidateVertex.transpositions()) {
-            final VariantGraphVertex other = t.other(joinCandidateVertex);
+          for (Neo4jVariantGraphTransposition t : joinCandidateVertex.transpositions()) {
+            final Neo4jVariantGraphVertex other = t.other(joinCandidateVertex);
             int id = t.getId();
             t.delete();
             transpose(vertex, other, id);
           }
-          for (VariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
-            final VariantGraphVertex to = e.to();
+          for (Neo4jVariantGraphEdge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
+            final Neo4jVariantGraphVertex to = e.to();
             final Set<Witness> witnesses = e.witnesses();
             e.delete();
             connect(vertex, to, witnesses);
@@ -249,8 +281,8 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
       }
 
       processed.add(vertex.getNode().getId());
-      for (VariantGraphEdge e : outgoingEdges) {
-        final VariantGraphVertex next = e.to();
+      for (Neo4jVariantGraphEdge e : outgoingEdges) {
+        final Neo4jVariantGraphVertex next = e.to();
         // FIXME: Why do we run out of memory in some cases here, if this is not checked?
         if (!processed.contains(next.getNode().getId())) {
           queue.push(next);
@@ -261,10 +293,10 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return this;
   }
 
-  public VariantGraph rank() {
-    for (VariantGraphVertex v : vertices()) {
+  public Neo4jVariantGraph rank() {
+    for (Neo4jVariantGraphVertex v : vertices()) {
       int rank = -1;
-      for (VariantGraphEdge e : v.incoming()) {
+      for (Neo4jVariantGraphEdge e : v.incoming()) {
         rank = Math.max(rank, e.from().getRank());
       }
       v.setRank(rank + 1);
@@ -272,12 +304,12 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return this;
   }
 
-  public VariantGraph adjustRanksForTranspositions() {
-    for (VariantGraphVertex v : vertices()) {
-      Iterable<VariantGraphTransposition> transpositions = v.transpositions();
-      for (VariantGraphTransposition vgt : transpositions) {
-        VariantGraphVertex from = vgt.from();
-        VariantGraphVertex to = vgt.to();
+  public Neo4jVariantGraph adjustRanksForTranspositions() {
+    for (Neo4jVariantGraphVertex v : vertices()) {
+      Iterable<Neo4jVariantGraphTransposition> transpositions = v.transpositions();
+      for (Neo4jVariantGraphTransposition vgt : transpositions) {
+        Neo4jVariantGraphVertex from = vgt.from();
+        Neo4jVariantGraphVertex to = vgt.to();
         if (from.equals(v)) {
           addNullVertex(v, from, to);
         } else if (to.equals(v)) {
@@ -288,34 +320,34 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
     return this;
   }
 
-  private void addNullVertex(VariantGraphVertex v, VariantGraphVertex from, VariantGraphVertex to) {
+  private void addNullVertex(Neo4jVariantGraphVertex v, Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to) {
     Set<Token> nullTokens = Sets.newHashSet();
     for (Witness w : to.witnesses()) {
       nullTokens.add(new SimpleToken(w, -1, "", ""));
     }
-    VariantGraphVertex nullVertex = new VariantGraphVertex(this, nullTokens);
+    Neo4jVariantGraphVertex nullVertex = new Neo4jVariantGraphVertex(this, nullTokens);
     int rank = v.getRank();
     nullVertex.setRank(rank);
     v.setRank(rank + 1);
-    for (VariantGraphVertex ov : vertices()) {
+    for (Neo4jVariantGraphVertex ov : vertices()) {
       if (!ov.equals(v) && ov.getRank() > rank) ov.setRank(ov.getRank() + 1);
     }
   }
 
-  public Iterable<Set<VariantGraphVertex>> ranks() {
+  public Iterable<Set<Neo4jVariantGraphVertex>> ranks() {
     return ranks(null);
   }
 
-  public Iterable<Set<VariantGraphVertex>> ranks(final Set<Witness> witnesses) {
-    return new Iterable<Set<VariantGraphVertex>>() {
+  public Iterable<Set<Neo4jVariantGraphVertex>> ranks(final Set<Witness> witnesses) {
+    return new Iterable<Set<Neo4jVariantGraphVertex>>() {
       @Override
-      public Iterator<Set<VariantGraphVertex>> iterator() {
-        return new AbstractIterator<Set<VariantGraphVertex>>() {
-          private final Iterator<VariantGraphVertex> vertices = vertices(witnesses).iterator();
-          private VariantGraphVertex last;
+      public Iterator<Set<Neo4jVariantGraphVertex>> iterator() {
+        return new AbstractIterator<Set<Neo4jVariantGraphVertex>>() {
+          private final Iterator<Neo4jVariantGraphVertex> vertices = vertices(witnesses).iterator();
+          private Neo4jVariantGraphVertex last;
 
           @Override
-          protected Set<VariantGraphVertex> computeNext() {
+          protected Set<Neo4jVariantGraphVertex> computeNext() {
             if (last == null) {
               Preconditions.checkState(vertices.hasNext());
               vertices.next(); // skip start vertex
@@ -327,11 +359,11 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
               return endOfData();
             }
 
-            final Set<VariantGraphVertex> next = Sets.newHashSet();
+            final Set<Neo4jVariantGraphVertex> next = Sets.newHashSet();
             next.add(last);
 
             while (vertices.hasNext()) {
-              final VariantGraphVertex vertex = vertices.next();
+              final Neo4jVariantGraphVertex vertex = vertices.next();
               if (vertex.getRank() == last.getRank()) {
                 next.add(last = vertex);
               } else {
@@ -349,7 +381,7 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
 
   public RowSortedTable<Integer, Witness, Set<Token>> toTable() {
     final TreeBasedTable<Integer, Witness, Set<Token>> table = TreeBasedTable.create(Ordering.natural(), Witness.SIGIL_COMPARATOR);
-    for (VariantGraphVertex v : rank().vertices()) {
+    for (Neo4jVariantGraphVertex v : rank().vertices()) {
       final int row = v.getRank();
       for (Token token : v.tokens()) {
         final Witness column = token.getWitness();
@@ -367,5 +399,30 @@ public class VariantGraph extends Graph<VariantGraphVertex, VariantGraphEdge> {
   @Override
   public String toString() {
     return Iterables.toString(witnesses());
+  }
+
+  public EntityMapper<Token> getTokenMapper() {
+    return tokenMapper;
+  }
+
+  public Function<Node, Neo4jVariantGraphVertex> getVertexWrapper() {
+    return vertexWrapper;
+  }
+
+  public Function<Relationship, Neo4jVariantGraphEdge> getEdgeWrapper() {
+    return edgeWrapper;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (start != null && obj != null && obj instanceof Neo4jVariantGraph) {
+      return start.equals(((Neo4jVariantGraph) obj).start);
+    }
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return (start == null ? super.hashCode() : start.hashCode());
   }
 }

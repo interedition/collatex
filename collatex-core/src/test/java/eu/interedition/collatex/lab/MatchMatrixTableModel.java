@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.slf4j.Logger;
 
 import eu.interedition.collatex.Token;
@@ -12,8 +14,6 @@ import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 
 /**
@@ -30,7 +30,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   private final MatchTableCell[][] data;
   private final int outlierTranspositionsSizeLimit;
 
-  public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness, int outlierTranspositionsSizeLimit) {
+  public MatchMatrixTableModel(MatchTable matchTable, Neo4jVariantGraph vg, Iterable<Token> witness, int outlierTranspositionsSizeLimit) {
     this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
     List<Token> rowList = matchTable.rowList();
     List<Integer> columnList = matchTable.columnList();
@@ -56,7 +56,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     data = new MatchTableCell[rowNum][colNum];
     for (int row = 0; row < rowNum; row++) {
       for (int col = 0; col < colNum; col++) {
-        VariantGraphVertex at = matchTable.vertexAt(row, col);
+        Neo4jVariantGraphVertex at = matchTable.vertexAt(row, col);
         MatchMatrixCellStatus status;
         if (at != null) {
           status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;

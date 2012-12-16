@@ -5,8 +5,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 
 import java.util.Iterator;
 import java.util.List;
@@ -15,10 +15,10 @@ import java.util.List;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Match {
-  public final VariantGraphVertex vertex;
+  public final Neo4jVariantGraphVertex vertex;
   public final Token token;
 
-  public Match(VariantGraphVertex vertex, Token token) {
+  public Match(Neo4jVariantGraphVertex vertex, Token token) {
     this.vertex = vertex;
     this.token = token;
   }
@@ -42,9 +42,9 @@ public class Match {
     return new StringBuilder("{").append(vertex).append("; ").append(token).append("}").toString();
   }
 
-  public static List<Match> createPhraseMatch(List<VariantGraphVertex> vertices, List<Token> tokens) {
+  public static List<Match> createPhraseMatch(List<Neo4jVariantGraphVertex> vertices, List<Token> tokens) {
     final List<Match> phraseMatch = Lists.newArrayListWithExpectedSize(vertices.size());
-    final Iterator<VariantGraphVertex> vertexIt = vertices.iterator();
+    final Iterator<Neo4jVariantGraphVertex> vertexIt = vertices.iterator();
     final Iterator<Token> tokenIt = tokens.iterator();
     while (vertexIt.hasNext() && tokenIt.hasNext()) {
       phraseMatch.add(new Match(vertexIt.next(), tokenIt.next()));
@@ -53,7 +53,7 @@ public class Match {
   }
 
 
-  public static Predicate<Match> createNoBoundaryMatchPredicate(final VariantGraph graph) {
+  public static Predicate<Match> createNoBoundaryMatchPredicate(final Neo4jVariantGraph graph) {
     return new Predicate<Match>() {
       @Override
       public boolean apply(Match input) {

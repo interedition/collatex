@@ -24,7 +24,7 @@ public class VariantGraphFactoryTest extends AbstractTest {
   
   @Test
   public void purgeGraphs() {
-    final VariantGraph vg = graphFactory.newVariantGraph();
+    final Neo4jVariantGraph vg = graphFactory.newVariantGraph();
     graphFactory.deleteGraphsOlderThan(Long.MAX_VALUE);
     Assert.assertEquals(0, Iterables.size(graphFactory.variantGraphs()));
   }

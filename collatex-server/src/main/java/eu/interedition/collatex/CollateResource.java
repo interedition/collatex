@@ -2,7 +2,7 @@ package eu.interedition.collatex;
 
 import com.google.inject.Inject;
 import eu.interedition.collatex.neo4j.GraphFactory;
-import eu.interedition.collatex.neo4j.VariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.io.Collation;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -64,11 +64,11 @@ public class CollateResource {
 
   @Path("collate")
   @POST
-  public VariantGraph collate(Collation collation) {
+  public Neo4jVariantGraph collate(Collation collation) {
     final Transaction tx = graphFactory.getDatabase().beginTx();
     try {
       // create
-      final VariantGraph graph = graphFactory.newVariantGraph();
+      final Neo4jVariantGraph graph = graphFactory.newVariantGraph();
 
       if (collation != null) {
         // merge

@@ -103,16 +103,16 @@ public class GraphFactory {
     return database;
   }
 
-  public Iterable<VariantGraph> variantGraphs() {
-    return Iterables.transform(variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING), new Function<Relationship, VariantGraph>() {
+  public Iterable<Neo4jVariantGraph> variantGraphs() {
+    return Iterables.transform(variantGraphs.getRelationships(VARIANT_GRAPH, OUTGOING), new Function<Relationship, Neo4jVariantGraph>() {
       @Override
-      public VariantGraph apply(Relationship input) {
+      public Neo4jVariantGraph apply(Relationship input) {
         return wrapVariantGraph(input);
       }
     });
   }
   
-  public VariantGraph newVariantGraph() {
+  public Neo4jVariantGraph newVariantGraph() {
     final Node startNode = database.createNode();
     final Node endNode = database.createNode();
 
@@ -120,9 +120,9 @@ public class GraphFactory {
     startRel.setProperty(CREATED_KEY, System.currentTimeMillis());
     startNode.createRelationshipTo(endNode, VARIANT_GRAPH);
 
-    final VariantGraph graph = wrapVariantGraph(startNode, endNode);
-    final VariantGraphVertex start = graph.getStart();
-    final VariantGraphVertex end = graph.getEnd();
+    final Neo4jVariantGraph graph = wrapVariantGraph(startNode, endNode);
+    final Neo4jVariantGraphVertex start = graph.getStart();
+    final Neo4jVariantGraphVertex end = graph.getEnd();
 
     start.setTokens(Collections.<Token>emptySet());
     end.setTokens(Collections.<Token>emptySet());
@@ -140,29 +140,29 @@ public class GraphFactory {
     }
   }
 
-  public void delete(VariantGraph vg) {
+  public void delete(Neo4jVariantGraph vg) {
     final Node startNode = vg.getStart().getNode();
     startNode.getSingleRelationship(VARIANT_GRAPH, INCOMING).delete();
     startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
-    for (VariantGraphVertex v : vg.vertices()) {
-      for (VariantGraphEdge e : v.incoming()) {
+    for (Neo4jVariantGraphVertex v : vg.vertices()) {
+      for (Neo4jVariantGraphEdge e : v.incoming()) {
         e.delete();
       }
-      for (VariantGraphTransposition t : v.transpositions()) {
+      for (Neo4jVariantGraphTransposition t : v.transpositions()) {
         t.delete();
       }
       v.delete();
     }
   }
   
-  protected VariantGraph wrapVariantGraph(Relationship startEndRel) {
+  protected Neo4jVariantGraph wrapVariantGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
     return wrapVariantGraph(startNode, startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).getEndNode());
   }
 
-  protected VariantGraph wrapVariantGraph(Node start, Node end) {
-    final VariantGraph graph = new VariantGraph(database, witnessMapper, tokenMapper);
-    graph.init(VariantGraphVertex.createWrapper(graph), VariantGraphEdge.createWrapper(graph), start, end);
+  protected Neo4jVariantGraph wrapVariantGraph(Node start, Node end) {
+    final Neo4jVariantGraph graph = new Neo4jVariantGraph(database, witnessMapper, tokenMapper);
+    graph.init(Neo4jVariantGraphVertex.createWrapper(graph), Neo4jVariantGraphEdge.createWrapper(graph), start, end);
     return graph;
   }
 }

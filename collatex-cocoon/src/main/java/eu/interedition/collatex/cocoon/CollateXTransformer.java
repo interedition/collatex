@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.cocoon.ProcessingException;
@@ -29,8 +31,6 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.neo4j.GraphFactory;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -90,7 +90,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
       ignoreHooksCount++;
       final Transaction tx = graphFactory.getDatabase().beginTx();
       try {
-        final VariantGraph graph = graphFactory.newVariantGraph();
+        final Neo4jVariantGraph graph = graphFactory.newVariantGraph();
         CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
         switch (outputType) {
           case TEI_APPARATUS:
@@ -109,7 +109,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     }
   }
 
-  private void sendAlignmentTable(VariantGraph graph) throws SAXException {
+  private void sendAlignmentTable(Neo4jVariantGraph graph) throws SAXException {
     sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
     final Set<Witness> witnesses = graph.witnesses();
     final RowSortedTable<Integer, Witness, Set<Token>> table = graph.toTable();
@@ -132,17 +132,17 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     sendEndElementEventNS("alignment");
   }
 
-  private void sendTeiApparatus(VariantGraph graph) throws SAXException {
+  private void sendTeiApparatus(Neo4jVariantGraph graph) throws SAXException {
     final Set<Witness> allWitnesses = graph.witnesses();
 
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
 
-    for (Iterator<Set<VariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
-      final Set<VariantGraphVertex> row = rowIt.next();
+    for (Iterator<Set<Neo4jVariantGraphVertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
+      final Set<Neo4jVariantGraphVertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
-      for (VariantGraphVertex v : row) {
+      for (Neo4jVariantGraphVertex v : row) {
         for (Token token : v.tokens()) {
           tokenIndex.put(token.getWitness(), token);
         }

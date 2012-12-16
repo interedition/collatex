@@ -5,13 +5,13 @@ import static org.junit.Assert.*;
 import java.util.Collections;
 import java.util.List;
 
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -29,7 +29,7 @@ public class MatchTableTest extends AbstractTest {
 
   @Test
   public void testTableCreationEmptyGraph() {
-    final VariantGraph graph = graphFactory.newVariantGraph();
+    final Neo4jVariantGraph graph = graphFactory.newVariantGraph();
     SimpleWitness[] witnesses = createWitnesses("a b");
     MatchTable table = MatchTable.create(graph, witnesses[0]);
     assertEquals(1, table.columnList().size());
@@ -38,7 +38,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testTableCreationVariationDoesNotCauseExtraColumns() {
     SimpleWitness[] witnesses = createWitnesses("a", "b", "c", "d");
-    VariantGraph graph = collate(witnesses[0], witnesses[1], witnesses[2]);
+    Neo4jVariantGraph graph = collate(witnesses[0], witnesses[1], witnesses[2]);
     MatchTable table = MatchTable.create(graph, witnesses[3]);
     assertEquals(1, table.columnList().size());
   }
@@ -46,7 +46,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testTableCreationAbAcAbc() {
     SimpleWitness[] witnesses = createWitnesses("a b", "a c", "a b c");
-    VariantGraph graph = collate(witnesses[0], witnesses[1]);
+    Neo4jVariantGraph graph = collate(witnesses[0], witnesses[1]);
     MatchTable table = MatchTable.create(graph, witnesses[2]);
     assertVertexEquals("a", table.vertexAt(0, 0));
     assertVertexEquals("b", table.vertexAt(1, 1));
@@ -56,7 +56,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testTableCreationAbcabCab() {
     SimpleWitness[] witnesses = createWitnesses("a b c a b", "c a b");
-    VariantGraph graph = collate(witnesses[0]);
+    Neo4jVariantGraph graph = collate(witnesses[0]);
     MatchTable table = MatchTable.create(graph, witnesses[1]);
     assertVertexEquals("a", table.vertexAt(1, 0));
     assertVertexEquals("b", table.vertexAt(2, 1));
@@ -68,7 +68,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testTableCreationAbcabAbcab() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
+    Neo4jVariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     assertEquals(5, table.columnList().size());
     assertEquals(5, table.rowList().size());
@@ -86,7 +86,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testTableCreationAsymmatricMatrix() {
     SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
+    Neo4jVariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     assertVertexEquals("a", table.vertexAt(0, 0));
     assertVertexEquals("a", table.vertexAt(0, 2));
@@ -104,7 +104,7 @@ public class MatchTableTest extends AbstractTest {
     String textD1 = "de het een";
     String textD9 = "het een de";
     SimpleWitness[] sw = createWitnesses(textD1, textD9);
-    VariantGraph vg = collate(sw[0]);
+    Neo4jVariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     List<Token> labels = table.rowList();
     assertTokenEquals("het", labels.get(0));
@@ -117,7 +117,7 @@ public class MatchTableTest extends AbstractTest {
     String textD1 = "de het een";
     String textD9 = "het een de";
     SimpleWitness[] sw = createWitnesses(textD1, textD9);
-    VariantGraph vg = collate(sw[0]);
+    Neo4jVariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     List<Integer> labels = table.columnList();
     assertEquals((Integer) 0, labels.get(0));
@@ -128,7 +128,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testGetAllMatches() {
     SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
+    Neo4jVariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     List<Coordinate> allTrue = table.allMatches();
     assertEquals(9, allTrue.size());
@@ -139,7 +139,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testIslandDetectionAbcabCab() {
     SimpleWitness[] witnesses = createWitnesses("a b c a b", "c a b");
-    VariantGraph graph = collate(witnesses[0]);
+    Neo4jVariantGraph graph = collate(witnesses[0]);
     MatchTable table = MatchTable.create(graph, witnesses[1]);
     List<Island> islands = Lists.newArrayList(table.getIslands());
     assertEquals(2, islands.size());
@@ -151,7 +151,7 @@ public class MatchTableTest extends AbstractTest {
   @Test
   public void testIslandDetectionXabcabXcab() {
     SimpleWitness[] witnesses = createWitnesses("x a b c a b", "x c a b");
-    VariantGraph graph = collate(witnesses[0]);
+    Neo4jVariantGraph graph = collate(witnesses[0]);
     MatchTable table = MatchTable.create(graph, witnesses[1]);
     List<Island> islands = Lists.newArrayList(table.getIslands());
     assertEquals(3, islands.size());

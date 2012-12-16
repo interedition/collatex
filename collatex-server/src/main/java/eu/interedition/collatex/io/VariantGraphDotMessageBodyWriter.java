@@ -1,10 +1,10 @@
 package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphEdge;
-import eu.interedition.collatex.neo4j.VariantGraphTransposition;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphEdge;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphTransposition;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.Produces;
@@ -25,20 +25,20 @@ import java.lang.reflect.Type;
  */
 @Provider
 @Produces(MediaType.TEXT_PLAIN)
-public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
+public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Neo4jVariantGraph> {
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    return VariantGraph.class.isAssignableFrom(type);
+    return Neo4jVariantGraph.class.isAssignableFrom(type);
   }
 
   @Override
-  public long getSize(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+  public long getSize(Neo4jVariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
     return -1;
   }
 
   @Override
-  public void writeTo(VariantGraph graph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+  public void writeTo(Neo4jVariantGraph graph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     final Transaction tx = graph.getDatabase().beginTx();
     try {
       final PrintWriter out = new PrintWriter(new OutputStreamWriter(entityStream, "UTF-8"));
@@ -48,19 +48,19 @@ public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Varia
 
         out.println("digraph G {");
 
-        for (VariantGraphVertex v : graph.vertices()) {
+        for (Neo4jVariantGraphVertex v : graph.vertices()) {
           out.print(indent + "v" + v.getNode().getId());
           out.print(" [label = \"" + toLabel(v) + "\"]");
           out.println(";");
         }
 
-        for (VariantGraphEdge e : graph.edges()) {
+        for (Neo4jVariantGraphEdge e : graph.edges()) {
           out.print(indent + "v" + e.from().getNode().getId() + connector + "v" + e.to().getNode().getId());
           out.print(" [label = \"" + toLabel(e) + "\"]");
           out.println(";");
         }
 
-        for (VariantGraphTransposition t : graph.transpositions()) {
+        for (Neo4jVariantGraphTransposition t : graph.transpositions()) {
           out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
           out.print(" [color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
           out.println(";");
@@ -75,12 +75,12 @@ public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Varia
     }
   }
 
-  private String toLabel(VariantGraphEdge e) {
-    return VariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
+  private String toLabel(Neo4jVariantGraphEdge e) {
+    return Neo4jVariantGraphEdge.TO_CONTENTS.apply(e).replaceAll("\"", "\\\"");
   }
 
-  private String toLabel(VariantGraphVertex v) {
-    return VariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
+  private String toLabel(Neo4jVariantGraphVertex v) {
+    return Neo4jVariantGraphVertex.TO_CONTENTS.apply(v).replaceAll("\"", "\\\"");
   }
 
 }

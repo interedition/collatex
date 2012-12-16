@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -19,8 +21,6 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.PhraseMatchDetector;
-import eu.interedition.collatex.neo4j.VariantGraph;
-import eu.interedition.collatex.neo4j.VariantGraphVertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -30,9 +30,9 @@ public class MatchTableLinkerTest extends AbstractTest {
   @Test
   public void testUsecase1() {
     final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
-    final VariantGraph graph = collate(w[0]);
+    final Neo4jVariantGraph graph = collate(w[0]);
     MatchTableLinker linker = new MatchTableLinker(3);
-    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
+    Map<Token, Neo4jVariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     assertEquals(3, link.size());
   }
 
@@ -42,9 +42,9 @@ public class MatchTableLinkerTest extends AbstractTest {
     // There are choices to be made however, since there is duplication of tokens
     // Optimal alignment has no gaps
     final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
-    final VariantGraph graph = collate(w[0]);
+    final Neo4jVariantGraph graph = collate(w[0]);
     MatchTableLinker linker = new MatchTableLinker(3);
-    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
+    Map<Token, Neo4jVariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     PhraseMatchDetector detector = new PhraseMatchDetector();
     List<List<Match>> phraseMatches = detector.detect(link, graph, w[1]);
     assertEquals(1, phraseMatches.size());
@@ -56,9 +56,9 @@ public class MatchTableLinkerTest extends AbstractTest {
     // Optimal alignment has 1 gap
     // Note: there are two paths here that contain 1 gap
     final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
-    final VariantGraph graph = collate(w[0]);
+    final Neo4jVariantGraph graph = collate(w[0]);
     MatchTableLinker linker = new MatchTableLinker(3);
-    Map<Token, VariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
+    Map<Token, Neo4jVariantGraphVertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     PhraseMatchDetector detector = new PhraseMatchDetector();
     List<List<Match>> phraseMatches = detector.detect(link, graph, w[1]);
     assertEquals(1, phraseMatches.size());
@@ -72,10 +72,10 @@ public class MatchTableLinkerTest extends AbstractTest {
     String textDMD1 = "Over de Atlantische Oceaan voer een vreselijk grote stomer.";
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9, textDMD1);
 
-    VariantGraph graph = collate(witnesses[0], witnesses[1]);
+    Neo4jVariantGraph graph = collate(witnesses[0], witnesses[1]);
 
     MatchTableLinker linker = new MatchTableLinker(1);
-    Map<Token, VariantGraphVertex> linkedTokens = linker.link(graph, witnesses[2], new EqualityTokenComparator());
+    Map<Token, Neo4jVariantGraphVertex> linkedTokens = linker.link(graph, witnesses[2], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -98,9 +98,9 @@ public class MatchTableLinkerTest extends AbstractTest {
   @Test
   public void test1() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
+    Neo4jVariantGraph vg = collate(sw[0]);
     MatchTableLinker linker = new MatchTableLinker(1);
-    Map<Token, VariantGraphVertex> linkedTokens = linker.link(vg, sw[1], new EqualityTokenComparator());
+    Map<Token, Neo4jVariantGraphVertex> linkedTokens = linker.link(vg, sw[1], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -121,8 +121,8 @@ public class MatchTableLinkerTest extends AbstractTest {
     String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/> Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
     String textDMD1 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>\nOp sommige dekken van de stomer lagen mensen in de zon, op andere dekken werd getennist, op nog andere liepen de passagiers heen en weer en praatten. Wie over de reling hing en recht naar beneden keek, kon vaststellen dat het schip vorderde; of draaide alleen de aarde er onderdoor?<p/>\nOp de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.<p/>";
     SimpleWitness[] sw = createWitnesses(textD9, textDMD1);
-    VariantGraph vg = collate(sw[0]);
-    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
+    Neo4jVariantGraph vg = collate(sw[0]);
+    Map<Token, Neo4jVariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -147,8 +147,8 @@ public class MatchTableLinkerTest extends AbstractTest {
     String textD9 = "Natuurlijk, alles mag relatief zijn";
     String textDmd1 = "Natuurlijk, alles is betrekkelijk";
     SimpleWitness[] sw = createWitnesses(textD1, textD9, textDmd1);
-    VariantGraph vg = collate(sw[0], sw[1]);
-    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
+    Neo4jVariantGraph vg = collate(sw[0], sw[1]);
+    Map<Token, Neo4jVariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -173,8 +173,8 @@ public class MatchTableLinkerTest extends AbstractTest {
     String b = "Et mortem sortis finiet post tridui somnum et morte morietur tribus diebus somno suscepto et tunc ab inferis regressus ad lucem veniet.";
     String c = "Et sortem mortis tribus diebus sompno suscepto et tunc ab inferis regressus ad lucem veniet.";
     SimpleWitness[] sw = createWitnesses(a, b, c);
-    VariantGraph vg = collate(sw[0], sw[1]);
-    Map<Token, VariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
+    Neo4jVariantGraph vg = collate(sw[0], sw[1]);
+    Map<Token, Neo4jVariantGraphVertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
