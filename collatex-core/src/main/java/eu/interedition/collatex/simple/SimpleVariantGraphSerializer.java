@@ -41,6 +41,7 @@ public class SimpleVariantGraphSerializer {
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
   private final VariantGraph graph;
+  private final Map<VariantGraph.Vertex, Integer> vertexIds = Maps.newHashMap();
 
   public SimpleVariantGraphSerializer(VariantGraph graph) {
     this.graph = graph;
@@ -226,9 +227,7 @@ public class SimpleVariantGraphSerializer {
     }
   }
 
-  public void toDot(Neo4jVariantGraph graph, Writer writer) {
-    final Transaction tx = graph.newTransaction();
-    try {
+  public void toDot(VariantGraph graph, Writer writer) {
       final PrintWriter out = new PrintWriter(writer);
       final String indent = "  ";
       final String connector = " -> ";
@@ -236,34 +235,39 @@ public class SimpleVariantGraphSerializer {
       out.println("digraph G {");
 
       for (VariantGraph.Vertex v : graph.vertices()) {
-        out.print(indent + "v" + ((Neo4jVariantGraphVertex) v).getNode().getId());
+        out.print(indent + id(v));
         out.print(" [label = \"" + toLabel(v) + "\"]");
         out.println(";");
       }
 
       for (VariantGraph.Edge e : graph.edges()) {
-        out.print(indent + "v" + e.from().getNode().getId() + connector + "v" + e.to().getNode().getId());
+        out.print(indent + id(e.from()) + connector + id(e.to()));
         out.print(" [label = \"" + toLabel(e) + "\"]");
         out.println(";");
       }
 
       for (VariantGraph.Transposition t : graph.transpositions()) {
-        out.print(indent + "v" + t.from().getNode().getId() + connector + "v" + t.to().getNode().getId());
+        out.print(indent + id(t.from()) + connector + id(t.to()));
         out.print(" [label = \"" + t.getId() + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
       }
 
-      out.print(indent + "v" + graph.getStart().getNode().getId() + connector + "v" + graph.getEnd().getNode().getId());
+      out.print(indent + id(graph.getStart()) + connector + id(graph.getEnd()));
       out.print(" [color =  \"white\"]");
       out.println(";");
 
       out.println("}");
 
       out.flush();
-      tx.success();
-    } finally {
-      tx.finish();
+  }
+
+  private String id(VariantGraph.Vertex vertex) {
+    Integer id = vertexIds.get(vertex);
+    if (id == null) {
+      id = vertexIds.size();
+      vertexIds.put(vertex, id);
     }
+    return ("v" + id);
   }
 
   private String toLabel(VariantGraph.Edge e) {

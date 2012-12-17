@@ -30,18 +30,18 @@ public class Neo4jVariantGraphTransposition implements VariantGraph.Transpositio
   }
 
   @Override
-  public Neo4jVariantGraphVertex from() {
+  public VariantGraph.Vertex from() {
     return new Neo4jVariantGraphVertex(graph, relationship.getStartNode());
   }
 
   @Override
-  public Neo4jVariantGraphVertex to() {
+  public VariantGraph.Vertex to() {
     return new Neo4jVariantGraphVertex(graph, relationship.getEndNode());
   }
 
   @Override
-  public Neo4jVariantGraphVertex other(Neo4jVariantGraphVertex vertex) {
-    return new Neo4jVariantGraphVertex(graph, relationship.getOtherNode(vertex.getNode()));
+  public VariantGraph.Vertex other(VariantGraph.Vertex vertex) {
+    return new Neo4jVariantGraphVertex(graph, relationship.getOtherNode(((Neo4jVariantGraphVertex) vertex).getNode()));
   }
 
   @Override

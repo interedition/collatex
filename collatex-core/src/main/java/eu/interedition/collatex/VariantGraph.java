@@ -26,9 +26,9 @@ public interface VariantGraph {
 
   Neo4jVariantGraphVertex add(Token token);
 
-  Edge connect(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses);
+  Edge connect(VariantGraph.Vertex from, VariantGraph.Vertex to, Set<Witness> witnesses);
 
-  Transposition transpose(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, int transpId);
+  Transposition transpose(VariantGraph.Vertex from, VariantGraph.Vertex to, int transpId);
 
   boolean isNear(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
 
@@ -108,11 +108,11 @@ public interface VariantGraph {
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
   interface Transposition {
-    Neo4jVariantGraphVertex from();
+    Vertex from();
 
-    Neo4jVariantGraphVertex to();
+    Vertex to();
 
-    Neo4jVariantGraphVertex other(Neo4jVariantGraphVertex vertex);
+    Vertex other(VariantGraph.Vertex vertex);
 
     void delete();
 

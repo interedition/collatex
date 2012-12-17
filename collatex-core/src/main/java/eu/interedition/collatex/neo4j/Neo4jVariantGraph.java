@@ -102,7 +102,7 @@ public class Neo4jVariantGraph implements VariantGraph {
       public Iterator<Vertex> iterator() {
         return new AbstractIterator<Vertex>() {
           private final Map<Long, Integer> encountered = Maps.newHashMap();
-          private final Queue<Vertex> queue = new ArrayDeque<Vertex>(singleton(getStart()));
+          private final Queue<Vertex> queue = new ArrayDeque<Vertex>(singleton(start));
 
           @Override
           protected Vertex computeNext() {
@@ -167,7 +167,7 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public Edge connect(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses) {
+  public Edge connect(VariantGraph.Vertex from, VariantGraph.Vertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
     if (LOG.isTraceEnabled()) {
@@ -186,11 +186,11 @@ public class Neo4jVariantGraph implements VariantGraph {
         return e.add(witnesses);
       }
     }
-    return new Neo4jVariantGraphEdge(this, from, to, witnesses);
+    return new Neo4jVariantGraphEdge(this, (Neo4jVariantGraphVertex) from, (Neo4jVariantGraphVertex) to, witnesses);
   }
 
   @Override
-  public Transposition transpose(Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, int transpId) {
+  public Transposition transpose(VariantGraph.Vertex from, VariantGraph.Vertex to, int transpId) {
     Preconditions.checkArgument(!from.equals(to));
     Preconditions.checkArgument(!from.tokens().isEmpty());
     Preconditions.checkArgument(!to.tokens().isEmpty());
@@ -202,7 +202,7 @@ public class Neo4jVariantGraph implements VariantGraph {
       }
     }
 
-    return new Neo4jVariantGraphTransposition(this, from, to, transpId);
+    return new Neo4jVariantGraphTransposition(this, (Neo4jVariantGraphVertex) from, (Neo4jVariantGraphVertex) to, transpId);
   }
 
   @Override
@@ -261,7 +261,7 @@ public class Neo4jVariantGraph implements VariantGraph {
         if (canJoin) {
           vertex.add(candidateTokens);
           for (Transposition t : joinCandidateVertex.transpositions()) {
-            final Neo4jVariantGraphVertex other = t.other(joinCandidateVertex);
+            final VariantGraph.Vertex other = t.other(joinCandidateVertex);
             int id = t.getId();
             t.delete();
             transpose(vertex, other, id);

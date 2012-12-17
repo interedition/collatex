@@ -56,10 +56,10 @@ public interface CollationAlgorithm {
 
       LOG.debug("{} + {}: Merge comparand into graph", into, witness);
       witnessTokenVertices = Maps.newHashMap();
-      Neo4jVariantGraphVertex last = into.getStart();
+      VariantGraph.Vertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
       for (Token token : witnessTokens) {
-        Neo4jVariantGraphVertex matchingVertex = (Neo4jVariantGraphVertex) alignments.get(token);
+        VariantGraph.Vertex matchingVertex = alignments.get(token);
         if (matchingVertex == null) {
           matchingVertex = into.add(token);
         } else {
@@ -88,7 +88,7 @@ public interface CollationAlgorithm {
           transposedTokens.put(match.token, match.vertex);
         }
         for (Token token : transposedTokens.keySet()) {
-          into.transpose((Neo4jVariantGraphVertex) transposedTokens.get(token), (Neo4jVariantGraphVertex) witnessTokenVertices.get(token), transpositionId);
+          into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token), transpositionId);
         }
       }
     }

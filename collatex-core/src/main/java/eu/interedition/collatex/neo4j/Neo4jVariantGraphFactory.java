@@ -122,8 +122,8 @@ public class Neo4jVariantGraphFactory {
     startNode.createRelationshipTo(endNode, VARIANT_GRAPH);
 
     final Neo4jVariantGraph graph = wrapVariantGraph(startNode, endNode);
-    final Neo4jVariantGraphVertex start = graph.getStart();
-    final Neo4jVariantGraphVertex end = graph.getEnd();
+    final Neo4jVariantGraphVertex start = graph.start;
+    final Neo4jVariantGraphVertex end = graph.end;
 
     start.setTokens(Collections.<Token>emptySet());
     end.setTokens(Collections.<Token>emptySet());
@@ -141,8 +141,8 @@ public class Neo4jVariantGraphFactory {
     }
   }
 
-  public void delete(VariantGraph vg) {
-    final Node startNode = vg.getStart().getNode();
+  public void delete(Neo4jVariantGraph vg) {
+    final Node startNode = vg.start.getNode();
     startNode.getSingleRelationship(VARIANT_GRAPH, INCOMING).delete();
     startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).delete();
     for (VariantGraph.Vertex v : vg.vertices()) {
@@ -156,7 +156,7 @@ public class Neo4jVariantGraphFactory {
     }
   }
 
-  protected VariantGraph wrapVariantGraph(Relationship startEndRel) {
+  protected Neo4jVariantGraph wrapVariantGraph(Relationship startEndRel) {
     final Node startNode = startEndRel.getEndNode();
     return wrapVariantGraph(startNode, startNode.getSingleRelationship(VARIANT_GRAPH, OUTGOING).getEndNode());
   }
