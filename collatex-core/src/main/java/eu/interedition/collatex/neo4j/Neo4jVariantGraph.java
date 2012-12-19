@@ -111,8 +111,8 @@ public class Neo4jVariantGraph implements VariantGraph {
             }
             final Vertex next = queue.remove();
             for (Edge edge : next.outgoing(witnesses)) {
-              final Neo4jVariantGraphVertex end = edge.to();
-              final long endId = end.getNode().getId();
+              final VariantGraph.Vertex end = edge.to();
+              final long endId = ((Neo4jVariantGraphVertex)end).getNode().getId();
 
               final int endEncountered = Objects.firstNonNull(encountered.get(endId), 0);
               final int endIncoming = Iterables.size(end.incoming(witnesses));
@@ -206,19 +206,19 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public boolean isNear(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
+  public boolean isNear(Vertex a, Vertex b) {
     return verticesAreAdjacent(a, b) && (Iterables.size(a.outgoing()) == 1 || Iterables.size(b.incoming()) == 1);
   }
 
   @Override
-  public boolean verticesAreAdjacent(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
+  public boolean verticesAreAdjacent(Vertex a, Vertex b) {
     return (edgeBetween(a, b) != null);
   }
 
   @Override
-  public Edge edgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
-    final Node aNode = a.getNode();
-    final Node bNode = b.getNode();
+  public Edge edgeBetween(Vertex a, Vertex b) {
+    final Node aNode = ((Neo4jVariantGraphVertex)a).getNode();
+    final Node bNode = ((Neo4jVariantGraphVertex)b).getNode();
     for (Relationship r : aNode.getRelationships(PATH)) {
       if (r.getOtherNode(aNode).equals(bNode)) {
         return new Neo4jVariantGraphEdge(this, r);
@@ -237,7 +237,7 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public Neo4jVariantGraph join() {
+  public VariantGraph join() {
     final Set<Long> processed = Sets.newHashSet();
 
     final Deque<Vertex> queue = new ArrayDeque<Vertex>();
@@ -251,9 +251,9 @@ public class Neo4jVariantGraph implements VariantGraph {
       final List<Edge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final Edge joinCandidateEdge = outgoingEdges.get(0);
-        final Neo4jVariantGraphVertex joinCandidateVertex = joinCandidateEdge.to();
+        final VariantGraph.Vertex joinCandidateVertex = joinCandidateEdge.to();
         Set<Token> candidateTokens = joinCandidateVertex.tokens();
-        Set<Integer> transpositionIds2 = joinCandidateVertex.getTranspositionIds();
+        Set<Integer> transpositionIds2 = ((Neo4jVariantGraphVertex)joinCandidateVertex).getTranspositionIds();
 
         boolean canJoin = !end.equals(joinCandidateVertex) && //
                 Iterables.size(joinCandidateVertex.incoming()) == 1 && //
@@ -267,7 +267,7 @@ public class Neo4jVariantGraph implements VariantGraph {
             transpose(vertex, other, id);
           }
           for (Edge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
-            final Neo4jVariantGraphVertex to = e.to();
+            final VariantGraph.Vertex to = e.to();
             final Set<Witness> witnesses = e.witnesses();
             e.delete();
             connect(vertex, to, witnesses);
@@ -281,9 +281,9 @@ public class Neo4jVariantGraph implements VariantGraph {
 
       processed.add(vertex.getNode().getId());
       for (Edge e : outgoingEdges) {
-        final Neo4jVariantGraphVertex next = e.to();
+        final VariantGraph.Vertex next = e.to();
         // FIXME: Why do we run out of memory in some cases here, if this is not checked?
-        if (!processed.contains(next.getNode().getId())) {
+        if (!processed.contains(((Neo4jVariantGraphVertex)next).getNode().getId())) {
           queue.push(next);
         }
       }

@@ -76,7 +76,7 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
       @Override
       public boolean apply(VariantGraph.Edge input) {
         if (witnessReferences == null) {
-          witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : input.getGraph().witnessMapper.map(witnesses));
+          witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : ((Neo4jVariantGraph)input.getGraph()).witnessMapper.map(witnesses));
         }
         return ((Neo4jVariantGraphEdge) input).traversableWith(witnessReferences);
       }
@@ -91,18 +91,18 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
   };
 
   @Override
-  public Neo4jVariantGraph getGraph() {
+  public VariantGraph getGraph() {
     return graph;
   }
 
   @Override
-  public Neo4jVariantGraphVertex from() {
-    return (Neo4jVariantGraphVertex) graph.vertexWrapper.apply(relationship.getStartNode());
+  public VariantGraph.Vertex from() {
+    return graph.vertexWrapper.apply(relationship.getStartNode());
   }
 
   @Override
-  public Neo4jVariantGraphVertex to() {
-    return (Neo4jVariantGraphVertex) graph.vertexWrapper.apply(relationship.getEndNode());
+  public VariantGraph.Vertex to() {
+    return graph.vertexWrapper.apply(relationship.getEndNode());
   }
 
   @Override

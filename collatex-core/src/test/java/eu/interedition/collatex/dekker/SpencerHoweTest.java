@@ -65,10 +65,10 @@ public class SpencerHoweTest extends AbstractTest {
     assertEquals(4, Iterables.size(graph.vertices()));
     assertEquals(5, Iterables.size(graph.edges()));
 
-    final Neo4jVariantGraphVertex startVertex = graph.getStart();
-    final Neo4jVariantGraphVertex aVertex = vertexWith(graph, "a", w[0]);
-    final Neo4jVariantGraphVertex bVertex = vertexWith(graph, "b", w[1]);
-    final Neo4jVariantGraphVertex endVertex = graph.getEnd();
+    final VariantGraph.Vertex startVertex = graph.getStart();
+    final VariantGraph.Vertex aVertex = vertexWith(graph, "a", w[0]);
+    final VariantGraph.Vertex bVertex = vertexWith(graph, "b", w[1]);
+    final VariantGraph.Vertex endVertex = graph.getEnd();
 
     assertHasWitnesses(edgeBetween(startVertex, aVertex), w[0], w[2]);
     assertHasWitnesses(edgeBetween(aVertex, endVertex), w[0]);

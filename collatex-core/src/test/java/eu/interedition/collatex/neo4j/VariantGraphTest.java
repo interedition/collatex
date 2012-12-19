@@ -55,8 +55,8 @@ public class VariantGraphTest extends AbstractTest {
   public void reconnectingVerticesYieldsSameEdge() {
     final SimpleWitness witness = createWitnesses("hello world")[0];
     final VariantGraph graph = graphFactory.newVariantGraph();
-    final Neo4jVariantGraphVertex helloVertex = graph.add(witness.getTokens().get(0));
-    final Neo4jVariantGraphVertex worldVertex = graph.add(witness.getTokens().get(1));
+    final VariantGraph.Vertex helloVertex = graph.add(witness.getTokens().get(0));
+    final VariantGraph.Vertex worldVertex = graph.add(witness.getTokens().get(1));
     final VariantGraph.Edge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
 
     Assert.assertEquals(1, edge.witnesses().size());
@@ -214,7 +214,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnessesWithTranspositions() {
     final SimpleWitness[] w = createWitnesses("voor Zo nu en dan zin2 na voor", "voor zin2 Nu en dan voor");
-    final Neo4jVariantGraph graph = collate(w).join();
+    final VariantGraph graph = collate(w).join();
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
     StringWriter writer = new StringWriter();
     s.toDot(graph, writer);

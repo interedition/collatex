@@ -122,7 +122,7 @@ public abstract class AbstractTest {
     assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.witnesses());
   }
 
-  protected static VariantGraph.Edge edgeBetween(Neo4jVariantGraphVertex start, Neo4jVariantGraphVertex end) {
+  protected static VariantGraph.Edge edgeBetween(VariantGraph.Vertex start, VariantGraph.Vertex end) {
     final VariantGraph.Edge edge = start.getGraph().edgeBetween(start, end);
     Assert.assertNotNull(String.format("No edge between %s and %s", start, end), edge);
     return edge;

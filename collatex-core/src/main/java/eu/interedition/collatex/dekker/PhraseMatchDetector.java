@@ -45,7 +45,7 @@ public class PhraseMatchDetector {
     List<List<Match>> phraseMatches = Lists.newArrayList();
     List<VariantGraph.Vertex> basePhrase = Lists.newArrayList();
     List<Token> witnessPhrase = Lists.newArrayList();
-    Neo4jVariantGraphVertex previous = base.getStart();
+    VariantGraph.Vertex previous = base.getStart();
 
     for (Token token : tokens) {
       if (!linkedTokens.containsKey(token)) {
@@ -58,7 +58,7 @@ public class PhraseMatchDetector {
       // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
       // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
-      boolean sameTranspositions = previous.getTranspositionIds().equals(baseVertex.getTranspositionIds());
+      boolean sameTranspositions = ((Neo4jVariantGraphVertex)previous).getTranspositionIds().equals(baseVertex.getTranspositionIds());
       boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
       boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
@@ -83,9 +83,9 @@ public class PhraseMatchDetector {
     }
   }
 
-  private boolean directedEdgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b) {
-    final Node aNode = a.getNode();
-    final Node bNode = b.getNode();
+  private boolean directedEdgeBetween(VariantGraph.Vertex a, VariantGraph.Vertex b) {
+    final Node aNode = ((Neo4jVariantGraphVertex)a).getNode();
+    final Node bNode = ((Neo4jVariantGraphVertex)b).getNode();
     for (Relationship r : aNode.getRelationships(Direction.OUTGOING, Neo4jGraphRelationships.PATH)) {
       if (r.getEndNode().equals(bNode)) {
         return true;

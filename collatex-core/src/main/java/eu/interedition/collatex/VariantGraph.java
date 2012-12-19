@@ -1,8 +1,6 @@
 package eu.interedition.collatex;
 
 import com.google.common.collect.RowSortedTable;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 
 import java.util.Set;
 
@@ -10,9 +8,9 @@ import java.util.Set;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public interface VariantGraph {
-  Neo4jVariantGraphVertex getStart();
+  Vertex getStart();
 
-  Neo4jVariantGraphVertex getEnd();
+  Vertex getEnd();
 
   Set<Transposition> transpositions();
 
@@ -24,21 +22,21 @@ public interface VariantGraph {
 
   Iterable<Edge> edges(Set<Witness> witnesses);
 
-  Neo4jVariantGraphVertex add(Token token);
+  Vertex add(Token token);
 
-  Edge connect(VariantGraph.Vertex from, VariantGraph.Vertex to, Set<Witness> witnesses);
+  Edge connect(Vertex from, Vertex to, Set<Witness> witnesses);
 
-  Transposition transpose(VariantGraph.Vertex from, VariantGraph.Vertex to, int transpId);
+  Transposition transpose(Vertex from, Vertex to, int transpId);
 
-  boolean isNear(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
+  boolean isNear(Vertex a, Vertex b);
 
-  boolean verticesAreAdjacent(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
+  boolean verticesAreAdjacent(Vertex a, Vertex b);
 
-  Edge edgeBetween(Neo4jVariantGraphVertex a, Neo4jVariantGraphVertex b);
+  Edge edgeBetween(Vertex a, Vertex b);
 
   Set<Witness> witnesses();
 
-  Neo4jVariantGraph join();
+  VariantGraph join();
 
   VariantGraph rank();
 
@@ -60,11 +58,11 @@ public interface VariantGraph {
 
     Set<Witness> witnesses();
 
-    Neo4jVariantGraph getGraph();
+    VariantGraph getGraph();
 
-    Neo4jVariantGraphVertex from();
+    Vertex from();
 
-    Neo4jVariantGraphVertex to();
+    Vertex to();
 
     void delete();
   }
@@ -83,7 +81,7 @@ public interface VariantGraph {
 
     Iterable<Transposition> transpositions();
 
-    Iterable<Vertex> vertices(Neo4jVariantGraphVertex to);
+    Iterable<Vertex> vertices(Vertex to);
 
     Set<Token> tokens();
 

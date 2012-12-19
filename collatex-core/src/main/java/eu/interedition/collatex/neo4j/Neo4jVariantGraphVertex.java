@@ -72,8 +72,9 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   @Override
-  public Iterable<VariantGraph.Vertex> vertices(final Neo4jVariantGraphVertex to) {
+  public Iterable<VariantGraph.Vertex> vertices(final VariantGraph.Vertex to) {
     final int[] witnesses = graph.witnessMapper.map(witnesses());
+    final Node toNode = ((Neo4jVariantGraphVertex) to).node;
     return Iterables.transform(Traversal.description().breadthFirst().relationships(Neo4jGraphRelationships.PATH, Direction.OUTGOING).evaluator(new Evaluator() {
       @Override
       public Evaluation evaluate(Path path) {
@@ -84,7 +85,7 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
           }
         }
         final Node node = path.endNode();
-        if (node != null && node.equals(to.node)) {
+        if (node != null && node.equals(toNode)) {
           return Evaluation.INCLUDE_AND_PRUNE;
         }
 
@@ -92,8 +93,6 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
       }
     }).traverse(node).nodes(), graph.vertexWrapper);
   }
-
-  ;
 
   @Override
   public Set<Token> tokens() {
