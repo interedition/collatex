@@ -9,11 +9,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
@@ -27,12 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
@@ -72,12 +69,12 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public Neo4jVariantGraphVertex getStart() {
+  public Vertex getStart() {
     return start;
   }
 
   @Override
-  public Neo4jVariantGraphVertex getEnd() {
+  public Vertex getEnd() {
     return end;
   }
 
@@ -97,39 +94,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public Iterable<Vertex> vertices(final Set<Witness> witnesses) {
-    return new Iterable<Vertex>() {
-      @Override
-      public Iterator<Vertex> iterator() {
-        return new AbstractIterator<Vertex>() {
-          private final Map<Long, Integer> encountered = Maps.newHashMap();
-          private final Queue<Vertex> queue = new ArrayDeque<Vertex>(singleton(start));
-
-          @Override
-          protected Vertex computeNext() {
-            if (queue.isEmpty()) {
-              return endOfData();
-            }
-            final Vertex next = queue.remove();
-            for (Edge edge : next.outgoing(witnesses)) {
-              final VariantGraph.Vertex end = edge.to();
-              final long endId = ((Neo4jVariantGraphVertex)end).getNode().getId();
-
-              final int endEncountered = Objects.firstNonNull(encountered.get(endId), 0);
-              final int endIncoming = Iterables.size(end.incoming(witnesses));
-
-              if (endIncoming == endEncountered) {
-                throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
-              } else if ((endIncoming - endEncountered) == 1) {
-                queue.add(end);
-              }
-
-              encountered.put(endId, endEncountered + 1);
-            }
-            return next;
-          }
-        };
-      }
-    };
+    return VariantGraphs.vertices(this, witnesses);
   }
 
   @Override
@@ -139,23 +104,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public Iterable<Edge> edges(final Set<Witness> witnesses) {
-    final int[] witnessReferences = (witnesses == null || witnesses.isEmpty()) ? null : witnessMapper.map(witnesses);
-    return transform(Traversal.description().relationships(PATH, OUTGOING).uniqueness(Uniqueness.RELATIONSHIP_GLOBAL).breadthFirst().evaluator(new Evaluator() {
-
-      @Override
-      public Evaluation evaluate(Path path) {
-        if (witnessReferences != null) {
-          final Relationship lastRel = path.lastRelationship();
-          if (lastRel != null) {
-            if (!((Neo4jVariantGraphEdge) edgeWrapper.apply(lastRel)).traversableWith(witnessReferences)) {
-              return Evaluation.EXCLUDE_AND_PRUNE;
-            }
-          }
-        }
-
-        return Evaluation.INCLUDE_AND_CONTINUE;
-      }
-    }).traverse(start.getNode()).relationships(), edgeWrapper);
+    return VariantGraphs.edges(this, witnesses);
   }
 
   @Override
@@ -402,7 +351,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public boolean equals(Object obj) {
-    if (start != null && obj != null && obj instanceof VariantGraph) {
+    if (obj != null && obj instanceof Neo4jVariantGraph) {
       return start.equals(((Neo4jVariantGraph) obj).start);
     }
     return super.equals(obj);
@@ -410,7 +359,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public int hashCode() {
-    return (start == null ? super.hashCode() : start.hashCode());
+    return start.hashCode();
   }
 
   @Override

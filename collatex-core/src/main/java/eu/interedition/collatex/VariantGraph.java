@@ -81,8 +81,6 @@ public interface VariantGraph {
 
     Iterable<Transposition> transpositions();
 
-    Iterable<Vertex> vertices(Vertex to);
-
     Set<Token> tokens();
 
     Set<Token> tokens(Set<Witness> witnesses);
@@ -90,8 +88,6 @@ public interface VariantGraph {
     Set<Witness> witnesses();
 
     void add(Iterable<Token> tokens);
-
-    void setTokens(Set<Token> tokens);
 
     int getRank();
 
