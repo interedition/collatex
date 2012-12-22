@@ -28,6 +28,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
 
 import java.util.Set;
@@ -49,7 +50,7 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void alignmentTable() {
     final SimpleWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final RowSortedTable<Integer, Witness, Set<Token>> table = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> table = VariantGraphRanking.of(collate(w)).asTable();
 
     assertEquals(3, table.columnKeySet().size());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element

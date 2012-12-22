@@ -110,16 +110,6 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
     setTokenReferences(graph.tokenMapper.map(tokens));
   }
 
-  @Override
-  public int getRank() {
-    return (Integer) node.getProperty(RANK_KEY);
-  }
-
-  @Override
-  public void setRank(int rank) {
-    node.setProperty(RANK_KEY, rank);
-  }
-
   public int[] getTokenReferences() {
     return (int[]) node.getProperty(TOKEN_REFERENCE_KEY);
   }
@@ -148,13 +138,6 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
     }
   };
 
-  public static final Function<VariantGraph.Vertex, Integer> TO_RANK = new Function<VariantGraph.Vertex, Integer>() {
-    @Override
-    public Integer apply(VariantGraph.Vertex input) {
-      return input.getRank();
-    }
-  };
-
   private static final Function<VariantGraph.Transposition, Integer> TRANSPOSITION_ID = new Function<VariantGraph.Transposition, Integer>() {
     @Override
     public Integer apply(@Nullable VariantGraph.Transposition t) {
@@ -167,7 +150,7 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   @Override
-  public VariantGraph getGraph() {
+  public VariantGraph graph() {
     return graph;
   }
 

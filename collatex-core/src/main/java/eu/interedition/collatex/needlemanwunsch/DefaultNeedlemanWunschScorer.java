@@ -23,8 +23,7 @@ public class DefaultNeedlemanWunschScorer implements NeedlemanWunschScorer {
   public float score(Set<VariantGraph.Vertex> vertices, Token token) {
     for (VariantGraph.Vertex vertex : vertices) {
       final Set<Token> tokens = vertex.tokens();
-      Preconditions.checkArgument(!tokens.isEmpty(), "Vertex without tokens");
-      if (comparator.compare(Iterables.getFirst(tokens, null), token) == 0) {
+      if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), token) == 0) {
         return 1;
       }
     }

@@ -14,6 +14,8 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphEdge;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.neo4j.graphdb.Transaction;
 
 import com.google.common.collect.HashMultimap;
@@ -42,6 +44,7 @@ public class SimpleVariantGraphSerializer {
 
   private final VariantGraph graph;
   private final Map<VariantGraph.Vertex, Integer> vertexIds = Maps.newHashMap();
+  private final Map<VariantGraph.Transposition, Integer> transpositionIds = Maps.newHashMap();
 
   public SimpleVariantGraphSerializer(VariantGraph graph) {
     this.graph = graph;
@@ -55,11 +58,10 @@ public class SimpleVariantGraphSerializer {
     xml.writeNamespace("cx", COLLATEX_NS);
     xml.writeNamespace("", TEI_NS);
 
-    for (Iterator<Set<VariantGraph.Vertex>> rowIt = graph.join().rank().adjustRanksForTranspositions().ranks().iterator(); rowIt.hasNext();) {
-      final Set<VariantGraph.Vertex> row = rowIt.next();
-
+    // FIXME: adjustRanksForTranspostions() !!!
+    for (Iterator<Set<VariantGraph.Vertex>> rowIt = VariantGraphRanking.of(VariantGraphs.join(graph)).iterator(); rowIt.hasNext(); ) {
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
-      for (VariantGraph.Vertex v : row) {
+      for (VariantGraph.Vertex v : rowIt.next()) {
         for (Token token : v.tokens()) {
           tokenIndex.put(token.getWitness(), token);
         }
@@ -248,7 +250,7 @@ public class SimpleVariantGraphSerializer {
 
       for (VariantGraph.Transposition t : graph.transpositions()) {
         out.print(indent + id(t.from()) + connector + id(t.to()));
-        out.print(" [label = \"" + t.getId() + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.print(" [label = \"" + id(t) + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
       }
 
@@ -268,6 +270,15 @@ public class SimpleVariantGraphSerializer {
       vertexIds.put(vertex, id);
     }
     return ("v" + id);
+  }
+
+  private String id(VariantGraph.Transposition transposition) {
+    Integer id = transpositionIds.get(transposition);
+    if (id == null) {
+      id = transpositionIds.size();
+      transpositionIds.put(transposition, id);
+    }
+    return ("t" + id);
   }
 
   private String toLabel(VariantGraph.Edge e) {

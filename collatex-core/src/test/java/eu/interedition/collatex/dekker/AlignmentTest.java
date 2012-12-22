@@ -56,7 +56,7 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void transposition() {
     final SimpleWitness[] w = createWitnesses("the cat is black", "black is the cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("|the|cat|is|black| |", toString(t, w[0]));
     assertEquals("|black| |is|the|cat|", toString(t, w[1]));
   }
@@ -64,7 +64,7 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void doubleTransposition2() {
     final SimpleWitness[] w = createWitnesses("a b", "b a");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("| |a|b|", toString(t, w[0]));
     assertEquals("|b|a| |", toString(t, w[1]));
   }
@@ -72,7 +72,7 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void doubleTransposition3() {
     final SimpleWitness[] w = createWitnesses("a b c", "b a c");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("| |a|b|c|", toString(t, w[0]));
     assertEquals("|b|a| |c|", toString(t, w[1]));
   }
@@ -83,7 +83,7 @@ public class AlignmentTest extends AbstractTest {
         "the cat is very happy",//
         "very happy is the cat",//
         "very delitied and happy is the cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("|the|cat| | |is|very|happy|", toString(t, w[0]));
     assertEquals("|very| | |happy|is|the|cat|", toString(t, w[1]));
     assertEquals("|very|delitied|and|happy|is|the|cat|", toString(t, w[2]));
@@ -95,7 +95,7 @@ public class AlignmentTest extends AbstractTest {
         "the cat is black",//
         "black is the cat",//
         "black and white is the cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
     assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
     assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
@@ -106,7 +106,7 @@ public class AlignmentTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
         "A black cat in a white basket",//
         "A white cat in a black basket");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("|A|black|cat|in|a|white|basket|", toString(t, w[0]));
     assertEquals("|A|white|cat|in|a|black|basket|", toString(t, w[1]));
   }
@@ -114,7 +114,7 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void transposeInOnePair() {
     final SimpleWitness[] w = createWitnesses("y", "x y z", "z y");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("| |y| |", toString(t, w[0]));
     assertEquals("|x|y|z|", toString(t, w[1]));
     assertEquals("|z|y| |", toString(t, w[2]));
@@ -123,7 +123,7 @@ public class AlignmentTest extends AbstractTest {
   @Test
   public void transposeInTwoPairs() {
     final SimpleWitness[] w = createWitnesses("y x", "x y z", "z y");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = collate(w).toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("| |y|x|", toString(t, w[0]));
     assertEquals("|x|y|z|", toString(t, w[1]));
     assertEquals("|z|y| |", toString(t, w[2]));

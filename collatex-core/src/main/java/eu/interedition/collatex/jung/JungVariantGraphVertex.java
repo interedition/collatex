@@ -21,11 +21,11 @@ import static eu.interedition.collatex.jung.JungVariantGraphEdge.IS_TRANSPOSITIO
  */
 public class JungVariantGraphVertex implements VariantGraph.Vertex {
   private final JungVariantGraph graph;
-  private final Set<Token> tokens = Sets.newHashSet();
-  private int rank;
+  private final Set<Token> tokens;
 
-  public JungVariantGraphVertex(JungVariantGraph graph) {
+  public JungVariantGraphVertex(JungVariantGraph graph, Set<Token> tokens) {
     this.graph = graph;
+    this.tokens = Sets.newHashSet(tokens);
   }
 
   @Override
@@ -89,17 +89,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   @Override
-  public int getRank() {
-    return 0;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public void setRank(int rank) {
-    //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public VariantGraph getGraph() {
+  public VariantGraph graph() {
     return graph;
   }
 
@@ -124,6 +114,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
     }))));
   }
 
+  @SuppressWarnings("unchecked")
   public static <T, C> Iterable<T> cast(Iterable<C> iterable) {
     Iterable iter = iterable;
     return iter;

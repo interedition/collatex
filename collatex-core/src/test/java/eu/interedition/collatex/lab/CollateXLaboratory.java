@@ -24,6 +24,7 @@ import javax.swing.table.TableColumnModel;
 
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +156,8 @@ public class CollateXLaboratory extends JFrame {
           collator.collate(pvg, witness);
         }
 
-        variantGraphModel.update(pvg.join().rank());
+        // FIXME: rank()!!!
+        variantGraphModel.update(VariantGraphs.join(pvg));
 
         transaction.success();
       } finally {

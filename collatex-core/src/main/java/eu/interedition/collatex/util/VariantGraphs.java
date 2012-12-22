@@ -4,19 +4,25 @@ import com.google.common.base.Objects;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
+import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeBasedTable;
 import com.google.common.collect.TreeMultimap;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -27,37 +33,6 @@ import static java.util.Collections.singleton;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class VariantGraphs {
-
-  public static Multimap<Integer, VariantGraph.Vertex> rank(VariantGraph graph, Set<Witness> witnesses) {
-    final Map<VariantGraph.Vertex, Integer> ranks = Maps.newHashMap();
-    final Multimap<Integer, VariantGraph.Vertex> ranking = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-    for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
-      int rank = -1;
-      for (VariantGraph.Edge e : v.incoming(witnesses)) {
-        rank = Math.max(rank, ranks.get(e.from()));
-      }
-      ranking.put(rank + 1, v);
-      ranks.put(v, rank + 1);
-    }
-    return ranking;
-  }
-
-  public RowSortedTable<Integer, Witness, Set<Token>> table(VariantGraph graph, Set<Witness> witnesses) {
-    final TreeBasedTable<Integer, Witness, Set<Token>> table = TreeBasedTable.create(Ordering.natural(), Witness.SIGIL_COMPARATOR);
-    for (Map.Entry<Integer, VariantGraph.Vertex> rank : rank(graph, witnesses).entries()) {
-      final int row = rank.getKey();
-      for (Token token : rank.getValue().tokens(witnesses)) {
-        final Witness column = token.getWitness();
-
-        Set<Token> cell = table.get(row, column);
-        if (cell == null) {
-          table.put(row, column, cell = Sets.newHashSet());
-        }
-        cell.add(token);
-      }
-    }
-    return table;
-  }
 
   public static Iterable<VariantGraph.Vertex> vertices(final VariantGraph graph, final Set<Witness> witnesses) {
     return new Iterable<VariantGraph.Vertex>() {
@@ -116,5 +91,61 @@ public class VariantGraphs {
         };
       }
     };
+  }
+
+  public static VariantGraph join(VariantGraph graph) {
+    final Set<VariantGraph.Vertex> processed = Sets.newHashSet();
+
+    final VariantGraph.Vertex end = graph.getEnd();
+    final Deque<VariantGraph.Vertex> queue = new ArrayDeque<VariantGraph.Vertex>();
+    for (VariantGraph.Edge startingEdges : graph.getStart().outgoing()) {
+      queue.push(startingEdges.to());
+    }
+
+    while (!queue.isEmpty()) {
+      final Neo4jVariantGraphVertex vertex = (Neo4jVariantGraphVertex) queue.pop();
+      Set<Integer> transpositionIds1 = vertex.getTranspositionIds();
+      final List<VariantGraph.Edge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
+      if (outgoingEdges.size() == 1) {
+        final VariantGraph.Edge joinCandidateEdge = outgoingEdges.get(0);
+        final VariantGraph.Vertex joinCandidateVertex = joinCandidateEdge.to();
+        Set<Token> candidateTokens = joinCandidateVertex.tokens();
+        Set<Integer> transpositionIds2 = ((Neo4jVariantGraphVertex)joinCandidateVertex).getTranspositionIds();
+
+        boolean canJoin = !end.equals(joinCandidateVertex) && //
+                Iterables.size(joinCandidateVertex.incoming()) == 1 && //
+                transpositionIds1.equals(transpositionIds2);
+        if (canJoin) {
+          vertex.add(candidateTokens);
+          for (VariantGraph.Transposition t : joinCandidateVertex.transpositions()) {
+            final VariantGraph.Vertex other = t.other(joinCandidateVertex);
+            int id = t.getId();
+            t.delete();
+            graph.transpose(vertex, other, id);
+          }
+          for (VariantGraph.Edge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
+            final VariantGraph.Vertex to = e.to();
+            final Set<Witness> witnesses = e.witnesses();
+            e.delete();
+            graph.connect(vertex, to, witnesses);
+          }
+          joinCandidateEdge.delete();
+          joinCandidateVertex.delete();
+          queue.push(vertex);
+          continue;
+        }
+      }
+
+      processed.add(vertex);
+      for (VariantGraph.Edge e : outgoingEdges) {
+        final VariantGraph.Vertex next = e.to();
+        // FIXME: Why do we run out of memory in some cases here, if this is not checked?
+        if (!processed.contains(next)) {
+          queue.push(next);
+        }
+      }
+    }
+
+    return graph;
   }
 }

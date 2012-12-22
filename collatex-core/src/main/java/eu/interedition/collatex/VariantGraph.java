@@ -1,7 +1,5 @@
 package eu.interedition.collatex;
 
-import com.google.common.collect.RowSortedTable;
-
 import java.util.Set;
 
 /**
@@ -28,37 +26,20 @@ public interface VariantGraph {
 
   Transposition transpose(Vertex from, Vertex to, int transpId);
 
-  boolean isNear(Vertex a, Vertex b);
-
-  boolean verticesAreAdjacent(Vertex a, Vertex b);
-
   Edge edgeBetween(Vertex a, Vertex b);
 
   Set<Witness> witnesses();
-
-  VariantGraph join();
-
-  VariantGraph rank();
-
-  VariantGraph adjustRanksForTranspositions();
-
-  Iterable<Set<Vertex>> ranks();
-
-  Iterable<Set<Vertex>> ranks(Set<Witness> witnesses);
-
-  RowSortedTable<Integer, Witness, Set<Token>> toTable();
 
   /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
   interface Edge {
-    boolean traversableWith(Set<Witness> witnesses);
+
+    VariantGraph graph();
 
     Edge add(Set<Witness> witnesses);
 
     Set<Witness> witnesses();
-
-    VariantGraph getGraph();
 
     Vertex from();
 
@@ -89,11 +70,7 @@ public interface VariantGraph {
 
     void add(Iterable<Token> tokens);
 
-    int getRank();
-
-    void setRank(int rank);
-
-    VariantGraph getGraph();
+    VariantGraph graph();
 
     void delete();
   }

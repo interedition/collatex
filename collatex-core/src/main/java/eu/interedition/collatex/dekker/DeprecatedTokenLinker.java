@@ -12,6 +12,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.matching.Matches;
+import eu.interedition.collatex.util.VariantGraphRanking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class DeprecatedTokenLinker implements TokenLinker {
   public Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
     Preconditions.checkArgument(!Iterables.isEmpty(witness), "Empty witness");
 
-    base.rank();
+    final VariantGraphRanking ranking = VariantGraphRanking.of(base);
 
     if (LOG.isTraceEnabled()) {
       LOG.trace("Matching tokens of {} and {}", base, Iterables.getFirst(witness, null).getWitness());
@@ -79,7 +80,7 @@ public class DeprecatedTokenLinker implements TokenLinker {
     // gather matched ranks into a set ordered by their natural order
     // Turn it into a List so that distance between matched ranks can be called
     // Note that omitted vertices are not in the list, so they don't cause an extra phrasematch
-    ranks = Lists.newArrayList(Sets.newTreeSet(Iterables.transform(baseMatches, Neo4jVariantGraphVertex.TO_RANK)));
+    ranks = Lists.newArrayList(Sets.newTreeSet(Iterables.transform(baseMatches, ranking)));
     if (LOG.isTraceEnabled()) {
       LOG.trace("Base: {}", baseMatches);
       LOG.trace("Ranks: {}", ranks);
@@ -88,13 +89,13 @@ public class DeprecatedTokenLinker implements TokenLinker {
     // try and find matches in the base for each sequence in the witness
     phraseMatches = Lists.newArrayList();
     for (List<Token> phrase : rightExpandingPhrases) {
-      final List<VariantGraph.Vertex> matchingPhrase = matchPhrase(phrase, 1);
+      final List<VariantGraph.Vertex> matchingPhrase = matchPhrase(ranking, phrase, 1);
       if (!matchingPhrase.isEmpty()) {        
         phraseMatches.add(Match.createPhraseMatch(matchingPhrase, phrase));
       }
     }
     for (List<Token> phrase : leftExpandingPhrases) {
-      final List<VariantGraph.Vertex> matchingPhrase = reverse(matchPhrase(reverse(phrase), -1));
+      final List<VariantGraph.Vertex> matchingPhrase = reverse(matchPhrase(ranking, reverse(phrase), -1));
       if (!matchingPhrase.isEmpty()) {
         phraseMatches.add(Match.createPhraseMatch(matchingPhrase, phrase));
       }
@@ -191,7 +192,7 @@ public class DeprecatedTokenLinker implements TokenLinker {
     }
   }
 
-  private List<VariantGraph.Vertex> matchPhrase(List<Token> phrase, int expectedDirection) {
+  private List<VariantGraph.Vertex> matchPhrase(VariantGraphRanking ranking, List<Token> phrase, int expectedDirection) {
     final List<VariantGraph.Vertex> matchedPhrase = Lists.newArrayList();
     if (LOG.isTraceEnabled()) {
       LOG.trace("Trying to find phrase: {}", phrase);
@@ -202,13 +203,13 @@ public class DeprecatedTokenLinker implements TokenLinker {
     for (Token token : phrase) {
       if (lastMatch == null) {
         lastMatch = Iterables.get(matches.getAll().get(token), 0);
-        lastMatchIndex = ranks.indexOf(lastMatch.getRank());
+        lastMatchIndex = ranks.indexOf(ranking.apply(lastMatch));
         matchedPhrase.add(lastMatch);
         continue;
       }
       boolean tokenMatched = false;
       for (VariantGraph.Vertex match : matches.getAll().get(token)) {
-        final int matchIndex = ranks.indexOf(match.getRank());
+        final int matchIndex = ranks.indexOf(ranking.apply(match));
         int direction = matchIndex - lastMatchIndex;
         if (direction == expectedDirection) {
           lastMatch = match;

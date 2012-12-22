@@ -3,6 +3,7 @@ package eu.interedition.collatex;
 import com.google.inject.Inject;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.io.Collation;
+import eu.interedition.collatex.util.VariantGraphs;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.neo4j.graphdb.Transaction;
@@ -67,7 +68,7 @@ public class CollateResource {
     final Transaction tx = graphFactory.getDatabase().beginTx();
     try {
       // create
-      final VariantGraph graph = graphFactory.newVariantGraph();
+      VariantGraph graph = graphFactory.newVariantGraph();
 
       if (collation != null) {
         // merge
@@ -75,9 +76,8 @@ public class CollateResource {
 
         // post-process
         if (collation.isJoined()) {
-          graph.join();
+          graph = VariantGraphs.join(graph);
         }
-        graph.rank();
       }
 
       tx.success();

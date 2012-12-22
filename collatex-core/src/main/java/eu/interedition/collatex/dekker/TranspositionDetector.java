@@ -22,8 +22,14 @@ package eu.interedition.collatex.dekker;
 import java.util.Collections;
 
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SortedSetMultimap;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +46,14 @@ public class TranspositionDetector {
 
   public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     //rank the variant graph
-    base.rank();
+    final VariantGraphRanking ranking = VariantGraphRanking.of(base);
 
     // gather matched ranks into a list ordered by their natural order
-    final List<Integer> ranks = Lists.newArrayList();
+    final List<Integer> phraseRanks = Lists.newArrayList();
     for (List<Match> phraseMatch : phraseMatches) {
-      ranks.add(phraseMatch.get(0).vertex.getRank());
+      phraseRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
     }
-    Collections.sort(ranks);
+    Collections.sort(phraseRanks);
 
     // detect transpositions
     final List<List<Match>> transpositions = Lists.newArrayList();
@@ -55,9 +61,8 @@ public class TranspositionDetector {
     Tuple<Integer> previous = new Tuple<Integer>(0, 0);
 
     for (List<Match> phraseMatch : phraseMatches) {
-      VariantGraph.Vertex baseToken = phraseMatch.get(0).vertex;
-      int rank = baseToken.getRank();
-      int expectedRank = ranks.get(previousRank);
+      int rank = ranking.apply(phraseMatch.get(0).vertex);
+      int expectedRank = phraseRanks.get(previousRank);
       Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
       if (expectedRank != rank && !isMirrored(previous, current)) {
         transpositions.add(phraseMatch);

@@ -1,5 +1,6 @@
 package eu.interedition.collatex.jung;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
@@ -22,8 +23,8 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   public JungVariantGraph() {
     super();
-    addVertex(this.start = new JungVariantGraphVertex(this));
-    addVertex(this.end = new JungVariantGraphVertex(this));
+    addVertex(this.start = new JungVariantGraphVertex(this, Collections.<Token>emptySet()));
+    addVertex(this.end = new JungVariantGraphVertex(this, Collections.<Token>emptySet()));
     connect(this.start, this.end, Collections.<Witness>emptySet());
   }
 
@@ -68,11 +69,28 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   @Override
   public Vertex add(Token token) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    final JungVariantGraphVertex vertex = new JungVariantGraphVertex(this, Collections.singleton(token));
+    addVertex(vertex);
+    return vertex;
   }
 
   @Override
   public Edge connect(Vertex from, Vertex to, Set<Witness> witnesses) {
+    Preconditions.checkArgument(!from.equals(to));
+
+    if (from.equals(start)) {
+      final Edge startEndEdge = edgeBetween(start, end);
+      if (startEndEdge != null) {
+        startEndEdge.delete();
+      }
+    }
+
+    for (Edge e : from.outgoing()) {
+      if (to.equals(e.to())) {
+        return e.add(witnesses);
+      }
+    }
+
     final JungVariantGraphEdge edge = new JungVariantGraphEdge(this, witnesses, false);
     addEdge(edge, (JungVariantGraphVertex) from, (JungVariantGraphVertex) to);
     return edge;
@@ -84,52 +102,12 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
   }
 
   @Override
-  public boolean isNear(Vertex a, Vertex b) {
-    return false;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public boolean verticesAreAdjacent(Vertex a, Vertex b) {
-    return false;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
   public Edge edgeBetween(Vertex a, Vertex b) {
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   public Set<Witness> witnesses() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public VariantGraph join() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public VariantGraph rank() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public VariantGraph adjustRanksForTranspositions() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public Iterable<Set<Vertex>> ranks() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public Iterable<Set<Vertex>> ranks(Set<Witness> witnesses) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public RowSortedTable<Integer, Witness, Set<Token>> toTable() {
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 }

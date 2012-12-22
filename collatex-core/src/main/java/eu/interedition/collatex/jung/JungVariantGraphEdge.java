@@ -28,18 +28,6 @@ public class JungVariantGraphEdge implements VariantGraph.Edge, VariantGraph.Tra
   }
 
   @Override
-  public boolean traversableWith(Set<Witness> witnesses) {
-    Preconditions.checkState(!transposition, "Transpositions are traversable independent of a witness set");
-
-    for (Witness witness : witnesses) {
-      if (witnesses.contains(witness)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
   public VariantGraph.Edge add(Set<Witness> witnesses) {
     Preconditions.checkState(!transposition, "Witnesses cannot be registered to transpositions");
     witnesses.addAll(witnesses);
@@ -52,7 +40,7 @@ public class JungVariantGraphEdge implements VariantGraph.Edge, VariantGraph.Tra
   }
 
   @Override
-  public VariantGraph getGraph() {
+  public VariantGraph graph() {
     return graph;
   }
 

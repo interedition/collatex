@@ -155,16 +155,6 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public boolean isNear(Vertex a, Vertex b) {
-    return verticesAreAdjacent(a, b) && (Iterables.size(a.outgoing()) == 1 || Iterables.size(b.incoming()) == 1);
-  }
-
-  @Override
-  public boolean verticesAreAdjacent(Vertex a, Vertex b) {
-    return (edgeBetween(a, b) != null);
-  }
-
-  @Override
   public Edge edgeBetween(Vertex a, Vertex b) {
     final Node aNode = ((Neo4jVariantGraphVertex)a).getNode();
     final Node bNode = ((Neo4jVariantGraphVertex)b).getNode();
@@ -185,75 +175,6 @@ public class Neo4jVariantGraph implements VariantGraph {
     return witnesses;
   }
 
-  @Override
-  public VariantGraph join() {
-    final Set<Long> processed = Sets.newHashSet();
-
-    final Deque<Vertex> queue = new ArrayDeque<Vertex>();
-    for (Edge startingEdges : start.outgoing()) {
-      queue.push(startingEdges.to());
-    }
-
-    while (!queue.isEmpty()) {
-      final Neo4jVariantGraphVertex vertex = (Neo4jVariantGraphVertex) queue.pop();
-      Set<Integer> transpositionIds1 = vertex.getTranspositionIds();
-      final List<Edge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
-      if (outgoingEdges.size() == 1) {
-        final Edge joinCandidateEdge = outgoingEdges.get(0);
-        final VariantGraph.Vertex joinCandidateVertex = joinCandidateEdge.to();
-        Set<Token> candidateTokens = joinCandidateVertex.tokens();
-        Set<Integer> transpositionIds2 = ((Neo4jVariantGraphVertex)joinCandidateVertex).getTranspositionIds();
-
-        boolean canJoin = !end.equals(joinCandidateVertex) && //
-                Iterables.size(joinCandidateVertex.incoming()) == 1 && //
-                transpositionIds1.equals(transpositionIds2);
-        if (canJoin) {
-          vertex.add(candidateTokens);
-          for (Transposition t : joinCandidateVertex.transpositions()) {
-            final VariantGraph.Vertex other = t.other(joinCandidateVertex);
-            int id = t.getId();
-            t.delete();
-            transpose(vertex, other, id);
-          }
-          for (Edge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
-            final VariantGraph.Vertex to = e.to();
-            final Set<Witness> witnesses = e.witnesses();
-            e.delete();
-            connect(vertex, to, witnesses);
-          }
-          joinCandidateEdge.delete();
-          joinCandidateVertex.delete();
-          queue.push(vertex);
-          continue;
-        }
-      }
-
-      processed.add(vertex.getNode().getId());
-      for (Edge e : outgoingEdges) {
-        final VariantGraph.Vertex next = e.to();
-        // FIXME: Why do we run out of memory in some cases here, if this is not checked?
-        if (!processed.contains(((Neo4jVariantGraphVertex)next).getNode().getId())) {
-          queue.push(next);
-        }
-      }
-    }
-
-    return this;
-  }
-
-  @Override
-  public VariantGraph rank() {
-    for (Vertex v : vertices()) {
-      int rank = -1;
-      for (Edge e : v.incoming()) {
-        rank = Math.max(rank, e.from().getRank());
-      }
-      v.setRank(rank + 1);
-    }
-    return this;
-  }
-
-  @Override
   public VariantGraph adjustRanksForTranspositions() {
     for (Vertex v : vertices()) {
       Iterable<Transposition> transpositions = v.transpositions();
@@ -276,77 +197,12 @@ public class Neo4jVariantGraph implements VariantGraph {
       nullTokens.add(new SimpleToken(w, -1, "", ""));
     }
     Vertex nullVertex = new Neo4jVariantGraphVertex(this, nullTokens);
-    int rank = v.getRank();
-    nullVertex.setRank(rank);
-    v.setRank(rank + 1);
+    //int rank = v.getRank();
+    //nullVertex.setRank(rank);
+    //v.setRank(rank + 1);
     for (Vertex ov : vertices()) {
-      if (!ov.equals(v) && ov.getRank() > rank) ov.setRank(ov.getRank() + 1);
+      //if (!ov.equals(v) && ov.getRank() > rank) ov.setRank(ov.getRank() + 1);
     }
-  }
-
-  @Override
-  public Iterable<Set<Vertex>> ranks() {
-    return ranks(null);
-  }
-
-  @Override
-  public Iterable<Set<Vertex>> ranks(final Set<Witness> witnesses) {
-    return new Iterable<Set<Vertex>>() {
-      @Override
-      public Iterator<Set<Vertex>> iterator() {
-        return new AbstractIterator<Set<Vertex>>() {
-          private final Iterator<Vertex> vertices = vertices(witnesses).iterator();
-          private Vertex last;
-
-          @Override
-          protected Set<Vertex> computeNext() {
-            if (last == null) {
-              Preconditions.checkState(vertices.hasNext());
-              vertices.next(); // skip start vertex
-              Preconditions.checkState(vertices.hasNext());
-              last = vertices.next();
-            }
-
-            if (last.equals(end)) {
-              return endOfData();
-            }
-
-            final Set<Vertex> next = Sets.newHashSet();
-            next.add(last);
-
-            while (vertices.hasNext()) {
-              final Vertex vertex = vertices.next();
-              if (vertex.getRank() == last.getRank()) {
-                next.add(last = vertex);
-              } else {
-                last = vertex;
-                break;
-              }
-            }
-
-            return next;
-          }
-        };
-      }
-    };
-  }
-
-  @Override
-  public RowSortedTable<Integer, Witness, Set<Token>> toTable() {
-    final TreeBasedTable<Integer, Witness, Set<Token>> table = TreeBasedTable.create(Ordering.natural(), Witness.SIGIL_COMPARATOR);
-    for (Vertex v : rank().vertices()) {
-      final int row = v.getRank();
-      for (Token token : v.tokens()) {
-        final Witness column = token.getWitness();
-
-        Set<Token> cell = table.get(row, column);
-        if (cell == null) {
-          table.put(row, column, cell = Sets.newHashSet());
-        }
-        cell.add(token);
-      }
-    }
-    return table;
   }
 
   @Override

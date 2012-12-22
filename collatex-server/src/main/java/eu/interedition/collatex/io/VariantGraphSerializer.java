@@ -8,6 +8,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.util.VariantGraphRanking;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -28,7 +29,7 @@ public class VariantGraphSerializer extends JsonSerializer<VariantGraph> {
     final Transaction tx = ((Neo4jVariantGraph)graph).getDatabase().beginTx();
     try {
       final List<Witness> witnesses = Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses());
-      final RowSortedTable<Integer,Witness,Set<Token>> table = graph.toTable();
+      final RowSortedTable<Integer,Witness,Set<Token>> table = VariantGraphRanking.of(graph).asTable();
 
       jgen.writeStartObject();
 

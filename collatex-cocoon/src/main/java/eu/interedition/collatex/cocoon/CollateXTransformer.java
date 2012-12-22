@@ -9,6 +9,8 @@ import java.util.SortedMap;
 
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.cocoon.ProcessingException;
@@ -111,7 +113,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   private void sendAlignmentTable(VariantGraph graph) throws SAXException {
     sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
     final Set<Witness> witnesses = graph.witnesses();
-    final RowSortedTable<Integer, Witness, Set<Token>> table = graph.toTable();
+    final RowSortedTable<Integer, Witness, Set<Token>> table = VariantGraphRanking.of(graph).asTable();
 
     for (Integer rowIndex : table.rowKeySet()) {
       final Map<Witness, Set<Token>> row = table.row(rowIndex);
@@ -137,7 +139,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
 
-    for (Iterator<Set<VariantGraph.Vertex>> rowIt = graph.join().rank().ranks().iterator(); rowIt.hasNext();) {
+    for (Iterator<Set<VariantGraph.Vertex>> rowIt = VariantGraphRanking.of(VariantGraphs.join(graph)).iterator(); rowIt.hasNext();) {
       final Set<VariantGraph.Vertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();

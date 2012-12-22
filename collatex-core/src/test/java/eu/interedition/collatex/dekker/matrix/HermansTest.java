@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamWriter;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -299,7 +300,7 @@ public class HermansTest extends AbstractTest {
     for (VariantGraph.Vertex v : vertices) {
       LOG.info("vertex:{}, transpositionids:{}", v, ((Neo4jVariantGraphVertex) v).getTranspositionIds());
     }
-    vg.join();
+    vg = VariantGraphs.join(vg);
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
@@ -318,7 +319,7 @@ public class HermansTest extends AbstractTest {
     String c = "c1 c2 c3 b1 b2 b3 d1 d2 d3 a1 a2 a3";
     SimpleWitness[] sw = createWitnesses(a, b, c);
     //    testWitnessCollation(sw);
-    Neo4jVariantGraph vg = collate(sw);
+    VariantGraph vg = collate(sw);
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
@@ -330,7 +331,7 @@ public class HermansTest extends AbstractTest {
     s.toDot(vg, writer);
     LOG.info(writer.toString());
 
-    vg.join();
+    vg = VariantGraphs.join(vg);
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
@@ -366,7 +367,7 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(textD1, textD9, textDMD1, textDMD5);
     testWitnessCollation(sw);
 
-    VariantGraph vg = collate(sw).join();
+    VariantGraph vg = VariantGraphs.join(collate(sw));
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     assertEquals(5, transpositions.size());
     VariantGraph.Transposition transposition = transpositions.iterator().next();
@@ -427,7 +428,7 @@ public class HermansTest extends AbstractTest {
   private String generateTEI(VariantGraph vg) throws XMLStreamException, FactoryConfigurationError {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
-    s.toDot(vg.join(), writer);
+    s.toDot(VariantGraphs.join(vg), writer);
     LOG.info(writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);

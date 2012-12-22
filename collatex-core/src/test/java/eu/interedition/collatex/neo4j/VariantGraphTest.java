@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -152,7 +153,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoIdenticalWitnesses() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
-    final VariantGraph graph = collate(w).join();
+    final VariantGraph graph = VariantGraphs.join(collate(w));
 
     assertEquals(3, Iterables.size(graph.vertices()));
     assertEquals(2, Iterables.size(graph.edges()));
@@ -166,7 +167,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses() {
     final SimpleWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
-    final VariantGraph graph = collate(w).join();
+    final VariantGraph graph = VariantGraphs.join(collate(w));
 
     final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
     final Neo4jVariantGraphVertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
@@ -192,7 +193,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses2() {
     final SimpleWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
-    final VariantGraph graph = collate(w).join();
+    final VariantGraph graph = VariantGraphs.join(collate(w));
 
     final Neo4jVariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);
     final Neo4jVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
@@ -214,7 +215,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnessesWithTranspositions() {
     final SimpleWitness[] w = createWitnesses("voor Zo nu en dan zin2 na voor", "voor zin2 Nu en dan voor");
-    final VariantGraph graph = collate(w).join();
+    final VariantGraph graph = VariantGraphs.join(collate(w));
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
     StringWriter writer = new StringWriter();
     s.toDot(graph, writer);

@@ -14,6 +14,7 @@ import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.util.Logging;
+import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -96,6 +97,10 @@ public abstract class AbstractTest {
     return collate(createWitnesses(witnesses));
   }
 
+  protected static RowSortedTable<Integer, Witness, Set<Token>> table(VariantGraph graph) {
+    return VariantGraphRanking.of(graph).asTable();
+  }
+
   protected static SortedSet<String> extractPhrases(VariantGraph graph, Witness witness) {
     return extractPhrases(Sets.<String> newTreeSet(), graph, witness);
   }
@@ -123,7 +128,7 @@ public abstract class AbstractTest {
   }
 
   protected static VariantGraph.Edge edgeBetween(VariantGraph.Vertex start, VariantGraph.Vertex end) {
-    final VariantGraph.Edge edge = start.getGraph().edgeBetween(start, end);
+    final VariantGraph.Edge edge = start.graph().edgeBetween(start, end);
     Assert.assertNotNull(String.format("No edge between %s and %s", start, end), edge);
     return edge;
   }

@@ -43,7 +43,7 @@ public class VariantGraphModel extends DirectedSparseGraph<VariantGraphVertexMod
 
     final Map<VariantGraph.Vertex, VariantGraphVertexModel> vertexMap = Maps.newHashMap();
     for (VariantGraph.Vertex pv : pvg.vertices()) {
-      final VariantGraphVertexModel v = new VariantGraphVertexModel(pv.tokens(), pv.getRank());
+      final VariantGraphVertexModel v = new VariantGraphVertexModel(pv.tokens(), 0 /* FIXME getRank() */);
       addVertex(v);
       vertexMap.put(pv, v);
       if (pvg.getStart().equals(pv)) {

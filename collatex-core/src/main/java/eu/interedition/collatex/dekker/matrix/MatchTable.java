@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +44,11 @@ public class MatchTable {
   }
 
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
+    final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
     // step 1: build the MatchTable
-    MatchTable table = createEmptyTable(graph, witness);
+    MatchTable table = createEmptyTable(ranking, graph, witness);
     // step 2: do the matching and fill the table
-    table.fillTableWithMatches(graph, witness, comparator);
+    table.fillTableWithMatches(ranking, graph, witness, comparator);
     return table;
   }
 
@@ -95,16 +98,15 @@ public class MatchTable {
     this.ranks = ranks;
   }
 
-  private static MatchTable createEmptyTable(VariantGraph graph, Iterable<Token> witness) {
-    graph.rank();
+  private static MatchTable createEmptyTable(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness) {
     // -2 === ignore the start and the end vertex
-    Range<Integer> ranksRange = Ranges.closed(0, Math.max(0, graph.getEnd().getRank() - 2));
+    Range<Integer> ranksRange = Ranges.closed(0, Math.max(0, ranking.apply(graph.getEnd()) - 2));
     ImmutableList<Integer> ranksSet = ranksRange.asSet(DiscreteDomains.integers()).asList();
     return new MatchTable(witness, ranksSet);
   }
 
   // move parameters into fields?
-  private void fillTableWithMatches(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
+  private void fillTableWithMatches(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
     Matches matches = Matches.between(graph.vertices(), witness, comparator);
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
@@ -113,7 +115,7 @@ public class MatchTable {
       if (unique.contains(t) || ambiguous.contains(t)) {
         List<VariantGraph.Vertex> matchingVertices = matches.getAll().get(t);
         for (VariantGraph.Vertex vgv : matchingVertices) {
-          set(rowIndex, vgv.getRank() - 1, t, vgv);
+          set(rowIndex, ranking.apply(vgv) - 1, t, vgv);
         }
       }
       rowIndex++;

@@ -23,8 +23,10 @@ package eu.interedition.collatex.dekker;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Map;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -35,37 +37,39 @@ public class VariantGraphRankerTest extends AbstractTest {
 
   @Test
   public void ranking() {
-    final VariantGraph graph = collate("The black cat", "The black and white cat", "The black and green cat").rank();
+    final VariantGraph graph = collate("The black cat", "The black and white cat", "The black and green cat");
+    final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
     final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("the", vertices.get(1));
-    assertEquals(1, vertices.get(1).getRank());
+    assertEquals(1, (long) ranking.apply(vertices.get(1)));
     assertVertexEquals("black", vertices.get(2));
-    assertEquals(2, vertices.get(2).getRank());
+    assertEquals(2, (long) ranking.apply(vertices.get(2)));
     assertVertexEquals("and", vertices.get(3));
-    assertEquals(3, vertices.get(3).getRank());
+    assertEquals(3, (long) ranking.apply(vertices.get(3)));
     assertVertexEquals("white", vertices.get(4));
-    assertEquals(4, vertices.get(4).getRank());
+    assertEquals(4, (long) ranking.apply(vertices.get(4)));
     assertVertexEquals("green", vertices.get(5));
-    assertEquals(4, vertices.get(5).getRank());
+    assertEquals(4, (long) ranking.apply(vertices.get(5)));
     assertVertexEquals("cat", vertices.get(6));
-    assertEquals(5, vertices.get(6).getRank());
+    assertEquals(5, (long) ranking.apply(vertices.get(6)));
   }
 
   @Test
   public void agastTranspositionHandling() {
-    final VariantGraph graph = collate("He was agast, so", "He was agast", "So he was agast").rank();
+    final VariantGraph graph = collate("He was agast, so", "He was agast", "So he was agast");
+    final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
     final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
 
     assertVertexEquals("so", vertices.get(1));
-    assertEquals(1, vertices.get(1).getRank());
+    assertEquals(1,(long) ranking.apply(vertices.get(1)));
     assertVertexEquals("he", vertices.get(2));
-    assertEquals(2, vertices.get(2).getRank());
+    assertEquals(2, (long) ranking.apply(vertices.get(2)));
     assertVertexEquals("was", vertices.get(3));
-    assertEquals(3, vertices.get(3).getRank());
+    assertEquals(3, (long) ranking.apply(vertices.get(3)));
     assertVertexEquals("agast", vertices.get(4));
-    assertEquals(4, vertices.get(4).getRank());
+    assertEquals(4, (long) ranking.apply(vertices.get(4)));
     assertVertexEquals("so", vertices.get(5));
-    assertEquals(5, vertices.get(5).getRank());
+    assertEquals(5, (long) ranking.apply(vertices.get(5)));
   }
 }

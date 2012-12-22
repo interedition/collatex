@@ -9,9 +9,12 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import com.google.common.collect.SortedSetMultimap;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphs;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -43,7 +46,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
   public void collate(VariantGraph against, Iterable<Token> witness) {
     final DefaultNeedlemanWunschScorer scorer = new DefaultNeedlemanWunschScorer(comparator);
 
-    final List<Set<VariantGraph.Vertex>> vertexList = Lists.newArrayList(against.rank().ranks());
+    final List<Set<VariantGraph.Vertex>> vertexList = Lists.newArrayList(VariantGraphRanking.of(against));
     final List<Token> tokenList = Lists.newArrayList(witness);
 
     final Map<Token, VariantGraph.Vertex> alignments = Maps.newHashMap();
