@@ -21,6 +21,7 @@ import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -103,25 +104,25 @@ public class VariantGraphs {
     }
 
     while (!queue.isEmpty()) {
-      final Neo4jVariantGraphVertex vertex = (Neo4jVariantGraphVertex) queue.pop();
-      Set<Integer> transpositionIds1 = vertex.getTranspositionIds();
+      final VariantGraph.Vertex vertex = queue.pop();
+      final Set<VariantGraph.Transposition> transpositions = Sets.newHashSet(vertex.transpositions());
       final List<VariantGraph.Edge> outgoingEdges = Lists.newArrayList(vertex.outgoing());
       if (outgoingEdges.size() == 1) {
         final VariantGraph.Edge joinCandidateEdge = outgoingEdges.get(0);
         final VariantGraph.Vertex joinCandidateVertex = joinCandidateEdge.to();
-        Set<Token> candidateTokens = joinCandidateVertex.tokens();
-        Set<Integer> transpositionIds2 = ((Neo4jVariantGraphVertex)joinCandidateVertex).getTranspositionIds();
+        final Set<VariantGraph.Transposition> joinCandidateTranspositions = Sets.newHashSet(joinCandidateVertex.transpositions());
 
         boolean canJoin = !end.equals(joinCandidateVertex) && //
                 Iterables.size(joinCandidateVertex.incoming()) == 1 && //
-                transpositionIds1.equals(transpositionIds2);
+                transpositions.equals(joinCandidateTranspositions);
         if (canJoin) {
-          vertex.add(candidateTokens);
+          vertex.add(joinCandidateVertex.tokens());
           for (VariantGraph.Transposition t : joinCandidateVertex.transpositions()) {
-            final VariantGraph.Vertex other = t.other(joinCandidateVertex);
-            int id = t.getId();
+            final Set<VariantGraph.Vertex> transposed = Sets.newHashSet(t);
+            transposed.remove(joinCandidateVertex);
+            transposed.add(vertex);
             t.delete();
-            graph.transpose(vertex, other, id);
+            graph.transpose(transposed);
           }
           for (VariantGraph.Edge e : Lists.newArrayList(joinCandidateVertex.outgoing())) {
             final VariantGraph.Vertex to = e.to();

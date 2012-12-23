@@ -24,7 +24,7 @@ public interface VariantGraph {
 
   Edge connect(Vertex from, Vertex to, Set<Witness> witnesses);
 
-  Transposition transpose(Vertex from, Vertex to, int transpId);
+  Transposition transpose(Set<Vertex> vertices);
 
   Edge edgeBetween(Vertex a, Vertex b);
 
@@ -78,15 +78,7 @@ public interface VariantGraph {
   /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
-  interface Transposition {
-    Vertex from();
-
-    Vertex to();
-
-    Vertex other(VariantGraph.Vertex vertex);
-
+  interface Transposition extends Iterable<Vertex> {
     void delete();
-
-    int getId();
   }
 }

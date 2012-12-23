@@ -28,7 +28,7 @@ public class TranspositionTest extends AbstractTest {
 
   @Test
   public void multipleTranspositions() {
-    assertEquals(2, collate("a b c", "b c a").transpositions().size());
+    assertEquals(1, collate("a b c", "b c a").transpositions().size());
   }
 
   @Test

@@ -7,14 +7,11 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import org.apache.commons.collections15.bag.PredicatedBag;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
-import static eu.interedition.collatex.jung.JungVariantGraphEdge.IS_PATH;
-import static eu.interedition.collatex.jung.JungVariantGraphEdge.IS_TRANSPOSITION;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -50,13 +47,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
 
   @Override
   public Iterable<VariantGraph.Transposition> transpositions() {
-    return cast(Iterables.filter(Iterables.concat(incoming(), outgoing()), new Predicate<VariantGraph.Edge>() {
-
-      @Override
-      public boolean apply(@Nullable VariantGraph.Edge edge) {
-        return IS_TRANSPOSITION.apply((JungVariantGraphEdge) edge);
-      }
-    }));
+    return null;
   }
 
   @Override
@@ -99,7 +90,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   protected static Iterable<VariantGraph.Edge> paths(final Iterable<JungVariantGraphEdge> edges, final Set<Witness> witnesses) {
-    return cast(Iterables.filter(edges, Predicates.and(IS_PATH, (witnesses == null
+    return cast(Iterables.filter(edges, (witnesses == null
             ? Predicates.<JungVariantGraphEdge>alwaysTrue()
             : new Predicate<JungVariantGraphEdge>() {
       @Override
@@ -111,7 +102,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
         }
         return false;
       }
-    }))));
+    })));
   }
 
   @SuppressWarnings("unchecked")

@@ -139,19 +139,14 @@ public class Neo4jVariantGraph implements VariantGraph {
   }
 
   @Override
-  public Transposition transpose(VariantGraph.Vertex from, VariantGraph.Vertex to, int transpId) {
-    Preconditions.checkArgument(!from.equals(to));
-    Preconditions.checkArgument(!from.tokens().isEmpty());
-    Preconditions.checkArgument(!to.tokens().isEmpty());
-
-    //    updateTranspositionIds(from, to);
-    for (Transposition t : from.transpositions()) {
-      if (t.other(from).equals(to)) {
-        return t;
+  public Transposition transpose(Set<VariantGraph.Vertex> vertices) {
+    Preconditions.checkArgument(!vertices.isEmpty());
+    for (Transposition transposition : vertices.iterator().next().transpositions()) {
+      if (Sets.newHashSet(transposition).equals(vertices)) {
+        return transposition;
       }
     }
-
-    return new Neo4jVariantGraphTransposition(this, (Neo4jVariantGraphVertex) from, (Neo4jVariantGraphVertex) to, transpId);
+    return new Neo4jVariantGraphTransposition(this, vertices);
   }
 
   @Override
@@ -179,8 +174,8 @@ public class Neo4jVariantGraph implements VariantGraph {
     for (Vertex v : vertices()) {
       Iterable<Transposition> transpositions = v.transpositions();
       for (Transposition vgt : transpositions) {
-        Vertex from = vgt.from();
-        Vertex to = vgt.to();
+        Vertex from = null; // FIXME
+        Vertex to = null; // FIXME
         if (from.equals(v)) {
           addNullVertex(v, from, to);
         } else if (to.equals(v)) {
@@ -237,9 +232,9 @@ public class Neo4jVariantGraph implements VariantGraph {
     }
   };
 
-  final Function<Relationship, Transposition> transpositionWrapper = new Function<Relationship, VariantGraph.Transposition>() {
+  final Function<Node, Transposition> transpositionWrapper = new Function<Node, VariantGraph.Transposition>() {
     @Override
-    public VariantGraph.Transposition apply(Relationship input) {
+    public VariantGraph.Transposition apply(Node input) {
       return new Neo4jVariantGraphTransposition(Neo4jVariantGraph.this, input);
     }
   };

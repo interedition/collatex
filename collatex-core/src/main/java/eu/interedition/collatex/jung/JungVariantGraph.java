@@ -1,7 +1,9 @@
 package eu.interedition.collatex.jung;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -20,6 +22,7 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   final JungVariantGraphVertex start;
   final JungVariantGraphVertex end;
+  final Multimap<JungVariantGraphVertex, JungVariantGraphTransposition> transpositionIndex = HashMultimap.create();
 
   public JungVariantGraph() {
     super();
@@ -91,13 +94,13 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
       }
     }
 
-    final JungVariantGraphEdge edge = new JungVariantGraphEdge(this, witnesses, false);
+    final JungVariantGraphEdge edge = new JungVariantGraphEdge(this, witnesses);
     addEdge(edge, (JungVariantGraphVertex) from, (JungVariantGraphVertex) to);
     return edge;
   }
 
   @Override
-  public Transposition transpose(Vertex from, Vertex to, int transpId) {
+  public Transposition transpose(Set<Vertex> vertices) {
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 

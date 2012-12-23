@@ -55,9 +55,11 @@ public class VariantGraphModel extends DirectedSparseGraph<VariantGraphVertexMod
     for (VariantGraph.Edge pe : pvg.edges()) {
       addEdge(new VariantGraphEdgeModel(pe.witnesses()), vertexMap.get(pe.from()), vertexMap.get(pe.to()));
     }
-    
+
+    /* FIXME
     for (VariantGraph.Transposition t : pvg.transpositions()) {
       addEdge(new VariantGraphEdgeModel(Collections.<Witness>emptySet()), vertexMap.get(t.from()), vertexMap.get(t.to()));
     }
+    */
   }
 }

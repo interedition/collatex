@@ -149,6 +149,7 @@ public class SimpleVariantGraphSerializer {
       GraphMLProperty.EDGE_WITNESSES.write(Neo4jVariantGraphEdge.TO_CONTENTS.apply(edge), xml);
       xml.writeEndElement();
     }
+    /* FIXME
     for (VariantGraph.Transposition transposition : graph.transpositions()) {
       xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
       xml.writeAttribute(ID_ATT, "e" + edgeNumber);
@@ -157,8 +158,8 @@ public class SimpleVariantGraphSerializer {
       GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
       GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_TRANSPOSITION, xml);
       xml.writeEndElement();
-
     }
+    */
 
     xml.writeEndElement();
 
@@ -248,11 +249,13 @@ public class SimpleVariantGraphSerializer {
         out.println(";");
       }
 
+      /* FIXME
       for (VariantGraph.Transposition t : graph.transpositions()) {
         out.print(indent + id(t.from()) + connector + id(t.to()));
         out.print(" [label = \"" + id(t) + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
       }
+      */
 
       out.print(indent + id(graph.getStart()) + connector + id(graph.getEnd()));
       out.print(" [color =  \"white\"]");

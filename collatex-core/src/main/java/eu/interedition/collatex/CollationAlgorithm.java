@@ -3,6 +3,7 @@ package eu.interedition.collatex;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
@@ -79,17 +80,15 @@ public interface CollationAlgorithm {
 
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
-        int transpositionId = transpositionIdSource.addAndGet(1);
-        final Map<Token, VariantGraph.Vertex> transposedTokens = Maps.newHashMap();
         if (LOG.isDebugEnabled()) {
-          LOG.debug("transposition: {}, hash={}", transposedPhrase, transpositionId);
+          LOG.debug("transposition: {}", transposedPhrase);
         }
+        final Set<VariantGraph.Vertex> transposed = Sets.newHashSet();
         for (Match match : transposedPhrase) {
-          transposedTokens.put(match.token, match.vertex);
+          transposed.add(witnessTokenVertices.get(match.token));
+          transposed.add(match.vertex);
         }
-        for (Token token : transposedTokens.keySet()) {
-          into.transpose(transposedTokens.get(token), witnessTokenVertices.get(token), transpositionId);
-        }
+        into.transpose(transposed);
       }
     }
 

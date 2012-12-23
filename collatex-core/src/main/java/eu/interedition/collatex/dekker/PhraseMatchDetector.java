@@ -22,6 +22,7 @@ package eu.interedition.collatex.dekker;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jGraphRelationships;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
@@ -58,7 +59,7 @@ public class PhraseMatchDetector {
       // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
       // - there should be a directed edge between previous and base vertex
       // - there may not be a longer path between previous and base vertex
-      boolean sameTranspositions = ((Neo4jVariantGraphVertex)previous).getTranspositionIds().equals(baseVertex.getTranspositionIds());
+      boolean sameTranspositions = Sets.newHashSet(previous.transpositions()).equals(Sets.newHashSet(baseVertex.transpositions()));
       boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
       boolean directedEdge = directedEdgeBetween(previous, baseVertex);
       boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);

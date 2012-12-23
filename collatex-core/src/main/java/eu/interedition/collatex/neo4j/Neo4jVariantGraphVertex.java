@@ -32,7 +32,6 @@ import eu.interedition.collatex.simple.SimpleToken;
  */
 public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   private static final String TOKEN_REFERENCE_KEY = "tokenReferences";
-  private static final String RANK_KEY = "rank";
   protected final Neo4jVariantGraph graph;
   protected final Node node;
 
@@ -68,7 +67,12 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
 
   @Override
   public Iterable<VariantGraph.Transposition> transpositions() {
-    return transform(node.getRelationships(Neo4jGraphRelationships.TRANSPOSITION), graph.transpositionWrapper);
+    return transform(node.getRelationships(Neo4jGraphRelationships.TRANSPOSITION), new Function<Relationship, VariantGraph.Transposition>() {
+      @Override
+      public VariantGraph.Transposition apply(@Nullable Relationship relationship) {
+        return graph.transpositionWrapper.apply(relationship.getStartNode());
+      }
+    });
   }
 
   @Override
@@ -138,17 +142,6 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
     }
   };
 
-  private static final Function<VariantGraph.Transposition, Integer> TRANSPOSITION_ID = new Function<VariantGraph.Transposition, Integer>() {
-    @Override
-    public Integer apply(@Nullable VariantGraph.Transposition t) {
-      return t.getId();
-    }
-  };
-
-  public Set<Integer> getTranspositionIds() {
-    return Sets.newHashSet(Iterables.transform(transpositions(), TRANSPOSITION_ID));
-  }
-
   @Override
   public VariantGraph graph() {
     return graph;
@@ -170,7 +163,7 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VariantGraph.Vertex) {
+    if (obj != null && obj instanceof Neo4jVariantGraphVertex) {
       return node.equals(((Neo4jVariantGraphVertex) obj).node);
     }
     return super.equals(obj);

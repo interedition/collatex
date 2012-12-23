@@ -9,8 +9,10 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +21,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.util.VariantGraphs;
@@ -298,16 +303,18 @@ public class HermansTest extends AbstractTest {
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
-      LOG.info("vertex:{}, transpositionids:{}", v, ((Neo4jVariantGraphVertex) v).getTranspositionIds());
+      LOG.info("vertex:{}, transpositions:{}", v, Iterables.toString(v.transpositions()));
     }
     vg = VariantGraphs.join(vg);
+    System.out.println(toString(table(vg)));
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
-      // all joined vertices should be size 3
       LOG.info("transposition {}", showTransposition(t));
-      assertEquals(showTransposition(t), 3, t.from().tokens().size());
-      assertEquals(showTransposition(t), 3, t.to().tokens().size());
+      // all joined vertices should be size 3
+      for (VariantGraph.Vertex vertex : t) {
+        assertEquals(showTransposition(t), 3, vertex.tokens().size());
+      }
     }
     assertEquals(3, transpositions.size());
   }
@@ -323,7 +330,7 @@ public class HermansTest extends AbstractTest {
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
-      LOG.info("vertex:{}, transpositionids:{}", v, ((Neo4jVariantGraphVertex) v).getTranspositionIds());
+      LOG.info("vertex:{}, transpositions:{}", v, Iterables.toString(v.transpositions()));
     }
 
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
@@ -411,10 +418,18 @@ public class HermansTest extends AbstractTest {
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     assertEquals(1, transpositions.size());
     VariantGraph.Transposition t = transpositions.iterator().next();
-    String string = t.from().toString();
-    assertTrue(string.contains("A:2:'c'"));
-    assertTrue(string.contains("B:1:'c'"));
-    assertEquals("[C:1:'c']", t.to().toString());
+    for (VariantGraph.Vertex vertex : t) {
+      for (SimpleToken token : Iterables.filter(vertex.tokens(), SimpleToken.class)) {
+        assertEquals(token.toString(), token.getContent(), "c");
+      }
+    }
+    final Set<Witness> witnessesInTransposition = Sets.newHashSet();
+    for (VariantGraph.Vertex vertex : t) {
+      for (Token token : vertex.tokens()) {
+        witnessesInTransposition.add(token.getWitness());
+      }
+    }
+    assertEquals(Sets.newHashSet(Arrays.asList(sw)), witnessesInTransposition);
   }
 
   //  @Test
@@ -443,10 +458,6 @@ public class HermansTest extends AbstractTest {
   };
 
   private String showTransposition(VariantGraph.Transposition t) {
-    List<Token> ftokens = Lists.newArrayList(t.from().tokens());
-    List<Token> ttokens = Lists.newArrayList(t.to().tokens());
-    Collections.sort(ftokens, ON_ORDER);
-    Collections.sort(ttokens, ON_ORDER);
-    return MessageFormat.format("{0} -> {1}", ftokens, ttokens);
+    return Iterables.toString(t);
   }
 }
