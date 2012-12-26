@@ -1,25 +1,5 @@
 package eu.interedition.collatex.cocoon;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
-import eu.interedition.collatex.util.VariantGraphRanking;
-import eu.interedition.collatex.util.VariantGraphs;
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.transformation.AbstractSAXTransformer;
-import org.apache.cocoon.xml.AttributesImpl;
-import org.neo4j.graphdb.Transaction;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
@@ -28,14 +8,31 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SetMultimap;
-
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceTokenizer;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphs;
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.ConfigurationException;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.transformation.AbstractSAXTransformer;
+import org.apache.cocoon.xml.AttributesImpl;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -49,7 +46,6 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     ALIGNMENT_TABLE, TEI_APPARATUS
   }
 
-  private Neo4jVariantGraphFactory graphFactory;
   private OutputType outputType = OutputType.ALIGNMENT_TABLE;
   private final List<Iterable<Token>> witnesses = Lists.newArrayList();
   private String sigil;
@@ -58,11 +54,6 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   public void configure(Configuration configuration) throws ConfigurationException {
     super.configure(configuration);
     this.defaultNamespaceURI = COLLATEX_NS;
-    try {
-      this.graphFactory = Neo4jVariantGraphFactory.create();
-    } catch (IOException e) {
-      throw new ConfigurationException("I/O error while creating variant graph factory", configuration, e);
-    }
   }
 
   @Override
@@ -89,20 +80,15 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   public void endTransformingElement(String uri, String name, String raw) throws ProcessingException, IOException, SAXException {
     if ("collation".equals(name) && !witnesses.isEmpty()) {
       ignoreHooksCount++;
-      final Transaction tx = graphFactory.getDatabase().beginTx();
-      try {
-        final VariantGraph graph = graphFactory.newVariantGraph();
-        CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
-        switch (outputType) {
-          case TEI_APPARATUS:
-            sendTeiApparatus(graph);
-            break;
-          default:
-            sendAlignmentTable(graph);
-            break;
-        }
-      } finally {
-        tx.finish();
+      final VariantGraph graph = new JungVariantGraph();
+      CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
+      switch (outputType) {
+        case TEI_APPARATUS:
+          sendTeiApparatus(graph);
+          break;
+        default:
+          sendAlignmentTable(graph);
+          break;
       }
       ignoreHooksCount--;
     } else if ("witness".equals(name)) {

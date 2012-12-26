@@ -6,13 +6,11 @@ import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
-import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,53 +24,48 @@ public class VariantGraphSerializer extends JsonSerializer<VariantGraph> {
 
   @Override
   public void serialize(VariantGraph graph, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-    final Transaction tx = ((Neo4jVariantGraph)graph).getDatabase().beginTx();
-    try {
-      final List<Witness> witnesses = Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses());
-      final RowSortedTable<Integer,Witness,Set<Token>> table = VariantGraphRanking.of(graph).asTable();
+    final List<Witness> witnesses = Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses());
+    final RowSortedTable<Integer, Witness, Set<Token>> table = VariantGraphRanking.of(graph).asTable();
 
-      jgen.writeStartObject();
+    jgen.writeStartObject();
 
-      // switch rows and columns due to horizontal content orientation
-      jgen.writeNumberField("columns", table.rowKeySet().size());
-      jgen.writeNumberField("rows", table.columnKeySet().size());
-      jgen.writeArrayFieldStart("sigils");
+    // switch rows and columns due to horizontal content orientation
+    jgen.writeNumberField("columns", table.rowKeySet().size());
+    jgen.writeNumberField("rows", table.columnKeySet().size());
+    jgen.writeArrayFieldStart("sigils");
 
-      for (Witness witness : witnesses) {
-        jgen.writeString(witness.getSigil());
-      }
-      jgen.writeEndArray();
-
-
-      jgen.writeArrayFieldStart("table");
-      for (Integer row : table.rowKeySet()) {
-        final Map<Witness,Set<Token>> cells = table.row(row);
-        jgen.writeStartArray();
-        for (Witness witness : witnesses) {
-          final Set<Token> cellContents = cells.get(witness);
-          if (cellContents == null) {
-            jgen.writeNull();
-          } else {
-            final List<SimpleToken> cell = Ordering.natural().sortedCopy(Iterables.filter(cellContents, SimpleToken.class));
-            jgen.writeStartArray();
-            for (SimpleToken token : cell) {
-              if (token instanceof WebToken) {
-                jgen.writeTree(((WebToken) token).getJsonNode());
-              } else {
-                jgen.writeString(token.getContent());
-              }
-            }
-            jgen.writeEndArray();
-          }
-
-        }
-        jgen.writeEndArray();
-      }
-      jgen.writeEndArray();
-
-      jgen.writeEndObject();
-    } finally {
-      tx.finish();
+    for (Witness witness : witnesses) {
+      jgen.writeString(witness.getSigil());
     }
+    jgen.writeEndArray();
+
+
+    jgen.writeArrayFieldStart("table");
+    for (Integer row : table.rowKeySet()) {
+      final Map<Witness, Set<Token>> cells = table.row(row);
+      jgen.writeStartArray();
+      for (Witness witness : witnesses) {
+        final Set<Token> cellContents = cells.get(witness);
+        if (cellContents == null) {
+          jgen.writeNull();
+        } else {
+          final List<SimpleToken> cell = Ordering.natural().sortedCopy(Iterables.filter(cellContents, SimpleToken.class));
+          jgen.writeStartArray();
+          for (SimpleToken token : cell) {
+            if (token instanceof WebToken) {
+              jgen.writeTree(((WebToken) token).getJsonNode());
+            } else {
+              jgen.writeString(token.getContent());
+            }
+          }
+          jgen.writeEndArray();
+        }
+
+      }
+      jgen.writeEndArray();
+    }
+    jgen.writeEndArray();
+
+    jgen.writeEndObject();
   }
 }

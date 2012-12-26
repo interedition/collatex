@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import java.io.BufferedInputStream;
@@ -47,7 +48,7 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    return dotPath != null && Neo4jVariantGraph.class.isAssignableFrom(type);
+    return VariantGraph.class.isAssignableFrom(type);
   }
 
   @Override
@@ -57,6 +58,10 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
 
   @Override
   public void writeTo(final VariantGraph variantGraph, final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    if (dotPath == null) {
+      throw new WebApplicationException(Response.Status.NO_CONTENT);
+    }
+
     final Process dotProc = Runtime.getRuntime().exec(dotPath.getAbsolutePath() + " -Grankdir=LR -Gid=VariantGraph -Tsvg");
 
     final Future<Void> inputTask = threadPool.submit(new Callable<Void>() {

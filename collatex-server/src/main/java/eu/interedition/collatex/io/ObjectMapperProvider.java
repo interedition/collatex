@@ -1,6 +1,7 @@
 package eu.interedition.collatex.io;
 
 import com.google.inject.Provider;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -23,7 +24,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     public CollateXModule() {
       super(CollateXModule.class.getPackage().getName(), Version.unknownVersion());
       addDeserializer(Collation.class, new CollationDeserializer());
-      addSerializer(Neo4jVariantGraph.class, new VariantGraphSerializer());
+      addSerializer(VariantGraph.class, new VariantGraphSerializer());
     }
   }
 }

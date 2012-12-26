@@ -20,6 +20,10 @@
 
 package eu.interedition.collatex;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Ordering;
+
 import java.util.Comparator;
 
 /**
@@ -38,6 +42,13 @@ public interface Witness {
     @Override
     public int compare(Witness o1, Witness o2) {
       return o1.getSigil().compareTo(o2.getSigil());
+    }
+  };
+
+  final Function<VariantGraph.Edge, String> TO_SIGILS = new Function<VariantGraph.Edge, String>() {
+    @Override
+    public String apply(VariantGraph.Edge input) {
+      return Joiner.on(", ").join(Ordering.from(SIGIL_COMPARATOR).sortedCopy(input.witnesses()));
     }
   };
 }

@@ -78,13 +78,6 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
     };
   }
 
-  public static final Function<VariantGraph.Edge, String> TO_CONTENTS = new Function<VariantGraph.Edge, String>() {
-    @Override
-    public String apply(VariantGraph.Edge input) {
-      return Joiner.on(", ").join(Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(input.witnesses()));
-    }
-  };
-
   @Override
   public VariantGraph graph() {
     return graph;

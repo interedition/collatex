@@ -11,12 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphEdge;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VariantGraphs;
-import org.neo4j.graphdb.Transaction;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
@@ -133,7 +129,7 @@ public class SimpleVariantGraphSerializer {
       xml.writeStartElement(GRAPHML_NS, NODE_TAG);
       xml.writeAttribute(ID_ATT, vertexNodeID);
       GraphMLProperty.NODE_NUMBER.write(Integer.toString(vertexNumber++), xml);
-      GraphMLProperty.NODE_TOKEN.write(Neo4jVariantGraphVertex.TO_CONTENTS.apply(vertex), xml);
+      GraphMLProperty.NODE_TOKEN.write(SimpleToken.TO_CONTENTS.apply(vertex), xml);
       xml.writeEndElement();
       vertexToId.put(vertex, vertexNodeID);
     }
@@ -146,7 +142,7 @@ public class SimpleVariantGraphSerializer {
       xml.writeAttribute(TARGET_ATT, vertexToId.get(edge.to()));
       GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
       GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
-      GraphMLProperty.EDGE_WITNESSES.write(Neo4jVariantGraphEdge.TO_CONTENTS.apply(edge), xml);
+      GraphMLProperty.EDGE_WITNESSES.write(Witness.TO_SIGILS.apply(edge), xml);
       xml.writeEndElement();
     }
     /* FIXME
@@ -285,11 +281,11 @@ public class SimpleVariantGraphSerializer {
   }
 
   private String toLabel(VariantGraph.Edge e) {
-    return escapeLabel(Neo4jVariantGraphEdge.TO_CONTENTS.apply(e));
+    return escapeLabel(Witness.TO_SIGILS.apply(e));
   }
 
   private String toLabel(VariantGraph.Vertex v) {
-    return escapeLabel(Neo4jVariantGraphVertex.TO_CONTENTS.apply(v));
+    return escapeLabel(SimpleToken.TO_CONTENTS.apply(v));
   }
 
   String escapeLabel(String string) {

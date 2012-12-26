@@ -87,7 +87,8 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
         // match
         final Token matchedToken = tokenList.get(bc - 1);
         for (VariantGraph.Vertex vertex : vertexList.get(ac - 1)) {
-          if (comparator.compare(Iterables.getFirst(vertex.tokens(), null), matchedToken) == 0) {
+          final Token vertexToken = Iterables.getFirst(vertex.tokens(), null);
+          if (vertexToken != null && comparator.compare(vertexToken, matchedToken) == 0) {
             if (LOG.isTraceEnabled()) {
               LOG.trace("Matched {} and {}", matchedToken, vertex);
             }

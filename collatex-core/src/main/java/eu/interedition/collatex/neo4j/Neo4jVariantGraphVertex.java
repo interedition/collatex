@@ -127,21 +127,6 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
     return Iterables.toString(tokens());
   }
 
-  public static final Function<VariantGraph.Vertex, String> TO_CONTENTS = new Function<VariantGraph.Vertex, String>() {
-    @Override
-    public String apply(VariantGraph.Vertex input) {
-      final Set<Witness> witnesses = input.witnesses();
-      if (witnesses.isEmpty()) {
-        return "";
-      }
-      final StringBuilder contents = new StringBuilder();
-      for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(input.tokens(singleton(getFirst(witnesses, null))), SimpleToken.class))) {
-        contents.append(token.getContent()).append(" ");
-      }
-      return contents.toString().trim();
-    }
-  };
-
   @Override
   public VariantGraph graph() {
     return graph;

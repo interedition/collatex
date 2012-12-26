@@ -47,7 +47,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
 
   @Override
   public Iterable<VariantGraph.Transposition> transpositions() {
-    return null;
+    return Iterables.filter(graph.transpositionIndex.get(this), VariantGraph.Transposition.class);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   protected static Iterable<VariantGraph.Edge> paths(final Iterable<JungVariantGraphEdge> edges, final Set<Witness> witnesses) {
-    return cast(Iterables.filter(edges, (witnesses == null
+    return Iterables.filter(Iterables.filter(edges, (witnesses == null
             ? Predicates.<JungVariantGraphEdge>alwaysTrue()
             : new Predicate<JungVariantGraphEdge>() {
       @Override
@@ -102,12 +102,7 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
         }
         return false;
       }
-    })));
+    })), VariantGraph.Edge.class);
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T, C> Iterable<T> cast(Iterable<C> iterable) {
-    Iterable iter = iterable;
-    return iter;
-  }
 }

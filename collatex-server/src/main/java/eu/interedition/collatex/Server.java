@@ -8,7 +8,6 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.io.ObjectMapperMessageBodyReaderWriter;
 import eu.interedition.collatex.io.ObjectMapperProvider;
 import eu.interedition.collatex.io.TemplateConfigurationProvider;
@@ -21,7 +20,6 @@ import eu.interedition.collatex.util.Logging;
 import freemarker.template.Configuration;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -35,7 +33,6 @@ import java.util.logging.Logger;
  */
 public class Server extends DefaultResourceConfig {
 
-  private static final int TWO_HOURS = 7200000;
   private static final Logger LOG = Logger.getLogger(Server.class.getName());
 
   private final Injector injector;
@@ -51,7 +48,6 @@ public class Server extends DefaultResourceConfig {
     final Injector injector = Guice.createInjector(new ConfigurationModule(), new AbstractModule() {
       @Override
       protected void configure() {
-        bind(Neo4jVariantGraphFactory.class).toProvider(GraphFactoryProvider.class).asEagerSingleton();
         bind(Configuration.class).toProvider(TemplateConfigurationProvider.class).asEagerSingleton();
         bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
       }
@@ -80,20 +76,9 @@ public class Server extends DefaultResourceConfig {
 
     httpServer.start();
 
-    final Neo4jVariantGraphFactory graphFactory = injector.getInstance(Neo4jVariantGraphFactory.class);
-    while (true) {
-      final Transaction tx = graphFactory.getDatabase().beginTx();
+    synchronized (httpServer) {
       try {
-        LOG.fine("Purging graphs older than 2 hours");
-        graphFactory.deleteGraphsOlderThan(System.currentTimeMillis() - TWO_HOURS);
-        tx.success();
-      } catch (Exception e) {
-        LOG.log(Level.SEVERE, "Error while purging old graphs", e);
-      } finally {
-        tx.finish();
-      }
-      try {
-        Thread.sleep(TWO_HOURS);
+        httpServer.wait();
       } catch (InterruptedException e) {
       }
     }

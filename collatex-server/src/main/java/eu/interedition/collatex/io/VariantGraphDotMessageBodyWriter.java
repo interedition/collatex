@@ -2,9 +2,7 @@ package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -28,7 +26,7 @@ public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Varia
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    return Neo4jVariantGraph.class.isAssignableFrom(type);
+    return VariantGraph.class.isAssignableFrom(type);
   }
 
   @Override
@@ -38,16 +36,11 @@ public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<Varia
 
   @Override
   public void writeTo(VariantGraph graph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
-    final Transaction tx = ((Neo4jVariantGraph)graph).getDatabase().beginTx();
+    final PrintWriter out = new PrintWriter(new OutputStreamWriter(entityStream, "UTF-8"));
     try {
-      final PrintWriter out = new PrintWriter(new OutputStreamWriter(entityStream, "UTF-8"));
-      try {
       new SimpleVariantGraphSerializer(graph).toDot(graph, out);
-      } finally {
-        Closeables.close(out, false);
-      }
     } finally {
-      tx.finish();
+      Closeables.close(out, false);
     }
   }
 }

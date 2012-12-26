@@ -43,11 +43,7 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   @Override
   public Set<Transposition> transpositions() {
-    final Set<Transposition> transpositions = Sets.newHashSet();
-    for (Vertex v : vertices()) {
-      Iterables.addAll(transpositions, v.transpositions());
-    }
-    return transpositions;
+    return Sets.newHashSet(Iterables.filter(transpositionIndex.values(), Transposition.class));
   }
 
   @Override
@@ -101,16 +97,26 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   @Override
   public Transposition transpose(Set<Vertex> vertices) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    Preconditions.checkArgument(!vertices.isEmpty());
+    for (Transposition transposition : vertices.iterator().next().transpositions()) {
+      if (Sets.newHashSet(transposition).equals(vertices)) {
+        return transposition;
+      }
+    }
+    return new JungVariantGraphTransposition(this, vertices);
   }
 
   @Override
   public Edge edgeBetween(Vertex a, Vertex b) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return findEdge((JungVariantGraphVertex) a, (JungVariantGraphVertex) b);
   }
 
   @Override
   public Set<Witness> witnesses() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    Set<Witness> witnesses = Sets.newHashSet();
+    for (Edge edge : start.outgoing()) {
+      witnesses.addAll(edge.witnesses());
+    }
+    return witnesses;
   }
 }

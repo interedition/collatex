@@ -27,7 +27,7 @@ public class JungVariantGraphEdge implements VariantGraph.Edge {
 
   @Override
   public VariantGraph.Edge add(Set<Witness> witnesses) {
-    witnesses.addAll(witnesses);
+    this.witnesses.addAll(witnesses);
     return this;
   }
 

@@ -44,33 +44,6 @@ public class ConfigurationModule extends AbstractModule {
   }
 
   protected void detectConfigurationSettings(Properties configuration) {
-    if (!configuration.containsKey("interedition.data")) {
-      String dataDirectoryPath;
-
-      final File userHome = new File(System.getProperty("user.home"));
-      final String osName = System.getProperty("os.name").toLowerCase();
-
-      if (osName.contains("mac os x")) {
-        dataDirectoryPath = new File(userHome, "Library/Application Support/Interedition").getAbsolutePath();
-      } else if (osName.contains("windows")) {
-        dataDirectoryPath = new File(userHome, "Application Data/Interedition").getAbsolutePath();
-      } else {
-        dataDirectoryPath = new File(userHome, ".interedition").getAbsolutePath();
-      }
-
-      final File dataDirectory = new File(dataDirectoryPath);
-      if (!dataDirectory.isDirectory() && !dataDirectory.mkdirs()) {
-        if (LOG.isLoggable(Level.WARNING)) {
-          LOG.warning("Cannot create data directory " + dataDirectory.getPath());
-        }
-      } else {
-        if (LOG.isLoggable(Level.INFO)) {
-          LOG.info("Auto-detected data directory " + dataDirectory);
-        }
-        configuration.put("interedition.data", dataDirectory.getPath());
-      }
-    }
-
     if (!configuration.containsKey("interedition.dot")) {
       InputStream stream = null;
       String dotPath = null;

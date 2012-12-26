@@ -1,12 +1,11 @@
 package eu.interedition.collatex;
 
 import com.google.inject.Inject;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.io.Collation;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.util.VariantGraphs;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -24,12 +23,10 @@ import java.io.IOException;
 public class CollateResource {
 
   private final Configuration templates;
-  private final Neo4jVariantGraphFactory graphFactory;
 
   @Inject
-  public CollateResource(Configuration templates, Neo4jVariantGraphFactory graphFactory) {
+  public CollateResource(Configuration templates) {
     this.templates = templates;
-    this.graphFactory = graphFactory;
   }
 
   @GET
@@ -65,25 +62,19 @@ public class CollateResource {
   @Path("collate")
   @POST
   public VariantGraph collate(Collation collation) {
-    final Transaction tx = graphFactory.getDatabase().beginTx();
-    try {
-      // create
-      VariantGraph graph = graphFactory.newVariantGraph();
+    // create
+    VariantGraph graph = new JungVariantGraph();
 
-      if (collation != null) {
-        // merge
-        collation.getAlgorithm().collate(graph, collation.getWitnesses());
+    if (collation != null) {
+      // merge
+      collation.getAlgorithm().collate(graph, collation.getWitnesses());
 
-        // post-process
-        if (collation.isJoined()) {
-          graph = VariantGraphs.join(graph);
-        }
+      // post-process
+      if (collation.isJoined()) {
+        graph = VariantGraphs.join(graph);
       }
-
-      tx.success();
-      return graph;
-    } finally {
-      tx.finish();
     }
+
+    return graph;
   }
 }

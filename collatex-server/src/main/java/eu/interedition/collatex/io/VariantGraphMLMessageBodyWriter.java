@@ -2,9 +2,7 @@ package eu.interedition.collatex.io;
 
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -31,7 +29,7 @@ public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<Varian
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-    return Neo4jVariantGraph.class.isAssignableFrom(type);
+    return VariantGraph.class.isAssignableFrom(type);
   }
 
   @Override
@@ -41,22 +39,17 @@ public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<Varian
 
   @Override
   public void writeTo(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
-    final Transaction tx = ((Neo4jVariantGraph)variantGraph).getDatabase().beginTx();
+    XMLStreamWriter xml = null;
     try {
-      XMLStreamWriter xml = null;
-      try {
-        new SimpleVariantGraphSerializer(variantGraph).toGraphML(xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream));
-      } catch (XMLStreamException e) {
-        throw new IOException(e.getMessage(), e);
-      } finally {
-        try {
-          xml.close();
-        } catch (XMLStreamException e) {
-        }
-        Closeables.close(entityStream, false);
-      }
+      new SimpleVariantGraphSerializer(variantGraph).toGraphML(xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream));
+    } catch (XMLStreamException e) {
+      throw new IOException(e.getMessage(), e);
     } finally {
-      tx.finish();
+      try {
+        xml.close();
+      } catch (XMLStreamException e) {
+      }
+      Closeables.close(entityStream, false);
     }
   }
 }

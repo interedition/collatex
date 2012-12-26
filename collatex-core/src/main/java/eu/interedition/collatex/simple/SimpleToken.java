@@ -20,13 +20,35 @@
 
 package eu.interedition.collatex.simple;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 
+import java.util.Set;
+
+import static com.google.common.collect.Iterables.getFirst;
+import static java.util.Collections.singleton;
+
 public class SimpleToken implements Token, Comparable<SimpleToken> {
+  public static final Function<VariantGraph.Vertex, String> TO_CONTENTS = new Function<VariantGraph.Vertex, String>() {
+    @Override
+    public String apply(VariantGraph.Vertex input) {
+      final Set<Witness> witnesses = input.witnesses();
+      if (witnesses.isEmpty()) {
+        return "";
+      }
+      final StringBuilder contents = new StringBuilder();
+      for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(input.tokens(singleton(getFirst(witnesses, null))), SimpleToken.class))) {
+        contents.append(token.getContent()).append(" ");
+      }
+      return contents.toString().trim();
+    }
+  };
   public static int nextId = 0;
   public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
   public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");

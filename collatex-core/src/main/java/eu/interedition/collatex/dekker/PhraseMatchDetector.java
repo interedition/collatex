@@ -53,7 +53,7 @@ public class PhraseMatchDetector {
 	addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
         continue;
       }
-      Neo4jVariantGraphVertex baseVertex = (Neo4jVariantGraphVertex) linkedTokens.get(token);
+      VariantGraph.Vertex baseVertex = linkedTokens.get(token);
       // requirements:
       // - previous and base vertex should have the same witnesses
       // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
@@ -61,7 +61,7 @@ public class PhraseMatchDetector {
       // - there may not be a longer path between previous and base vertex
       boolean sameTranspositions = Sets.newHashSet(previous.transpositions()).equals(Sets.newHashSet(baseVertex.transpositions()));
       boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
-      boolean directedEdge = directedEdgeBetween(previous, baseVertex);
+      boolean directedEdge = (base.edgeBetween(previous, baseVertex) != null);
       boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
       if (!isNear) {
         addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
@@ -82,16 +82,5 @@ public class PhraseMatchDetector {
       basePhrase.clear();
       witnessPhrase.clear();
     }
-  }
-
-  private boolean directedEdgeBetween(VariantGraph.Vertex a, VariantGraph.Vertex b) {
-    final Node aNode = ((Neo4jVariantGraphVertex)a).getNode();
-    final Node bNode = ((Neo4jVariantGraphVertex)b).getNode();
-    for (Relationship r : aNode.getRelationships(Direction.OUTGOING, Neo4jGraphRelationships.PATH)) {
-      if (r.getEndNode().equals(bNode)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

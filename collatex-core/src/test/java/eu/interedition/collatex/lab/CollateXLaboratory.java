@@ -23,6 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
 import eu.interedition.collatex.util.VariantGraphs;
 import org.neo4j.graphdb.Transaction;
@@ -51,10 +52,8 @@ public class CollateXLaboratory extends JFrame {
   public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
   public static final BasicStroke SOLID_STROKE = new BasicStroke(1.5f);
 
-  private final Neo4jVariantGraphFactory graphFactory;
   private final WitnessPanel witnessPanel = new WitnessPanel();
 
-  private final VariantGraphModel variantGraphModel = new VariantGraphModel();
   private final VariantGraphPanel variantGraphPanel;
 
   private final JTable matchMatrixTable = new JTable();
@@ -64,9 +63,8 @@ public class CollateXLaboratory extends JFrame {
   private final JComboBox algorithm;
   private final JTabbedPane tabbedPane;
 
-  public CollateXLaboratory(Neo4jVariantGraphFactory graphFactory) {
+  public CollateXLaboratory() {
     super("CollateX Laboratory");
-    this.graphFactory = graphFactory;
 
     this.algorithm = new JComboBox(new Object[] { "Dekker", "Needleman-Wunsch" });
     this.algorithm.setEditable(false);
@@ -74,7 +72,7 @@ public class CollateXLaboratory extends JFrame {
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
 
     this.tabbedPane = new JTabbedPane();
-    this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(variantGraphModel));
+    this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(new JungVariantGraph()));
     this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
     this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -107,7 +105,7 @@ public class CollateXLaboratory extends JFrame {
   }
 
   public static void main(String[] args) throws Exception {
-    new CollateXLaboratory(Neo4jVariantGraphFactory.create()).setVisible(true);
+    new CollateXLaboratory().setVisible(true);
   }
 
   private class AddWitnessAction extends AbstractAction {
@@ -146,27 +144,18 @@ public class CollateXLaboratory extends JFrame {
 
       LOG.debug("Collating {}", Iterables.toString(w));
 
-      Transaction transaction = graphFactory.getDatabase().beginTx();
-      try {
-        final EqualityTokenComparator comparator = new EqualityTokenComparator();
-        final VariantGraph pvg = graphFactory.newVariantGraph();
+      final EqualityTokenComparator comparator = new EqualityTokenComparator();
+      final JungVariantGraph variantGraph = new JungVariantGraph();
 
-        final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem()) ? dekker(comparator) : needlemanWunsch(comparator);
-        for (SimpleWitness witness : w) {
-          collator.collate(pvg, witness);
-        }
-
-        // FIXME: rank()!!!
-        variantGraphModel.update(VariantGraphs.join(pvg));
-
-        transaction.success();
-      } finally {
-        transaction.finish();
+      final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem()) ? dekker(comparator) : needlemanWunsch(comparator);
+      for (SimpleWitness witness : w) {
+        collator.collate(variantGraph, witness);
       }
+      VariantGraphs.join(variantGraph);
 
+      variantGraphPanel.setVariantGraph(variantGraph);
       LOG.debug("Collated {}", Iterables.toString(w));
 
-      variantGraphPanel.getModel().setGraphLayout(new SugiyamaLayout<VariantGraphVertexModel, VariantGraphEdgeModel>(variantGraphModel));
       tabbedPane.setSelectedIndex(0);
     }
   }
@@ -207,32 +196,27 @@ public class CollateXLaboratory extends JFrame {
         return;
       }
 
-      final Transaction transaction = graphFactory.getDatabase().beginTx();
-      try {
-        final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
-        final VariantGraph vg = graphFactory.newVariantGraph();
+      final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
+      final VariantGraph vg = new JungVariantGraph();
 
-        int outlierTranspositionsSizeLimit = 3;
-        for (int i = 0; i <= w.size() - 2; i++) {
-          SimpleWitness witness = w.get(i);
-          LOG.debug("Collating: {}", witness.getSigil());
-          CollationAlgorithmFactory.dekkerMatchMatrix(comparator, outlierTranspositionsSizeLimit).collate(vg, witness);
-        }
-
-        SimpleWitness lastWitness = w.get(w.size() - 1);
-        LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
-        matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness, outlierTranspositionsSizeLimit));
-
-        final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
-        columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
-        for (int col = 1; col < matchMatrixTable.getColumnCount(); col++) {
-          columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
-        }
-
-        tabbedPane.setSelectedIndex(2);
-      } finally {
-        transaction.finish();
+      int outlierTranspositionsSizeLimit = 3;
+      for (int i = 0; i <= w.size() - 2; i++) {
+        SimpleWitness witness = w.get(i);
+        LOG.debug("Collating: {}", witness.getSigil());
+        CollationAlgorithmFactory.dekkerMatchMatrix(comparator, outlierTranspositionsSizeLimit).collate(vg, witness);
       }
+
+      SimpleWitness lastWitness = w.get(w.size() - 1);
+      LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
+      matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness, outlierTranspositionsSizeLimit));
+
+      final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
+      columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());
+      for (int col = 1; col < matchMatrixTable.getColumnCount(); col++) {
+        columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
+      }
+
+      tabbedPane.setSelectedIndex(2);
     }
   }
 
