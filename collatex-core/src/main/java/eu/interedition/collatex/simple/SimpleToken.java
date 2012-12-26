@@ -49,6 +49,7 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
       return contents.toString().trim();
     }
   };
+
   public static int nextId = 0;
   public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
   public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");

@@ -31,7 +31,6 @@ import eu.interedition.collatex.simple.SimpleToken;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
-  private static final String TOKEN_REFERENCE_KEY = "tokenReferences";
   protected final Neo4jVariantGraph graph;
   protected final Node node;
 
@@ -41,7 +40,7 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   public Neo4jVariantGraphVertex(Neo4jVariantGraph graph, Set<Token> tokens) {
-    this(graph, graph.getDatabase().createNode());
+    this(graph, graph.database.createNode());
     setTokens(tokens);
   }
 
@@ -82,16 +81,7 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
 
   @Override
   public Set<Token> tokens(Set<Witness> witnesses) {
-    final Set<Token> tokens = graph.tokenMapper.map(getTokenReferences());
-    if (witnesses != null && !witnesses.isEmpty()) {
-      for (Iterator<Token> tokenIt = tokens.iterator(); tokenIt.hasNext(); ) {
-        final Token token = tokenIt.next();
-        if (!witnesses.contains(token.getWitness())) {
-          tokenIt.remove();
-        }
-      }
-    }
-    return tokens;
+    return graph.adapter.getTokens(this, witnesses);
   }
 
   @Override
@@ -111,15 +101,7 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   public void setTokens(Set<Token> tokens) {
-    setTokenReferences(graph.tokenMapper.map(tokens));
-  }
-
-  public int[] getTokenReferences() {
-    return (int[]) node.getProperty(TOKEN_REFERENCE_KEY);
-  }
-
-  public void setTokenReferences(int... references) {
-    node.setProperty(TOKEN_REFERENCE_KEY, references);
+    graph.adapter.setTokens(this, tokens);
   }
 
   @Override

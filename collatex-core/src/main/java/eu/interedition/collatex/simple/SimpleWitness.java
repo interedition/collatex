@@ -21,6 +21,7 @@
 package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import eu.interedition.collatex.Token;
@@ -95,10 +96,9 @@ public class SimpleWitness implements Iterable<Token>, Witness {
     return sigil;
   }
 
-  // TODO check whether iterator.remove() throws exception!
   @Override
   public Iterator<Token> iterator() {
-    return tokens.iterator();
+    return Iterators.unmodifiableIterator(tokens.iterator());
   }
 
   @Override

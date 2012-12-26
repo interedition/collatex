@@ -15,7 +15,6 @@ import java.util.Set;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
-  private static final String WITNESS_REFERENCE_KEY = "witnessReferences";
   protected final Neo4jVariantGraph graph;
   protected final Relationship relationship;
 
@@ -26,20 +25,17 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
 
   public Neo4jVariantGraphEdge(Neo4jVariantGraph graph, Neo4jVariantGraphVertex from, Neo4jVariantGraphVertex to, Set<Witness> witnesses) {
     this(graph, from.getNode().createRelationshipTo(to.getNode(), Neo4jGraphRelationships.PATH));
-    setWitnessReferences(this.graph.witnessMapper.map(witnesses));
+    graph.adapter.setWitnesses(this, witnesses);
   }
 
-  public boolean traversableWith(int[] witnesses) {
-    if (witnesses == null || witnesses.length == 0) {
+  public boolean traversableWith(Set<Witness> witnesses) {
+    if (witnesses == null || witnesses.isEmpty()) {
       return true;
     }
-
-    final int[] witnessReferences = getWitnessReferences();
-    for (int wrc = 0; wrc < witnessReferences.length; wrc++) {
-      for (int wc = 0; wc < witnesses.length; wc++) {
-        if (witnessReferences[wrc] == witnesses[wc]) {
-          return true;
-        }
+    final Set<Witness> edgeWitnesses = witnesses();
+    for (Witness witness : witnesses) {
+      if (edgeWitnesses.contains(witness)) {
+        return true;
       }
     }
     return false;
@@ -47,33 +43,21 @@ public class Neo4jVariantGraphEdge implements VariantGraph.Edge {
 
   @Override
   public VariantGraph.Edge add(Set<Witness> witnesses) {
-    setWitnessReferences(graph.witnessMapper.map(Sets.union(witnesses(), witnesses)));
+    graph.adapter.setWitnesses(this, Sets.union(witnesses(), witnesses));
     return this;
   }
 
   @Override
   public Set<Witness> witnesses() {
-    return graph.witnessMapper.map(getWitnessReferences());
-  }
-
-  public int[] getWitnessReferences() {
-    return (int[]) relationship.getProperty(WITNESS_REFERENCE_KEY);
-  }
-
-  public void setWitnessReferences(int... references) {
-    relationship.setProperty(WITNESS_REFERENCE_KEY, references);
+    return graph.adapter.getWitnesses(this);
   }
 
   public static Predicate<VariantGraph.Edge> createTraversableFilter(final Set<Witness> witnesses) {
     return new Predicate<VariantGraph.Edge>() {
-      private int[] witnessReferences;
 
       @Override
       public boolean apply(VariantGraph.Edge input) {
-        if (witnessReferences == null) {
-          witnessReferences = ((witnesses == null || witnesses.isEmpty()) ? new int[0] : ((Neo4jVariantGraph)input.graph()).witnessMapper.map(witnesses));
-        }
-        return ((Neo4jVariantGraphEdge) input).traversableWith(witnessReferences);
+        return ((Neo4jVariantGraphEdge) input).traversableWith(witnesses);
       }
     };
   }
