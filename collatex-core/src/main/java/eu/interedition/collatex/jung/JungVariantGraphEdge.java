@@ -3,6 +3,7 @@ package eu.interedition.collatex.jung;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.util.Pair;
 import eu.interedition.collatex.VariantGraph;
@@ -54,5 +55,10 @@ public class JungVariantGraphEdge implements VariantGraph.Edge {
   @Override
   public void delete() {
     graph.removeEdge(this);
+  }
+
+  @Override
+  public String toString() {
+    return Iterables.toString(witnesses);
   }
 }

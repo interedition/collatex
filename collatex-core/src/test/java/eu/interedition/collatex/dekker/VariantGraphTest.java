@@ -48,9 +48,9 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(5, Iterables.size(graph.vertices()));
     assertEquals(4, Iterables.size(graph.edges()));
 
-    final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final Neo4jVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final Neo4jVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0], w[1]);
@@ -66,11 +66,11 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(7, Lists.newArrayList(graph.vertices()).size());
     assertEquals(7, Iterables.size(graph.edges()));
 
-    final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final Neo4jVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
-    final Neo4jVariantGraphVertex andVertex = vertexWith(graph, "and", w[1]);
-    final Neo4jVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final Neo4jVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraph.Vertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final VariantGraph.Vertex andVertex = vertexWith(graph, "and", w[1]);
+    final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);
@@ -90,13 +90,13 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(9, vertices.size());
     assertEquals(12, Iterables.size(graph.edges()));
 
-    final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final Neo4jVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final Neo4jVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
-    final Neo4jVariantGraphVertex greenVertex = vertexWith(graph, "green", w[2]);
-    final Neo4jVariantGraphVertex redVertex = vertexWith(graph, "red", w[3]);
-    final Neo4jVariantGraphVertex yellowVertex = vertexWith(graph, "yellow", w[4]);
-    final Neo4jVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraph.Vertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final VariantGraph.Vertex greenVertex = vertexWith(graph, "green", w[2]);
+    final VariantGraph.Vertex redVertex = vertexWith(graph, "red", w[3]);
+    final VariantGraph.Vertex yellowVertex = vertexWith(graph, "yellow", w[4]);
+    final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1], w[2], w[3], w[4]);
     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0]);

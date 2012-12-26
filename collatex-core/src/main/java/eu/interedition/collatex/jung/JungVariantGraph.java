@@ -119,4 +119,9 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
     }
     return witnesses;
   }
+
+  @Override
+  public String toString() {
+    return Iterables.toString(witnesses());
+  }
 }

@@ -72,10 +72,10 @@ public class BeckettTest extends AbstractTest {
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = collate(w);
 
-    final Neo4jVariantGraphVertex itsVertex = vertexWith(graph, "its", w[0]);
-    final Neo4jVariantGraphVertex softVertex = vertexWith(graph, "soft", w[0]);
-    final Neo4jVariantGraphVertex changelessVertex = vertexWith(graph, "changeless", w[1]);
-    final Neo4jVariantGraphVertex lightVertex = vertexWith(graph, "light", w[0]);
+    final VariantGraph.Vertex itsVertex = vertexWith(graph, "its", w[0]);
+    final VariantGraph.Vertex softVertex = vertexWith(graph, "soft", w[0]);
+    final VariantGraph.Vertex changelessVertex = vertexWith(graph, "changeless", w[1]);
+    final VariantGraph.Vertex lightVertex = vertexWith(graph, "light", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), itsVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(itsVertex, softVertex), w[0], w[1]);

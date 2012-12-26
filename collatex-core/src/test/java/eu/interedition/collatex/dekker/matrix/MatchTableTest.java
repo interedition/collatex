@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -29,7 +30,7 @@ public class MatchTableTest extends AbstractTest {
 
   @Test
   public void testTableCreationEmptyGraph() {
-    final VariantGraph graph = graphFactory.newVariantGraph();
+    final VariantGraph graph = new JungVariantGraph();
     SimpleWitness[] witnesses = createWitnesses("a b");
     MatchTable table = MatchTable.create(graph, witnesses[0]);
     assertEquals(1, table.columnList().size());

@@ -342,7 +342,7 @@ public class HermansTest extends AbstractTest {
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
-      String showTransposition = showTransposition(t);
+      String showTransposition = t.toString();
       LOG.info("transposition {}", showTransposition);
       boolean transpositionOfA = showTransposition.contains("a");
       boolean transpositionOfB = showTransposition.contains("b");

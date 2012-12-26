@@ -43,14 +43,16 @@ public class VariantGraphRankerTest extends AbstractTest {
 
     assertVertexEquals("the", vertices.get(1));
     assertEquals(1, (long) ranking.apply(vertices.get(1)));
+
     assertVertexEquals("black", vertices.get(2));
     assertEquals(2, (long) ranking.apply(vertices.get(2)));
+
     assertVertexEquals("and", vertices.get(3));
     assertEquals(3, (long) ranking.apply(vertices.get(3)));
-    assertVertexEquals("white", vertices.get(4));
-    assertEquals(4, (long) ranking.apply(vertices.get(4)));
-    assertVertexEquals("green", vertices.get(5));
-    assertEquals(4, (long) ranking.apply(vertices.get(5)));
+
+    assertEquals(4, (long) ranking.apply(vertices.get(4))); // green or white
+    assertEquals(4, (long) ranking.apply(vertices.get(5))); // green or white
+
     assertVertexEquals("cat", vertices.get(6));
     assertEquals(5, (long) ranking.apply(vertices.get(6)));
   }

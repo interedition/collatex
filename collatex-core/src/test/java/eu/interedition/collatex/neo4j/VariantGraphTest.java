@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.util.VariantGraphs;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void reconnectingVerticesYieldsSameEdge() {
     final SimpleWitness witness = createWitnesses("hello world")[0];
-    final VariantGraph graph = graphFactory.newVariantGraph();
+    final VariantGraph graph = new JungVariantGraph();
     final VariantGraph.Vertex helloVertex = graph.add(witness.getTokens().get(0));
     final VariantGraph.Vertex worldVertex = graph.add(witness.getTokens().get(1));
     final VariantGraph.Edge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
@@ -88,9 +89,9 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(5, Iterables.size(graph.vertices()));
     assertEquals(4, Iterables.size(graph.edges()));
 
-    final Neo4jVariantGraphVertex firstVertex = vertexWith(graph, "only", w[0]);
-    final Neo4jVariantGraphVertex secondVertex = vertexWith(graph, "one", w[0]);
-    final Neo4jVariantGraphVertex thirdVertex = vertexWith(graph, "witness", w[0]);
+    final VariantGraph.Vertex firstVertex = vertexWith(graph, "only", w[0]);
+    final VariantGraph.Vertex secondVertex = vertexWith(graph, "one", w[0]);
+    final VariantGraph.Vertex thirdVertex = vertexWith(graph, "witness", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), firstVertex), w[0]);
     assertHasWitnesses(edgeBetween(firstVertex, secondVertex), w[0]);
@@ -158,10 +159,10 @@ public class VariantGraphTest extends AbstractTest {
     assertEquals(3, Iterables.size(graph.vertices()));
     assertEquals(2, Iterables.size(graph.edges()));
 
-    final Neo4jVariantGraphVertex joinedVertex = vertexWith(graph, "the black cat", w[0]);
+    final VariantGraph.Vertex joinedVertex = vertexWith(graph, "the black cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), joinedVertex), w[0], w[1]);
-    assertHasWitnesses(edgeBetween(graph.getEnd(), joinedVertex), w[0], w[1]);
+    assertHasWitnesses(edgeBetween(joinedVertex, graph.getEnd()), w[0], w[1]);
   }
 
   @Test
@@ -169,14 +170,14 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
     final VariantGraph graph = VariantGraphs.join(collate(w));
 
-    final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final Neo4jVariantGraphVertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
-    final Neo4jVariantGraphVertex badWhiteVertex = vertexWith(graph, "bad white", w[1]);
-    final Neo4jVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
-    final Neo4jVariantGraphVertex sharedVertex = vertexWith(graph, "shared", w[0]);
-    final Neo4jVariantGraphVertex spilledVertex = vertexWith(graph, "spilled", w[1]);
-    final Neo4jVariantGraphVertex hisFoodVertex = vertexWith(graph, "his food", w[0]);
-    final Neo4jVariantGraphVertex againVertex = vertexWith(graph, "again", w[1]);
+    final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraph.Vertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
+    final VariantGraph.Vertex badWhiteVertex = vertexWith(graph, "bad white", w[1]);
+    final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraph.Vertex sharedVertex = vertexWith(graph, "shared", w[0]);
+    final VariantGraph.Vertex spilledVertex = vertexWith(graph, "spilled", w[1]);
+    final VariantGraph.Vertex hisFoodVertex = vertexWith(graph, "his food", w[0]);
+    final VariantGraph.Vertex againVertex = vertexWith(graph, "again", w[1]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
     assertHasWitnesses(edgeBetween(theVertex, niceBlackVertex), w[0]);
@@ -195,12 +196,12 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
     final VariantGraph graph = VariantGraphs.join(collate(w));
 
-    final Neo4jVariantGraphVertex blackieVertex = vertexWith(graph, "blackie", w[0]);
-    final Neo4jVariantGraphVertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
-    final Neo4jVariantGraphVertex theVertex = vertexWith(graph, "the", w[0]);
-    final Neo4jVariantGraphVertex blackVertex = vertexWith(graph, "black", w[0]);
-    final Neo4jVariantGraphVertex whiteVertex = vertexWith(graph, "white", w[1]);
-    final Neo4jVariantGraphVertex catVertex = vertexWith(graph, "cat", w[0]);
+    final VariantGraph.Vertex blackieVertex = vertexWith(graph, "blackie", w[0]);
+    final VariantGraph.Vertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
+    final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
+    final VariantGraph.Vertex whiteVertex = vertexWith(graph, "white", w[1]);
+    final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);
 
     assertHasWitnesses(edgeBetween(graph.getStart(), blackieVertex), w[0]);
     assertHasWitnesses(edgeBetween(blackieVertex, theVertex), w[0]);
@@ -221,11 +222,11 @@ public class VariantGraphTest extends AbstractTest {
     s.toDot(graph, writer);
     LOG.debug("dot={}", writer.toString());
 
-    final Neo4jVariantGraphVertex voorVertex1 = vertexWith(graph, "voor", w[0]);
-    final Neo4jVariantGraphVertex zoVertex = vertexWith(graph, "zo", w[0]);
-    final Neo4jVariantGraphVertex nuendanVertex = vertexWith(graph, "nu en dan", w[0]);
+    final VariantGraph.Vertex voorVertex1 = vertexWith(graph, "voor", w[0]);
+    final VariantGraph.Vertex zoVertex = vertexWith(graph, "zo", w[0]);
+    final VariantGraph.Vertex nuendanVertex = vertexWith(graph, "nu en dan", w[0]);
     //    final VariantGraphVertex zin2AVertex = vertexWith(graph, "zin2", w[0]);
-    final Neo4jVariantGraphVertex zin2BVertex = vertexWith(graph, "zin2", w[1]);
+    final VariantGraph.Vertex zin2BVertex = vertexWith(graph, "zin2", w[1]);
     //    final VariantGraphVertex naVertex = vertexWith(graph, "na", w[0]);
     //    final VariantGraphVertex voorVertex2 = vertexWith(graph, "voor", w[0]);
 

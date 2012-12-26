@@ -35,4 +35,9 @@ public class JungVariantGraphTransposition implements VariantGraph.Transposition
   public Iterator<VariantGraph.Vertex> iterator() {
     return Iterators.filter(vertices.iterator(), VariantGraph.Vertex.class);
   }
+
+  @Override
+  public String toString() {
+    return Iterables.toString(vertices);
+  }
 }

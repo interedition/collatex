@@ -89,6 +89,11 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
     graph.removeVertex(this);
   }
 
+  @Override
+  public String toString() {
+    return Iterables.toString(tokens);
+  }
+
   protected static Iterable<VariantGraph.Edge> paths(final Iterable<JungVariantGraphEdge> edges, final Set<Witness> witnesses) {
     return Iterables.filter(Iterables.filter(edges, (witnesses == null
             ? Predicates.<JungVariantGraphEdge>alwaysTrue()
@@ -104,5 +109,4 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
       }
     })), VariantGraph.Edge.class);
   }
-
 }

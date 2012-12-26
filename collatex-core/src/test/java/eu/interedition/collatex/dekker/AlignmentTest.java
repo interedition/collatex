@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import org.junit.Test;
 
 import com.google.common.collect.RowSortedTable;
@@ -166,7 +167,7 @@ public class AlignmentTest extends AbstractTest {
     witnesses.add(new SimpleWitness("w3", "Y A X ", tokenizer));
 
     setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
-    VariantGraph graph = graphFactory.newVariantGraph();
+    VariantGraph graph = new JungVariantGraph();
     collationAlgorithm.collate(graph, witnesses.toArray(new SimpleWitness[0]));
 
     StringWriter writer = new StringWriter();

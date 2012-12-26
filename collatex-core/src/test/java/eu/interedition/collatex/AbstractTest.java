@@ -1,28 +1,5 @@
 package eu.interedition.collatex;
 
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphFactory;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
-import eu.interedition.collatex.util.Logging;
-import eu.interedition.collatex.util.VariantGraphRanking;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.neo4j.graphdb.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -32,13 +9,31 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceTokenizer;
+import eu.interedition.collatex.util.Logging;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -47,27 +42,12 @@ public abstract class AbstractTest {
   protected final Logger LOG = LoggerFactory.getLogger(getClass());
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
-  protected static Neo4jVariantGraphFactory graphFactory;
   protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
   private Transaction transaction;
 
   @BeforeClass
   public static void init() throws IOException {
     Logging.configureLogging();
-    graphFactory = Neo4jVariantGraphFactory.create();
-  }
-
-  @Before
-  public void startGraphTransaction() {
-    transaction = graphFactory.getDatabase().beginTx();
-  }
-
-  @After
-  public void finishGraphTransaction() {
-    if (transaction != null) {
-      transaction.finish();
-      transaction = null;
-    }
   }
 
   protected SimpleWitness[] createWitnesses(Function<String, List<String>> tokenizer, String... contents) {
@@ -83,8 +63,8 @@ public abstract class AbstractTest {
     return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
-  protected Neo4jVariantGraph collate(SimpleWitness... witnesses) {
-    final Neo4jVariantGraph graph = graphFactory.newVariantGraph();
+  protected VariantGraph collate(SimpleWitness... witnesses) {
+    final VariantGraph graph = new JungVariantGraph();
     collate(graph, witnesses);
     return graph;
   }
@@ -145,10 +125,10 @@ public abstract class AbstractTest {
     Assert.assertEquals(String.format("%s does not has expected content for %s", vertex, in), content, toString(vertex, in));
   }
 
-  protected static Neo4jVariantGraphVertex vertexWith(VariantGraph graph, String content, Witness in) {
+  protected static VariantGraph.Vertex vertexWith(VariantGraph graph, String content, Witness in) {
     for (VariantGraph.Vertex v : graph.vertices(Collections.singleton(in))) {
       if (content.equals(toString(v, in))) {
-        return (Neo4jVariantGraphVertex) v;
+        return v;
       }
     }
     fail(String.format("No vertex with content '%s' in witness %s", content, in));

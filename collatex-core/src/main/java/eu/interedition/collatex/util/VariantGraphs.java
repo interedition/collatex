@@ -117,7 +117,7 @@ public class VariantGraphs {
                 transpositions.equals(joinCandidateTranspositions);
         if (canJoin) {
           vertex.add(joinCandidateVertex.tokens());
-          for (VariantGraph.Transposition t : joinCandidateVertex.transpositions()) {
+          for (VariantGraph.Transposition t : Sets.newHashSet(joinCandidateVertex.transpositions())) {
             final Set<VariantGraph.Vertex> transposed = Sets.newHashSet(t);
             transposed.remove(joinCandidateVertex);
             transposed.add(vertex);
