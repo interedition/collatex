@@ -3,7 +3,6 @@ package eu.interedition.collatex.util;
 import com.google.common.base.Function;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
@@ -17,6 +16,7 @@ import eu.interedition.collatex.Witness;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<VariantGraph.Vertex,Integer> {
+public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<VariantGraph.Vertex,Integer>, Comparator<VariantGraph.Vertex> {
 
   private final Map<VariantGraph.Vertex, Integer> byVertex = Maps.newHashMap();
   private final SortedSetMultimap<Integer, VariantGraph.Vertex> byRank = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
@@ -94,5 +94,10 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
   @Override
   public Integer apply(@Nullable VariantGraph.Vertex vertex) {
     return byVertex.get(vertex);
+  }
+
+  @Override
+  public int compare(VariantGraph.Vertex o1, VariantGraph.Vertex o2) {
+    return (byVertex.get(o1).intValue() - byVertex.get(o2).intValue());
   }
 }
