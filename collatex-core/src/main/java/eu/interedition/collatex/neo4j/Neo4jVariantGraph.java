@@ -7,8 +7,6 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphs;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -146,35 +144,6 @@ public class Neo4jVariantGraph implements VariantGraph {
       witnesses.addAll(e.witnesses());
     }
     return witnesses;
-  }
-
-  public VariantGraph adjustRanksForTranspositions() {
-    for (Vertex v : vertices()) {
-        for (Transposition vgt : v.transpositions()) {
-        Vertex from = null; // FIXME
-        Vertex to = null; // FIXME
-        if (from.equals(v)) {
-          addNullVertex(v, from, to);
-        } else if (to.equals(v)) {
-          addNullVertex(v, to, from);
-        }
-      }
-    }
-    return this;
-  }
-
-  private void addNullVertex(Vertex v, Vertex from, Vertex to) {
-    Set<Token> nullTokens = Sets.newHashSet();
-    for (Witness w : to.witnesses()) {
-      nullTokens.add(new SimpleToken((SimpleWitness) w, "", ""));
-    }
-    Vertex nullVertex = new Neo4jVariantGraphVertex(this, nullTokens);
-    //int rank = v.getRank();
-    //nullVertex.setRank(rank);
-    //v.setRank(rank + 1);
-    for (Vertex ov : vertices()) {
-      //if (!ov.equals(v) && ov.getRank() > rank) ov.setRank(ov.getRank() + 1);
-    }
   }
 
   @Override
