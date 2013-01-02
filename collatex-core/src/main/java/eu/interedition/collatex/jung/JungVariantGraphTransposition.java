@@ -14,26 +14,26 @@ import java.util.Set;
 public class JungVariantGraphTransposition implements VariantGraph.Transposition {
 
   private final JungVariantGraph graph;
-  private final Set<JungVariantGraphVertex> vertices;
+  private final Set<VariantGraph.Vertex> vertices;
 
   public JungVariantGraphTransposition(JungVariantGraph graph, Set<VariantGraph.Vertex> vertices) {
     this.graph = graph;
-    this.vertices = Sets.newHashSet(Iterables.filter(vertices, JungVariantGraphVertex.class));
-    for (JungVariantGraphVertex vertex : this.vertices) {
+    this.vertices = Sets.newHashSet(vertices);
+    for (VariantGraph.Vertex vertex : this.vertices) {
       graph.transpositionIndex.put(vertex, this);
     }
   }
 
   @Override
   public void delete() {
-    for (JungVariantGraphVertex vertex : this.vertices) {
+    for (VariantGraph.Vertex vertex : this.vertices) {
       graph.transpositionIndex.remove(vertex, this);
     }
   }
 
   @Override
   public Iterator<VariantGraph.Vertex> iterator() {
-    return Iterators.filter(vertices.iterator(), VariantGraph.Vertex.class);
+    return vertices.iterator();
   }
 
   @Override

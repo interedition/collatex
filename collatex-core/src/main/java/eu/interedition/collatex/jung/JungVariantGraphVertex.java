@@ -26,28 +26,28 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> incoming() {
+  public Iterable<? extends VariantGraph.Edge> incoming() {
     return incoming(null);
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> incoming(final Set<Witness> witnesses) {
+  public Iterable<? extends VariantGraph.Edge> incoming(final Set<Witness> witnesses) {
     return paths(graph.getInEdges(this), witnesses);
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> outgoing() {
+  public Iterable<? extends VariantGraph.Edge> outgoing() {
     return outgoing(null);
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> outgoing(Set<Witness> witnesses) {
+  public Iterable<? extends VariantGraph.Edge> outgoing(Set<Witness> witnesses) {
     return paths(graph.getOutEdges(this), witnesses);
   }
 
   @Override
-  public Iterable<VariantGraph.Transposition> transpositions() {
-    return Iterables.filter(graph.transpositionIndex.get(this), VariantGraph.Transposition.class);
+  public Iterable<? extends VariantGraph.Transposition> transpositions() {
+    return graph.transpositionIndex.get(this);
   }
 
   @Override
@@ -94,10 +94,8 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
     return Iterables.toString(tokens);
   }
 
-  protected static Iterable<VariantGraph.Edge> paths(final Iterable<JungVariantGraphEdge> edges, final Set<Witness> witnesses) {
-    return Iterables.filter(Iterables.filter(edges, (witnesses == null
-            ? Predicates.<JungVariantGraphEdge>alwaysTrue()
-            : new Predicate<JungVariantGraphEdge>() {
+  protected static Iterable<? extends VariantGraph.Edge> paths(final Iterable<JungVariantGraphEdge> edges, final Set<Witness> witnesses) {
+    return Iterables.filter(edges, (witnesses == null ? Predicates.<JungVariantGraphEdge>alwaysTrue() : new Predicate<JungVariantGraphEdge>() {
       @Override
       public boolean apply(@Nullable JungVariantGraphEdge edge) {
         for (Witness edgeWitness : edge.witnesses()) {
@@ -107,6 +105,6 @@ public class JungVariantGraphVertex implements VariantGraph.Vertex {
         }
         return false;
       }
-    })), VariantGraph.Edge.class);
+    }));
   }
 }

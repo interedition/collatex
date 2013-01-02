@@ -22,7 +22,7 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   final JungVariantGraphVertex start;
   final JungVariantGraphVertex end;
-  final Multimap<JungVariantGraphVertex, JungVariantGraphTransposition> transpositionIndex = HashMultimap.create();
+  final Multimap<VariantGraph.Vertex, VariantGraph.Transposition> transpositionIndex = HashMultimap.create();
 
   public JungVariantGraph() {
     super();
@@ -43,7 +43,7 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   @Override
   public Set<Transposition> transpositions() {
-    return Sets.newHashSet(Iterables.filter(transpositionIndex.values(), Transposition.class));
+    return Sets.newHashSet(transpositionIndex.values());
   }
 
   @Override

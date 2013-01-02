@@ -1,9 +1,6 @@
 package eu.interedition.collatex.neo4j;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;

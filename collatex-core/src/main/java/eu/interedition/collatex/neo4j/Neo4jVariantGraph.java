@@ -149,8 +149,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   public VariantGraph adjustRanksForTranspositions() {
     for (Vertex v : vertices()) {
-      Iterable<Transposition> transpositions = v.transpositions();
-      for (Transposition vgt : transpositions) {
+        for (Transposition vgt : v.transpositions()) {
         Vertex from = null; // FIXME
         Vertex to = null; // FIXME
         if (from.equals(v)) {

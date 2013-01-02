@@ -1,15 +1,10 @@
 package eu.interedition.collatex.jung;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import edu.uci.ics.jung.graph.util.Pair;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 

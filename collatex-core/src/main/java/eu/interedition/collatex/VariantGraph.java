@@ -52,15 +52,15 @@ public interface VariantGraph {
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
   interface Vertex {
-    Iterable<Edge> incoming();
+    Iterable<? extends Edge> incoming();
 
-    Iterable<Edge> incoming(Set<Witness> witnesses);
+    Iterable<? extends Edge> incoming(Set<Witness> witnesses);
 
-    Iterable<Edge> outgoing();
+    Iterable<? extends Edge> outgoing();
 
-    Iterable<Edge> outgoing(Set<Witness> witnesses);
+    Iterable<? extends Edge> outgoing(Set<Witness> witnesses);
 
-    Iterable<Transposition> transpositions();
+    Iterable<? extends Transposition> transpositions();
 
     Set<Token> tokens();
 

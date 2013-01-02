@@ -1,31 +1,22 @@
 package eu.interedition.collatex.neo4j;
 
 import static com.google.common.collect.Iterables.*;
-import static java.util.Collections.singleton;
 import static org.neo4j.graphdb.Direction.*;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import eu.interedition.collatex.VariantGraph;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.traversal.Evaluation;
-import org.neo4j.graphdb.traversal.Evaluator;
-import org.neo4j.kernel.Traversal;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleToken;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -45,27 +36,27 @@ public class Neo4jVariantGraphVertex implements VariantGraph.Vertex {
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> incoming() {
+  public Iterable<? extends VariantGraph.Edge> incoming() {
     return incoming(null);
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> incoming(Set<Witness> witnesses) {
+  public Iterable<? extends VariantGraph.Edge> incoming(Set<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(Neo4jGraphRelationships.PATH, INCOMING), graph.edgeWrapper), Neo4jVariantGraphEdge.createTraversableFilter(witnesses));
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> outgoing() {
+  public Iterable<? extends VariantGraph.Edge> outgoing() {
     return outgoing(null);
   }
 
   @Override
-  public Iterable<VariantGraph.Edge> outgoing(Set<Witness> witnesses) {
+  public Iterable<? extends VariantGraph.Edge> outgoing(Set<Witness> witnesses) {
     return Iterables.filter(transform(node.getRelationships(Neo4jGraphRelationships.PATH, OUTGOING), graph.edgeWrapper), Neo4jVariantGraphEdge.createTraversableFilter(witnesses));
   }
 
   @Override
-  public Iterable<VariantGraph.Transposition> transpositions() {
+  public Iterable<? extends VariantGraph.Transposition> transpositions() {
     return transform(node.getRelationships(Neo4jGraphRelationships.TRANSPOSITION), new Function<Relationship, VariantGraph.Transposition>() {
       @Override
       public VariantGraph.Transposition apply(@Nullable Relationship relationship) {
