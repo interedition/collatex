@@ -19,22 +19,16 @@
  */
 package eu.interedition.collatex.dekker;
 
-import java.util.Collections;
-
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.SortedSetMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import eu.interedition.collatex.util.VariantGraphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.List;
 
 /**
 *

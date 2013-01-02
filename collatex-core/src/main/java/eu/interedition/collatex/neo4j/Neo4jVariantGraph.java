@@ -7,7 +7,7 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.util.VariantGraphs;
+import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -70,7 +70,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public Iterable<Vertex> vertices(final Set<Witness> witnesses) {
-    return VariantGraphs.vertices(this, witnesses);
+    return VariantGraphTraversal.of(this, witnesses);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public Iterable<Edge> edges(final Set<Witness> witnesses) {
-    return VariantGraphs.edges(this, witnesses);
+    return VariantGraphTraversal.of(this, witnesses).edges();
   }
 
   @Override

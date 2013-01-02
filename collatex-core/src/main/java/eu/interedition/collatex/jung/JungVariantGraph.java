@@ -4,13 +4,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.util.VariantGraphs;
+import eu.interedition.collatex.util.VariantGraphTraversal;
 
 import java.util.Collections;
 import java.util.Set;
@@ -53,7 +52,7 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   @Override
   public Iterable<Vertex> vertices(Set<Witness> witnesses) {
-    return VariantGraphs.vertices(this, witnesses);
+    return VariantGraphTraversal.of(this, witnesses);
   }
 
   @Override
@@ -63,7 +62,7 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
 
   @Override
   public Iterable<Edge> edges(Set<Witness> witnesses) {
-    return VariantGraphs.edges(this, witnesses);
+    return VariantGraphTraversal.of(this, witnesses).edges();
   }
 
   @Override

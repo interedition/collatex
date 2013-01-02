@@ -20,7 +20,17 @@
 
 package eu.interedition.collatex.neo4j;
 
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -28,20 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
-import eu.interedition.collatex.util.VariantGraphs;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import eu.interedition.collatex.simple.SimpleWitness;
+import static org.junit.Assert.assertEquals;
 
 public class VariantGraphTest extends AbstractTest {
 
@@ -154,7 +151,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoIdenticalWitnesses() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
-    final VariantGraph graph = VariantGraphs.join(collate(w));
+    final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
 
     assertEquals(3, Iterables.size(graph.vertices()));
     assertEquals(2, Iterables.size(graph.edges()));
@@ -168,7 +165,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses() {
     final SimpleWitness[] w = createWitnesses("the nice black cat shared his food", "the bad white cat spilled his food again");
-    final VariantGraph graph = VariantGraphs.join(collate(w));
+    final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
 
     final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
     final VariantGraph.Vertex niceBlackVertex = vertexWith(graph, "nice black", w[0]);
@@ -194,7 +191,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnesses2() {
     final SimpleWitness[] w = createWitnesses("Blackie, the black cat", "Whitney, the white cat");
-    final VariantGraph graph = VariantGraphs.join(collate(w));
+    final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
 
     final VariantGraph.Vertex blackieVertex = vertexWith(graph, "blackie", w[0]);
     final VariantGraph.Vertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
@@ -216,7 +213,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void joinTwoDifferentWitnessesWithTranspositions() {
     final SimpleWitness[] w = createWitnesses("voor Zo nu en dan zin2 na voor", "voor zin2 Nu en dan voor");
-    final VariantGraph graph = VariantGraphs.join(collate(w));
+    final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
     StringWriter writer = new StringWriter();
     s.toDot(graph, writer);

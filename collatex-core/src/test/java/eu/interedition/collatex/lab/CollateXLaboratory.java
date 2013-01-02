@@ -11,7 +11,6 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
-import eu.interedition.collatex.util.VariantGraphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,7 +156,7 @@ public class CollateXLaboratory extends JFrame {
       for (SimpleWitness witness : w) {
         collator.collate(variantGraph, witness);
       }
-      VariantGraphs.join(variantGraph);
+      VariantGraph.JOIN.apply(variantGraph);
 
       variantGraphPanel.setVariantGraph(variantGraph);
       LOG.debug("Collated {}", Iterables.toString(w));

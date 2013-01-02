@@ -3,7 +3,6 @@ package eu.interedition.collatex;
 import com.google.inject.Inject;
 import eu.interedition.collatex.io.Collation;
 import eu.interedition.collatex.jung.JungVariantGraph;
-import eu.interedition.collatex.util.VariantGraphs;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -71,7 +70,7 @@ public class CollateResource {
 
       // post-process
       if (collation.isJoined()) {
-        graph = VariantGraphs.join(graph);
+        graph = VariantGraph.JOIN.apply(graph);
       }
     }
 

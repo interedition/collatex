@@ -18,7 +18,6 @@ import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import eu.interedition.collatex.util.VariantGraphs;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.cocoon.ProcessingException;
@@ -125,7 +124,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
     startPrefixMapping("tei", TEI_NS);
 
-    for (Iterator<Set<VariantGraph.Vertex>> rowIt = VariantGraphRanking.of(VariantGraphs.join(graph)).iterator(); rowIt.hasNext();) {
+    for (Iterator<Set<VariantGraph.Vertex>> rowIt = VariantGraphRanking.of(VariantGraph.JOIN.apply(graph)).iterator(); rowIt.hasNext();) {
       final Set<VariantGraph.Vertex> row = rowIt.next();
 
       final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();

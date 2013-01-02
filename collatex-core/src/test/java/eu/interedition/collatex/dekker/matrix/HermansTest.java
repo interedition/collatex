@@ -1,47 +1,40 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
-import eu.interedition.collatex.util.VariantGraphs;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class HermansTest extends AbstractTest {
 
@@ -305,7 +298,7 @@ public class HermansTest extends AbstractTest {
     for (VariantGraph.Vertex v : vertices) {
       LOG.info("vertex:{}, transpositions:{}", v, Iterables.toString(v.transpositions()));
     }
-    vg = VariantGraphs.join(vg);
+    vg = VariantGraph.JOIN.apply(vg);
     System.out.println(toString(table(vg)));
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
@@ -338,7 +331,7 @@ public class HermansTest extends AbstractTest {
     s.toDot(vg, writer);
     LOG.info(writer.toString());
 
-    vg = VariantGraphs.join(vg);
+    vg = VariantGraph.JOIN.apply(vg);
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.info("{} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
@@ -374,7 +367,7 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(textD1, textD9, textDMD1, textDMD5);
     testWitnessCollation(sw);
 
-    VariantGraph vg = VariantGraphs.join(collate(sw));
+    VariantGraph vg = VariantGraph.JOIN.apply(collate(sw));
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     assertEquals(5, transpositions.size());
     VariantGraph.Transposition transposition = transpositions.iterator().next();
@@ -443,7 +436,7 @@ public class HermansTest extends AbstractTest {
   private String generateTEI(VariantGraph vg) throws XMLStreamException, FactoryConfigurationError {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
-    s.toDot(VariantGraphs.join(vg), writer);
+    s.toDot(VariantGraph.JOIN.apply(vg), writer);
     LOG.info(writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);

@@ -1,16 +1,5 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.util.VariantGraphRanking;
-import eu.interedition.collatex.util.VariantGraphs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -19,10 +8,18 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 // author: Ronald Haentjens Dekker
 //
