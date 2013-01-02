@@ -1,11 +1,9 @@
 package eu.interedition.collatex.lab;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Objects;
@@ -33,8 +31,6 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
-
-import javax.swing.BorderFactory;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -121,7 +117,7 @@ public class VariantGraphPanel extends VisualizationViewer<JungVariantGraphVerte
     for (VariantGraph.Transposition transposition : variantGraph.transpositions()) {
       this.transpositionColors.put(transposition, KELLY_MAX_CONTRAST_COLORS[tc++ % KELLY_MAX_CONTRAST_COLORS.length]);
     }
-    setGraphLayout(new SugiyamaLayout<JungVariantGraphVertex, JungVariantGraphEdge>(variantGraph, SugiyamaLayout.Orientation.LEFT, 300, 150));
+    setGraphLayout(new VariantGraphLayoutAdapter(variantGraph, VariantGraphLayoutAdapter.Orientation.LEFT, 300, 150));
     revalidate();
   }
 
