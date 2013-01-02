@@ -21,8 +21,6 @@
 package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import eu.interedition.collatex.Token;
@@ -32,20 +30,14 @@ import eu.interedition.collatex.Witness;
 import java.util.Collections;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
-  private final Witness witness;
-  private final int index;
+  private final SimpleWitness witness;
   private final String content;
   private final String normalized;
 
-  public SimpleToken(Witness witness, int index, String content, String normalized) {
+  public SimpleToken(SimpleWitness witness, String content, String normalized) {
     this.witness = witness;
-    this.index = index;
     this.content = content;
     this.normalized = normalized;
-  }
-
-  public int getIndex() {
-    return index;
   }
 
   public String getContent() {
@@ -63,7 +55,7 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
 
   @Override
   public String toString() {
-    return new StringBuilder(witness.toString()).append(":").append(index).append(":'").append(normalized).append("'").toString();
+    return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
   }
 
   public static String toString(Iterable<? extends Token> tokens) {
@@ -75,23 +67,8 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hashCode(getIndex(), getWitness());
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof SimpleToken) {
-      final SimpleToken other = (SimpleToken) obj;
-      return index == other.index && witness.equals(other.witness);
-    }
-    return super.equals(obj);
-  }
-
-  @Override
   public int compareTo(SimpleToken o) {
-    Preconditions.checkArgument(witness.equals(o.witness));
-    return (index - o.index);
+    return witness.compare(this, o);
   }
 
     public static final Function<VariantGraph.Vertex, String> VERTEX_TO_STRING = new Function<VariantGraph.Vertex, String>() {

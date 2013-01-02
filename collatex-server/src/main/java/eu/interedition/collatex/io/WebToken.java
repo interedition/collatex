@@ -20,16 +20,16 @@
 
 package eu.interedition.collatex.io;
 
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
 import org.codehaus.jackson.JsonNode;
 
 public class WebToken extends SimpleToken {
 
   private final JsonNode jsonNode;
 
-  public WebToken(Witness witness, int index, String content, String normalized, JsonNode jsonNode) {
-    super(witness, index, content, normalized);
+  public WebToken(SimpleWitness witness, String content, String normalized, JsonNode jsonNode) {
+    super(witness, content, normalized);
     this.jsonNode = jsonNode;
   }
 

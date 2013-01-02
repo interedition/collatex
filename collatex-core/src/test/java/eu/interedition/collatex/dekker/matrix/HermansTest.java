@@ -450,13 +450,6 @@ public class HermansTest extends AbstractTest {
     return writer.toString();
   }
 
-  private static final Comparator<Token> ON_ORDER = new Comparator<Token>() {
-    @Override
-    public int compare(Token t1, Token t2) {
-      return ((SimpleToken) t1).getIndex() - ((SimpleToken) t2).getIndex();
-    }
-  };
-
   private String showTransposition(VariantGraph.Transposition t) {
     return Iterables.toString(t);
   }

@@ -21,17 +21,19 @@
 package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class SimpleWitness implements Iterable<Token>, Witness {
+public class SimpleWitness implements Iterable<Token>, Witness, Comparator<SimpleToken> {
 
   private final String sigil;
   private final List<Token> tokens = new ArrayList<Token>();
@@ -52,7 +54,7 @@ public class SimpleWitness implements Iterable<Token>, Witness {
   public void setTokenContents(List<String> tokenContents) {
     final List<Token> tokens = Lists.newArrayListWithExpectedSize(tokenContents.size());
     for (String content : tokenContents) {
-      tokens.add(new SimpleToken(this, tokens.size(), content, TOKEN_NORMALIZER.apply(content)));
+      tokens.add(new SimpleToken(this, content, TOKEN_NORMALIZER.apply(content)));
     }
     setTokens(tokens);
   }
@@ -77,6 +79,15 @@ public class SimpleWitness implements Iterable<Token>, Witness {
     return getSigil();
   }
 
+  @Override
+  public int compare(SimpleToken o1, SimpleToken o2) {
+    final int o1Index = tokens.indexOf(o1);
+    final int o2Index = tokens.indexOf(o2);
+    Preconditions.checkArgument(o1Index >= 0, o1);
+    Preconditions.checkArgument(o2Index >= 0, o2);
+    return (o1Index - o2Index);
+  }
+
   public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
 
   public static final Function<String, String> TOKEN_NORMALIZER = new Function<String, String>() {
@@ -86,4 +97,5 @@ public class SimpleWitness implements Iterable<Token>, Witness {
       return (normalized == null || normalized.length() == 0 ? input : normalized);
     }
   };
+
 }

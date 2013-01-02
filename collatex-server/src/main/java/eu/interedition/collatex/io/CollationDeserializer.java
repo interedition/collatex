@@ -86,7 +86,7 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
             throw JsonMappingException.from(jp, String.format("Empty token encountered in witness \"%s\"", witness));
           }
 
-          tokens.add(new WebToken(witness, tokens.size(), tokenContent, normalizedTokenContent, tokenNode));
+          tokens.add(new WebToken(witness, tokenContent, normalizedTokenContent, tokenNode));
         }
         witness.setTokens(tokens);
       } else {

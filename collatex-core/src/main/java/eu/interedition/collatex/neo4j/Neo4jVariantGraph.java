@@ -8,6 +8,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphs;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -165,7 +166,7 @@ public class Neo4jVariantGraph implements VariantGraph {
   private void addNullVertex(Vertex v, Vertex from, Vertex to) {
     Set<Token> nullTokens = Sets.newHashSet();
     for (Witness w : to.witnesses()) {
-      nullTokens.add(new SimpleToken(w, -1, "", ""));
+      nullTokens.add(new SimpleToken((SimpleWitness) w, "", ""));
     }
     Vertex nullVertex = new Neo4jVariantGraphVertex(this, nullTokens);
     //int rank = v.getRank();
