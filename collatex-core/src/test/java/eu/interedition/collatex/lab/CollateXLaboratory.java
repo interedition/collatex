@@ -1,14 +1,19 @@
 package eu.interedition.collatex.lab;
 
-import static eu.interedition.collatex.CollationAlgorithmFactory.*;
-
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.List;
+import com.google.common.collect.Iterables;
+import edu.uci.ics.jung.algorithms.layout.TreeLayout;
+import eu.interedition.collatex.CollationAlgorithm;
+import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.matrix.MatchTable;
+import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.util.VariantGraphs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
@@ -19,25 +24,19 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.util.List;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
-import eu.interedition.collatex.util.VariantGraphs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterables;
-
-import edu.uci.ics.jung.algorithms.layout.TreeLayout;
-import eu.interedition.collatex.CollationAlgorithm;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
-import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.suffixtree.SuffixTree;
+import static eu.interedition.collatex.CollationAlgorithmFactory.dekker;
+import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -96,13 +95,22 @@ public class CollateXLaboratory extends JFrame {
     add(toolBar, BorderLayout.NORTH);
 
     setDefaultCloseOperation(EXIT_ON_CLOSE);
-    setSize(800, 600);
-    pack();
+
+    final Dimension screenSize = getToolkit().getScreenSize();
+    setSize(Math.max(800, screenSize.width - 200), Math.max(600, screenSize.height - 100));
+
+    final Dimension frameSize = getSize();
+    setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
     splitPane.setDividerLocation(0.3f);
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
+    try {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     new CollateXLaboratory().setVisible(true);
   }
 
