@@ -1,11 +1,10 @@
 package eu.interedition.collatex;
 
-import java.util.Comparator;
-
-import eu.interedition.collatex.dekker.DeprecatedTokenLinker;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
+
+import java.util.Comparator;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -23,10 +22,5 @@ public class CollationAlgorithmFactory {
 
   public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
     return new NeedlemanWunschAlgorithm(comparator);
-  }
-
-  @Deprecated
-  public static CollationAlgorithm dekkerPreviousVersion(Comparator<Token> comparator) {
-   return new DekkerAlgorithm(comparator, new DeprecatedTokenLinker());
   }
 }

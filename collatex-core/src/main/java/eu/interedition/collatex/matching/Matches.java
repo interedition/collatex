@@ -75,10 +75,6 @@ public class Matches {
       }
     }
 
-    // add start and end tokens as matches
-    all.put(SimpleToken.START, Iterables.getFirst(vertices, null));
-    all.put(SimpleToken.END, Iterables.getLast(vertices));
-
     return new Matches(all, unmatched, ambiguous, unique);
   }
 

@@ -32,13 +32,10 @@ import eu.interedition.collatex.Witness;
 import java.util.Collections;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
-  public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
-  public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");
-
-  final Witness witness;
-  final int index;
-  final String content;
-  final String normalized;
+  private final Witness witness;
+  private final int index;
+  private final String content;
+  private final String normalized;
 
   public SimpleToken(Witness witness, int index, String content, String normalized) {
     this.witness = witness;
