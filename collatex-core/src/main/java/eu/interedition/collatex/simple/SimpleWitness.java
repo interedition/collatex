@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class SimpleWitness implements Iterable<Token>, Witness {
-  public static final SimpleWitness SUPERBASE = new SimpleWitness("");
 
   private final String sigil;
   private final List<Token> tokens = new ArrayList<Token>();
