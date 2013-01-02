@@ -129,7 +129,7 @@ public class SimpleVariantGraphSerializer {
       xml.writeStartElement(GRAPHML_NS, NODE_TAG);
       xml.writeAttribute(ID_ATT, vertexNodeID);
       GraphMLProperty.NODE_NUMBER.write(Integer.toString(vertexNumber++), xml);
-      GraphMLProperty.NODE_TOKEN.write(SimpleToken.TO_CONTENTS.apply(vertex), xml);
+      GraphMLProperty.NODE_TOKEN.write(SimpleToken.VERTEX_TO_STRING.apply(vertex), xml);
       xml.writeEndElement();
       vertexToId.put(vertex, vertexNodeID);
     }
@@ -285,7 +285,7 @@ public class SimpleVariantGraphSerializer {
   }
 
   private String toLabel(VariantGraph.Vertex v) {
-    return escapeLabel(SimpleToken.TO_CONTENTS.apply(v));
+    return escapeLabel(SimpleToken.VERTEX_TO_STRING.apply(v));
   }
 
   String escapeLabel(String string) {

@@ -25,53 +25,26 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.Token;
 
-import java.util.Set;
-
-import static com.google.common.collect.Iterables.getFirst;
-import static java.util.Collections.singleton;
+import java.util.Collections;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
-  public static final Function<VariantGraph.Vertex, String> TO_CONTENTS = new Function<VariantGraph.Vertex, String>() {
-    @Override
-    public String apply(VariantGraph.Vertex input) {
-      final Set<Witness> witnesses = input.witnesses();
-      if (witnesses.isEmpty()) {
-        return "";
-      }
-      final StringBuilder contents = new StringBuilder();
-      for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(input.tokens(singleton(getFirst(witnesses, null))), SimpleToken.class))) {
-        contents.append(token.getContent()).append(" ");
-      }
-      return contents.toString().trim();
-    }
-  };
-
-  public static int nextId = 0;
   public static final SimpleToken START = new SimpleToken(SimpleWitness.SUPERBASE, -1, "", "#");
   public static final SimpleToken END = new SimpleToken(SimpleWitness.SUPERBASE, Integer.MAX_VALUE, "", "#");
 
-  private final int id;
-  private Witness witness;
-  private int index;
-  private String content;
-  private String normalized;
+  private final Witness witness;
+  private final int index;
+  private final String content;
+  private final String normalized;
 
   public SimpleToken(Witness witness, int index, String content, String normalized) {
-    synchronized (SimpleToken.class) {
-      this.id = (nextId == Integer.MAX_VALUE ? 0 : nextId++);
-    }
     this.witness = witness;
     this.index = index;
     this.content = content;
     this.normalized = normalized;
-  }
-
-  public int getId() {
-    return id;
   }
 
   public int getIndex() {
@@ -113,14 +86,29 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof SimpleToken) {
       final SimpleToken other = (SimpleToken) obj;
-      return getIndex() == other.getIndex() && getWitness().equals(other.getWitness());
+      return index == other.index && witness.equals(other.witness);
     }
     return super.equals(obj);
   }
 
   @Override
   public int compareTo(SimpleToken o) {
-    Preconditions.checkArgument(witness.equals(o.getWitness()));
+    Preconditions.checkArgument(witness.equals(o.witness));
     return (index - o.index);
   }
+
+    public static final Function<VariantGraph.Vertex, String> VERTEX_TO_STRING = new Function<VariantGraph.Vertex, String>() {
+        @Override
+        public String apply(VariantGraph.Vertex input) {
+            final Witness witness = Iterables.getFirst(input.witnesses(), null);
+            if (witness == null) {
+                return "";
+            }
+            final StringBuilder contents = new StringBuilder();
+            for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(input.tokens(Collections.singleton(witness)), SimpleToken.class))) {
+                contents.append(token.getContent()).append(" ");
+            }
+            return contents.toString().trim();
+        }
+    };
 }
