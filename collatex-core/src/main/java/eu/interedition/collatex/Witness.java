@@ -36,8 +36,6 @@ public interface Witness {
 
   String getSigil();
 
-  boolean isNear(Token a, Token b);
-  
   final Comparator<Witness> SIGIL_COMPARATOR = new Comparator<Witness>() {
     @Override
     public int compare(Witness o1, Witness o2) {

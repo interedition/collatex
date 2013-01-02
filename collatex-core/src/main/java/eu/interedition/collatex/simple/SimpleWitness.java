@@ -23,14 +23,12 @@ package eu.interedition.collatex.simple;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class SimpleWitness implements Iterable<Token>, Witness {
@@ -38,7 +36,6 @@ public class SimpleWitness implements Iterable<Token>, Witness {
 
   private final String sigil;
   private final List<Token> tokens = new ArrayList<Token>();
-  private final Map<Token, Token> relations = Maps.newLinkedHashMap();
 
   public SimpleWitness(String sigil) {
     this.sigil = sigil;
@@ -63,14 +60,7 @@ public class SimpleWitness implements Iterable<Token>, Witness {
 
   public void setTokens(List<Token> tokens) {
     this.tokens.clear();
-    this.relations.clear();
-    Token previous = SimpleToken.START;
-    for (Token token : tokens) {
-      this.tokens.add(token);
-      this.relations.put(previous, token);
-      previous = token;
-    }
-    relations.put(previous, SimpleToken.END);
+    this.tokens.addAll(tokens);
   }
 
   @Override
@@ -88,22 +78,13 @@ public class SimpleWitness implements Iterable<Token>, Witness {
     return getSigil();
   }
 
-  @Override
-  public boolean isNear(Token a, Token b) {
-    if (!relations.containsKey(a)) {
-      throw new RuntimeException("Error; "+a+" is an unknown token! "+a.getClass());
+  public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
+
+  public static final Function<String, String> TOKEN_NORMALIZER = new Function<String, String>() {
+    @Override
+    public String apply(String input) {
+      final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
+      return (normalized == null || normalized.length() == 0 ? input : normalized);
     }
-    Token other = relations.get(a);
-    return other.equals(b);
-  }
-
-    public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
-
-    public static final Function<String, String> TOKEN_NORMALIZER = new Function<String, String>() {
-        @Override
-        public String apply(String input) {
-            final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
-            return (normalized == null || normalized.length() == 0 ? input : normalized);
-        }
-    };
+  };
 }
