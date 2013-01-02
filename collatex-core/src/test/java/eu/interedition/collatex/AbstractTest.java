@@ -16,15 +16,12 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceTokenizer;
-import eu.interedition.collatex.util.Logging;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,11 +41,6 @@ public abstract class AbstractTest {
 
   protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
   private Transaction transaction;
-
-  @BeforeClass
-  public static void init() throws IOException {
-    Logging.configureLogging();
-  }
 
   protected SimpleWitness[] createWitnesses(Function<String, List<String>> tokenizer, String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);
