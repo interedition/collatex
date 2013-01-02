@@ -16,7 +16,6 @@ import eu.interedition.collatex.io.VariantGraphDotMessageBodyWriter;
 import eu.interedition.collatex.io.VariantGraphMLMessageBodyWriter;
 import eu.interedition.collatex.io.VariantGraphSVGMessageBodyWriter;
 import eu.interedition.collatex.io.VariantGraphTEIMessageBodyWriter;
-import eu.interedition.collatex.util.Logging;
 import freemarker.template.Configuration;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -43,8 +42,6 @@ public class Server extends DefaultResourceConfig {
   }
 
   public static void main(String... args) throws IOException {
-    Logging.configureLogging();
-
     final Injector injector = Guice.createInjector(new ConfigurationModule(), new AbstractModule() {
       @Override
       protected void configure() {
