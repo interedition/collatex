@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import eu.interedition.collatex.Token;
@@ -284,7 +285,7 @@ public class SimpleVariantGraphSerializer {
         final String leftId = id(transposedTuple.left);
         final String rightId = id(transposedTuple.right);
         out.print(indent + leftId + connector + rightId);
-        out.print(" [label = \"" + leftId + rightId + "\", color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.print(" [ color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
         out.println(";");
       }
 
@@ -327,8 +328,8 @@ public class SimpleVariantGraphSerializer {
     return string.replaceAll("\"", "\\\"").replaceAll("\n", "[LB]");
   }
 
-  private List<Tuple<VariantGraph.Vertex>> transposedTuples() {
-    final List<Tuple<VariantGraph.Vertex>> tuples = Lists.newLinkedList();
+  private Set<Tuple<VariantGraph.Vertex>> transposedTuples() {
+    final Set<Tuple<VariantGraph.Vertex>> tuples = Sets.newHashSet();
     final Ordering<VariantGraph.Vertex> vertexOrdering = Ordering.from(ranking()).compound(new Comparator<VariantGraph.Vertex>() {
       @Override
       public int compare(VariantGraph.Vertex o1, VariantGraph.Vertex o2) {
@@ -348,9 +349,13 @@ public class SimpleVariantGraphSerializer {
       for (Witness witness : verticesByWitness.keySet()) {
         if (prev != null) {
           final Iterator<VariantGraph.Vertex> prevIt = verticesByWitness.get(prev).iterator();
-          final Iterator<VariantGraph.Vertex> witnessIt = verticesByWitness.get(witness).iterator();
-          while (prevIt.hasNext() && witnessIt.hasNext()) {
-            tuples.add(new Tuple<VariantGraph.Vertex>(prevIt.next(), witnessIt.next()));
+          final Iterator<VariantGraph.Vertex> nextIt = verticesByWitness.get(witness).iterator();
+          while (prevIt.hasNext() && nextIt.hasNext()) {
+            final VariantGraph.Vertex prevVertex = prevIt.next();
+            final VariantGraph.Vertex nextVertex = nextIt.next();
+            if (!prevVertex.equals(nextVertex)) {
+              tuples.add(new Tuple<VariantGraph.Vertex>(prevVertex, nextVertex));
+            }
           }
         }
         prev = witness;
