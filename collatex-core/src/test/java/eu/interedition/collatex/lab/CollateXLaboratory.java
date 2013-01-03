@@ -155,10 +155,12 @@ public class CollateXLaboratory extends JFrame {
       final EqualityTokenComparator comparator = new EqualityTokenComparator();
       final JungVariantGraph variantGraph = new JungVariantGraph();
 
-      final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem()) ? dekker(comparator) : needlemanWunsch(comparator);
-      for (SimpleWitness witness : w) {
-        collator.collate(variantGraph, witness);
-      }
+      final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem())
+              ? dekker(comparator)
+              : needlemanWunsch(comparator);
+
+      collator.collate(variantGraph, w);
+
       VariantGraph.JOIN.apply(variantGraph);
 
       variantGraphPanel.setVariantGraph(variantGraph);

@@ -20,7 +20,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <license.licenseName>gpl_v3</license.licenseName>
-    <slf4j.version>1.6.4</slf4j.version>
     <jung.version>2.0.1</jung.version>
     <jersey.version>1.15</jersey.version>
   </properties>

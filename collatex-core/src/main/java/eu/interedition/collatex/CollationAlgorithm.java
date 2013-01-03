@@ -29,7 +29,7 @@ public interface CollationAlgorithm {
 
   void collate(VariantGraph against, Iterable<Token>... witnesses);
 
-  void collate(VariantGraph against, List<Iterable<Token>> witnesses);
+  void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses);
 
   abstract class Base implements CollationAlgorithm {
     protected final Logger LOG = Logger.getLogger(getClass().getName());
@@ -41,7 +41,7 @@ public interface CollationAlgorithm {
     }
 
     @Override
-    public void collate(VariantGraph against, List<Iterable<Token>> witnesses) {
+    public void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses) {
       for (Iterable<Token> witness : witnesses) {
         if (LOG.isLoggable(Level.FINE)) {
           LOG.log(Level.FINE, "heap space: {0}/{1}", new Object[] {
