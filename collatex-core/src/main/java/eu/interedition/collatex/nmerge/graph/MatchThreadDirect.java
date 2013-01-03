@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.logging.Level;
 
 import static java.util.Collections.disjoint;
 
@@ -247,7 +248,7 @@ public class MatchThreadDirect<T> implements Runnable {
         pathVersions.retainAll(arc.versions);
         for (PrevChar<T> pc : prevChars) {
           if (pc == null) {
-            Errors.LOG.error("null", new Exception());
+            Errors.LOG.log(Level.SEVERE, "null", new Exception());
           }
           // FIXME: introduce token comparator instead of equals()
           if (pc.previous.equals(dataPrevChar) && !disjoint(pc.versions, pathVersions)) {

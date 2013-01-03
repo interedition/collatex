@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import eu.interedition.collatex.VariantGraph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -23,7 +23,7 @@ import com.google.common.collect.Sets;
  */
 public class ArchipelagoWithVersions extends Archipelago {
   private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
-  Logger LOG = LoggerFactory.getLogger(ArchipelagoWithVersions.class);
+  Logger LOG = Logger.getLogger(ArchipelagoWithVersions.class.getName());
   private final MatchTable table;
   Set<Integer> fixedRows = Sets.newHashSet();
   Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
@@ -83,11 +83,11 @@ public class ArchipelagoWithVersions extends Archipelago {
           }
         }
         Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
-        LOG.debug("addBestOfCompeting with competingIslandsOnIdealLine");
+        LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
         addBestOfCompeting(archipelago, distanceMap1);
 
         Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
-        LOG.debug("addBestOfCompeting with otherCompetingIslands");
+        LOG.fine("addBestOfCompeting with otherCompetingIslands");
         addBestOfCompeting(archipelago, distanceMap2);
 
         for (Island i : getNonCompetingIslands(islands, competingIslands)) {
@@ -209,20 +209,26 @@ public class ArchipelagoWithVersions extends Archipelago {
 
   private void addIslandToResult(Island isl, Archipelago result) {
     if (islandIsNoOutlier(result, isl)) {
-      LOG.debug("adding island: '{}'", isl);
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "adding island: '{0}'", isl);
+      }
       result.add(isl);
       for (Coordinate coordinate : isl) {
         fixedRows.add(coordinate.row);
         fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
       }
     } else {
-      LOG.debug("island: '{}' is an outlier, not added", isl);
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "island: '{0}' is an outlier, not added", isl);
+      }
     }
   }
 
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {
     double smallestDistance = a.smallestDistanceToIdealLine(isl);
-    LOG.debug("island {}, distance={}", isl, smallestDistance);
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "island {0}, distance={1}", new Object[] { isl, smallestDistance });
+    }
     int islandSize = isl.size();
     return (!(a.size() > 0 && islandSize <= outlierTranspositionsSizeLimit && smallestDistance >= islandSize * MINIMUM_OUTLIER_DISTANCE_FACTOR));
   }

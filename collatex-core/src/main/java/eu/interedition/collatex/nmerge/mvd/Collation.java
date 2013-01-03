@@ -33,6 +33,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.logging.Level;
 
 import static java.util.Collections.disjoint;
 
@@ -326,10 +327,10 @@ public class Collation<T> {
             specials.put(bestMUM.getArc(), bestMUM.getGraph());
           }
         }
-        if (Errors.LOG.isTraceEnabled()) {
+        if (Errors.LOG.isLoggable(Level.FINER)) {
           for (VariantGraphSpecialArc<T> s : specials.keySet()) {
             final MaximalUniqueMatch<T> bestMatch = s.getBest();
-            Errors.LOG.trace("{}{}", (bestMatch.isTransposition() ? "Transposed: " : ""), bestMatch.getMatch());
+            Errors.LOG.log(Level.FINER, (bestMatch.isTransposition() ? "Transposed: " : "") + bestMatch.getMatch());
           }
         }
 
@@ -350,9 +351,9 @@ public class Collation<T> {
     original.adopt(witness);
     matches = con.serialise();
 
-    if (Errors.LOG.isDebugEnabled()) {
+    if (Errors.LOG.isLoggable(Level.FINE)) {
       float percentUnique = (witnesses.size() == 1 ? 0.0f : getPercentUnique(witness));
-      Errors.LOG.debug("Updated {} in {}: {} % unique", new Object[]{witness, this, percentUnique});
+      Errors.LOG.log(Level.FINE, "Updated {0} in {1}: {2} % unique", new Object[]{witness, this, percentUnique});
     }
 
     return witness;

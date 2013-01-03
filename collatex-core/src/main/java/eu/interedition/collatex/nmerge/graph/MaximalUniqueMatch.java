@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.logging.Level;
 
 import static java.util.Collections.singleton;
 
@@ -940,7 +941,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
       VariantGraphArc<T> child = new VariantGraphArc<T>(versions, parents[i]);
       arcFrom.addOutgoing(child);
       if (parents[i].versions.contains(version)) {
-        Errors.LOG.error("Ooops!", new Exception());
+        Errors.LOG.log(Level.SEVERE, "Ooops!", new Exception());
       }
       if (i < parents.length - 1) {
         arcFrom = new VariantGraphNode<T>();

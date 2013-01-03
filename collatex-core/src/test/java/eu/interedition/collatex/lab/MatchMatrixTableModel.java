@@ -1,19 +1,16 @@
 package eu.interedition.collatex.lab;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.table.AbstractTableModel;
-
-import eu.interedition.collatex.VariantGraph;
-import org.slf4j.Logger;
-
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.simple.SimpleToken;
+
+import javax.swing.table.AbstractTableModel;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -23,7 +20,6 @@ import eu.interedition.collatex.simple.SimpleToken;
 @SuppressWarnings("serial")
 public class MatchMatrixTableModel extends AbstractTableModel {
 
-  Logger LOG = org.slf4j.LoggerFactory.getLogger(MatchMatrixTableModel.class);
   private final String[] rowNames;
   private final String[] columnNames;
   private final MatchTableCell[][] data;

@@ -23,12 +23,12 @@ package eu.interedition.collatex.suffixtree;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is a Java translation of Shlomo Yona's open source
@@ -38,7 +38,7 @@ import java.util.List;
  * @author Desmond Schmidt 25/10/08
  */
 public class SuffixTree<T> {
-  private static final Logger LOG = LoggerFactory.getLogger(SuffixTree.class);
+  private static final Logger LOG = Logger.getLogger(SuffixTree.class.getName());
 
   /**
    * The one and only real source string of the tree. All edge-labels
@@ -201,8 +201,8 @@ public class SuffixTree<T> {
     Path originalPath = new Path(str.begin, str.end);
     Node<T> tmp;
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("\n{}extension: {} phase+1: {} -- {} ({},{} | {})", new Object[]{
+    if (LOG.isLoggable(Level.FINER)) {
+      LOG.log(Level.FINER, "\n{0}extension: {1} phase+1: {2} -- {3} ({4},{5} | {6})", new Object[]{
               toString(),
               str.begin, str.end,
               (afterRule3 == 0 ? "followed from" : "starting at"),
@@ -258,8 +258,8 @@ public class SuffixTree<T> {
         suffixless = null;
       }
 
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("rule 3 ({},{})", str.begin, str.end);
+      if (LOG.isLoggable(Level.FINER)) {
+        LOG.log(Level.FINER, "rule 3 ({0},{1})", new Object[] { str.begin, str.end });
       }
       return ruleApplied;
     }
@@ -352,8 +352,8 @@ public class SuffixTree<T> {
     Node<T> newLeaf, newInternal, son;
     // newSon
     if (type == Rule2Type.NEW_CHILD) {
-      if (LOG.isTraceEnabled()) {
-        LOG.trace("rule 2: new leaf ({},{})", edgeLabelBegin, edgeLabelEnd);
+      if (LOG.isLoggable(Level.FINER)) {
+        LOG.log(Level.FINER, "rule 2: new leaf ({0},{1})", new Object[] { edgeLabelBegin, edgeLabelEnd });
       }
       // create a new leaf (4) with the characters of the extension
       newLeaf = new Node<T>(this, node, edgeLabelBegin, edgeLabelEnd, pathPos);
@@ -367,8 +367,8 @@ public class SuffixTree<T> {
       return newLeaf;
     }
     // split
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("rule 2: split ({}, {})", edgeLabelBegin, edgeLabelEnd);
+    if (LOG.isLoggable(Level.FINER)) {
+      LOG.log(Level.FINER, "rule 2: split ({0}, {1})", new Object[] { edgeLabelBegin, edgeLabelEnd });
     }
     // create a new internal node (3) at the split point
     newInternal = new Node<T>(this, node.parent, node.edgeStart,

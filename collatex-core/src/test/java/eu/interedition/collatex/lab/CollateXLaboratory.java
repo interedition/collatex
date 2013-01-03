@@ -11,8 +11,6 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixtree.SuffixTree;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
@@ -33,6 +31,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static eu.interedition.collatex.CollationAlgorithmFactory.dekker;
 import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch;
@@ -44,7 +44,7 @@ import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch
  */
 @SuppressWarnings("serial")
 public class CollateXLaboratory extends JFrame {
-  private static final Logger LOG = LoggerFactory.getLogger(CollateXLaboratory.class);
+  private static final Logger LOG = Logger.getLogger(CollateXLaboratory.class.getName());
   public static final BasicStroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, new float[] { 5.0f }, 0.0f);
   public static final BasicStroke SOLID_STROKE = new BasicStroke(1.5f);
 
@@ -147,7 +147,10 @@ public class CollateXLaboratory extends JFrame {
     public void actionPerformed(ActionEvent e) {
       final List<SimpleWitness> w = witnessPanel.getWitnesses();
 
-      LOG.debug("Collating {}", Iterables.toString(w));
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "Collating {0}", Iterables.toString(w));
+      }
+
 
       final EqualityTokenComparator comparator = new EqualityTokenComparator();
       final JungVariantGraph variantGraph = new JungVariantGraph();
@@ -159,7 +162,9 @@ public class CollateXLaboratory extends JFrame {
       VariantGraph.JOIN.apply(variantGraph);
 
       variantGraphPanel.setVariantGraph(variantGraph);
-      LOG.debug("Collated {}", Iterables.toString(w));
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "Collated {0}", Iterables.toString(w));
+      }
 
       tabbedPane.setSelectedIndex(0);
     }
@@ -207,12 +212,16 @@ public class CollateXLaboratory extends JFrame {
       int outlierTranspositionsSizeLimit = 3;
       for (int i = 0; i <= w.size() - 2; i++) {
         SimpleWitness witness = w.get(i);
-        LOG.debug("Collating: {}", witness.getSigil());
+        if (LOG.isLoggable(Level.FINE)) {
+          LOG.log(Level.FINE, "Collating: {0}", witness.getSigil());
+        }
         CollationAlgorithmFactory.dekkerMatchMatrix(comparator, outlierTranspositionsSizeLimit).collate(vg, witness);
       }
 
       SimpleWitness lastWitness = w.get(w.size() - 1);
-      LOG.debug("Creating MatchTable for: {}", lastWitness.getSigil());
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "Creating MatchTable for: {0}", lastWitness.getSigil());
+      }
       matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness, outlierTranspositionsSizeLimit));
 
       final TableColumnModel columnModel = matchMatrixTable.getColumnModel();

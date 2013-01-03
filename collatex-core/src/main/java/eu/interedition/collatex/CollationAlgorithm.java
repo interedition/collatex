@@ -6,10 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,7 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -34,9 +32,8 @@ public interface CollationAlgorithm {
   void collate(VariantGraph against, List<Iterable<Token>> witnesses);
 
   abstract class Base implements CollationAlgorithm {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    protected final Logger LOG = Logger.getLogger(getClass().getName());
     private Map<Token, VariantGraph.Vertex> witnessTokenVertices;
-    private AtomicInteger transpositionIdSource = new AtomicInteger();
 
     @Override
     public void collate(VariantGraph against, Iterable<Token>... witnesses) {
@@ -46,7 +43,12 @@ public interface CollationAlgorithm {
     @Override
     public void collate(VariantGraph against, List<Iterable<Token>> witnesses) {
       for (Iterable<Token> witness : witnesses) {
-        LOG.debug("heap space: {}/{}", Runtime.getRuntime().totalMemory(), Runtime.getRuntime().maxMemory());
+        if (LOG.isLoggable(Level.FINE)) {
+          LOG.log(Level.FINE, "heap space: {0}/{1}", new Object[] {
+                  Runtime.getRuntime().totalMemory(),
+                  Runtime.getRuntime().maxMemory()
+          });
+        }
         collate(against, witness);
       }
     }
@@ -55,7 +57,9 @@ public interface CollationAlgorithm {
       Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
       final Witness witness = Iterables.getFirst(witnessTokens, null).getWitness();
 
-      LOG.debug("{} + {}: Merge comparand into graph", into, witness);
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "{0} + {1}: Merge comparand into graph", new Object[] { into, witness });
+      }
       witnessTokenVertices = Maps.newHashMap();
       VariantGraph.Vertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
@@ -64,8 +68,8 @@ public interface CollationAlgorithm {
         if (matchingVertex == null) {
           matchingVertex = into.add(token);
         } else {
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Adding matched {} to {}", token, matchingVertex);
+          if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "Adding matched {0} to {1}", new Object[] { token, matchingVertex });
           }
           matchingVertex.add(Collections.singleton(token));
         }
@@ -80,8 +84,8 @@ public interface CollationAlgorithm {
 
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("transposition: {}", transposedPhrase);
+        if (LOG.isLoggable(Level.FINE)) {
+          LOG.log(Level.FINE, "transposition: {0}", transposedPhrase);
         }
         final Set<VariantGraph.Vertex> transposed = Sets.newHashSet();
         for (Match match : transposedPhrase) {

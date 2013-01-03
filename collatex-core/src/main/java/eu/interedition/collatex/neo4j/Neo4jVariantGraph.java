@@ -11,11 +11,11 @@ import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static eu.interedition.collatex.neo4j.Neo4jGraphRelationships.PATH;
 import static java.util.Collections.singleton;
@@ -24,7 +24,7 @@ import static java.util.Collections.singleton;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Neo4jVariantGraph implements VariantGraph {
-  private static final Logger LOG = LoggerFactory.getLogger(Neo4jVariantGraph.class);
+  private static final Logger LOG = Logger.getLogger(Neo4jVariantGraph.class.getName());
 
   final GraphDatabaseService database;
   final Neo4jVariantGraphAdapter adapter;
@@ -85,8 +85,8 @@ public class Neo4jVariantGraph implements VariantGraph {
 
   @Override
   public Neo4jVariantGraphVertex add(Token token) {
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Creating new vertex with {}", token);
+    if (LOG.isLoggable(Level.FINER)) {
+      LOG.log(Level.FINER, "Creating new vertex with {0}", token);
     }
     return new Neo4jVariantGraphVertex(this, singleton(token));
   }
@@ -95,8 +95,8 @@ public class Neo4jVariantGraph implements VariantGraph {
   public Edge connect(VariantGraph.Vertex from, VariantGraph.Vertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("Connected {} and {} with {}", new Object[]{from, to, witnesses});
+    if (LOG.isLoggable(Level.FINER)) {
+      LOG.log(Level.FINER, "Connected {0} and {1} with {2}", new Object[]{ from, to, witnesses });
     }
 
     if (from.equals(start)) {

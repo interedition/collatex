@@ -21,12 +21,11 @@
 
 package eu.interedition.collatex.nmerge;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Errors {
-  public static final Logger LOG = LoggerFactory.getLogger(Errors.class.getPackage().getName());
+  public static final Logger LOG = Logger.getLogger(Errors.class.getPackage().getName());
 }

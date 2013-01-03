@@ -19,14 +19,13 @@ import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Assert;
 import org.neo4j.graphdb.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
@@ -36,7 +35,7 @@ import static org.junit.Assert.fail;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public abstract class AbstractTest {
-  protected final Logger LOG = LoggerFactory.getLogger(getClass());
+  protected final Logger LOG = Logger.getLogger(getClass().getName());
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
   protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);

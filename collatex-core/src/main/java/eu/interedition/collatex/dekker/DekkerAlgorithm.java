@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -61,37 +62,48 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     Preconditions.checkArgument(!Iterables.isEmpty(tokens), "Empty witness");
     final Witness witness = Iterables.getFirst(tokens, null).getWitness();
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("{} + {}: {} vs. {}", new Object[] { graph, witness, graph.vertices(), tokens });
+    if (LOG.isLoggable(Level.FINER)) {
+      LOG.log(Level.FINER, "{0} + {1}: {2} vs. {3}", new Object[] { graph, witness, graph.vertices(), tokens });
     }
 
-    LOG.debug("{} + {}: Match and link tokens", graph, witness);
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "{0} + {1}: Match and link tokens", new Object[] { graph, witness });
+    }
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
     //    new SimpleVariantGraphSerializer(graph).toDot(graph, writer);
-    if (LOG.isTraceEnabled()) {
+    if (LOG.isLoggable(Level.FINER)) {
       for (Map.Entry<Token, VariantGraph.Vertex> tokenLink : tokenLinks.entrySet()) {
-        LOG.trace("{} + {}: Token match: {} = {}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
+        LOG.log(Level.FINER, "{0} + {1}: Token match: {2} = {3}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
       }
     }
 
-    LOG.debug("{} + {}: Detect phrase matches", graph, witness);
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "{0} + {1}: Detect phrase matches", new Object[] { graph, witness });
+    }
     phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, tokens);
-    if (LOG.isTraceEnabled()) {
+    if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> phraseMatch : phraseMatches) {
-        LOG.trace("{} + {}: Phrase match: {}", new Object[] { graph, witness, Iterables.toString(phraseMatch) });
+        LOG.log(Level.FINER, "{0} + {1}: Phrase match: {2}", new Object[] { graph, witness, Iterables.toString(phraseMatch) });
       }
     }
 
-    LOG.debug("{} + {}: Detect transpositions", graph, witness);
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "{0} + {1}: Detect transpositions", new Object[] { graph, witness });
+    }
     transpositions = transpositionDetector.detect(phraseMatches, graph);
-    LOG.debug("transpositions:{}", transpositions);
-    if (LOG.isTraceEnabled()) {
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "transpositions:{0}", transpositions);
+    }
+
+    if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> transposition : transpositions) {
-        LOG.trace("{} + {}: Transposition: {}", new Object[] { graph, witness, Iterables.toString(transposition) });
+        LOG.log(Level.FINER, "{0} + {1}: Transposition: {2}", new Object[] { graph, witness, Iterables.toString(transposition) });
       }
     }
 
-    LOG.debug("{} + {}: Determine aligned tokens by filtering transpositions", graph, witness);
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "{0} + {1}: Determine aligned tokens by filtering transpositions", new Object[] { graph, witness });
+    }
     alignments = Maps.newHashMap(tokenLinks);
 
     for (List<Match> transposedPhrase : transpositions) {
@@ -99,17 +111,17 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
         alignments.remove(match.token);
       }
     }
-    if (LOG.isTraceEnabled()) {
+    if (LOG.isLoggable(Level.FINER)) {
       for (Map.Entry<Token, VariantGraph.Vertex> alignment : alignments.entrySet()) {
-        LOG.trace("{} + {}: Alignment: {} = {}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
+        LOG.log(Level.FINER, "{0} + {1}: Alignment: {2} = {3}", new Object[] { graph, witness, alignment.getValue(), alignment.getKey() });
       }
     }
 
     merge(graph, tokens, alignments);
     mergeTranspositions(graph, transpositions);
 
-    if (LOG.isTraceEnabled()) {
-      LOG.trace("!{}: {}", graph, Iterables.toString(graph.vertices()));
+    if (LOG.isLoggable(Level.FINER)) {
+      LOG.log(Level.FINER, "!{0}: {1}", new Object[] {graph, Iterables.toString(graph.vertices())});
     }
   }
 

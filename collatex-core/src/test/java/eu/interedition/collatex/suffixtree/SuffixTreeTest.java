@@ -39,7 +39,7 @@ public class SuffixTreeTest extends AbstractTest {
   @Test
   public void simple() {
     final SuffixTree<String> st = SuffixTree.create(TEST_STRING, Ordering.<String>natural());
-    LOG.debug(st.toString());
+    LOG.fine(st.toString());
     Assert.assertNotNull(st.findSubstring(TEST_STRING.subList(0, 3)));
   }
 

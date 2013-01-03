@@ -13,8 +13,6 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +27,6 @@ import java.util.Set;
 // However the API of this class looks very much like an array based one
 // since you can use tokenAt(row, column) or vertexAt(row, column)
 public class MatchTable {
-  static Logger LOG = LoggerFactory.getLogger(MatchTable.class);
   private final HashBasedTable<Integer, Integer, MatchTableCell> table;
   private final Iterable<Token> witness;
   private final List<Integer> ranks;

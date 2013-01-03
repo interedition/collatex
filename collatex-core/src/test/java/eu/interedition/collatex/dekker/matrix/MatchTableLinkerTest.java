@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
+import com.google.common.collect.Iterables;
 import eu.interedition.collatex.VariantGraph;
 import org.junit.Test;
 
@@ -81,7 +83,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
-    System.out.println(tokensAsString);
+    LOG.fine(Iterables.toString(tokensAsString));
     assertTrue(tokensAsString.contains("C:0:'over'"));
     assertTrue(tokensAsString.contains("C:1:'de'"));
     assertTrue(tokensAsString.contains("C:2:'atlantische'"));
@@ -130,7 +132,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     }
     List<String> l = Lists.newArrayList(tokensAsString);
     Collections.sort(l);
-    LOG.debug("tokensAsString={}", l);
+    LOG.log(Level.FINE, "tokensAsString={0}", l);
     assertTrue(tokensAsString.contains("B:75:'onder'"));
     assertTrue(tokensAsString.contains("B:0:'over'"));
     assertTrue(tokensAsString.contains("B:1:'de'"));
@@ -156,7 +158,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     }
     List<String> l = Lists.newArrayList(tokensAsString);
     Collections.sort(l);
-    LOG.debug("tokensAsString={}", l);
+    LOG.log(Level.FINE, "tokensAsString={0}", l);
     //    assertTrue(tokensAsString.contains("B:75:'onder'"));
     //    assertTrue(tokensAsString.contains("B:0:'over'"));
     //    assertTrue(tokensAsString.contains("B:1:'de'"));
@@ -182,7 +184,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     }
     List<String> l = Lists.newArrayList(tokensAsString);
     Collections.sort(l);
-    LOG.debug("tokensAsString={}", l);
+    LOG.log(Level.FINE, "tokensAsString={0}", l);
     assertTrue(tokensAsString.contains("C:6:'suscepto'"));
   }
 

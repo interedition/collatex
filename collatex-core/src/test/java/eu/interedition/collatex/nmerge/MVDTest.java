@@ -38,6 +38,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -72,24 +73,24 @@ public class MVDTest extends AbstractTest {
     }
 
     for (Match<String> m : collation.getMatches()) {
-      LOG.debug(m.toString());
+      LOG.fine(m.toString());
     }
 
     final Converter<String> converter = new Converter<String>();
     final VariantGraph<String> graph = converter.create(collation.getMatches(), collation.getWitnesses());
-    LOG.debug("\n" + graph.toString());
+    LOG.fine("\n" + graph.toString());
 
     for (Witness w : collation.getWitnesses()) {
-      LOG.debug("{}: {}", w, Iterables.toString(collation.getVersion(w)));
+      LOG.log(Level.FINE, "{0}: {1}", new Object[]{w, Iterables.toString(collation.getVersion(w))});
     }
 
     final Witness base = witnesses.get(0);
     for (Chunk<String> ch : collation.compare(base, witnesses.get(1), ChunkState.ADDED)) {
-      LOG.debug(ch.toString());
+      LOG.fine(ch.toString());
     }
 
     for (Variant<String> v : collation.getApparatus(base, 0, collation.getVersion(base).size())) {
-      LOG.debug(v.toString());
+      LOG.fine(v.toString());
     }
   }
 

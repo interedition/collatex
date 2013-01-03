@@ -24,11 +24,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
 *
@@ -36,7 +36,7 @@ import java.util.List;
 */
 public class TranspositionDetector {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TranspositionDetector.class);
+  private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
 
   public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     //rank the variant graph
@@ -64,9 +64,9 @@ public class TranspositionDetector {
       previousRank++;
       previous = current;
     }
-    if (LOG.isTraceEnabled()) {
+    if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> transposition : transpositions) {
-        LOG.trace("Detected transposition: {}", Iterables.toString(transposition));
+        LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
       }
     }
     return transpositions;

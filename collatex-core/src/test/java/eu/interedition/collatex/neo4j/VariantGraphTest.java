@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import static org.junit.Assert.assertEquals;
 
@@ -217,7 +218,7 @@ public class VariantGraphTest extends AbstractTest {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
     StringWriter writer = new StringWriter();
     s.toDot(graph, writer);
-    LOG.debug("dot={}", writer.toString());
+    LOG.log(Level.FINE, "dot={0}", writer.toString());
 
     final VariantGraph.Vertex voorVertex1 = vertexWith(graph, "voor", w[0]);
     final VariantGraph.Vertex zoVertex = vertexWith(graph, "zo", w[0]);

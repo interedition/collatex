@@ -3,16 +3,15 @@ package eu.interedition.collatex.dekker.matrix;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class Archipelago {
-  Logger LOG = LoggerFactory.getLogger(Archipelago.class);
+  Logger LOG = Logger.getLogger(Archipelago.class.getName());
 
   private ArrayList<Island> islands;
   private final Set<Integer> islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
@@ -178,7 +177,10 @@ public class Archipelago {
     } else if (minimum2 < minimum1) {
       closest = island2;
     } else {
-      LOG.debug("{} -> {}", island1, island2);
+      if (LOG.isLoggable(Level.FINE)) {
+        LOG.log(Level.FINE, "{0} -> {1}", new Object[] { island1, island2 });
+      }
+
       throw new RuntimeException("no minimum found, help!");
     }
     return closest;

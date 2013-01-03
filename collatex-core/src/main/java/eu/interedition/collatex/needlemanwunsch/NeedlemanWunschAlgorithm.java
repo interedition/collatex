@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -86,8 +87,8 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
         for (VariantGraph.Vertex vertex : vertexList.get(ac - 1)) {
           final Token vertexToken = Iterables.getFirst(vertex.tokens(), null);
           if (vertexToken != null && comparator.compare(vertexToken, matchedToken) == 0) {
-            if (LOG.isTraceEnabled()) {
-              LOG.trace("Matched {} and {}", matchedToken, vertex);
+            if (LOG.isLoggable(Level.FINE)) {
+              LOG.log(Level.FINE, "Matched {0} and {1}", new Object[] { matchedToken, vertex });
             }
             alignments.put(matchedToken, vertex);
             break;

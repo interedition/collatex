@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * An Arc is a fragment of data, a set of versions in a variant graph
@@ -228,7 +229,7 @@ public class VariantGraphArc<T> {
       }
       return sb.toString();
     } catch (Exception e) {
-      Errors.LOG.error(e.getMessage(), e);
+      Errors.LOG.log(Level.SEVERE, e.getMessage(), e);
       return "";
     }
   }

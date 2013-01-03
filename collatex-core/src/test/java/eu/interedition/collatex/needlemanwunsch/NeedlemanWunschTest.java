@@ -19,6 +19,6 @@ public class NeedlemanWunschTest extends AbstractTest {
     final CollationAlgorithm collator = CollationAlgorithmFactory.needlemanWunsch(new EqualityTokenComparator());
     final VariantGraph graph = new JungVariantGraph();
     collator.collate(graph, createWitnesses("a b a b a", "a b a"));
-    LOG.debug(toString(table(graph)));
+    LOG.fine(toString(table(graph)));
   }
 }

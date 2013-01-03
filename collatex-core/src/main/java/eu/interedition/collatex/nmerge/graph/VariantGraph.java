@@ -27,6 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Simple representation of a variant graph, or subgraph thereof
@@ -306,7 +307,7 @@ public class VariantGraph<T> {
         n.reset();
       }
     } catch (Exception e) {
-      Errors.LOG.error(sb.toString(), e);
+      Errors.LOG.log(Level.SEVERE, sb.toString(), e);
     }
     float averageOutdegree = (float) totalOutdegree / (float) totalNodes;
     float averageIndegree = (float) totalIndegree / (float) totalNodes;
@@ -395,7 +396,7 @@ public class VariantGraph<T> {
       try {
         node.verify();
       } catch (Exception e) {
-        Errors.LOG.error(e.getMessage(), e);
+        Errors.LOG.log(Level.SEVERE, e.getMessage(), e);
       }
     }
     // we removed the version, so clear the constraint

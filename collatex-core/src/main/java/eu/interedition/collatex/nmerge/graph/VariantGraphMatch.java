@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 
 /**
  * Define a match between the graph and the special arc. A match is defined
@@ -298,7 +299,7 @@ public class VariantGraphMatch<T> {
   VariantGraphNode<T> getLeftNode() throws MVDException {
     VariantGraphArc<T>[] path = getMatchPath();
     if (path[0].from == null) {
-      Errors.LOG.error("null!", new Exception());
+      Errors.LOG.log(Level.SEVERE, "null!", new Exception());
     }
     return path[0].from;
   }

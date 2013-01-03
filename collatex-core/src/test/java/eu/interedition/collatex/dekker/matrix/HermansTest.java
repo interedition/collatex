@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.logging.Level;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,7 +51,7 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(textD1, textD9);
     VariantGraph vg = collate(sw[0]);
     MatchTable buildMatrix = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    System.out.println(new MatchTableSerializer(buildMatrix).toHtml());
+    LOG.fine(new MatchTableSerializer(buildMatrix).toHtml());
   }
 
   @Test
@@ -65,8 +66,8 @@ public class HermansTest extends AbstractTest {
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
-    System.out.println("archipelago: " + archipelago);
-    System.out.println("archipelago.size(): " + archipelago.size());
+    LOG.fine("archipelago: " + archipelago);
+    LOG.fine("archipelago.size(): " + archipelago.size());
     assertEquals(42, archipelago.size());
     assertEquals(98, archipelago.numOfConflicts());
     // assertTrue(false);
@@ -77,18 +78,7 @@ public class HermansTest extends AbstractTest {
 
     Archipelago firstVersion = archipelago.createNonConflictingVersion();
     for (Island isl : firstVersion.iterator()) {
-      System.out.print(" " + isl.size());
-    }
-    try {
-      int i = 0;
-      String file_name = "result_3_" + i + ".html";
-      File logFile = new File(File.separator + "C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\output_collatex_exp\\" + file_name);
-      PrintWriter logging = new PrintWriter(new FileOutputStream(logFile));
-      // logging.println(buildMatrix.toHtml(archipelago.getVersion(i)));
-      logging.println(new MatchTableSerializer(matchTable).toHtml(firstVersion));
-      logging.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      LOG.fine(" " + isl.size());
     }
     // for(int i=0; i<10; i++) {
     // try {
@@ -124,30 +114,19 @@ public class HermansTest extends AbstractTest {
     for (Island isl : matchTable.getIslands()) {
       archipelago.add(isl);
     }
-    System.out.println("archipelago: " + archipelago);
-    System.out.println("archipelago.size(): " + archipelago.size());
+    LOG.fine("archipelago: " + archipelago);
+    LOG.fine("archipelago.size(): " + archipelago.size());
+    StringBuilder islandSizes = new StringBuilder();
     for (Island isl : archipelago.iterator()) {
-      System.out.print(" " + isl.size());
+      islandSizes.append(" " + isl.size());
     }
-    System.out.println();
+    LOG.fine(islandSizes.toString().trim());
     assertEquals(233, archipelago.size());
     assertEquals(1429, archipelago.numOfConflicts());
     Archipelago firstVersion = archipelago.createNonConflictingVersion();
     for (Island isl : firstVersion.iterator()) {
-      System.out.print(" " + isl.size());
+      LOG.fine(" " + isl.size());
     }
-    try {
-      int i = 0;
-      String file_name = "result_2_" + i + ".html";
-      File logFile = new File(File.separator + "C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\output_collatex_exp\\" + file_name);
-      PrintWriter logging = new PrintWriter(new FileOutputStream(logFile));
-      // logging.println(buildMatrix.toHtml(archipelago.getVersion(i)));
-      logging.println(new MatchTableSerializer(matchTable).toHtml(firstVersion));
-      logging.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-
     //    assertEquals(4877, firstVersion.value());
     // assertTrue(false);
 
@@ -272,7 +251,7 @@ public class HermansTest extends AbstractTest {
     //    List<VariantGraphVertex> v = Lists.newArrayList(vg.vertices());
     String teiMM = generateTEI(vg);
     assertNotNull(teiMM);
-    LOG.info(teiMM);
+    LOG.fine(teiMM);
 
     //    setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
     //    vg = collate(sw);
@@ -291,19 +270,19 @@ public class HermansTest extends AbstractTest {
     VariantGraph vg = collate(sw);
     Set<VariantGraph.Transposition> transpositions0 = vg.transpositions();
     for (VariantGraph.Transposition t : transpositions0) {
-      LOG.info("transposition {}", showTransposition(t));
+      LOG.log(Level.FINE, "transposition {0}", showTransposition(t));
     }
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
-      LOG.info("vertex:{}, transpositions:{}", v, Iterables.toString(v.transpositions()));
+      LOG.log(Level.FINE, "vertex:{0}, transpositions:{1}", new Object[] { v, Iterables.toString(v.transpositions()) });
     }
     vg = VariantGraph.JOIN.apply(vg);
-    System.out.println(toString(table(vg)));
+    LOG.fine(toString(table(vg)));
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
-    LOG.info("{} transpositions", transpositions.size());
+    LOG.log(Level.FINE, "{0} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
-      LOG.info("transposition {}", showTransposition(t));
+      LOG.log(Level.FINE, "transposition {0}", showTransposition(t));
       // all joined vertices should be size 3
       for (VariantGraph.Vertex vertex : t) {
         assertEquals(showTransposition(t), 3, vertex.tokens().size());
@@ -323,20 +302,20 @@ public class HermansTest extends AbstractTest {
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
-      LOG.info("vertex:{}, transpositions:{}", v, Iterables.toString(v.transpositions()));
+      LOG.log(Level.FINE, "vertex:{0}, transpositions:{1}", new Object[]{v, Iterables.toString(v.transpositions())});
     }
 
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
     s.toDot(vg, writer);
-    LOG.info(writer.toString());
+    LOG.fine(writer.toString());
 
     vg = VariantGraph.JOIN.apply(vg);
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
-    LOG.info("{} transpositions", transpositions.size());
+    LOG.log(Level.FINE, "{0} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
       String showTransposition = t.toString();
-      LOG.info("transposition {}", showTransposition);
+      LOG.log(Level.FINE, "transposition {0}", showTransposition);
       boolean transpositionOfA = showTransposition.contains("a");
       boolean transpositionOfB = showTransposition.contains("b");
       boolean transpositionOfC = showTransposition.contains("c");
@@ -437,7 +416,7 @@ public class HermansTest extends AbstractTest {
     SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(vg);
     StringWriter writer = new StringWriter();
     s.toDot(VariantGraph.JOIN.apply(vg), writer);
-    LOG.info(writer.toString());
+    LOG.fine(writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
     s.toTEI(xml);
     return writer.toString();

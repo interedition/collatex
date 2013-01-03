@@ -3,6 +3,7 @@ package eu.interedition.collatex.matching;
 import static org.junit.Assert.*;
 
 import java.util.Set;
+import java.util.logging.Level;
 
 import com.google.common.collect.ListMultimap;
 
@@ -41,16 +42,16 @@ public class MatchesTest extends AbstractTest {
 
   private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
     Set<Token> unmatched = matches.getUnmatched();
-    LOG.debug("unmatched: {}", unmatched);
+    LOG.log(Level.FINE, "unmatched: {0}", unmatched);
 
     Set<Token> unique = matches.getUnique();
-    LOG.debug("unique: {}", unique);
+    LOG.log(Level.FINE, "unique: {0}", unique);
 
     Set<Token> ambiguous = matches.getAmbiguous();
-    LOG.debug("ambiguous: {}", ambiguous);
+    LOG.log(Level.FINE, "ambiguous: {0}", ambiguous);
 
     ListMultimap<Token,VariantGraph.Vertex> all = matches.getAll();
-    LOG.debug("all: {}", all);
+    LOG.log(Level.FINE, "all: {0}", all);
 
     assertEquals(expected_unmatched, unmatched.size());
     assertEquals(expected_unique, unique.size());
