@@ -208,6 +208,11 @@
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>2.3</version>
+      </extension>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
         <version>1.0-beta-7</version>
       </extension>
@@ -269,15 +274,16 @@
 
   <distributionManagement>
     <repository>
-      <id>interedition-releases</id>
-      <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
+      <id>collatex-releases</id>
+      <url>dav:http://collatex.huygens.knaw.nl/maven/content/repositories/collatex-releases</url>
     </repository>
     <snapshotRepository>
-      <id>interedition-snapshots</id>
-      <url>http://gregor.middell.net/maven/content/repositories/interedition-snapshots</url>
+      <id>collatex-snapshots</id>
+      <url>dav:http://collatex.huygens.knaw.nl/maven/content/repositories/collatex-snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  <issueManagement>
+
+ <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/interedition/microservices/issues</url>
   </issueManagement>
