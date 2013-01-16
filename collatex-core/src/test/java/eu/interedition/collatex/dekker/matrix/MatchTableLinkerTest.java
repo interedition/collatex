@@ -29,6 +29,8 @@ import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchTableLinkerTest extends AbstractTest {
 
+	
+	
   @Test
   public void testUsecase1() {
     final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");

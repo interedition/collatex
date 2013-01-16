@@ -1,18 +1,20 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -26,6 +28,17 @@ public class MatchTableTest extends AbstractTest {
     Coordinate rightEnd = island.getRightEnd();
     assertEquals(rightRow, rightEnd.getRow());
     assertEquals(rightColumn, rightEnd.getColumn());
+  }
+
+  // helper method
+  // note: x = x of start coordinate
+  // note: y = y of start coordinate
+  //TODO: replace Island by a real Vector class
+  private void assertVectorEquals(int x, int y, int length, Island island) {
+	 Coordinate leftEnd = island.getLeftEnd();
+	 assertEquals(x, leftEnd.getRow());
+	 assertEquals(y, leftEnd.getColumn());
+	 assertEquals(length, island.size());
   }
 
   @Test
@@ -161,4 +174,17 @@ public class MatchTableTest extends AbstractTest {
     assertIslandEquals(0, 0, 0, 0, island);
   }
 
+  @Test
+  public void testIslandDetectionPartlyOverlappingIslandsUsecase() {
+	SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
+	VariantGraph graph = collate(w[0]);
+    MatchTable table = MatchTable.create(graph, w[1], new EqualityTokenComparator());
+    List<Island> islands = Lists.newArrayList(table.getIslands());
+    Collections.sort(islands);
+    assertEquals(4, islands.size());
+    assertVectorEquals(0, 0, 1, islands.get(0));
+    assertVectorEquals(3, 0, 2, islands.get(1));
+	assertVectorEquals(2, 2, 2, islands.get(2));
+    assertVectorEquals(0, 3, 2, islands.get(3));
+  }
 }
