@@ -10,6 +10,8 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.RowSortedTable;
 
+import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
+
 public class VectorConflictResolver {
 
 	//NOTE: vector class
@@ -53,7 +55,7 @@ public class VectorConflictResolver {
 		return ordered;
 	}
 
-	public boolean inConflict(Vector one, Vector other) {
+	public boolean isInConflict(Vector one, Vector other) {
 		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
 		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
 		Range<Integer> v1verirange = Ranges.closed(one.y, one.y+one.length);
@@ -61,11 +63,22 @@ public class VectorConflictResolver {
 		return v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange);
 	}
 		
+	//TODO; eigen v!
+	public Integer getNumberOfConflictsFor(Vector v) {
+		int conflicts = 0;
+		for (Vector other: vectors) {
+			if (other!=v&&isInConflict(v, other)) {
+				conflicts++;
+			}
+		}
+		return conflicts;
+	}
 
 	public RowSortedTable<Vector, Vector, Boolean> getConflictsTable() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	
 	
 }
