@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.Ranges;
+import com.google.common.collect.RowSortedTable;
 
 public class VectorConflictResolver {
 
@@ -48,6 +51,20 @@ public class VectorConflictResolver {
 		List<Vector> ordered = Lists.newArrayList(vectors);
 		Collections.sort(ordered, comp);
 		return ordered;
+	}
+
+	public boolean inConflict(Vector one, Vector other) {
+		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
+		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
+		Range<Integer> v1verirange = Ranges.closed(one.y, one.y+one.length);
+		Range<Integer> v2verirange = Ranges.closed(other.y, other.y+other.length);
+		return v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange);
+	}
+		
+
+	public RowSortedTable<Vector, Vector, Boolean> getConflictsTable() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
