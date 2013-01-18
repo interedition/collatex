@@ -55,15 +55,17 @@ public class VectorConflictResolver {
 		return ordered;
 	}
 
+	// a vector is in conflict with another vector
+	// if they both have the same size and are in the same
+	// horizontal or vertical range
 	public boolean isInConflict(Vector one, Vector other) {
 		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
 		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
 		Range<Integer> v1verirange = Ranges.closed(one.y, one.y+one.length);
 		Range<Integer> v2verirange = Ranges.closed(other.y, other.y+other.length);
-		return v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange);
+		return one.length == other.length&&(v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange));
 	}
 		
-	//TODO; eigen v!
 	public Integer getNumberOfConflictsFor(Vector v) {
 		int conflicts = 0;
 		for (Vector other: vectors) {
