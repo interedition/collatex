@@ -8,9 +8,6 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
-import com.google.common.collect.RowSortedTable;
-
-import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 
 public class VectorConflictResolver {
 
@@ -76,10 +73,28 @@ public class VectorConflictResolver {
 		return conflicts;
 	}
 
-	public RowSortedTable<Vector, Vector, Boolean> getConflictsTable() {
-		// TODO Auto-generated method stub
-		return null;
+	// To get the next vector to commit
+	// we order the vectors based on several properties:
+	// 1. length
+	// 2. if multiple vectors have the same length; order on least amount
+	// of conflicts
+	public Vector selectPriorityVector() {
+		List<Vector> prioritizedVectors = Lists.newArrayList(vectors);
+		Comparator<Vector> comp = new Comparator<Vector>() {
+			@Override
+			public int compare(Vector one, Vector other) {
+				int i = other.length - one.length;
+				if (i != 0) return i;
+				int oneNrOfConflicts = getNumberOfConflictsFor(one);
+				int otherNrOfConflicts = getNumberOfConflictsFor(other);
+				return oneNrOfConflicts - otherNrOfConflicts;
+			}
+		};
+		Collections.sort(prioritizedVectors, comp);
+		return prioritizedVectors.get(0);
 	}
+
+
 
 	
 	
