@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
@@ -55,6 +57,8 @@ public class VectorConflictResolver {
 	// a vector is in conflict with another vector
 	// if they both have the same size and are in the same
 	// horizontal or vertical range
+	//TODO: check length --> I think it should be length -1..
+	//TODO: not enough tests apparently
 	public boolean isInConflict(Vector one, Vector other) {
 		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
 		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
@@ -93,9 +97,17 @@ public class VectorConflictResolver {
 		Collections.sort(prioritizedVectors, comp);
 		return prioritizedVectors.get(0);
 	}
-
-
-
 	
-	
+	// The intersection is the part that we want to remove
+	// from the second vector
+	// Note: this method only works when the other vector
+	// intersects with the one vector at the end
+	public Vector split(Vector one, Vector other) {
+		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length-1);
+		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length-1);
+		Range<Integer> intersection = v1horirange.intersection(v2horirange);
+		ContiguousSet<Integer> stuffthatwewantremove = intersection.asSet(DiscreteDomains.integers());
+		int lengththatwewanttoremove = stuffthatwewantremove.size();
+		return new Vector(other.x, other.y, other.length-lengththatwewanttoremove);
+	}
 }
