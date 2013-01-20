@@ -18,6 +18,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Assert;
+import org.junit.Before;
 import org.neo4j.graphdb.Transaction;
 
 import java.util.Arrays;
@@ -35,11 +36,16 @@ import static org.junit.Assert.fail;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public abstract class AbstractTest {
-  protected final Logger LOG = Logger.getLogger(getClass().getName());
   public static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
-  protected CollationAlgorithm collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
-  private Transaction transaction;
+  protected final Logger LOG = Logger.getLogger(getClass().getName());
+
+  protected CollationAlgorithm collationAlgorithm;
+
+  @Before
+  public void initAlgorithm() {
+    collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
+  }
 
   protected SimpleWitness[] createWitnesses(Function<String, List<String>> tokenizer, String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);

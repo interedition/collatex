@@ -20,7 +20,7 @@
  */
 package eu.interedition.collatex.nmerge.graph;
 
-import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -48,7 +48,7 @@ public class MatchThreadTransposeLeft<T> extends MatchThreadDirect<T> {
    * @param travelled the distance from the special arc on our right
    * @param forbidden the forbidden node we mustn't cross
    */
-  MatchThreadTransposeLeft(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphArc<T> a,
+  MatchThreadTransposeLeft(MaximalUniqueMatch<T> mum, UkkonenSuffixTree<T> st, VariantGraphArc<T> a,
                            int first, List<PrevChar<T>> prevChars, int travelled, VariantGraphNode<T> forbidden) {
     super(mum, null, st, a, a.from, first, prevChars, forbidden);
     this.travelled = travelled;

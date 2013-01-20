@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.suffixtree;
+package eu.interedition.collatex.schmidt;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -32,13 +32,13 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class SuffixTreeTest extends AbstractTest {
+public class UkkonenSuffixTreeTest extends AbstractTest {
 
-  private static final List<String> TEST_STRING = Lists.newArrayList("Hello ", "world ", "world ", "World ", "!");
+  private static final List<String> TEST_STRING = Lists.newArrayList("hello", "world", "earth", "sun", "earth");
 
   @Test
   public void simple() {
-    final SuffixTree<String> st = SuffixTree.create(TEST_STRING, Ordering.<String>natural());
+    final UkkonenSuffixTree<String> st = UkkonenSuffixTree.create(TEST_STRING, Ordering.<String>natural());
     LOG.fine(st.toString());
     Assert.assertNotNull(st.findSubstring(TEST_STRING.subList(0, 3)));
   }
@@ -48,7 +48,7 @@ public class SuffixTreeTest extends AbstractTest {
    */
   @Test
   public void verifyAllSuffixes() {
-    final SuffixTree<String> st = SuffixTree.create(TEST_STRING, Ordering.<String>natural());
+    final UkkonenSuffixTree<String> st = UkkonenSuffixTree.create(TEST_STRING, Ordering.<String>natural());
     final int end = TEST_STRING.size();
     for (int start = 0; start < end; start++) {
       Assert.assertNotNull("Couldn't find word [" + start + ", " + end + "]", st.findSubstring(TEST_STRING.subList(start, end)));

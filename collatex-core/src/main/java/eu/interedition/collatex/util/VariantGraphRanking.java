@@ -28,11 +28,9 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
 
   private final Map<VariantGraph.Vertex, Integer> byVertex = Maps.newHashMap();
   private final SortedSetMultimap<Integer, VariantGraph.Vertex> byRank = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-  private final VariantGraph graph;
   private final Set<Witness> witnesses;
 
-  public VariantGraphRanking(VariantGraph graph, Set<Witness> witnesses) {
-    this.graph = graph;
+  public VariantGraphRanking(Set<Witness> witnesses) {
     this.witnesses = witnesses;
   }
 
@@ -41,7 +39,7 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
   }
 
   public static VariantGraphRanking of(VariantGraph graph, Set<Witness> witnesses) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
+    final VariantGraphRanking ranking = new VariantGraphRanking(witnesses);
     for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
       int rank = -1;
       for (VariantGraph.Edge e : v.incoming(witnesses)) {
@@ -60,6 +58,10 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
 
   public SortedSetMultimap<Integer, VariantGraph.Vertex> getByRank() {
     return Multimaps.unmodifiableSortedSetMultimap(byRank);
+  }
+
+  public int size() {
+    return byRank.keySet().size();
   }
 
   @Override

@@ -23,7 +23,7 @@ package eu.interedition.collatex.nmerge.graph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Errors;
 import eu.interedition.collatex.nmerge.exception.MVDException;
-import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -285,7 +285,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    * @param subGraph the subgraph directly opposite it
    * @return the best MUM or null
    */
-  public static <T> MaximalUniqueMatch<T> findDirectMUM(VariantGraphSpecialArc<T> special, SuffixTree<T> st,
+  public static <T> MaximalUniqueMatch<T> findDirectMUM(VariantGraphSpecialArc<T> special, UkkonenSuffixTree<T> st,
                                                         VariantGraph<T> subGraph) throws MVDException {
     MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, false);
     HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
@@ -393,7 +393,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    * @param subGraph the subgraph directly opposite it
    * @return the best left transpose MUM or null
    */
-  public static <T> MaximalUniqueMatch<T> findLeftTransposeMUM(VariantGraphSpecialArc<T> special, SuffixTree<T> st,
+  public static <T> MaximalUniqueMatch<T> findLeftTransposeMUM(VariantGraphSpecialArc<T> special, UkkonenSuffixTree<T> st,
                                                                VariantGraph<T> subGraph) {
     MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, true);
     mum.transposeLeft = true;
@@ -426,7 +426,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    * @param node     node to look backwards from
    * @param distance the distance to search left in bytes
    */
-  static <T> void findLeftPositions(MaximalUniqueMatch<T> mum, SuffixTree<T> st,
+  static <T> void findLeftPositions(MaximalUniqueMatch<T> mum, UkkonenSuffixTree<T> st,
                                     VariantGraphNode<T> node, int distance) {
     HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);
     Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
@@ -510,7 +510,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    * @param subGraph the subgraph directly opposite it
    * @return the best right transpose MUM or null
    */
-  public static <T> MaximalUniqueMatch<T> findRightTransposeMUM(VariantGraphSpecialArc<T> special, SuffixTree<T> st,
+  public static <T> MaximalUniqueMatch<T> findRightTransposeMUM(VariantGraphSpecialArc<T> special, UkkonenSuffixTree<T> st,
                                                                 VariantGraph<T> subGraph) {
     MaximalUniqueMatch<T> mum = new MaximalUniqueMatch<T>(special, subGraph, true);
     // 1. calculate number of bytes to go forwards
@@ -537,7 +537,7 @@ public class MaximalUniqueMatch<T> implements Comparable<MaximalUniqueMatch<T>> 
    * @param node     the node to start from
    * @param distance the distance to search forwards
    */
-  static <T> void findRightPositions(MaximalUniqueMatch<T> mum, SuffixTree<T> st, VariantGraphNode<T> node,
+  static <T> void findRightPositions(MaximalUniqueMatch<T> mum, UkkonenSuffixTree<T> st, VariantGraphNode<T> node,
                                      int distance) {
     Queue<VariantGraphNode<T>> queue = new ArrayDeque<VariantGraphNode<T>>();
     HashSet<VariantGraphNode<T>> printedNodes = new HashSet<VariantGraphNode<T>>(PRINTED_HASH_SIZE);

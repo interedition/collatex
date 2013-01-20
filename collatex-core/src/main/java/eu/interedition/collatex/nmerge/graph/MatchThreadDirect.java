@@ -22,7 +22,7 @@ package eu.interedition.collatex.nmerge.graph;
 
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Errors;
-import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
 import com.google.common.collect.Sets;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class MatchThreadDirect<T> implements Runnable {
   /**
    * the Suffix Tree we are matching against
    */
-  protected SuffixTree<T> st;
+  protected UkkonenSuffixTree<T> st;
   /**
    * the last node we have seen before the match started
    */
@@ -77,7 +77,7 @@ public class MatchThreadDirect<T> implements Runnable {
   /**
    * the current position in the SuffixTree
    */
-  protected SuffixTree.Position<T> position;
+  protected UkkonenSuffixTree.Position<T> position;
   /**
    * Versions shared by all arcs in the path
    */
@@ -121,7 +121,7 @@ public class MatchThreadDirect<T> implements Runnable {
    * @param prevChars an array of possible bytes that immediately
    *                  precede this match
    */
-  public MatchThreadDirect(MaximalUniqueMatch<T> mum, VariantGraph<T> graph, SuffixTree<T> st, VariantGraphArc<T> arc,
+  public MatchThreadDirect(MaximalUniqueMatch<T> mum, VariantGraph<T> graph, UkkonenSuffixTree<T> st, VariantGraphArc<T> arc,
                            VariantGraphNode<T> start, int offset, List<PrevChar<T>> prevChars, VariantGraphNode<T> forbidden) {
     this.mum = mum;
     this.first = offset;
@@ -129,7 +129,7 @@ public class MatchThreadDirect<T> implements Runnable {
     this.arc = arc;
     this.start = start;
     this.graph = graph;
-    this.position = new SuffixTree.Position<T>(null, 0);
+    this.position = new UkkonenSuffixTree.Position<T>(null, 0);
     this.offset = offset;
     this.prevChars = prevChars;
     this.forbidden = forbidden;
@@ -152,7 +152,7 @@ public class MatchThreadDirect<T> implements Runnable {
     this.offset = mtd.offset;
     // don't forget to duplicate this!
     // or splits will update each other
-    this.position = new SuffixTree.Position<T>(mtd.position.node, mtd.position.edgePos);
+    this.position = new UkkonenSuffixTree.Position<T>(mtd.position.node, mtd.position.edgePos);
     this.versions = Sets.newHashSet(mtd.versions);
     this.pathLen = mtd.pathLen;
     this.prevChars = mtd.prevChars;

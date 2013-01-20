@@ -9,8 +9,8 @@ import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
+import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
 import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.suffixtree.SuffixTree;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
@@ -189,7 +189,7 @@ public class CollateXLaboratory extends JFrame {
 
       final SimpleWitness witness = w.get(0);
       tabbedPane.setSelectedIndex(1);
-      final SuffixTreeModel treeModel = new SuffixTreeModel(SuffixTree.create(witness, new EqualityTokenComparator()));
+      final SuffixTreeModel treeModel = new SuffixTreeModel(UkkonenSuffixTree.create(witness, new EqualityTokenComparator()));
       suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
     }
   }

@@ -24,7 +24,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Errors;
 import eu.interedition.collatex.nmerge.exception.MVDException;
 import eu.interedition.collatex.nmerge.graph.*;
-import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -305,7 +305,7 @@ public class Collation<T> {
     VariantGraph<T> g = original;
     VariantGraphSpecialArc<T> special = g.addSpecialArc(data, witness, 0);
     if (g.getStart().cardinality() > 1) {
-      SuffixTree<T> st = makeSuffixTree(special);
+      UkkonenSuffixTree<T> st = makeSuffixTree(special);
       MaximalUniqueMatch<T> bestMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
       TreeMap<VariantGraphSpecialArc<T>, VariantGraph<T>> specials =
               new TreeMap<VariantGraphSpecialArc<T>, VariantGraph<T>>();
@@ -425,7 +425,7 @@ public class Collation<T> {
    */
   private MaximalUniqueMatch<T> computeBestMUM(VariantGraph<T> g, VariantGraphSpecialArc<T> special)
           throws MVDException {
-    SuffixTree<T> st = makeSuffixTree(special);
+    UkkonenSuffixTree<T> st = makeSuffixTree(special);
     MaximalUniqueMatch<T> directMUM = MaximalUniqueMatch.findDirectMUM(special, st, g);
     MaximalUniqueMatch<T> best = directMUM;
     if (!directAlignOnly) {
@@ -447,8 +447,8 @@ public class Collation<T> {
    * @return the suffix tree
    * @throws MVDException
    */
-  private SuffixTree<T> makeSuffixTree(VariantGraphSpecialArc<T> special) throws MVDException {
-    return SuffixTree.create(Lists.newArrayList(special.getData()), tokenOrdering);
+  private UkkonenSuffixTree<T> makeSuffixTree(VariantGraphSpecialArc<T> special) throws MVDException {
+    return UkkonenSuffixTree.create(Lists.newArrayList(special.getData()), tokenOrdering);
   }
 
   /**

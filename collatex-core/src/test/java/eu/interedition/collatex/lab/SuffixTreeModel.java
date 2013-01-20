@@ -3,7 +3,7 @@ package eu.interedition.collatex.lab;
 import com.google.common.collect.Lists;
 import edu.uci.ics.jung.graph.DelegateTree;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.suffixtree.SuffixTree;
+import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
 
 import java.util.List;
 
@@ -12,11 +12,11 @@ import java.util.List;
  */
 public class SuffixTreeModel extends DelegateTree<SuffixTreeVertexModel, SuffixTreeEdgeModel> {
 
-  public SuffixTreeModel(SuffixTree<Token> suffixTree) {
+  public SuffixTreeModel(UkkonenSuffixTree<Token> suffixTree) {
     add(suffixTree, null, suffixTree.getRoot());
   }
 
-  void add(SuffixTree<Token> st, SuffixTreeVertexModel parent, SuffixTree.Node node) {
+  void add(UkkonenSuffixTree<Token> st, SuffixTreeVertexModel parent, UkkonenSuffixTree.Node node) {
     final int start = node.getEdgeStart();
     final int end = node.getEdgeEnd();
 
@@ -32,7 +32,7 @@ public class SuffixTreeModel extends DelegateTree<SuffixTreeVertexModel, SuffixT
       addChild(new SuffixTreeEdgeModel(), parent, vertexModel);
     }
 
-    for (SuffixTree.Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
+    for (UkkonenSuffixTree.Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
       add(st, vertexModel, child);
     }
   }

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.interedition.collatex.suffixtree;
+package eu.interedition.collatex.schmidt;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -37,12 +37,12 @@ import java.util.logging.Logger;
  *
  * @author Desmond Schmidt 25/10/08
  */
-public class SuffixTree<T> {
-  private static final Logger LOG = Logger.getLogger(SuffixTree.class.getName());
+public class UkkonenSuffixTree<T> {
+  private static final Logger LOG = Logger.getLogger(UkkonenSuffixTree.class.getName());
 
   /**
    * The one and only real source string of the tree. All edge-labels
-   * contain only indices to this string and do not contain the characters
+   * contain only indices to this string and do not contain the symbols
    * themselves
    */
   private final T[] source;
@@ -56,7 +56,7 @@ public class SuffixTree<T> {
 
   /**
    * The node that is the head of all others. It has no siblings nor a
-   * father
+   * parent
    */
   private final Node<T> root;
 
@@ -71,24 +71,20 @@ public class SuffixTree<T> {
    */
   private int virtualEnd;
 
-  public static <T> SuffixTree<T> create(Iterable<T> str, Comparator<T> comparator) {
-    final SuffixTree<T> suffixTree = new SuffixTree<T>(str, comparator);
-    final Position<T> position = suffixTree.at(suffixTree.root, 0);
+  public static <T> UkkonenSuffixTree<T> create(Iterable<T> str, Comparator<T> comparator) {
+    final UkkonenSuffixTree<T> suffixTree = new UkkonenSuffixTree<T>(str, comparator);
+    final Position<T> position = new Position<T>(suffixTree.root, 0);
 
     // initializing algorithm parameters
-    final ExtensionState ep = new ExtensionState(2, (char) 0);
+    final ExtensionState extensionState = new ExtensionState(2, false);
 
     // Ukkonen's algorithm begins here
     for (int offset = 2; offset < suffixTree.length; offset++) {
       // perform Single Phase Algorithm
-      suffixTree.build(position, offset, ep);
+      suffixTree.build(position, offset, extensionState);
     }
 
     return suffixTree;
-  }
-
-  public Position<T> at(Node<T> node, int edgePos) {
-    return new Position<T>(node, edgePos);
   }
 
   public T[] getSource() {
@@ -99,7 +95,7 @@ public class SuffixTree<T> {
     return root;
   }
 
-  private boolean compare(T t1, T t2) {
+  private boolean symbolsEqual(T t1, T t2) {
     return (t1 == null && t2 == null) || (t1 != null && t2 != null && comparator.compare(t1, t2) == 0);
   }
 
@@ -113,7 +109,7 @@ public class SuffixTree<T> {
    *            version it is appended at the end of the input string and then never used.
    */
   @SuppressWarnings("unchecked")
-  private SuffixTree(Iterable<T> str, Comparator<T> comparator) {
+  private UkkonenSuffixTree(Iterable<T> str, Comparator<T> comparator) {
     this.length = Iterables.size(str) + 1;
     Preconditions.checkArgument(this.length > 1);
     this.source = (T[]) Array.newInstance(Iterables.getFirst(str, null).getClass(), this.length + 1);
@@ -142,13 +138,13 @@ public class SuffixTree<T> {
    *
    * @param position the node and position in its incoming edge where extension begins
    * @param offset    current phase number - offset into text
-   * @param ep       the first extension number of that phase, a flag signaling whether
+   * @param extensionState       the first extension number of that phase, a flag signaling whether
    *                 the extension is the first of this phase, after the last phase ended with
    *                 rule 3. If so - extension will be executed again in this phase, and thus
    *                 its suffix link would not be followed. Updated: The extension number that
    *                 was last executed on this phase. Next phase will start from it and not from 1
    */
-  private void build(Position<T> position, int offset, ExtensionState ep) {
+  private void build(Position<T> position, int offset, ExtensionState extensionState) {
     // no such rule (0). Used for entering the loop
     int ruleApplied = 0;
     Path path = new Path(0, 0);
@@ -158,21 +154,21 @@ public class SuffixTree<T> {
 
     // apply explicit extensions until last extension of this phase is reached
     // or extension rule 3 is applied once
-    while (ep.extension <= offset + 1) {
-      path.begin = ep.extension;
+    while (extensionState.extension <= offset + 1) {
+      path.start = extensionState.extension;
       path.end = offset + 1;
       // Call Single-Extension-Algorithm
-      ruleApplied = extend(position, path, ep.repeatedExtension, ruleApplied);
+      ruleApplied = extend(position, path, extensionState.repeatedExtension, ruleApplied);
 
       // check if rule 3 was applied for the current extension
       if (ruleApplied == 3) {
         // Signaling that the next phase's first extension will not follow a
         // suffix link because same extension is repeated
-        ep.repeatedExtension = 1;
+        extensionState.repeatedExtension = true;
         break;
       }
-      ep.repeatedExtension = 0;
-      ep.extension++;
+      extensionState.repeatedExtension = false;
+      extensionState.extension++;
     }
   }
 
@@ -195,22 +191,22 @@ public class SuffixTree<T> {
    * @return The rule that was applied to that extension. Can be 3 (phase is done)
    *         or 2 (a new leaf was created).
    */
-  private int extend(Position<T> position, Path str, char afterRule3, int ruleApplied) {
+  private int extend(Position<T> position, Path str, boolean afterRule3, int ruleApplied) {
     int charsFound = 0;
-    int pathPos = str.begin;
-    Path originalPath = new Path(str.begin, str.end);
+    int pathPos = str.start;
+    Path originalPath = new Path(str.start, str.end);
     Node<T> tmp;
 
     if (LOG.isLoggable(Level.FINER)) {
       LOG.log(Level.FINER, "\n{0}extension: {1} phase+1: {2} -- {3} ({4},{5} | {6})", new Object[]{
               toString(),
-              str.begin, str.end,
-              (afterRule3 == 0 ? "followed from" : "starting at"),
+              str.start, str.end,
+              (afterRule3 ? "starting at" : "followed from"),
               position.node.edgeStart, position.node.getEdgeEnd(), position.edgePos
       });
     }
     // follow suffix link only if it's not the first extension after rule 3 was applied
-    if (afterRule3 == 0) {
+    if (!afterRule3) {
       followSuffixLink(position);
     }
     // if node is root - trace whole string starting from the root, else -
@@ -223,7 +219,7 @@ public class SuffixTree<T> {
       position.edgePos = trv.edgePos;
       charsFound = trv.charsFound;
     } else {
-      str.begin = str.end;
+      str.start = str.end;
       charsFound = 0;
 
       // consider 2 cases:
@@ -240,14 +236,14 @@ public class SuffixTree<T> {
       // 2. last character matched is NOT the last of its edge
       else {
         // Trace only last symbol of str, search in the CURRENT edge (node)
-        if (compare(source[position.node.edgeStart + position.edgePos + 1], source[str.end])) {
+        if (symbolsEqual(source[position.node.edgeStart + position.edgePos + 1], source[str.end])) {
           position.edgePos++;
           charsFound = 1;
         }
       }
     }
     // if whole string was found - rule 3 applies
-    if (charsFound == str.end - str.begin + 1) {
+    if (charsFound == str.end - str.start + 1) {
       ruleApplied = 3;
       // if there is an internal node that has no suffix link yet (only one may
       // exist) - create a suffix link from it to the father-node of the
@@ -259,7 +255,7 @@ public class SuffixTree<T> {
       }
 
       if (LOG.isLoggable(Level.FINER)) {
-        LOG.log(Level.FINER, "rule 3 ({0},{1})", new Object[] { str.begin, str.end });
+        LOG.log(Level.FINER, "rule 3 ({0},{1})", new Object[] { str.start, str.end });
       }
       return ruleApplied;
     }
@@ -271,7 +267,7 @@ public class SuffixTree<T> {
       if (position.node.firstChild != null) {
         // apply extension rule 2 new son - a new leaf is created and returned
         // by applyExtensionRule2
-        applyExtensionRule2(position.node, str.begin + charsFound, str.end, pathPos, 0,
+        applyExtensionRule2(position.node, str.start + charsFound, str.end, pathPos, 0,
                 Rule2Type.NEW_CHILD);
         ruleApplied = 2;
         // if there is an internal node that has no suffix link yet (only one
@@ -286,7 +282,7 @@ public class SuffixTree<T> {
     } else {
       // apply extension rule 2 split - a new node is created and returned by
       // applyExtensionRule2
-      tmp = applyExtensionRule2(position.node, str.begin + charsFound, str.end, pathPos,
+      tmp = applyExtensionRule2(position.node, str.start + charsFound, str.end, pathPos,
               position.edgePos, Rule2Type.SPLIT);
       if (suffixless != null) {
         suffixless.linkTo(tmp);
@@ -420,7 +416,7 @@ public class SuffixTree<T> {
 
     // search for the first character of the string in the outgoing
     // edge of node
-    contNode = node.findChild(source[str.begin]);
+    contNode = node.findChild(source[str.start]);
     if (contNode == null) {
       // Search is done, string not found
       trv.edgePos = node.edgeLength() - 1;
@@ -430,7 +426,7 @@ public class SuffixTree<T> {
     // found first character - prepare for continuing the search
     node = contNode;
     length = node.edgeLength();
-    strLen = str.end - str.begin + 1;
+    strLen = str.end - str.start + 1;
 
     // compare edge length and string length.
     // if edge is shorter then the string being searched and skipping
@@ -457,7 +453,7 @@ public class SuffixTree<T> {
            trv.charsFound++, trv.edgePos++) {
         // compare current characters of the string and the edge.
         // if equal - continue
-        if (!equals(comparator.compare(source[node.edgeStart + trv.edgePos], source[str.begin + trv.edgePos]))) {
+        if (!equals(comparator.compare(source[node.edgeStart + trv.edgePos], source[str.start + trv.edgePos]))) {
           trv.edgePos--;
           return node;
         }
@@ -493,7 +489,7 @@ public class SuffixTree<T> {
    */
   private Node<T> traceString(Node<T> node, Path str, TraceReturnValue trv,
                                      SkipType type) {
-    Path localStr = new Path(str.begin, str.end);
+    Path localStr = new Path(str.start, str.end);
     trv.charsFound = 0;
     TraceReturnValue localTrv = new TraceReturnValue();
     localTrv.searchDone = false;
@@ -501,7 +497,7 @@ public class SuffixTree<T> {
       trv.edgePos = localTrv.edgePos = 0;
       localTrv.charsFound = 0;
       node = traceSingleEdge(node, localStr, localTrv, type);
-      localStr.begin += localTrv.charsFound;
+      localStr.start += localTrv.charsFound;
       trv.charsFound += localTrv.charsFound;
       trv.edgePos = localTrv.edgePos;
     }
@@ -555,7 +551,7 @@ public class SuffixTree<T> {
           return false;
         }
       } else {
-        boolean success = compare(source[position.edgePos + 1], b);
+        boolean success = symbolsEqual(source[position.edgePos + 1], b);
         if (success) {
           position.edgePos++;
         }
@@ -613,7 +609,7 @@ public class SuffixTree<T> {
       nodeLabelEnd = node.getEdgeEnd();
       // Scan a single edge - compare each character with the searched
       // string
-      while (j < str.size() && k <= nodeLabelEnd && compare(source[k], str.get(j))) {
+      while (j < str.size() && k <= nodeLabelEnd && symbolsEqual(source[k], str.get(j))) {
         j++;
         k++;
       }
@@ -669,7 +665,7 @@ public class SuffixTree<T> {
         return position;
       }
       // store gama - the indices of node's incoming edge
-      gama.begin = position.node.edgeStart;
+      gama.start = position.node.edgeStart;
       gama.end = position.node.edgeStart + position.edgePos;
       // follow father's suffix link
       position.node = position.node.parent.largestSuffix;
@@ -739,7 +735,7 @@ public class SuffixTree<T> {
    */
   public static class Node<T> {
 
-    final SuffixTree<T> tree;
+    final UkkonenSuffixTree<T> tree;
     /**
      * A pointer to that node's father
      */
@@ -782,7 +778,7 @@ public class SuffixTree<T> {
      * @param end      the end index of the incoming edge to that node
      * @param position the path starting position of the node.
      */
-    public Node(SuffixTree<T> tree, Node<T> parent, int start, int end, int position) {
+    public Node(UkkonenSuffixTree<T> tree, Node<T> parent, int start, int end, int position) {
       Preconditions.checkArgument(end >= start, "Error: start greater than end");
       this.tree = tree;
       this.parent = parent;
@@ -861,7 +857,7 @@ public class SuffixTree<T> {
      */
     Node<T> findChild(T character) {
       for (Node<T> child = firstChild; child != null; child = child.nextSibling) {
-        if (tree.compare(tree.source[child.edgeStart], character)) {
+        if (tree.symbolsEqual(tree.source[child.edgeStart], character)) {
           return child;
         }
       }
@@ -901,7 +897,7 @@ public class SuffixTree<T> {
 
   /**
    * needed to store VAR parameters in
-   * {@link SuffixTree#traceSingleEdge(eu.interedition.collatex.suffixtree.SuffixTree.Node, eu.interedition.collatex.suffixtree.SuffixTree.Path, eu.interedition.collatex.suffixtree.SuffixTree.TraceReturnValue, eu.interedition.collatex.suffixtree.SuffixTree.SkipType)}
+   * {@link UkkonenSuffixTree#traceSingleEdge(UkkonenSuffixTree.Node, UkkonenSuffixTree.Path, UkkonenSuffixTree.TraceReturnValue, UkkonenSuffixTree.SkipType)}
    */
   private static class TraceReturnValue {
     /**
@@ -920,7 +916,7 @@ public class SuffixTree<T> {
 
   /**
    * Used in function
-   * {@link SuffixTree#traceString(eu.interedition.collatex.suffixtree.SuffixTree.Node, eu.interedition.collatex.suffixtree.SuffixTree.Path, eu.interedition.collatex.suffixtree.SuffixTree.TraceReturnValue, eu.interedition.collatex.suffixtree.SuffixTree.SkipType)}
+   * {@link UkkonenSuffixTree#traceString(UkkonenSuffixTree.Node, UkkonenSuffixTree.Path, UkkonenSuffixTree.TraceReturnValue, UkkonenSuffixTree.SkipType)}
    * for skipping (Ukkonen's Skip Trick).
    */
   private enum SkipType {
@@ -938,7 +934,7 @@ public class SuffixTree<T> {
   }
 
   /**
-   * required by {@link SuffixTree#build}
+   * required by {@link UkkonenSuffixTree#build}
    */
   private static class ExtensionState {
     /**
@@ -948,20 +944,20 @@ public class SuffixTree<T> {
     /**
      * 1 if the last rule applied is 3
      */
-    char repeatedExtension;
+    boolean repeatedExtension;
 
-    private ExtensionState(int extension, char repeatedExtension) {
+    private ExtensionState(int extension, boolean repeatedExtension) {
       this.extension = extension;
       this.repeatedExtension = repeatedExtension;
     }
   }
 
   private static class Path {
-    int begin;
+    int start;
     int end;
 
-    Path(int begin, int end) {
-      this.begin = begin;
+    Path(int start, int end) {
+      this.start = start;
       this.end = end;
     }
 
