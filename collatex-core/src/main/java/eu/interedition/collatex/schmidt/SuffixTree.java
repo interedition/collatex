@@ -160,7 +160,7 @@ class SuffixTree<T> {
     }
   }
 
-  class EquivalenceClass {
+  class EquivalenceClass implements Comparable<EquivalenceClass> {
 
     int[] members = new int[2];
     int length = 0;
@@ -182,6 +182,24 @@ class SuffixTree<T> {
 
     public boolean isMember(T symbol) {
       return (members[0] == source.length ? false : comparator.compare(symbol, source[members[0]]) == 0);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj != null && obj instanceof SuffixTree<?>.EquivalenceClass) {
+        return members[0] == ((EquivalenceClass)obj).members[0];
+      }
+      return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+      return members[0];
+    }
+
+    @Override
+    public int compareTo(EquivalenceClass o) {
+      return (members[0] - o.members[0]);
     }
 
     @Override
