@@ -9,7 +9,6 @@ import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
-import eu.interedition.collatex.medite.UkkonenSuffixTree;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 import javax.swing.AbstractAction;
@@ -54,8 +53,6 @@ public class CollateXLaboratory extends JFrame {
 
   private final JTable matchMatrixTable = new JTable();
 
-  private final SuffixTreePanel suffixTreePanel;
-
   private final JComboBox algorithm;
   private final JTabbedPane tabbedPane;
 
@@ -69,7 +66,6 @@ public class CollateXLaboratory extends JFrame {
 
     this.tabbedPane = new JTabbedPane();
     this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(new JungVariantGraph()));
-    this.tabbedPane.addTab("Suffix Tree", suffixTreePanel = new SuffixTreePanel());
     this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     matchMatrixTable.setShowGrid(true);
@@ -89,7 +85,6 @@ public class CollateXLaboratory extends JFrame {
     toolBar.add(new AddWitnessAction());
     toolBar.add(new RemoveWitnessesAction());
     toolBar.add(new CollateAction());
-    toolBar.add(new SuffixTreeAction());
     toolBar.add(new MatchMatrixAction());
     add(toolBar, BorderLayout.NORTH);
 
@@ -172,28 +167,6 @@ public class CollateXLaboratory extends JFrame {
     }
   }
 
-  private class SuffixTreeAction extends AbstractAction {
-
-    private SuffixTreeAction() {
-      super("Suffix Tree");
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      final List<SimpleWitness> w = witnessPanel.getWitnesses();
-
-      if (w.size() < 1) {
-        return;
-      }
-
-      final SimpleWitness witness = w.get(0);
-      tabbedPane.setSelectedIndex(1);
-      final SuffixTreeModel treeModel = new SuffixTreeModel(UkkonenSuffixTree.create(witness, new EqualityTokenComparator()));
-      suffixTreePanel.getModel().setGraphLayout(new TreeLayout(treeModel, 100, 50));
-    }
-  }
-
   private class MatchMatrixAction extends AbstractAction {
 
     private MatchMatrixAction() {
@@ -232,7 +205,7 @@ public class CollateXLaboratory extends JFrame {
         columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
       }
 
-      tabbedPane.setSelectedIndex(2);
+      tabbedPane.setSelectedIndex(1);
     }
   }
 

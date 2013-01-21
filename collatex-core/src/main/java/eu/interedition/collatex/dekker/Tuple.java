@@ -12,7 +12,7 @@ public class Tuple<T> {
   public final T left;
   public final T right;
 
-  private final Set<T> set;
+  private final Set<?> set;
 
   public Tuple(T left, T right) {
     this.left = left;
