@@ -1,7 +1,6 @@
 package eu.interedition.collatex.lab;
 
 import com.google.common.collect.Iterables;
-import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
