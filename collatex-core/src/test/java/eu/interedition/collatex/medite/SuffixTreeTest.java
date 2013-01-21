@@ -1,4 +1,4 @@
-package eu.interedition.collatex.schmidt;
+package eu.interedition.collatex.medite;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;

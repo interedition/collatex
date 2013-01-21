@@ -1,4 +1,4 @@
-package eu.interedition.collatex.schmidt;
+package eu.interedition.collatex.medite;
 
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
@@ -10,11 +10,12 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class MaximalUniqueMatchesTest extends AbstractTest {
+public class MatcherTest extends AbstractTest {
 
   @Test
   public void find() {
@@ -35,11 +36,10 @@ public class MaximalUniqueMatchesTest extends AbstractTest {
   protected void print(String... witnesses) {
     final SimpleWitness[] w = createWitnesses(witnesses);
 
-    final Map<List<VariantGraph.Vertex>, List<Token>> mums = MaximalUniqueMatches.find(new EqualityTokenComparator(), collate(w[0]), w[1]);
+    final Map<List<VariantGraph.Vertex>, List<Token>> mums = Matcher.searchMaximumUniqueMatches(new EqualityTokenComparator(), collate(w[0]), w[1]);
 
     for (Map.Entry<List<VariantGraph.Vertex>, List<Token>> match : mums.entrySet()) {
-      System.out.printf("%s == %s\n", Iterables.toString(match.getKey()), Iterables.toString(match.getValue()));
+      LOG.log(Level.FINE, "{0} == {1}", new Object[] { Iterables.toString(match.getKey()), Iterables.toString(match.getValue()) });
     }
-    System.out.println();
   }
 }

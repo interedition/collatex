@@ -1,4 +1,4 @@
-package eu.interedition.collatex.schmidt;
+package eu.interedition.collatex.medite;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -35,10 +35,10 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class MaximalUniqueMatches extends HashMap<List<VariantGraph.Vertex>,List<Integer>> {
-  private static final Logger LOG = Logger.getLogger(MaximalUniqueMatches.class.getName());
+public class Matcher {
+  private static final Logger LOG = Logger.getLogger(Matcher.class.getName());
 
-  public static SortedMap<List<VariantGraph.Vertex>,List<Token>> find(Comparator<Token> comparator, VariantGraph graph, Iterable<Token> tokens) {
+  public static SortedMap<List<VariantGraph.Vertex>,List<Token>> searchMaximumUniqueMatches(Comparator<Token> comparator, VariantGraph graph, Iterable<Token> tokens) {
     Stopwatch stopwatch = null;
     final boolean logTimings = LOG.isLoggable(Level.FINER);
 

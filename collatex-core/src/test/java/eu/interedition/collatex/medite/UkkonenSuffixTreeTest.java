@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.schmidt;
+package eu.interedition.collatex.medite;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;

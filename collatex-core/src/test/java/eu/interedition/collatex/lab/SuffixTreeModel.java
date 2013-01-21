@@ -3,7 +3,7 @@ package eu.interedition.collatex.lab;
 import com.google.common.collect.Lists;
 import edu.uci.ics.jung.graph.DelegateTree;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
+import eu.interedition.collatex.medite.UkkonenSuffixTree;
 
 import java.util.List;
 

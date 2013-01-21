@@ -23,7 +23,7 @@ package eu.interedition.collatex.nmerge.graph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.nmerge.Errors;
 import eu.interedition.collatex.nmerge.exception.MVDException;
-import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
+import eu.interedition.collatex.medite.UkkonenSuffixTree;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

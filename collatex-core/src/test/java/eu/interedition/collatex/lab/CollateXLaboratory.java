@@ -9,7 +9,7 @@ import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
-import eu.interedition.collatex.schmidt.UkkonenSuffixTree;
+import eu.interedition.collatex.medite.UkkonenSuffixTree;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 import javax.swing.AbstractAction;
