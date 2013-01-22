@@ -1,5 +1,7 @@
 package eu.interedition.collatex.medite;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
@@ -10,6 +12,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.SortedSet;
 import java.util.logging.Level;
 
 /**
@@ -24,8 +27,8 @@ public class MatcherTest extends AbstractTest {
             "the cat was observing birds in the little trees this morning it observed birds for two hours"
     );
     print(
-            "a b c a b c",
-            "a b c a"
+            "a b c d e a b c d",
+            "c d e b c d a b c"
     );
     print(
             "It has been disputed at what period of life the causes of variability, whatever they may be, generally act; whether during the early or late period of development of the embryo, or at the instant of conception. Geoffroy St. Hilaire's experiments show that unnatural treatment of the embryo causes monstrosities; and monstrosities cannot be separated by any clear line of distinction from mere variations. But I am strongly inclined to suspect that the most frequent cause of variability may be attributed to the male and female reproductive elements having been affected prior to the act of conception. Several reasons make me believe in this; but the chief one is the remarkable effect which confinement or cultivation has on the functions of the reproductive system; this system appearing to be far more susceptible than any other part of the organisation, to the action of any change in the conditions of life. Nothing is more easy than to tame an animal, and few things more difficult than to get it to breed freely under confinement, even in the many cases when the male and female unite. How many animals there are which will not breed, though living long under not very close confinement in their native country! This is generally attributed to vitiated instincts; but how many cultivated plants display the utmost vigour, and yet rarely or never seed! In some few such cases it has been found out that very trifling changes, such as a little more or less water at some particular period of growth, will determine whether or not the plant sets a seed. I cannot here enter on the copious details which I have collected on this curious subject; but to show how singular the laws are which determine the reproduction of animals under confinement, I may just mention that carnivorous animals, even from the tropics, breed in this country pretty freely under confinement, with the exception of the plantigrades or bear family; whereas, carnivorous birds, with the rarest exceptions, hardly ever lay fertile eggs. Many exotic plants have pollen utterly worthless, in the same exact condition as in the most sterile hybrids. When, on the one hand, we see domesticated animals and plants, though often weak and sickly, yet breeding quite freely under confinement; and when, on the other hand, we see individuals, though taken young from a state of nature, perfectly tamed, long-lived, and healthy (of which I could give numerous instances), yet having their reproductive system so seriously affected by unperceived causes as to fail in acting, we need not be surprised at this system, when it does act under confinement, acting not quite regularly, and producing offspring not perfectly like their parents or variable.",
@@ -34,19 +37,36 @@ public class MatcherTest extends AbstractTest {
   }
 
   protected void print(String... witnesses) {
+    System.out.println(Strings.repeat("=", 100));
+
+    System.out.println(Joiner.on('\n').join(witnesses));
+    System.out.println(Strings.repeat("-", 100));
+
     final SimpleWitness[] w = createWitnesses(witnesses);
     final Token[] tokens = Iterables.toArray(w[1], Token.class);
     final Matcher matcher = Matcher.create(new EqualityTokenComparator(), collate(w[0]), tokens);
 
-    for (Phrase<TokenMatch> mum : matcher.maximalUniqueMatches(new IndexRangeSet(), new IndexRangeSet())) {
-      final List<VariantGraph.Vertex> mumVertices = Lists.newLinkedList();
-      final List<Token> mumTokens = Lists.newLinkedList();
-      for (TokenMatch match : mum) {
-        mumVertices.add(match.vertex);
-        mumTokens.add(tokens[match.token]);
-      }
+    final SortedSet<Phrase<TokenMatch>> maximalUniqueMatches = matcher.maximalUniqueMatches(new IndexRangeSet(), new IndexRangeSet());
+    printPhrases(maximalUniqueMatches, tokens);
 
-      LOG.log(Level.FINE, Iterables.toString(mumVertices) + " <==> " + Iterables.toString(mumTokens));
+    System.out.println(Strings.repeat("-", 100));
+
+    final SortedSet<Phrase<TokenMatch>> aligned = Aligner.align(maximalUniqueMatches);
+    printPhrases(aligned, tokens);
+
+    System.out.println(Strings.repeat("=", 100));
+  }
+
+  protected void printPhrases(SortedSet<Phrase<TokenMatch>> phrases, Token[] tokens) {
+    System.out.println(phrases.size());
+    for (Phrase<TokenMatch> mum : phrases) {
+      final List<VariantGraph.Vertex> phraseVertices = Lists.newLinkedList();
+      final List<Token> phraseTokens = Lists.newLinkedList();
+      for (TokenMatch match : mum) {
+        phraseVertices.add(match.vertex);
+        phraseTokens.add(tokens[match.token]);
+      }
+      System.out.println(Iterables.toString(phraseVertices) + " <==> " + Iterables.toString(phraseTokens));
     }
   }
 }

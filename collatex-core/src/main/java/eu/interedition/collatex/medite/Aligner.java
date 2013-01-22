@@ -3,35 +3,37 @@ package eu.interedition.collatex.medite;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import eu.interedition.collatex.dekker.Tuple;
+import com.google.common.collect.Sets;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class Aligner {
 
-  private final Tuple<Tuple<Integer>>[] matches;
+  private final List<Phrase<TokenMatch>> matches;
   private final PriorityQueue<Path> bestPaths;
   private final Map<Path, Integer> minCosts;
 
-  Aligner(Tuple<Tuple<Integer>>[] matches) {
+  Aligner(List<Phrase<TokenMatch>> matches) {
     this.matches = matches;
-    this.bestPaths = new PriorityQueue<Path>(matches.length, PATH_COST_COMPARATOR);
+    this.bestPaths = new PriorityQueue<Path>(matches.size(), PATH_COST_COMPARATOR);
     this.minCosts = Maps.newHashMap();
   }
 
-  static List<Tuple<Tuple<Integer>>> align(Tuple<Tuple<Integer>>[] matches) {
-    final List<Tuple<Tuple<Integer>>> alignments = Lists.newLinkedList();
+  static SortedSet<Phrase<TokenMatch>> align(SortedSet<Phrase<TokenMatch>> matches) {
+    final SortedSet<Phrase<TokenMatch>> alignments = Sets.newTreeSet();
 
-    Path optimal = new Aligner(matches).optimize();
+    final List<Phrase<TokenMatch>> matchList = Lists.newArrayList(matches);
+    Path optimal = new Aligner(matchList).optimize();
     while (optimal.matchIndex >= 0) {
       if (optimal.aligned) {
-        alignments.add(0, matches[optimal.matchIndex]);
+        alignments.add(matchList.get(optimal.matchIndex));
       }
       optimal = optimal.previous;
     }
@@ -42,7 +44,7 @@ public class Aligner {
     bestPaths.add(new Path(null, -1, false, 0));
     while (!bestPaths.isEmpty()) {
       final Path current = bestPaths.remove();
-      if (current.matchIndex == matches.length - 1) {
+      if (current.matchIndex == matches.size() - 1) {
         return current;
       }
       for (Path successor : current.successors()) {
@@ -59,16 +61,18 @@ public class Aligner {
   }
 
   private int heuristicCost(Path path) {
-    final Tuple<Tuple<Integer>> match = matches[path.matchIndex];
+    final Phrase<TokenMatch> evaluated = matches.get(path.matchIndex);
+    final TokenMatch lastMatch = evaluated.last();
 
     int cost = 0;
-    for (int mc = path.matchIndex + 1; mc < matches.length; mc++) {
-      if ((match.left.right < matches[mc].left.left) && (match.right.right < matches[mc].right.left)) {
-        // we still can align this match as the matched components are to the right of this path's final match
+    for (Phrase<TokenMatch> following : matches.subList(path.matchIndex + 1, matches.size())) {
+      final TokenMatch followingFirstMatch = following.first();
+      if (lastMatch.vertexRank < followingFirstMatch.vertexRank && lastMatch.token < followingFirstMatch.token) {
+        // we still can align this following match as the matched components are to the right of this path's last match
         continue;
       }
-      // we cannot align this match, so add it to the cost
-      cost += matches[mc].left.right - matches[mc].left.left + 1;
+      // we cannot align this following match, so add it to the cost
+      cost += following.size();
     }
     return cost;
   }
@@ -77,7 +81,7 @@ public class Aligner {
     int cost = 0;
     while (current.matchIndex >= 0) {
       if (!current.aligned) {
-        cost += matches[current.matchIndex].left.right - matches[current.matchIndex].left.left + 1;
+        cost += matches.get(current.matchIndex).size();
       }
       current = current.previous;
     }
