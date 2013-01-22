@@ -5,11 +5,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
@@ -20,14 +17,8 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +29,14 @@ import java.util.logging.Logger;
 public class Matcher {
   private static final Logger LOG = Logger.getLogger(Matcher.class.getName());
 
-  public static SortedMap<List<VariantGraph.Vertex>,List<Token>> searchMaximumUniqueMatches(Comparator<Token> comparator, VariantGraph graph, Iterable<Token> tokens) {
+  private SuffixTree<Token> suffixTree;
+
+  private SortedSetMultimap<Integer,Phrase<EquivalenceClassMatch>> phrases;
+
+  public static Matcher create(Comparator<Token> comparator, VariantGraph graph, Token[] tokens) {
+
+    final Matcher matcher = new Matcher();
+
     Stopwatch stopwatch = null;
     final boolean logTimings = LOG.isLoggable(Level.FINER);
 
@@ -47,7 +45,7 @@ public class Matcher {
       stopwatch.start();
     }
 
-    final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, Iterables.toArray(tokens, Token.class));
+    matcher.suffixTree = SuffixTree.build(comparator, tokens);
 
     if (logTimings) {
       stopwatch.stop();
@@ -71,14 +69,14 @@ public class Matcher {
       final SortedSet<VariantGraph.Vertex> vertices = rankMap.get(rank);
 
       for (VariantGraph.Vertex vertex : vertices) {
-        final MatchThread matchThread = new MatchThread(suffixTree).advance(vertex);
+        final MatchThread matchThread = new MatchThread(matcher.suffixTree).advance(vertex, rank);
         if (matchThread != null) {
           matchThreads.put(rank, matchThread);
         }
       }
       for (MatchThread matchThread : matchThreads.get(rank - 1)) {
         for (VariantGraph.Vertex vertex : vertices) {
-          final MatchThread advanced = matchThread.advance(vertex);
+          final MatchThread advanced = matchThread.advance(vertex, rank);
           if (advanced != null) {
             matchThreads.put(rank, advanced);
             break;
@@ -94,72 +92,36 @@ public class Matcher {
       stopwatch.start();
     }
 
-    final Set<Range<Integer>> excludedRanks = Sets.newHashSet();
-    final Set<Range<Integer>> excludedTokens = Sets.newHashSet();
-    final Function<List<Match>, Map<List<VariantGraph.Vertex>,List<Integer>>> availableMatch = new Function<List<Match>, Map<List<VariantGraph.Vertex>, List<Integer>>>() {
+    matcher.phrases = TreeMultimap.create(Ordering.natural().reverse(), new Comparator<Phrase<EquivalenceClassMatch>>() {
       @Override
-      public Map<List<VariantGraph.Vertex>, List<Integer>> apply(@Nullable List<Match> input) {
-        final List<VariantGraph.Vertex> vertices = Lists.newArrayListWithExpectedSize(input.size());
-        final LinkedList<Integer> tokens = Lists.newLinkedList();
-
-        for (Match match : input) {
-          final Integer vertexRank = ranking.apply(match.vertex);
-          for (Range<Integer> excludedRange : excludedRanks) {
-            if (excludedRange.contains(vertexRank)) {
-              return null;
-            }
-          }
-          final Integer last = tokens.peek();
-          boolean matchFound = false;
-          for (int mc = 0; mc < match.equivalenceClass.length; mc++) {
-            if (last != null && (last != match.equivalenceClass.members[mc] + 1)) {
-              continue;
-            }
-            boolean notExcluded = true;
-            for (Range<Integer> excludedRange : excludedTokens) {
-              if (excludedRange.contains(match.equivalenceClass.members[mc])) {
-                notExcluded = false;
-                break;
-              }
-            }
-            if (notExcluded) {
-              matchFound = true;
-              vertices.add(0, match.vertex);
-              tokens.add(0, match.equivalenceClass.members[mc]);
-              break;
-            }
-          }
-          if (!matchFound) {
-            return null;
-          }
-        }
-
-        return Collections.<List<VariantGraph.Vertex>, List<Integer>>singletonMap(vertices, tokens);
-      }
-    };
-
-    final Multimap<Integer,List<Match>> matchesByLength = TreeMultimap.create(Ordering.natural().reverse(), new Comparator<List<Match>>() {
-      @Override
-      public int compare(List<Match> o1, List<Match> o2) {
-        // compare by match length
+      public int compare(Phrase<EquivalenceClassMatch> o1, Phrase<EquivalenceClassMatch> o2) {
+        // 1. reverse ordering by match length
         int result = o2.size() - o1.size();
         if (result != 0) {
           return result;
         }
 
-        // compare by first token
-        result = o2.get(0).equivalenceClass.compareTo(o1.get(0).equivalenceClass);
+        // 2. reverse ordering by first token
+        result = o2.first().equivalenceClass.compareTo(o1.first().equivalenceClass);
         if (result != 0) {
           return result;
         }
 
-        // compare by first vertex ranking
-        return (ranking.apply(o2.get(0).vertex) - ranking.apply(o1.get(0).vertex));
+        // 3. reverse ordering by first vertex ranking
+        return (ranking.apply(o2.first().vertex) - ranking.apply(o1.first().vertex));
       }
     });
 
-    for (List<Match> match : Iterables.transform(matchThreads.values(), toMatchList())) {
-      matchesByLength.put(match.size(), match);
+    for (MatchThread matchThread : matchThreads.values()) {
+      final Phrase<EquivalenceClassMatch> phrase = new Phrase<EquivalenceClassMatch>();
+
+      MatchThread current = matchThread;
+      while (current.vertex != null) {
+        phrase.add(new EquivalenceClassMatch(current.vertex, current.vertexRank, current.cursor.matchedClass()));
+        current = current.previous;
+      }
+
+      matcher.phrases.put(phrase.size(), phrase);
     }
 
     if (logTimings) {
@@ -169,35 +131,39 @@ public class Matcher {
       stopwatch.start();
     }
 
-    final SortedMap<List<VariantGraph.Vertex>, List<Token>> mums = Maps.newTreeMap(new Comparator<List<VariantGraph.Vertex>>() {
-      @Override
-      public int compare(List<VariantGraph.Vertex> o1, List<VariantGraph.Vertex> o2) {
-        return (ranking.apply(o1.get(0)) - ranking.apply(o2.get(0)));
-      }
-    });
+    return matcher;
+  }
+
+  public SortedSet<Phrase<TokenMatch>> maximalUniqueMatches(IndexRangeSet rankFilter, IndexRangeSet tokenFilter) {
+    rankFilter = new IndexRangeSet(rankFilter);
+    tokenFilter = new IndexRangeSet(tokenFilter);
+
+    final Function<Phrase<EquivalenceClassMatch>, Phrase<TokenMatch>> tokenSelector = tokenSelector(rankFilter, tokenFilter);
+    final SortedSet<Phrase<TokenMatch>> maximalUniqueMatches = Sets.newTreeSet();
 
     while (true) {
-      Map<List<VariantGraph.Vertex>, List<Integer>> maximalUniqueMatch = null;
-      final Set<List<Match>> exhaustedMatches = Sets.newHashSet();
+      final Set<Phrase<EquivalenceClassMatch>> exhaustedMatches = Sets.newHashSet();
 
-      for (Integer matchLength : matchesByLength.keySet()) {
-        final Collection<List<Match>> matchesOfSameLength = matchesByLength.get(matchLength);
+      Phrase<TokenMatch> nextMum = null;
+
+      for (Integer matchLength : phrases.keySet()) {
+        final Collection<Phrase<EquivalenceClassMatch>> matchesOfSameLength = phrases.get(matchLength);
 
         if (matchesOfSameLength.size() == 1) {
-          final List<Match> onlyMatch = Iterables.get(matchesOfSameLength, 0);
-          maximalUniqueMatch = availableMatch.apply(onlyMatch);
-          if (maximalUniqueMatch != null) {
+          final Phrase<EquivalenceClassMatch> onlyMatch = Iterables.get(matchesOfSameLength, 0);
+          nextMum = tokenSelector.apply(onlyMatch);
+          if (nextMum != null) {
             break;
           } else {
             exhaustedMatches.add(onlyMatch);
           }
         }
-        if (maximalUniqueMatch == null) {
-          List<Match> prev = null;
-          for (List<Match> next : matchesOfSameLength) {
-            if (prev != null && prev.get(0).equivalenceClass.equals(next.get(0).equivalenceClass)) {
-              maximalUniqueMatch = availableMatch.apply(prev);
-              if (maximalUniqueMatch != null) {
+        if (nextMum == null) {
+          Phrase<EquivalenceClassMatch> prev = null;
+          for (Phrase<EquivalenceClassMatch> next : matchesOfSameLength) {
+            if (prev != null && prev.first().equivalenceClass.equals(next.first().equivalenceClass)) {
+              nextMum = tokenSelector.apply(prev);
+              if (nextMum != null) {
                 break;
               }
               exhaustedMatches.add(prev);
@@ -205,51 +171,69 @@ public class Matcher {
             }
           }
         }
-        if (maximalUniqueMatch != null) {
+        if (nextMum != null) {
           break;
         }
       }
 
-      if (maximalUniqueMatch == null) {
-        for (Integer matchLength : matchesByLength.keySet()) {
-          for (List<Match> match : matchesByLength.get(matchLength)) {
-            maximalUniqueMatch = availableMatch.apply(match);
-            if (maximalUniqueMatch != null) {
+      if (nextMum == null) {
+        for (Integer matchLength : phrases.keySet()) {
+          for (Phrase<EquivalenceClassMatch> match : phrases.get(matchLength)) {
+            nextMum = tokenSelector.apply(match);
+            if (nextMum != null) {
               break;
             }
             exhaustedMatches.add(match);
           }
-          if (maximalUniqueMatch != null) {
+          if (nextMum != null) {
             break;
           }
         }
       }
-      if (maximalUniqueMatch == null) {
+      if (nextMum == null) {
         break;
       }
 
-      matchesByLength.values().removeAll(exhaustedMatches);
+      Preconditions.checkState(maximalUniqueMatches.add(nextMum), "Duplicate MUM");
 
-      final Map.Entry<List<VariantGraph.Vertex>, List<Integer>> matchPhrases = Iterables.get(maximalUniqueMatch.entrySet(), 0);
-      final List<VariantGraph.Vertex> vertexPhrase = matchPhrases.getKey();
-      final List<Integer> tokenIndexPhrase = matchPhrases.getValue();
+      phrases.values().removeAll(exhaustedMatches);
 
-      excludedRanks.add(Ranges.closed(ranking.apply(vertexPhrase.get(0)), ranking.apply(vertexPhrase.get(vertexPhrase.size() - 1))));
-      excludedTokens.add(Ranges.closed(tokenIndexPhrase.get(0), tokenIndexPhrase.get(tokenIndexPhrase.size() - 1)));
+      rankFilter.add(Ranges.closed(nextMum.first().vertexRank, nextMum.last().vertexRank));
+      tokenFilter.add(Ranges.closed(nextMum.first().token, nextMum.last().token));
+    }
+    return maximalUniqueMatches;
+  }
 
-      final List<Token> tokenPhrase = Lists.newArrayListWithExpectedSize(tokenIndexPhrase.size());
-      for (Integer tokenIndex : tokenIndexPhrase) {
-        tokenPhrase.add(suffixTree.source[tokenIndex]);
+  static Function<Phrase<EquivalenceClassMatch>, Phrase<TokenMatch>> tokenSelector(final IndexRangeSet rankFilter, final IndexRangeSet tokenFilter) {
+    return new Function<Phrase<EquivalenceClassMatch>, Phrase<TokenMatch>>() {
+      @Override
+      public Phrase<TokenMatch> apply(@Nullable Phrase<EquivalenceClassMatch> input) {
+        final Phrase<TokenMatch> tokenPhrase = new Phrase<TokenMatch>();
+        Integer lastToken = null;
+        for (EquivalenceClassMatch match : input) {
+          if (rankFilter.apply(match.vertexRank)) {
+            return null;
+          }
+
+          boolean matchFound = false;
+          for (int mc = 0; mc < match.equivalenceClass.length; mc++) {
+            final int tokenCandidate = match.equivalenceClass.members[mc];
+            if (lastToken != null && (lastToken + 1) != tokenCandidate) {
+              continue;
+            }
+            if (!tokenFilter.apply(tokenCandidate)) {
+              matchFound = true;
+              tokenPhrase.add(new TokenMatch(match.vertex, match.vertexRank, lastToken = tokenCandidate));
+              break;
+            }
+          }
+          if (!matchFound) {
+            return null;
+          }
+        }
+        return tokenPhrase;
       }
-      Preconditions.checkState(mums.put(vertexPhrase, tokenPhrase) == null, "Duplicate MUM");
-    }
-
-    if (logTimings) {
-      stopwatch.stop();
-      LOG.log(Level.FINER, "Found {0} maximum unique matche(s) out of {1} match phrase(s) in {2}", new Object[]{mums.size(), matchThreads.size(), stopwatch});
-    }
-
-    return mums;
+    };
   }
 
   /**
@@ -258,63 +242,32 @@ public class Matcher {
   static class MatchThread {
 
     final MatchThread previous;
-    final SuffixTree<Token>.Cursor cursor;
     final VariantGraph.Vertex vertex;
+    final int vertexRank;
+    final SuffixTree<Token>.Cursor cursor;
 
     MatchThread(SuffixTree<Token> suffixTree) {
-      this(null, suffixTree.cursor(), null);
+      this(null, null, -1, suffixTree.cursor());
     }
 
-    MatchThread(MatchThread previous, SuffixTree<Token>.Cursor cursor, VariantGraph.Vertex vertex) {
+    MatchThread(MatchThread previous, VariantGraph.Vertex vertex, int vertexRank, SuffixTree<Token>.Cursor cursor) {
       this.previous = previous;
-      this.cursor = cursor;
       this.vertex = vertex;
+      this.vertexRank = vertexRank;
+      this.cursor = cursor;
     }
 
-    MatchThread advance(VariantGraph.Vertex vertex) {
+    MatchThread advance(VariantGraph.Vertex vertex, int vertexRank) {
       final Set<Token> tokens = vertex.tokens();
       if (!tokens.isEmpty()) {
         final SuffixTree<Token>.Cursor next = cursor.move(Iterables.get(tokens, 0));
         if (next != null) {
-          return new MatchThread(this, next, vertex);
+          return new MatchThread(this, vertex, vertexRank, next);
         }
       }
       return null;
     }
   }
 
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
-  static class Match {
-    final VariantGraph.Vertex vertex;
-    final SuffixTree.EquivalenceClass equivalenceClass;
 
-    Match(VariantGraph.Vertex vertex, SuffixTree.EquivalenceClass equivalenceClass) {
-      this.vertex = vertex;
-      this.equivalenceClass = equivalenceClass;
-    }
-
-    @Override
-    public String toString() {
-      return "{" + vertex + " -> " + equivalenceClass + "}";
-    }
-  }
-
-  static Function<MatchThread,List<Match>> toMatchList() {
-    return new Function<MatchThread, List<Match>>() {
-      @Override
-      public List<Match> apply(@Nullable MatchThread input) {
-        final List<Match> matches = Lists.newLinkedList();
-
-        MatchThread current = input;
-        while (current.vertex != null) {
-          matches.add(new Match(current.vertex, current.cursor.matchedClass()));
-          current = current.previous;
-        }
-
-        return matches;
-      }
-    };
-  }
 }

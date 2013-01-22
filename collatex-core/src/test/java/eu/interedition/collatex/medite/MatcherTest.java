@@ -1,6 +1,7 @@
 package eu.interedition.collatex.medite;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -9,7 +10,6 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -35,11 +35,18 @@ public class MatcherTest extends AbstractTest {
 
   protected void print(String... witnesses) {
     final SimpleWitness[] w = createWitnesses(witnesses);
+    final Token[] tokens = Iterables.toArray(w[1], Token.class);
+    final Matcher matcher = Matcher.create(new EqualityTokenComparator(), collate(w[0]), tokens);
 
-    final Map<List<VariantGraph.Vertex>, List<Token>> mums = Matcher.searchMaximumUniqueMatches(new EqualityTokenComparator(), collate(w[0]), w[1]);
+    for (Phrase<TokenMatch> mum : matcher.maximalUniqueMatches(new IndexRangeSet(), new IndexRangeSet())) {
+      final List<VariantGraph.Vertex> mumVertices = Lists.newLinkedList();
+      final List<Token> mumTokens = Lists.newLinkedList();
+      for (TokenMatch match : mum) {
+        mumVertices.add(match.vertex);
+        mumTokens.add(tokens[match.token]);
+      }
 
-    for (Map.Entry<List<VariantGraph.Vertex>, List<Token>> match : mums.entrySet()) {
-      LOG.log(Level.FINE, "{0} == {1}", new Object[] { Iterables.toString(match.getKey()), Iterables.toString(match.getValue()) });
+      LOG.log(Level.FINE, Iterables.toString(mumVertices) + " <==> " + Iterables.toString(mumTokens));
     }
   }
 }
