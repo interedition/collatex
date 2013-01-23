@@ -16,20 +16,20 @@ import java.util.SortedSet;
  */
 public class Aligner {
 
-  private final List<Phrase<TokenMatch>> matches;
+  private final List<Phrase<Match.WithTokenIndex>> matches;
   private final PriorityQueue<Path> bestPaths;
   private final Map<Path, Integer> minCosts;
 
-  Aligner(List<Phrase<TokenMatch>> matches) {
+  Aligner(List<Phrase<Match.WithTokenIndex>> matches) {
     this.matches = matches;
     this.bestPaths = new PriorityQueue<Path>(matches.size(), PATH_COST_COMPARATOR);
     this.minCosts = Maps.newHashMap();
   }
 
-  static SortedSet<Phrase<TokenMatch>> align(SortedSet<Phrase<TokenMatch>> matches) {
-    final SortedSet<Phrase<TokenMatch>> alignments = Sets.newTreeSet();
+  static SortedSet<Phrase<Match.WithTokenIndex>> align(SortedSet<Phrase<Match.WithTokenIndex>> matches) {
+    final SortedSet<Phrase<Match.WithTokenIndex>> alignments = Sets.newTreeSet();
 
-    final List<Phrase<TokenMatch>> matchList = Lists.newArrayList(matches);
+    final List<Phrase<Match.WithTokenIndex>> matchList = Lists.newArrayList(matches);
     Path optimal = new Aligner(matchList).optimize();
     while (optimal.matchIndex >= 0) {
       if (optimal.aligned) {
@@ -61,12 +61,12 @@ public class Aligner {
   }
 
   private int heuristicCost(Path path) {
-    final Phrase<TokenMatch> evaluated = matches.get(path.matchIndex);
-    final TokenMatch lastMatch = evaluated.last();
+    final Phrase<Match.WithTokenIndex> evaluated = matches.get(path.matchIndex);
+    final Match.WithTokenIndex lastMatch = evaluated.last();
 
     int cost = 0;
-    for (Phrase<TokenMatch> following : matches.subList(path.matchIndex + 1, matches.size())) {
-      final TokenMatch followingFirstMatch = following.first();
+    for (Phrase<Match.WithTokenIndex> following : matches.subList(path.matchIndex + 1, matches.size())) {
+      final Match.WithTokenIndex followingFirstMatch = following.first();
       if (lastMatch.vertexRank < followingFirstMatch.vertexRank && lastMatch.token < followingFirstMatch.token) {
         // we still can align this following match as the matched components are to the right of this path's last match
         continue;
