@@ -29,6 +29,10 @@ YUI.add('interedition-collate', function(Y) {
             this.set("algorithm", "needleman-wunsch");
             return this;
         },
+        withMedite: function() {
+            this.set("algorithm", "medite");
+            return this;
+        },
         withExactMatching: function() {
             this.set("tokenComparator", { type: "equality" })
             return this;

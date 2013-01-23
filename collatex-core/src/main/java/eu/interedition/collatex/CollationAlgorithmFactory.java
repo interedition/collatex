@@ -2,6 +2,7 @@ package eu.interedition.collatex;
 
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
+import eu.interedition.collatex.medite.MediteAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 
 import java.util.Comparator;
@@ -22,5 +23,9 @@ public class CollationAlgorithmFactory {
 
   public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
     return new NeedlemanWunschAlgorithm(comparator);
+  }
+
+  public static CollationAlgorithm medite(Comparator<Token> comparator) {
+    return new MediteAlgorithm(comparator);
   }
 }

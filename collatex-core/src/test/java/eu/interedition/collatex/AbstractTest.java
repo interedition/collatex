@@ -19,7 +19,6 @@ import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Assert;
 import org.junit.Before;
-import org.neo4j.graphdb.Transaction;
 
 import java.util.Arrays;
 import java.util.Collections;

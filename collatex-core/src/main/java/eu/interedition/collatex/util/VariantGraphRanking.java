@@ -1,6 +1,7 @@
 package eu.interedition.collatex.util;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
@@ -100,6 +101,12 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
 
   @Override
   public int compare(VariantGraph.Vertex o1, VariantGraph.Vertex o2) {
-    return (byVertex.get(o1).intValue() - byVertex.get(o2).intValue());
+    final Integer o1Rank = byVertex.get(o1);
+    final Integer o2Rank = byVertex.get(o2);
+
+    Preconditions.checkState(o1Rank != null, o1);
+    Preconditions.checkState(o2Rank != null, o2);
+
+    return (o1Rank.intValue() - o2Rank.intValue());
   }
 }

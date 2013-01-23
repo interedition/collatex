@@ -8,6 +8,7 @@
                 <select id="algorithm" name="algorithm" style="width: 40em">
                   <option value="dekker">Dekker</option>
                   <option value="needleman-wunsch">Needleman-Wunsch</option>
+                  <option value="medite">MEDITE</option>
                 </select>
               </div>
             </div>

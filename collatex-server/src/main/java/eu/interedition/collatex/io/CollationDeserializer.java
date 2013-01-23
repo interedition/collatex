@@ -124,6 +124,8 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
       final String collationAlgorithmValue = collationAlgorithmNode.getTextValue();
       if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
         collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
+      } else if ("medite".equalsIgnoreCase(collationAlgorithmValue)) {
+        collationAlgorithm = CollationAlgorithmFactory.medite(tokenComparator);
       }
     }
     if (collationAlgorithm == null) {
