@@ -1,5 +1,6 @@
 package eu.interedition.collatex.medite;
 
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
 /**
@@ -36,9 +37,9 @@ abstract class Match implements Comparable<Match> {
   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
   */
   static class WithEquivalence extends Match {
-    final SuffixTree.EquivalenceClass equivalenceClass;
+    final SuffixTree<Token>.EquivalenceClass equivalenceClass;
 
-    WithEquivalence(VariantGraph.Vertex vertex, int vertexRank, SuffixTree.EquivalenceClass equivalenceClass) {
+    WithEquivalence(VariantGraph.Vertex vertex, int vertexRank, SuffixTree<Token>.EquivalenceClass equivalenceClass) {
       super(vertex, vertexRank);
       this.equivalenceClass = equivalenceClass;
     }

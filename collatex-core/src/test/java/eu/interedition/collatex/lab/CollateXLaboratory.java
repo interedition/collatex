@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static eu.interedition.collatex.CollationAlgorithmFactory.dekker;
-import static eu.interedition.collatex.CollationAlgorithmFactory.needlemanWunsch;
-
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  * @author Bram Buitendijk
@@ -58,7 +55,7 @@ public class CollateXLaboratory extends JFrame {
   public CollateXLaboratory() {
     super("CollateX Laboratory");
 
-    this.algorithm = new JComboBox(new Object[] { "Dekker", "Needleman-Wunsch" });
+    this.algorithm = new JComboBox<String>(new String[] { "Dekker", "Needleman-Wunsch", "MEDITE" });
     this.algorithm.setEditable(false);
     this.algorithm.setFocusable(false);
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
@@ -149,9 +146,14 @@ public class CollateXLaboratory extends JFrame {
       final EqualityTokenComparator comparator = new EqualityTokenComparator();
       final JungVariantGraph variantGraph = new JungVariantGraph();
 
-      final CollationAlgorithm collator = "Dekker".equals(algorithm.getSelectedItem())
-              ? dekker(comparator)
-              : needlemanWunsch(comparator);
+      final CollationAlgorithm collator;
+      if ("Dekker".equals(algorithm.getSelectedItem())) {
+        collator = CollationAlgorithmFactory.dekker(comparator);
+      } else if ("Needleman-Wunsch".equals(algorithm.getSelectedItem())) {
+        collator = CollationAlgorithmFactory.needlemanWunsch(comparator);
+      } else {
+        collator = CollationAlgorithmFactory.medite(comparator);
+      }
 
       collator.collate(variantGraph, w);
 

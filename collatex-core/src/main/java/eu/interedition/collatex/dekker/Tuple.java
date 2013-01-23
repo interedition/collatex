@@ -12,12 +12,12 @@ public class Tuple<T> {
   public final T left;
   public final T right;
 
-  private final Set<?> set;
+  private final Set<Object> set;
 
   public Tuple(T left, T right) {
     this.left = left;
     this.right = right;
-    this.set = Sets.newHashSet(left, right);
+    this.set = Sets.<Object>newHashSet(left, right);
   }
 
   @Override

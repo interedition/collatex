@@ -187,7 +187,7 @@ class SuffixTree<T> {
     @Override
     public boolean equals(Object obj) {
       if (obj != null && obj instanceof SuffixTree<?>.EquivalenceClass) {
-        return members[0] == ((EquivalenceClass)obj).members[0];
+        return members[0] == ((SuffixTree<?>.EquivalenceClass)obj).members[0];
       }
       return super.equals(obj);
     }
