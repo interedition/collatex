@@ -11,8 +11,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 
-public class VectorConflictResolver {
+import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 
+public class VectorConflictResolver {
+	private Set<Vector> vectors;
+	private List<Vector> committed;
+	
 	//NOTE: vector class
 	//NOTE: is meant as a replacement for the current Island class
 	public static class Vector {
@@ -32,10 +36,10 @@ public class VectorConflictResolver {
 		}
 	}
 
-	private Set<Vector> vectors;
 	
 	public VectorConflictResolver(Set<Vector> vectors) {
 		this.vectors = vectors;
+		this.committed = Lists.newArrayList();
 	}
 
 	public List<Vector> orderVectorsBySizePosition() {
@@ -67,6 +71,7 @@ public class VectorConflictResolver {
 		return one.length == other.length&&(v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange));
 	}
 		
+	//TODO: remove duplication between this method and the next!
 	public Integer getNumberOfConflictsFor(Vector v) {
 		int conflicts = 0;
 		for (Vector other: vectors) {
@@ -75,6 +80,17 @@ public class VectorConflictResolver {
 			}
 		}
 		return conflicts;
+	}
+	
+	//TODO: test
+	public List<Vector> getConflictingVectorsFor(Vector v) {
+		List<Vector> conflicting = Lists.newArrayList();
+		for (Vector other: vectors) {
+			if (other!=v&&isInConflict(v, other)) {
+				conflicting.add(other);
+			}
+		}
+		return conflicting;
 	}
 
 	// To get the next vector to commit
@@ -109,5 +125,22 @@ public class VectorConflictResolver {
 		ContiguousSet<Integer> stuffthatwewantremove = intersection.asSet(DiscreteDomains.integers());
 		int lengththatwewanttoremove = stuffthatwewantremove.size();
 		return new Vector(other.x, other.y, other.length-lengththatwewanttoremove);
+	}
+
+	public List<Vector> commitPriorityVector() {
+		Vector priority = selectPriorityVector();
+		committed.add(priority);
+		vectors.remove(priority);
+		List<Vector> conflicting = getConflictingVectorsFor(priority);
+		System.out.println(conflicting);
+		for (Vector v : conflicting) {
+			vectors.remove(v);
+			//TODO: add the split vector!
+		}
+		return committed;
+	}
+
+	public Set<Vector> getUnresolvedVectors() {
+		return vectors;
 	}
 }
