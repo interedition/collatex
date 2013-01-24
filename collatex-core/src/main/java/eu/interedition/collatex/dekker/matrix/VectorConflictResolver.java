@@ -163,7 +163,6 @@ public class VectorConflictResolver {
 		committed.add(priority);
 		vectors.remove(priority);
 		List<Vector> conflicting = getConflictingVectorsFor(priority);
-		System.out.println(conflicting);
 		for (Vector v : conflicting) {
 			vectors.remove(v);
 			Vector split = this.split(priority, v);

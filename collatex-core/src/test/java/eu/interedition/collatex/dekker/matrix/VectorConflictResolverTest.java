@@ -114,7 +114,7 @@ public class VectorConflictResolverTest {
 		assertEquals(2, result.y);
 	}
 	
-//	@Test
+	@Test
 	public void testCommitFirstVector() {
 		// prepare incoming vectors;
 		Vector v1 = new Vector(0,0,1);
@@ -129,20 +129,18 @@ public class VectorConflictResolverTest {
 		// 2. add the vector to the committed vector list
 		// 3. remove it from the unresolved vectors set
 		// 4. split conflicting vectors up into smaller parts
-		// NOTE: the first one could either be v2 of be v4
 		Vector firstCo = committed.get(0);
+		// NOTE: the first one could either be v2 of be v4
 		assertTrue(firstCo.equals(v2)||firstCo.equals(v4));
 		Set<Vector> unresolved = resolver.getUnresolvedVectors();
-		// first test that the committed is no longer unresolved
+		// first test that the committed vector is no longer unresolved
 		assertTrue(!unresolved.contains(firstCo));
 		// now depending on the one or the other the remaining vectors differ
 		// in any case the conflicting vector should be removed
 		assertTrue(!unresolved.contains(v3));
 		// and then replaced by a new vector, which is split off from the old one
-		System.out.println(unresolved);
 		assertTrue(unresolved.contains(new Vector(2,2,1)));
-		
-		fail();
+		assertEquals(3, unresolved.size());
 	}
 	
 	
