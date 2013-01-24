@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.Lists;
@@ -33,6 +34,20 @@ public class VectorConflictResolver {
 		@Override
 		public String toString() {
 			return "V:("+x+","+y+"):"+length;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof Vector)) {
+				return false;
+			}
+			Vector other = (Vector) obj;
+			return x==other.x&&y==other.y&&length==other.length;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(x, y, length);
 		}
 	}
 
@@ -119,11 +134,27 @@ public class VectorConflictResolver {
 	// Note: this method only works when the other vector
 	// intersects with the one vector at the end
 	public Vector split(Vector one, Vector other) {
+		int lengththatwewanttoremove;
+		// Note there can be a horizontal or vertical intersection
+		// first check horizontal intersection
 		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length-1);
 		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length-1);
-		Range<Integer> intersection = v1horirange.intersection(v2horirange);
-		ContiguousSet<Integer> stuffthatwewantremove = intersection.asSet(DiscreteDomains.integers());
-		int lengththatwewanttoremove = stuffthatwewantremove.size();
+		if (v1horirange.isConnected(v2horirange)) {
+			Range<Integer> intersection = v1horirange.intersection(v2horirange);
+			ContiguousSet<Integer> stuffthatwewantremove = intersection.asSet(DiscreteDomains.integers());
+			lengththatwewanttoremove = stuffthatwewantremove.size();
+		} else {
+			// check vertical intersection
+			Range<Integer> v1vertirange = Ranges.closed(one.y, one.y+one.length-1);
+			Range<Integer> v2vertirange = Ranges.closed(other.y, other.y+other.length-1);
+			if (v1vertirange.isConnected(v2vertirange)) {
+				Range<Integer> intersection = v1vertirange.intersection(v2vertirange);
+				ContiguousSet<Integer> stuffthatwewantremove = intersection.asSet(DiscreteDomains.integers());
+				lengththatwewanttoremove = stuffthatwewantremove.size();
+			} else {
+				throw new RuntimeException("There is no horizontal or vertical intersection!");
+			}
+		}
 		return new Vector(other.x, other.y, other.length-lengththatwewanttoremove);
 	}
 
@@ -135,7 +166,8 @@ public class VectorConflictResolver {
 		System.out.println(conflicting);
 		for (Vector v : conflicting) {
 			vectors.remove(v);
-			//TODO: add the split vector!
+			Vector split = this.split(priority, v);
+			vectors.add(split);
 		}
 		return committed;
 	}
