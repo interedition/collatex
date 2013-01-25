@@ -16,7 +16,6 @@ import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 
 public class VectorConflictResolver {
 	private Set<Vector> vectors;
-	private List<Vector> committed;
 	
 	//NOTE: vector class
 	//NOTE: is meant as a replacement for the current Island class
@@ -54,7 +53,10 @@ public class VectorConflictResolver {
 	
 	public VectorConflictResolver(Set<Vector> vectors) {
 		this.vectors = vectors;
-		this.committed = Lists.newArrayList();
+	}
+
+	public Set<Vector> getUnresolvedVectors() {
+		return vectors;
 	}
 
 	public List<Vector> orderVectorsBySizePosition() {
@@ -158,9 +160,9 @@ public class VectorConflictResolver {
 		return new Vector(other.x, other.y, other.length-lengththatwewanttoremove);
 	}
 
-	public List<Vector> commitPriorityVector() {
+	public Vector commitPriorityVector() {
 		Vector priority = selectPriorityVector();
-		committed.add(priority);
+//		committed.add(priority);
 		vectors.remove(priority);
 		List<Vector> conflicting = getConflictingVectorsFor(priority);
 		for (Vector v : conflicting) {
@@ -168,10 +170,15 @@ public class VectorConflictResolver {
 			Vector split = this.split(priority, v);
 			vectors.add(split);
 		}
-		return committed;
+		return priority;
 	}
 
-	public Set<Vector> getUnresolvedVectors() {
-		return vectors;
+	public List<Vector> resolveConflicts() {
+		List<Vector> committedV = Lists.newArrayList();
+		while(!vectors.isEmpty()) {
+			Vector committed = commitPriorityVector();
+			committedV.add(committed);
+		}
+		return committedV;
 	}
 }

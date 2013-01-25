@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -124,17 +125,16 @@ public class VectorConflictResolverTest {
 		Set<Vector> vectors = Sets.newHashSet(v1, v2, v3, v4);
 		// create resolver
 		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
-		List<Vector> committed = resolver.commitPriorityVector();
+		Vector committed = resolver.commitPriorityVector();
 		// 1. first find the highest priority vector
 		// 2. add the vector to the committed vector list
 		// 3. remove it from the unresolved vectors set
 		// 4. split conflicting vectors up into smaller parts
-		Vector firstCo = committed.get(0);
 		// NOTE: the first one could either be v2 of be v4
-		assertTrue(firstCo.equals(v2)||firstCo.equals(v4));
+		assertTrue(committed.equals(v2)||committed.equals(v4));
 		Set<Vector> unresolved = resolver.getUnresolvedVectors();
 		// first test that the committed vector is no longer unresolved
-		assertTrue(!unresolved.contains(firstCo));
+		assertTrue(!unresolved.contains(committed));
 		// now depending on the one or the other the remaining vectors differ
 		// in any case the conflicting vector should be removed
 		assertTrue(!unresolved.contains(v3));
@@ -144,27 +144,22 @@ public class VectorConflictResolverTest {
 	}
 	
 	
-//	@Test
-//	public void testIdealLine() {
-//		// prepare incoming vectors;
-//		Vector v1 = new Vector(0,0,1);
-//		Vector v2 = new Vector(3,0,2);
-//		Vector v3 = new Vector(2,2,2);
-//		Vector v4 = new Vector(0,3,2);
-//		Set<Vector> vectors = Sets.newHashSet(v1, v2, v3, v4);
-//		// create resolver
-//		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
-//		//test
-//		// hier wil ik behavior driven development doen
-//		// er moet gecommit worden op vectors
-//		// die vectors kunnen ook nieuwe vectors zijn..
-//		// door middel van conflicts kunnen bestaande eilanden conflicteren 
-//		// en dus opgesplitst moeten worden..
-//		// eigenlijk wil ik dat opsplitsen eerst testen
-//		Vector 
-//		
-//		Vector result = resolver.selectPriorityVector();
-//		assertTrue(result.toString(), result.equals(v2) || result.equals(v4));
-//	}
-
+	
+	//TODO; make this test work
+	@Ignore
+	@Test
+	public void testIdealLine() {
+		// prepare incoming vectors;
+		Vector v1 = new Vector(0,0,1);
+		Vector v2 = new Vector(3,0,2);
+		Vector v3 = new Vector(2,2,2);
+		Vector v4 = new Vector(0,3,2);
+		Set<Vector> vectors = Sets.newHashSet(v1, v2, v3, v4);
+		// create resolver
+		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
+		List<Vector> resolved = resolver.resolveConflicts();
+		System.out.println(resolved);
+		assertTrue(resolved.get(0).equals(v2)||resolved.get(0).equals(v4));
+		fail();
+	}
 }
