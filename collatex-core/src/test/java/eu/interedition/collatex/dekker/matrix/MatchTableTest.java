@@ -108,8 +108,8 @@ public class MatchTableTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     List<Token> labels = table.rowList();
-    assertTokenEquals("het", labels.get(0));
-    assertTokenEquals("een", labels.get(1));
+    assertTokenEquals("het ", labels.get(0));
+    assertTokenEquals("een ", labels.get(1));
     assertTokenEquals("de", labels.get(2));
   }
 

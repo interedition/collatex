@@ -15,7 +15,6 @@ import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,17 +45,13 @@ public abstract class AbstractTest {
     collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
   }
 
-  protected SimpleWitness[] createWitnesses(Function<String, List<String>> tokenizer, String... contents) {
+  protected SimpleWitness[] createWitnesses(String... contents) {
     Assert.assertTrue("Not enough sigla", contents.length <= SIGLA.length);
     final SimpleWitness[] witnesses = new SimpleWitness[contents.length];
     for (int wc = 0; wc < contents.length; wc++) {
-      witnesses[wc] = new SimpleWitness(Character.toString(SIGLA[wc]), contents[wc], tokenizer);
+      witnesses[wc] = new SimpleWitness(Character.toString(SIGLA[wc]), contents[wc]);
     }
     return witnesses;
-  }
-
-  protected SimpleWitness[] createWitnesses(String... contents) {
-    return createWitnesses(new WhitespaceTokenizer(), contents);
   }
 
   protected VariantGraph collate(SimpleWitness... witnesses) {
@@ -150,7 +145,7 @@ public abstract class AbstractTest {
         tableRowStr.append(Joiner.on(" ").join(Iterables.transform(simpleTokens, new Function<Token, String>() {
           @Override
           public String apply(Token input) {
-            return ((SimpleToken) input).getContent();
+            return ((SimpleToken) input).getNormalized();
           }
         }))).append("|");
       }

@@ -215,9 +215,8 @@ public class VariantGraphTest extends AbstractTest {
   public void joinTwoDifferentWitnessesWithTranspositions() {
     final SimpleWitness[] w = createWitnesses("voor Zo nu en dan zin2 na voor", "voor zin2 Nu en dan voor");
     final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
-    SimpleVariantGraphSerializer s = new SimpleVariantGraphSerializer(graph);
-    StringWriter writer = new StringWriter();
-    s.toDot(graph, writer);
+    final StringWriter writer = new StringWriter();
+    new SimpleVariantGraphSerializer(graph).toDot(writer);
     LOG.log(Level.FINE, "dot={0}", writer.toString());
 
     final VariantGraph.Vertex voorVertex1 = vertexWith(graph, "voor", w[0]);

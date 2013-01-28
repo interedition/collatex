@@ -40,7 +40,7 @@ public class SimpleWitnessTeiBuilder {
         reader.next();
       }
     }
-    witness.setTokenContents(tokenContents);
+    witness.setTokenContents(tokenContents, SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
     return witness;
   }
 

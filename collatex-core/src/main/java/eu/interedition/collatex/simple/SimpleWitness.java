@@ -22,6 +22,7 @@ package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
@@ -42,19 +43,26 @@ public class SimpleWitness implements Iterable<Token>, Witness, Comparator<Simpl
     this.sigil = sigil;
   }
 
-  public SimpleWitness(String sigil, String content, Function<String, List<String>> tokenizer) {
+  public SimpleWitness(String sigil, String content) {
+    this(sigil, content, SimplePatternTokenizer.BY_WS_AND_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
+  }
+
+  public SimpleWitness(String sigil,
+                       String content,
+                       Function<String, Iterable<String>> tokenizer,
+                       Function<String, String> normalizer) {
     this(sigil);
-    setTokenContents(tokenizer.apply(content));
+    setTokenContents(tokenizer.apply(content), normalizer);
   }
 
   public List<Token> getTokens() {
     return tokens;
   }
 
-  public void setTokenContents(List<String> tokenContents) {
-    final List<Token> tokens = Lists.newArrayListWithExpectedSize(tokenContents.size());
+  public void setTokenContents(Iterable<String> tokenContents, Function<String, String> normalizer) {
+    final List<Token> tokens = Lists.newArrayListWithExpectedSize(Iterables.size(tokenContents));
     for (String content : tokenContents) {
-      tokens.add(new SimpleToken(this, content, TOKEN_NORMALIZER.apply(content)));
+      tokens.add(new SimpleToken(this, content, normalizer.apply(content)));
     }
     setTokens(tokens);
   }

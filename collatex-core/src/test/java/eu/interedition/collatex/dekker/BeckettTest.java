@@ -1,31 +1,28 @@
 package eu.interedition.collatex.dekker;
 
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import static org.junit.Assert.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.matching.Matches;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Sets;
-
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.matching.Matches;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceAndPunctuationTokenizer;
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BeckettTest extends AbstractTest {
 
@@ -159,7 +156,7 @@ public class BeckettTest extends AbstractTest {
   @Test
   public void sentence42Transposition() {
     // punctuation should be treated as separate tokens for this test to succeed
-    final SimpleWitness[] w = createWitnesses(new WhitespaceAndPunctuationTokenizer(),//
+    final SimpleWitness[] w = createWitnesses(//
         "The same clock as when for example Magee once died.",//
         "The same as when for example Magee once died.",//
         "The same as when for example McKee once died .",//
@@ -167,13 +164,13 @@ public class BeckettTest extends AbstractTest {
         "The same as when Darly among others once died and left him.");
 
     final VariantGraph graph = collate(w[0], w[1]);
-    assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died", ".");
+    assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died");
 
     collate(graph, w[2]);
-    assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died", ".");
+    assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died");
 
     collate(graph, w[3]);
-    assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "&", "left", "him", ".");
+    assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "left", "him");
 
     // transpositions should be handled correctly for this test to succeed
     collate(graph, w[4]);

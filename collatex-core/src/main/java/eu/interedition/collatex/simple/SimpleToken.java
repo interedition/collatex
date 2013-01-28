@@ -20,14 +20,9 @@
 
 package eu.interedition.collatex.simple;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-
-import java.util.Collections;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
   private final SimpleWitness witness;
@@ -70,19 +65,4 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
   public int compareTo(SimpleToken o) {
     return witness.compare(this, o);
   }
-
-    public static final Function<VariantGraph.Vertex, String> VERTEX_TO_STRING = new Function<VariantGraph.Vertex, String>() {
-        @Override
-        public String apply(VariantGraph.Vertex input) {
-            final Witness witness = Iterables.getFirst(input.witnesses(), null);
-            if (witness == null) {
-                return "";
-            }
-            final StringBuilder contents = new StringBuilder();
-            for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(input.tokens(Collections.singleton(witness)), SimpleToken.class))) {
-                contents.append(token.getContent()).append(" ");
-            }
-            return contents.toString().trim();
-        }
-    };
 }

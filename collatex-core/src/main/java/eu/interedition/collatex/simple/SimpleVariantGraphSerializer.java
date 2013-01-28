@@ -1,11 +1,14 @@
 package eu.interedition.collatex.simple;
 
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
@@ -16,16 +19,21 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
+import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -42,12 +50,18 @@ public class SimpleVariantGraphSerializer {
   protected static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
 
   private final VariantGraph graph;
+  private final Function<Iterable<Token>, String> tokensToString;
   private final Map<VariantGraph.Vertex, Integer> vertexIds = Maps.newHashMap();
   private final Map<VariantGraph.Transposition, Integer> transpositionIds = Maps.newHashMap();
   private VariantGraphRanking ranking;
 
   public SimpleVariantGraphSerializer(VariantGraph graph) {
+    this(graph, SIMPLE_TOKEN_TO_STRING);
+  }
+
+  public SimpleVariantGraphSerializer(VariantGraph graph, Function<Iterable<Token>, String> tokensToString) {
     this.graph = graph;
+    this.tokensToString = tokensToString;
   }
 
   public void toTEI(XMLStreamWriter xml) throws XMLStreamException {
@@ -65,20 +79,19 @@ public class SimpleVariantGraphSerializer {
       if (vertices.size() == 1 && Iterables.getOnlyElement(vertices).tokens().isEmpty()) {
         // skip start and end vertex
         continue;
-      } else if (rank > 1) {
-        // FIXME: dependent on tokenization
-        xml.writeCharacters(" ");
       }
 
       // spreading vertices with same rank according to their registered transpositions
       final Multimap<Integer, VariantGraph.Vertex> verticesByTranspositionRank = HashMultimap.create();
       for (VariantGraph.Vertex v : vertices) {
         int transpositionRank = 0;
+        /*
         for (VariantGraph.Transposition transposition : v.transpositions()) {
           for (VariantGraph.Vertex tv : transposition) {
             transpositionRank += (ranking.apply(tv).intValue() - rank);
           }
         }
+        */
         verticesByTranspositionRank.put(transpositionRank, v);
       }
 
@@ -92,11 +105,7 @@ public class SimpleVariantGraphSerializer {
         }
         final SortedMap<Witness, String> cellContents = Maps.newTreeMap(Witness.SIGIL_COMPARATOR);
         for (Witness witness : tokensByWitness.keySet()) {
-          final StringBuilder cellContent = new StringBuilder();
-          for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(tokensByWitness.get(witness), SimpleToken.class))) {
-            cellContent.append(token.getContent()).append(" ");
-          }
-          cellContents.put(witness, cellContent.toString().trim());
+          cellContents.put(witness, tokensToString.apply(tokensByWitness.get(witness)));
         }
 
         final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
@@ -106,7 +115,7 @@ public class SimpleVariantGraphSerializer {
 
         final Set<String> segmentContents = segments.keySet();
         if (segmentContents.size() == 1) {
-          xml.writeCharacters(Iterables.getFirst(segmentContents, ""));
+          xml.writeCharacters(Iterables.getOnlyElement(segmentContents));
         } else {
           xml.writeStartElement("", "app", TEI_NS);
           for (String segment : segmentContents) {
@@ -121,10 +130,6 @@ public class SimpleVariantGraphSerializer {
           }
           xml.writeEndElement();
         }
-
-        if (transpositionRankIt.hasNext()) {
-          xml.writeCharacters(" ");
-        }
       }
     }
 
@@ -132,11 +137,147 @@ public class SimpleVariantGraphSerializer {
     xml.writeEndDocument();
   }
 
-  private VariantGraphRanking ranking() {
+  public void toCsv(Writer out) throws IOException {
+    final List<Witness> witnessList = Ordering.from(Witness.SIGIL_COMPARATOR).immutableSortedCopy(graph.witnesses());
+    for (Iterator<Witness> it = witnessList.iterator(); it.hasNext(); ) {
+      out.write(escapeCsvField(it.next().getSigil()));
+      if (it.hasNext()) {
+        out.write(",");
+      }
+    }
+    out.write("\r\n");
+
+    final RowSortedTable<Integer,Witness,Set<Token>> table = ranking().asTable();
+    for (Iterator<Integer> rowIt = table.rowKeySet().iterator(); rowIt.hasNext(); ) {
+      final Map<Witness,Set<Token>> rowContents = table.row(rowIt.next());
+      for (Iterator<Witness> witnessIt = witnessList.iterator(); witnessIt.hasNext();) {
+        out.write(escapeCsvField(tokensToString.apply(Objects.firstNonNull(rowContents.get(witnessIt.next()), Collections.<Token>emptySet()))));
+        if (witnessIt.hasNext()) {
+          out.write(",");
+        }
+      }
+      if (rowIt.hasNext()) {
+        out.write("\r\n");
+      }
+
+    }
+
+  }
+
+  static final Pattern CSV_SPECIAL_CHARS = Pattern.compile("[\r\n\",]");
+
+  static String escapeCsvField(String content) {
+    return (CSV_SPECIAL_CHARS.matcher(content).find() ? ("\"" + content.replaceAll("\"", "\"\"") + "\"") : content);
+  }
+
+  public void toDot(Writer writer) {
+      final PrintWriter out = new PrintWriter(writer);
+      final String indent = "  ";
+      final String connector = " -> ";
+
+      out.println("digraph G {");
+
+      for (VariantGraph.Vertex v : graph.vertices()) {
+        out.print(indent + id(v));
+        out.print(" [label = \"" + toDotLabel(v) + "\"]");
+        out.println(";");
+      }
+
+      for (VariantGraph.Edge e : graph.edges()) {
+        out.print(indent + id(e.from()) + connector + id(e.to()));
+        out.print(" [label = \"" + toDotLabel(e) + "\"]");
+        out.println(";");
+      }
+
+      for (Tuple<VariantGraph.Vertex> transposedTuple : transposedTuples()) {
+        final String leftId = id(transposedTuple.left);
+        final String rightId = id(transposedTuple.right);
+        out.print(indent + leftId + connector + rightId);
+        out.print(" [ color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
+        out.println(";");
+      }
+
+      out.print(indent + id(graph.getStart()) + connector + id(graph.getEnd()));
+      out.print(" [color =  \"white\"]");
+      out.println(";");
+
+      out.println("}");
+
+      out.flush();
+  }
+
+  private String id(VariantGraph.Vertex vertex) {
+    Integer id = vertexIds.get(vertex);
+    if (id == null) {
+      id = vertexIds.size();
+      vertexIds.put(vertex, id);
+    }
+    return ("v" + id);
+  }
+
+  private String id(VariantGraph.Transposition transposition) {
+    Integer id = transpositionIds.get(transposition);
+    if (id == null) {
+      id = transpositionIds.size();
+      transpositionIds.put(transposition, id);
+    }
+    return ("t" + id);
+  }
+
+  String toDotLabel(VariantGraph.Edge e) {
+    return escapeDotLabel(Witness.TO_SIGILS.apply(e));
+  }
+
+  String toDotLabel(VariantGraph.Vertex v) {
+    return escapeDotLabel(vertexToString.apply(v));
+  }
+
+  static String escapeDotLabel(String string) {
+    return string.replaceAll("\"", "\\\"").replaceAll("[\n\r]+", "[LB]");
+  }
+
+  VariantGraphRanking ranking() {
     if (ranking == null) {
       ranking = VariantGraphRanking.of(graph);
     }
     return ranking;
+  }
+
+  Set<Tuple<VariantGraph.Vertex>> transposedTuples() {
+    final Set<Tuple<VariantGraph.Vertex>> tuples = Sets.newHashSet();
+    final Ordering<VariantGraph.Vertex> vertexOrdering = Ordering.from(ranking()).compound(new Comparator<VariantGraph.Vertex>() {
+      @Override
+      public int compare(VariantGraph.Vertex o1, VariantGraph.Vertex o2) {
+        return Ordering.arbitrary().compare(o1, o2);
+      }
+    });
+
+    for (VariantGraph.Transposition transposition : graph.transpositions()) {
+      final SortedSetMultimap<Witness, VariantGraph.Vertex> verticesByWitness = TreeMultimap.create(Witness.SIGIL_COMPARATOR, vertexOrdering);
+      for (VariantGraph.Vertex vertex : transposition) {
+        for (Witness witness : vertex.witnesses()) {
+          verticesByWitness.put(witness, vertex);
+        }
+      }
+
+      Witness prev = null;
+      for (Witness witness : verticesByWitness.keySet()) {
+        if (prev != null) {
+          final Iterator<VariantGraph.Vertex> prevIt = verticesByWitness.get(prev).iterator();
+          final Iterator<VariantGraph.Vertex> nextIt = verticesByWitness.get(witness).iterator();
+          while (prevIt.hasNext() && nextIt.hasNext()) {
+            final VariantGraph.Vertex prevVertex = prevIt.next();
+            final VariantGraph.Vertex nextVertex = nextIt.next();
+            if (!prevVertex.equals(nextVertex)) {
+              tuples.add(new Tuple<VariantGraph.Vertex>(prevVertex, nextVertex));
+            }
+          }
+        }
+        prev = witness;
+      }
+    }
+
+    return tuples;
   }
 
   public void toGraphML(XMLStreamWriter xml) throws XMLStreamException {
@@ -164,7 +305,7 @@ public class SimpleVariantGraphSerializer {
       xml.writeStartElement(GRAPHML_NS, NODE_TAG);
       xml.writeAttribute(ID_ATT, vertexNodeID);
       GraphMLProperty.NODE_NUMBER.write(Integer.toString(vertexNumber++), xml);
-      GraphMLProperty.NODE_TOKEN.write(SimpleToken.VERTEX_TO_STRING.apply(vertex), xml);
+      GraphMLProperty.NODE_TOKEN.write(vertexToString.apply(vertex), xml);
       xml.writeEndElement();
       vertexToId.put(vertex, vertexNodeID);
     }
@@ -260,106 +401,24 @@ public class SimpleVariantGraphSerializer {
     }
   }
 
-  public void toDot(VariantGraph graph, Writer writer) {
-      final PrintWriter out = new PrintWriter(writer);
-      final String indent = "  ";
-      final String connector = " -> ";
-
-      out.println("digraph G {");
-
-      for (VariantGraph.Vertex v : graph.vertices()) {
-        out.print(indent + id(v));
-        out.print(" [label = \"" + toLabel(v) + "\"]");
-        out.println(";");
-      }
-
-      for (VariantGraph.Edge e : graph.edges()) {
-        out.print(indent + id(e.from()) + connector + id(e.to()));
-        out.print(" [label = \"" + toLabel(e) + "\"]");
-        out.println(";");
-      }
-
-      for (Tuple<VariantGraph.Vertex> transposedTuple : transposedTuples()) {
-        final String leftId = id(transposedTuple.left);
-        final String rightId = id(transposedTuple.right);
-        out.print(indent + leftId + connector + rightId);
-        out.print(" [ color = \"lightgray\", style = \"dashed\" arrowhead = \"none\", arrowtail = \"none\" ]");
-        out.println(";");
-      }
-
-      out.print(indent + id(graph.getStart()) + connector + id(graph.getEnd()));
-      out.print(" [color =  \"white\"]");
-      out.println(";");
-
-      out.println("}");
-
-      out.flush();
-  }
-
-  private String id(VariantGraph.Vertex vertex) {
-    Integer id = vertexIds.get(vertex);
-    if (id == null) {
-      id = vertexIds.size();
-      vertexIds.put(vertex, id);
+  final Function<VariantGraph.Vertex, String> vertexToString = new Function<VariantGraph.Vertex, String>() {
+    @Override
+    public String apply(@Nullable VariantGraph.Vertex input) {
+      final Witness witness = Iterables.getFirst(input.witnesses(), null);
+      return (witness == null ? "" : tokensToString.apply(input.tokens(Collections.singleton(witness))));
     }
-    return ("v" + id);
-  }
+  };
 
-  private String id(VariantGraph.Transposition transposition) {
-    Integer id = transpositionIds.get(transposition);
-    if (id == null) {
-      id = transpositionIds.size();
-      transpositionIds.put(transposition, id);
+  static final Function<Iterable<Token>, String> SIMPLE_TOKEN_TO_STRING = new Function<Iterable<Token>, String>() {
+    public String apply(@Nullable Iterable<Token> input) {
+      final List<SimpleToken> tokens = Ordering.natural().immutableSortedCopy(
+              Iterables.filter(input, SimpleToken.class)
+      );
+      final StringBuilder sb = new StringBuilder();
+      for (SimpleToken token : tokens) {
+        sb.append(token.getContent());
+      }
+      return sb.toString();
     }
-    return ("t" + id);
-  }
-
-  private String toLabel(VariantGraph.Edge e) {
-    return escapeLabel(Witness.TO_SIGILS.apply(e));
-  }
-
-  private String toLabel(VariantGraph.Vertex v) {
-    return escapeLabel(SimpleToken.VERTEX_TO_STRING.apply(v));
-  }
-
-  String escapeLabel(String string) {
-    return string.replaceAll("\"", "\\\"").replaceAll("\n", "[LB]");
-  }
-
-  private Set<Tuple<VariantGraph.Vertex>> transposedTuples() {
-    final Set<Tuple<VariantGraph.Vertex>> tuples = Sets.newHashSet();
-    final Ordering<VariantGraph.Vertex> vertexOrdering = Ordering.from(ranking()).compound(new Comparator<VariantGraph.Vertex>() {
-      @Override
-      public int compare(VariantGraph.Vertex o1, VariantGraph.Vertex o2) {
-        return Ordering.arbitrary().compare(o1, o2);
-      }
-    });
-
-    for (VariantGraph.Transposition transposition : graph.transpositions()) {
-      final SortedSetMultimap<Witness, VariantGraph.Vertex> verticesByWitness = TreeMultimap.create(Witness.SIGIL_COMPARATOR, vertexOrdering);
-      for (VariantGraph.Vertex vertex : transposition) {
-        for (Witness witness : vertex.witnesses()) {
-          verticesByWitness.put(witness, vertex);
-        }
-      }
-
-      Witness prev = null;
-      for (Witness witness : verticesByWitness.keySet()) {
-        if (prev != null) {
-          final Iterator<VariantGraph.Vertex> prevIt = verticesByWitness.get(prev).iterator();
-          final Iterator<VariantGraph.Vertex> nextIt = verticesByWitness.get(witness).iterator();
-          while (prevIt.hasNext() && nextIt.hasNext()) {
-            final VariantGraph.Vertex prevVertex = prevIt.next();
-            final VariantGraph.Vertex nextVertex = nextIt.next();
-            if (!prevVertex.equals(nextVertex)) {
-              tuples.add(new Tuple<VariantGraph.Vertex>(prevVertex, nextVertex));
-            }
-          }
-        }
-        prev = witness;
-      }
-    }
-
-    return tuples;
-  }
+  };
 }

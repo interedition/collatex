@@ -39,7 +39,7 @@ public class TranspositionTest extends AbstractTest {
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
 
     assertEquals("|the|white|and|black|cat|", toString(table, w[0]));
-    assertEquals("|The| | |black|cat|", toString(table, w[1]));
+    assertEquals("|the| | |black|cat|", toString(table, w[1]));
     assertEquals("|the|black|and|white|cat|", toString(table, w[2]));
     assertEquals("|the|black|and|green|cat|", toString(table, w[3]));
   }
@@ -49,9 +49,9 @@ public class TranspositionTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
 
-    assertEquals("| |He|was|agast,|so|", toString(table, w[0]));
-    assertEquals("| |He|was|agast| |", toString(table, w[1]));
-    assertEquals("|So|he|was|agast| |", toString(table, w[2]));
+    assertEquals("| |he|was|agast|so|", toString(table, w[0]));
+    assertEquals("| |he|was|agast| |", toString(table, w[1]));
+    assertEquals("|so|he|was|agast| |", toString(table, w[2]));
   }
 
   @Test
@@ -60,8 +60,8 @@ public class TranspositionTest extends AbstractTest {
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
 
     // TODO: it would be nice if He was agast stayed in one place!
-    assertEquals("| | | |So|he|was|agast|", toString(table, w[0]));
-    assertEquals("| | | | |He|was|agast|", toString(table, w[1]));
-    assertEquals("|He|was|agast,|so| | | |", toString(table, w[2]));
+    assertEquals("| | | |so|he|was|agast|", toString(table, w[0]));
+    assertEquals("| | | | |he|was|agast|", toString(table, w[1]));
+    assertEquals("|he|was|agast|so| | | |", toString(table, w[2]));
   }
 }

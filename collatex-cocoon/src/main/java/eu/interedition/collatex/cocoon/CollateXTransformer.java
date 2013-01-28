@@ -16,7 +16,6 @@ import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
@@ -91,7 +90,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
       }
       ignoreHooksCount--;
     } else if ("witness".equals(name)) {
-      witnesses.add(new SimpleWitness(sigil, endTextRecording(), new WhitespaceTokenizer()));
+      witnesses.add(new SimpleWitness(sigil, endTextRecording()));
     }
   }
 

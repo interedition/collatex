@@ -77,7 +77,6 @@ public interface CollationAlgorithm {
 
         into.connect(last, matchingVertex, witnessSet);
         last = matchingVertex;
-        //        toDotFile("inmerge", into);
       }
       into.connect(last, into.getEnd(), witnessSet);
     }
@@ -95,18 +94,5 @@ public interface CollationAlgorithm {
         into.transpose(transposed);
       }
     }
-
-    void toDotFile(String filename, Neo4jVariantGraph vg) {
-      try {
-        PrintWriter writer = new PrintWriter(new File("out/" + filename + ".dot"), "UTF-8");
-        new SimpleVariantGraphSerializer(vg).toDot(vg, writer);
-        writer.close();
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-    }
   }
-
 }

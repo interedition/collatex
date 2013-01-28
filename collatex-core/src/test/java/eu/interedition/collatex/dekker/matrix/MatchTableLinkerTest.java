@@ -10,6 +10,7 @@ import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.VariantGraph;
 import org.junit.Test;
@@ -132,8 +133,8 @@ public class MatchTableLinkerTest extends AbstractTest {
     }
     List<String> l = Lists.newArrayList(tokensAsString);
     Collections.sort(l);
-    LOG.log(Level.FINE, "tokensAsString={0}", l);
-    assertTrue(tokensAsString.contains("B:75:'onder'"));
+    LOG.log(Level.FINE, Joiner.on('\n').join(l));
+    assertTrue(tokensAsString.contains("B:77:'onder'"));
     assertTrue(tokensAsString.contains("B:0:'over'"));
     assertTrue(tokensAsString.contains("B:1:'de'"));
     assertTrue(tokensAsString.contains("B:2:'atlantische'"));

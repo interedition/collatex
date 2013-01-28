@@ -3,7 +3,6 @@ package eu.interedition.collatex.lab;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -61,7 +60,7 @@ public class WitnessPanel extends JPanel {
     for (WitnessTextArea textArea : this.witnesses) {
       final String textContent = textArea.getTextContent();
       if (!Strings.isNullOrEmpty(textContent)) {
-        witnesses.add(new SimpleWitness(textArea.getSigil(), textContent, new WhitespaceTokenizer()));
+        witnesses.add(new SimpleWitness(textArea.getSigil(), textContent));
       }
     }
     return witnesses;

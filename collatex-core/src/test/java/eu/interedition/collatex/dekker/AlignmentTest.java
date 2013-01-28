@@ -19,31 +19,27 @@
  */
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.RowSortedTable;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.CollationAlgorithmFactory;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Test;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
-import org.junit.Test;
-
-import com.google.common.collect.RowSortedTable;
-
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
-import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceAndPunctuationTokenizer;
+import static org.junit.Assert.assertEquals;
 
 /**
  * 
@@ -108,8 +104,8 @@ public class AlignmentTest extends AbstractTest {
         "A black cat in a white basket",//
         "A white cat in a black basket");
     final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
-    assertEquals("|A|black|cat|in|a|white|basket|", toString(t, w[0]));
-    assertEquals("|A|white|cat|in|a|black|basket|", toString(t, w[1]));
+    assertEquals("|a|black|cat|in|a|white|basket|", toString(t, w[0]));
+    assertEquals("|a|white|cat|in|a|black|basket|", toString(t, w[1]));
   }
 
   @Test
@@ -159,12 +155,10 @@ public class AlignmentTest extends AbstractTest {
 
   @Test
   public void testOrderIndependenceTroy() throws XMLStreamException {
-    WhitespaceAndPunctuationTokenizer tokenizer = new WhitespaceAndPunctuationTokenizer();
-
-    List<SimpleWitness> witnesses = new ArrayList<SimpleWitness>();
-    witnesses.add(new SimpleWitness("w1", "X A Z ", tokenizer));
-    witnesses.add(new SimpleWitness("w2", "Y B Z ", tokenizer));
-    witnesses.add(new SimpleWitness("w3", "Y A X ", tokenizer));
+    final List<SimpleWitness> witnesses = new ArrayList<SimpleWitness>();
+    witnesses.add(new SimpleWitness("w1", "X A Z "));
+    witnesses.add(new SimpleWitness("w2", "Y B Z "));
+    witnesses.add(new SimpleWitness("w3", "Y A X "));
 
     setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
     VariantGraph graph = new JungVariantGraph();
