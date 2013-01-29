@@ -191,6 +191,10 @@ public class VectorConflictResolver {
 			Vector split = this.split(priority, v);
 			vectors.add(split);
 		}
+		List<Vector> overpowered = getOverpoweredVectors(priority);
+		for (Vector v : overpowered) {
+			vectors.remove(v);
+		}
 		return priority;
 	}
 

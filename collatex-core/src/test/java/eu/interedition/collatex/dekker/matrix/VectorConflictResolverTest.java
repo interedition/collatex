@@ -130,6 +130,7 @@ public class VectorConflictResolverTest {
 		// 2. add the vector to the committed vector list
 		// 3. remove it from the unresolved vectors set
 		// 4. split conflicting vectors up into smaller parts
+		// 5. Remove overpowered vectos
 		// NOTE: the first one could either be v2 of be v4
 		assertTrue(committed.equals(v2)||committed.equals(v4));
 		Set<Vector> unresolved = resolver.getUnresolvedVectors();
@@ -140,7 +141,7 @@ public class VectorConflictResolverTest {
 		assertTrue(!unresolved.contains(v3));
 		// and then replaced by a new vector, which is split off from the old one
 		assertTrue(unresolved.contains(new Vector(2,2,1)));
-		assertEquals(3, unresolved.size());
+		assertEquals(2, unresolved.size());
 	}
 	
 	
@@ -178,8 +179,6 @@ public void testIsOverpowered() {
 	
 	
 	
-	//TODO; make this test work
-	@Ignore
 	@Test
 	public void testIdealLine() {
 		// prepare incoming vectors;
@@ -191,8 +190,9 @@ public void testIsOverpowered() {
 		// create resolver
 		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
 		List<Vector> resolved = resolver.resolveConflicts();
-		System.out.println(resolved);
 		assertTrue(resolved.get(0).equals(v2)||resolved.get(0).equals(v4));
-		fail();
+		assertTrue(resolved.get(1).equals(v2)||resolved.get(1).equals(v4));
+		assertTrue(resolved.get(2).equals(new Vector(2,2,1)));
+		assertEquals(3, resolved.size());
 	}
 }
