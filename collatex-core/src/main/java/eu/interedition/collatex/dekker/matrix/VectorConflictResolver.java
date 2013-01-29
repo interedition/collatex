@@ -87,7 +87,18 @@ public class VectorConflictResolver {
 		Range<Integer> v2verirange = Ranges.closed(other.y, other.y+other.length);
 		return one.length == other.length&&(v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange));
 	}
-		
+
+	//TODO: check range length --> I think it should be length -1..
+	//TODO: not enough tests apparently
+	public boolean isOverpowered(Vector one, Vector other) {
+		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
+		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
+		Range<Integer> v1verirange = Ranges.closed(one.y, one.y+one.length);
+		Range<Integer> v2verirange = Ranges.closed(other.y, other.y+other.length);
+		return v1horirange.encloses(v2horirange) || v1verirange.encloses(v2verirange);
+	}
+	
+	
 	//TODO: remove duplication between this method and the next!
 	public Integer getNumberOfConflictsFor(Vector v) {
 		int conflicts = 0;
@@ -99,7 +110,7 @@ public class VectorConflictResolver {
 		return conflicts;
 	}
 	
-	//TODO: test
+	//TODO: test (only tested implicitly by getNumberofConflicts
 	public List<Vector> getConflictingVectorsFor(Vector v) {
 		List<Vector> conflicting = Lists.newArrayList();
 		for (Vector other: vectors) {
@@ -108,6 +119,16 @@ public class VectorConflictResolver {
 			}
 		}
 		return conflicting;
+	}
+
+	public List<Vector> getOverpoweredVectors(Vector v) {
+		List<Vector> overpowered = Lists.newArrayList();
+		for (Vector other: vectors) {
+			if (other!=v&&isOverpowered(v, other)) {
+				overpowered.add(other);
+			}
+		}
+		return overpowered;
 	}
 
 	// To get the next vector to commit
@@ -181,4 +202,5 @@ public class VectorConflictResolver {
 		}
 		return committedV;
 	}
+
 }

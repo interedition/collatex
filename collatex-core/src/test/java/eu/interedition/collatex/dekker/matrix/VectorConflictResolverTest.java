@@ -144,6 +144,39 @@ public class VectorConflictResolverTest {
 	}
 	
 	
+	@Test
+public void testIsOverpowered() {
+	// prepare incoming vectors;
+	Vector v1 = new Vector(0,0,1);
+	Vector v2 = new Vector(3,0,2);
+	Vector v3 = new Vector(2,2,2);
+	Vector v4 = new Vector(0,3,2);
+	Set<Vector> vectors = Sets.newHashSet(v1, v2, v3, v4);
+	// create resolver
+	VectorConflictResolver resolver = new VectorConflictResolver(vectors);
+	// v2 is the one being considered for a commit
+	// v1 is the one who should be removed
+	assertTrue(resolver.isOverpowered(v2, v1));	
+	// v3 is partly overlapping with v2.. so it does not overpower it
+	assertTrue(!resolver.isOverpowered(v2, v3));
+}
+	
+	@Test
+	public void testFindOverpoweredVectors() {
+		// prepare incoming vectors;
+		Vector v1 = new Vector(0,0,1);
+		Vector v2 = new Vector(3,0,2);
+		Vector v3 = new Vector(2,2,2);
+		Vector v4 = new Vector(0,3,2);
+		Set<Vector> vectors = Sets.newHashSet(v1, v2, v3, v4);
+		// create resolver
+		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
+		List<Vector> result = resolver.getOverpoweredVectors(v2);
+		assertEquals(v1, result.get(0));
+		assertEquals(1, result.size());
+	}
+	
+	
 	
 	//TODO; make this test work
 	@Ignore
