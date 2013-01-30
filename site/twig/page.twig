@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>CollateX{% if title %} &ndash; {{ title }}{% endif %}</title>
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.8.1/build/cssfonts/cssfonts-min.css&3.8.1/build/cssgrids/cssgrids-min.css&3.8.1/build/cssreset/cssreset-min.css&3.8.1/build/cssbase/cssbase-min.css">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <script type="text/javascript" src="http://yui.yahooapis.com/combo?3.8.1/build/yui-base/yui-base-min.js&3.8.1/build/oop/oop-min.js&3.8.1/build/event-custom-base/event-custom-base-min.js&3.8.1/build/features/features-min.js&3.8.1/build/dom-core/dom-core-min.js&3.8.1/build/dom-base/dom-base-min.js&3.8.1/build/selector-native/selector-native-min.js&3.8.1/build/selector/selector-min.js&3.8.1/build/node-core/node-core-min.js&3.8.1/build/node-base/node-base-min.js&3.8.1/build/event-base/event-base-min.js&3.8.1/build/event-delegate/event-delegate-min.js&3.8.1/build/node-event-delegate/node-event-delegate-min.js&3.8.1/build/pluginhost-base/pluginhost-base-min.js&3.8.1/build/pluginhost-config/pluginhost-config-min.js&3.8.1/build/node-pluginhost/node-pluginhost-min.js&3.8.1/build/dom-style/dom-style-min.js&3.8.1/build/dom-screen/dom-screen-min.js&3.8.1/build/node-screen/node-screen-min.js&3.8.1/build/node-style/node-style-min.js&3.8.1/build/event-custom-complex/event-custom-complex-min.js&3.8.1/build/event-synthetic/event-synthetic-min.js"></script>
+    <script type="text/javascript" src="http://yui.yahooapis.com/combo?3.8.1/build/event-mousewheel/event-mousewheel-min.js&3.8.1/build/event-mouseenter/event-mouseenter-min.js&3.8.1/build/event-key/event-key-min.js&3.8.1/build/event-focus/event-focus-min.js&3.8.1/build/event-resize/event-resize-min.js&3.8.1/build/event-hover/event-hover-min.js&3.8.1/build/event-outside/event-outside-min.js&3.8.1/build/event-touch/event-touch-min.js&3.8.1/build/event-move/event-move-min.js&3.8.1/build/event-flick/event-flick-min.js&3.8.1/build/event-valuechange/event-valuechange-min.js&3.8.1/build/event-tap/event-tap-min.js"></script>
+    {% block head %}{% endblock %}
+</head>
+<body class="yui3-skin-sam">
+<div id="header">
+    <h1><a href="/" title="Homepage">CollateX &ndash; Software for collating textual sources, for example, to produce an apparatus</a></h1>
+    <p class="subtitle"><span class="quote">&ldquo;In a language, in the system of language, there are only differences.&rdquo;</span> &ndash; Jacques Derrida</p>
+</div>
+<div id="menu">
+    <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about/">Project</a></li>
+        <li><a href="/doc/">Documentation</a></li>
+        <li><a href="/download/">Download</a></li>
+    </ol>
+</div>
+<div id="content">{% block content %}{% endblock %}</div>
+<div id="footer">Copyright &copy; 2013 <a href="/about/">The Interedition Development Group</a>. All rights reserved.</div>
+{% block appendix %}{% endblock %}
+</body>
+</html>

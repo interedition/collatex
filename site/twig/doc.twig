@@ -1,0 +1,160 @@
+{% extends "page.twig" %}
+
+{% block content %}
+
+    <h2>The Gothenburg model</h2>
+    <p>Developers of CollateX and
+        <a href="http://www.juxtasoftware.org/">Juxta</a> met in 2009 at a joint workshop of the EU-funded research
+        projects <a href="http://www.cost-a32.eu/">COST Action 32</a> and
+        <a href="http://www.interedition.eu/">Interedition</a> in Gothenburg. They
+        wanted to agree on a modular software architecture, so these two as well as similar projects interested in
+        collation software would have a common base for collaborating in the development of needed tools. As a first
+        result the participants identified the following 4 modules/tasks, which were found to be essential to
+        computer-aided collation. The underlying ideas might consequently need to be discussed in the context of
+        encoding the in- and output of these modules as part of – or pre-stage to – a critical apparatus.</p>
+
+    <h3>Tokenizer</h3>
+
+    <p>While collators can compare witnesses on a character-by-character basis, in the more common use case each
+        comparand is split up into tokens/ segments before collation and compared on the token level. This preprocessing
+        step called <em>tokenization</em> and performed by a <em>tokenizer</em> can happen on any level of granularity, e.g.
+        on the level of syllables, words, lines, phrases, verses, paragraphes, text nodes in a normalized DOM etc.</p>
+
+    <p>Another service provided by tokenizers and of special value to text-oriented collators relates to marked-up
+        comparands: As these collators primarily compare witnesses based on their textual content, embedded markup would
+        usually get in the way and therefore needs to be filtered out and/or “pushed in the background”, so the collator
+        can operate on tokens of textual content. At the same time it might be valueable to have the markup context of
+        every token available, e.g. in case one wants to make use of it in complex token comparator functions.</p>
+
+    <p>The figure to the right depicts this process: Think of the upper line as a witness, its characters a, b, c, d as
+        arbitrary tokens and e1, e2 as examples of embedded markup elements. A tokenizer would transform this marked-up
+        text into a sequence of tokens, each referring to their respective markup/tagging context. From now on a
+        collator can compare this witness to others based on its tokenized content and does not have to deal with it on
+        a syntactic level anymore, that is rather specific to a particular markup language or dialect.
+    </p>
+
+    <h3>Aligner</h3>
+
+    <p>After the witnesses have been tokenized, collators try to align all witnesses involved. Simply put, aligning the
+        witnesses means in this case: Find matching tokens and insert empty tokens (<i>gap tokens</i>) such that the
+        token sequences of all witness line up properly. Interestingly this problem is computationally similar to the
+        problem of <a href="http://en.wikipedia.org/wiki/Sequence_alignment" class="external text" rel="nofollow">sequence
+            alignment</a> encountered in bioinformatics.
+    </p>
+
+    <p>Looking at an example, assume that we have three witnesses: the first is comprised of the token sequence (a, b,
+        c, d), the second reads (a, c, d, b) and the third (b, c, d). A collator might align these three witnesses as
+        depicted in a tabular fashion on the right. Each witness occupies a column, matching tokens are aligned in a
+        row, necessary gap tokens as inserted during the alignment process are denoted via a hyphen. Depending from
+        which perspective one interprets this <i>alignment table</i>, one can say for example that the (b) in the second
+        row was ommitted in the second witness or it has been added in the first and the third. A similar statement can
+        be made about (b) in the last row by just inverting the relationship of being added/ommitted.
+    </p>
+
+    <p>Alignment tables like the one shown can be encoded losslessly with an existing apparatus encoding scheme, in
+        parallel segmentation mode, as long as only the textual content of token needs to be represented. Each row is
+        represented by a segment with empty readings for gap tokens. Optionally consecutive rows with identical readings
+        for each witness can be compressed into a single segment, e.g.
+    </p>
+
+    <pre>&lt;app&gt;
+  &lt;rdg wit="#w1 #w2"&gt;a&lt;/rdg&gt;
+  &lt;rdg wit="#w3" /&gt;
+&lt;/app&gt;
+&lt;app&gt;
+  &lt;rdg wit="#w1 #w3"&gt;b&lt;/rdg&gt;
+  &lt;rdg wit="w2" /&gt;
+&lt;/app&gt;
+&lt;app&gt;
+  &lt;rdg wit="#w1 #w2 #w3"&gt;cd&lt;/rdg&gt;
+&lt;/app&gt;
+&lt;app&gt;
+  &lt;rdg wit="#w2"&gt;b&lt;/rdg&gt;
+  &lt;rdg wit="#w1 #w3" /&gt;
+&lt;/app&gt;</pre>
+
+    <h3>Analyzer</h3>
+
+    <p>On top of the results delivered by the alignment process, a further analysis can yield additional findings.
+        Echoing the example from the above section, one might want to think of the token (b) in row 2 and 5 as being
+        transposed instead of as being added/omitted separately. Some collators try to detect transpositions as part of
+        the alignment process, some do it as a post-processing step and others do not handle transpositions at all
+        and/or leave it to the user to declare those beforehand. Part of the reason for algorithmic differences in
+        transpostion handling is the fact, that the question which tokens are actually transposed is much more a matter
+        of interpretation than the question of matching and aligning them. While alignment results can still be judged
+        in terms of their quality to some extent, transposition detection can only be done heuristically as one can
+        easily think of cases, where it is impossible for a computer “to get it right”.
+    </p>
+
+    <p>Apart from the specific problem of transpositions, it seems generally necessary to incorporate a step in the
+        collation process, in which the user can examine the preliminary collation result, edit and augment it according
+        to her knowledge and possibly feed it back into the collator for another run yielding enhanced results.
+    </p>
+
+    <h3>Visualization</h3>
+
+    <p>The last module of the Gothenburg model deals with visualizing collation results. As we are concerned with
+        modelling and encoding textual variance properly, the question of how to visualize it is of technical importance
+        and should not be disregarded, but is essentially out of scope with regard to this discussion.
+    </p>
+
+    <h3>The “variant graph”: Schmidt’s model of textual variance</h3>
+
+    <p>In a <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" class="external text" rel="nofollow">recent paper</a> D. Schmidt and R. Colomb proposed a data model of textual variance (or “multi-version texts” as they call it in the title), which they call a <i>variant graph</i>:
+    </p>
+
+    <p>In this model, varying texts/ a collation are/ is expressed in a <a href="http://en.wikipedia.org/wiki/Directed_acyclic_graph" class="external text" rel="nofollow">directed acyclic graph</a> with each path through the graph representing one version/ witness. The textual data is annotated on the edges, each edge carrying a (common) segment of text(s) and a set of identifiers, that denotes the versions/witnesses, in which the segment appears. Transpositions can be superimposed on the graph by linking edges of transposed segments.
+    </p>
+
+    <p>The tabular model described above and the given graph-based model can be converted into each other, with Schmidt’s model having the advantage, that it is
+    </p>
+
+    <ul><li> more space-efficient as it combines matching segments into a single edge instead of duplicating them per row/column,
+        </li><li> more natural in expressing transpostions as matching segments are linked and not pairs of tokens.
+        </li></ul>
+
+    <p>The tabular model on the other hand might be advantageous, if one wanted to keep collation results in a relational datastore.
+    </p>
+
+    <h2>Resources/ Bibliography</h2>
+
+    <ul>
+        <li> Multi-Version Document Format. <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001"
+                                               class="external text" rel="nofollow">Schmidt, D. and Colomb, R, 2009. A
+                data structure for representing multi-version texts online, International Journal of Human-Computer
+                Studies, 67.6, 497-514.</a> (See the related <a href="http://multiversiondocs.blogspot.com/"
+                                                                class="external text" rel="nofollow">blog</a> and <a
+                    href="http://multiversiondocs.blogspot.com/2008/03/whats-multi-version-document.html"
+                    class="external text" rel="nofollow">the post “What's a Multi-Version Document?”</a>.
+        </li>
+        <li> Multi-Version Texts and Collation. <a
+                    href="http://www.balisage.net/Proceedings/vol3/html/Schmidt01/BalisageVol3-Schmidt01.html"
+                    class="external text" rel="nofollow">Schmidt, Desmond. “Merging Multi-Version Texts: a Generic
+                Solution to the Overlap Problem.”</a> Presented at Balisage: The Markup Conference 2009, Montréal,
+            Canada, August 11 - 14, 2009. In Proceedings of Balisage: The Markup Conference 2009. Balisage Series on
+            Markup Technologies, vol. 3 (2009). doi:10.4242/BalisageVol3.Schmidt01.]
+        </li>
+    </ul>
+
+    <ul>
+        <li> Matthew Spencer, Christopher J. Howe. Collating Texts Using Progressive Multiple Alignment. Computers and
+            the Humanities. 38/2004. S. 253–270.
+        </li>
+        <li><a href="http://edoc.bbaw.de/volltexte/2007/516/" class="external text" rel="nofollow">Michael Stolz,
+                Friedrich Michael Dimpel. Computergestützte Kollationierung und ihre Integration in den editorischen
+                Arbeitsfluss. 2006.</a>
+        </li>
+    </ul>
+
+    <ul>
+        <li><a href="http://www.sd-editions.com/about/index.html" class="external text" rel="nofollow">Collate</a>
+        </li>
+        <li><a href="http://collatex.sourceforge.net/" class="external text" rel="nofollow">CollateX</a>
+        </li>
+        <li><a href="http://www.juxtasoftware.org/" class="external text" rel="nofollow">Juxta</a>
+        </li>
+        <li><a href="http://code.google.com/p/multiversiondocs/wiki/NMerge" class="external text"
+               rel="nofollow">NMerge</a>
+        </li>
+    </ul>
+{% endblock %}
