@@ -1,6 +1,5 @@
-package eu.interedition.collatex.io;
+package eu.interedition.collatex.http;
 
-import com.google.inject.Inject;
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.SimpleType;
@@ -27,7 +26,6 @@ public class ObjectMapperMessageBodyReaderWriter extends AbstractMessageReaderWr
 
   private final ObjectMapper objectMapper;
 
-  @Inject
   public ObjectMapperMessageBodyReaderWriter(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }

@@ -1,25 +1,19 @@
-package eu.interedition.collatex;
+package eu.interedition.collatex.http;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import com.sun.jersey.api.NotFoundException;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -30,13 +24,10 @@ import java.util.Date;
 @Path("/static")
 public class StaticResource {
 
-  private static final MediaType TEXT_CSS_TYPE = new MediaType("text", "css");
-
   private final File staticPath;
   private final Date initial = new Date();
 
-  @Inject
-  public StaticResource(@Named("interedition.static") String staticPath) {
+  public StaticResource(String staticPath) {
     this.staticPath = (Strings.isNullOrEmpty(staticPath) ? null : new File(staticPath));
   }
 

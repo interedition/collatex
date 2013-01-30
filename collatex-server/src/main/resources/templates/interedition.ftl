@@ -8,25 +8,15 @@
   <title>${title} :: Interedition Microservices</title>
 
   <link rel="shortcut icon" href="${cp}/static/interedition_logo.ico" type="image/x-icon">
-  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.6.0/build/cssfonts/cssfonts-min.css&3.6.0/build/cssgrids/cssgrids-min.css&3.6.0/build/cssreset/cssreset-min.css&3.6.0/build/cssbase/cssbase-min.css&3.6.0/build/cssbutton/cssbutton-min.css">
+
+  <link rel="stylesheet" type="text/css" href="${cp}/static/yui-3.8.1-rollup.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/interedition.css">
   <link rel="stylesheet" type="text/css" href="${cp}/static/webapp.css">
 
   <script type="text/javascript">var cp = "${cp?js_string}";</script>
-  <script type="text/javascript" src="http://yui.yahooapis.com/combo?3.6.0/build/yui/yui-min.js"></script>
-  <script type="text/javascript">
-    YUI.applyConfig({
-      debug: true,
-      combine: true,
-      modules: {
-        'interedition-collate': {
-          fullpath: cp + '/static/collate.js',
-          requires: ["base", "io", "json", "node", "array-extras", "escape", "dump"]
-        }
-      }
-    });
-  </script>
-${header}
+  <script type="text/javascript" src="${cp}/static/yui-3.8.1-rollup.js"></script>
+  <script type="text/javascript" src="${cp}/static/collate.js"></script>
+  ${header}
 </head>
 <body class="yui3-skin-sam">
 <div id="header"><h1 class="boxed">${title?html}</h1></div>

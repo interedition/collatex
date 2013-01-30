@@ -24,11 +24,11 @@ import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.codehaus.jackson.JsonNode;
 
-public class WebToken extends SimpleToken {
+public class JsonToken extends SimpleToken {
 
   private final JsonNode jsonNode;
 
-  public WebToken(SimpleWitness witness, String content, String normalized, JsonNode jsonNode) {
+  public JsonToken(SimpleWitness witness, String content, String normalized, JsonNode jsonNode) {
     super(witness, content, normalized);
     this.jsonNode = jsonNode;
   }

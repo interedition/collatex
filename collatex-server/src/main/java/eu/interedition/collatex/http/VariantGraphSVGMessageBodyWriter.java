@@ -1,14 +1,13 @@
-package eu.interedition.collatex.io;
+package eu.interedition.collatex.http;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import com.google.inject.Inject;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
 
-import javax.inject.Named;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -20,9 +19,11 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -36,13 +37,11 @@ import java.util.concurrent.Future;
 @Produces("image/svg+xml")
 public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
 
-  private final ExecutorService threadPool = Executors.newCachedThreadPool();
+  final ExecutorService threadPool = Executors.newCachedThreadPool();
+  final String dotPath;
 
-  private final File dotPath;
-
-  @Inject
-  public VariantGraphSVGMessageBodyWriter(@Named("interedition.dot") String dotPath) {
-    this.dotPath = (!dotPath.isEmpty() && new File(dotPath).canExecute() ? new File(dotPath) : null);
+  public VariantGraphSVGMessageBodyWriter(String dotPath) {
+    this.dotPath = detectDot(dotPath);
   }
 
 
@@ -62,7 +61,7 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
       throw new WebApplicationException(Response.Status.NO_CONTENT);
     }
 
-    final Process dotProc = Runtime.getRuntime().exec(dotPath.getAbsolutePath() + " -Grankdir=LR -Gid=VariantGraph -Tsvg");
+    final Process dotProc = Runtime.getRuntime().exec(dotPath + " -Grankdir=LR -Gid=VariantGraph -Tsvg");
 
     final Future<Void> inputTask = threadPool.submit(new Callable<Void>() {
       @Override
@@ -100,5 +99,41 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
       svgBuf.reset();
       Closeables.close(entityStream, false);
     }
+  }
+
+  protected String detectDot(String dotPath) {
+    if (dotPath != null && new File(dotPath).canExecute()) {
+      return dotPath;
+    }
+
+    dotPath = null;
+    InputStream stream = null;
+    try {
+      final Process which = new ProcessBuilder("which", "dot").start();
+      dotPath = CharStreams.toString(new InputStreamReader(stream = which.getInputStream(), Charset.defaultCharset())).trim();
+      which.waitFor();
+    } catch (IOException e) {
+    } catch (InterruptedException e) {
+    } finally {
+      Closeables.closeQuietly(stream);
+    }
+
+    if (Strings.isNullOrEmpty(dotPath)) {
+      try {
+        final Process where = new ProcessBuilder("where.exe", "dot.exe").start();
+        dotPath = CharStreams.toString(new InputStreamReader(stream = where.getInputStream(), Charset.defaultCharset())).trim();
+        where.waitFor();
+      } catch (IOException e) {
+      } catch (InterruptedException e) {
+      } finally {
+        Closeables.closeQuietly(stream);
+      }
+    }
+
+    if (!Strings.isNullOrEmpty(dotPath)) {
+      dotPath = dotPath.split("[\r\n]+")[0].trim();
+    }
+
+    return (Strings.isNullOrEmpty(dotPath) ? null : dotPath);
   }
 }

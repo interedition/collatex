@@ -1,4 +1,4 @@
-package eu.interedition.collatex.io;
+package eu.interedition.collatex.http;
 
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.VariantGraph;
@@ -22,14 +22,10 @@ import java.lang.reflect.Type;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Provider
-@Produces("application/tei+xml")
-public class VariantGraphTEIMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
+@Produces("application/graphml+xml")
+public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
 
   private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
-
-  static {
-    XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
-  }
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -45,7 +41,7 @@ public class VariantGraphTEIMessageBodyWriter implements MessageBodyWriter<Varia
   public void writeTo(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     XMLStreamWriter xml = null;
     try {
-      new SimpleVariantGraphSerializer(variantGraph).toTEI(xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream));
+      new SimpleVariantGraphSerializer(variantGraph).toGraphML(xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream));
     } catch (XMLStreamException e) {
       throw new IOException(e.getMessage(), e);
     } finally {

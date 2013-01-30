@@ -1,4 +1,4 @@
-package eu.interedition.collatex.io;
+package eu.interedition.collatex.http;
 
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.VariantGraph;
@@ -10,11 +10,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -22,10 +21,8 @@ import java.lang.reflect.Type;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Provider
-@Produces("application/graphml+xml")
-public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
-
-  private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
+@Produces(MediaType.TEXT_PLAIN)
+public class VariantGraphDotMessageBodyWriter implements MessageBodyWriter<VariantGraph> {
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -38,18 +35,12 @@ public class VariantGraphMLMessageBodyWriter implements MessageBodyWriter<Varian
   }
 
   @Override
-  public void writeTo(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
-    XMLStreamWriter xml = null;
+  public void writeTo(VariantGraph graph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    final PrintWriter out = new PrintWriter(new OutputStreamWriter(entityStream, "UTF-8"));
     try {
-      new SimpleVariantGraphSerializer(variantGraph).toGraphML(xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream));
-    } catch (XMLStreamException e) {
-      throw new IOException(e.getMessage(), e);
+      new SimpleVariantGraphSerializer(graph).toDot(out);
     } finally {
-      try {
-        xml.close();
-      } catch (XMLStreamException e) {
-      }
-      Closeables.close(entityStream, false);
+      Closeables.close(out, false);
     }
   }
 }

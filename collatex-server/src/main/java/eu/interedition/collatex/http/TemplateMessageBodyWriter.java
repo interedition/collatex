@@ -1,4 +1,4 @@
-package eu.interedition.collatex.io;
+package eu.interedition.collatex.http;
 
 import com.google.common.io.Closeables;
 import com.sun.jersey.server.impl.model.HttpHelper;

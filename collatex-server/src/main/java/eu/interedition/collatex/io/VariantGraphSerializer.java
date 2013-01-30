@@ -52,8 +52,8 @@ public class VariantGraphSerializer extends JsonSerializer<VariantGraph> {
           final List<SimpleToken> cell = Ordering.natural().sortedCopy(Iterables.filter(cellContents, SimpleToken.class));
           jgen.writeStartArray();
           for (SimpleToken token : cell) {
-            if (token instanceof WebToken) {
-              jgen.writeTree(((WebToken) token).getJsonNode());
+            if (token instanceof JsonToken) {
+              jgen.writeTree(((JsonToken) token).getJsonNode());
             } else {
               jgen.writeString(token.getContent());
             }

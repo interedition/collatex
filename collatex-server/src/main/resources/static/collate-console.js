@@ -1,5 +1,9 @@
 var examples = [
     [
+        "This morning the cat observed little birds in the trees.",
+        "The cat was observing birds in the little trees this morning, it observed birds for two hours."
+    ],
+    [
         "The black cat",
         "The black and white cat",
         "The black and green cat",

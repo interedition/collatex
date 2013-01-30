@@ -6,8 +6,9 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimplePatternTokenizer;
+import eu.interedition.collatex.simple.SimpleTokenNormalizers;
 import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.simple.WhitespaceTokenizer;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationContext;
@@ -86,14 +87,17 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
             throw JsonMappingException.from(jp, String.format("Empty token encountered in witness \"%s\"", witness));
           }
 
-          tokens.add(new WebToken(witness, tokenContent, normalizedTokenContent, tokenNode));
+          tokens.add(new JsonToken(witness, tokenContent, normalizedTokenContent, tokenNode));
         }
         witness.setTokens(tokens);
       } else {
         if (!contentNode.isTextual()) {
           throw JsonMappingException.from(jp, String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
-        witness.setTokenContents(new WhitespaceTokenizer().apply(contentNode.getTextValue()));
+        witness.setTokenContents(
+                SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(contentNode.getTextValue()),
+                SimpleTokenNormalizers.LC_TRIM_WS_PUNCT
+        );
       }
 
       if (witness.getTokens().isEmpty()) {
