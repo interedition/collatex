@@ -74,15 +74,14 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
       if (maximalUniqueMatches.isEmpty()) {
         break;
       }
-      final SortedSet<Phrase<Match.WithTokenIndex>> aligned = Aligner.align(maximalUniqueMatches);
-      for (Phrase<Match.WithTokenIndex> phrase : aligned) {
+      for (Phrase<Match.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches)) {
         final Match.WithTokenIndex firstMatch = phrase.first();
         final Match.WithTokenIndex lastMatch = phrase.last();
 
+        alignments.add(phrase);
         rankFilter.add(Ranges.closed(firstMatch.vertexRank, lastMatch.vertexRank));
         tokenFilter.add(Ranges.closed(firstMatch.token, lastMatch.token));
       }
-      alignments.addAll(aligned);
     }
 
     if (logTimings) {

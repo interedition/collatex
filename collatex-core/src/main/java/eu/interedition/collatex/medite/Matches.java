@@ -195,14 +195,15 @@ public class Matches extends ArrayList<Phrase<Match.WithEquivalence>> {
         return result;
       }
 
-      // 2. reverse ordering by first token
-      result = o2.first().equivalenceClass.compareTo(o1.first().equivalenceClass);
+      // 2. ordering by first vertex ranking
+      result = o1.first().vertexRank - o2.first().vertexRank;
       if (result != 0) {
         return result;
       }
 
-      // 3. reverse ordering by first vertex ranking
-      return (o2.first().vertexRank - o1.first().vertexRank);
+      // 3. ordering by first token equivalence class
+      return o1.first().equivalenceClass.compareTo(o1.first().equivalenceClass);
+
     }
   };
 

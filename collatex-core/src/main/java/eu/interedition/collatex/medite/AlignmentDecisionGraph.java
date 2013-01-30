@@ -14,23 +14,23 @@ import java.util.SortedSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Aligner {
+public class AlignmentDecisionGraph {
 
   private final List<Phrase<Match.WithTokenIndex>> matches;
-  private final PriorityQueue<Path> bestPaths;
-  private final Map<Path, Integer> minCosts;
+  private final PriorityQueue<Node> bestPaths;
+  private final Map<Node, Integer> minCosts;
 
-  Aligner(List<Phrase<Match.WithTokenIndex>> matches) {
+  AlignmentDecisionGraph(List<Phrase<Match.WithTokenIndex>> matches) {
     this.matches = matches;
-    this.bestPaths = new PriorityQueue<Path>(matches.size(), PATH_COST_COMPARATOR);
+    this.bestPaths = new PriorityQueue<Node>(matches.size(), PATH_COST_COMPARATOR);
     this.minCosts = Maps.newHashMap();
   }
 
-  static SortedSet<Phrase<Match.WithTokenIndex>> align(SortedSet<Phrase<Match.WithTokenIndex>> matches) {
+  static SortedSet<Phrase<Match.WithTokenIndex>> filter(SortedSet<Phrase<Match.WithTokenIndex>> matches) {
     final SortedSet<Phrase<Match.WithTokenIndex>> alignments = Sets.newTreeSet();
 
     final List<Phrase<Match.WithTokenIndex>> matchList = Lists.newArrayList(matches);
-    Path optimal = new Aligner(matchList).optimize();
+    Node optimal = new AlignmentDecisionGraph(matchList).findBestPath();
     while (optimal.matchIndex >= 0) {
       if (optimal.aligned) {
         alignments.add(matchList.get(optimal.matchIndex));
@@ -40,27 +40,30 @@ public class Aligner {
     return alignments;
   }
 
-  private Path optimize() {
-    bestPaths.add(new Path(null, -1, false, 0));
+  private Node findBestPath() {
+    bestPaths.add(new Node(-1, false));
     while (!bestPaths.isEmpty()) {
-      final Path current = bestPaths.remove();
+      final Node current = bestPaths.remove();
       if (current.matchIndex == matches.size() - 1) {
         return current;
       }
-      for (Path successor : current.successors()) {
-        final int tentativeCost = cost(successor);
+      for (Node successor : current.successors()) {
+        final int tentativeCost = cost(current) + cost(successor);
         if (bestPaths.contains(successor) && tentativeCost >= minCosts.get(successor)) {
           continue;
         }
         minCosts.put(successor, tentativeCost);
+
+        successor.cost = tentativeCost + heuristicCost(successor);
+        successor.previous = current;
         bestPaths.remove(successor);
-        bestPaths.add(new Path(successor, tentativeCost + heuristicCost(successor)));
+        bestPaths.add(successor);
       }
     }
     throw new IllegalStateException("No optimal alignment found");
   }
 
-  private int heuristicCost(Path path) {
+  private int heuristicCost(Node path) {
     final Phrase<Match.WithTokenIndex> evaluated = matches.get(path.matchIndex);
     final Match.WithTokenIndex lastMatch = evaluated.last();
 
@@ -72,48 +75,46 @@ public class Aligner {
         continue;
       }
       // we cannot align this following match, so add it to the cost
-      cost += following.size();
+      cost += value(following);
     }
     return cost;
   }
 
-  private int cost(Path current) {
+  private int cost(Node current) {
     int cost = 0;
-    while (current.matchIndex >= 0) {
+    while (current != null && current.matchIndex >= 0) {
       if (!current.aligned) {
-        cost += matches.get(current.matchIndex).size();
+        cost += value(matches.get(current.matchIndex));
       }
       current = current.previous;
     }
     return cost;
   }
 
-  static class Path {
-    final Path previous;
+  private int value(Phrase<Match.WithTokenIndex> match) {
+    return match.size();
+  }
+
+  static class Node {
     final int matchIndex;
     final boolean aligned;
-    final int cost;
+    Node previous;
+    int cost;
 
-    Path(Path previous, int matchIndex, boolean aligned, int cost) {
-      this.previous = previous;
+    Node(int matchIndex, boolean aligned) {
       this.matchIndex = matchIndex;
       this.aligned = aligned;
-      this.cost = cost;
     }
 
-    public Path(Path other, int cost) {
-      this(other.previous, other.matchIndex, other.aligned, cost);
-    }
-
-    Path[] successors() {
+    Node[] successors() {
       final int nextIndex = matchIndex + 1;
-      return new Path[] { new Path(this, nextIndex, true, cost), new Path(this, nextIndex, false, cost) };
+      return new Node[] { new Node(nextIndex, true), new Node(nextIndex, false) };
     }
 
     @Override
     public boolean equals(Object obj) {
-      if (obj != null && obj instanceof Path) {
-        final Path other = (Path) obj;
+      if (obj != null && obj instanceof Node) {
+        final Node other = (Node) obj;
         return (matchIndex == other.matchIndex) && (aligned == other.aligned);
       }
       return super.equals(obj);
@@ -125,9 +126,9 @@ public class Aligner {
     }
   }
 
-  static final Comparator<Path> PATH_COST_COMPARATOR = new Comparator<Path>() {
+  static final Comparator<Node> PATH_COST_COMPARATOR = new Comparator<Node>() {
     @Override
-    public int compare(Path o1, Path o2) {
+    public int compare(Node o1, Node o2) {
       return (o1.cost - o2.cost);
     }
   };
