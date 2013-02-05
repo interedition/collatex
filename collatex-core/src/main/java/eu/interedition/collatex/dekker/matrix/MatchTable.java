@@ -10,6 +10,7 @@ import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
@@ -161,7 +162,23 @@ public class MatchTable {
     return pairs;
   }
   
-  private class MatchTableCell {
+  static Set<Vector> convertIslandsToVectors(Set<Island> islands2) {
+		Set<Vector> vectors = Sets.newHashSet();
+		for (Island i : islands2) {
+			Coordinate leftEnd = i.getLeftEnd();
+			Vector v = new Vector(leftEnd.column, leftEnd.row, i.size());
+			vectors.add(v);
+		}
+		return vectors;
+	}
+
+	public Set<Vector> getVectors() {
+		Set<Island> islands2 = getIslands();
+		Set<Vector> vectors = MatchTable.convertIslandsToVectors(islands2);
+		return vectors;
+	}
+
+	private class MatchTableCell {
     public final Token token;
     public final VariantGraph.Vertex vertex;
 

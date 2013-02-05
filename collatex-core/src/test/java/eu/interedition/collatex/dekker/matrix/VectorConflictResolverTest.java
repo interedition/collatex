@@ -195,4 +195,5 @@ public void testIsOverpowered() {
 		assertTrue(resolved.get(2).equals(new Vector(2,2,1)));
 		assertEquals(3, resolved.size());
 	}
+	
 }

@@ -3,8 +3,10 @@ package eu.interedition.collatex.dekker.matrix;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
@@ -14,13 +16,22 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchTableTest extends AbstractTest {
 
-  // helper method
+	Comparator<Vector> comp = new Comparator<Vector>() {
+		@Override
+		public int compare(Vector v1, Vector v2) {
+	    final int result = v1.x- v2.x;
+	    return (result == 0 ? v1.y - v2.y : result);
+		}
+	};
+
+	// helper method
   private void assertIslandEquals(int leftRow, int leftColumn, int rightRow, int rightColumn, Island island) {
     Coordinate leftEnd = island.getLeftEnd();
     assertEquals(leftRow, leftEnd.getRow());
@@ -176,15 +187,37 @@ public class MatchTableTest extends AbstractTest {
 
   @Test
   public void testIslandDetectionPartlyOverlappingIslandsUsecase() {
-	SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
-	VariantGraph graph = collate(w[0]);
+  	SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
+  	VariantGraph graph = collate(w[0]);
     MatchTable table = MatchTable.create(graph, w[1], new EqualityTokenComparator());
     List<Island> islands = Lists.newArrayList(table.getIslands());
     Collections.sort(islands);
     assertEquals(4, islands.size());
     assertVectorEquals(0, 0, 1, islands.get(0));
     assertVectorEquals(3, 0, 2, islands.get(1));
-	assertVectorEquals(2, 2, 2, islands.get(2));
+    assertVectorEquals(2, 2, 2, islands.get(2));
     assertVectorEquals(0, 3, 2, islands.get(3));
   }
+  
+  // A: Et sumpno suscepto tribus diebus morte morietur et deinde ab inferis regressus ad lucem veniet.
+	// B: Et mortem sortis finiet post tridui somnum et morte morietur tribus diebus somno suscepto et tunc ab inferis regressus ad lucem veniet.
+	@Test
+	public void testLatinGenerateVectors() {
+  	SimpleWitness[] w = createWitnesses("Et sumpno suscepto tribus diebus morte morietur et deinde ab inferis regressus ad lucem veniet.", "Et mortem sortis finiet post tridui somnum et morte morietur tribus diebus somno suscepto et tunc ab inferis regressus ad lucem veniet.");
+  	VariantGraph graph = collate(w[0]);
+    MatchTable table = MatchTable.create(graph, w[1], new EqualityTokenComparator());
+    List<Vector> vectors = Lists.newArrayList(table.getVectors());
+    Collections.sort(vectors, comp);
+    assertEquals(new Vector(0,0,1), vectors.get(0));
+    assertEquals(new Vector(0,7,1), vectors.get(1));
+    assertEquals(new Vector(0,14,1), vectors.get(2));
+    assertEquals(new Vector(2,13,1), vectors.get(3));
+    assertEquals(new Vector(3,10,2), vectors.get(4));
+    assertEquals(new Vector(5,8,2), vectors.get(5));
+    assertEquals(new Vector(7,0,1), vectors.get(6));
+    assertEquals(new Vector(7,7,1), vectors.get(7));
+    assertEquals(new Vector(7,14,1), vectors.get(8));
+    assertEquals(new Vector(9,16,6), vectors.get(9));
+    assertEquals(10, vectors.size());
+	}
 }

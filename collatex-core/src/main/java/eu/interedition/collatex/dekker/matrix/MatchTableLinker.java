@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -63,14 +62,7 @@ public class MatchTableLinker implements TokenLinker {
 	    return map;
     } else {
       LOG.fine("create the vector space from the matches");
-	    // create Archipelago data structure and fill it with all the islands
-	    Set<Island> islands2 = table.getIslands();
-	    Set<Vector> vectors = Sets.newHashSet();
-	    for (Island i : islands2) {
-	    	Coordinate leftEnd = i.getLeftEnd();
-	    	Vector v = new Vector(leftEnd.column, leftEnd.row, i.size());
-	    	vectors.add(v);
-	    }
+	    Set<Vector> vectors = table.getVectors();
 	    VectorConflictResolver resolver = new VectorConflictResolver(vectors);
 	    List<Vector> resolved = resolver.resolveConflicts();
 	    // Here the result is put in a map
