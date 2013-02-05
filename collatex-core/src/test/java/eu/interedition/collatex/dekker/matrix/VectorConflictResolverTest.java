@@ -16,6 +16,21 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 
 public class VectorConflictResolverTest {
+	private Set<Vector> example2() {
+		Set<Vector> vectors = Sets.newHashSet();
+		vectors.add(new Vector(0,0,1));
+		vectors.add(new Vector(0,7,1));
+		vectors.add(new Vector(0,14,1));
+		vectors.add(new Vector(2,13,1));
+		vectors.add(new Vector(3,10,2));
+		vectors.add(new Vector(5,8,2));
+		vectors.add(new Vector(7,0,1));
+		vectors.add(new Vector(7,7,1));
+		vectors.add(new Vector(7,14,1));
+		vectors.add(new Vector(9,16,6));
+		return vectors;
+	}
+
 	@Test
 	public void testSortingPartlyOverlappingVectors() {
 		// prepare incoming vectors;
@@ -49,6 +64,16 @@ public class VectorConflictResolverTest {
 		assertTrue(resolver.isInConflict(v2, v3));
 		assertTrue(resolver.isInConflict(v3, v4));
 	}
+	
+	@Test
+	public void testConflictingVectors2() {
+		Set<Vector> vectors = example2();
+		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
+		Vector v2a = new Vector(5,8,2);
+		List<Vector> conflicts = resolver.getConflictingVectorsFor(v2a);
+		assertTrue("No conflicts were expected! but found "+conflicts, conflicts.isEmpty());
+	}
+	
 
 	@Test
 	public void testNumberOfConflicts() {
@@ -195,5 +220,21 @@ public void testIsOverpowered() {
 		assertTrue(resolved.get(2).equals(new Vector(2,2,1)));
 		assertEquals(3, resolved.size());
 	}
+	
+	//TODO; fix!
+	@Ignore
+	@Test 
+	public void testIdealLine2() {
+    Set<Vector> vectors = example2();
+		Vector v2a = new Vector(5,8,2);
+		// create resolver
+		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
+		Vector v = resolver.commitPriorityVector();
+		v =	resolver.selectPriorityVector();
+		assertEquals(v2a, v);
+		List<Vector> conflictingVectorsFor = resolver.getConflictingVectorsFor(v);
+		System.out.println(conflictingVectorsFor);
+	}
+
 	
 }

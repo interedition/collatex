@@ -78,23 +78,27 @@ public class VectorConflictResolver {
 	// a vector is in conflict with another vector
 	// if they both have the same size and are in the same
 	// horizontal or vertical range
-	//TODO: check length --> I think it should be length -1..
-	//TODO: not enough tests apparently
 	public boolean isInConflict(Vector one, Vector other) {
-		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
-		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
-		Range<Integer> v1verirange = Ranges.closed(one.y, one.y+one.length);
-		Range<Integer> v2verirange = Ranges.closed(other.y, other.y+other.length);
-		return one.length == other.length&&(v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange));
+		Range<Integer> v1horirange = getHorizontalRange(one);
+		Range<Integer> v2horirange = getHorizontalRange(other);
+		Range<Integer> v1verirange = getVerticalRange(one);
+		Range<Integer> v2verirange = getVerticalRange(other);
+		return !(one.equals(other))&&one.length == other.length&&(v1horirange.isConnected(v2horirange)||v1verirange.isConnected(v2verirange));
 	}
 
-	//TODO: check range length --> I think it should be length -1..
-	//TODO: not enough tests apparently
+	private Range<Integer> getVerticalRange(Vector one) {
+		return Ranges.closed(one.y, one.y+one.length-1);
+	}
+
+	private Range<Integer> getHorizontalRange(Vector one) {
+		return Ranges.closed(one.x, one.x+one.length-1);
+	}
+
 	public boolean isOverpowered(Vector one, Vector other) {
-		Range<Integer> v1horirange = Ranges.closed(one.x, one.x+one.length);
-		Range<Integer> v2horirange = Ranges.closed(other.x, other.x+other.length);
-		Range<Integer> v1verirange = Ranges.closed(one.y, one.y+one.length);
-		Range<Integer> v2verirange = Ranges.closed(other.y, other.y+other.length);
+		Range<Integer> v1horirange = getHorizontalRange(one);
+		Range<Integer> v2horirange = getHorizontalRange(other);
+		Range<Integer> v1verirange = getVerticalRange(one);
+		Range<Integer> v2verirange = getVerticalRange(other);
 		return v1horirange.encloses(v2horirange) || v1verirange.encloses(v2verirange);
 	}
 	
@@ -114,7 +118,7 @@ public class VectorConflictResolver {
 	public List<Vector> getConflictingVectorsFor(Vector v) {
 		List<Vector> conflicting = Lists.newArrayList();
 		for (Vector other: vectors) {
-			if (other!=v&&isInConflict(v, other)) {
+			if (isInConflict(v, other)) {
 				conflicting.add(other);
 			}
 		}
