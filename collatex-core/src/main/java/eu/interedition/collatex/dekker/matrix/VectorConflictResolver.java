@@ -3,18 +3,23 @@ package eu.interedition.collatex.dekker.matrix;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 
 import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 
 public class VectorConflictResolver {
+  Logger LOG = Logger.getLogger(VectorConflictResolver.class.getName());
 	private Set<Vector> vectors;
 	
 	//NOTE: vector class
@@ -28,6 +33,9 @@ public class VectorConflictResolver {
 			this.x = x;
 			this.y = y;
 			this.length = length;
+			if (length==0) {
+				throw new RuntimeException("Lenght can not be zero!");
+			}
 		}
 
 		@Override
@@ -57,6 +65,25 @@ public class VectorConflictResolver {
 
 	public Set<Vector> getUnresolvedVectors() {
 		return vectors;
+	}
+
+	//This method returns all the vectors that are in range
+	//of the given Vector
+	//There multiple possible relations:
+	//1) The given Vector can overpower the other Vector
+	//2) The given Vector can partly overlap with the other Vector
+	//3) The given Vector can directly compete with the other Vector
+	//4) The given can lay outside of the range of the other Vector
+	//   Those will not be returned
+	public Map<Vector, VectorRelation> getRelatedVectors(Vector vector) {
+		//TODO: this implementation is too simple..
+		//TODO: first we need more unit tests!
+		Map<Vector, VectorRelation> relations = Maps.newHashMap();
+		List<Vector> conflicting = getConflictingVectorsFor(vector);
+		for (Vector v : conflicting) {
+			relations.put(v, VectorRelation.COMPETING);
+		}
+		return relations;
 	}
 
 	public List<Vector> orderVectorsBySizePosition() {
@@ -161,6 +188,7 @@ public class VectorConflictResolver {
 	// Note: this method only works when the other vector
 	// intersects with the one vector at the end
 	public Vector split(Vector one, Vector other) {
+		LOG.log(Level.INFO, "Splitting "+one+":"+"with "+other);
 		int lengththatwewanttoremove;
 		// Note there can be a horizontal or vertical intersection
 		// first check horizontal intersection
@@ -187,13 +215,20 @@ public class VectorConflictResolver {
 
 	public Vector commitPriorityVector() {
 		Vector priority = selectPriorityVector();
+		LOG.log(Level.INFO, "Notify: vector about to commit: "+priority);
 //		committed.add(priority);
 		vectors.remove(priority);
 		List<Vector> conflicting = getConflictingVectorsFor(priority);
 		for (Vector v : conflicting) {
 			vectors.remove(v);
-			Vector split = this.split(priority, v);
-			vectors.add(split);
+			//TODO: The differences types of conflict should be made
+			//more explicit
+			//and handled differently
+			//just separating them by start position is crude
+			if (v.x!=priority.x&&v.y!=priority.y) {
+				Vector split = this.split(priority, v);
+				vectors.add(split);
+			}
 		}
 		List<Vector> overpowered = getOverpoweredVectors(priority);
 		for (Vector v : overpowered) {
@@ -210,5 +245,4 @@ public class VectorConflictResolver {
 		}
 		return committedV;
 	}
-
 }

@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Ignore;
@@ -31,6 +33,17 @@ public class VectorConflictResolverTest {
 		return vectors;
 	}
 
+	@Test
+	public void testVectorRelationsCompetingVectors() {
+		Set<Vector> vectors = example2();
+		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
+		Map<Vector, VectorRelation> relations = resolver.getRelatedVectors(new Vector(0,0,1));
+		assertEquals(VectorRelation.COMPETING, relations.get(new Vector(0,7,1)));
+		assertEquals(VectorRelation.COMPETING, relations.get(new Vector(0,14,1)));
+		assertEquals(VectorRelation.COMPETING, relations.get(new Vector(7,0,1)));
+		assertEquals(3, relations.size());
+	}
+	
 	@Test
 	public void testSortingPartlyOverlappingVectors() {
 		// prepare incoming vectors;
@@ -221,7 +234,10 @@ public void testIsOverpowered() {
 		assertEquals(3, resolved.size());
 	}
 	
-	//TODO; fix!
+	
+	//TODO: this test does not work correctly yet!
+	//TODO; after fixing subproblems
+	//TODO; add the correct asserts
 	@Ignore
 	@Test 
 	public void testIdealLine2() {
@@ -229,11 +245,18 @@ public void testIsOverpowered() {
 		Vector v2a = new Vector(5,8,2);
 		// create resolver
 		VectorConflictResolver resolver = new VectorConflictResolver(vectors);
-		Vector v = resolver.commitPriorityVector();
-		v =	resolver.selectPriorityVector();
-		assertEquals(v2a, v);
-		List<Vector> conflictingVectorsFor = resolver.getConflictingVectorsFor(v);
-		System.out.println(conflictingVectorsFor);
+		List<Vector> result = resolver.resolveConflicts();
+		System.out.println(result);
+		Iterator<Vector> i = result.iterator();
+//		Vector v = resolver.commitPriorityVector();
+//		v =	resolver.selectPriorityVector();
+//		assertEquals(v2a, v);
+//		List<Vector> conflictingVectorsFor = resolver.getConflictingVectorsFor(v);
+//		System.out.println(conflictingVectorsFor);
+		assertEquals(new Vector(9,16,6), i.next());
+		assertEquals(new Vector(5,8,2), i.next());
+		assertEquals(new Vector(3,10,2), i.next());
+		assertEquals(new Vector(2,13,1), i.next());
 	}
 
 	
