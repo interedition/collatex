@@ -50,11 +50,6 @@
     </dependency>
   </dependencies>
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -63,7 +58,6 @@
         <configuration>
           <repositoryLayout>flat</repositoryLayout>
           <repositoryName>lib</repositoryName>
-          <copyConfigurationDirectory>true</copyConfigurationDirectory>
           <useAsterikClassPath>true</useAsterikClassPath>
           <extraJvmArguments>-Xmx512m</extraJvmArguments>
           <programs>
