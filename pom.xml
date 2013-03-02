@@ -20,7 +20,7 @@
   <modules>
     <module>collatex-core</module>
     <module>collatex-cocoon</module>
-    <module>collatex-server</module>
+    <module>collatex-tools</module>
   </modules>
 
   <dependencies>
