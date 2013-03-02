@@ -1,7 +1,7 @@
-YUI.add('interedition-collate', function(Y) {
-    var NS = Y.namespace("interedition.collate");
+YUI.add('collatex', function(Y) {
+    var NS = Y.namespace("collatex");
 
-    NS.Collator = Y.Base.create("interedition-collate-collator", Y.Base, [], {
+    NS.Collator = Y.Base.create("collatex-collator", Y.Base, [], {
         collate: function(resultType, witnesses, callback) {
             Y.io(this.get("base") + "/collate", {
                 method:"post",

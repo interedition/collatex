@@ -1,22 +1,30 @@
 package eu.interedition.collatex.http;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.io.Closeables;
+import com.google.common.io.Files;
+import com.sun.jersey.api.NotFoundException;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.io.Collation;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -30,13 +38,14 @@ import java.util.concurrent.ThreadFactory;
 @Path("/")
 public class CollateResource {
 
-  private final Configuration templates;
+  private final File staticPath;
+  private final Date initial = new Date();
 
   private final int maxCollationSize;
   private final ExecutorService executor;
 
-  public CollateResource(Configuration templates, int maxParallelCollations, int maxCollationSize) {
-    this.templates = templates;
+  public CollateResource(String staticPath, int maxParallelCollations, int maxCollationSize) {
+    this.staticPath = (Strings.isNullOrEmpty(staticPath) ? null : new File(staticPath));
     this.maxCollationSize = maxCollationSize;
     this.executor = Executors.newFixedThreadPool(maxParallelCollations, new ThreadFactory() {
       @Override
@@ -50,33 +59,21 @@ public class CollateResource {
   }
 
   @GET
-  public Template index() throws IOException {
-    return templates.getTemplate("index.ftl");
+  public Response index(@Context Request request) throws IOException {
+    return stream(request, "index.html");
   }
 
   @GET
-  @Path("collate/apidocs")
-  public Template apidocs() throws IOException {
-    return templates.getTemplate("collate/apidocs.ftl");
-  }
-
-  @GET
-  @Path("collate/console")
-  public Template console() throws IOException {
-    return templates.getTemplate("collate/console.ftl");
-  }
-
-  @GET
-  @Path("collate/darwin")
-  public Template darwin() throws IOException {
-    return templates.getTemplate("collate/darwin-example.ftl");
+  @Path("darwin")
+  public Response darwin(@Context Request request) throws IOException {
+    return stream(request, "darwin.html");
   }
 
 
   @Path("collate")
   @GET
-  public Response redirectToDocs(@Context UriInfo uriInfo) throws NoSuchMethodException {
-    return Response.seeOther(uriInfo.getBaseUriBuilder().path(getClass().getMethod("apidocs")).build()).build();
+  public Response redirectToIndex(@Context UriInfo uriInfo) throws NoSuchMethodException {
+    return Response.seeOther(uriInfo.getBaseUriBuilder().path(getClass().getMethod("index")).build()).build();
   }
 
   @Path("collate")
@@ -113,5 +110,53 @@ public class CollateResource {
         return graph;
       }
     }).get();
+  }
+
+  @Path("{path: .+?\\.((html)|(css)|(js)|(png)|(ico))}")
+  @GET
+  public Response stream(@Context Request request, @PathParam("path") String path) throws IOException {
+    InputStream stream = null;
+    Date lastModified = initial;
+    if (staticPath == null) {
+      stream = getClass().getResourceAsStream("/static/" + path);
+    } else {
+      final File file = new File(staticPath, path);
+      if (file.isFile() && file.getCanonicalPath().startsWith(staticPath.getCanonicalPath())) {
+        stream = new FileInputStream(file);
+        lastModified = new Date(file.lastModified());
+      }
+    }
+
+    if (stream == null) {
+      throw new NotFoundException();
+    }
+
+    if (request.getMethod().equals("GET")) {
+      final Response.ResponseBuilder preconditions = request.evaluatePreconditions(lastModified);
+      if (preconditions != null) {
+        Closeables.close(stream, false);
+        throw new WebApplicationException(preconditions.build());
+      }
+    }
+
+    final String extension = Files.getFileExtension(path);
+    String contentType = "application/octet-stream";
+    if ("html".equals(extension)) {
+      contentType = "text/html";
+    } else if ("js".equals(extension)) {
+      contentType = "text/javascript";
+    } else if ("css".equals(extension)) {
+      contentType = "text/css";
+    } else if ("png".equals(extension)) {
+      contentType = "image/png";
+    } else if ("ico".equals(extension)) {
+      contentType = "image/x-icon";
+    }
+
+    return Response.ok()
+            .entity(stream)
+            .lastModified(lastModified)
+            .type(contentType)
+            .build();
   }
 }

@@ -1,6 +1,5 @@
 package eu.interedition.collatex.http;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -8,10 +7,6 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.io.Collation;
 import eu.interedition.collatex.io.CollationDeserializer;
 import eu.interedition.collatex.io.VariantGraphSerializer;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.FileTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateModelException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -23,10 +18,8 @@ import org.codehaus.jackson.map.module.SimpleModule;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.UriBuilder;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +29,6 @@ import java.util.logging.Logger;
  */
 public class Server extends DefaultResourceConfig implements Runnable {
 
-  String templatePath;
   String staticPath;
   String dotPath;
 
@@ -44,7 +36,6 @@ public class Server extends DefaultResourceConfig implements Runnable {
   int httpPort;
 
   ObjectMapper objectMapper;
-  Configuration templates;
 
   int maxParallelCollations;
   int maxCollationSize;
@@ -54,20 +45,6 @@ public class Server extends DefaultResourceConfig implements Runnable {
     try {
       objectMapper = new ObjectMapper();
       objectMapper.registerModule(new CollateXModule());
-
-      templates = new Configuration();
-      templates.setSharedVariable("cp", contextPath);
-      templates.setAutoIncludes(Collections.singletonList("/header.ftl"));
-      templates.setDefaultEncoding("UTF-8");
-      templates.setOutputEncoding("UTF-8");
-      templates.setURLEscapingCharset("UTF-8");
-      templates.setStrictSyntaxMode(true);
-      templates.setWhitespaceStripping(true);
-      templates.setTemplateLoader(
-              Strings.isNullOrEmpty(templatePath)
-                      ? new ClassTemplateLoader(getClass(), "/templates")
-                      : new FileTemplateLoader(new File(templatePath))
-      );
 
       final URI context = UriBuilder.fromUri("http://localhost/").port(httpPort).path(contextPath).build();
 
@@ -94,8 +71,6 @@ public class Server extends DefaultResourceConfig implements Runnable {
         } catch (InterruptedException e) {
         }
       }
-    } catch (TemplateModelException e) {
-      LOG.log(Level.SEVERE, "Template engine error", e);
     } catch (IOException e) {
       LOG.log(Level.SEVERE, "I/O error", e);
     }
@@ -111,7 +86,6 @@ public class Server extends DefaultResourceConfig implements Runnable {
     maxCollationSize = Integer.parseInt(commandLine.getOptionValue("mcs", "0"));
 
     staticPath = System.getProperty("collatex.static.path", null);
-    templatePath = System.getProperty("collatex.template.path", null);
 
     return this;
   }
@@ -134,7 +108,6 @@ public class Server extends DefaultResourceConfig implements Runnable {
   @Override
   public Set<Class<?>> getProviderClasses() {
     return Sets.<Class<?>>newHashSet(
-            TemplateMessageBodyWriter.class,
             VariantGraphDotMessageBodyWriter.class,
             VariantGraphMLMessageBodyWriter.class,
             VariantGraphTEIMessageBodyWriter.class
@@ -144,8 +117,7 @@ public class Server extends DefaultResourceConfig implements Runnable {
   @Override
   public Set<Object> getSingletons() {
     return Sets.newHashSet(
-            new CollateResource(templates, maxParallelCollations, maxCollationSize),
-            new StaticResource(staticPath),
+            new CollateResource(staticPath, maxParallelCollations, maxCollationSize),
             new ObjectMapperMessageBodyReaderWriter(objectMapper),
             new VariantGraphSVGMessageBodyWriter(dotPath)
     );

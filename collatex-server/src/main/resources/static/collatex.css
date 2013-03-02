@@ -1,5 +1,5 @@
 body {
-    margin: 1em auto; /* center in viewport */
+    margin: 1em auto;
     width: 960px;
 }
 
@@ -16,14 +16,41 @@ label {
     margin: 0 1em
 }
 
-table.alignment { border-collapse: separate; border-spacing: 0.25em; }
-table.alignment tr { border: 0; }
-table.alignment th, table.alignment td { border: 1px solid #d3d3d3; padding: 0.5em; }
-table.alignment th { border-width: 2px; padding: 0 1em  }
-table.alignment td.gap { border: 0; text-align: center }
-table.alignment td.invariant { border-color: #80BB00 }
-table.alignment td.variant { border-color: #ffa07a }
-table.alignment td { white-space: nowrap; }
+table.alignment {
+    border-collapse: separate;
+    border-spacing: 0.25em;
+}
+
+table.alignment tr {
+    border: 0;
+}
+
+table.alignment th, table.alignment td {
+    border: 1px solid #d3d3d3;
+    padding: 0.5em;
+}
+
+table.alignment th {
+    border-width: 2px;
+    padding: 0 1em
+}
+
+table.alignment td.gap {
+    border: 0;
+    text-align: center
+}
+
+table.alignment td.invariant {
+    border-color: #80BB00
+}
+
+table.alignment td.variant {
+    border-color: #ffa07a
+}
+
+table.alignment td {
+    white-space: nowrap;
+}
 
 a, a:visited, a:link, a:hover, a:active {
     color: #080A80;
@@ -59,7 +86,6 @@ img.icon {
     visibility: hidden;
 }
 
-
 .error {
     color: #FF3366;
 }
@@ -87,19 +113,16 @@ img.icon {
     padding: 1em 0.5em;
 }
 
-#header h1 {
-    text-align: right;
-    margin-bottom: 0.5em;
-}
-
-#main-menu {
-    margin-bottom: 1.5em;
+#logo {
+    float: right;
+    margin: 1em;
 }
 
 #footer {
     margin-top: 1.5em;
     text-align: center;
 }
+
 .none {
     color: black;
 }
@@ -118,4 +141,32 @@ img.icon {
 
 .replacement {
     color: purple;
+}
+
+.chapter {
+    overflow-x: auto;
+}
+
+.form-element {
+    margin: 1em 0;
+}
+
+.form-label {
+    text-align: right
+}
+
+.form-label label {
+    padding-right: 1em
+}
+
+#variant-graph-svg, #alignment-table {
+    overflow-x: auto;
+    border: 1px solid #ccc;
+    padding: 1em
+}
+
+#input, #output {
+    margin-top: 2em;
+    padding: 1em;
+    border: 1px solid #ccc;
 }
