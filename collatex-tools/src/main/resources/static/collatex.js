@@ -18,11 +18,17 @@
  */
 
 YUI.add('collatex', function(Y) {
-    var NS = Y.namespace("collatex");
+    Y.CollateX = function(config) {
+        config = (config || {});
 
-    NS.Collator = Y.Base.create("collatex-collator", Y.Base, [], {
+        this.serviceUrl = (config.serviceUrl || "collate");
+        this.algorithm = (config.algorithm || "dekker");
+        this.tokenComparator = (config.tokenComparator || { type: "equality" });
+        this.joined = (config.joined || true);
+    };
+    Y.CollateX.prototype = {
         collate: function(resultType, witnesses, callback) {
-            Y.io(this.get("base") + "/collate", {
+            Y.io(this.serviceUrl, {
                 method:"post",
                 headers:{
                     "Content-Type":"application/json",
@@ -30,34 +36,37 @@ YUI.add('collatex', function(Y) {
                 },
                 data: Y.JSON.stringify({
                     witnesses: witnesses,
-                    algorithm: this.get("algorithm"),
-                    tokenComparator: this.get("tokenComparator"),
-                    joined: this.get("joined")
+                    algorithm: this.algorithm,
+                    tokenComparator: this.tokenComparator,
+                    joined: this.joined
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
-                    failure: function(transactionId, resp) { Y.log(resp.status + " " + resp.statusText, "error", resp); }
+                    failure: function(transactionId, resp) {
+                        alert(resp.status + " " + resp.statusText);
+                        Y.log(resp.status + " " + resp.statusText, "error", resp);
+                    }
                 }
             });
         },
         withDekker: function() {
-            this.set("algorithm", "dekker");
+            this.algorithm = "dekker";
             return this;
         },
         withNeedlemanWunsch: function() {
-            this.set("algorithm", "needleman-wunsch");
+            this.algorithm = "needleman-wunsch";
             return this;
         },
         withMedite: function() {
-            this.set("algorithm", "medite");
+            this.algorithm = "medite";
             return this;
         },
         withExactMatching: function() {
-            this.set("tokenComparator", { type: "equality" })
+            this.tokenComparator = { type: "equality" };
             return this;
         },
         withFuzzyMatching: function(maxDistance) {
-            this.set("tokenComparator", { type: "levenshtein", distance: maxDistance || 1 })
+            this.tokenComparator = { type: "levenshtein", distance: maxDistance || 1 };
             return this;
         },
         toJSON: function(data, callback) {
@@ -116,29 +125,7 @@ YUI.add('collatex', function(Y) {
                 container.append(table);
             });
         }
-    }, {
-        ATTRS: {
-            "base": {
-                valueFn: function() {
-                    var collateJsResource = /\/static\/api\/collate\.js$/;
-                    var value = "";
-                    Y.all("script").each(function(s) {
-                        var src = s.get("src");
-                        if (src != null) {
-                            var result = collateJsResource.exec(src);
-                            if (result) {
-                                value = src.substring(0, result.index);
-                            }
-                        }
-                    });
-                    return value;
-                }
-            },
-            "algorithm": { value: "dekker" },
-            "tokenComparator": { value: { type: "equality" } },
-            "joined": { value: true }
-        }
-    });
+    };
 }, "1", {
-    requires: ["base", "io", "json", "node", "array-extras", "escape", "dump"]
+    requires: [ "node", "io", "json", "array-extras", "escape", "dump" ]
 });

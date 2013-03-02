@@ -164,8 +164,8 @@ var examples = [
     ]
 ];
 
-YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "collatex", function(Y) {
-    var collator = new Y.collatex.Collator(),
+YUI().use("event", "node", "button", "collatex", function(Y) {
+    var collator = new Y.CollateX(),
         create = Y.Node.create,
         sub = Y.Lang.sub,
         svgContainer = null,
@@ -175,7 +175,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "coll
         teiPsContainer = null;
 
     function addWitness(e) {
-        if (e) e.preventDefault();
+        e && e.preventDefault();
         var witnesses = getWitnesses();
         witnesses.push("");
         setWitnesses(witnesses);
@@ -213,13 +213,11 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "coll
             return false;
         });
 
-        Y.on("focus", function(e) { this.select(); }, "#witnesses textarea");
+        Y.on("focus", function() { this.select(); }, "#witnesses textarea");
         return contents;
     }
 
-    function collate(e) {
-        if (e) e.preventDefault();
-
+    function collate() {
         clearResults();
 
         var witnessTexts = getWitnesses();
@@ -253,7 +251,7 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "coll
         });
     }
 
-    function selectExample(e) {
+    function selectExample() {
         clearResults();
         var selected = this.get("value").replace(/^e/, "");
         if (selected.length == 0) {
@@ -264,11 +262,18 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "coll
         }
     }
 
-    function selectAlgorithm(e) {
+    function selectAlgorithm() {
         var newValue = this.get("value");
-        var oldValue = collator.get("algorithm");
-        if (oldValue != newValue) {
-            collator.set("algorithm", newValue);
+        if (collator.algorithm != newValue) {
+            collator.algorithm = newValue;
+            collate();
+        }
+    }
+
+    function selectJoined() {
+        var newValue = this.get("checked");
+        if (collator.joined != newValue) {
+            collator.joined =  newValue;
             collate();
         }
     }
@@ -279,15 +284,6 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "coll
         graphVizDotContainer.empty();
         graphmlContainer.empty();
         teiPsContainer.empty();
-    }
-
-    function selectJoined(e) {
-        var newValue = this.get("checked");
-        var oldValue = collator.get("joined");
-        if (oldValue != newValue) {
-            collator.set("joined", newValue);
-            collate();
-        }
     }
 
     Y.on("domready", function() {
@@ -310,7 +306,8 @@ YUI().use("io", "json", "dump", "event", "node", "escape", "array-extras", "coll
         Y.on("change", selectJoined, "#joined");
         Y.on("change", selectAlgorithm, "#algorithm");
         Y.on("change", selectExample, "#examples");
-        Y.on("click", addWitness, "#add-witness");
-        Y.on("submit", collate, "#collate-form");
+
+        new Y.Button({ srcNode: "#add-witness", render: true }).on("click", addWitness);
+        new Y.Button({ srcNode: "#collate", render: true }).on("click", collate);
     });
 });

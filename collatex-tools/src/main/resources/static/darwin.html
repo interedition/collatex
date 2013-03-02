@@ -11,7 +11,7 @@
 <body class="yui3-skin-sam">
 <div id="results"></div>
 <div id="footer">
-    Copyright &copy; 2010-2013 The Interedition Development Group. All rights reserved. See the <a href="http://www.interedition.eu/" title="Interedition Homepage">Interedition Homepage</a> for further information.
+    Copyright &copy; 2010-2013 The Interedition Development Group. All rights reserved. Go to <a href="http://collatex.net/" title="Homepage">http://collatex.net/</a> for further information.
 </div>
 <script type="text/javascript">
 var darwinChapters = [ {
@@ -909,7 +909,7 @@ var darwinChapters = [ {
 } ];
 
 YUI().use("node", "array-extras", "json", "escape", "collatex", function(Y) {
-    var collator = new Y.collatex.Collator(), results = Y.one("#results"), slots = [];
+    var collator = new Y.CollateX(), results = Y.one("#results"), slots = [];
 
     for (var cc = 0; cc < darwinChapters.length; cc++) {
         slots[cc] = Y.Node.create('<div class="chapter"><h2>' + (cc + 1) + '.</h2></div>');

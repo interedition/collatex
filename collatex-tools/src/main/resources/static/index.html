@@ -12,39 +12,37 @@
 <body class="yui3-skin-sam">
 <div id="input">
     <div id="logo"><img src="collatex.png" alt="CollateX"></div>
-    <form id="collate-form" method="post">
-        <div class="yui3-g form-element">
-            <div class="yui3-u-1-6 form-label"><label for="algorithm">Algorithm:</label></div>
-            <div class="yui3-u form-input">
-                <select id="algorithm" name="algorithm" style="width: 40em">
-                    <option value="dekker">Dekker</option>
-                    <option value="needleman-wunsch">Needleman-Wunsch</option>
-                    <option value="medite">MEDITE</option>
-                </select>
-            </div>
+    <div class="yui3-g form-element">
+        <div class="yui3-u-1-6 form-label"><label for="algorithm">Algorithm:</label></div>
+        <div class="yui3-u form-input">
+            <select id="algorithm" name="algorithm" style="width: 40em">
+                <option value="dekker">Dekker</option>
+                <option value="needleman-wunsch">Needleman-Wunsch</option>
+                <option value="medite">MEDITE</option>
+            </select>
         </div>
-        <div class="yui3-g form-element">
-            <div class="yui3-u-1-6 form-label"><label for="examples">Examples:</label></div>
-            <div class="yui3-u form-input">
-                <select id="examples" name="examples" style="width: 40em">
-                    <option value=""></option>
-                </select>
-            </div>
+    </div>
+    <div class="yui3-g form-element">
+        <div class="yui3-u-1-6 form-label"><label for="examples">Examples:</label></div>
+        <div class="yui3-u form-input">
+            <select id="examples" name="examples" style="width: 40em">
+                <option value=""></option>
+            </select>
         </div>
-        <div id="witnesses">
+    </div>
+    <div id="witnesses">
+    </div>
+    <div class="yui3-g form-element">
+        <div class="yui3-u-1-6 form-label"><label for="examples">Segmentation:</label></div>
+        <div class="yui3-u form-input"><input type="checkbox" id="joined" name="joined" checked="checked"></div>
+    </div>
+    <div class="yui-3">
+        <div class="yui3-u-1-4">&nbsp;</div>
+        <div class="yui3-u">
+            <button id="add-witness">Add</button>
+            <button id="collate">Collate</button>
         </div>
-        <div class="yui3-g form-element">
-            <div class="yui3-u-1-6 form-label"><label for="examples">Segmentation:</label></div>
-            <div class="yui3-u form-input"><input type="checkbox" id="joined" name="joined" checked="checked"></div>
-        </div>
-        <div class="yui-3">
-            <div class="yui3-u-1-4">&nbsp;</div>
-            <div class="yui3-u">
-                <button id="add-witness">Add</button>
-                <input type="submit" value="Collate">
-            </div>
-        </div>
-    </form>
+    </div>
 </div>
 
 
@@ -72,8 +70,8 @@
         </div>
     </div>
 </div>
-<div id="footer" class="color12">
-    Copyright &copy; 2010-2013 The Interedition Development Group. All rights reserved. See the <a href="http://www.interedition.eu/" title="Interedition Homepage">Interedition Homepage</a> for further information.
+<div id="footer">
+    Copyright &copy; 2010-2013 The Interedition Development Group. All rights reserved. Go to <a href="http://collatex.net/" title="Homepage">http://collatex.net/</a> for further information.
 </div>
 </body>
 </html>
