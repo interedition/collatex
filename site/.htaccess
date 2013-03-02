@@ -1,3 +1,5 @@
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !^/apidocs
+RewriteCond %{REQUEST_URI} !^/maven
 RewriteRule ^ index.php [QSA,L]
