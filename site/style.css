@@ -8,13 +8,17 @@ body {
 h2 {
     width: 100%;
     padding: 0.25em 0;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #ccc;
 }
 
 a, a:visited, a:link, a:active {
     color: #060;
     font-weight: bold;
     text-decoration: none;
+}
+
+p {
+    text-align: justify;
 }
 
 a:hover {
@@ -77,6 +81,24 @@ a:hover {
     text-align: center;
 }
 
+#project-team a {
+    color: inherit;
+    font-weight: normal;
+}
+
+#project-team .institution {
+    font-size: 80%;
+}
+
+#license pre {
+    border: 1px solid #eee;
+    padding: 1em
+}
+
 .quote {
     font-style: italic;
+}
+
+.content {
+    margin: .5em;
 }
