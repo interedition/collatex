@@ -17,8 +17,9 @@ a, a:visited, a:link, a:active {
     text-decoration: none;
 }
 
-p {
+p, li {
     text-align: justify;
+    margin: .5em;
 }
 
 a:hover {
@@ -81,6 +82,17 @@ a:hover {
     text-align: center;
 }
 
+#under-construction {
+    color: red;
+    font-size: 197%;
+    width: 100%;
+    text-align: center;
+    margin: 1em auto;
+}
+
+#project-team li {
+    margin: 0
+}
 #project-team a {
     color: inherit;
     font-weight: normal;
@@ -101,4 +113,18 @@ a:hover {
 
 .content {
     margin: .5em;
+}
+
+.download-option {
+    background: #cfc;
+    padding: .5em;
+    border-radius: .5em;
+}
+
+.download-link {
+    font-size: 125%;
+}
+
+#download-binary .prettyprint {
+    width: 90%
 }

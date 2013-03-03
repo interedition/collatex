@@ -19,8 +19,7 @@
 
 /**
  * Implementation of a collation algorithm inspired by the work of Jean-Gabriel Ganascia and Julien Bourdaillet
- * on <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project" title="MEDITE project">MEDITE</a>, "a powerful
- * text comparison software that is issued from a collaboration between literary and AI scholars".
+ * on <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project" title="MEDITE project">MEDITE</a>.
  *
  * @see eu.interedition.collatex.medite.MediteAlgorithm
  *

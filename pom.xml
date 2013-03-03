@@ -162,6 +162,10 @@
         <version>2.8.1</version>
         <configuration>
           <bottom><![CDATA[Copyright 2010-2013 <a href="http://collatex.net/" target="_blank">The Interedition Development Group<a>.]]></bottom>
+          <detectLinks>true</detectLinks>
+          <detectJavaApiLink>true</detectJavaApiLink>
+          <doctitle>CollateX ${project.version}</doctitle>
+          <windowtitle>CollateX ${project.version}</windowtitle>
         </configuration>
         <executions>
           <execution>

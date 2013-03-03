@@ -1,0 +1,40 @@
+<!--
+  ~ Copyright (c) 2013 The Interedition Development Group.
+  ~
+  ~ This file is part of CollateX.
+  ~
+  ~ CollateX is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ CollateX is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<html>
+<body>
+A software component to collate versions of a text, for instance in order to produce a critical apparatus.
+<p/>
+CollateX resembles software used to compute differences between files (e.g. {@code diff}) or tools for
+<a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia Article">sequence alignment</a>, commonly used
+in Bioinformatics. While some of the techniques and algorithms are the same, this library aims for a flexible and configurable approach to
+the problem of finding commonalities and differences in texts, sometimes trading computational soundness or complexity for
+the user's ability to influence results. This is because the assessment of such findings in disciplines like
+<a href="http://en.wikipedia.org/wiki/Philology" title="Wikipedia Article">Philology</a> or more specifically in the field
+of <a href="http://en.wikipedia.org/wiki/Textual_criticism" title="Wikipedia Article">Textual Criticism</a>) is
+often based on hermeneutic inquiry and as such can be supported by computational means &ndash; but such findings are not necessarily
+computable.
+<p/>
+CollateX allows to compare more than two text versions (in the following called "{@link eu.interedition.collatex.Witness witnesses}"). This
+achieved by merging the results of consecutive comparisons between a witness and all previously compared witnesses into a
+data structure called a {@link eu.interedition.collatex.VariantGraph variant graph}.
+
+@see <a href="http://collatex.net/" title="Project Homepage">collatex.net</a>
+</body>
+</html>
