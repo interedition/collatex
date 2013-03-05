@@ -90,6 +90,7 @@ public class SimpleVariantGraphSerializer {
     xml.writeNamespace("", TEI_NS);
 
     final VariantGraphRanking ranking = ranking();
+    final Set<Witness> allWitnesses = graph.witnesses();
     for (Iterator<Map.Entry<Integer, Collection<VariantGraph.Vertex>>> rowIt = ranking.getByRank().asMap().entrySet().iterator(); rowIt.hasNext(); ) {
       final Map.Entry<Integer, Collection<VariantGraph.Vertex>> row = rowIt.next();
       final int rank = row.getKey();
@@ -104,13 +105,11 @@ public class SimpleVariantGraphSerializer {
       final Multimap<Integer, VariantGraph.Vertex> verticesByTranspositionRank = HashMultimap.create();
       for (VariantGraph.Vertex v : vertices) {
         int transpositionRank = 0;
-        /*
         for (VariantGraph.Transposition transposition : v.transpositions()) {
           for (VariantGraph.Vertex tv : transposition) {
             transpositionRank += (ranking.apply(tv).intValue() - rank);
           }
         }
-        */
         verticesByTranspositionRank.put(transpositionRank, v);
       }
 
@@ -123,8 +122,8 @@ public class SimpleVariantGraphSerializer {
           }
         }
         final SortedMap<Witness, String> cellContents = Maps.newTreeMap(Witness.SIGIL_COMPARATOR);
-        for (Witness witness : tokensByWitness.keySet()) {
-          cellContents.put(witness, tokensToString.apply(tokensByWitness.get(witness)));
+        for (Witness witness : allWitnesses) {
+          cellContents.put(witness, tokensByWitness.containsKey(witness) ? tokensToString.apply(tokensByWitness.get(witness)) : "");
         }
 
         final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
@@ -142,10 +141,18 @@ public class SimpleVariantGraphSerializer {
             for (Witness witness : segments.get(segment)) {
               witnesses.append(witness.getSigil()).append(" ");
             }
-            xml.writeStartElement("", "rdg", TEI_NS);
+            if (segment.length() == 0) {
+              xml.writeEmptyElement("", "rdg", TEI_NS);
+            } else {
+              xml.writeStartElement("", "rdg", TEI_NS);
+            }
+
             xml.writeAttribute("wit", witnesses.toString().trim());
-            xml.writeCharacters(segment);
-            xml.writeEndElement();
+
+            if (segment.length() > 0) {
+              xml.writeCharacters(segment);
+              xml.writeEndElement();
+            }
           }
           xml.writeEndElement();
         }
