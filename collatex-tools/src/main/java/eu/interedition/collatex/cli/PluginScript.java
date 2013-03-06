@@ -20,9 +20,7 @@
 package eu.interedition.collatex.cli;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.Token;

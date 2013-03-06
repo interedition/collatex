@@ -275,7 +275,7 @@ public class SimpleVariantGraphSerializer {
   }
 
   static String escapeDotLabel(String string) {
-    return string.replaceAll("\"", "\\\"").replaceAll("[\n\r]+", "[LB]");
+    return string.replaceAll("\"", "\\\"").replaceAll("[\n\r]+", "\u00B6");
   }
 
   VariantGraphRanking ranking() {
