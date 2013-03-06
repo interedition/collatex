@@ -6,13 +6,13 @@ body {
 }
 
 h2 {
-    width: 100%;
     padding: 0.25em 0;
-    border-bottom: 1px solid #ccc;
+    font-size: 131%;
+    font-variant: small-caps;
 }
 
 a, a:visited, a:link, a:active {
-    color: #030;
+    color: #060;
     font-weight: bold;
     text-decoration: none;
 }
@@ -120,10 +120,6 @@ a:hover {
     margin: .5em;
 }
 
-.figure {
-    margin: 2em 0;
-}
-
 .figure img {
     display: block;
     padding: .25em;
@@ -136,6 +132,19 @@ a:hover {
     font-style: italic;
 }
 
+.float-left {
+    float: left;
+    margin-right: 2em;
+}
+
+.float-right {
+    float: right;
+    margin-left: 2em;
+}
+
+.clear {
+    clear: both;
+}
 .download-option {
     background: #cfc;
     padding: .5em;
@@ -143,9 +152,27 @@ a:hover {
 }
 
 .download-link, .teaser {
-    font-size: 125%;
+    font-size: 123.1%;
 }
 
 #download-binary .prettyprint {
     width: 90%
+}
+
+.toc {
+    list-style: none;
+    border-radius: .5em;
+    padding: .5em;
+    margin: 0 2em .5em 0;
+    background: #eee;
+    width: 50%;
+}
+
+.toc li {
+    margin: .5em 1em;
+}
+
+.toc a {
+    color: inherit;
+    font-weight: normal;
 }

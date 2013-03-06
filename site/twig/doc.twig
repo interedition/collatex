@@ -2,14 +2,13 @@
 
 {% block content %}
 
-    <h2>Introduction</h2>
-
     <p>To express textual variance, CollateX uses a graph-based data model
         (<a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" title="Schmidt, D. and Colomb, R, 2009. A data structure for representing multi-version texts online, International Journal of Human-Computer Studies, 67.6, 497-514.">Schmidt 2009</a>).
         On top of this model it supports several algorithms to progressively align multiple text versions.</p>
 
 
-    <h2>The Gothenburg model</h2>
+    <h2>Stages of the Collation Process: The Gothenburg Model</h2>
+
     <p>Developers of CollateX and
         <a href="http://www.juxtasoftware.org/">Juxta</a> met in 2009 at a joint workshop of the EU-funded research
         projects <a href="http://www.cost-a32.eu/">COST Action 32</a> and
@@ -21,6 +20,11 @@
         encoding the in- and output of these modules as part of – or pre-stage to – a critical apparatus.</p>
 
     <h3>Tokenizer</h3>
+
+    <div class="figure float-right">
+        <img src="/images/tokenizer.png" alt="Tokenizer">
+        <p class="caption">A tokenized text</p>
+    </div>
 
     <p>While collators can compare witnesses on a character-by-character basis, in the more common use case each
         comparand is split up into tokens/ segments before collation and compared on the token level. This preprocessing
@@ -41,6 +45,11 @@
     </p>
 
     <h3>Aligner</h3>
+
+    <div class="figure float-left">
+        <img src="/images/aligner.png" alt="Alignment">
+        <p class="caption">An alignment of 3 versions/witnesses</p>
+    </div>
 
     <p>After the witnesses have been tokenized, collators try to align all witnesses involved. Simply put, aligning the
         witnesses means in this case: Find matching tokens and insert empty tokens (<i>gap tokens</i>) such that the
@@ -64,7 +73,7 @@
         for each witness can be compressed into a single segment, e.g.
     </p>
 
-    <pre>&lt;app&gt;
+    <pre class="prettyprint clear">&lt;app&gt;
   &lt;rdg wit="#w1 #w2"&gt;a&lt;/rdg&gt;
   &lt;rdg wit="#w3" /&gt;
 &lt;/app&gt;
@@ -81,6 +90,11 @@
 &lt;/app&gt;</pre>
 
     <h3>Analyzer</h3>
+
+    <div class="figure float-right">
+        <img src="/images/analyzer.png" alt="Alignment Analysis">
+        <p class="caption">Analyzing an alignment</p>
+    </div>
 
     <p>On top of the results delivered by the alignment process, a further analysis can yield additional findings.
         Echoing the example from the above section, one might want to think of the token (b) in row 2 and 5 as being
@@ -105,10 +119,12 @@
         and should not be disregarded, but is essentially out of scope with regard to this discussion.
     </p>
 
-    <h3>The “variant graph”: Schmidt’s model of textual variance</h3>
+    <h2 class="clear">Variant Graphs: A Data Model for Textual Variance</h2>
 
     <p>In a <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" class="external text" rel="nofollow">recent paper</a> D. Schmidt and R. Colomb proposed a data model of textual variance (or “multi-version texts” as they call it in the title), which they call a <i>variant graph</i>:
     </p>
+
+    <div class="figure"><img src="/images/variant-graph-schmidt.png" alt="Schmidt's Variant Graph Model"></div>
 
     <p>In this model, varying texts/ a collation are/ is expressed in a <a href="http://en.wikipedia.org/wiki/Directed_acyclic_graph" class="external text" rel="nofollow">directed acyclic graph</a> with each path through the graph representing one version/ witness. The textual data is annotated on the edges, each edge carrying a (common) segment of text(s) and a set of identifiers, that denotes the versions/witnesses, in which the segment appears. Transpositions can be superimposed on the graph by linking edges of transposed segments.
     </p>
@@ -123,17 +139,12 @@
     <p>The tabular model on the other hand might be advantageous, if one wanted to keep collation results in a relational datastore.
     </p>
 
-    <h2>REST service</h2>
+    <h2>The RESTful Web Service</h2>
     <p>
         This page documents the
         <a href="http://en.wikipedia.org/wiki/Application_programming_interface" title="Wikipedia Page">Application Programming Interface (API)</a>
         of CollateX via which you can provide textual versions (&ldquo;witnesses&rdquo;) to be compared and get the collation result back in a number of formats.
     </p>
-
-    <div class="yui3-g">
-    <div class="yui3-u-1-2">
-    <div id="rest-apidocs">
-    <h2>HTTP-based RESTful API</h2>
 
     <p>
         The CollateX service is callable via
@@ -345,11 +356,8 @@
   v306 -> v305 [label = "B"];
   v305 -> v302 [label = "A, B"];
 }</pre>
-    </div>
-    </div>
-    <div class="yui3-u-1-2">
         <div id="js-apidocs">
-            <h2>JavaScript API</h2>
+            <h2>The HTTP-based JavaScript API</h2>
 
             <p>Enables the use of CollateX' RESTful API via JavaScript … Based on <a href="http://yuilibrary.com/" title="Homepage">YUI framework</a> …</p>
 
@@ -357,10 +365,8 @@
 
             <p>Add dependencies to header … YUI library plus CollateX module …</p>
 
-        <pre class="prettyprint">&lt;script type="text/javascript"
-  src="[ROOT]/static/yui-3.4.1/build/yui/yui-min.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript"
-  src="[ROOT]/static/collate.js"&gt;&lt;/script&gt;</pre>
+        <pre class="prettyprint">&lt;script type="text/javascript" src="[ROOT]/static/yui-3.4.1/build/yui/yui-min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="[ROOT]/static/collate.js"&gt;&lt;/script&gt;</pre>
 
             <p>Substitute URL prefix <code>[ROOT]</code> with the base URL of your installation, e.g.
                 <a href="${cp}/" title="Base URL">this one</a> for the installation you are currently looking at …</p>
@@ -397,8 +403,6 @@
 
             <p>… configuration of a collator instance via methods like <code>withDekker()</code>, <code>withFuzzyMatching(maxDistance)</code> …</p>
         </div>
-    </div>
-    </div>
 
     <h2>API Documentation (Javadoc)</h2>
 
@@ -422,9 +426,7 @@
             Canada, August 11 - 14, 2009. In Proceedings of Balisage: The Markup Conference 2009. Balisage Series on
             Markup Technologies, vol. 3 (2009). doi:10.4242/BalisageVol3.Schmidt01.]
         </li>
-    </ul>
 
-    <ul>
         <li> Matthew Spencer, Christopher J. Howe. Collating Texts Using Progressive Multiple Alignment. Computers and
             the Humanities. 38/2004. S. 253–270.
         </li>
@@ -432,9 +434,7 @@
                 Friedrich Michael Dimpel. Computergestützte Kollationierung und ihre Integration in den editorischen
                 Arbeitsfluss. 2006.</a>
         </li>
-    </ul>
 
-    <ul>
         <li><a href="http://www.sd-editions.com/about/index.html" class="external text" rel="nofollow">Collate</a>
         </li>
         <li><a href="http://collatex.sourceforge.net/" class="external text" rel="nofollow">CollateX</a>
@@ -445,4 +445,5 @@
                rel="nofollow">NMerge</a>
         </li>
     </ul>
+    <script type="text/javascript" src="/toc.js"></script>
 {% endblock %}
