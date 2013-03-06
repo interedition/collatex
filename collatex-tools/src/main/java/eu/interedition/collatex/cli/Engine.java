@@ -38,6 +38,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.xml.sax.SAXException;
 
 import javax.script.ScriptException;
 import javax.xml.xpath.XPathExpression;
@@ -52,7 +53,6 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class Engine implements Closeable {
   Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException {
     this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
     this.xmlMode = commandLine.hasOption("xml");
-    this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//w"));
+    this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//text()"));
 
     final String script = commandLine.getOptionValue("s");
     try {
@@ -143,7 +143,7 @@ public class Engine implements Closeable {
     return this;
   }
 
-  Engine read() throws IOException, XPathExpressionException {
+  Engine read() throws IOException, XPathExpressionException, SAXException {
     for (URLWitness witness : witnesses) {
       witness.read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null));
     }
@@ -216,6 +216,8 @@ public class Engine implements Closeable {
       engine.error("Illegal argument", e);
     } catch (IOException e) {
       engine.error("I/O error", e);
+    } catch (SAXException e) {
+      engine.error("XML error", e);
     } catch (XPathExpressionException e) {
       engine.error("XPath error", e);
     } catch (ScriptException e) {
@@ -235,7 +237,7 @@ public class Engine implements Closeable {
     OPTIONS.addOption("ie", "input-encoding", true, "charset to use for decoding non-XML witnesses; default: UTF-8");
     OPTIONS.addOption("oe", "output-encoding", true, "charset to use for encoding the output; default: UTF-8");
     OPTIONS.addOption("xml", "xml-mode", false, "witnesses are treated as XML documents");
-    OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//w'");
+    OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//text()'");
     OPTIONS.addOption("a", "algorithm", true, "progressive alignment algorithm to use 'dekker' (default), 'medite', 'needleman-wunsch'");
     OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
     OPTIONS.addOption("f", "format", true, "result/output format: 'csv', 'dot', 'graphml', 'tei'");

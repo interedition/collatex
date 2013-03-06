@@ -26,10 +26,14 @@ import com.google.common.io.Closeables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -57,12 +61,16 @@ public class URLWitness extends SimpleWitness {
           Function<String, String> normalizer,
           Charset charset,
           XPathExpression tokenXPath)
-          throws IOException, XPathExpressionException {
+          throws IOException, XPathExpressionException, SAXException {
     InputStream stream = null;
     try {
       stream = url.openStream();
       if (tokenXPath != null) {
-        final NodeList tokenNodes = (NodeList) tokenXPath.evaluate(new InputSource(stream), XPathConstants.NODESET);
+        final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        final Document document = documentBuilder.parse(stream);
+        document.normalizeDocument();
+
+        final NodeList tokenNodes = (NodeList) tokenXPath.evaluate(document, XPathConstants.NODESET);
         final List<Token> tokens = Lists.newArrayListWithExpectedSize(tokenNodes.getLength());
         for (int nc = 0; nc < tokenNodes.getLength(); nc++) {
           final Node tokenNode = tokenNodes.item(nc);
@@ -77,6 +85,8 @@ public class URLWitness extends SimpleWitness {
         }
         setTokens(tokens);
       }
+    } catch (ParserConfigurationException e) {
+      throw new SAXException(e);
     } finally {
       Closeables.close(stream, false);
     }
