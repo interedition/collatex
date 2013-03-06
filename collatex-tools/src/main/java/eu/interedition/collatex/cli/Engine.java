@@ -43,6 +43,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -73,7 +74,7 @@ public class Engine implements Closeable {
   String outputFormat;
   PrintWriter out;
   File outFile = null;
-  PrintWriter log = new PrintWriter(System.out);
+  PrintWriter log = new PrintWriter(System.err);
   boolean errorOccurred = false;
 
   Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException {
@@ -103,7 +104,19 @@ public class Engine implements Closeable {
     this.joined = !commandLine.hasOption("t");
 
     this.outputFormat = commandLine.getOptionValue("f", "tei").toLowerCase();
-    this.out = new PrintWriter(System.out);
+
+    final String output = commandLine.getOptionValue("o", "-");
+    if (!"-".equals(output)) {
+      try {
+        this.outFile = new File(output);
+        this.out = new PrintWriter(this.outFile);
+      } catch (FileNotFoundException e) {
+        throw new ParseException("Output file '" + outFile + "' not found");
+      }
+    } else {
+      this.out = new PrintWriter(System.out);
+    }
+
 
     final String[] witnessSpecs = commandLine.getArgs();
     this.witnessResources = Lists.newArrayListWithExpectedSize(witnessSpecs.length);
