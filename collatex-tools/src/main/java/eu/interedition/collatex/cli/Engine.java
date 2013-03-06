@@ -59,18 +59,22 @@ public class Engine implements Closeable {
 
   Charset inputCharset;
   boolean xmlMode;
-  List<URL> witnessURLs;
+  List<URL> witnessResources;
   List<URLWitness> witnesses;
   XPathExpression tokenXPath;
+
   Function<String, Iterable<String>> tokenizer;
   Function<String, String> normalizer;
   Comparator<Token> comparator;
   CollationAlgorithm collationAlgorithm;
   VariantGraph variantGraph;
+  boolean joined = false;
+
+  String outputFormat;
   PrintWriter out;
   File outFile = null;
   PrintWriter log = new PrintWriter(System.out);
-  boolean errorState;
+  boolean errorOccurred = false;
 
   Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException {
     if (commandLine.hasOption("s")) {
@@ -84,37 +88,41 @@ public class Engine implements Closeable {
     this.tokenizer = SimplePatternTokenizer.BY_WS_AND_PUNCT;
     this.normalizer = SimpleTokenNormalizers.LC_TRIM_WS_PUNCT;
     this.comparator = new EqualityTokenComparator();
-    this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator);
+
+    final String algorithm = commandLine.getOptionValue("a", "dekker").toLowerCase();
+    if ("needleman-wunsch".equals(algorithm)) {
+      this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
+    } else if ("medite".equals(algorithm)) {
+      this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator);
+    } else {
+      this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
+    }
 
     this.variantGraph = new JungVariantGraph();
 
+    this.joined = !commandLine.hasOption("t");
+
+    this.outputFormat = commandLine.getOptionValue("f", "tei").toLowerCase();
     this.out = new PrintWriter(System.out);
 
     final String[] witnessSpecs = commandLine.getArgs();
-    this.witnessURLs = Lists.newArrayListWithExpectedSize(witnessSpecs.length);
+    this.witnessResources = Lists.newArrayListWithExpectedSize(witnessSpecs.length);
     for (String witnessSpec : witnessSpecs) {
-      try {
-        witnessURLs.add(new URL(witnessSpec));
-      } catch (MalformedURLException urlEx) {
-        try {
-          witnessURLs.add(new File(witnessSpec).toURI().normalize().toURL());
-        } catch (MalformedURLException fileUrlEx) {
-          throw new ParseException("Invalid witness: " + witnessSpec);
-        }
-      }
+      witnessResources.add(argumentToResource(witnessSpec));
     }
-    if (witnessURLs.size() < 2) {
+    if (witnessResources.size() < 2) {
       throw new ParseException("At least 2 witnesses must be given");
     }
-    this.witnesses = Lists.newArrayListWithExpectedSize(witnessURLs.size());
+
+    this.witnesses = Lists.newArrayListWithExpectedSize(witnessResources.size());
+    for (URL witnessURL : witnessResources) {
+      this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL));
+    }
 
     return this;
   }
 
   Engine read() throws IOException, XPathExpressionException {
-    for (URL witnessURL : witnessURLs) {
-      witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL));
-    }
     for (URLWitness witness : witnesses) {
       witness.read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null));
     }
@@ -125,11 +133,23 @@ public class Engine implements Closeable {
     for (SimpleWitness witness : witnesses) {
       collationAlgorithm.collate(variantGraph, witness);
     }
+    if (joined) {
+      VariantGraph.JOIN.apply(variantGraph);
+    }
     return this;
   }
 
   void write() throws IOException {
-    new SimpleVariantGraphSerializer(VariantGraph.JOIN.apply(variantGraph)).toCsv(out);
+    final SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraph);
+    if ("csv".equals(outputFormat)) {
+      serializer.toCsv(out);
+    } else if ("dot".equals(outputFormat)) {
+      serializer.toDot(out);
+    } else if("graphml".equals(outputFormat)) {
+      serializer.toGraphML(out);
+    } else {
+      serializer.toTEI(out);
+    }
   }
 
   Engine log(String str) {
@@ -138,12 +158,25 @@ public class Engine implements Closeable {
   }
 
   void error(String str, Throwable t) {
-    errorState = true;
+    errorOccurred = true;
     log("Error: ").log(str).log("\n").log(t.getMessage()).log("\n");
   }
 
   void help() {
     new HelpFormatter().printHelp(log, 78, "collatex [<options>] <witness_1> <witness_2> [[<witness_3>] ...]", "", OPTIONS, 2, 4, "");
+  }
+
+  URL argumentToResource(String arg) throws ParseException {
+    try {
+      final File witnessFile = new File(arg);
+      if (witnessFile.exists()) {
+        return witnessFile.toURI().normalize().toURL();
+      } else {
+         return new URL(arg);
+      }
+    } catch (MalformedURLException urlEx) {
+      throw new ParseException("Invalid resource specified: " + arg);
+    }
   }
 
   public static void main(String... args) {
@@ -179,6 +212,7 @@ public class Engine implements Closeable {
     OPTIONS.addOption("xml", "xml-mode", false, "witnesses are treated as XML documents");
     OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//w'");
     OPTIONS.addOption("a", "algorithm", true, "progressive alignment algorithm to use 'dekker' (default), 'medite', 'needleman-wunsch'");
+    OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
     OPTIONS.addOption("f", "format", true, "result/output format: 'csv', 'dot', 'graphml', 'tei'");
     OPTIONS.addOption("s", "script", true, "ECMA/JavaScript resource with functions to be plugged into the alignment algorithm");
   }
@@ -196,7 +230,7 @@ public class Engine implements Closeable {
       Closeables.closeQuietly(out);
       Closeables.closeQuietly(log);
     }
-    if (errorState && (outFile != null) && outFile.isFile()) {
+    if (errorOccurred && (outFile != null) && outFile.isFile()) {
       outFile.delete();
     }
   }

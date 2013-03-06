@@ -39,6 +39,7 @@ import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import javax.annotation.Nullable;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
@@ -81,6 +82,21 @@ public class SimpleVariantGraphSerializer {
   public SimpleVariantGraphSerializer(VariantGraph graph, Function<Iterable<Token>, String> tokensToString) {
     this.graph = graph;
     this.tokensToString = tokensToString;
+  }
+
+  public void toTEI(Writer out) throws IOException {
+    try {
+      XMLStreamWriter xml = null;
+      try {
+        toTEI(xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out));
+      } finally {
+        if (xml != null) {
+          xml.close();
+        }
+      }
+    } catch (XMLStreamException e) {
+      throw new IOException(e);
+    }
   }
 
   public void toTEI(XMLStreamWriter xml) throws XMLStreamException {
@@ -304,6 +320,21 @@ public class SimpleVariantGraphSerializer {
     }
 
     return tuples;
+  }
+
+  public void toGraphML(Writer out) throws IOException {
+    try {
+      XMLStreamWriter xml = null;
+      try {
+        toGraphML(xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out));
+      } finally {
+        if (xml != null) {
+          xml.close();
+        }
+      }
+    } catch (XMLStreamException e) {
+      throw new IOException(e);
+    }
   }
 
   public void toGraphML(XMLStreamWriter xml) throws XMLStreamException {
