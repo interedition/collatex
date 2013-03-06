@@ -20,6 +20,7 @@
 package eu.interedition.collatex.cli;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import eu.interedition.collatex.CollationAlgorithm;
@@ -38,6 +39,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import javax.script.ScriptException;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -46,6 +48,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -77,18 +80,23 @@ public class Engine implements Closeable {
   PrintWriter log = new PrintWriter(System.err);
   boolean errorOccurred = false;
 
-  Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException {
-    if (commandLine.hasOption("s")) {
-      System.out.println(Arrays.asList(commandLine.getOptionValues("s")));
-    }
-
+  Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException {
     this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
     this.xmlMode = commandLine.hasOption("xml");
     this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//w"));
 
-    this.tokenizer = SimplePatternTokenizer.BY_WS_AND_PUNCT;
-    this.normalizer = SimpleTokenNormalizers.LC_TRIM_WS_PUNCT;
-    this.comparator = new EqualityTokenComparator();
+    final String script = commandLine.getOptionValue("s");
+    try {
+      final PluginScript pluginScript = (script == null
+              ? PluginScript.read("<internal>", new StringReader(""))
+              : PluginScript.read(argumentToResource(script)));
+
+      this.tokenizer = Objects.firstNonNull(pluginScript.tokenizer(), SimplePatternTokenizer.BY_WS_AND_PUNCT);
+      this.normalizer = Objects.firstNonNull(pluginScript.normalizer(), SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
+      this.comparator = Objects.firstNonNull(pluginScript.comparator(), new EqualityTokenComparator());
+    } catch (IOException e) {
+      throw new ParseException("Failed to read script '" + script + "' - " + e.getMessage());
+    }
 
     final String algorithm = commandLine.getOptionValue("a", "dekker").toLowerCase();
     if ("needleman-wunsch".equals(algorithm)) {
@@ -172,7 +180,7 @@ public class Engine implements Closeable {
 
   void error(String str, Throwable t) {
     errorOccurred = true;
-    log("Error: ").log(str).log("\n").log(t.getMessage()).log("\n");
+    log(str).log("\n").log(t.getMessage()).log("\n");
   }
 
   void help() {
@@ -188,7 +196,7 @@ public class Engine implements Closeable {
          return new URL(arg);
       }
     } catch (MalformedURLException urlEx) {
-      throw new ParseException("Invalid resource specified: " + arg);
+      throw new ParseException("Invalid resource: " + arg);
     }
   }
 
@@ -202,14 +210,18 @@ public class Engine implements Closeable {
       }
       engine.configure(commandLine).read().collate().write();
     } catch (ParseException e) {
-      engine.error("Command Line Arguments Incorrect", e);
+      engine.error("Error while parsing command line arguments", e);
       engine.log("\n").help();
     } catch (IllegalArgumentException e) {
-      engine.error("Illegal Argument", e);
+      engine.error("Illegal argument", e);
     } catch (IOException e) {
-      engine.error("I/O Error", e);
+      engine.error("I/O error", e);
     } catch (XPathExpressionException e) {
-      engine.error("XPath Error", e);
+      engine.error("XPath error", e);
+    } catch (ScriptException e) {
+      engine.error("Script error", e);
+    } catch (PluginScript.PluginScriptExecutionException e) {
+      engine.error("Script error", e);
     } finally {
       Closeables.closeQuietly(engine);
     }
