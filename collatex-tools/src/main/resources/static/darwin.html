@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <title>Darwin Example</title>
-    <link rel="stylesheet" type="text/css" href="yui-3.8.1-rollup.css">
+    <link rel="stylesheet" type="text/css" href="yui-3.8.1-modules.css">
     <link rel="stylesheet" type="text/css" href="collatex.css">
-    <script type="text/javascript" src="yui-3.8.1-rollup.js"></script>
+    <script type="text/javascript" src="yui-3.8.1-modules.js"></script>
     <script type="text/javascript" src="collatex.js"></script>
 </head>
 <body class="yui3-skin-sam">
@@ -908,7 +908,7 @@ var darwinChapters = [ {
     } ]
 } ];
 
-YUI().use("node", "array-extras", "json", "escape", "collatex", function(Y) {
+YUI().use("node", "collatex", function(Y) {
     var collator = new Y.CollateX(), results = Y.one("#results"), slots = [];
 
     for (var cc = 0; cc < darwinChapters.length; cc++) {
