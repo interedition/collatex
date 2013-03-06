@@ -19,7 +19,7 @@
         computer-aided collation. The underlying ideas might consequently need to be discussed in the context of
         encoding the in- and output of these modules as part of – or pre-stage to – a critical apparatus.</p>
 
-    <h3>Tokenizer</h3>
+    <h3>Tokenization</h3>
 
     <div class="figure float-right">
         <img src="/images/tokenizer.png" alt="Tokenizer">
@@ -44,7 +44,7 @@
         a syntactic level anymore, that is rather specific to a particular markup language or dialect.
     </p>
 
-    <h3>Aligner</h3>
+    <h3>Alignment</h3>
 
     <div class="figure float-left">
         <img src="/images/aligner.png" alt="Alignment">
@@ -89,7 +89,7 @@
   &lt;rdg wit="#w1 #w3" /&gt;
 &lt;/app&gt;</pre>
 
-    <h3>Analyzer</h3>
+    <h3>Analysis</h3>
 
     <div class="figure float-right">
         <img src="/images/analyzer.png" alt="Alignment Analysis">
@@ -138,6 +138,112 @@
 
     <p>The tabular model on the other hand might be advantageous, if one wanted to keep collation results in a relational datastore.
     </p>
+
+    <h2>Alignment Algorithms</h2>
+
+    <h3>Dekker</h3>
+
+    <h3>Needleman-Wunsch</h3>
+
+    <h3>MEDITE</h3>
+
+    <h2>Output Formats</h2>
+
+    <h3>JSON</h3>
+
+    <p>The tabular output format, resembling matrices commonly used in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> results, looks as follows (indentation/whitespace added for easier readability):</p>
+
+    <pre class="prettyprint">{
+    "rows": 3,
+    "columns": 2,
+    "sigils": ["A", "B"],
+    "table":[
+      [
+        [ {"t":"A"} ],
+        [ {"t":"A"} ]
+      ],[
+        [ {"t":"black"} ],
+        [ {"t":"white"} ]
+      ], [
+        [ {"t":"cat"} ],
+        [ {"t":"kitten.", "n":"cat"} ]
+      ]
+    ]
+}</pre>
+
+    <p>First 3&nbsp;properties: metadata … dimensions of table; <code>rows</code> aka. number of aligned segments; <code>columns</code> aka. number of witnesses;
+        <code>sigils</code> contains ordered set of witness identifiers, maps to order of segments in table …</p>
+
+    <p>Each row: matching segments, each colum/cell: the segment of a witness aka. a list of tokens comprising this segment or <code>null</code> in case of a gap …</p>
+
+    <h3>TEI P5</h3>
+
+    <pre class="prettyprint">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;cx:apparatus
+  xmlns:cx="http://interedition.eu/collatex/ns/1.0"
+  xmlns="http://www.tei-c.org/ns/1.0"&gt;
+    A
+    &lt;app&gt;
+      &lt;rdg wit="A"&gt;black&lt;/rdg&gt;
+      &lt;rdg wit="B"&gt;white&lt;/rdg&gt;
+    &lt;/app&gt;
+    &lt;app&gt;
+      &lt;rdg wit="A"&gt;cat&lt;/rdg&gt;
+      &lt;rdg wit="B"&gt;kitten.&lt;/rdg&gt;
+    &lt;/app&gt;
+&lt;/cx:apparatus&gt;</pre>
+
+
+    <h3>GraphML</h3>
+
+    <p>The GraphML-formatted output of a variant graph is suitable for import of (possibly larger) graphs in tools
+        for complex graph analysis and visualization, e. g. <a href="http://gephi.org/" title="Homepage">Gephi</a>.
+        For an example GraphML document, take a look at sample output from the
+        <a href="${cp}/collate/console" title="CollateX Console">web console</a>.</p>
+
+    <h3>GraphViz DOT</h3>
+
+    <pre class="prettyprint">digraph G {
+  v301 [label = ""];
+  v303 [label = "A"];
+  v304 [label = "black"];
+  v306 [label = "white"];
+  v305 [label = "cat"];
+  v302 [label = ""];
+  v301 -> v303 [label = "A, B"];
+  v303 -> v304 [label = "A"];
+  v303 -> v306 [label = "B"];
+  v304 -> v305 [label = "A"];
+  v306 -> v305 [label = "B"];
+  v305 -> v302 [label = "A, B"];
+}</pre>
+
+    <h2>The Command Line Interface</h2>
+
+    <pre class="prettyprint lang-xml">usage: collatex [&lt;options>] &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...]
+  -a,--algorithm &lt;arg>           progressive alignment algorithm to use
+                                 'dekker' (default), 'medite',
+                                 'needleman-wunsch'
+  -f,--format &lt;arg>              result/output format: 'csv', 'dot',
+                                 'graphml', 'tei'
+  -h,--help                      print usage instructions (which your are
+                                 looking at right now)
+  -ie,--input-encoding &lt;arg>     charset to use for decoding non-XML
+                                 witnesses; default: UTF-8
+  -o,--output &lt;arg>              output file; '-' for standard output
+                                 (default)
+  -oe,--output-encoding &lt;arg>    charset to use for encoding the output;
+                                 default: UTF-8
+  -s,--script &lt;arg>              ECMA/JavaScript resource with functions to be
+                                 plugged into the alignment algorithm
+  -t,--tokenized                 consecutive matches of tokens will *not* be
+                                 joined to segments
+  -xml,--xml-mode                witnesses are treated as XML documents
+  -xp,--xpath &lt;arg>              XPath 1.0 expression evaluating to tokens of
+                                 XML witnesses; default: '//text()'
+</pre>
+
+    <h3>ECMA/JavaScript Callbacks</h3>
 
     <h2>The RESTful Web Service</h2>
     <p>
@@ -286,76 +392,9 @@
         </tr>
     </table>
 
-    <h3>Output Format: Alignment Table in JSON</h3>
-
-    <p>The tabular output format, resembling matrices commonly used in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> results, looks as follows (indentation/whitespace added for easier readability):</p>
-
-	<pre class="prettyprint">{
-    "rows": 3,
-    "columns": 2,
-    "sigils": ["A", "B"],
-    "table":[
-      [
-        [ {"t":"A"} ],
-        [ {"t":"A"} ]
-      ],[
-        [ {"t":"black"} ],
-        [ {"t":"white"} ]
-      ], [
-        [ {"t":"cat"} ],
-        [ {"t":"kitten.", "n":"cat"} ]
-      ]
-    ]
-}</pre>
-
-    <p>First 3&nbsp;properties: metadata … dimensions of table; <code>rows</code> aka. number of aligned segments; <code>columns</code> aka. number of witnesses;
-        <code>sigils</code> contains ordered set of witness identifiers, maps to order of segments in table …</p>
-
-    <p>Each row: matching segments, each colum/cell: the segment of a witness aka. a list of tokens comprising this segment or <code>null</code> in case of a gap …</p>
-
-    <h3>Output Format: TEI-P5-encoded Critical Apparatus</h3>
-
-	      <pre class="prettyprint">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
-&lt;cx:apparatus
-  xmlns:cx="http://interedition.eu/collatex/ns/1.0"
-  xmlns="http://www.tei-c.org/ns/1.0"&gt;
-    A
-    &lt;app&gt;
-      &lt;rdg wit="A"&gt;black&lt;/rdg&gt;
-      &lt;rdg wit="B"&gt;white&lt;/rdg&gt;
-    &lt;/app&gt;
-    &lt;app&gt;
-      &lt;rdg wit="A"&gt;cat&lt;/rdg&gt;
-      &lt;rdg wit="B"&gt;kitten.&lt;/rdg&gt;
-    &lt;/app&gt;
-&lt;/cx:apparatus&gt;</pre>
-
     <p>For further examples, take a look at sample output from the
         <a href="${cp}/collate/console" title="CollateX Console">web console</a>.</p>
 
-    <h3>Output Format: Variant Graph in GraphML</h3>
-
-    <p>The GraphML-formatted output of a variant graph is suitable for import of (possibly larger) graphs in tools
-        for complex graph analysis and visualization, e. g. <a href="http://gephi.org/" title="Homepage">Gephi</a>.
-        For an example GraphML document, take a look at sample output from the
-        <a href="${cp}/collate/console" title="CollateX Console">web console</a>.</p>
-
-    <h3>Output Format: Variant Graph in GraphViz' DOT</h3>
-
-        <pre class="prettyprint">digraph G {
-  v301 [label = ""];
-  v303 [label = "A"];
-  v304 [label = "black"];
-  v306 [label = "white"];
-  v305 [label = "cat"];
-  v302 [label = ""];
-  v301 -> v303 [label = "A, B"];
-  v303 -> v304 [label = "A"];
-  v303 -> v306 [label = "B"];
-  v304 -> v305 [label = "A"];
-  v306 -> v305 [label = "B"];
-  v305 -> v302 [label = "A, B"];
-}</pre>
         <div id="js-apidocs">
             <h2>The HTTP-based JavaScript API</h2>
 
