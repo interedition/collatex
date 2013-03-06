@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<p>CollateX is open source software and made available for download in source as well as binary form.</p>
+
 <div id="download-binary">
     <h2>Binary Distributions</h2>
 
@@ -11,8 +13,8 @@
     <div class="yui3-g">
         <div class="yui3-u-1-2"><div class="content download-option">
             <h3>1. Tools</h3>
-            <p class="download-link">» <a href="/dist/collatex-tools-1.3.zip">collatex-tools-1.3.zip</a></p>
-            <p class="download-link">» <a href="/dist/collatex-tools-1.3.tar.bz2">collatex-tools-1.3.tar.bz2</a></p>
+            <p class="download-link">» <a href="/dist/collatex-tools-{{ version }}.zip">collatex-tools-{{ version }}.zip</a></p>
+            <p class="download-link">» <a href="/dist/collatex-tools-{{ version }}.tar.bz2">collatex-tools-{{ version }}.tar.bz2</a></p>
         </div></div>
         <div class="yui3-u-1-2"><div class="content">
             <h3>Requirements</h3>
@@ -33,7 +35,7 @@
 &lt;dependency>
     &lt;groupId>eu.interedition.collatex&lt;/groupId>
     &lt;artifactId>collatex-core&lt;/artifactId>
-    &lt;version>1.3&lt;/version>
+    &lt;version>{{ version }}&lt;/version>
 &lt;/dependency>
 </pre>
             </div></div>
@@ -50,7 +52,7 @@
 &lt;dependency>
     &lt;groupId>eu.interedition.collatex&lt;/groupId>
     &lt;artifactId>collatex-cocoon&lt;/artifactId>
-    &lt;version>1.3&lt;/version>
+    &lt;version>{{ version }}&lt;/version>
 &lt;/dependency>
 </pre>
             </div></div>
@@ -64,8 +66,9 @@
             <em>command-line tool</em> and a <em>self-contained RESTful web service</em>. So whether your project is web-based or
             runs in your local environment, whether you write in Ruby, Python, PHP, JavaScript or some other language: This is
             probably the option to get started on.</li>
-        <li>Should you be a <em>Java developer</em> and would like to <strong>embed CollateX</strong> in your application, we provide
-            <a href="http://maven.apache.org/" title="Homepage">Apache-Maven</a>-compatible artifacts of CollateX' core for download.</li>
+        <li>Should you target the <em>Java Virtual Machine</em> as your runtime environment and would like to <strong>embed CollateX</strong>
+            in your application, we provide <a href="http://maven.apache.org/" title="Homepage">Apache-Maven</a>-compatible artifacts of
+            CollateX' core for download.</li>
         <li>Should you use <a href="http://cocoon.apache.org/" title="Homepage">Apache Cocoon</a> as the framework for your
             <em>XML-oriented application</em>, we offer a <strong>Cocoon block</strong> making collation functionality available
             as a transformer for your XML processing pipelines.</li>
@@ -75,9 +78,16 @@
 <div id="download-source">
     <h2>Source Code</h2>
 
-    <p>We do not prepare source code bundles for download. Development of CollateX takes place on
-        <a href="https://github.com/interedition/collatex" title="CollateX on GitHub">GitHub</a> where you can find
-        the latest version of CollateX' source as well as earlier versions.</p>
+    <div class="yui3-g">
+        <div class="yui3-u-1-2"><div class="content">
+            <p>We do not prepare source code bundles for download. Development of CollateX takes place on
+                <a href="https://github.com/interedition/collatex" title="CollateX on GitHub">GitHub</a> where you can find
+                the latest version of CollateX' source as well as earlier versions.</p>
+        </div></div>
+        <div class="yui3-u-1-2"><div class="content download-option">
+            <p class="download-link">» <a href="https://github.com/interedition/collatex/">github.com/interedition/collatex/</a></p>
+        </div></div>
+    </div>
 </div>
 
 <div id="license">

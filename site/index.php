@@ -14,6 +14,7 @@ function markdown($input)
 
 $twig = new \Twig_Environment(new \Twig_Loader_Filesystem("twig"));
 $twig->addGlobal("server", $_SERVER);
+$twig->addGlobal("version", "1.3-beta");
 $twig->addFilter("markdown", new \Twig_Filter_Function('markdown', array('is_safe' => array('html'))));
 
 class TwigView extends \Slim\View

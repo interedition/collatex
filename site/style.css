@@ -12,9 +12,14 @@ h2 {
 }
 
 a, a:visited, a:link, a:active {
-    color: #060;
+    color: #030;
     font-weight: bold;
     text-decoration: none;
+}
+
+h2, h3, h4, h5, h6 {
+    margin-left: .5em;
+    margin-right: .5em;
 }
 
 p, li {
@@ -115,13 +120,29 @@ a:hover {
     margin: .5em;
 }
 
+.figure {
+    margin: 2em 0;
+}
+
+.figure img {
+    display: block;
+    padding: .25em;
+    margin: 0 auto;
+}
+
+.figure .caption {
+    font-size: 80%;
+    text-align: center;
+    font-style: italic;
+}
+
 .download-option {
     background: #cfc;
     padding: .5em;
     border-radius: .5em;
 }
 
-.download-link {
+.download-link, .teaser {
     font-size: 125%;
 }
 
