@@ -72,13 +72,9 @@ public class Engine implements Closeable {
   PrintWriter log = new PrintWriter(System.out);
   boolean errorState;
 
-  boolean configure(CommandLine commandLine) throws XPathExpressionException, ParseException {
+  Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException {
     if (commandLine.hasOption("s")) {
       System.out.println(Arrays.asList(commandLine.getOptionValues("s")));
-    }
-
-    if (commandLine.hasOption("h")) {
-      return false;
     }
 
     this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
@@ -108,11 +104,11 @@ public class Engine implements Closeable {
       }
     }
     if (witnessURLs.size() < 2) {
-      throw new ParseException("At least 2 witnesses must be given to compare");
+      throw new ParseException("At least 2 witnesses must be given");
     }
     this.witnesses = Lists.newArrayListWithExpectedSize(witnessURLs.size());
 
-    return true;
+    return this;
   }
 
   Engine read() throws IOException, XPathExpressionException {
@@ -143,7 +139,7 @@ public class Engine implements Closeable {
 
   void error(String str, Throwable t) {
     errorState = true;
-    log("Error: <").log(str).log(">\n").log(t.getMessage()).log("\n");
+    log("Error: ").log(str).log("\n").log(t.getMessage()).log("\n");
   }
 
   void help() {
@@ -153,19 +149,21 @@ public class Engine implements Closeable {
   public static void main(String... args) {
     final Engine engine = new Engine();
     try {
-      if (engine.configure(new GnuParser().parse(OPTIONS, args))) {
-        engine.read().collate().write();
+      final CommandLine commandLine = new GnuParser().parse(OPTIONS, args);
+      if (commandLine.hasOption("h")) {
+        engine.help();
         return;
       }
-      engine.help();
+      engine.configure(commandLine).read().collate().write();
     } catch (ParseException e) {
-      engine.error("Command line error", e);
+      engine.error("Command Line Arguments Incorrect", e);
+      engine.log("\n").help();
     } catch (IllegalArgumentException e) {
       engine.error("Illegal Argument", e);
     } catch (IOException e) {
-      engine.error("I/O error", e);
+      engine.error("I/O Error", e);
     } catch (XPathExpressionException e) {
-      engine.error("XPath error", e);
+      engine.error("XPath Error", e);
     } finally {
       Closeables.closeQuietly(engine);
     }
