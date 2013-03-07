@@ -40,17 +40,17 @@
         collation tool does not have to be concerned about the specifics of a text's encoding. At the same time it might be valuable
         to keep the markup context of every token for reference, for instance if one wanted to make use of it when comparing tokens.</p>
 
-    <p>The figure to the right depicts this process: The line on top shows a marked-up text version, its textual content as the
-        characters "a", "b", "c", "d" representing arbitrary tokens and "e1", "e2" as examples of embedded markup elements.
-        A markup-aware tokenizer would not only split the version into 4 textual tokens but transform this into a sequence of tokens,
-        each referring to their respective markup context.</p>
+    <p>The figure to the right depicts this process: The line on top shows a marked-up text, its content as the
+        characters "a", "b", "c" and "d" &ndash; each representing a token &ndash; and "e1", "e2" as examples of embedded markup elements.
+        A markup-aware tokenizer would not only split this version into 4 distinct tokens but transform it into a sequence of such tokens,
+        with each token referring to its markup context.</p>
 
-    <p>CollateX offers a very simple tokenizer for prototyping purposes that either</p>
+    <p>For now CollateX offers a very simple tokenizer, mainly serving prototyping purposes by either</p>
 
     <ul>
-    <li>splits plain text without any embedded markup on boundaries determined by
+    <li>splitting plain text without any embedded markup on boundaries determined by
         <a href="http://en.wikipedia.org/wiki/Whitespace_character" title="Wikipedia Article">whitespace</a>, or</li>
-    <li>evaluates a configurable <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath 1.0 expression</a> on an XML-encoded
+    <li>evaluating a configurable <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath 1.0 expression</a> on an XML-encoded
         text version which yields a list of node values as textual tokens.</li>
     </ul>
 
