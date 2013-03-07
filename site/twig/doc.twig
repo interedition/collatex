@@ -10,14 +10,15 @@
     <h2>Stages of the Collation Process: The Gothenburg Model</h2>
 
     <p>Developers of CollateX and
-        <a href="http://www.juxtasoftware.org/">Juxta</a> met in 2009 at a joint workshop of the EU-funded research
-        projects <a href="http://www.cost-a32.eu/">COST Action 32</a> and
-        <a href="http://www.interedition.eu/">Interedition</a> in Gothenburg. They
-        wanted to agree on a modular software architecture, so these two as well as similar projects interested in
-        collation software would have a common base for collaborating in the development of needed tools. As a first
-        result the participants identified the following 4 modules/tasks, which were found to be essential to
-        computer-aided collation. The underlying ideas might consequently need to be discussed in the context of
-        encoding the in- and output of these modules as part of – or pre-stage to – a critical apparatus.</p>
+        <a href="http://www.juxtasoftware.org/">Juxta</a> met for the first time in&nbsp;2009 at a joint workshop of
+        <a href="http://www.cost-a32.eu/">COST Action&nbsp;32</a> and
+        <a href="http://www.interedition.eu/">Interedition</a> in Gothenburg. They started discussing, how the different concerns
+        of computer-supported collation of texts could be separated such that these two as well as similar projects would have a common
+        understanding of its process and could thus collaborate more efficiently on the development of collation tools
+        as well as their components. As a first result of this ongoing discussion, the participants identified four distinct tasks
+        present in any computer-supported collation workflow.</p>
+
+    <p>CollateX is designed around this separation of concerns.</p>
 
     <h3>Tokenization</h3>
 
@@ -26,23 +27,46 @@
         <p class="caption">A tokenized text</p>
     </div>
 
-    <p>While collators can compare witnesses on a character-by-character basis, in the more common use case each
-        comparand is split up into tokens/ segments before collation and compared on the token level. This preprocessing
-        step called <em>tokenization</em> and performed by a <em>tokenizer</em> can happen on any level of granularity, e.g.
-        on the level of syllables, words, lines, phrases, verses, paragraphes, text nodes in a normalized DOM etc.</p>
+    <p>While computers can compare a text's versions on a character-by-character basis, in the more common use case each
+        version is first split up into parts &ndash; henceforth called <em>tokens</em> &ndash; so the comparison can be conducted
+        on a more coarse-grained level where the tokens to be compared ideally correspond to the text's units which carry meaning.
+        This pre-processing step is called <strong>tokenization</strong> and performed by a <em>tokenizer</em>; it can happen on any
+        level of granularity, i.e. on the level of syllables, words, lines, phrases, verses, paragraphs or text nodes in a
+        <a href="http://en.wikipedia.org/wiki/Document_Object_Model" title="Wikipedia Article">DOM</a>.</p>
 
-    <p>Another service provided by tokenizers and of special value to text-oriented collators relates to marked-up
-        comparands: As these collators primarily compare witnesses based on their textual content, embedded markup would
-        usually get in the way and therefore needs to be filtered out and/or “pushed in the background”, so the collator
-        can operate on tokens of textual content. At the same time it might be valueable to have the markup context of
-        every token available, e.g. in case one wants to make use of it in complex token comparator functions.</p>
+    <p>Another service provided by tokenizers and of special value to the comparison of natural language texts relates to marked-up
+        text versions: As most collation software primarily compares text versions based on their textual content, embedded markup
+        would usually get in the way of this process and therefore needs to be discarded or “pushed in the background”, so the
+        collation tool does not have to be concerned about the specifics of a text's encoding. At the same time it might be valuable
+        to keep the markup context of every token for reference, for instance if one wanted to make use of it when comparing tokens.</p>
 
-    <p>The figure to the right depicts this process: Think of the upper line as a witness, its characters a, b, c, d as
-        arbitrary tokens and e1, e2 as examples of embedded markup elements. A tokenizer would transform this marked-up
-        text into a sequence of tokens, each referring to their respective markup/tagging context. From now on a
-        collator can compare this witness to others based on its tokenized content and does not have to deal with it on
-        a syntactic level anymore, that is rather specific to a particular markup language or dialect.
-    </p>
+    <p>The figure to the right depicts this process: The line on top shows a marked-up text version, its textual content as the
+        characters "a", "b", "c", "d" representing arbitrary tokens and "e1", "e2" as examples of embedded markup elements.
+        A markup-aware tokenizer would not only split the version into 4 textual tokens but transform this into a sequence of tokens,
+        each referring to their respective markup context.</p>
+
+    <p>CollateX offers a very simple tokenizer for prototyping purposes that either</p>
+
+    <ul>
+    <li>splits plain text without any embedded markup on boundaries determined by
+        <a href="http://en.wikipedia.org/wiki/Whitespace_character" title="Wikipedia Article">whitespace</a>, or</li>
+    <li>evaluates a configurable <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath 1.0 expression</a> on an XML-encoded
+        text version which yields a list of node values as textual tokens.</li>
+    </ul>
+
+    <p>While not offering a comprehensive tokenizer itself, CollateX can be combined with any tokenizer that suits your specific requirements.
+        CollateX only expects you then to provide versions pre-tokenized and define a <strong>token comparator function</strong> which &ndash; when
+        called with any two tokens &ndash; evaluates to a <em>match</em> in case those two tokens shall  be treated as equal, or a <em>mismatch</em> in case
+        this should not be assumed. Formally speaking, a token comparator function defines an
+        <a href="http://en.wikipedia.org/wiki/Equivalence_relation" title="Wikipedia Article">equivalence relation</a> over all tokens for a
+        collation. In processing tokens on the level of their equivalence defined by such a relation, CollateX is agnostic about how tokens
+        are defined for a specific use case, whether they are plain text, text with a markup context or not even textual at all.</p>
+
+    <p>Detailed information about when and how to define your own notion of a token and its equivalence relation will be given in the
+    following sections addressing CollateX' different user interfaces.</p>
+
+    <h3>Normalization</h3>
+
 
     <h3>Alignment</h3>
 
