@@ -112,10 +112,24 @@ public class CollateResource {
       for (Iterable<Token> witness : collation.getWitnesses()) {
         for (SimpleToken token : Iterables.filter(witness, SimpleToken.class)) {
           witnessLength += token.getContent().length();
-
         }
         if (witnessLength > maxCollationSize) {
-          throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
+          return Response.status(new Response.StatusType() {
+            @Override
+            public int getStatusCode() {
+              return 413;
+            }
+
+            @Override
+            public Response.Status.Family getFamily() {
+              return Response.Status.Family.CLIENT_ERROR;
+            }
+
+            @Override
+            public String getReasonPhrase() {
+              return "Request Entity Too Large";
+            }
+          }).build();
         }
       }
     }
