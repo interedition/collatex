@@ -83,9 +83,6 @@ public class CollateResource {
 
   @GET
   public Response index(@Context Request request, @Context UriInfo uriInfo) throws IOException {
-    if (!uriInfo.getRequestUri().getPath().endsWith("/")) {
-      return Response.seeOther(uriInfo.getBaseUriBuilder().path("/").build()).build();
-    }
     return stream(request, "index.html");
   }
 

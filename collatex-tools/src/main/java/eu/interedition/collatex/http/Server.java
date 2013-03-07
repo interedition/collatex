@@ -68,11 +68,8 @@ public class Server extends DefaultResourceConfig implements Runnable {
   Server() {
     super();
     final HashMap<String,Object> config = Maps.newHashMap();
-    config.put(PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.<Class<?>>asList(NormalizeFilter.class, GZIPContentEncodingFilter.class));
+    config.put(PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.<Class<?>>asList(GZIPContentEncodingFilter.class));
     config.put(PROPERTY_CONTAINER_RESPONSE_FILTERS, Arrays.<Class<?>>asList(GZIPContentEncodingFilter.class));
-    config.put(FEATURE_CANONICALIZE_URI_PATH, true);
-    config.put(FEATURE_NORMALIZE_URI, true);
-    config.put(FEATURE_REDIRECT, true);
     setPropertiesAndFeatures(config);
   }
 
