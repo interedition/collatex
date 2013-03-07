@@ -19,9 +19,13 @@
 
 package eu.interedition.collatex.http;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.server.impl.container.filter.NormalizeFilter;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.io.Collation;
 import eu.interedition.collatex.io.CollationDeserializer;
@@ -39,6 +43,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +64,17 @@ public class Server extends DefaultResourceConfig implements Runnable {
 
   int maxParallelCollations;
   int maxCollationSize;
+
+  Server() {
+    super();
+    final HashMap<String,Object> config = Maps.newHashMap();
+    config.put(PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.<Class<?>>asList(NormalizeFilter.class, GZIPContentEncodingFilter.class));
+    config.put(PROPERTY_CONTAINER_RESPONSE_FILTERS, Arrays.<Class<?>>asList(GZIPContentEncodingFilter.class));
+    config.put(FEATURE_CANONICALIZE_URI_PATH, true);
+    config.put(FEATURE_NORMALIZE_URI, true);
+    config.put(FEATURE_REDIRECT, true);
+    setPropertiesAndFeatures(config);
+  }
 
   @Override
   public void run() {
@@ -97,7 +114,7 @@ public class Server extends DefaultResourceConfig implements Runnable {
 
   Server configure(CommandLine commandLine) {
     httpPort = Integer.parseInt(commandLine.getOptionValue("p", "7369"));
-    contextPath = commandLine.getOptionValue("cp", "/").replaceAll("/+$", "");
+    contextPath = commandLine.getOptionValue("cp", "").replaceAll("/*$", "/");
 
     dotPath = commandLine.getOptionValue("dot", null);
 

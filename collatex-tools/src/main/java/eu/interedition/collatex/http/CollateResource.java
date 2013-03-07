@@ -39,7 +39,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -83,7 +82,10 @@ public class CollateResource {
   }
 
   @GET
-  public Response index(@Context Request request) throws IOException {
+  public Response index(@Context Request request, @Context UriInfo uriInfo) throws IOException {
+    if (!uriInfo.getRequestUri().getPath().endsWith("/")) {
+      return Response.seeOther(uriInfo.getBaseUriBuilder().path("/").build()).build();
+    }
     return stream(request, "index.html");
   }
 
