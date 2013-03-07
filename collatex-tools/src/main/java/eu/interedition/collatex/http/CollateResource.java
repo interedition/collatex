@@ -42,7 +42,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -82,7 +81,7 @@ public class CollateResource {
   }
 
   @GET
-  public Response index(@Context Request request, @Context UriInfo uriInfo) throws IOException {
+  public Response index(@Context Request request) throws IOException {
     return stream(request, "index.html");
   }
 
@@ -95,8 +94,8 @@ public class CollateResource {
 
   @Path("collate")
   @GET
-  public Response redirectToIndex(@Context HttpHeaders hh, @Context UriInfo uriInfo) throws NoSuchMethodException {
-    return corsSupport(hh, Response.seeOther(uriInfo.getBaseUriBuilder().path("/").build())).build();
+  public Response redirectToIndex(@Context HttpHeaders hh) throws NoSuchMethodException {
+    return corsSupport(hh, Response.noContent()).build();
   }
 
   @Path("collate")
