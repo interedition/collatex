@@ -19,6 +19,7 @@
 
 package eu.interedition.collatex.http;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Closeables;
@@ -31,11 +32,15 @@ import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -91,13 +96,19 @@ public class CollateResource {
 
   @Path("collate")
   @GET
-  public Response redirectToIndex(@Context UriInfo uriInfo) throws NoSuchMethodException {
-    return Response.seeOther(uriInfo.getBaseUriBuilder().path(getClass().getMethod("index")).build()).build();
+  public Response redirectToIndex(@Context HttpHeaders hh, @Context UriInfo uriInfo) throws NoSuchMethodException {
+    return corsSupport(hh, Response.seeOther(uriInfo.getBaseUriBuilder().path("/").build())).build();
+  }
+
+  @Path("collate")
+  @OPTIONS
+  public Response collateOptions(@Context HttpHeaders hh) {
+    return corsSupport(hh, Response.ok()).build();
   }
 
   @Path("collate")
   @POST
-  public VariantGraph collate(final Collation collation) throws ExecutionException, InterruptedException {
+  public Response collate(final Collation collation, @Context HttpHeaders hh) throws ExecutionException, InterruptedException {
     if (maxCollationSize > 0) {
       int witnessLength = 0;
       for (Iterable<Token> witness : collation.getWitnesses()) {
@@ -111,7 +122,7 @@ public class CollateResource {
       }
     }
 
-    return executor.submit(new Callable<VariantGraph>() {
+    return corsSupport(hh, Response.ok(executor.submit(new Callable<VariantGraph>() {
       @Override
       public VariantGraph call() throws Exception {
         VariantGraph graph = new JungVariantGraph();
@@ -128,7 +139,16 @@ public class CollateResource {
 
         return graph;
       }
-    }).get();
+    }).get())).build();
+  }
+
+  Response.ResponseBuilder corsSupport(@Context HttpHeaders hh, Response.ResponseBuilder response) {
+    final MultivaluedMap<String, String> requestHeaders = hh.getRequestHeaders();
+    return response.header("Access-Control-Allow-Origin", Objects.firstNonNull(requestHeaders.getFirst("Origin"), "*"))
+            .header("Access-Control-Allow-Methods", Objects.firstNonNull(requestHeaders.getFirst("Access-Control-Request-Method"), "GET, POST, HEAD, OPTIONS"))
+            .header("Access-Control-Allow-Headers", Objects.firstNonNull(requestHeaders.getFirst("Access-Control-Request-Headers"), "Content-Type, Accept, X-Requested-With"))
+            .header("Access-Control-Max-Age", "86400")
+            .header("Access-Control-Allow-Credentials", "true");
   }
 
   @Path("{path: .+?\\.((html)|(css)|(js)|(png)|(ico))}")
