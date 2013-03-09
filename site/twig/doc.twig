@@ -2,12 +2,12 @@
 
 {% block content %}
 
-    <p>To express textual variance, CollateX uses a graph-based data model
+    <p xmlns="http://www.w3.org/1999/html">To express textual variance, CollateX uses a graph-based data model
         (<a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" title="Schmidt, D. and Colomb, R, 2009. A data structure for representing multi-version texts online, International Journal of Human-Computer Studies, 67.6, 497-514.">Schmidt 2009</a>).
         On top of this model it supports several algorithms to progressively align multiple text versions.</p>
 
 
-    <h2 id="gothenburg-model">Stages of the Collation Process: The Gothenburg Model</h2>
+    <h2 id="gothenburg-model">The Gothenburg Model</h2>
 
     <p>Developers of CollateX and
         <a href="http://www.juxtasoftware.org/">Juxta</a> met for the first time in&nbsp;2009 at a joint workshop of
@@ -88,7 +88,7 @@
     </div>
 
     <p>After each version has been split into a sequence of tokens and each has been (optionally) normalized, the token
-        sequences will be aligned. The alignment process is at the core of any collation tool and generally achieved
+        sequences will be aligned. The alignment process constitutes the core of CollateX' functionality and is generally conducted
         by <ol>
         <li>finding a set of matching tokens determined by the token equivalence relation, and</li>
         <li>aligning them via the insertion of <em>gaps</em> such that the token sequences of all versions line up optimally.</li>
@@ -131,39 +131,42 @@
   &lt;rdg wit="#w1 #w3" /&gt;
 &lt;/app&gt;</pre>
 
-    <p>Also beyond the field of Humanities Computing, the problem of <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia Article">aligning sequences</a>
-        in ways as described is relevant in many application areas; maybe most prominently it has been addressed in Bioinformatics.
-        Accordingly and as part of the larger field of <a href="http://en.wikipedia.org/wiki/Pattern_matching" title="Wikipedia Article">pattern matching</a>,
-        extensive research exists on this topic. CollateX primarily strives to make the results of this research available to
-        textual scholars. From a methodological perspective, the assessment of findings in their field is based on interpretation. While
-        it can be supported by computational means, it is not necessarily computable. As a consequence, CollateX
+    <p>Also beyond the field of Humanities Computing, the technique of <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia Article">sequence alignment</a>
+        has many application areas; Bioinformatics for example has addressed it as a computational problem thoroughly in recent years.
+        In this context and as part of the larger field of <a href="http://en.wikipedia.org/wiki/Pattern_matching" title="Wikipedia Article">pattern matching</a>,
+        extensive research exists on the topic. CollateX primarily strives to make the results of this research available to
+        textual scholars. For this import of computational methods it has to be noted though that &ndash; generally speaking &ndash;
+        the assessment of findings in the Humanities is based on interpretation. While it certainly can be supported by computational means,
+        it is not necessarily computable. As a concrete consequence of that difference in methodology, CollateX
         offers its users not one algorithm optimized by specific criteria, but a choice between
         several <a href="#alignment-algorithms" title="Section">alignment algorithms</a> so they can select the one that
-        supports their respective project and expected results best.
+        supports their expected results best, always assuming that any computational heuristic may fail in the light of
+        subjective judgement.
     </p>
 
-    <h3 id="alignment-analysis">Analysis</h3>
+    <h3 id="alignment-analysis">Analysis/Feedback</h3>
 
     <div class="figure float-right">
         <img src="/images/analyzer.png" alt="Alignment Analysis">
         <p class="caption">Analyzing an alignment</p>
     </div>
 
-    <p>On top of the results delivered by the alignment process, a further analysis can yield additional findings.
-        Echoing the example from the above section, one might want to think of the token (b) in row 2 and 5 as being
-        transposed instead of as being added/omitted separately. Some collators try to detect transpositions as part of
-        the alignment process, some do it as a post-processing step and others do not handle transpositions at all
-        and/or leave it to the user to declare those beforehand. Part of the reason for algorithmic differences in
-        transpostion handling is the fact, that the question which tokens are actually transposed is much more a matter
-        of interpretation than the question of matching and aligning them. While alignment results can still be judged
-        in terms of their quality to some extent, transposition detection can only be done heuristically as one can
-        easily think of cases, where it is impossible for a computer “to get it right”.
-    </p>
+    <p>As the heuristic approach to the problem of sequence alignment may not yield the desired result, a further analysis
+        of the alignment may be necessary. Echoing the example from the above section, evidence not accessible to the
+        collation tool (e.g. because it was not encoded in the text versions at hand) might support the assumption of token "b"
+        in row&nbsp;2 and&nbsp;5 as not only being <em>added</em>/<em>omitted</em> but <em>transposed</em>/<em>moved</em> (see figure to the right).
+        While heuristic algorithms may compute transpositions as part of the alignment process, the correctness of such a computation,
+        given external evidence and its heuristic nature, obviously cannot be ensured.</p>
 
-    <p>Apart from the specific problem of transpositions, it seems generally necessary to incorporate a step in the
-        collation process, in which the user can examine the preliminary collation result, edit and augment it according
-        to her knowledge and possibly feed it back into the collator for another run yielding enhanced results.
-    </p>
+    <p>An additional (possibly manual) analysis of the alignment result therefore may alleviate that deficiency by introducing the
+        possibility of a feedback cycle, in which users edit the alignment and feed their knowledge back into the alignment process for
+        another run delivering enhanced results. The declaration of pre-determined alignments between specific tokens and the
+        parametrization of optimizing algorithms along the requirements of a specific use case would be such feedback information which
+        influences results substantially.</p>
+
+    <p>CollateX offers rudimentary support for tailoring alignment results to a user's specific requirements, mainly through
+        its <a href="#javadoc" title="Section">Java API</a>. It is an area in need for improvement, particularly with regard to its
+        ease of use.</p>
 
     <h3>Visualization</h3>
 
@@ -172,7 +175,7 @@
         and should not be disregarded, but is essentially out of scope with regard to this discussion.
     </p>
 
-    <h2 id="variant-graphs" class="clear">Variant Graphs: A Data Model for Textual Variance</h2>
+    <h2 id="variant-graphs" class="clear">Variant Graphs: The Data Model</h2>
 
     <p>In a <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" class="external text" rel="nofollow">recent paper</a> D. Schmidt and R. Colomb proposed a data model of textual variance (or “multi-version texts” as they call it in the title), which they call a <i>variant graph</i>:
     </p>
