@@ -7,7 +7,7 @@
         On top of this model it supports several algorithms to progressively align multiple text versions.</p>
 
 
-    <h2>Stages of the Collation Process: The Gothenburg Model</h2>
+    <h2 id="gothenburg-model">Stages of the Collation Process: The Gothenburg Model</h2>
 
     <p>Developers of CollateX and
         <a href="http://www.juxtasoftware.org/">Juxta</a> met for the first time in&nbsp;2009 at a joint workshop of
@@ -15,12 +15,12 @@
         <a href="http://www.interedition.eu/">Interedition</a> in Gothenburg. They started discussing, how the different concerns
         of computer-supported collation of texts could be separated such that these two as well as similar projects would have a common
         understanding of its process and could thus collaborate more efficiently on the development of collation tools
-        as well as their components. As a first result of this ongoing discussion, the participants identified four distinct tasks
+        as well as their components. As a first result of this ongoing discussion, the participants identified five distinct tasks
         present in any computer-supported collation workflow.</p>
 
     <p>CollateX is designed around this separation of concerns.</p>
 
-    <h3>Tokenization</h3>
+    <h3 id="tokenization">Tokenization</h3>
 
     <div class="figure float-right">
         <img src="/images/tokenizer.png" alt="Tokenizer">
@@ -45,7 +45,7 @@
         A markup-aware tokenizer would not only split this version into 4 distinct tokens but transform it into a sequence of such tokens,
         with each token referring to its markup context.</p>
 
-    <p>For now CollateX offers a very simple tokenizer, mainly serving prototyping purposes by either</p>
+    <p>For now CollateX offers a simple tokenizer, mainly serving prototyping purposes by either</p>
 
     <ul>
     <li>splitting plain text without any embedded markup on boundaries determined by
@@ -54,28 +54,40 @@
         text version which yields a list of node values as textual tokens.</li>
     </ul>
 
-    <p>While not offering a comprehensive tokenizer itself, CollateX can be combined with any tokenizer that suits your specific requirements.
-        CollateX only expects you then to provide versions pre-tokenized and define a <strong>token comparator function</strong> which &ndash; when
+    <p>While not offering a comprehensive tokenizer itself, CollateX can be combined with any such tool that suits your specific requirements.
+        CollateX only expects you then to provide text versions in pre-tokenized form and define a <strong>token comparator function</strong> which &ndash; when
         called with any two tokens &ndash; evaluates to a <em>match</em> in case those two tokens shall  be treated as equal, or a <em>mismatch</em> in case
         this should not be assumed. Formally speaking, a token comparator function defines an
         <a href="http://en.wikipedia.org/wiki/Equivalence_relation" title="Wikipedia Article">equivalence relation</a> over all tokens for a
-        collation. In processing tokens on the level of their equivalence defined by such a relation, CollateX is agnostic about how tokens
-        are defined for a specific use case, whether they are plain text, text with a markup context or not even textual at all.</p>
+        collation. In processing tokens on the level of their equivalence defined by such a relation, CollateX is agnostic with regard to what constitutes
+        a token in your specific use case, whether it is plain text, text with a markup context or not textual at all.</p>
 
-    <p>Detailed information about when and how to define your own notion of a token and its equivalence relation will be given in the
-    following sections addressing CollateX' different user interfaces.</p>
+    <p>Detailed information about when and how to define your own notion of a token and its corresponding equivalence relation will be given in
+        the following sections on CollateX' usage. Its built-in tokenizer will provide for an easy start. Later on you can opt for a more versatile tokenizer
+        and/or token comparator function in order to enhance the accuracy of collation results.</p>
 
-    <h3>Normalization</h3>
+    <h3 id="normalization">Normalization/Regularization</h3>
 
+    <p>With a configurable equivalence relation between tokens (defined via the aforementioned comparator function), CollateX can compare
+        text versions which are comprised of arbitrary tokens sequences. For a larger number of use cases though, this flexibility of defining a
+        fully customized comparator function is not really needed. It might suffice to normalize the tokens' textual content
+        such that an exact matching of the normalized content yields the desired equivalence relation. For instance, in many cases all tokens
+        of the text versions are normalized to their lower-case equivalent before being compared, thereby making their comparison case insensitive. Other
+        examples would be the removal of punctuation, the rule-based normalization of orthographic differences or the
+        <a href="http://en.wikipedia.org/wiki/Stemming" title="Wikipedia Article">stemming of words</a>.</p>
 
-    <h3>Alignment</h3>
+    <p>Just as with the tokenizer included in CollateX, its normalization options are rather simple. Beyond the mentioned case normalization
+        and the removal of punctuation and/or whitespace characters, CollateX does not include any sophisticated normalization routines. Instead its
+        API and supported input formats provide the user with options to plug in their own components when needed.</p>
+
+    <h3 id="alignment">Alignment</h3>
 
     <div class="figure float-left">
         <img src="/images/aligner.png" alt="Alignment">
         <p class="caption">An alignment of 3 versions/witnesses</p>
     </div>
 
-    <p>After the witnesses have been tokenized, collators try to align all witnesses involved. Simply put, aligning the
+    <p>After each version has been tokenized and optionally normalized, a collation tool will align the token sequences. Simply put, aligning the
         witnesses means in this case: Find matching tokens and insert empty tokens (<i>gap tokens</i>) such that the
         token sequences of all witness line up properly. Interestingly this problem is computationally similar to the
         problem of <a href="http://en.wikipedia.org/wiki/Sequence_alignment" class="external text" rel="nofollow">sequence
@@ -113,7 +125,7 @@
   &lt;rdg wit="#w1 #w3" /&gt;
 &lt;/app&gt;</pre>
 
-    <h3>Analysis</h3>
+    <h3 id="alignment-analysis">Analysis</h3>
 
     <div class="figure float-right">
         <img src="/images/analyzer.png" alt="Alignment Analysis">
@@ -143,7 +155,7 @@
         and should not be disregarded, but is essentially out of scope with regard to this discussion.
     </p>
 
-    <h2 class="clear">Variant Graphs: A Data Model for Textual Variance</h2>
+    <h2 id="variant-graphs" class="clear">Variant Graphs: A Data Model for Textual Variance</h2>
 
     <p>In a <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" class="external text" rel="nofollow">recent paper</a> D. Schmidt and R. Colomb proposed a data model of textual variance (or “multi-version texts” as they call it in the title), which they call a <i>variant graph</i>:
     </p>
@@ -163,17 +175,17 @@
     <p>The tabular model on the other hand might be advantageous, if one wanted to keep collation results in a relational datastore.
     </p>
 
-    <h2>Alignment Algorithms</h2>
+    <h2 id="alignment-algorithms">Alignment Algorithms</h2>
 
-    <h3>Dekker</h3>
+    <h3 id="dekker-algorithm">Dekker</h3>
 
-    <h3>Needleman-Wunsch</h3>
+    <h3 id="needleman-wunsch-algorithm">Needleman-Wunsch</h3>
 
-    <h3>MEDITE</h3>
+    <h3 id="medite-algorithm">MEDITE</h3>
 
-    <h2>Output Formats</h2>
+    <h2 id="output-formats">Output Formats</h2>
 
-    <h3>JSON</h3>
+    <h3 id="json-output">JSON</h3>
 
     <p>The tabular output format, resembling matrices commonly used in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> results, looks as follows (indentation/whitespace added for easier readability):</p>
 
@@ -200,7 +212,7 @@
 
     <p>Each row: matching segments, each colum/cell: the segment of a witness aka. a list of tokens comprising this segment or <code>null</code> in case of a gap …</p>
 
-    <h3>TEI P5</h3>
+    <h3 id="tei-p5-output">TEI P5</h3>
 
     <pre class="prettyprint">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;cx:apparatus
@@ -218,14 +230,14 @@
 &lt;/cx:apparatus&gt;</pre>
 
 
-    <h3>GraphML</h3>
+    <h3 id="graphml-output">GraphML</h3>
 
     <p>The GraphML-formatted output of a variant graph is suitable for import of (possibly larger) graphs in tools
         for complex graph analysis and visualization, e. g. <a href="http://gephi.org/" title="Homepage">Gephi</a>.
         For an example GraphML document, take a look at sample output from the
         <a href="${cp}/collate/console" title="CollateX Console">web console</a>.</p>
 
-    <h3>GraphViz DOT</h3>
+    <h3 id="graphviz-dot-output">GraphViz DOT</h3>
 
     <pre class="prettyprint">digraph G {
   v301 [label = ""];
@@ -242,7 +254,7 @@
   v305 -> v302 [label = "A, B"];
 }</pre>
 
-    <h2>The Command Line Interface</h2>
+    <h2 id="cli">The Command Line Interface</h2>
 
     <pre class="prettyprint lang-xml">usage: collatex [&lt;options>] &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...]
   -a,--algorithm &lt;arg>           progressive alignment algorithm to use
@@ -267,9 +279,9 @@
                                  XML witnesses; default: '//text()'
 </pre>
 
-    <h3>ECMA/JavaScript Callbacks</h3>
+    <h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3>
 
-    <h2>The RESTful Web Service</h2>
+    <h2 id="rest-service">The RESTful Web Service</h2>
     <p>
         This page documents the
         <a href="http://en.wikipedia.org/wiki/Application_programming_interface" title="Wikipedia Page">Application Programming Interface (API)</a>
@@ -462,11 +474,11 @@
             <p>… configuration of a collator instance via methods like <code>withDekker()</code>, <code>withFuzzyMatching(maxDistance)</code> …</p>
         </div>
 
-    <h2>API Documentation (Javadoc)</h2>
+    <h2 id="javadoc">API Documentation (Javadoc)</h2>
 
     <p><a href="/apidocs/" title="CollateX API (Javadoc)">here</a></p>
 
-    <h2>Resources/ Bibliography</h2>
+    <h2 id="bibliography">Resources/ Bibliography</h2>
 
     <ul>
         <li> Multi-Version Document Format. <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001"
