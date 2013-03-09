@@ -27,6 +27,14 @@ p, li {
     margin: .5em;
 }
 
+ol {
+    list-style: lower-alpha inside;
+}
+
+ul {
+    list-style: disc inside;
+}
+
 a:hover {
     color: #060;
     font-weight: bold;

@@ -82,31 +82,37 @@
 
     <h3 id="alignment">Alignment</h3>
 
-    <div class="figure float-left">
+    <div class="figure float-right">
         <img src="/images/aligner.png" alt="Alignment">
-        <p class="caption">An alignment of 3 versions/witnesses</p>
+        <p class="caption">An alignment of 3 versions</p>
     </div>
 
-    <p>After each version has been tokenized and optionally normalized, a collation tool will align the token sequences. Simply put, aligning the
-        witnesses means in this case: Find matching tokens and insert empty tokens (<i>gap tokens</i>) such that the
-        token sequences of all witness line up properly. Interestingly this problem is computationally similar to the
-        problem of <a href="http://en.wikipedia.org/wiki/Sequence_alignment" class="external text" rel="nofollow">sequence
-            alignment</a> encountered in bioinformatics.
+    <p>After each version has been split into a sequence of tokens and each has been (optionally) normalized, the token
+        sequences will be aligned. The alignment process is at the core of any collation tool and generally achieved
+        by <ol>
+        <li>finding a set of matching tokens determined by the token equivalence relation, and</li>
+        <li>aligning them via the insertion of <em>gaps</em> such that the token sequences of all versions line up optimally.</li>
+    </ol></p>
+
+    <p>Looking at an example, assume that we have three versions: the first is comprised of the token sequence ["a", "b",
+        "c", "d"], the second reads ["a", "c", "d", "b"] and the third ["b", "c", "d"]. A collation tool may align these three
+        versions as depicted on the right. Each version occupies a column, matching tokens are aligned horizontally in a
+        row, gaps are inserted as needed during the alignment process and denoted via a hyphen. Depending from
+        which perspective one interprets this <strong>alignment table</strong>, one can say that the "b" in the second
+        row was <em>omitted</em> in the second version or that it has been <em>added</em> in the first and the third. A
+        similar statement can be made about the "b" in the last row, inverting the relationship of being <em>added</em> or
+        <em>omitted</em>. Basic edit operations (e.g. those underlying the concept
+        of <a href="http://en.wikipedia.org/wiki/Edit_distance" title="Wikipedia Article">edit distance</a>) are thus
+        implicitly expressed in such an alignment and can be interpreted accordingly to make assumptions about how a
+        text has been changed.
     </p>
 
-    <p>Looking at an example, assume that we have three witnesses: the first is comprised of the token sequence (a, b,
-        c, d), the second reads (a, c, d, b) and the third (b, c, d). A collator might align these three witnesses as
-        depicted in a tabular fashion on the right. Each witness occupies a column, matching tokens are aligned in a
-        row, necessary gap tokens as inserted during the alignment process are denoted via a hyphen. Depending from
-        which perspective one interprets this <i>alignment table</i>, one can say for example that the (b) in the second
-        row was ommitted in the second witness or it has been added in the first and the third. A similar statement can
-        be made about (b) in the last row by just inverting the relationship of being added/ommitted.
-    </p>
-
-    <p>Alignment tables like the one shown can be encoded losslessly with an existing apparatus encoding scheme, in
-        parallel segmentation mode, as long as only the textual content of token needs to be represented. Each row is
-        represented by a segment with empty readings for gap tokens. Optionally consecutive rows with identical readings
-        for each witness can be compressed into a single segment, e.g.
+    <p>The concept of a sequence alignment and its tabular representation is well established in the field of Humanities
+        Computing as alignment tables like the one shown can be encoded with well-known apparatus encoding schemes. In
+        the parallel segmentation mode of <a href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/TC.html" title="TEI-P5 Guidelines">TEI-P5's
+        apparatus encoding scheme</a>, to pick just one possible representation, each row would be encoded as a segment, with empty readings
+        standing in for the gaps. Optionally, consecutive segments with matching readings for each version could be concatenated, so that for our example
+        a possible encoding capturing the alignment information reads:
     </p>
 
     <pre class="prettyprint clear">&lt;app&gt;
@@ -124,6 +130,17 @@
   &lt;rdg wit="#w2"&gt;b&lt;/rdg&gt;
   &lt;rdg wit="#w1 #w3" /&gt;
 &lt;/app&gt;</pre>
+
+    <p>Also beyond the field of Humanities Computing, the problem of <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia Article">aligning sequences</a>
+        in ways as described is relevant in many application areas; maybe most prominently it has been addressed in Bioinformatics.
+        Accordingly and as part of the larger field of <a href="http://en.wikipedia.org/wiki/Pattern_matching" title="Wikipedia Article">pattern matching</a>,
+        extensive research exists on this topic. CollateX primarily strives to make the results of this research available to
+        textual scholars. From a methodological perspective, the assessment of findings in their field is based on interpretation. While
+        it can be supported by computational means, it is not necessarily computable. As a consequence, CollateX
+        offers its users not one algorithm optimized by specific criteria, but a choice between
+        several <a href="#alignment-algorithms" title="Section">alignment algorithms</a> so they can select the one that
+        supports their respective project and expected results best.
+    </p>
 
     <h3 id="alignment-analysis">Analysis</h3>
 
