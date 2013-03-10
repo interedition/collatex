@@ -22,7 +22,7 @@ h2, h3, h4, h5, h6 {
     margin-right: .5em;
 }
 
-p, li {
+p, li, dl, dd {
     text-align: justify;
     margin: .5em;
 }
@@ -183,4 +183,17 @@ a:hover {
 .toc a {
     color: inherit;
     font-weight: normal;
+}
+
+.bibliography dt {
+    float: left;
+    margin-right: .5em;
+}
+
+.bibliography dt:before {
+    content: "[";
+}
+
+.bibliography dt:after {
+    content: "]";
 }

@@ -107,8 +107,8 @@
         text has been changed.
     </p>
 
-    <p>The concept of a sequence alignment and its tabular representation is well established in the field of Humanities
-        Computing as alignment tables like the one shown can be encoded with well-known apparatus encoding schemes. In
+    <p>The concept of sequence alignment and its tabular representation is well established in the field of Humanities
+        Computing; alignment tables like the one shown can be encoded with well-known apparatus encoding schemes. In
         the parallel segmentation mode of <a href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/TC.html" title="TEI-P5 Guidelines">TEI-P5's
         apparatus encoding scheme</a>, to pick just one possible representation, each row would be encoded as a segment, with empty readings
         standing in for the gaps. Optionally, consecutive segments with matching readings for each version could be concatenated, so that for our example
@@ -144,7 +144,7 @@
         subjective judgement.
     </p>
 
-    <h3 id="alignment-analysis">Analysis/Feedback</h3>
+    <h3 id="analysis-feedback">Analysis/Feedback</h3>
 
     <div class="figure float-right">
         <img src="/images/analyzer.png" alt="Alignment Analysis">
@@ -168,16 +168,16 @@
         its <a href="#javadoc" title="Section">Java API</a>. It is an area in need for improvement, particularly with regard to its
         ease of use.</p>
 
-    <h3>Visualization</h3>
+    <h3 id="visualization">Visualization</h3>
 
     <p>The final concern of any collation workflow relates to the visualization of its results. As the broad variety
         of building principles, layouts and notational conventions found in printed apparatuses already suggests, representing
         textual variance is a complex problem on its own. Software like <a href="http://juxtasoftware.org/" title="Homepage">Juxta</a>
         has demonstrated the potential of digital media to cope with this complexity in innovative ways. For CollateX, the visualization
-        of results is deemed out of scope at the moment. Instead it provides several output formats which facilitate the integration
-        with software in charge of presenting collation results to the user, be it in printed or in digital form.</p>
+        of results is deemed out of scope at the moment. Instead it provides several <a href="#output">output formats</a> which facilitate
+        the integration with software in charge of visualizing results, be it in printed or in digital form.</p>
 
-    <h2 id="variant-graphs" class="clear">Variant Graphs: The Data Model</h2>
+    <h2 id="variant-graphs" class="clear">The Data Model: Variant Graphs</h2>
 
     <p>In a <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" class="external text" rel="nofollow">recent paper</a> D. Schmidt and R. Colomb proposed a data model of textual variance (or “multi-version texts” as they call it in the title), which they call a <i>variant graph</i>:
     </p>
@@ -205,7 +205,15 @@
 
     <h3 id="medite-algorithm">MEDITE</h3>
 
-    <h2 id="output-formats">Output Formats</h2>
+    <h2 id="input">Input</h2>
+
+    <h3 id="text-input">Plain Text</h3>
+
+    <h3 id="json-input">JSON</h3>
+
+    <h3 id="xml-input">XML</h3>
+
+    <h2 id="output">Output</h2>
 
     <h3 id="json-output">JSON</h3>
 
@@ -502,40 +510,36 @@
 
     <h2 id="bibliography">Resources/ Bibliography</h2>
 
-    <ul>
-        <li> Multi-Version Document Format. <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001"
-                                               class="external text" rel="nofollow">Schmidt, D. and Colomb, R, 2009. A
-                data structure for representing multi-version texts online, International Journal of Human-Computer
-                Studies, 67.6, 497-514.</a> (See the related <a href="http://multiversiondocs.blogspot.com/"
-                                                                class="external text" rel="nofollow">blog</a> and <a
-                    href="http://multiversiondocs.blogspot.com/2008/03/whats-multi-version-document.html"
-                    class="external text" rel="nofollow">the post “What's a Multi-Version Document?”</a>.
-        </li>
-        <li> Multi-Version Texts and Collation. <a
-                    href="http://www.balisage.net/Proceedings/vol3/html/Schmidt01/BalisageVol3-Schmidt01.html"
-                    class="external text" rel="nofollow">Schmidt, Desmond. “Merging Multi-Version Texts: a Generic
-                Solution to the Overlap Problem.”</a> Presented at Balisage: The Markup Conference 2009, Montréal,
-            Canada, August 11 - 14, 2009. In Proceedings of Balisage: The Markup Conference 2009. Balisage Series on
-            Markup Technologies, vol. 3 (2009). doi:10.4242/BalisageVol3.Schmidt01.]
-        </li>
+    <dl class="bibliography">
+        <dt id="bib-collate-2000"><a href="http://www.sd-editions.com/about/index.html" title="Homepage">Collate</a></dt>
+        <dd>Robinson, P., 2000. Collate.</dd>
 
-        <li> Matthew Spencer, Christopher J. Howe. Collating Texts Using Progressive Multiple Alignment. Computers and
-            the Humanities. 38/2004. S. 253–270.
-        </li>
-        <li><a href="http://edoc.bbaw.de/volltexte/2007/516/" class="external text" rel="nofollow">Michael Stolz,
-                Friedrich Michael Dimpel. Computergestützte Kollationierung und ihre Integration in den editorischen
-                Arbeitsfluss. 2006.</a>
-        </li>
+        <dt id="bib-juxta-2013"><a href="https://github.com/performant-software" title="GitHub">Juxta 2013</a></dt>
+        <dd>Performant Software Solutions LLC, 2013. Juxta.</dd>
 
-        <li><a href="http://www.sd-editions.com/about/index.html" class="external text" rel="nofollow">Collate</a>
-        </li>
-        <li><a href="http://collatex.sourceforge.net/" class="external text" rel="nofollow">CollateX</a>
-        </li>
-        <li><a href="http://www.juxtasoftware.org/" class="external text" rel="nofollow">Juxta</a>
-        </li>
-        <li><a href="http://code.google.com/p/multiversiondocs/wiki/NMerge" class="external text"
-               rel="nofollow">NMerge</a>
-        </li>
-    </ul>
+        <dt id="bib-nmerge-2012"><a href="https://github.com/HRIT-Infrastructure/NMergeNew" title="GitHub">NMerge 2012</a></dt>
+        <dd>Schmidt, D., 2012. NMerge. The nmerge Java library/commandline tool for making multi-version documents.</dd>
+
+        <dt id="bib-schmidt-2008"><a href="http://multiversiondocs.blogspot.com/2008/03/whats-multi-version-document.html">Schmidt 2008</a></dt>
+        <dd>Schmidt, D., 2008. What's a Multi-Version Document. <a href="http://multiversiondocs.blogspot.com/"title="Web Resource">Multi-Version Documents Blog</a>.</dd>
+
+        <dt id="bib-schmidt-2009"><a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" title="Electronic Article">Schmidt 2009</a></dt>
+        <dd>Schmidt, D. and Colomb, R., 2009. A data structure for representing multi-version texts online.
+            International Journal of Human-Computer Studies, 67.6, 497-514.</dd>
+
+        <dt id="bib-schmidt-2009a"><a href="http://www.balisage.net/Proceedings/vol3/html/Schmidt01/BalisageVol3-Schmidt01.html">Schmidt 2009a</a></dt>
+        <dd>Schmidt, D., 2009. Merging Multi-Version Texts: a Generic Solution to the Overlap Problem.” Presented at Balisage:
+            The Markup Conference 2009, Montréal, Canada, August 11 - 14, 2009. In Proceedings of Balisage: The Markup Conference 2009.
+            Balisage Series on Markup Technologies, vol. 3 (2009). doi:10.4242/BalisageVol3.Schmidt01.</dd>
+
+        <dt id="bib-spencer-2004"><a href="http://dx.doi.org/10.1007/s10579-004-8682-1">Spencer 2004</a></dt>
+        <dd>Spencer M., Howe and Christopher J., 2004. Collating Texts Using Progressive Multiple Alignment. Computers and
+            the Humanities. 38/2004, 253–270.</dd>
+
+        <dt id="bib-stolz-2006"><a href="http://edoc.bbaw.de/volltexte/2007/516/">Stolz 2006</a></dt>
+        <dd>Stolz, M. and Dimpel F. M., 2006. Computergestützte Kollationierung und ihre Integration in den editorischen
+            Arbeitsfluss. 2006.</dd>
+    </dl>
+
     <script type="text/javascript" src="/toc.js"></script>
 {% endblock %}
