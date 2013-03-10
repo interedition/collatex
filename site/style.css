@@ -28,11 +28,20 @@ p, li, dl, dd {
 }
 
 ol {
-    list-style: lower-alpha inside;
+    list-style: decimal inside;
 }
 
 ul {
     list-style: disc inside;
+}
+
+table {
+    margin: 1em .5em;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: .5em;
 }
 
 a:hover {

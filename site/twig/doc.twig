@@ -10,7 +10,7 @@
     <h2 id="gothenburg-model">The Gothenburg Model</h2>
 
     <p>Developers of CollateX and
-        <a href="http://www.juxtasoftware.org/">Juxta</a> met for the first time in&nbsp;2009 at a joint workshop of
+        <a href="#bib-juxta-2013">Juxta</a> met for the first time in&nbsp;2009 at a joint workshop of
         <a href="http://www.cost-a32.eu/">COST Action&nbsp;32</a> and
         <a href="http://www.interedition.eu/">Interedition</a> in Gothenburg. They started discussing, how the different concerns
         of computer-supported collation of texts could be separated such that these two as well as similar projects would have a common
@@ -179,23 +179,70 @@
 
     <h2 id="variant-graphs" class="clear">The Data Model: Variant Graphs</h2>
 
-    <p>In a <a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" class="external text" rel="nofollow">recent paper</a> D. Schmidt and R. Colomb proposed a data model of textual variance (or “multi-version texts” as they call it in the title), which they call a <i>variant graph</i>:
-    </p>
+    <p>The tabular representation of collation results as shown in the section on <a href="#alignment">sequence aligment</a> is popular,
+        in the Humanties and beyond. CollateX can output results in this representation but uses a different one internally
+        for modelling textual variance: <em>variant graphs</em>.</p>
 
-    <div class="figure"><img src="/images/variant-graph-schmidt.png" alt="Schmidt's Variant Graph Model"></div>
+    <p>Variant graphs are the central data structure of CollateX. Any generated <a href="#output">output</a> from CollateX is a derivation, providing different views on it.
+        The idea of a graph-oriented model for expressing textual variance has been originally developed by Desmond Schmidt (<a href="#bib-schmidt-2008" class="citation" title="Reference">Schmidt 2008</a>,
+        <a href="#bib-schmidt-2009" class="citation" title="Reference">Schmidt 2009</a>, <a href="#bib-schmidt-2009a" class="citation" title="Reference">Schmidt 2009a</a>)
+        and proved to be particularly well suited as a data model for computer-supported collation. The following figure taken from one of his publications
+        illustrates it:</p>
 
-    <p>In this model, varying texts/ a collation are/ is expressed in a <a href="http://en.wikipedia.org/wiki/Directed_acyclic_graph" class="external text" rel="nofollow">directed acyclic graph</a> with each path through the graph representing one version/ witness. The textual data is annotated on the edges, each edge carrying a (common) segment of text(s) and a set of identifiers, that denotes the versions/witnesses, in which the segment appears. Transpositions can be superimposed on the graph by linking edges of transposed segments.
-    </p>
+    <div class="figure" style="margin-bottom: 1em">
+        <img src="/images/variant-graph-schmidt.png" alt="Schmidt's Variant Graph Model">
+        <p class="caption">Schmidt/Colomb's Variant Graph Model</p>
+    </div>
 
-    <p>The tabular model described above and the given graph-based model can be converted into each other, with Schmidt’s model having the advantage, that it is
-    </p>
+    <p>Variant graphs are in principal <a href="http://en.wikipedia.org/wiki/Directed_acyclic_graph">directed and acyclic</a>. They are comprised at least of a
+        start and end node/vertex ("s" and "e" in the figure above) and can be traversed from the one to the other via labelled edges. The labels on each edge
+        contain content segments of compared text versions and a set of identifiers/sigils, denoting the versions which contain the respective content of an edge's label.
+        Thus
+        <ol>
+            <li>common segments of multiple text versions can be <em>merged</em> in a variant graph,</li>
+            <li>differing segments result in the graph <em>branching</em> at nodes, while</li>
+            <li>each version can still be retrieved from the graph by traversing it along the edges labeled with the appropriate identifier of that version.</li>
+        </ol></p>
 
-    <ul><li> more space-efficient as it combines matching segments into a single edge instead of duplicating them per row/column,
-        </li><li> more natural in expressing transpostions as matching segments are linked and not pairs of tokens.
-        </li></ul>
+    <p></p>
 
-    <p>The tabular model on the other hand might be advantageous, if one wanted to keep collation results in a relational datastore.
-    </p>
+    <p>Following these principles, the depicted variant graph models three text versions A, B and C with the following content (markup omitted):</p>
+
+    <table>
+        <tr><th>A</th><td>Queste è l'ultima traccia d'un antico acquedotto di sguardi, una orbita assorta e magica:</td></tr>
+        <tr><th>B</th><td>Queste è l'ultima cenno d'un antico acquedotto di sguardi, la sua curva sacra e muta:</td></tr>
+        <tr><th>C</th><td>Queste è l'ultima porta d'un antico acquedotto di sguardi, la sua curva sacra e solitaria:</td></tr>
+    </table>
+
+    <p>In order to account for the <a href="#gothenburg-model">separation of concerns</a> laid out above, CollateX' implementation of Schmidt's model
+        adjusted the latter slightly. Instead of labelling the edges of a variant graph with two attributes &ndash; the content as well as the sigils of text versions containing it &ndash;
+        the edges of variant graphs in CollateX are only labeled with sigil sets. The version's content segments &ndash; in the form of partial token sequences &ndash; have
+        been moved to the nodes/vertices. The ending of the example graph then looks like this (with sigils being mapped from A, B, C to W1, W2, W3):</p>
+
+    <div class="figure" style="margin-bottom: 1em">
+        <img src="/images/variant-graph-collatex.png" alt="CollateX's Variant Graph Model">
+        <p class="caption">CollateX' Variant Graph Model</p>
+    </div>
+
+    <p>The above illustration does not reveal the internal structure of the graph completely insofar as the nodes' labels in this figure are a simplification.
+        For instance, the second node in the graph (read from left to right) is labeled "sacra", with the two versions W2 and W3 "sharing some content". More precisely
+        though and in line with the above definition of <a href="#tokenization">tokens and their equivalence relation</a>, W2 and W3 do not "share some content". Instead they
+        both contain a token with the content "sacra", both deemed to be equal according to the definition of a specific token comparator function. In the graphical
+        representation of the variant graph above, this subtle distinction is not made and both tokens are just represented via their common textual content. In CollateX'
+        data model though, this distinction is still relevant and represented: Each node/vertex in a variant graph is not modelled via textual content (as it would be the
+        case when translated directly from Schmidt's model) but as a <em>set of tokens</em> from one or more versions, with all tokens in such a set belonging to the same
+        equivalence class.</p>
+
+    <p>The described change to Schmidt's model serves mainly two purposes: Firstly, it allows for arbitrary tokens to be compared and their commonalities, differences as
+        well as their sequential order to be represented in this graph-like structure. Secondly, CollateX' graph model is easy to transform into the tabular representation
+        introduced further above by ranking the graph's nodes in <a href="http://en.wikipedia.org/wiki/Topological_sorting" title="Wikipedia Article">topological order</a>
+        and aligning tokens which belong to nodes of the same rank.</p>
+
+    <p>It has to be noted that also in this data model, the <em>transposition</em> of tokens still remains a problematic case. Like in Schmidt's model, CollateX also represents the
+        transposition of a token (or more precisely: it's content) as a link between nodes (in the case of Schmidt' model: edges) containing the transposed segment. The link is undirected
+        and does not form part of a variant graph's traversal scheme because those transposition links would break the assertion of the graph's acyclic nature and
+        consequently the ability to sort it topologically. While the linking of nodes sufficiently represents transposed segments, it is superimposed
+        on a variant graph, i.e. it does not integrate well with it. Future work in this area may yield a more concise representation.</p>
 
     <h2 id="alignment-algorithms">Alignment Algorithms</h2>
 
