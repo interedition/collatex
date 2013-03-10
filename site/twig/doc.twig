@@ -181,7 +181,7 @@
 
     <p>The tabular representation of collation results as shown in the section on <a href="#alignment">sequence aligment</a> is popular,
         in the Humanties and beyond. CollateX can output results in this representation but uses a different one internally
-        for modelling textual variance: <em>variant graphs</em>.</p>
+        for modelling textual variance: <strong>variant graphs</strong>.</p>
 
     <p>Variant graphs are the central data structure of CollateX. Any generated <a href="#output">output</a> from CollateX is a derivation, providing different views on it.
         The idea of a graph-oriented model for expressing textual variance has been originally developed by Desmond Schmidt (<a href="#bib-schmidt-2008" class="citation" title="Reference">Schmidt 2008</a>,
@@ -230,27 +230,69 @@
         both contain a token with the content "sacra", both deemed to be equal according to the definition of a specific token comparator function. In the graphical
         representation of the variant graph above, this subtle distinction is not made and both tokens are just represented via their common textual content. In CollateX'
         data model though, this distinction is still relevant and represented: Each node/vertex in a variant graph is not modelled via textual content (as it would be the
-        case when translated directly from Schmidt's model) but as a <em>set of tokens</em> from one or more versions, with all tokens in such a set belonging to the same
-        equivalence class.</p>
+        case when translated directly from Schmidt's model) but as a <strong>set of tokens per node</strong> originating from one or more versions, with all tokens in such a
+        set belonging to the same equivalence class.</p>
 
     <p>The described change to Schmidt's model serves mainly two purposes: Firstly, it allows for arbitrary tokens to be compared and their commonalities, differences as
-        well as their sequential order to be represented in this graph-like structure. Secondly, CollateX' graph model is easy to transform into the tabular representation
+        well as their sequential order to be represented in a graph structure. Secondly, CollateX' graph model is easy to transform into the tabular representation
         introduced further above by ranking the graph's nodes in <a href="http://en.wikipedia.org/wiki/Topological_sorting" title="Wikipedia Article">topological order</a>
         and aligning tokens which belong to nodes of the same rank.</p>
 
-    <p>It has to be noted that also in this data model, the <em>transposition</em> of tokens still remains a problematic case. Like in Schmidt's model, CollateX also represents the
+    <p>It has to be noted that also in this data model, the <strong>transposition</strong> of tokens still remains a problematic case. Like in Schmidt's model, CollateX represents the
         transposition of a token (or more precisely: it's content) as a link between nodes (in the case of Schmidt' model: edges) containing the transposed segment. The link is undirected
-        and does not form part of a variant graph's traversal scheme because those transposition links would break the assertion of the graph's acyclic nature and
-        consequently the ability to sort it topologically. While the linking of nodes sufficiently represents transposed segments, it is superimposed
+        and does not form part of a variant graph's traversal scheme because transposition links would break the assertion of a variant graph's acyclic nature and
+        consequently the ability to sort it topologically. While the linking of nodes can represent transposed segments sufficiently, it is superimposed
         on a variant graph, i.e. it does not integrate well with it. Future work in this area may yield a more concise representation.</p>
 
     <h2 id="alignment-algorithms">Alignment Algorithms</h2>
 
+    <p>CollateX strives for maximum flexibility on the users' side when comparing text versions and adjusting the results to their requirements. One part of this
+        flexibility is rooted in the support of several alignment algorithms users can switch between and experiment with.</p>
+
+    <p>Currently three algorithms have been implemented. They all operate on variant graph structures and belong to the group of <strong>progressive alignment algorithms</strong>.
+        Instead of comparing all versions at once, they <ol>
+        <li>start by comparing two versions, </li>
+        <li>transforming the result into a variant graph, then</li>
+        <li>progressively comparing another versions against that graph, and</li>
+        <li>merging the result of that comparison into the graph,</li>
+        <li>repeating the procedure until all versions have been merged.</li>
+    </ol></p>
+
+    <p>On the one hand, the progressive approach is advantageous because it reduces the problem of comparing an arbitrary number of versions to the
+        simpler comparison of a single version with a variant graph representing several ones. The disadvantage on the other hand is the occasional <strong>dependence of
+        the result on the order</strong> in which versions are merged into the graph (<a href="#bib-spencer-2004" class="citation" title="Reference">Spencer 2004</a>).
+        Adding tools to deal with this dependency, e.g. by performing a <a href="http://en.wikipedia.org/wiki/Computational_phylogenetics" title="Wikipedia Article">phylogenetic analysis</a>
+        to determine an optimal order, is planned for a future version.</p>
+
     <h3 id="dekker-algorithm">Dekker</h3>
+
+    <p>The most mature algorithm offered by CollateX thus far has been developed by Ronald Haentjens Dekker (<a href="#bib-dekker-2011" class="citation" title="Reference">Dekker 2011</a>).
+        It aligns an arbitary number of text versions, optimizes the local alignment of partial tokens sequences (phrases) and detects transpositions.</p>
 
     <h3 id="needleman-wunsch-algorithm">Needleman-Wunsch</h3>
 
+    <p>The <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm" title="Wikipedia Article">Needleman-Wunsch algorithm</a>
+        (<a href="#bib-needleman-1970" classs="citation" title="Reference">Needleman 1970</a>) is a well-known global alignment
+        algorithm broadly applied in Bioinformatics and social science. Based on dynamic programming, this algorithm searches for an optimal alignment
+        of an arbitrary number of versions by using a scoring function which penalizes the insertion of gaps. It does not take the
+        possibility of transposed segments into account.</p>
+
+    <p>The scoring function can not be freely configured at the moment; the gap penality used by CollateX' implementation is constant and equal
+        to the score of a match.</p>
+
     <h3 id="medite-algorithm">MEDITE</h3>
+
+    <p>Only recently added to the code base, this algorithm takes its name from a <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project" title="Homepage">pairwise
+        alignment algorithm</a> developed by Julien Bourdaillet and Jean-Gabriel Ganascia (<a href="#bib-bourdaillet-2007" class="citation" title="Reference">Bourdaillet 2007</a>).
+        It is based on <a href="http://en.wikipedia.org/wiki/Suffix_tree" title="Wikipedia Article">suffix trees</a> for the search of maximal unique matches between
+        text versions and the <a href="http://en.wikipedia.org/wiki/A*_search_algorithm" title="Wikipedia Article">A* algorithm</a> for optimizing the alignment.
+        Like Dekker's algorithm, it takes transpositions into account while doing so.</p>
+
+    <p>CollateX' implementation of this algorithm is in an experimental stage. While it already delivers promising results, it has not been
+        fully optimized and &ndash; above all &ndash; not been extensively tested. In the case of issues with this algorithm,
+        <a href="/about/" title="Contact">the CollateX team</a> would appreciate feedback. Altenatively users can download
+        <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project" title="Homepage">the original version of MEDITE</a> written by the algorithm's
+        authors.</p>
 
     <h2 id="input">Input</h2>
 
@@ -558,11 +600,23 @@
     <h2 id="bibliography">Resources/ Bibliography</h2>
 
     <dl class="bibliography">
+        <dt id="bib-bourdaillet-2007"><a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project?action=AttachFile&do=view&target=LATA+2007" title="Electronic Resource">Bourdaillet 2007</a></dt>
+        <dd>Bourdaillet J. and Ganascia J.-G., 2007. Practical block sequence alignment with moves.
+            LATA 2007 - International Conference on Language and Automata Theory and Applications, 3/2007.</dd>
+
         <dt id="bib-collate-2000"><a href="http://www.sd-editions.com/about/index.html" title="Homepage">Collate</a></dt>
         <dd>Robinson, P., 2000. Collate.</dd>
 
+        <dt id="bib-dekker-2011"><a href="http://crdo.up.univ-aix.fr/SLDRdata/doc/show/copenhagen/SDH-2011/proceedings.html" title="Conference Proceedings">Dekker 2011</a></dt>
+        <dd>Dekker, R. H. and Middell, G., 2011. Computer-Supported Collation with CollateX: Managing Textual Variance in an Environment with Varying Requirements.
+            Supporting Digital Humanities 2011. University of Copenhagen, Denmark. 17-18 November 2011.</dd>
+
         <dt id="bib-juxta-2013"><a href="https://github.com/performant-software" title="GitHub">Juxta 2013</a></dt>
         <dd>Performant Software Solutions LLC, 2013. Juxta.</dd>
+
+        <dt id="bib-needleman-1970"><a href="http://dx.doi.org/10.1016%2F0022-2836%2870%2990057-4" title="Electronic Resource">Needleman 1970</a></dt>
+        <dd>Needleman, Saul B. and Wunsch, Christian D., 1970. A general method applicable to the search for similarities in the amino acid sequence of two proteins.
+            Journal of Molecular Biology 48 (3), 443–53.</dd>
 
         <dt id="bib-nmerge-2012"><a href="https://github.com/HRIT-Infrastructure/NMergeNew" title="GitHub">NMerge 2012</a></dt>
         <dd>Schmidt, D., 2012. NMerge. The nmerge Java library/commandline tool for making multi-version documents.</dd>
