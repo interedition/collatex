@@ -273,12 +273,12 @@
 
     <p>The <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm" title="Wikipedia Article">Needleman-Wunsch algorithm</a>
         (<a href="#bib-needleman-1970" classs="citation" title="Reference">Needleman 1970</a>) is a well-known global alignment
-        algorithm broadly applied in Bioinformatics and social science. Based on dynamic programming, this algorithm searches for an optimal alignment
-        of an arbitrary number of versions by using a scoring function which penalizes the insertion of gaps. It does not take the
-        possibility of transposed segments into account.</p>
+        algorithm broadly applied in Bioinformatics and the social sciences. Based on <a href="http://en.wikipedia.org/wiki/Dynamic_programming" title="Wikipedia Article">dynamic programming</a>,
+        this algorithm searches for an optimal alignment of an arbitrary number of versions by consulting a scoring function which penalizes the insertion of gaps. It does not take
+        the possibility of transposed segments into account though.</p>
 
-    <p>The scoring function can not be freely configured at the moment; the gap penality used by CollateX' implementation is constant and equal
-        to the score of a match.</p>
+    <p>The scoring function in CollateX' implementation can not be freely configured at the moment; the gap penality is assumed to be constant and equals
+        the score of a match.</p>
 
     <h3 id="medite-algorithm">MEDITE</h3>
 
@@ -290,15 +290,141 @@
 
     <p>CollateX' implementation of this algorithm is in an experimental stage. While it already delivers promising results, it has not been
         fully optimized and &ndash; above all &ndash; not been extensively tested. In the case of issues with this algorithm,
-        <a href="/about/" title="Contact">the CollateX team</a> would appreciate feedback. Altenatively users can download
+        <a href="/about/" title="Contact">the CollateX team</a> would appreciate feedback. Alternatively users can download
         <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project" title="Homepage">the original version of MEDITE</a> written by the algorithm's
         authors.</p>
 
     <h2 id="input">Input</h2>
 
+    <p>This section describes the different input formats CollateX supports. Besides the contents of a text's versions to be compared, the
+        input may also include parameters like the alignment algorithm to be used.</p>
+
     <h3 id="text-input">Plain Text</h3>
 
+    <p>Like any collation tool, CollateX can process text versions provided as plain text. As CollateX is written for the Java Virtual Machine,
+        internally the comparison of plain text is based on the JVM's string type and thus on 16-bit
+        <a href="http://en.wikipedia.org/wiki/Unicode" title="Wikipedia Article">Unicode</a> characters.</p>
+
+    <p>Depending on the way CollateX is used, plain text version can also be provided in <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html" title="Java Documentation">other
+        encodings supported by the Java Platform</a> and will be converted to Unicode before comparison. The <a href="#cli" title="Section">command line interface</a>
+        is one such interface which supports character set conversions.</p>
+
+    <p>Plain text version are always subject to tokenization and optional normalization of the resulting token sequence before they will be compared with each other.</p>
+
     <h3 id="json-input">JSON</h3>
+
+    <p>As a more flexible format, CollateX supports input in <a href="http://json.org/" title="Website">JavaScript Object Notation (JSON)</a>. A set of text versions
+        to be compared can be JSON encoded as follows:</p>
+
+	<pre class="prettyprint">{
+  "witnesses" : [
+    {
+      "id" : "A",
+      "content" : "A black cat in a black basket"
+    },
+    {
+      "id" : "B",
+      "content" : "A black cat in a black basket"
+    },
+    {
+      "id" : "C",
+      "content" : "A striped cat in a black basket"
+    },
+    {
+      "id" : "D",
+      "content" : "A striped cat in a white basket"
+    }
+  ]
+}</pre>
+
+    <p>JSON input always consists of a single root object wrapping input data. The root object has one required property containing the versions to be compared which
+        (for historical reasons) is named <em>witnesses</em>. The value of this property is of an array (a list) of objects in turn, with each object representing a version.
+        The order of the objects in the array determines the order in which they are processed by an alignment algorithms, i.e. merged into a variant graph.</p>
+
+    <p>Each object in the <em>witnesses</em> array must have a unique identifier in the required property <em>id</em>. This identifier will be used in the
+        <a href="#output" title="Section">output</a> to reference a particular version. Besides the identifier each object must describe the content of the version.
+        The content can either be specified as a string property named <em>content</em> as shown above. In this case the version is treated like a plain text version
+        with tokenization and normalization taking place before the alignment.</p>
+
+    <p>Another option is to provide the content of a version in tokenized (and optionally normalized) form:</p>
+
+	<pre class="prettyprint">{
+  "witnesses" : [
+    {
+      "id" : "A",
+      "tokens" : [
+          { "t" : "A" },
+          { "t" : "black" },
+          { "t" : "cat" }
+      ]
+    },
+    {
+      "id" : "B",
+      "tokens" : [
+          { "t" : "A" },
+          { "t" : "white" },
+          { "t" : "kitten.", "n" : "cat" }
+      ]
+    }
+  ]
+}</pre>
+    </p>
+
+    <p>
+        Each token object has to contain a property <code>t</code>, which contains the token content itself.
+        Optionally a “normalized” version of the token can be provided in the property <code>n</code>.
+        It can be any kind of alternate reading the collator should use in precendence over the original token content during alignment.
+        Apart from these 2&nbsp;known properties, token objects can contain an arbitrary number of additional properties,
+        which will not be interpreted by the collator but just be passed through and reappear in the output.
+    </p>
+
+    <p>… Choose alignment algorithm … </p>
+
+        <pre class="prettyprint">{
+  "witnesses": [ … ],
+  "algorithm": "dekker"
+}</pre>
+
+    <p>Available algorithms …</p>
+
+    <table>
+        <tr>
+            <th>dekker</th>
+            <td><a href="http://www.huygens.knaw.nl/en/dekker/" title="Homepage">Ronald Haentjens Dekker's</a> algorithm, includes transposition detection …</td>
+        </tr>
+        <tr>
+            <th>dekker-experimental</th>
+            <td>Experimental version of Dekker's algorithm with enhanced token matching, alpha-level quality …</td>
+        </tr>
+        <tr>
+            <th>needleman-wunsch</th>
+            <td>Adaptation of <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm" title="Wikipedia">Needleman-Wunsch's</a> global alignment algorithm …</td>
+        </tr>
+    </table>
+
+    <p>Choose token matching function …</p>
+
+        <pre class="prettyprint">{
+  "witnesses": [ … ],
+  "algorithm": "dekker",
+  "tokenComparator": { type: "equality" }
+}</pre>
+
+    <p>Default: exact matching … Alternative: fuzzy matching via <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">Levenshtein distance</a> threshold:</p>
+
+        <pre class="prettyprint">{
+  "witnesses": [ … ],
+  "algorithm": "dekker",
+  "tokenComparator": {
+    "type": "levenshtein",
+    "distance": 2
+  }
+}</pre>
+
+    <p>Property <code>distance</code> contains maximal edit distance to be deemed a match …</p>
+
+    <p>More options (algorithms/ matching functions) added in forthcoming releases …</p>
+
 
     <h3 id="xml-input">XML</h3>
 
@@ -395,12 +521,12 @@
                                  joined to segments
   -xml,--xml-mode                witnesses are treated as XML documents
   -xp,--xpath &lt;arg>              XPath 1.0 expression evaluating to tokens of
-                                 XML witnesses; default: '//text()'
-</pre>
+                                 XML witnesses; default: '//text()'</pre>
 
     <h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3>
 
     <h2 id="rest-service">The RESTful Web Service</h2>
+
     <p>
         This page documents the
         <a href="http://en.wikipedia.org/wiki/Application_programming_interface" title="Wikipedia Page">Application Programming Interface (API)</a>
@@ -412,112 +538,8 @@
         <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" title="RFC">HTTP POST requests</a> to
         <a href="${cp}/collate" title="REST-API Endpoint">${cp}/collate</a>.</p>
 
-    <h3>Input</h3>
-
     <p>It expects <strong>input</strong> formatted in <a href="http://json.org/" title="Website">JavaScript Object Notation (JSON)</a> as the request body;
         accordingly the content type of the HTTP request must be set to <code>application/json</code> by the client.</p>
-
-    <p>
-        An exemplary request’s body looks as follows:
-    </p>
-
-	<pre class="prettyprint">{
-  "witnesses" : [ {
-      "id" : "A",
-      "content" : "A black cat in a black basket"
-    }, {
-      "id" : "B",
-      "content" : "A black cat in a black basket"
-    }, {
-      "id" : "C",
-      "content" : "A striped cat in a black basket"
-    }, {
-      "id" : "D",
-      "content" : "A striped cat in a white basket"
-    } ]
-}</pre>
-
-    <p>
-        Each request body contains a single object. It has a required property <code>witnesses</code>, which contains a list of objects in turn.
-        Each object represents a text version to be collated and has to contain a unique identifier in the property <code>id</code>.
-        Besides the identifier each object can either contain the textual content of the witness as a string property named <code>content</code> (as shown above).
-        The other option is a pre-tokenized witness, that is comprised of list of tokens notated as follows:
-    </p>
-
-    <p>
-	<pre class="prettyprint">{
-  "witnesses" : [ {
-      "id" : "A",
-      "tokens" : [
-          { "t" : "A" },
-          { "t" : "black" },
-          { "t" : "cat" } ]
-    }, {
-      "id" : "B",
-      "tokens" : [
-          { "t" : "A" },
-          { "t" : "white" },
-          { "t" : "kitten.", "n" : "cat" } ]
-    } ]
-}</pre>
-    </p>
-
-    <p>
-        Each token object has to contain a property <code>t</code>, which contains the token content itself.
-        Optionally a “normalized” version of the token can be provided in the property <code>n</code>.
-        It can be any kind of alternate reading the collator should use in precendence over the original token content during alignment.
-        Apart from these 2&nbsp;known properties, token objects can contain an arbitrary number of additional properties,
-        which will not be interpreted by the collator but just be passed through and reappear in the output.
-    </p>
-
-    <p>… Choose alignment algorithm … </p>
-
-        <pre class="prettyprint">{
-  "witnesses": [ … ],
-  "algorithm": "dekker"
-}</pre>
-
-    <p>Available algorithms …</p>
-
-    <table>
-        <tr>
-            <th>dekker</th>
-            <td><a href="http://www.huygens.knaw.nl/en/dekker/" title="Homepage">Ronald Haentjens Dekker's</a> algorithm, includes transposition detection …</td>
-        </tr>
-        <tr>
-            <th>dekker-experimental</th>
-            <td>Experimental version of Dekker's algorithm with enhanced token matching, alpha-level quality …</td>
-        </tr>
-        <tr>
-            <th>needleman-wunsch</th>
-            <td>Adaptation of <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm" title="Wikipedia">Needleman-Wunsch's</a> global alignment algorithm …</td>
-        </tr>
-    </table>
-
-    <p>Choose token matching function …</p>
-
-        <pre class="prettyprint">{
-  "witnesses": [ … ],
-  "algorithm": "dekker",
-  "tokenComparator": { type: "equality" }
-}</pre>
-
-    <p>Default: exact matching … Alternative: fuzzy matching via <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">Levenshtein distance</a> threshold:</p>
-
-        <pre class="prettyprint">{
-  "witnesses": [ … ],
-  "algorithm": "dekker",
-  "tokenComparator": {
-    "type": "levenshtein",
-    "distance": 2
-  }
-}</pre>
-
-    <p>Property <code>distance</code> contains maximal edit distance to be deemed a match …</p>
-
-    <p>More options (algorithms/ matching functions) added in forthcoming releases …</p>
-
-    <h3>Output</h3>
 
     <p>
         The output format of the collator, contained in the response to an HTTP POST request, can be chosen via
