@@ -346,85 +346,75 @@
         The content can either be specified as a string property named <em>content</em> as shown above. In this case the version is treated like a plain text version
         with tokenization and normalization taking place before the alignment.</p>
 
-    <p>Another option is to provide the content of a version in tokenized (and optionally normalized) form:</p>
+    <p>Another option is to provide the content of versions in tokenized (and optionally normalized) form:</p>
 
 	<pre class="prettyprint">{
   "witnesses" : [
     {
       "id" : "A",
       "tokens" : [
-          { "t" : "A" },
-          { "t" : "black" },
-          { "t" : "cat" }
+          { "t" : "A", "ref" : 123 },
+          { "t" : "black" : "adj" : true },
+          { "t" : "cat", "id" : "xyz" }
       ]
     },
     {
       "id" : "B",
       "tokens" : [
           { "t" : "A" },
-          { "t" : "white" },
+          { "t" : "white" : "adj" : true },
           { "t" : "kitten.", "n" : "cat" }
       ]
     }
   ]
 }</pre>
-    </p>
 
-    <p>
-        Each token object has to contain a property <code>t</code>, which contains the token content itself.
-        Optionally a “normalized” version of the token can be provided in the property <code>n</code>.
-        It can be any kind of alternate reading the collator should use in precendence over the original token content during alignment.
-        Apart from these 2&nbsp;known properties, token objects can contain an arbitrary number of additional properties,
-        which will not be interpreted by the collator but just be passed through and reappear in the output.
-    </p>
+    <p>Instead of providing a property <em>content</em> for a version, one can provide a sequence of tokens via the property <em>tokens</em>.
+        The version's property value must be a list with one object per token Each token object in turn must at least contain a property <em>t</em>, which defines
+        its content. Accordingly, in the example above, version "A" has the tokens ["A", "black", "cat"] whereas version "B" is comprised of the token sequence
+        ["A", "white", "kitten"].</p>
 
-    <p>… Choose alignment algorithm … </p>
+    <p>Optionally a <a href="#normalization" title="Section">normalized</a> reading of the token can be provided in the property <em>n</em>.
+        Again, in the example above, that means the last token of version "B" is normalized from the reading "kitten" to the reading "cat", thus facilitating
+        a match of "kitten" with the last token of version "A".</p>
+
+    <p>Apart from these 2&nbsp; defined properties <em>t</em> and <em>n</em>, token objects can contain an arbitrary number of additional properties.
+        Additional properties will not be interpreted by the CollateX but just be passed through, reappearing in
+        the <a href="#output" title="Section">output</a> unchanged. Properties like <em>ref</em>, <em>adj</em> or <em>id</em> in the example would be such
+        additional properties of a token object. Users of the JSON input can make use of this pass-through mode e.g. in order to uniquely identify aligned tokens
+        independently of their (possibly non-unique) content.</p>
+
+    <p>When using interfaces like the <a href="#rest-service" title="Section">HTTP service</a> of CollateX, JSON encoded input can contain optional parameters
+        controlling the collation process. You can set the alignment algorithm for instance by providing a property <em>algorithm</em> in the root object with
+        one of the values "needleman-wunsch", "medite" or "dekker" (the default):</p>
 
         <pre class="prettyprint">{
   "witnesses": [ … ],
-  "algorithm": "dekker"
+  "algorithm": "needleman-wunsch"
 }</pre>
 
-    <p>Available algorithms …</p>
-
-    <table>
-        <tr>
-            <th>dekker</th>
-            <td><a href="http://www.huygens.knaw.nl/en/dekker/" title="Homepage">Ronald Haentjens Dekker's</a> algorithm, includes transposition detection …</td>
-        </tr>
-        <tr>
-            <th>dekker-experimental</th>
-            <td>Experimental version of Dekker's algorithm with enhanced token matching, alpha-level quality …</td>
-        </tr>
-        <tr>
-            <th>needleman-wunsch</th>
-            <td>Adaptation of <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm" title="Wikipedia">Needleman-Wunsch's</a> global alignment algorithm …</td>
-        </tr>
-    </table>
-
-    <p>Choose token matching function …</p>
+    <p>There is also limited support for customizing the <a href="#tokenization" title="Section">token comparator function</a>. Via JSON, two functions are available:</p>
 
         <pre class="prettyprint">{
   "witnesses": [ … ],
-  "algorithm": "dekker",
+  "algorithm": "…",
   "tokenComparator": { type: "equality" }
 }</pre>
 
-    <p>Default: exact matching … Alternative: fuzzy matching via <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">Levenshtein distance</a> threshold:</p>
+    <p>The default function, which can also be explicitly configured like shown above, tests for exact equality of the normalized token content. An alternative is the use of approximate matching via
+        the a <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">Levenshtein/edit distance</a> threshold for matching tokens:</p>
 
         <pre class="prettyprint">{
   "witnesses": [ … ],
-  "algorithm": "dekker",
   "tokenComparator": {
     "type": "levenshtein",
     "distance": 2
   }
 }</pre>
 
-    <p>Property <code>distance</code> contains maximal edit distance to be deemed a match …</p>
-
-    <p>More options (algorithms/ matching functions) added in forthcoming releases …</p>
-
+    <p>For approximate matching, the <em>type</em> property of the token object descring the token comparator function must be assigned the value "levenshtein".
+        The optional property <em>distance</em> defines the maximum edit distance between two normalized tokens strings which is still considered to be a match.
+        An edit distance of&nbsp;1 is the default.</p>
 
     <h3 id="xml-input">XML</h3>
 
@@ -663,6 +653,9 @@
         <dd>Stolz, M. and Dimpel F. M., 2006. Computergestützte Kollationierung und ihre Integration in den editorischen
             Arbeitsfluss. 2006.</dd>
     </dl>
+{% endblock %}
 
+{% block appendix %}
+    {{ parent() }}
     <script type="text/javascript" src="/toc.js"></script>
 {% endblock %}
