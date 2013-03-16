@@ -21,11 +21,10 @@ package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.collect.HashMultimap;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SetMultimap;
@@ -36,6 +35,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Tuple;
+import eu.interedition.collatex.util.ParallelSegmentationApparatus;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import javax.annotation.Nullable;
@@ -45,7 +45,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -99,84 +98,73 @@ public class SimpleVariantGraphSerializer {
     }
   }
 
-  public void toTEI(XMLStreamWriter xml) throws XMLStreamException {
-    xml.writeStartDocument();
-    xml.writeStartElement("cx", "apparatus", COLLATEX_NS);
-    xml.writeNamespace("cx", COLLATEX_NS);
-    xml.writeNamespace("", TEI_NS);
-
-    final VariantGraphRanking ranking = ranking();
-    final Set<Witness> allWitnesses = graph.witnesses();
-    for (Iterator<Map.Entry<Integer, Collection<VariantGraph.Vertex>>> rowIt = ranking.getByRank().asMap().entrySet().iterator(); rowIt.hasNext(); ) {
-      final Map.Entry<Integer, Collection<VariantGraph.Vertex>> row = rowIt.next();
-      final int rank = row.getKey();
-      final Collection<VariantGraph.Vertex> vertices = row.getValue();
-
-      if (vertices.size() == 1 && Iterables.getOnlyElement(vertices).tokens().isEmpty()) {
-        // skip start and end vertex
-        continue;
-      }
-
-      // spreading vertices with same rank according to their registered transpositions
-      final Multimap<Integer, VariantGraph.Vertex> verticesByTranspositionRank = HashMultimap.create();
-      for (VariantGraph.Vertex v : vertices) {
-        int transpositionRank = 0;
-        for (VariantGraph.Transposition transposition : v.transpositions()) {
-          for (VariantGraph.Vertex tv : transposition) {
-            transpositionRank += (ranking.apply(tv).intValue() - rank);
+  public void toTEI(final XMLStreamWriter xml) throws XMLStreamException {
+    try {
+      ParallelSegmentationApparatus.generate(ranking(), new ParallelSegmentationApparatus.GeneratorCallback() {
+        @Override
+        public void start() {
+          try {
+            xml.writeStartDocument();
+            xml.writeStartElement("cx", "apparatus", COLLATEX_NS);
+            xml.writeNamespace("cx", COLLATEX_NS);
+            xml.writeNamespace("", TEI_NS);
+          } catch (XMLStreamException e) {
+            throw Throwables.propagate(e);
           }
         }
-        verticesByTranspositionRank.put(transpositionRank, v);
-      }
 
-      // render segments
-      for (Iterator<Integer> transpositionRankIt = Ordering.natural().immutableSortedCopy(verticesByTranspositionRank.keySet()).iterator(); transpositionRankIt.hasNext() ;) {
-        final Multimap<Witness, Token> tokensByWitness = HashMultimap.create();
-        for (VariantGraph.Vertex v : verticesByTranspositionRank.get(transpositionRankIt.next())) {
-          for (Token token : v.tokens()) {
-            tokensByWitness.put(token.getWitness(), token);
+        @Override
+        public void segment(SortedMap<Witness, Iterable<Token>> contents) {
+          final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
+          for (Map.Entry<Witness, Iterable<Token>> cell : contents.entrySet()) {
+            segments.put(tokensToString.apply(cell.getValue()), cell.getKey());
           }
-        }
-        final SortedMap<Witness, String> cellContents = Maps.newTreeMap(Witness.SIGIL_COMPARATOR);
-        for (Witness witness : allWitnesses) {
-          cellContents.put(witness, tokensByWitness.containsKey(witness) ? tokensToString.apply(tokensByWitness.get(witness)) : "");
-        }
 
-        final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
-        for (Map.Entry<Witness, String> cell : cellContents.entrySet()) {
-          segments.put(cell.getValue(), cell.getKey());
-        }
-
-        final Set<String> segmentContents = segments.keySet();
-        if (segmentContents.size() == 1) {
-          xml.writeCharacters(Iterables.getOnlyElement(segmentContents));
-        } else {
-          xml.writeStartElement("", "app", TEI_NS);
-          for (String segment : segmentContents) {
-            final StringBuilder witnesses = new StringBuilder();
-            for (Witness witness : segments.get(segment)) {
-              witnesses.append(witness.getSigil()).append(" ");
-            }
-            if (segment.length() == 0) {
-              xml.writeEmptyElement("", "rdg", TEI_NS);
+          final Set<String> segmentContents = segments.keySet();
+          try {
+            if (segmentContents.size() == 1) {
+              xml.writeCharacters(Iterables.getOnlyElement(segmentContents));
             } else {
-              xml.writeStartElement("", "rdg", TEI_NS);
-            }
+              xml.writeStartElement("", "app", TEI_NS);
+              for (String segment : segmentContents) {
+                final StringBuilder witnesses = new StringBuilder();
+                for (Witness witness : segments.get(segment)) {
+                  witnesses.append(witness.getSigil()).append(" ");
+                }
+                if (segment.length() == 0) {
+                  xml.writeEmptyElement("", "rdg", TEI_NS);
+                } else {
+                  xml.writeStartElement("", "rdg", TEI_NS);
+                }
 
-            xml.writeAttribute("wit", witnesses.toString().trim());
+                xml.writeAttribute("wit", witnesses.toString().trim());
 
-            if (segment.length() > 0) {
-              xml.writeCharacters(segment);
+                if (segment.length() > 0) {
+                  xml.writeCharacters(segment);
+                  xml.writeEndElement();
+                }
+              }
               xml.writeEndElement();
             }
+          } catch (XMLStreamException e) {
+            throw Throwables.propagate(e);
           }
-          xml.writeEndElement();
         }
-      }
-    }
 
-    xml.writeEndElement();
-    xml.writeEndDocument();
+        @Override
+        public void end() {
+          try {
+            xml.writeEndElement();
+            xml.writeEndDocument();
+          } catch (XMLStreamException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+      });
+    } catch (Throwable t) {
+      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), XMLStreamException.class);
+      throw Throwables.propagate(t);
+    }
   }
 
   public void toCsv(Writer out) throws IOException {

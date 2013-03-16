@@ -20,6 +20,7 @@
 package eu.interedition.collatex.util;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Maps;
@@ -48,9 +49,11 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
 
   private final Map<VariantGraph.Vertex, Integer> byVertex = Maps.newHashMap();
   private final SortedSetMultimap<Integer, VariantGraph.Vertex> byRank = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
+  private final VariantGraph graph;
   private final Set<Witness> witnesses;
 
-  public VariantGraphRanking(Set<Witness> witnesses) {
+  VariantGraphRanking(VariantGraph graph, Set<Witness> witnesses) {
+    this.graph = graph;
     this.witnesses = witnesses;
   }
 
@@ -59,7 +62,7 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
   }
 
   public static VariantGraphRanking of(VariantGraph graph, Set<Witness> witnesses) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(witnesses);
+    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
     for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
       int rank = -1;
       for (VariantGraph.Edge e : v.incoming(witnesses)) {
@@ -70,6 +73,10 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
       ranking.byRank.put(rank, v);
     }
     return ranking;
+  }
+
+  public Set<Witness> witnesses() {
+    return Objects.firstNonNull(witnesses, graph.witnesses());
   }
 
   public Map<VariantGraph.Vertex, Integer> getByVertex() {
