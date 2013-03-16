@@ -19,22 +19,25 @@
 
 package eu.interedition.collatex.cocoon;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.base.Objects;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SetMultimap;
+import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.util.ParallelSegmentationApparatus;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
@@ -45,7 +48,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,11 +62,13 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   private static final String TEI_NS = "http://www.tei-c.org/ns/1.0";
   public static final String COLLATEX_NS = "http://interedition.eu/collatex/ns/1.0";
 
-  private enum OutputType {
+  private enum Format {
     ALIGNMENT_TABLE, TEI_APPARATUS
   }
 
-  private OutputType outputType = OutputType.ALIGNMENT_TABLE;
+  private Format format = Format.ALIGNMENT_TABLE;
+  private CollationAlgorithm algorithm;
+  private boolean joined;
   private final List<Iterable<Token>> witnesses = Lists.newArrayList();
   private String sigil;
 
@@ -75,31 +80,58 @@ public class CollateXTransformer extends AbstractSAXTransformer {
 
   @Override
   public void startTransformingElement(String uri, String name, String raw, Attributes attr) throws ProcessingException, IOException, SAXException {
+    if (!COLLATEX_NS.equals(uri)) {
+      return;
+    }
     if ("collation".equals(name)) {
-      final String outputType = attr.getValue(defaultNamespaceURI, "outputType");
-      if (outputType != null && "tei".equalsIgnoreCase(outputType.trim())) {
-        this.outputType = OutputType.TEI_APPARATUS;
+      final String format = Objects.firstNonNull(attributeValue(attr, "format"), "table").trim().toLowerCase();
+      if ("tei".equals(format)) {
+        this.format = Format.TEI_APPARATUS;
       } else {
-        this.outputType = OutputType.ALIGNMENT_TABLE;
+        this.format = Format.ALIGNMENT_TABLE;
       }
+
+      Comparator<Token> tokenComparator = new EqualityTokenComparator();
+      try {
+        final int editDistance = Integer.parseInt(Objects.firstNonNull(attributeValue(attr, "editDistance"), "0"));
+        if (editDistance > 0) {
+          tokenComparator = new EditDistanceTokenComparator(editDistance);
+        }
+      } catch (NumberFormatException e) {
+      }
+
+      final String algorithm = Objects.firstNonNull(attributeValue(attr, "algorithm"), "dekker").trim().toLowerCase();
+      if (algorithm.equals("medite")) {
+        this.algorithm = CollationAlgorithmFactory.medite(tokenComparator);
+      } else if (algorithm.equals("needleman-wunsch")) {
+        this.algorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
+      } else {
+        this.algorithm = CollationAlgorithmFactory.dekker(tokenComparator);
+      }
+
+      this.joined = "true".equals(Objects.firstNonNull(attributeValue(attr, "joined"), "true").trim().toLowerCase());
+
       sigil = null;
       witnesses.clear();
     } else if ("witness".equals(name)) {
-      sigil = attr.getValue("sigil");
-      if (sigil == null) {
-        sigil = "w" + (witnesses.size() + 1);
-      }
+      sigil = Objects.firstNonNull(attributeValue(attr, "sigil"), "w" + (witnesses.size() + 1));
       startTextRecording();
     }
   }
 
   @Override
   public void endTransformingElement(String uri, String name, String raw) throws ProcessingException, IOException, SAXException {
+    if (!COLLATEX_NS.equals(uri)) {
+      return;
+    }
     if ("collation".equals(name) && !witnesses.isEmpty()) {
       ignoreHooksCount++;
       final VariantGraph graph = new JungVariantGraph();
-      CollationAlgorithmFactory.dekker(new EqualityTokenComparator()).collate(graph, witnesses);
-      switch (outputType) {
+      this.algorithm.collate(graph, witnesses);
+      if (this.joined) {
+        VariantGraph.JOIN.apply(graph);
+      }
+      switch (format) {
         case TEI_APPARATUS:
           sendTeiApparatus(graph);
           break;
@@ -114,83 +146,105 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   }
 
   private void sendAlignmentTable(VariantGraph graph) throws SAXException {
-    sendStartElementEventNS("alignment", EMPTY_ATTRIBUTES);
+    startPrefixMapping("", COLLATEX_NS);
+    startElement(COLLATEX_NS, "alignment", "alignment", EMPTY_ATTRIBUTES);
     final Set<Witness> witnesses = graph.witnesses();
     final RowSortedTable<Integer, Witness, Set<Token>> table = VariantGraphRanking.of(graph).asTable();
 
     for (Integer rowIndex : table.rowKeySet()) {
       final Map<Witness, Set<Token>> row = table.row(rowIndex);
-      sendStartElementEventNS("row", EMPTY_ATTRIBUTES);
+      startElement(COLLATEX_NS, "row", "row", EMPTY_ATTRIBUTES);
       for (Witness witness : witnesses) {
         final AttributesImpl cellAttrs = new AttributesImpl();
-        cellAttrs.addCDATAAttribute(namespaceURI, "sigil", "sigil", witness.getSigil());
-        sendStartElementEventNS("cell", cellAttrs);
-        if (!row.containsKey(witness)) {
-          sendTextEvent(SimpleToken.toString(row.get(witness)));
+        cellAttrs.addCDATAAttribute("sigil", witness.getSigil());
+        startElement(COLLATEX_NS, "cell", "cell", cellAttrs);
+        if (row.containsKey(witness)) {
+          for (SimpleToken token : Ordering.natural().immutableSortedCopy(Iterables.filter(row.get(witness), SimpleToken.class))) {
+            sendTextEvent(token.getContent());
+          }
         }
-        sendEndElementEventNS("cell");
+        endElement(COLLATEX_NS, "cell", "cell");
 
       }
-      sendEndElementEventNS("row");
+      endElement(COLLATEX_NS, "row", "row");
     }
-    sendEndElementEventNS("alignment");
+    endElement(COLLATEX_NS, "alignment", "alignment");
+    endPrefixMapping("");
   }
 
   private void sendTeiApparatus(VariantGraph graph) throws SAXException {
-    final Set<Witness> allWitnesses = graph.witnesses();
-
-    sendStartElementEventNS("apparatus", EMPTY_ATTRIBUTES);
-    startPrefixMapping("tei", TEI_NS);
-
-    for (Iterator<Set<VariantGraph.Vertex>> rowIt = VariantGraphRanking.of(VariantGraph.JOIN.apply(graph)).iterator(); rowIt.hasNext();) {
-      final Set<VariantGraph.Vertex> row = rowIt.next();
-
-      final SetMultimap<Witness, Token> tokenIndex = HashMultimap.create();
-      for (VariantGraph.Vertex v : row) {
-        for (Token token : v.tokens()) {
-          tokenIndex.put(token.getWitness(), token);
-        }
-      }
-
-      final SortedMap<Witness, String> cellContents = Maps.newTreeMap(Witness.SIGIL_COMPARATOR);
-      for (Witness witness : tokenIndex.keySet()) {
-        final StringBuilder cellContent = new StringBuilder();
-        for (SimpleToken token : Ordering.natural().sortedCopy(Iterables.filter(tokenIndex.get(witness), SimpleToken.class))) {
-          cellContent.append(token.getContent()).append(" ");
-        }
-        cellContents.put(witness, cellContent.toString().trim());
-      }
-
-      final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
-      for (Map.Entry<Witness, String> cell : cellContents.entrySet()) {
-        segments.put(cell.getValue(), cell.getKey());
-      }
-
-      final String firstSegment = Iterables.getFirst(segments.keySet(), "");
-      if (segments.keySet().size() == 1 && segments.get(firstSegment).size() == allWitnesses.size()) {
-        sendTextEvent(firstSegment);
-      } else {
-        startElement(TEI_NS, "app", "tei:app", EMPTY_ATTRIBUTES);
-        for (String segment : segments.keySet()) {
-          final StringBuilder witnesses = new StringBuilder();
-          for (Witness witness : segments.get(segment)) {
-            witnesses.append(witness.getSigil()).append(" ");
+    try {
+      ParallelSegmentationApparatus.generate(VariantGraphRanking.of(graph), new ParallelSegmentationApparatus.GeneratorCallback() {
+        @Override
+        public void start() {
+          try {
+            startPrefixMapping("cx", COLLATEX_NS);
+            startPrefixMapping("", TEI_NS);
+            startElement(COLLATEX_NS, "apparatus", "cx:apparatus", EMPTY_ATTRIBUTES);
+          } catch (SAXException e) {
+            throw Throwables.propagate(e);
           }
-          final AttributesImpl attributes = new AttributesImpl();
-          attributes.addCDATAAttribute("wit", witnesses.toString().trim());
-          startElement(TEI_NS, "rdg", "tei:rdg", attributes);
-          sendTextEvent(segment);
-          endElement(TEI_NS, "rdg", "tei:rdg");
         }
-        endElement(TEI_NS, "app", "tei:app");
-      }
 
-      if (rowIt.hasNext()) {
-        sendTextEvent(" ");
+        @Override
+        public void segment(SortedMap<Witness, Iterable<Token>> contents) {
+          final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
+          for (Map.Entry<Witness, Iterable<Token>> cell : contents.entrySet()) {
+            final StringBuilder sb = new StringBuilder();
+            for (SimpleToken token : Ordering.natural().immutableSortedCopy(Iterables.filter(cell.getValue(), SimpleToken.class))) {
+              sb.append(token.getContent());
+            }
+            segments.put(sb.toString(), cell.getKey());
+          }
+
+          final Set<String> segmentContents = segments.keySet();
+          try {
+            if (segmentContents.size() == 1) {
+              sendTextEvent(Iterables.getOnlyElement(segmentContents));
+            } else {
+              startElement(TEI_NS, "app", "app", EMPTY_ATTRIBUTES);
+              for (String segment : segmentContents) {
+                final StringBuilder witnesses = new StringBuilder();
+                for (Witness witness : segments.get(segment)) {
+                  witnesses.append(witness.getSigil()).append(" ");
+                }
+
+                final AttributesImpl attributes = new AttributesImpl();
+                attributes.addCDATAAttribute("wit", witnesses.toString().trim());
+                startElement(TEI_NS, "rdg", "rdg", attributes);
+                sendTextEvent(segment);
+                endElement(TEI_NS, "rdg", "rdg");
+              }
+              endElement(TEI_NS, "app", "app");
+            }
+          } catch (SAXException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+
+        @Override
+        public void end() {
+          try {
+            endElement(COLLATEX_NS, "apparatus", "cx:apparatus");
+            endPrefixMapping("");
+            endPrefixMapping("cx");
+          } catch (SAXException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+      });
+    } catch (Throwable t) {
+      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), SAXException.class);
+      throw Throwables.propagate(t);
+    }
+  }
+
+  static String attributeValue(Attributes attr, String localName) {
+    for (int ac = 0, al = attr.getLength(); ac < al; ac++) {
+      if (localName.equals(attr.getLocalName(ac))) {
+        return attr.getValue(ac);
       }
     }
-
-    endPrefixMapping("tei");
-    sendEndElementEventNS("apparatus");
+    return null;
   }
 }
