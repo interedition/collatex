@@ -378,8 +378,8 @@
         Again, in the example above, that means the last token of version "B" is normalized from the reading "kitten" to the reading "cat", thus facilitating
         a match of "kitten" with the last token of version "A".</p>
 
-    <p>Apart from these 2&nbsp; defined properties <em>t</em> and <em>n</em>, token objects can contain an arbitrary number of additional properties.
-        Additional properties will not be interpreted by the CollateX but just be passed through, reappearing in
+    <p>Apart from these 2&nbsp;defined properties <em>t</em> and <em>n</em>, token objects can contain an arbitrary number of additional properties.
+        Additional properties will not be interpreted by CollateX but just be passed through, reappearing in
         the <a href="#output" title="Section">output</a> unchanged. Properties like <em>ref</em>, <em>adj</em> or <em>id</em> in the example would be such
         additional properties of a token object. Users of the JSON input can make use of this pass-through mode e.g. in order to uniquely identify aligned tokens
         independently of their (possibly non-unique) content.</p>
@@ -417,6 +417,18 @@
         An edit distance of&nbsp;1 is the default.</p>
 
     <h3 id="xml-input">XML</h3>
+
+    <p>XML-encoded text versions are also supported by CollateX, though the ability to preserve the markup context of tokens originating from XML documents is
+        fairly limited at the moment. You can compare XML documents e.g. via the <a href="#cli" title="Section">command line interface</a> by providing an
+        <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath 1.0 expression</a></p>
+
+    <p>In a Cocoon XML transformation pipeline:</p>
+
+    <pre class="prettyprint">&lt;collation xmlns="http://interedition.eu/collatex/ns/1.0" joined="true" editDistance="1" algorithm="medite" format="tei">
+    &lt;witness>Almost every aspect of what scholarly editors do may be changed&lt;/witness>
+    &lt;witness>Hardly any aspect of what stupid editors do in the privacy of their own home may be changed again and again&lt;/witness>
+    &lt;witness>very many aspects of what scholarly editors do in the livingrooms of their own home may not be changed&lt;/witness>
+&lt;/collation></pre>
 
     <h2 id="output">Output</h2>
 
@@ -464,6 +476,30 @@
     &lt;/app&gt;
 &lt;/cx:apparatus&gt;</pre>
 
+    <h3 id="xml-output">XML</h3>
+
+    <pre class="prettyprint">&lt;alignment xmlns="http://interedition.eu/collatex/ns/1.0">
+    &lt;row>
+        &lt;cell sigil="w1">Auch hier &lt;/cell>
+        &lt;cell sigil="w2">Ich &lt;/cell>
+        &lt;cell sigil="w3">Ich &lt;/cell>
+    &lt;/row>
+    &lt;row>
+        &lt;cell sigil="w1">hab &lt;/cell>
+        &lt;cell sigil="w2">hab &lt;/cell>
+        &lt;cell sigil="w3">hab &lt;/cell>
+    &lt;/row>
+    &lt;row>
+        &lt;cell sigil="w1">ich &lt;/cell>
+        &lt;cell sigil="w2">auch hier &lt;/cell>
+        &lt;cell sigil="w3">auch hier &lt;/cell>
+    &lt;/row>
+    &lt;row>
+        &lt;cell sigil="w1">wieder ein Plätzchen&lt;/cell>
+        &lt;cell sigil="w2">wieder ein Pläzchen&lt;/cell>
+        &lt;cell sigil="w3">wieder ein Pläzchen&lt;/cell>
+    &lt;/row>
+&lt;/alignment></pre>
 
     <h3 id="graphml-output">GraphML</h3>
 
@@ -515,6 +551,29 @@
 
     <h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3>
 
+    <h2 id="cocoon">Apache Cocoon Integration</h2>
+    
+    <pre class="prettyprint">&lt;map:components>
+...
+&lt;map:transformers>
+    ...
+    &lt;map:transformer name="collatex" src="eu.interedition.collatex.cocoon.CollateXTransformer" />
+    ...
+&lt;/map:transformers>
+...
+&lt;/map:components></pre>
+    
+    <pre class="prettyprint">&lt;map:pipelines>
+...
+&lt;map:pipeline>
+  &lt;map:match pattern="collatex-test">
+    &lt;map:generate src="resource/internal/collation.xml" />
+    &lt;map:transform type="collatex"/>
+    &lt;map:serialize type="xml"/>
+  &lt;/map:match>
+&lt;/map:pipeline>
+...
+&lt;/map:pipelines></pre>
     <h2 id="rest-service">The RESTful Web Service</h2>
 
     <p>
