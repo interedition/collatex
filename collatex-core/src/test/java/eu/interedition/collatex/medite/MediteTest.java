@@ -22,6 +22,7 @@ package eu.interedition.collatex.medite;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class MediteTest extends AbstractTest {
 
   @Override
   public void initAlgorithm() {
-    collationAlgorithm = CollationAlgorithmFactory.medite(new EqualityTokenComparator());
+    collationAlgorithm = CollationAlgorithmFactory.medite(new EqualityTokenComparator(), SimpleToken.TOKEN_MATCH_EVALUATOR);
   }
 
   @Test
