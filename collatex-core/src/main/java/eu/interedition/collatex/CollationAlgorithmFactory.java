@@ -19,9 +19,12 @@
 
 package eu.interedition.collatex;
 
+import com.google.common.base.Function;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
+import eu.interedition.collatex.medite.Match;
 import eu.interedition.collatex.medite.MediteAlgorithm;
+import eu.interedition.collatex.medite.Phrase;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 
 import java.util.Comparator;
@@ -44,7 +47,7 @@ public class CollationAlgorithmFactory {
     return new NeedlemanWunschAlgorithm(comparator);
   }
 
-  public static CollationAlgorithm medite(Comparator<Token> comparator) {
-    return new MediteAlgorithm(comparator);
+  public static CollationAlgorithm medite(Comparator<Token> comparator, Function<Phrase<Match.WithToken>, Integer> matchEvaluator) {
+    return new MediteAlgorithm(comparator, matchEvaluator);
   }
 }

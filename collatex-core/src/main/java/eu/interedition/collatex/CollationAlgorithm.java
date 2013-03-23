@@ -87,8 +87,8 @@ public interface CollationAlgorithm {
         if (matchingVertex == null) {
           matchingVertex = into.add(token);
         } else {
-          if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "Adding matched {0} to {1}", new Object[] { token, matchingVertex });
+          if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Match: {0} to {1}", new Object[] { matchingVertex, token });
           }
           matchingVertex.add(Collections.singleton(token));
         }
@@ -103,7 +103,7 @@ public interface CollationAlgorithm {
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
         if (LOG.isLoggable(Level.FINE)) {
-          LOG.log(Level.FINE, "transposition: {0}", transposedPhrase);
+          LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
         }
         final Set<VariantGraph.Vertex> transposed = Sets.newHashSet();
         for (Match match : transposedPhrase) {

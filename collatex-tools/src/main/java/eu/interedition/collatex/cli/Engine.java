@@ -30,6 +30,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -102,7 +103,7 @@ public class Engine implements Closeable {
     if ("needleman-wunsch".equals(algorithm)) {
       this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
     } else if ("medite".equals(algorithm)) {
-      this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator);
+      this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
     } else {
       this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
     }

@@ -27,6 +27,7 @@ import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 import javax.swing.AbstractAction;
@@ -171,7 +172,7 @@ public class CollateXLaboratory extends JFrame {
       } else if ("Needleman-Wunsch".equals(algorithm.getSelectedItem())) {
         collator = CollationAlgorithmFactory.needlemanWunsch(comparator);
       } else {
-        collator = CollationAlgorithmFactory.medite(comparator);
+        collator = CollationAlgorithmFactory.medite(comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
       }
 
       collator.collate(variantGraph, w);

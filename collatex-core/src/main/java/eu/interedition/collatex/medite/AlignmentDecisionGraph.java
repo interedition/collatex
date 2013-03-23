@@ -19,6 +19,7 @@
 
 package eu.interedition.collatex.medite;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -36,20 +37,22 @@ import java.util.SortedSet;
 public class AlignmentDecisionGraph {
 
   private final List<Phrase<Match.WithTokenIndex>> matches;
+  private final Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator;
   private final PriorityQueue<Node> bestPaths;
   private final Map<Node, Integer> minCosts;
 
-  AlignmentDecisionGraph(List<Phrase<Match.WithTokenIndex>> matches) {
+  AlignmentDecisionGraph(List<Phrase<Match.WithTokenIndex>> matches, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
     this.matches = matches;
+    this.matchEvaluator = matchEvaluator;
     this.bestPaths = new PriorityQueue<Node>(matches.size(), PATH_COST_COMPARATOR);
     this.minCosts = Maps.newHashMap();
   }
 
-  static SortedSet<Phrase<Match.WithTokenIndex>> filter(SortedSet<Phrase<Match.WithTokenIndex>> matches) {
+  static SortedSet<Phrase<Match.WithTokenIndex>> filter(SortedSet<Phrase<Match.WithTokenIndex>> matches, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
     final SortedSet<Phrase<Match.WithTokenIndex>> alignments = Sets.newTreeSet();
 
     final List<Phrase<Match.WithTokenIndex>> matchList = Lists.newArrayList(matches);
-    Node optimal = new AlignmentDecisionGraph(matchList).findBestPath();
+    Node optimal = new AlignmentDecisionGraph(matchList, matchEvaluator).findBestPath();
     while (optimal.matchIndex >= 0) {
       if (optimal.aligned) {
         alignments.add(matchList.get(optimal.matchIndex));
@@ -111,7 +114,7 @@ public class AlignmentDecisionGraph {
   }
 
   private int value(Phrase<Match.WithTokenIndex> match) {
-    return match.size();
+    return matchEvaluator.apply(match);
   }
 
   static class Node {

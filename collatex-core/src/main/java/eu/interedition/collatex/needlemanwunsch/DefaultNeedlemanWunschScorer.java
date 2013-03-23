@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.needlemanwunsch;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -30,7 +29,7 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class DefaultNeedlemanWunschScorer implements NeedlemanWunschScorer {
+public class DefaultNeedlemanWunschScorer implements NeedlemanWunschScorer<Set<VariantGraph.Vertex>, Token> {
 
   private final Comparator<Token> comparator;
 
@@ -39,10 +38,10 @@ public class DefaultNeedlemanWunschScorer implements NeedlemanWunschScorer {
   }
 
   @Override
-  public float score(Set<VariantGraph.Vertex> vertices, Token token) {
-    for (VariantGraph.Vertex vertex : vertices) {
+  public float score(Set<VariantGraph.Vertex> a, Token b) {
+    for (VariantGraph.Vertex vertex : a) {
       final Set<Token> tokens = vertex.tokens();
-      if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), token) == 0) {
+      if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), b) == 0) {
         return 1;
       }
     }

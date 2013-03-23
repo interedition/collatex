@@ -26,6 +26,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.codehaus.jackson.JsonNode;
@@ -148,7 +149,7 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
       if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
         collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
       } else if ("medite".equalsIgnoreCase(collationAlgorithmValue)) {
-        collationAlgorithm = CollationAlgorithmFactory.medite(tokenComparator);
+        collationAlgorithm = CollationAlgorithmFactory.medite(tokenComparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
       }
     }
     if (collationAlgorithm == null) {

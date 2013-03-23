@@ -25,9 +25,9 @@ import eu.interedition.collatex.VariantGraph;
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
 */
-abstract class Match implements Comparable<Match> {
-  final VariantGraph.Vertex vertex;
-  final int vertexRank;
+public abstract class Match implements Comparable<Match> {
+  public final VariantGraph.Vertex vertex;
+  public final int vertexRank;
 
   Match(VariantGraph.Vertex vertex, int vertexRank) {
     this.vertex = vertex;
@@ -50,6 +50,24 @@ abstract class Match implements Comparable<Match> {
   @Override
   public int hashCode() {
     return vertexRank;
+  }
+
+  /**
+   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+   */
+  public static class WithToken extends Match {
+
+    public final Token token;
+
+    WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
+      super(vertex, vertexRank);
+      this.token = token;
+    }
+
+    @Override
+    public String toString() {
+      return "{" + vertex + " -> " + token + "}";
+    }
   }
 
   /**
@@ -86,4 +104,5 @@ abstract class Match implements Comparable<Match> {
       return "{" + vertex + " -> " + token + "}";
     }
   }
+
 }
