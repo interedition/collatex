@@ -24,6 +24,7 @@ import com.google.common.collect.Range;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 /**
@@ -32,6 +33,10 @@ import java.util.HashSet;
 class IndexRangeSet extends HashSet<Range<Integer>> implements Predicate<Integer> {
 
   IndexRangeSet() {
+  }
+
+  IndexRangeSet(Range<Integer> c) {
+    this(Collections.singleton(c));
   }
 
   IndexRangeSet(Collection<? extends Range<Integer>> c) {

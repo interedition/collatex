@@ -20,10 +20,11 @@
 package eu.interedition.collatex.medite;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
@@ -32,198 +33,188 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.logging.Level;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Matches extends ArrayList<Phrase<Match.WithEquivalence>> {
-  private static final Logger LOG = Logger.getLogger(Matches.class.getName());
+public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
 
   public Matches(int initialCapacity) {
     super(initialCapacity);
   }
 
-  public static Matches between(Comparator<Token> comparator, VariantGraphRanking ranking, SuffixTree<Token> suffixTree) {
+  public static Matches between(VariantGraphRanking ranking, SuffixTree<Token> suffixTree, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
 
     final SortedSetMultimap<Integer,VariantGraph.Vertex> rankMap = ranking.getByRank();
-    final Multimap<Integer, MatchThread> matchThreads = HashMultimap.create();
+    final Multimap<Integer, MatchThreadElement> matchThreads = HashMultimap.create();
     for (Integer rank : rankMap.keySet()) {
       final SortedSet<VariantGraph.Vertex> vertices = rankMap.get(rank);
-
       for (VariantGraph.Vertex vertex : vertices) {
-        final MatchThread matchThread = new MatchThread(suffixTree).advance(vertex, rank);
-        if (matchThread != null) {
-          matchThreads.put(rank, matchThread);
+        final MatchThreadElement matchThreadElement = new MatchThreadElement(suffixTree).advance(vertex, rank);
+        if (matchThreadElement != null) {
+          matchThreads.put(rank, matchThreadElement);
         }
       }
-      for (MatchThread matchThread : matchThreads.get(rank - 1)) {
+      for (MatchThreadElement matchThreadElement : matchThreads.get(rank - 1)) {
         for (VariantGraph.Vertex vertex : vertices) {
-          final MatchThread advanced = matchThread.advance(vertex, rank);
+          final MatchThreadElement advanced = matchThreadElement.advance(vertex, rank);
           if (advanced != null) {
             matchThreads.put(rank, advanced);
-            break;
           }
         }
       }
     }
 
-    final Matches matcher = new Matches(matchThreads.size());
-    for (MatchThread matchThread : matchThreads.values()) {
-      final Phrase<Match.WithEquivalence> phrase = new Phrase<Match.WithEquivalence>();
-
-      MatchThread current = matchThread;
-      while (current.vertex != null) {
-        phrase.add(new Match.WithEquivalence(current.vertex, current.vertexRank, current.cursor.matchedClass()));
-        current = current.previous;
+    final Matches matches = new Matches(matchThreads.size());
+    for (MatchThreadElement matchThreadElement : matchThreads.values()) {
+      final List<Phrase<Match.WithTokenIndex>> threadPhrases = Lists.newArrayList();
+      boolean firstElement = true;
+      for (MatchThreadElement threadElement : matchThreadElement.thread()) {
+        final SuffixTree<Token>.EquivalenceClass equivalenceClass = threadElement.cursor.matchedClass();
+        for (int mc = 0; mc < equivalenceClass.length; mc++) {
+          final int tokenCandidate = equivalenceClass.members[mc];
+          if (firstElement) {
+            final Phrase<Match.WithTokenIndex> phrase = new Phrase<Match.WithTokenIndex>();
+            phrase.add(new Match.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
+            threadPhrases.add(phrase);
+          } else {
+            for (Phrase<Match.WithTokenIndex> phrase : threadPhrases) {
+              if ((phrase.last().token + 1) == tokenCandidate) {
+                phrase.add(new Match.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
+              }
+            }
+          }
+        }
+        firstElement = false;
       }
-
-      matcher.add(phrase);
+      matches.addAll(threadPhrases);
     }
-    Collections.sort(matcher, MAXIMUM_UNIQUE_MATCH_ORDERING);
+    Collections.sort(matches, maximalUniqueMatchOrdering(matchEvaluator));
 
-    return matcher;
+    return matches;
   }
 
-  public SortedSet<Phrase<Match.WithTokenIndex>> removeMaximalUniqueMatches(IndexRangeSet rankFilter, IndexRangeSet tokenFilter) {
-    rankFilter = new IndexRangeSet(rankFilter);
-    tokenFilter = new IndexRangeSet(tokenFilter);
+  private static Comparator<Phrase<Match.WithTokenIndex>> maximalUniqueMatchOrdering(final Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
+    return new Comparator<Phrase<Match.WithTokenIndex>>() {
+      @Override
+      public int compare(Phrase<Match.WithTokenIndex> o1, Phrase<Match.WithTokenIndex> o2) {
+        // 1. reverse ordering by match value
+        int result = matchEvaluator.apply(o2) - matchEvaluator.apply(o1);
+        if (result != 0) {
+          return result;
+        }
 
-    final Function<Phrase<Match.WithEquivalence>, Phrase<Match.WithTokenIndex>> tokenSelector = tokenSelector(rankFilter, tokenFilter);
+        final Match.WithTokenIndex firstMatch1 = o1.first();
+        final Match.WithTokenIndex firstMatch2 = o2.first();
+
+        // 2. ordering by match distance
+        result = (Math.abs(firstMatch1.token - firstMatch1.vertexRank) - Math.abs(firstMatch2.token - firstMatch2.vertexRank));
+        if (result != 0) {
+          return result;
+        }
+
+
+        // 3. ordering by first vertex ranking
+        result = firstMatch1.vertexRank - firstMatch2.vertexRank;
+        if (result != 0) {
+          return result;
+        }
+
+        // 3. ordering by first token index
+        return firstMatch1.token - firstMatch2.token;
+
+      }
+    };
+  }
+
+  public SortedSet<Phrase<Match.WithTokenIndex>> findMaximalUniqueMatches() {
+    final TreeSet<Phrase<Match.WithTokenIndex>> allMatches = Sets.newTreeSet(this);
+
     final SortedSet<Phrase<Match.WithTokenIndex>> maximalUniqueMatches = Sets.newTreeSet();
 
     while (true) {
-      final Set<Phrase<Match.WithEquivalence>> exhaustedMatches = Sets.newHashSet();
       Phrase<Match.WithTokenIndex> nextMum = null;
-
-      final int numPhrases = size();
-      for (int pc = 0; pc < (numPhrases - 1); pc++) {
-        final Phrase<Match.WithEquivalence> candidate = get(pc);
-        final Phrase<Match.WithEquivalence> successor = get(pc + 1);
-
-        if (candidate.size() > successor.size() || candidate.first().equivalenceClass.equals(successor.first().equivalenceClass)) {
-          nextMum = tokenSelector.apply(candidate);
-          if (nextMum != null) {
-            break;
-          } else {
-            exhaustedMatches.add(candidate);
-          }
+      Phrase<Match.WithTokenIndex> candidate = null;
+      for (Phrase<Match.WithTokenIndex> successor : allMatches) {
+        if (candidate == null) {
+          continue;
         }
+        if (candidate.size() > successor.size() || candidate.first().token == successor.first().token) {
+          nextMum = candidate;
+          break;
+        }
+        candidate = successor;
       }
       if (nextMum == null) {
-        for (Phrase<Match.WithEquivalence> candidate : this) {
-          nextMum = tokenSelector.apply(candidate);
-          if (nextMum != null) {
-            break;
-          }
-          exhaustedMatches.add(candidate);
-        }
+        nextMum = Iterables.getFirst(allMatches, null);
       }
       if (nextMum == null) {
         break;
       }
-
       Preconditions.checkState(maximalUniqueMatches.add(nextMum), "Duplicate MUM");
 
-      removeAll(exhaustedMatches);
-
-      rankFilter.add(Ranges.closed(nextMum.first().vertexRank, nextMum.last().vertexRank));
-      tokenFilter.add(Ranges.closed(nextMum.first().token, nextMum.last().token));
+      Iterables.removeIf(allMatches, Match.filter(
+              new IndexRangeSet(Ranges.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
+              new IndexRangeSet(Ranges.closed(nextMum.first().token, nextMum.last().token))
+      ));
     }
     return maximalUniqueMatches;
-  }
-
-  static Function<Phrase<Match.WithEquivalence>, Phrase<Match.WithTokenIndex>> tokenSelector(final IndexRangeSet rankFilter, final IndexRangeSet tokenFilter) {
-    return new Function<Phrase<Match.WithEquivalence>, Phrase<Match.WithTokenIndex>>() {
-      @Override
-      public Phrase<Match.WithTokenIndex> apply(@Nullable Phrase<Match.WithEquivalence> input) {
-        final Phrase<Match.WithTokenIndex> tokenPhrase = new Phrase<Match.WithTokenIndex>();
-        Integer lastToken = null;
-        for (Match.WithEquivalence match : input) {
-          if (rankFilter.apply(match.vertexRank)) {
-            return null;
-          }
-
-          boolean matchFound = false;
-          for (int mc = 0; mc < match.equivalenceClass.length; mc++) {
-            final int tokenCandidate = match.equivalenceClass.members[mc];
-            if (lastToken != null && (lastToken + 1) != tokenCandidate) {
-              continue;
-            }
-            if (!tokenFilter.apply(tokenCandidate)) {
-              matchFound = true;
-              tokenPhrase.add(new Match.WithTokenIndex(match.vertex, match.vertexRank, lastToken = tokenCandidate));
-              break;
-            }
-          }
-          if (!matchFound) {
-            return null;
-          }
-        }
-        return tokenPhrase;
-      }
-    };
   }
 
   /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
-  static class MatchThread {
+  static class MatchThreadElement {
 
-    final MatchThread previous;
+    final MatchThreadElement previous;
     final VariantGraph.Vertex vertex;
     final int vertexRank;
     final SuffixTree<Token>.Cursor cursor;
 
-    MatchThread(SuffixTree<Token> suffixTree) {
+    MatchThreadElement(SuffixTree<Token> suffixTree) {
       this(null, null, -1, suffixTree.cursor());
     }
 
-    MatchThread(MatchThread previous, VariantGraph.Vertex vertex, int vertexRank, SuffixTree<Token>.Cursor cursor) {
+    MatchThreadElement(MatchThreadElement previous, VariantGraph.Vertex vertex, int vertexRank, SuffixTree<Token>.Cursor cursor) {
       this.previous = previous;
       this.vertex = vertex;
       this.vertexRank = vertexRank;
       this.cursor = cursor;
     }
 
-    MatchThread advance(VariantGraph.Vertex vertex, int vertexRank) {
+    MatchThreadElement advance(VariantGraph.Vertex vertex, int vertexRank) {
       final Set<Token> tokens = vertex.tokens();
       if (!tokens.isEmpty()) {
         final SuffixTree<Token>.Cursor next = cursor.move(Iterables.get(tokens, 0));
         if (next != null) {
-          return new MatchThread(this, vertex, vertexRank, next);
+          return new MatchThreadElement(this, vertex, vertexRank, next);
         }
       }
       return null;
     }
-  }
 
-  static final Comparator<Phrase<Match.WithEquivalence>> MAXIMUM_UNIQUE_MATCH_ORDERING = new Comparator<Phrase<Match.WithEquivalence>>() {
-    @Override
-    public int compare(Phrase<Match.WithEquivalence> o1, Phrase<Match.WithEquivalence> o2) {
-      // 1. reverse ordering by match length
-      int result = o2.size() - o1.size();
-      if (result != 0) {
-        return result;
+    List<MatchThreadElement> thread() {
+      final LinkedList<MatchThreadElement> thread = Lists.newLinkedList();
+      MatchThreadElement current = this;
+      while (current.vertex != null) {
+        thread.addFirst(current);
+        current = current.previous;
       }
-
-      // 2. ordering by first vertex ranking
-      result = o1.first().vertexRank - o2.first().vertexRank;
-      if (result != 0) {
-        return result;
-      }
-
-      // 3. ordering by first token equivalence class
-      return o1.first().equivalenceClass.compareTo(o1.first().equivalenceClass);
-
+      return thread;
     }
-  };
 
+    @Override
+    public String toString() {
+      return "[" + Joiner.on(", ").join(vertexRank, vertex, cursor.matchedClass()) + "]";
+    }
+  }
 }

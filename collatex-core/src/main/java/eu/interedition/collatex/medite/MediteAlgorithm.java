@@ -20,13 +20,12 @@
 package eu.interedition.collatex.medite;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
@@ -84,24 +83,25 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     }
 
 
-    final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, ranking.size(), tokens);
-    final Matches matcher = Matches.between(comparator, ranking, suffixTree);
+    final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, tokens);
+    final Matches matches = Matches.between(ranking, suffixTree, matchEvaluator);
 
     if (logTimings) {
       stopwatch.stop();
-      LOG.log(Level.FINE, "Found a total of {0} matching phrase(s) in {1}", new Object[] { matcher.size(), stopwatch });
+      LOG.log(Level.FINE, "Found a total of {0} matching phrase(s) in {1}", new Object[] { matches.size(), stopwatch });
       stopwatch.reset().start();
     }
 
-    final IndexRangeSet rankFilter = new IndexRangeSet();
-    final IndexRangeSet tokenFilter = new IndexRangeSet();
-
     final SortedSet<Phrase<Match.WithTokenIndex>> alignments = Sets.newTreeSet();
     while (true) {
-      final SortedSet<Phrase<Match.WithTokenIndex>> maximalUniqueMatches = matcher.removeMaximalUniqueMatches(rankFilter, tokenFilter);
+      final SortedSet<Phrase<Match.WithTokenIndex>> maximalUniqueMatches = matches.findMaximalUniqueMatches();
       if (maximalUniqueMatches.isEmpty()) {
         break;
       }
+
+      final IndexRangeSet rankFilter = new IndexRangeSet();
+      final IndexRangeSet tokenFilter = new IndexRangeSet();
+
       for (Phrase<Match.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches, matchEvaluator)) {
         final Match.WithTokenIndex firstMatch = phrase.first();
         final Match.WithTokenIndex lastMatch = phrase.last();
@@ -110,19 +110,25 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
         rankFilter.add(Ranges.closed(firstMatch.vertexRank, lastMatch.vertexRank));
         tokenFilter.add(Ranges.closed(firstMatch.token, lastMatch.token));
       }
+
+      Iterables.removeIf(matches, Match.filter(rankFilter, tokenFilter));
     }
 
     if (logTimings) {
       stopwatch.stop();
-      LOG.log(Level.FINE, "Selected {0} maximal unique matches in {1}", new Object[] { alignments.size(), stopwatch });
+      LOG.log(Level.FINE, "Selected {0} maximal unique matches in {1}\n{2}", new Object[]{
+              alignments.size(), stopwatch, Joiner.on('\n').join(alignments)
+      });
       stopwatch.reset().start();
     }
 
-    final List<Phrase<Match.WithTokenIndex>> transpositions = transpositions(alignments);
+    final List<Phrase<Match.WithTokenIndex>> transpositions = transpositions(alignments, matchEvaluator, Math.max(tokens.length, ranking.size()));
 
     if (logTimings) {
       stopwatch.stop();
-      LOG.log(Level.FINE, "Detected {0} transpositions in {1} maximal unique matches in {2}", new Object[] { transpositions.size(), alignments.size(), stopwatch });
+      LOG.log(Level.FINE, "Detected {0} transpositions in {1} maximal unique matches in {2}\n{3}", new Object[]{
+              transpositions.size(), alignments.size(), stopwatch, Joiner.on('\n').join(transpositions)
+      });
       stopwatch.reset().start();
     }
 
@@ -152,71 +158,69 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     }
   }
 
-  List<Phrase<Match.WithTokenIndex>> transpositions(SortedSet<Phrase<Match.WithTokenIndex>> phraseMatches) {
+  @SuppressWarnings("unchecked")
+  List<Phrase<Match.WithTokenIndex>> transpositions(SortedSet<Phrase<Match.WithTokenIndex>> phraseMatches, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator, int penalty) {
+    final Phrase<Match.WithTokenIndex>[] vertexSorted = (Phrase<Match.WithTokenIndex>[]) phraseMatches.toArray(new Phrase[phraseMatches.size()]);
+    final Phrase<Match.WithTokenIndex>[] tokenSorted = (Phrase<Match.WithTokenIndex>[]) Ordering.from(new Comparator<Phrase<Match.WithTokenIndex>>() {
+      @Override
+      public int compare(Phrase<Match.WithTokenIndex> o1, Phrase<Match.WithTokenIndex> o2) {
+        return (o1.first().token - o2.first().token);
+      }
+    }).immutableSortedCopy(phraseMatches).toArray(new Phrase[phraseMatches.size()]);
 
-    final SortedSet<Integer> sortedMatchSet = Sets.newTreeSet();
-    final Integer[] matches = new Integer[phraseMatches.size()];
-    int tc = 0;
-    for (Phrase<Match.WithTokenIndex> phraseMatch : phraseMatches) {
-      sortedMatchSet.add(matches[tc++] = phraseMatch.first().token);
-    }
-    final Integer[] sortedMatches = sortedMatchSet.toArray(new Integer[sortedMatchSet.size()]);
-
-    final Set<Integer> alignedMatches = NeedlemanWunschAlgorithm.align(
-            sortedMatches,
-            matches,
-            new TranspositionAlignmentScorer(matches.length)
+    final Set<Phrase<Match.WithTokenIndex>> aligned = NeedlemanWunschAlgorithm.align(
+            vertexSorted,
+            tokenSorted,
+            new TranspositionAlignmentScorer(matchEvaluator, penalty)
     ).keySet();
 
     final List<Phrase<Match.WithTokenIndex>> transpositions = Lists.newArrayList();
     for (Phrase<Match.WithTokenIndex> phraseMatch : phraseMatches) {
-      if (!alignedMatches.contains(phraseMatch.first().token)) {
+      if (!aligned.contains(phraseMatch)) {
         transpositions.add(phraseMatch);
       }
     }
     return transpositions;
   }
 
-  static class TranspositionAlignmentScorer implements NeedlemanWunschScorer<Integer, Integer> {
+  static class TranspositionAlignmentScorer implements NeedlemanWunschScorer<Phrase<Match.WithTokenIndex>, Phrase<Match.WithTokenIndex>> {
 
-    final int maxPenality;
+    final Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator;
+    final int penalty;
 
-    TranspositionAlignmentScorer(int matchCount) {
-      this.maxPenality = -matchCount;
+    TranspositionAlignmentScorer(Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator, int penalty) {
+      this.matchEvaluator = matchEvaluator;
+      this.penalty = penalty;
     }
 
     @Override
-    public float score(Integer a, Integer b) {
-      return (a.equals(b) ? 1 : maxPenality);
+    public float score(Phrase<Match.WithTokenIndex> a, Phrase<Match.WithTokenIndex> b) {
+      return (a.equals(b) ? 1 : -penalty);
     }
 
     @Override
     public float gap() {
-      return -1;
+      return -(1 / (penalty * 1.0f));
     }
   }
 
   static class MatchEvaluatorWrapper implements Function<Phrase<Match.WithTokenIndex>, Integer> {
 
-    final int maxDistance;
     private final Function<Phrase<Match.WithToken>, Integer> wrapped;
-    private final Token[] tokens;
+    private final Function<Match.WithTokenIndex,Match.WithToken> tokenResolver;
 
-    MatchEvaluatorWrapper(final Function<Phrase<Match.WithToken>, Integer> wrapped, final int ranks, final Token[] tokens) {
+    MatchEvaluatorWrapper(final Function<Phrase<Match.WithToken>, Integer> wrapped, final Token[] tokens) {
       this.wrapped = wrapped;
-      this.tokens = tokens;
-      this.maxDistance = Math.max(ranks, tokens.length);
+      this.tokenResolver = Match.tokenResolver(tokens);
     }
 
     @Override
     public Integer apply(@Nullable Phrase<Match.WithTokenIndex> input) {
-      Phrase<Match.WithToken> tokenPhrase = new Phrase<Match.WithToken>();
+      final Phrase<Match.WithToken> tokenPhrase = new Phrase<Match.WithToken>();
       for (Match.WithTokenIndex match : input) {
-        tokenPhrase.add(new Match.WithToken(match.vertex, match.vertexRank, tokens[match.token]));
+        tokenPhrase.add(tokenResolver.apply(match));
       }
-
-      final Match.WithTokenIndex firstMatch = input.first();
-      return (maxDistance * wrapped.apply(tokenPhrase)) + (maxDistance - Math.abs(firstMatch.vertexRank - firstMatch.token));
+      return wrapped.apply(tokenPhrase);
     }
   }
 }

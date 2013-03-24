@@ -19,8 +19,12 @@
 
 package eu.interedition.collatex.medite;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+
+import javax.annotation.Nullable;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -71,23 +75,6 @@ public abstract class Match implements Comparable<Match> {
   }
 
   /**
-  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-  */
-  static class WithEquivalence extends Match {
-    final SuffixTree<Token>.EquivalenceClass equivalenceClass;
-
-    WithEquivalence(VariantGraph.Vertex vertex, int vertexRank, SuffixTree<Token>.EquivalenceClass equivalenceClass) {
-      super(vertex, vertexRank);
-      this.equivalenceClass = equivalenceClass;
-    }
-
-    @Override
-    public String toString() {
-      return "{" + vertex + " -> " + equivalenceClass + "}";
-    }
-  }
-
-  /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
   static class WithTokenIndex extends Match {
@@ -105,4 +92,26 @@ public abstract class Match implements Comparable<Match> {
     }
   }
 
+  static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
+    return new Function<WithTokenIndex, WithToken>() {
+      @Override
+      public WithToken apply(@Nullable WithTokenIndex input) {
+        return new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
+      }
+    };
+  }
+
+  static final Predicate<Phrase<WithTokenIndex>> filter(final IndexRangeSet rankFilter, final IndexRangeSet tokenFilter) {
+    return new Predicate<Phrase<WithTokenIndex>>() {
+      @Override
+      public boolean apply(@Nullable Phrase<WithTokenIndex> input) {
+        for (WithTokenIndex match : input) {
+          if (tokenFilter.apply(match.token) || rankFilter.apply(match.vertexRank)) {
+            return true;
+          }
+        }
+        return false;
+      }
+    };
+  }
 }
