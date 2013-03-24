@@ -167,31 +167,48 @@ public class SimpleVariantGraphSerializer {
     }
   }
 
-  public void toCsv(Writer out) throws IOException {
-    final List<Witness> witnessList = Ordering.from(Witness.SIGIL_COMPARATOR).immutableSortedCopy(graph.witnesses());
-    for (Iterator<Witness> it = witnessList.iterator(); it.hasNext(); ) {
-      out.write(escapeCsvField(it.next().getSigil()));
-      if (it.hasNext()) {
-        out.write(",");
-      }
-    }
-    out.write("\r\n");
-
-    final RowSortedTable<Integer,Witness,Set<Token>> table = ranking().asTable();
-    for (Iterator<Integer> rowIt = table.rowKeySet().iterator(); rowIt.hasNext(); ) {
-      final Map<Witness,Set<Token>> rowContents = table.row(rowIt.next());
-      for (Iterator<Witness> witnessIt = witnessList.iterator(); witnessIt.hasNext();) {
-        out.write(escapeCsvField(tokensToString.apply(Objects.firstNonNull(rowContents.get(witnessIt.next()), Collections.<Token>emptySet()))));
-        if (witnessIt.hasNext()) {
-          out.write(",");
+  public void toCsv(final Writer out) throws IOException {
+    try {
+      ParallelSegmentationApparatus.generate(ranking(), new ParallelSegmentationApparatus.GeneratorCallback() {
+        @Override
+        public void start() {
+          try {
+            final List<Witness> witnessList = Ordering.from(Witness.SIGIL_COMPARATOR).immutableSortedCopy(graph.witnesses());
+            for (Iterator<Witness> it = witnessList.iterator(); it.hasNext(); ) {
+              out.write(escapeCsvField(it.next().getSigil()));
+              if (it.hasNext()) {
+                out.write(",");
+              }
+            }
+            out.write("\r\n");
+          } catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
         }
-      }
-      if (rowIt.hasNext()) {
-        out.write("\r\n");
-      }
 
+        @Override
+        public void segment(SortedMap<Witness, Iterable<Token>> contents) {
+          try {
+            for (Iterator<Witness> witnessIt = contents.keySet().iterator(); witnessIt.hasNext();) {
+              out.write(escapeCsvField(tokensToString.apply(Objects.firstNonNull(contents.get(witnessIt.next()), Collections.<Token>emptySet()))));
+              if (witnessIt.hasNext()) {
+                out.write(",");
+              }
+            }
+            out.write("\r\n");
+          } catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+
+        @Override
+        public void end() {
+        }
+      });
+    } catch (Throwable t) {
+      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), IOException.class);
+      throw Throwables.propagate(t);
     }
-
   }
 
   static final Pattern CSV_SPECIAL_CHARS = Pattern.compile("[\r\n\",]");
