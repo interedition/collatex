@@ -137,10 +137,8 @@ public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
   }
 
   public SortedSet<Phrase<Match.WithTokenIndex>> findMaximalUniqueMatches() {
-    final TreeSet<Phrase<Match.WithTokenIndex>> allMatches = Sets.newTreeSet(this);
-
+    final List<Phrase<Match.WithTokenIndex>> allMatches = Lists.newArrayList(this);
     final SortedSet<Phrase<Match.WithTokenIndex>> maximalUniqueMatches = Sets.newTreeSet();
-
     while (true) {
       Phrase<Match.WithTokenIndex> nextMum = null;
       Phrase<Match.WithTokenIndex> candidate = null;
