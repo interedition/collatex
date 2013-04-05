@@ -2,6 +2,8 @@
 
 {% block content %}
 
+    <ol class="toc float-left"></ol>
+
     <p xmlns="http://www.w3.org/1999/html">To express textual variance, CollateX uses a graph-based data model
         (<a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" title="Schmidt, D. and Colomb, R, 2009. A data structure for representing multi-version texts online, International Journal of Human-Computer Studies, 67.6, 497-514.">Schmidt 2009</a>).
         On top of this model it supports several algorithms to progressively align multiple text versions.</p>
@@ -297,7 +299,7 @@
     <h2 id="input">Input</h2>
 
     <p>This section describes the different input formats CollateX supports. Besides the contents of a text's versions to be compared, the
-        input may also include parameters like the alignment algorithm to be used.</p>
+        input may also include parameters, i. e. the alignment algorithm to be used.</p>
 
     <h3 id="text-input">Plain Text</h3>
 
@@ -402,7 +404,7 @@
 }</pre>
 
     <p>The default function, which can also be explicitly configured like shown above, tests for exact equality of the normalized token content. An alternative is the use of approximate matching via
-        the a <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">Levenshtein/edit distance</a> threshold for matching tokens:</p>
+        a <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">Levenshtein/edit distance</a> threshold for matching tokens:</p>
 
         <pre class="prettyprint">{
   "witnesses": [ … ],
@@ -418,11 +420,16 @@
 
     <h3 id="xml-input">XML</h3>
 
-    <p>XML-encoded text versions are also supported by CollateX, though the ability to preserve the markup context of tokens originating from XML documents is
-        fairly limited at the moment. You can compare XML documents e.g. via the <a href="#cli" title="Section">command line interface</a> by providing an
-        <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath 1.0 expression</a></p>
+    <p>XML-encoded text versions are also supported by CollateX, though the ability to preserve the markup context during the collation process is
+        fairly limited at the moment when not using the <a href="#javadoc">Java API</a>. Out of the box, you can compare XML documents either via
+        the <a href="#cli" title="Section">command line interface</a> or collate them as part of a processing pipeline in <a href="#cocoon">Apache Cocoon</a>.</p>
 
-    <p>In a Cocoon XML transformation pipeline:</p>
+    <p>On the command line, CollateX accepts XML documents with arbitrary tag sets. All it needs is an <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath&nbsp;1.0
+        expression</a> that evaluates to a <a href="http://www.w3.org/TR/xpath/#node-sets" title="Node Sets">node set</a> for each document. The
+        tex content of each node in such a set equals a token. For example, the XPath expression "//w" would result in a text version for each XML document with the sequence
+        of text segments enclosed in &lt;w/> elements as tokens.</p>
+
+    <p>When using CollateX' Apache Cocoon component, the collation will be performed on one or more XML fragments in an input document which adhere to the following schema:</p>
 
     <pre class="prettyprint">&lt;collation xmlns="http://interedition.eu/collatex/ns/1.0" joined="true" editDistance="1" algorithm="medite" format="tei">
     &lt;witness>Almost every aspect of what scholarly editors do may be changed&lt;/witness>
@@ -430,7 +437,25 @@
     &lt;witness>very many aspects of what scholarly editors do in the livingrooms of their own home may not be changed&lt;/witness>
 &lt;/collation></pre>
 
+    <p>CollateX will process any XML fragment enclosed in a &lt;collation/> element from its namespace. In order to configure the collation, this element can have a number of
+        optional attributes:</p>
+
+    <table>
+        <tr><th>algorithm</th><td>the collation algorithm to use: "dekker" (default), "needleman-wunsch" or "medite"</td></tr>
+        <tr><th>format</th><td>the desired output format: "table" for an alignment table in <a href="#xml-output">CollateX' custom schema</a> (default), or
+                "tei" for output in <a href="#tei-p5-output">TEI&nbsp;P5's parallel segmentation format</a></td></tr>
+        <tr><th>editDistance</th><td>the edit distance threshold for optional fuzzy matching of tokens; the default is exact matching</td></tr>
+        <tr><th>joined</th><td>Whether consecutive alignments of tokens should be joined/merged in the output, or whether each alignment of tokens should
+            occupy a separate cell/segment; the latter being the default.</td></tr>
+    </table>
+
+    <p>Each text version to be collated is given as an XML fragment enclosed in a &lt;witness/> element. CollateX will compare all versions contained in a
+    &lt;collation/> element against each other. Markup within &lt;witness/> elements is ignored; only the text content is considered and tokenized/normalized
+    before collation as if it were originating from a plain text source.</p>
+
     <h2 id="output">Output</h2>
+
+    <p>CollateX supports several formats to represent collation results.</p>
 
     <h3 id="json-output">JSON</h3>
 
@@ -440,7 +465,7 @@
     "rows": 3,
     "columns": 2,
     "sigils": ["A", "B"],
-    "table":[
+    "xml":[
       [
         [ {"t":"A"} ],
         [ {"t":"A"} ]
@@ -712,9 +737,4 @@
         <dd>Stolz, M. and Dimpel F. M., 2006. Computergestützte Kollationierung und ihre Integration in den editorischen
             Arbeitsfluss. 2006.</dd>
     </dl>
-{% endblock %}
-
-{% block appendix %}
-    {{ parent() }}
-    <script type="text/javascript" src="/toc.js"></script>
 {% endblock %}
