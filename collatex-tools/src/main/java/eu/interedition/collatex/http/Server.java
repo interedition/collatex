@@ -24,11 +24,10 @@ import com.google.common.collect.Sets;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.server.impl.container.filter.NormalizeFilter;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.io.Collation;
 import eu.interedition.collatex.io.CollationDeserializer;
+import eu.interedition.collatex.io.IOExceptionMapper;
 import eu.interedition.collatex.io.VariantGraphSerializer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
@@ -141,6 +140,7 @@ public class Server extends DefaultResourceConfig implements Runnable {
   @Override
   public Set<Class<?>> getProviderClasses() {
     return Sets.<Class<?>>newHashSet(
+            IOExceptionMapper.class,
             VariantGraphDotMessageBodyWriter.class,
             VariantGraphMLMessageBodyWriter.class,
             VariantGraphTEIMessageBodyWriter.class

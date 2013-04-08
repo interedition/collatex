@@ -94,7 +94,7 @@ public class CollateResource {
 
   @Path("collate")
   @GET
-  public Response redirectToIndex(@Context HttpHeaders hh) throws NoSuchMethodException {
+  public Response noContent(@Context HttpHeaders hh) throws NoSuchMethodException {
     return corsSupport(hh, Response.noContent()).build();
   }
 
