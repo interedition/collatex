@@ -19,22 +19,21 @@
 
 package eu.interedition.collatex.io;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.util.ParallelSegmentationApparatus;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -42,49 +41,61 @@ import java.util.Set;
 public class VariantGraphSerializer extends JsonSerializer<VariantGraph> {
 
   @Override
-  public void serialize(VariantGraph graph, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-    final List<Witness> witnesses = Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses());
-    final RowSortedTable<Integer, Witness, Set<Token>> table = VariantGraphRanking.of(graph).asTable();
+  public void serialize(final VariantGraph graph, final JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    try {
+      ParallelSegmentationApparatus.generate(VariantGraphRanking.of(graph), new ParallelSegmentationApparatus.GeneratorCallback() {
+        @Override
+        public void start() {
+          try {
+            jgen.writeStartObject();
 
-    jgen.writeStartObject();
-
-    // switch rows and columns due to horizontal content orientation
-    jgen.writeNumberField("columns", table.rowKeySet().size());
-    jgen.writeNumberField("rows", table.columnKeySet().size());
-    jgen.writeArrayFieldStart("sigils");
-
-    for (Witness witness : witnesses) {
-      jgen.writeString(witness.getSigil());
-    }
-    jgen.writeEndArray();
-
-
-    jgen.writeArrayFieldStart("table");
-    for (Integer row : table.rowKeySet()) {
-      final Map<Witness, Set<Token>> cells = table.row(row);
-      jgen.writeStartArray();
-      for (Witness witness : witnesses) {
-        final Set<Token> cellContents = cells.get(witness);
-        if (cellContents == null) {
-          jgen.writeNull();
-        } else {
-          final List<SimpleToken> cell = Ordering.natural().sortedCopy(Iterables.filter(cellContents, SimpleToken.class));
-          jgen.writeStartArray();
-          for (SimpleToken token : cell) {
-            if (token instanceof JsonToken) {
-              jgen.writeTree(((JsonToken) token).getJsonNode());
-            } else {
-              jgen.writeString(token.getContent());
+            jgen.writeArrayFieldStart("witnesses");
+            for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(graph.witnesses())) {
+              jgen.writeString(witness.getSigil());
             }
+            jgen.writeEndArray();
+
+
+            jgen.writeArrayFieldStart("table");
+          } catch (IOException e) {
+            throw Throwables.propagate(e);
           }
-          jgen.writeEndArray();
         }
 
-      }
-      jgen.writeEndArray();
-    }
-    jgen.writeEndArray();
+        @Override
+        public void segment(SortedMap<Witness, Iterable<Token>> contents) {
+          try {
+            jgen.writeStartArray();
+            for (Iterable<Token> tokens : contents.values()) {
+              jgen.writeStartArray();
+              for (SimpleToken token : Ordering.natural().immutableSortedCopy(Iterables.filter(tokens, SimpleToken.class))) {
+                if (token instanceof JsonToken) {
+                  jgen.writeTree(((JsonToken) token).getJsonNode());
+                } else {
+                  jgen.writeString(token.getContent());
+                }
+              }
+              jgen.writeEndArray();
+            }
+            jgen.writeEndArray();
+          } catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
+        }
 
-    jgen.writeEndObject();
+        @Override
+        public void end() {
+          try {
+            jgen.writeEndArray();
+            jgen.writeEndObject();
+          } catch (IOException e) {
+            throw Throwables.propagate(e);
+          }
+        }
+      });
+    } catch (Throwable t) {
+      Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), IOException.class);
+      throw Throwables.propagate(t);
+    }
   }
 }

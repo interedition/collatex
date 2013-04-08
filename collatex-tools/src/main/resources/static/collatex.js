@@ -102,7 +102,7 @@ YUI.add('collatex', function(Y) {
                 Y.each(at.table, function (r) {
                     var cellContents = [];
                     Y.each(r, function (c) {
-                        cellContents.push(c == null ? null : Y.Array.reduce(c, "", function (str, next) {
+                        cellContents.push(c.length == 0 ? null : Y.Array.reduce(c, "", function (str, next) {
                             next = Y.Lang.isString(next) ? next : Y.dump(next);
                             return str + (str.length == 0 ? "" : " ") + next;
                         }));
@@ -112,14 +112,12 @@ YUI.add('collatex', function(Y) {
                         return (c != null);
                     })).length == 1);
                 });
-                for (var wc = 0; wc < at.sigils.length; wc++) {
-                    var column = Y.Node.create("<tr/>");
-                    column.append('<th>' + Y.Escape.html(at.sigils[wc]) + '</th>');
+                for (var wc = 0; wc < at.witnesses.length; wc++) {
+                    var column = table.appendChild(Y.Node.create("<tr/>").append('<th>' + Y.Escape.html(at.witnesses[wc]) + '</th>'));
                     Y.each(cells, function (r, cc) {
                         var c = r[wc];
                         column.append('<td class="' + (variantStatus[cc] ? "invariant" : "variant") + (c == null ? " gap" : "") + '">' + (c == null ? "" : Y.Escape.html(c)));
                     });
-                    table.append(column);
                 }
 
                 container.append(table);
