@@ -340,8 +340,8 @@
 }</pre>
 
     <p>JSON input always consists of a single root object wrapping input data. The root object has one required property containing the versions to be compared which
-        (for historical reasons) is named <em>witnesses</em>. The value of this property is of an array (a list) of objects in turn, with each object representing a version.
-        The order of the objects in the array determines the order in which they are processed by an alignment algorithms, i.e. merged into a variant graph.</p>
+        (for historical reasons) is named <em>witnesses</em>. The value of this property is an array (a list) of objects in turn, with each object representing a version.
+        The order of the array elements determines the order in which they are processed by an alignment algorithms, i.e. in which versions are merged into a variant graph.</p>
 
     <p>Each object in the <em>witnesses</em> array must have a unique identifier in the required property <em>id</em>. This identifier will be used in the
         <a href="#output" title="Section">output</a> to reference a particular version. Besides the identifier each object must describe the content of the version.
@@ -356,7 +356,7 @@
       "id" : "A",
       "tokens" : [
           { "t" : "A", "ref" : 123 },
-          { "t" : "black" : "adj" : true },
+          { "t" : "black" , "adj" : true },
           { "t" : "cat", "id" : "xyz" }
       ]
     },
@@ -364,7 +364,7 @@
       "id" : "B",
       "tokens" : [
           { "t" : "A" },
-          { "t" : "white" : "adj" : true },
+          { "t" : "white" , "adj" : true },
           { "t" : "kitten.", "n" : "cat" }
       ]
     }
@@ -459,27 +459,19 @@
 
     <h3 id="json-output">JSON</h3>
 
-    <p>The tabular output format, resembling matrices commonly used in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> results, looks as follows (indentation/whitespace added for easier readability):</p>
+    <p>As JSON is supported as an input format, collation results can be output in JSON as well. The schema resembles matrices commonly encountered in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> results,
+        and looks as follows for the second example given in the <a href="#json-input">section on JSON input</a> (indentation/whitespace added for easier readability):</p>
 
     <pre class="prettyprint">{
-    "rows": 3,
-    "columns": 2,
-    "sigils": ["A", "B"],
-    "xml":[
-      [
-        [ {"t":"A"} ],
-        [ {"t":"A"} ]
-      ],[
-        [ {"t":"black"} ],
-        [ {"t":"white"} ]
-      ], [
-        [ {"t":"cat"} ],
-        [ {"t":"kitten.", "n":"cat"} ]
-      ]
+    "witnesses":["A","B"],
+    "table":[
+        [ [ {"t":"A","ref":123 } ], [ {"t":"A" } ] ],
+        [ [ {"t":"black","adj":true } ], [ {"t":"white","adj":true } ] ],
+        [ [ {"t":"cat","id":"xyz" } ], [ {"t":"kitten.","n":"cat" } ] ]
     ]
 }</pre>
 
-    <p>First 3&nbsp;properties: metadata … dimensions of table; <code>rows</code> aka. number of aligned segments; <code>columns</code> aka. number of witnesses;
+    <p>The root object always contains 2&nbsp;properties: metadata … dimensions of table; <code>rows</code> aka. number of aligned segments; <code>columns</code> aka. number of witnesses;
         <code>sigils</code> contains ordered set of witness identifiers, maps to order of segments in table …</p>
 
     <p>Each row: matching segments, each colum/cell: the segment of a witness aka. a list of tokens comprising this segment or <code>null</code> in case of a gap …</p>
@@ -552,11 +544,12 @@
 
     <h2 id="cli">The Command Line Interface</h2>
 
-    <pre class="prettyprint lang-xml">usage: collatex [&lt;options>] &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...]
+    <pre class="prettyprint lang-xml">usage: collatex [&lt;options>]
+                (&lt;json_input> | &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...])
   -a,--algorithm &lt;arg>           progressive alignment algorithm to use
                                  'dekker' (default), 'medite',
                                  'needleman-wunsch'
-  -f,--format &lt;arg>              result/output format: 'csv', 'dot',
+  -f,--format &lt;arg>              result/output format: 'json', 'csv', 'dot',
                                  'graphml', 'tei'
   -h,--help                      print usage instructions (which your are
                                  looking at right now)
