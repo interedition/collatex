@@ -24,19 +24,14 @@ import com.google.common.collect.Sets;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.io.Collation;
-import eu.interedition.collatex.io.CollationDeserializer;
+import eu.interedition.collatex.io.CollateXModule;
 import eu.interedition.collatex.io.IOExceptionMapper;
-import eu.interedition.collatex.io.VariantGraphSerializer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.module.SimpleModule;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.UriBuilder;
@@ -154,15 +149,6 @@ public class Server extends DefaultResourceConfig implements Runnable {
             new ObjectMapperMessageBodyReaderWriter(objectMapper),
             new VariantGraphSVGMessageBodyWriter(dotPath)
     );
-  }
-
-  static class CollateXModule extends SimpleModule {
-
-    public CollateXModule() {
-      super(CollateXModule.class.getPackage().getName(), Version.unknownVersion());
-      addDeserializer(Collation.class, new CollationDeserializer());
-      addSerializer(VariantGraph.class, new VariantGraphSerializer());
-    }
   }
 
   static final Logger LOG = Logger.getLogger(Server.class.getName());

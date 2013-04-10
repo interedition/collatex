@@ -53,7 +53,7 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
       throw JsonMappingException.from(jp, "Expecting 'witnesses' array");
     }
 
-    final List<Iterable<Token>> witnesses = Lists.newArrayList();
+    final List<SimpleWitness> witnesses = Lists.newArrayList();
     for (JsonNode witnessNode : witnessesNode) {
       if (!witnessNode.isObject()) {
         throw JsonMappingException.from(jp, "Expecting witness object");

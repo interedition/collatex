@@ -19,34 +19,19 @@
 
 package eu.interedition.collatex.io;
 
-import eu.interedition.collatex.CollationAlgorithm;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.http.Server;
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.map.module.SimpleModule;
 
-import java.util.List;
+/**
+* @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+*/
+public class CollateXModule extends SimpleModule {
 
-public class Collation {
-
-  private final List<SimpleWitness> witnesses;
-  private final CollationAlgorithm algorithm;
-  private final boolean joined;
-
-  public Collation(List<SimpleWitness> witnesses, CollationAlgorithm algorithm, boolean joined) {
-    this.witnesses = witnesses;
-    this.algorithm = algorithm;
-    this.joined = joined;
-  }
-
-  public List<SimpleWitness> getWitnesses() {
-    return witnesses;
-  }
-
-  public CollationAlgorithm getAlgorithm() {
-    return algorithm;
-  }
-
-  public boolean isJoined() {
-    return joined;
+  public CollateXModule() {
+    super(CollateXModule.class.getPackage().getName(), Version.unknownVersion());
+    addDeserializer(Collation.class, new CollationDeserializer());
+    addSerializer(VariantGraph.class, new VariantGraphSerializer());
   }
 }

@@ -27,6 +27,8 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.io.CollateXModule;
+import eu.interedition.collatex.io.Collation;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
@@ -39,6 +41,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.xml.sax.SAXException;
 
 import javax.script.ScriptException;
@@ -64,8 +67,8 @@ public class Engine implements Closeable {
 
   Charset inputCharset;
   boolean xmlMode;
-  List<URL> witnessResources;
-  List<URLWitness> witnesses;
+  List<URL> inputResources;
+  List<SimpleWitness> witnesses;
   XPathExpression tokenXPath;
 
   Function<String, Iterable<String>> tokenizer;
@@ -81,7 +84,9 @@ public class Engine implements Closeable {
   PrintWriter log = new PrintWriter(System.err);
   boolean errorOccurred = false;
 
-  Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException {
+  ObjectMapper objectMapper = new ObjectMapper().withModule(new CollateXModule());
+
+  Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException, IOException {
     this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
     this.xmlMode = commandLine.hasOption("xml");
     this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//text()"));
@@ -112,7 +117,7 @@ public class Engine implements Closeable {
 
     this.joined = !commandLine.hasOption("t");
 
-    this.outputFormat = commandLine.getOptionValue("f", "tei").toLowerCase();
+    this.outputFormat = commandLine.getOptionValue("f", "json").toLowerCase();
 
     final String output = commandLine.getOptionValue("o", "-");
     if (!"-".equals(output)) {
@@ -128,25 +133,27 @@ public class Engine implements Closeable {
 
 
     final String[] witnessSpecs = commandLine.getArgs();
-    this.witnessResources = Lists.newArrayListWithExpectedSize(witnessSpecs.length);
+    this.inputResources = Lists.newArrayListWithExpectedSize(witnessSpecs.length);
     for (String witnessSpec : witnessSpecs) {
-      witnessResources.add(argumentToResource(witnessSpec));
+      inputResources.add(argumentToResource(witnessSpec));
     }
-    if (witnessResources.size() < 2) {
-      throw new ParseException("At least 2 witnesses must be given");
+    if (inputResources.size() < 1) {
+      throw new ParseException("No input resource(s) given");
     }
 
-    this.witnesses = Lists.newArrayListWithExpectedSize(witnessResources.size());
-    for (URL witnessURL : witnessResources) {
-      this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL));
-    }
 
     return this;
   }
 
   Engine read() throws IOException, XPathExpressionException, SAXException {
-    for (URLWitness witness : witnesses) {
-      witness.read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null));
+    if (inputResources.size() < 2) {
+      this.witnesses = objectMapper.readValue(inputResources.get(0), Collation.class).getWitnesses();
+    } else {
+      this.witnesses = Lists.newArrayListWithExpectedSize(inputResources.size());
+      for (URL witnessURL : inputResources) {
+        this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL)
+                .read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null)));
+      }
     }
     return this;
   }
@@ -169,8 +176,10 @@ public class Engine implements Closeable {
       serializer.toDot(out);
     } else if("graphml".equals(outputFormat)) {
       serializer.toGraphML(out);
-    } else {
+    } else if ("tei".equals(outputFormat)) {
       serializer.toTEI(out);
+    } else {
+      objectMapper.writer().writeValue(out, variantGraph);
     }
   }
 
@@ -185,7 +194,7 @@ public class Engine implements Closeable {
   }
 
   void help() {
-    new HelpFormatter().printHelp(log, 78, "collatex [<options>] <witness_1> <witness_2> [[<witness_3>] ...]", "", OPTIONS, 2, 4, "");
+    new HelpFormatter().printHelp(log, 78, "collatex [<options>]\n (<json_input> | <witness_1> <witness_2> [[<witness_3>] ...])", "", OPTIONS, 2, 4, "");
   }
 
   URL argumentToResource(String arg) throws ParseException {
@@ -241,7 +250,7 @@ public class Engine implements Closeable {
     OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//text()'");
     OPTIONS.addOption("a", "algorithm", true, "progressive alignment algorithm to use 'dekker' (default), 'medite', 'needleman-wunsch'");
     OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
-    OPTIONS.addOption("f", "format", true, "result/output format: 'csv', 'dot', 'graphml', 'tei'");
+    OPTIONS.addOption("f", "format", true, "result/output format: 'json', 'csv', 'dot', 'graphml', 'tei'");
     OPTIONS.addOption("s", "script", true, "ECMA/JavaScript resource with functions to be plugged into the alignment algorithm");
   }
 
