@@ -254,12 +254,16 @@ public class SimpleVariantGraphSerializer {
   }
 
   private String id(VariantGraph.Vertex vertex) {
+    return ("v" + numericId(vertex));
+  }
+
+  private int numericId(VariantGraph.Vertex vertex) {
     Integer id = vertexIds.get(vertex);
     if (id == null) {
       id = vertexIds.size();
       vertexIds.put(vertex, id);
     }
-    return ("v" + id);
+    return id;
   }
 
   private String id(VariantGraph.Transposition transposition) {
@@ -360,24 +364,23 @@ public class SimpleVariantGraphSerializer {
     xml.writeAttribute(PARSEEDGEIDS_ATT, PARSEEDGEIDS_DEFAULT_VALUE);
     xml.writeAttribute(PARSEORDER_ATT, PARSEORDER_DEFAULT_VALUE);
 
-    final Map<VariantGraph.Vertex, String> vertexToId = Maps.newHashMap();
-    int vertexNumber = 0;
+    final VariantGraphRanking ranking = ranking();
     for (VariantGraph.Vertex vertex : graph.vertices()) {
-      final String vertexNodeID = "n" + vertexNumber;
+      final int id = numericId(vertex);
       xml.writeStartElement(GRAPHML_NS, NODE_TAG);
-      xml.writeAttribute(ID_ATT, vertexNodeID);
-      GraphMLProperty.NODE_NUMBER.write(Integer.toString(vertexNumber++), xml);
+      xml.writeAttribute(ID_ATT, "n" + id);
+      GraphMLProperty.NODE_NUMBER.write(Integer.toString(id), xml);
+      GraphMLProperty.NODE_RANK.write(Integer.toString(ranking.apply(vertex)), xml);
       GraphMLProperty.NODE_TOKEN.write(vertexToString.apply(vertex), xml);
       xml.writeEndElement();
-      vertexToId.put(vertex, vertexNodeID);
     }
 
     int edgeNumber = 0;
     for (VariantGraph.Edge edge : graph.edges()) {
       xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
       xml.writeAttribute(ID_ATT, "e" + edgeNumber);
-      xml.writeAttribute(SOURCE_ATT, vertexToId.get(edge.from()));
-      xml.writeAttribute(TARGET_ATT, vertexToId.get(edge.to()));
+      xml.writeAttribute(SOURCE_ATT, "n" + numericId(edge.from()));
+      xml.writeAttribute(TARGET_ATT, "n" + numericId(edge.to()));
       GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
       GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
       GraphMLProperty.EDGE_WITNESSES.write(Witness.TO_SIGILS.apply(edge), xml);
@@ -387,8 +390,8 @@ public class SimpleVariantGraphSerializer {
     for (Tuple<VariantGraph.Vertex> transposedTuple : transposedTuples()) {
       xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
       xml.writeAttribute(ID_ATT, "e" + edgeNumber);
-      xml.writeAttribute(SOURCE_ATT, vertexToId.get(transposedTuple.left));
-      xml.writeAttribute(TARGET_ATT, vertexToId.get(transposedTuple.right));
+      xml.writeAttribute(SOURCE_ATT, "n" + numericId(transposedTuple.left));
+      xml.writeAttribute(TARGET_ATT, "n" + numericId(transposedTuple.right));
       GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
       GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_TRANSPOSITION, xml);
       xml.writeEndElement();
@@ -433,6 +436,7 @@ public class SimpleVariantGraphSerializer {
   private enum GraphMLProperty {
     NODE_NUMBER(NODE_TAG, "number", "int"), //
     NODE_TOKEN(NODE_TAG, "tokens", "string"), //
+    NODE_RANK(NODE_TAG, "rank", "int"), //
     EDGE_NUMBER(EDGE_TAG, "number", "int"), //
     EDGE_TYPE(EDGE_TAG, "type", "string"), //
     EDGE_WITNESSES(EDGE_TAG, "witnesses", "string");
