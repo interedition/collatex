@@ -64,9 +64,12 @@ public class VariantGraphTEIMessageBodyWriter implements MessageBodyWriter<Varia
   public void writeTo(VariantGraph variantGraph, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
     XMLStreamWriter xml = null;
     try {
-      new SimpleVariantGraphSerializer(variantGraph).toTEI(xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream));
+      xml = XML_OUTPUT_FACTORY.createXMLStreamWriter(entityStream);
+      xml.writeStartDocument();
+      new SimpleVariantGraphSerializer(variantGraph).toTEI(xml);
+      xml.writeEndDocument();
     } catch (XMLStreamException e) {
-      throw new IOException(e.getMessage(), e);
+      throw new IOException(e);
     } finally {
       try {
         xml.close();

@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
+import com.google.common.io.Files;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -45,6 +46,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.xml.sax.SAXException;
 
 import javax.script.ScriptException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -52,6 +56,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -79,6 +84,7 @@ public class Engine implements Closeable {
   boolean joined = false;
 
   String outputFormat;
+  Charset outputCharset;
   PrintWriter out;
   File outFile = null;
   PrintWriter log = new PrintWriter(System.err);
@@ -119,16 +125,17 @@ public class Engine implements Closeable {
 
     this.outputFormat = commandLine.getOptionValue("f", "json").toLowerCase();
 
+    outputCharset = Charset.forName(commandLine.getOptionValue("oe", "UTF-8"));
     final String output = commandLine.getOptionValue("o", "-");
     if (!"-".equals(output)) {
       try {
         this.outFile = new File(output);
-        this.out = new PrintWriter(this.outFile);
+        this.out = new PrintWriter(Files.newWriter(this.outFile, outputCharset));
       } catch (FileNotFoundException e) {
         throw new ParseException("Output file '" + outFile + "' not found");
       }
     } else {
-      this.out = new PrintWriter(System.out);
+      this.out = new PrintWriter(new OutputStreamWriter(System.out, outputCharset));
     }
 
 
@@ -174,10 +181,28 @@ public class Engine implements Closeable {
       serializer.toCsv(out);
     } else if ("dot".equals(outputFormat)) {
       serializer.toDot(out);
-    } else if("graphml".equals(outputFormat)) {
-      serializer.toGraphML(out);
-    } else if ("tei".equals(outputFormat)) {
-      serializer.toTEI(out);
+    } else if ("graphml".equals(outputFormat) || "tei".equals(outputFormat)) {
+      XMLStreamWriter xml = null;
+      try {
+        xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
+        xml.writeStartDocument(outputCharset.name(), "1.0");
+        if ("graphml".equals(outputFormat)) {
+          serializer.toGraphML(xml);
+        } else {
+          serializer.toTEI(xml);
+        }
+        xml.writeEndDocument();
+      } catch (XMLStreamException e) {
+        throw new IOException(e);
+      } finally {
+        if (xml != null) {
+          try {
+            xml.close();
+          } catch (XMLStreamException e) {
+            throw new IOException(e);
+          }
+        }
+      }
     } else {
       objectMapper.writer().writeValue(out, variantGraph);
     }

@@ -83,28 +83,12 @@ public class SimpleVariantGraphSerializer {
     this.tokensToString = tokensToString;
   }
 
-  public void toTEI(Writer out) throws IOException {
-    try {
-      XMLStreamWriter xml = null;
-      try {
-        toTEI(xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out));
-      } finally {
-        if (xml != null) {
-          xml.close();
-        }
-      }
-    } catch (XMLStreamException e) {
-      throw new IOException(e);
-    }
-  }
-
   public void toTEI(final XMLStreamWriter xml) throws XMLStreamException {
     try {
       ParallelSegmentationApparatus.generate(ranking(), new ParallelSegmentationApparatus.GeneratorCallback() {
         @Override
         public void start() {
           try {
-            xml.writeStartDocument();
             xml.writeStartElement("cx", "apparatus", COLLATEX_NS);
             xml.writeNamespace("cx", COLLATEX_NS);
             xml.writeNamespace("", TEI_NS);
@@ -155,7 +139,6 @@ public class SimpleVariantGraphSerializer {
         public void end() {
           try {
             xml.writeEndElement();
-            xml.writeEndDocument();
           } catch (XMLStreamException e) {
             throw Throwables.propagate(e);
           }
@@ -331,23 +314,7 @@ public class SimpleVariantGraphSerializer {
     return tuples;
   }
 
-  public void toGraphML(Writer out) throws IOException {
-    try {
-      XMLStreamWriter xml = null;
-      try {
-        toGraphML(xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out));
-      } finally {
-        if (xml != null) {
-          xml.close();
-        }
-      }
-    } catch (XMLStreamException e) {
-      throw new IOException(e);
-    }
-  }
-
   public void toGraphML(XMLStreamWriter xml) throws XMLStreamException {
-    xml.writeStartDocument();
     xml.writeStartElement("", GRAPHML_TAG, GRAPHML_NS);
     xml.writeNamespace("", GRAPHML_NS);
     xml.writeAttribute(XMLNSXSI_ATT, GRAPHML_XMLNSXSI);
@@ -400,7 +367,6 @@ public class SimpleVariantGraphSerializer {
     xml.writeEndElement();
 
     xml.writeEndElement();
-    xml.writeEndDocument();
   }
 
   private static final String NODE_TAG = "node";

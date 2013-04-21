@@ -439,7 +439,9 @@ public class HermansTest extends AbstractTest {
     s.toDot(writer);
     LOG.fine(writer.toString());
     XMLStreamWriter xml = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
+    xml.writeStartDocument();
     s.toTEI(xml);
+    xml.writeEndDocument();
     return writer.toString();
   }
 

@@ -165,7 +165,8 @@ public class AlignmentTest extends AbstractTest {
 
     StringWriter writer = new StringWriter();
     XMLStreamWriter swriter = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
-    SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(graph);
-    serializer.toGraphML(swriter);
+    swriter.writeStartDocument();
+    new SimpleVariantGraphSerializer(graph).toGraphML(swriter);
+    swriter.writeEndDocument();
   }
 }
