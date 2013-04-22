@@ -459,7 +459,8 @@
 
     <h3 id="json-output">JSON</h3>
 
-    <p>As JSON is supported as an input format, collation results can be output in JSON as well. The schema resembles matrices commonly encountered in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> results,
+    <p>In conjunction with JSON being supported as an input format, collation results can be output in JSON as well.
+        The schema of such output resembles matrices commonly encountered in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> representations,
         and looks as follows for the second example given in the <a href="#json-input">section on JSON input</a> (indentation/whitespace added for easier readability):</p>
 
     <pre class="prettyprint">{
@@ -471,13 +472,46 @@
     ]
 }</pre>
 
-    <p>The root object always contains 2&nbsp;properties: metadata … dimensions of table; <code>rows</code> aka. number of aligned segments; <code>columns</code> aka. number of witnesses;
-        <code>sigils</code> contains ordered set of witness identifiers, maps to order of segments in table …</p>
+    <p>The root object always contains 2&nbsp;properties. The value of property <em>witnesses</em> is a list of a all compared text versions, represented by their sigils/identifiers.
+        The witness list's order is significant insofar as the contents of the second property <em>table</em> &ndash; which contains the actual alignment &ndash; is ordered accordingly.</p>
 
-    <p>Each row: matching segments, each colum/cell: the segment of a witness aka. a list of tokens comprising this segment or <code>null</code> in case of a gap …</p>
+    <p>The tabular alignment data is represented as a list of lists, with <ul>
+        <li>the parent list containing one entry per aligned segment, and</li>
+        <li>each segment/ child list containing sets of tokens from each compared version.</li>
+    </ul></p>
+
+    <p>Because aligned segments can span multiple tokens, the aligned token sets of each text version are also represented as lists, we effectively have 3&nbsp;levels:</p>
+
+    <ol>
+        <li>On the top-level, each list entry represents a <strong>set of aligned segments from different text versions</strong>.</li>
+        <li>On the intermediate level, each list entry represents a <strong>set of tokens from a particular text version</strong>.</li>
+        <li>On the lowest level, each list entry is an object representing a <strong>single token</strong>.</li>
+    </ol>
+
+    <p>Out example output thus is comprised of 3&nbsp;segments, each containing exactly one token per text version. The order in which the token sets are listed equals the
+    order of the text versions as listed in the property <em>witnesses</em>. Thus "A" from text version <em>A</em> is aligned with "A" from text version <em>B</em>,
+    "black" from text version <em>A</em> is aligned with "white" from text version <em>B</em>, and so on.</p>
+
+    <p>Additions and omissions are expressed via empty token sets, e.g. an alignment of</p>
+
+    <pre class="prettyprint">{
+    "witnesses":["X","Y"],
+    "table":[
+        [ [ {"t":"A" } ], [ {"t":"A" } ] ],
+        [ [ {"t":"brown" } ], [] ],
+        [ [ {"t":"dog" } ], [ {"t":"dog" } ] ]
+    ]
+}</pre>
+
+    <p>could be interpreted as "brown" being added in version "X" or omitted in version "Y".</p>
+
+    <p>Please note that transpositions are not represented explicitly in tabular output formats like this one. While the detection of transpositions affects the alignment,
+        the links between tokens which are assumed to be transposed by the collation algorithm are not given in this output format. Support for transpositions in tabular
+        representations of collation results will be added in a future version of CollateX.</p>
 
     <h3 id="tei-p5-output">TEI P5</h3>
 
+    <p>The tabular representation of alignments described in the previous section can be encoded in a number of ways.</p>
     <pre class="prettyprint">&lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;cx:apparatus
   xmlns:cx="http://interedition.eu/collatex/ns/1.0"
