@@ -19,6 +19,11 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -27,17 +32,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 // author: Ronald Haentjens Dekker
 //
@@ -50,6 +51,10 @@ public class MatchTable {
   private final HashBasedTable<Integer, Integer, MatchTableCell> table;
   private final Iterable<Token> witness;
   private final List<Integer> ranks;
+  //this fields are needed for the locking of table cells
+  private final Set<Integer> fixedRows = Sets.newHashSet();
+  private final Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
+
   
   // assumes default token comparator
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
@@ -106,7 +111,38 @@ public class MatchTable {
     return Sets.newHashSet(coordinateMapper.values());
   }
 
-  private MatchTable(Iterable<Token> tokens, List<Integer> ranks) {
+	/*
+	 * Commit an island in the match table
+	 * Island will be part of the final alignment
+	 */
+  public void commitIsland(Island isl) {
+  	for (Coordinate coordinate : isl) {
+      fixedRows.add(coordinate.row);
+      fixedVertices.add(vertexAt(coordinate.row, coordinate.column));
+	  }
+	}
+
+	/*
+	 * Return whether an island overlaps with an already committed island
+	 */
+  public boolean isIslandPossibleCandidate(Island island) {
+    for (Coordinate coordinate : island) {
+      if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) return false;
+    }
+		return true;
+	}
+  
+  /*
+	 * Return whether a coordinate overlaps with an already committed coordinate
+	 */
+	public boolean doesCoordinateOverlapWithCommittedCoordinate(Coordinate coordinate) {
+    return fixedRows.contains(coordinate.row) || //
+        fixedVertices.contains(vertexAt(coordinate.row, coordinate.column));
+	}
+
+
+	
+	private MatchTable(Iterable<Token> tokens, List<Integer> ranks) {
     this.table = HashBasedTable.create();
     this.witness = tokens;
     this.ranks = ranks;
@@ -198,12 +234,15 @@ public class MatchTable {
 	}
 
 	private class MatchTableCell {
-    public final Token token;
-    public final VariantGraph.Vertex vertex;
+	    public final Token token;
+	    public final VariantGraph.Vertex vertex;
+	
+	    public MatchTableCell(Token token, VariantGraph.Vertex vertex) {
+	      this.token = token;
+	      this.vertex = vertex;
+	    }
+	}
 
-    public MatchTableCell(Token token, VariantGraph.Vertex vertex) {
-      this.token = token;
-      this.vertex = vertex;
-    }
-  }
+
+
 }

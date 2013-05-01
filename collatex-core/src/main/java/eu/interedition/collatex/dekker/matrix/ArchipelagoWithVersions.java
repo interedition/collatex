@@ -27,8 +27,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import eu.interedition.collatex.VariantGraph;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -44,8 +42,6 @@ public class ArchipelagoWithVersions extends Archipelago {
   private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
   Logger LOG = Logger.getLogger(ArchipelagoWithVersions.class.getName());
   private final MatchTable table;
-  Set<Integer> fixedRows = Sets.newHashSet();
-  Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
   private final int outlierTranspositionsSizeLimit;
 
   public ArchipelagoWithVersions(MatchTable table, int outlierTranspositionsSizeLimit) {
@@ -75,8 +71,6 @@ public class ArchipelagoWithVersions extends Archipelago {
     * possible islands
     */
   public Archipelago createNonConflictingVersion(Archipelago archipelago) {
-    fixedRows = Sets.newHashSet();
-    fixedVertices = Sets.newHashSet();
     Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
     for (Island isl : getIslands()) {
       islandMultimap.put(isl.size(), isl);
@@ -90,38 +84,43 @@ public class ArchipelagoWithVersions extends Archipelago {
       if (islands.size() == 1) {
         addIslandToResult(islands.get(0), archipelago);
       } else if (islands.size() > 1) {
-        Set<Island> competingIslands = getCompetingIslands(islands, archipelago);
-        Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
-        Set<Island> otherCompetingIslands = Sets.newHashSet();
-        for (Island island : competingIslands) {
-          Coordinate leftEnd = island.getLeftEnd();
-          if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
-            competingIslandsOnIdealLine.add(island);
-          } else {
-            otherCompetingIslands.add(island);
-          }
-        }
-        Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
-        LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-        addBestOfCompeting(archipelago, distanceMap1);
-
-        Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
-        LOG.fine("addBestOfCompeting with otherCompetingIslands");
-        addBestOfCompeting(archipelago, distanceMap2);
-
-        for (Island i : getNonCompetingIslands(islands, competingIslands)) {
-          addIslandToResult(i, archipelago);
-        }
+        handleMultipleIslandSameSize(archipelago, islands);
       }
     }
     return archipelago;
   }
 
+private void handleMultipleIslandSameSize(Archipelago archipelago,
+		List<Island> islandsOfSameSize) {
+	Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
+	Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
+	Set<Island> otherCompetingIslands = Sets.newHashSet();
+	for (Island island : competingIslands) {
+	  Coordinate leftEnd = island.getLeftEnd();
+	  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+	    competingIslandsOnIdealLine.add(island);
+	  } else {
+	    otherCompetingIslands.add(island);
+	  }
+	}
+	Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
+	LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
+	addBestOfCompeting(archipelago, distanceMap1);
+
+	Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
+	LOG.fine("addBestOfCompeting with otherCompetingIslands");
+	addBestOfCompeting(archipelago, distanceMap2);
+
+	for (Island i : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
+	  addIslandToResult(i, archipelago);
+	}
+}
+
   // TODO: find a better way to determine the best choice of island
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
-        if (islandIsPossible(ci)) {
+        if (table.isIslandPossibleCandidate(ci)) {
           addIslandToResult(ci, archipelago);
         }
       }
@@ -175,7 +174,7 @@ public class ArchipelagoWithVersions extends Archipelago {
   private List<Island> possibleIslands(Collection<Island> islandsOfSize) {
     List<Island> islands = Lists.newArrayList();
     for (Island island : islandsOfSize) {
-      if (islandIsPossible(island)) {
+      if (table.isIslandPossibleCandidate(island)) {
         islands.add(island);
       } else {
         removeConflictingEndCoordinates(island);
@@ -191,7 +190,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     boolean goOn = true;
     while (goOn) {
       Coordinate leftEnd = island.getLeftEnd();
-      if (coordinateOverlapsWithFixed(leftEnd)) {
+      if (table.doesCoordinateOverlapWithCommittedCoordinate(leftEnd)) {
         island.removeCoordinate(leftEnd);
         if (island.size() == 0) {
           return;
@@ -203,7 +202,7 @@ public class ArchipelagoWithVersions extends Archipelago {
     goOn = true;
     while (goOn) {
       Coordinate rightEnd = island.getRightEnd();
-      if (coordinateOverlapsWithFixed(rightEnd)) {
+      if (table.doesCoordinateOverlapWithCommittedCoordinate(rightEnd)) {
         island.removeCoordinate(rightEnd);
         if (island.size() == 0) {
           return;
@@ -214,28 +213,14 @@ public class ArchipelagoWithVersions extends Archipelago {
     }
   }
 
-  private boolean islandIsPossible(Island island) {
-    for (Coordinate coordinate : island) {
-      if (coordinateOverlapsWithFixed(coordinate)) return false;
-    }
-    return true;
-  }
-
-  private boolean coordinateOverlapsWithFixed(Coordinate coordinate) {
-    return fixedRows.contains(coordinate.row) || //
-        fixedVertices.contains(table.vertexAt(coordinate.row, coordinate.column));
-  }
 
   private void addIslandToResult(Island isl, Archipelago result) {
     if (islandIsNoOutlier(result, isl)) {
       if (LOG.isLoggable(Level.FINE)) {
         LOG.log(Level.FINE, "adding island: '{0}'", isl);
       }
+      table.commitIsland(isl);
       result.add(isl);
-      for (Coordinate coordinate : isl) {
-        fixedRows.add(coordinate.row);
-        fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
-      }
     } else {
       if (LOG.isLoggable(Level.FINE)) {
         LOG.log(Level.FINE, "island: '{0}' is an outlier, not added", isl);
