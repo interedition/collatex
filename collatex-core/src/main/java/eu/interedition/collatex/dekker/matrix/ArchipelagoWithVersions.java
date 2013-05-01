@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +37,7 @@ import com.google.common.collect.Sets;
  * @author Bram Buitendijk
  * @author Meindert Kroese
  */
-public class ArchipelagoWithVersions extends Archipelago {
+public class ArchipelagoWithVersions {
   private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
   Logger LOG = Logger.getLogger(ArchipelagoWithVersions.class.getName());
   private final MatchTable table;
@@ -47,32 +46,18 @@ public class ArchipelagoWithVersions extends Archipelago {
   public ArchipelagoWithVersions(MatchTable table, int outlierTranspositionsSizeLimit) {
     this.table = table;
     this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
-    setIslands(new ArrayList<Island>());
   }
 
-  @Override
-  public void add(Island island) {
-    super.add(island);
-  }
-
-  @Override
-  public ArchipelagoWithVersions copy() {
-    ArchipelagoWithVersions result = new ArchipelagoWithVersions(this.table, outlierTranspositionsSizeLimit);
-    for (Island isl : getIslands()) {
-      result.add(new Island(isl));
-    }
-    return result;
-  }
-
-  /*
+   /*
     * Create a non-conflicting version by simply taken all the islands
     * that do not conflict with each other, largest first. This presuming
     * that Archipelago will have a high value if it contains the largest
     * possible islands
     */
-  public Archipelago createNonConflictingVersion(Archipelago archipelago) {
-    Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
-    for (Island isl : getIslands()) {
+  public Archipelago createNonConflictingVersion(Set<Island> islands) {
+    Archipelago result = new Archipelago();
+  	Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
+    for (Island isl : islands) {
       islandMultimap.put(isl.size(), isl);
     }
     List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
@@ -80,41 +65,40 @@ public class ArchipelagoWithVersions extends Archipelago {
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
       //      if (islandSize > 0) { // limitation to prevent false transpositions
-      List<Island> islands = possibleIslands(islandMultimap.get(islandSize));
-      if (islands.size() == 1) {
-        addIslandToResult(islands.get(0), archipelago);
-      } else if (islands.size() > 1) {
-        handleMultipleIslandSameSize(archipelago, islands);
+      List<Island> possibleIslands = possibleIslands(islandMultimap.get(islandSize));
+      if (possibleIslands.size() == 1) {
+        addIslandToResult(possibleIslands.get(0), result);
+      } else if (possibleIslands.size() > 1) {
+        handleMultipleIslandSameSize(result, possibleIslands);
       }
     }
-    return archipelago;
+    return result;
   }
 
-private void handleMultipleIslandSameSize(Archipelago archipelago,
-		List<Island> islandsOfSameSize) {
-	Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
-	Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
-	Set<Island> otherCompetingIslands = Sets.newHashSet();
-	for (Island island : competingIslands) {
-	  Coordinate leftEnd = island.getLeftEnd();
-	  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
-	    competingIslandsOnIdealLine.add(island);
-	  } else {
-	    otherCompetingIslands.add(island);
-	  }
+	private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
+		Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
+		Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
+		Set<Island> otherCompetingIslands = Sets.newHashSet();
+		for (Island island : competingIslands) {
+		  Coordinate leftEnd = island.getLeftEnd();
+		  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+		    competingIslandsOnIdealLine.add(island);
+		  } else {
+		    otherCompetingIslands.add(island);
+		  }
+		}
+		Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
+		LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
+		addBestOfCompeting(archipelago, distanceMap1);
+	
+		Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
+		LOG.fine("addBestOfCompeting with otherCompetingIslands");
+		addBestOfCompeting(archipelago, distanceMap2);
+	
+		for (Island i : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
+		  addIslandToResult(i, archipelago);
+		}
 	}
-	Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
-	LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-	addBestOfCompeting(archipelago, distanceMap1);
-
-	Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
-	LOG.fine("addBestOfCompeting with otherCompetingIslands");
-	addBestOfCompeting(archipelago, distanceMap2);
-
-	for (Island i : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
-	  addIslandToResult(i, archipelago);
-	}
-}
 
   // TODO: find a better way to determine the best choice of island
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
@@ -133,10 +117,6 @@ private void handleMultipleIslandSameSize(Archipelago archipelago,
       distanceMap.put(archipelago.smallestDistance(isl), isl);
     }
     return distanceMap;
-  }
-
-  public Archipelago createNonConflictingVersion() {
-    return createNonConflictingVersion(new Archipelago());
   }
 
   private List<Double> shortestToLongestDistances(Multimap<Double, Island> distanceMap) {
@@ -165,11 +145,6 @@ private void handleMultipleIslandSameSize(Archipelago archipelago,
     }
     return competingIslands;
   }
-
-  @Override
-  public boolean islandsCompete(Island i1, Island i2) {
-    return false;
-  };
 
   private List<Island> possibleIslands(Collection<Island> islandsOfSize) {
     List<Island> islands = Lists.newArrayList();

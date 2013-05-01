@@ -93,11 +93,8 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     Set<Island> islands = matchTable.getIslands();
     // prepare
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, outlierTranspositionsSizeLimit);
-    for (Island isl : islands) {
-      archipelago.add(isl);
-    }
     // find preferred islands
-    Archipelago preferred = archipelago.createNonConflictingVersion();
+    Archipelago preferred = archipelago.createNonConflictingVersion(islands);
     return preferred;
   }
 

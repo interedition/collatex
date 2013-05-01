@@ -234,15 +234,12 @@ public class MatchTable {
 	}
 
 	private class MatchTableCell {
-	    public final Token token;
-	    public final VariantGraph.Vertex vertex;
-	
-	    public MatchTableCell(Token token, VariantGraph.Vertex vertex) {
-	      this.token = token;
-	      this.vertex = vertex;
-	    }
+    public final Token token;
+    public final VariantGraph.Vertex vertex;
+
+    public MatchTableCell(Token token, VariantGraph.Vertex vertex) {
+      this.token = token;
+      this.vertex = vertex;
+    }
 	}
-
-
-
 }

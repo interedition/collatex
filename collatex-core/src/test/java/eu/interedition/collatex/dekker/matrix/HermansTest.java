@@ -19,8 +19,31 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.logging.Level;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -31,30 +54,6 @@ import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.logging.Level;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 public class HermansTest extends AbstractTest {
 
@@ -82,20 +81,17 @@ public class HermansTest extends AbstractTest {
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     // System.out.println(buildMatrix.toHtml());
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
-    for (Island isl : matchTable.getIslands()) {
-      archipelago.add(isl);
-    }
-    LOG.fine("archipelago: " + archipelago);
-    LOG.fine("archipelago.size(): " + archipelago.size());
-    assertEquals(42, archipelago.size());
-    assertEquals(98, archipelago.numOfConflicts());
+//    LOG.fine("archipelago: " + archipelago);
+//    LOG.fine("archipelago.size(): " + archipelago.size());
+//    assertEquals(42, archipelago.size());
+//    assertEquals(98, archipelago.numOfConflicts());
     // assertTrue(false);
     // archipelago.createNonConflictingVersions();
     // assertEquals(603,archipelago.numOfNonConflConstell());
     // assertEquals(500,archipelago.getVersion(0).value());
     // assertEquals(497,archipelago.getVersion(4).value());
 
-    Archipelago firstVersion = archipelago.createNonConflictingVersion();
+    Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
     for (Island isl : firstVersion.iterator()) {
       LOG.fine(" " + isl.size());
     }
@@ -131,19 +127,9 @@ public class HermansTest extends AbstractTest {
     // }
     // System.out.println(buildMatrix.toHtml());
     ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
-    for (Island isl : matchTable.getIslands()) {
-      archipelago.add(isl);
-    }
-    LOG.fine("archipelago: " + archipelago);
-    LOG.fine("archipelago.size(): " + archipelago.size());
-    StringBuilder islandSizes = new StringBuilder();
-    for (Island isl : archipelago.iterator()) {
-      islandSizes.append(" " + isl.size());
-    }
-    LOG.fine(islandSizes.toString().trim());
-    assertEquals(233, archipelago.size());
-    assertEquals(1429, archipelago.numOfConflicts());
-    Archipelago firstVersion = archipelago.createNonConflictingVersion();
+//    LOG.fine("archipelago: " + archipelago);
+//    LOG.fine("archipelago.size(): " + archipelago.size());
+    Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
     for (Island isl : firstVersion.iterator()) {
       LOG.fine(" " + isl.size());
     }
@@ -207,9 +193,6 @@ public class HermansTest extends AbstractTest {
     VariantGraph base = collate(witnesses[0]);
     MatchTable matchTable = MatchTable.create(base, witnesses[1], new EqualityTokenComparator());
     ArchipelagoWithVersions creator = new ArchipelagoWithVersions(matchTable, 1);
-    for (Island island : matchTable.getIslands()) {
-      creator.add(island);
-    }
 
     //Mock Archipelago
     Archipelago result = mock(Archipelago.class);
@@ -240,7 +223,8 @@ public class HermansTest extends AbstractTest {
     when(result.findClosestIsland(i1, i3)).thenReturn(i1);
     when(result.findClosestIsland(i5, i6)).thenReturn(i1);
 
-    creator.createNonConflictingVersion(result);
+    //TODO: push mock into createNonConflictingVersion
+    creator.createNonConflictingVersion(matchTable.getIslands());
     verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));
     verify(result).add(new Island(new Coordinate(8, 8), new Coordinate(15, 15)));
     verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));

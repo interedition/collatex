@@ -115,19 +115,6 @@ public class IslandTest extends AbstractTest {
   }
 
   @Test
-  public void testIslands() {
-    SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
-    VariantGraph vg = collate(sw[0]);
-    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions islands = new ArchipelagoWithVersions(table, 1);
-    for (Island isl : table.getIslands()) {
-      islands.add(isl);
-    }
-    assertEquals(3, islands.size());
-    assertEquals(2, islands.numOfConflicts());
-  }
-
-  @Test
   public void testRemovePoints() {
     Island di_1 = new Island();
     di_1.add(new Coordinate(1, 1));

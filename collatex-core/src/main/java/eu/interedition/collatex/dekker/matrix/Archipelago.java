@@ -108,14 +108,6 @@ public class Archipelago {
     return getIslands().get(i);
   }
 
-  public Archipelago copy() {
-    Archipelago result = new Archipelago();
-    for (Island isl : getIslands()) {
-      result.add(new Island(isl));
-    }
-    return result;
-  }
-
   public boolean conflictsWith(Island island) {
     for (Island isl : getIslands()) {
       if (isl.isCompetitor(island)) return true;

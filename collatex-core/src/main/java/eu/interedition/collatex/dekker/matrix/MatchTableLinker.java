@@ -56,17 +56,13 @@ public class MatchTableLinker implements TokenLinker {
 
     if (USE_ARCHIPELAGO==true) {
 	    LOG.fine("create Archipelago data structure");
-	    // create Archipelago data structure and fill it with all the islands
+	    // create ArchipelagoWithVersions
 	    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(table, outlierTranspositionsSizeLimit);
-	    LOG.fine("fill it with all the islands");
-	    for (Island isl : islands) {
-	      archipelago.add(isl);
-	    }
 	
 	    // The archipelago with version createNonConflictingVersion() method
 	    // selects the optimal islands
 	    LOG.fine("select the optimal islands");
-	    Archipelago preferredIslands = archipelago.createNonConflictingVersion();
+	    Archipelago preferredIslands = archipelago.createNonConflictingVersion(islands);
 	    if (LOG.isLoggable(Level.FINE)) {
 	      LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
 	    }
