@@ -69,7 +69,7 @@ public class MatchTableLinker implements TokenLinker {
 	
 	    // Here the result is put in a map
 	    Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
-	    for (Island island : preferredIslands.iterator()) {
+	    for (Island island : preferredIslands.getIslands()) {
 	      for (Coordinate c : island) {
 	        map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
 	      }

@@ -20,143 +20,47 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+/*
+ * @author Meindert Kroese
+ * @author Bram Buitendijk
+ * @author Ronald Haentjens Dekker
+ */
 public class Archipelago {
   Logger LOG = Logger.getLogger(Archipelago.class.getName());
 
-  private ArrayList<Island> islands;
+  private final List<Island> islands;
   private final Set<Integer> islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
 
   public Archipelago() {
-    setIslands(new ArrayList<Island>());
+    islands = new ArrayList<Island>();
   }
 
   public Archipelago(Island isl) {
-    setIslands(new ArrayList<Island>());
-    getIslands().add(isl);
+    islands = new ArrayList<Island>();
+    islands.add(isl);
   }
 
   public void add(Island island) {
-    // islands on the archipelago are sorted on size (large -> small) and direction
-    //    for (Island i : getIslands()) {
-    //      if (island.size() > i.size()) {
-    //        getIslands().add(getIslands().indexOf(i), island);
-    //        return;
-    //
-    //      } else
-    //        try {
-    //          Island disl = island;
-    //          Island di = i;
-    //          if (island.size() > i.size() && disl.direction() > di.direction()) {
-    //            getIslands().add(getIslands().indexOf(i), island);
-    //            return;
-    //          }
-    //        } catch (Exception e) {}
-    //    }
-    getIslands().add(island);
+    islands.add(island);
     Coordinate leftEnd = island.getLeftEnd();
     islandvectors.add(leftEnd.row - leftEnd.column);
   }
 
-  // this is not a real iterator implementation but it works...
-  public ArrayList<Island> iterator() {
-    return getIslands();
-  }
-
   public int size() {
-    return getIslands().size();
-  }
-
-  public void mergeIslands() {
-    int i = 0;
-    int j = 1;
-    int[] rr = new int[size()];
-    for (i = 0; i < size(); i++) {
-      for (j = i + 1; j < size(); j++) {
-        if (getIslands().get(i).overlap(getIslands().get(j))) {
-          (getIslands().get(i)).merge(getIslands().get(j));
-          getIslands().get(j).clear();
-          rr[j] = 1;
-        }
-      }
-    }
-    for (i = (rr.length - 1); i > 0; i--) {
-      if (rr[i] == 1) getIslands().remove(i);
-    }
-  }
-
-  public Object numOfConflicts() {
-    int result = 0;
-    int num = getIslands().size();
-    for (int i = 0; i < num; i++)
-      for (int j = i + 1; j < num; j++) {
-        //				System.out.println("compare "+islands.get(j)+" with "+islands.get(i));				
-        if (getIslands().get(j).isCompetitor(getIslands().get(i))) result++;
-      }
-    return result;
+    return islands.size();
   }
 
   public Island get(int i) {
-    return getIslands().get(i);
-  }
-
-  public boolean conflictsWith(Island island) {
-    for (Island isl : getIslands()) {
-      if (isl.isCompetitor(island)) return true;
-    }
-    return false;
-  }
-
-  public int value() {
-    int result = 0;
-    for (Island isl : getIslands()) {
-      result += isl.value();
-    }
-    return result;
-  }
-
-  public ArrayList<Coordinate> findGaps() {
-    ArrayList<Coordinate> list = new ArrayList<Coordinate>();
-    return findGaps(list);
-  }
-
-  public ArrayList<Coordinate> findGaps(Coordinate begin, Coordinate end) {
-    ArrayList<Coordinate> list = new ArrayList<Coordinate>();
-    list.add(begin);
-    list.add(end);
-    return findGaps(list);
-  }
-
-  public ArrayList<Coordinate> findGaps(ArrayList<Coordinate> list) {
-    ArrayList<Coordinate> result = new ArrayList<Coordinate>(list);
-    for (Island isl : getIslands()) {
-      Coordinate left = isl.getLeftEnd();
-      Coordinate right = isl.getRightEnd();
-      boolean found = false;
-      for (int i = 0; i < result.size(); i++) {
-        if (left.column < result.get(i).column || (left.column == result.get(i).column && left.row < result.get(i).row)) {
-          result.add(i, right);
-          result.add(i, left);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        result.add(left);
-        result.add(right);
-      }
-    }
-    result.remove(result.size() - 1);
-    result.remove(0);
-    return result;
+    return islands.get(i);
   }
 
   public boolean containsCoordinate(int row, int column) {
@@ -167,38 +71,12 @@ public class Archipelago {
     return i1.isCompetitor(i2);
   }
 
-  public void setIslands(ArrayList<Island> islands) {
-    this.islands = islands;
-  }
-
-  public ArrayList<Island> getIslands() {
+  public List<Island> getIslands() {
     return islands;
   }
 
-  public Island findClosestIsland(Island island1, Island island2) {
-    Island closest = null;
-    double minimum1 = 10000;
-    double minimum2 = 10000;
-    for (Island fixedIsland : getIslands()) {
-      minimum1 = Math.min(minimum1, distance(island1, fixedIsland));
-      minimum2 = Math.min(minimum2, distance(island2, fixedIsland));
-    }
-    if (minimum1 < minimum2) {
-      closest = island1;
-    } else if (minimum2 < minimum1) {
-      closest = island2;
-    } else {
-      if (LOG.isLoggable(Level.FINE)) {
-        LOG.log(Level.FINE, "{0} -> {1}", new Object[] { island1, island2 });
-      }
-
-      throw new RuntimeException("no minimum found, help!");
-    }
-    return closest;
-  }
-
   protected void remove(int i) {
-    getIslands().remove(i);
+    islands.remove(i);
   }
 
   @Override
@@ -232,7 +110,7 @@ public class Archipelago {
 
   private Map<Integer, Integer> getCoordinatesMap() {
     final Map<Integer, Integer> map = Maps.newHashMap();
-    for (final Island isl : iterator()) {
+    for (final Island isl : islands) {
       for (final Coordinate c : isl) {
         map.put(c.getRow(), c.getColumn());
       }

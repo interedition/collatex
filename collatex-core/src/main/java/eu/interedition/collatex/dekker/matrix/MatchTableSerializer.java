@@ -66,7 +66,7 @@ public class MatchTableSerializer {
   // arch = preferred matches
   public String toHtml(Archipelago arch) {
     int mat[] = new int[rowNum()];
-    for (Island isl : arch.iterator()) {
+    for (Island isl : arch.getIslands()) {
       for (Coordinate c : isl) {
         mat[c.row] = c.column;
       }

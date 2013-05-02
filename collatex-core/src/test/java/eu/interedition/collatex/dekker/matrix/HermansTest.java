@@ -92,7 +92,7 @@ public class HermansTest extends AbstractTest {
     // assertEquals(497,archipelago.getVersion(4).value());
 
     Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
-    for (Island isl : firstVersion.iterator()) {
+    for (Island isl : firstVersion.getIslands()) {
       LOG.fine(" " + isl.size());
     }
     // for(int i=0; i<10; i++) {
@@ -130,7 +130,7 @@ public class HermansTest extends AbstractTest {
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
     Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
-    for (Island isl : firstVersion.iterator()) {
+    for (Island isl : firstVersion.getIslands()) {
       LOG.fine(" " + isl.size());
     }
     //    assertEquals(4877, firstVersion.value());
@@ -217,12 +217,7 @@ public class HermansTest extends AbstractTest {
     when(result.islandsCompete(i4, i5)).thenReturn(false);
     when(result.islandsCompete(i6, i7)).thenReturn(false);
     when(result.islandsCompete(i8, i9)).thenReturn(true);
-    when(result.findClosestIsland(i2, i4)).thenReturn(i4);
-    when(result.findClosestIsland(i3, i4)).thenReturn(i4);
-    when(result.findClosestIsland(i1, i2)).thenReturn(i1);
-    when(result.findClosestIsland(i1, i3)).thenReturn(i1);
-    when(result.findClosestIsland(i5, i6)).thenReturn(i1);
-
+ 
     //TODO: push mock into createNonConflictingVersion
     creator.createNonConflictingVersion(matchTable.getIslands());
     verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));

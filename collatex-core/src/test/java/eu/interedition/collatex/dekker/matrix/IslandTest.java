@@ -97,8 +97,6 @@ public class IslandTest extends AbstractTest {
     arch.add(isl_2);
     assertEquals(2, arch.size());
     assertTrue(isl_1.overlap(isl_2));
-    arch.mergeIslands();
-    assertEquals(1, arch.size());
   }
 
   @Test
@@ -111,7 +109,6 @@ public class IslandTest extends AbstractTest {
       archipelago.add(isl);
     }
     assertEquals(3, archipelago.size());
-    assertEquals(2, archipelago.numOfConflicts());
   }
 
   @Test
@@ -149,9 +146,5 @@ public class IslandTest extends AbstractTest {
     isl_2.add(new Coordinate(2, 2));
     isl_2.add(new Coordinate(1, 3));
     assertEquals(3, isl_2.value());
-    Archipelago arch = new Archipelago();
-    arch.add(isl_1);
-    arch.add(isl_2);
-    assertEquals(13, arch.value());
   }
 }
