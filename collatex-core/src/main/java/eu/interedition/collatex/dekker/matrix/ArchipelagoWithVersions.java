@@ -76,18 +76,19 @@ public class ArchipelagoWithVersions {
   }
 
 	private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
+		Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
 		Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
-		Set<Island> competingIslandsOnIdealLine = Sets.newHashSet();
 		Set<Island> otherCompetingIslands = Sets.newHashSet();
 		for (Island island : competingIslands) {
 		  Coordinate leftEnd = island.getLeftEnd();
 		  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
-		    competingIslandsOnIdealLine.add(island);
+		    conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
 		  } else {
 		    otherCompetingIslands.add(island);
 		  }
 		}
-		Multimap<Double, Island> distanceMap1 = makeDistanceMap(competingIslandsOnIdealLine, archipelago);
+		
+		Multimap<Double, Island> distanceMap1 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
 		LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
 		addBestOfCompeting(archipelago, distanceMap1);
 	
@@ -122,7 +123,7 @@ public class ArchipelagoWithVersions {
     }
   }
 
-  private Multimap<Double, Island> makeDistanceMap(Set<Island> competingIslands, Archipelago archipelago) {
+  private Multimap<Double, Island> makeDistanceMap(Collection<Island> competingIslands, Archipelago archipelago) {
     Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
     for (Island isl : competingIslands) {
       distanceMap.put(archipelago.smallestDistance(isl), isl);
