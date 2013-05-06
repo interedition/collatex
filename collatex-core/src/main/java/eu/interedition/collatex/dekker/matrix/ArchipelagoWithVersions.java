@@ -94,9 +94,20 @@ public class ArchipelagoWithVersions {
 		Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
 		LOG.fine("addBestOfCompeting with otherCompetingIslands");
 		addBestOfCompeting(archipelago, distanceMap2);
-	
+		
+		List<Island> islandsToCommit = Lists.newArrayList();
 		for (Island i : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
-		  addIslandToResult(i, archipelago);
+			islandsToCommit.add(i);
+		}
+		
+    /* Add the islands to commit to the result Archipelago
+		 * If we want to re-factor this into a pull construction
+		 * rather then a push construction
+		 * we have to move this code out of this method
+		 * and move it to the caller class
+		 */
+		for (Island i: islandsToCommit) {
+			addIslandToResult(i, archipelago);
 		}
 	}
 
