@@ -1,6 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
 public enum IslandCompetition {
-	CompetingIslandAndOnIdealIine
+	CompetingIslandAndOnIdealIine, CompetingIsland, NonCompetingIsland
 
 }

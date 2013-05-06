@@ -76,28 +76,18 @@ public class ArchipelagoWithVersions {
   }
 
 	private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
-		Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
-		Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
-		Set<Island> otherCompetingIslands = Sets.newHashSet();
-		for (Island island : competingIslands) {
-		  Coordinate leftEnd = island.getLeftEnd();
-		  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
-		    conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
-		  } else {
-		    otherCompetingIslands.add(island);
-		  }
-		}
+		Multimap<IslandCompetition, Island> conflictMap = analyse(archipelago, islandsOfSameSize);
 		
 		Multimap<Double, Island> distanceMap1 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
 		LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
 		addBestOfCompeting(archipelago, distanceMap1);
 	
-		Multimap<Double, Island> distanceMap2 = makeDistanceMap(otherCompetingIslands, archipelago);
+		Multimap<Double, Island> distanceMap2 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIsland), archipelago);
 		LOG.fine("addBestOfCompeting with otherCompetingIslands");
 		addBestOfCompeting(archipelago, distanceMap2);
 		
 		List<Island> islandsToCommit = Lists.newArrayList();
-		for (Island i : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
+		for (Island i : conflictMap.get(IslandCompetition.NonCompetingIsland)) {
 			islandsToCommit.add(i);
 		}
 		
@@ -110,6 +100,23 @@ public class ArchipelagoWithVersions {
 		for (Island i: islandsToCommit) {
 			addIslandToResult(i, archipelago);
 		}
+	}
+
+	private Multimap<IslandCompetition, Island> analyse(Archipelago archipelago, List<Island> islandsOfSameSize) {
+		Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
+		Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
+		for (Island island : competingIslands) {
+		  Coordinate leftEnd = island.getLeftEnd();
+		  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+		    conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
+		  } else {
+		    conflictMap.put(IslandCompetition.CompetingIsland, island);
+		  }
+		}
+		for (Island island : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
+			conflictMap.put(IslandCompetition.NonCompetingIsland, island);
+		}
+		return conflictMap;
 	}
 
   // TODO: find a better way to determine the best choice of island
