@@ -69,37 +69,11 @@ public class ArchipelagoWithVersions {
       if (possibleIslands.size() == 1) {
         addIslandToResult(possibleIslands.get(0), result);
       } else if (possibleIslands.size() > 1) {
-        handleMultipleIslandSameSize(result, possibleIslands);
+        Multimap<IslandCompetition, Island> analysis = analyze(result, possibleIslands);
+        resolveConflictsBySelectingPreferredIslands(result, analysis);
       }
     }
     return result;
-  }
-
-  private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
-    Multimap<IslandCompetition, Island> conflictMap = analyze(archipelago, islandsOfSameSize);
-
-    Multimap<Double, Island> distanceMap1 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
-    LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-    addBestOfCompeting(archipelago, distanceMap1);
-
-    Multimap<Double, Island> distanceMap2 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIsland), archipelago);
-    LOG.fine("addBestOfCompeting with otherCompetingIslands");
-    addBestOfCompeting(archipelago, distanceMap2);
-
-    List<Island> islandsToCommit = Lists.newArrayList();
-    for (Island i : conflictMap.get(IslandCompetition.NonCompetingIsland)) {
-      islandsToCommit.add(i);
-    }
-
-    /*
-     * Add the islands to commit to the result Archipelago If we want to
-     * re-factor this into a pull construction rather then a push construction
-     * we have to move this code out of this method and move it to the caller
-     * class
-     */
-    for (Island i : islandsToCommit) {
-      addIslandToResult(i, archipelago);
-    }
   }
 
   /*
@@ -128,7 +102,32 @@ public class ArchipelagoWithVersions {
     return conflictMap;
   }
 
-  // TODO: find a better way to determine the best choice of island
+  /*
+   * The preferred Islands are directly added to the result Archipelago 
+   * If we want to
+   * re-factor this into a pull construction rather then a push construction
+   * we have to move this code out of this method and move it to the caller
+   * class
+   */
+  private void resolveConflictsBySelectingPreferredIslands(Archipelago archipelago, Multimap<IslandCompetition, Island> islandConflictMap) {
+    // First select competing islands that are on the ideal line
+    Multimap<Double, Island> distanceMap1 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
+    LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
+    addBestOfCompeting(archipelago, distanceMap1);
+    
+    // Second select other competing islands
+    Multimap<Double, Island> distanceMap2 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIsland), archipelago);
+    LOG.fine("addBestOfCompeting with otherCompetingIslands");
+    addBestOfCompeting(archipelago, distanceMap2);
+
+    // Third select non competing islands
+    LOG.fine("add non competing islands");
+    for (Island i : islandConflictMap.get(IslandCompetition.NonCompetingIsland)) {
+      addIslandToResult(i, archipelago);
+    }
+  }
+
+   // TODO: find a better way to determine the best choice of island
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
