@@ -76,7 +76,7 @@ public class ArchipelagoWithVersions {
   }
 
 	private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
-		Multimap<IslandCompetition, Island> conflictMap = analyse(archipelago, islandsOfSameSize);
+		Multimap<IslandCompetition, Island> conflictMap = analyze(archipelago, islandsOfSameSize);
 		
 		Multimap<Double, Island> distanceMap1 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
 		LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
@@ -101,19 +101,33 @@ public class ArchipelagoWithVersions {
 			addIslandToResult(i, archipelago);
 		}
 	}
-
-	private Multimap<IslandCompetition, Island> analyse(Archipelago archipelago, List<Island> islandsOfSameSize) {
+	
+	/*
+	 * This method analyzes the relationship between 
+	 * all the islands of the same size that have
+	 * yet to be selected. 
+	 * They can compete with one another (choosing one
+	 * locks out the other), some of them can be on the
+	 * ideal line.
+	 * 
+	 * Parameters:
+	 * fixedIslands: the already committed islands
+	 * possibleIslands: the islands to select the next islands
+	 * 	to commit from. They all have the same size
+	 * 
+	 */
+	private Multimap<IslandCompetition, Island> analyze(Archipelago fixedIslands, List<Island> possibleIslands) {
 		Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
-		Set<Island> competingIslands = getCompetingIslands(islandsOfSameSize, archipelago);
+		Set<Island> competingIslands = getCompetingIslands(possibleIslands, fixedIslands);
 		for (Island island : competingIslands) {
 		  Coordinate leftEnd = island.getLeftEnd();
-		  if (archipelago.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+		  if (fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
 		    conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
 		  } else {
 		    conflictMap.put(IslandCompetition.CompetingIsland, island);
 		  }
 		}
-		for (Island island : getNonCompetingIslands(islandsOfSameSize, competingIslands)) {
+		for (Island island : getNonCompetingIslands(possibleIslands, competingIslands)) {
 			conflictMap.put(IslandCompetition.NonCompetingIsland, island);
 		}
 		return conflictMap;
