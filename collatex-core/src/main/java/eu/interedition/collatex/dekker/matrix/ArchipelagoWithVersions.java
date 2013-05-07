@@ -48,15 +48,15 @@ public class ArchipelagoWithVersions {
     this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
   }
 
-   /*
-    * Create a non-conflicting version by simply taken all the islands
-    * that do not conflict with each other, largest first. This presuming
-    * that Archipelago will have a high value if it contains the largest
-    * possible islands
-    */
+  /*
+   * Create a non-conflicting version by simply taken all the islands that do
+   * not conflict with each other, largest first. This presuming that
+   * Archipelago will have a high value if it contains the largest possible
+   * islands
+   */
   public Archipelago createNonConflictingVersion(Set<Island> islands) {
     Archipelago result = new Archipelago();
-  	Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
+    Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
     for (Island isl : islands) {
       islandMultimap.put(isl.size(), isl);
     }
@@ -64,7 +64,7 @@ public class ArchipelagoWithVersions {
     Collections.sort(keySet);
     List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
     for (Integer islandSize : decreasingIslandSizes) {
-      //      if (islandSize > 0) { // limitation to prevent false transpositions
+      // if (islandSize > 0) { // limitation to prevent false transpositions
       List<Island> possibleIslands = possibleIslands(islandMultimap.get(islandSize));
       if (possibleIslands.size() == 1) {
         addIslandToResult(possibleIslands.get(0), result);
@@ -75,63 +75,58 @@ public class ArchipelagoWithVersions {
     return result;
   }
 
-	private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
-		Multimap<IslandCompetition, Island> conflictMap = analyze(archipelago, islandsOfSameSize);
-		
-		Multimap<Double, Island> distanceMap1 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
-		LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-		addBestOfCompeting(archipelago, distanceMap1);
-	
-		Multimap<Double, Island> distanceMap2 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIsland), archipelago);
-		LOG.fine("addBestOfCompeting with otherCompetingIslands");
-		addBestOfCompeting(archipelago, distanceMap2);
-		
-		List<Island> islandsToCommit = Lists.newArrayList();
-		for (Island i : conflictMap.get(IslandCompetition.NonCompetingIsland)) {
-			islandsToCommit.add(i);
-		}
-		
-    /* Add the islands to commit to the result Archipelago
-		 * If we want to re-factor this into a pull construction
-		 * rather then a push construction
-		 * we have to move this code out of this method
-		 * and move it to the caller class
-		 */
-		for (Island i: islandsToCommit) {
-			addIslandToResult(i, archipelago);
-		}
-	}
-	
-	/*
-	 * This method analyzes the relationship between 
-	 * all the islands of the same size that have
-	 * yet to be selected. 
-	 * They can compete with one another (choosing one
-	 * locks out the other), some of them can be on the
-	 * ideal line.
-	 * 
-	 * Parameters:
-	 * fixedIslands: the already committed islands
-	 * possibleIslands: the islands to select the next islands
-	 * 	to commit from. They all have the same size
-	 * 
-	 */
-	private Multimap<IslandCompetition, Island> analyze(Archipelago fixedIslands, List<Island> possibleIslands) {
-		Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
-		Set<Island> competingIslands = getCompetingIslands(possibleIslands, fixedIslands);
-		for (Island island : competingIslands) {
-		  Coordinate leftEnd = island.getLeftEnd();
-		  if (fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
-		    conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
-		  } else {
-		    conflictMap.put(IslandCompetition.CompetingIsland, island);
-		  }
-		}
-		for (Island island : getNonCompetingIslands(possibleIslands, competingIslands)) {
-			conflictMap.put(IslandCompetition.NonCompetingIsland, island);
-		}
-		return conflictMap;
-	}
+  private void handleMultipleIslandSameSize(Archipelago archipelago, List<Island> islandsOfSameSize) {
+    Multimap<IslandCompetition, Island> conflictMap = analyze(archipelago, islandsOfSameSize);
+
+    Multimap<Double, Island> distanceMap1 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
+    LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
+    addBestOfCompeting(archipelago, distanceMap1);
+
+    Multimap<Double, Island> distanceMap2 = makeDistanceMap(conflictMap.get(IslandCompetition.CompetingIsland), archipelago);
+    LOG.fine("addBestOfCompeting with otherCompetingIslands");
+    addBestOfCompeting(archipelago, distanceMap2);
+
+    List<Island> islandsToCommit = Lists.newArrayList();
+    for (Island i : conflictMap.get(IslandCompetition.NonCompetingIsland)) {
+      islandsToCommit.add(i);
+    }
+
+    /*
+     * Add the islands to commit to the result Archipelago If we want to
+     * re-factor this into a pull construction rather then a push construction
+     * we have to move this code out of this method and move it to the caller
+     * class
+     */
+    for (Island i : islandsToCommit) {
+      addIslandToResult(i, archipelago);
+    }
+  }
+
+  /*
+   * This method analyzes the relationship between all the islands of the same
+   * size that have yet to be selected. They can compete with one another
+   * (choosing one locks out the other), some of them can be on the ideal line.
+   * 
+   * Parameters: fixedIslands: the already committed islands possibleIslands:
+   * the islands to select the next islands to commit from. They all have the
+   * same size
+   */
+  private Multimap<IslandCompetition, Island> analyze(Archipelago fixedIslands, List<Island> possibleIslands) {
+    Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
+    Set<Island> competingIslands = getCompetingIslands(possibleIslands, fixedIslands);
+    for (Island island : competingIslands) {
+      Coordinate leftEnd = island.getLeftEnd();
+      if (fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+        conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
+      } else {
+        conflictMap.put(IslandCompetition.CompetingIsland, island);
+      }
+    }
+    for (Island island : getNonCompetingIslands(possibleIslands, competingIslands)) {
+      conflictMap.put(IslandCompetition.NonCompetingIsland, island);
+    }
+    return conflictMap;
+  }
 
   // TODO: find a better way to determine the best choice of island
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
@@ -220,7 +215,6 @@ public class ArchipelagoWithVersions {
       }
     }
   }
-
 
   private void addIslandToResult(Island isl, Archipelago result) {
     if (islandIsNoOutlier(result, isl)) {
