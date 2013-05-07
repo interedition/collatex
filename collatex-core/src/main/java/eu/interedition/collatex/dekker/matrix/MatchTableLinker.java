@@ -55,26 +55,26 @@ public class MatchTableLinker implements TokenLinker {
     Set<Island> islands = table.getIslands();
 
     if (USE_ARCHIPELAGO==true) {
-	    LOG.fine("create Archipelago data structure");
-	    // create ArchipelagoWithVersions
-	    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(table, outlierTranspositionsSizeLimit);
+	  // create IslandConflictResolver
+      LOG.fine("create island conflict resolver");
+	  IslandConflictResolver resolver = new IslandConflictResolver(table, outlierTranspositionsSizeLimit);
 	
-	    // The archipelago with version createNonConflictingVersion() method
-	    // selects the optimal islands
-	    LOG.fine("select the optimal islands");
-	    Archipelago preferredIslands = archipelago.createNonConflictingVersion(islands);
-	    if (LOG.isLoggable(Level.FINE)) {
-	      LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
-	    }
+	  // The IslandConflictResolver createNonConflictingVersion() method
+	  // selects the optimal islands
+	  LOG.fine("select the optimal islands");
+	  Archipelago preferredIslands = resolver.createNonConflictingVersion(islands);
+	  if (LOG.isLoggable(Level.FINE)) {
+	    LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
+	  }
 	
-	    // Here the result is put in a map
-	    Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
-	    for (Island island : preferredIslands.getIslands()) {
-	      for (Coordinate c : island) {
-	        map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
-	      }
+	  // Here the result is put in a map
+	  Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
+	  for (Island island : preferredIslands.getIslands()) {
+	    for (Coordinate c : island) {
+	      map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
 	    }
-	    return map;
+	  }
+	  return map;
     } else {
       LOG.fine("create the vector space from the matches");
 	    Set<Vector> vectors = table.getVectors();

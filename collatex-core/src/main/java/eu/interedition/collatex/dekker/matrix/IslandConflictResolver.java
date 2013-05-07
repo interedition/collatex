@@ -37,13 +37,13 @@ import com.google.common.collect.Sets;
  * @author Bram Buitendijk
  * @author Meindert Kroese
  */
-public class ArchipelagoWithVersions {
+public class IslandConflictResolver {
   private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
-  Logger LOG = Logger.getLogger(ArchipelagoWithVersions.class.getName());
+  Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
   private final MatchTable table;
   private final int outlierTranspositionsSizeLimit;
 
-  public ArchipelagoWithVersions(MatchTable table, int outlierTranspositionsSizeLimit) {
+  public IslandConflictResolver(MatchTable table, int outlierTranspositionsSizeLimit) {
     this.table = table;
     this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
   }

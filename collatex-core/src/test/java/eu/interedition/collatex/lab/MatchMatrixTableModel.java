@@ -19,17 +19,18 @@
 
 package eu.interedition.collatex.lab;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.table.AbstractTableModel;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.Archipelago;
-import eu.interedition.collatex.dekker.matrix.ArchipelagoWithVersions;
 import eu.interedition.collatex.dekker.matrix.Island;
+import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.simple.SimpleToken;
-
-import javax.swing.table.AbstractTableModel;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -92,9 +93,9 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     // detect islands
     Set<Island> islands = matchTable.getIslands();
     // prepare
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, outlierTranspositionsSizeLimit);
+    IslandConflictResolver resolver = new IslandConflictResolver(matchTable, outlierTranspositionsSizeLimit);
     // find preferred islands
-    Archipelago preferred = archipelago.createNonConflictingVersion(islands);
+    Archipelago preferred = resolver.createNonConflictingVersion(islands);
     return preferred;
   }
 

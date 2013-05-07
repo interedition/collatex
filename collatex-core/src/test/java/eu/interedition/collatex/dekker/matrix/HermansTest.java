@@ -80,7 +80,7 @@ public class HermansTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     // System.out.println(buildMatrix.toHtml());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
+    IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
 //    assertEquals(42, archipelago.size());
@@ -126,7 +126,7 @@ public class HermansTest extends AbstractTest {
     // e.printStackTrace();
     // }
     // System.out.println(buildMatrix.toHtml());
-    ArchipelagoWithVersions archipelago = new ArchipelagoWithVersions(matchTable, 1);
+    IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
     Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
@@ -192,7 +192,7 @@ public class HermansTest extends AbstractTest {
 
     VariantGraph base = collate(witnesses[0]);
     MatchTable matchTable = MatchTable.create(base, witnesses[1], new EqualityTokenComparator());
-    ArchipelagoWithVersions creator = new ArchipelagoWithVersions(matchTable, 1);
+    IslandConflictResolver creator = new IslandConflictResolver(matchTable, 1);
 
     //Mock Archipelago
     Archipelago result = mock(Archipelago.class);
