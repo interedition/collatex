@@ -66,6 +66,15 @@ public class IslandConflictResolver {
     for (Integer islandSize : decreasingIslandSizes) {
       // if (islandSize > 0) { // limitation to prevent false transpositions
       List<Island> possibleIslands = possibleIslands(islandMultimap.get(islandSize));
+      // CHECK THAT THE ISLANDS ARE THE EXPECTED SIZE!
+      if (!possibleIslands.isEmpty()) {
+        for (Island island : possibleIslands) {
+          if (island.size()!=islandSize) {
+            throw new RuntimeException("Not all islands are of the expected size! Expected: "+islandSize+" got: "+island.size()+" number of islands: "+possibleIslands.size());
+          }
+        }
+      }
+      
       if (possibleIslands.size() == 1) {
         addIslandToResult(possibleIslands.get(0), result);
       } else if (possibleIslands.size() > 1) {
