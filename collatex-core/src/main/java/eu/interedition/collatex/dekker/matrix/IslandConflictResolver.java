@@ -50,31 +50,27 @@ public class IslandConflictResolver {
 
   /*
    * Create a non-conflicting version by simply taken all the islands that do
-   * not conflict with each other, largest first. This presuming that
-   * Archipelago will have a high value if it contains the largest possible
-   * islands
+   * not conflict with each other, largest first. 
    */
   public Archipelago createNonConflictingVersion(Set<Island> islands) {
     Archipelago result = new Archipelago();
+    if (islands.isEmpty()) {
+      return result;
+    }
+    // Group all the possible islands by size
     Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
     for (Island isl : islands) {
       islandMultimap.put(isl.size(), isl);
     }
-    List<Integer> keySet = Lists.newArrayList(islandMultimap.keySet());
-    Collections.sort(keySet);
-    List<Integer> decreasingIslandSizes = Lists.reverse(keySet);
-    for (Integer islandSize : decreasingIslandSizes) {
-      // if (islandSize > 0) { // limitation to prevent false transpositions
-      List<Island> possibleIslands = possibleIslands(islandMultimap.get(islandSize));
-      // CHECK THAT THE ISLANDS ARE THE EXPECTED SIZE!
-      if (!possibleIslands.isEmpty()) {
-        for (Island island : possibleIslands) {
-          if (island.size()!=islandSize) {
-            throw new RuntimeException("Not all islands are of the expected size! Expected: "+islandSize+" got: "+island.size()+" number of islands: "+possibleIslands.size());
-          }
-        }
-      }
-      
+    // find the maximum island size and traverse groups in descending order
+    Integer max = Collections.max(islandMultimap.keySet());
+    for (int islandSize=max; islandSize > 0; islandSize--) {
+      LOG.fine("Checking islands of size: "+islandSize);
+      // check the possible islands of a certain size against 
+      // the already committed islands.
+      removeOrSplitPossibleIslands(islandSize, islandMultimap);
+      List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
+      // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
         addIslandToResult(possibleIslands.get(0), result);
       } else if (possibleIslands.size() > 1) {
@@ -83,6 +79,28 @@ public class IslandConflictResolver {
       }
     }
     return result;
+  }
+  
+  /*
+   * For all the possible islands of a certain size
+   * this method checks whether they conflict with one of the
+   * previously committed islands.
+   * If so, the possible island is removed from the multimap.
+   * Or in case of overlap, split into a smaller island
+   * and then put in back into the map
+   * Note that this method changes the possible islands multimap.
+   */
+  private void removeOrSplitPossibleIslands(Integer islandSize, Multimap<Integer, Island> islandMultimap) {
+    Collection<Island> islandsToCheck = Lists.newArrayList(islandMultimap.get(islandSize));
+    for (Island island : islandsToCheck) {
+      if (!table.isIslandPossibleCandidate(island)) {
+        islandMultimap.remove(islandSize, island);
+        removeConflictingEndCoordinates(island);
+        if (island.size() > 1) {
+          islandMultimap.put(island.size(), island);
+        }
+      }
+    }
   }
 
   /*
@@ -180,21 +198,6 @@ public class IslandConflictResolver {
       }
     }
     return competingIslands;
-  }
-
-  private List<Island> possibleIslands(Collection<Island> islandsOfSize) {
-    List<Island> islands = Lists.newArrayList();
-    for (Island island : islandsOfSize) {
-      if (table.isIslandPossibleCandidate(island)) {
-        islands.add(island);
-      } else {
-        removeConflictingEndCoordinates(island);
-        if (island.size() > 1) {
-          islands.add(island);
-        }
-      }
-    }
-    return islands;
   }
 
   private void removeConflictingEndCoordinates(Island island) {
