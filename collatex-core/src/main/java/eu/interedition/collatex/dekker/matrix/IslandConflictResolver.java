@@ -42,25 +42,29 @@ public class IslandConflictResolver {
   Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
   private final MatchTable table;
   private final int outlierTranspositionsSizeLimit;
+  // group the islands together by size; islands may change after commit islands
+  private final Multimap<Integer, Island> islandMultimap;
+  // fixed islands contains all the islands that are selected for the final alignment
+  private final Archipelago fixedIslands;
 
   public IslandConflictResolver(MatchTable table, int outlierTranspositionsSizeLimit) {
     this.table = table;
     this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
+    islandMultimap = ArrayListMultimap.create();
+    for (Island isl : table.getIslands()) {
+      islandMultimap.put(isl.size(), isl);
+    }
+    fixedIslands = new Archipelago();
   }
 
   /*
    * Create a non-conflicting version by simply taken all the islands that do
    * not conflict with each other, largest first. 
    */
+  //TODO: remove islands parameter here!
   public Archipelago createNonConflictingVersion(Set<Island> islands) {
-    Archipelago result = new Archipelago();
     if (islands.isEmpty()) {
-      return result;
-    }
-    // Group all the possible islands by size
-    Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
-    for (Island isl : islands) {
-      islandMultimap.put(isl.size(), isl);
+      return fixedIslands;
     }
     // find the maximum island size and traverse groups in descending order
     Integer max = Collections.max(islandMultimap.keySet());
@@ -68,17 +72,18 @@ public class IslandConflictResolver {
       LOG.fine("Checking islands of size: "+islandSize);
       // check the possible islands of a certain size against 
       // the already committed islands.
+      //TODO: remove this method to IMpossibleIslands
       removeOrSplitPossibleIslands(islandSize, islandMultimap);
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
-        addIslandToResult(possibleIslands.get(0), result);
+        addIslandToResult(possibleIslands.get(0), fixedIslands);
       } else if (possibleIslands.size() > 1) {
-        Multimap<IslandCompetition, Island> analysis = analyze(result, possibleIslands);
-        resolveConflictsBySelectingPreferredIslands(result, analysis);
+        Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(islandSize);
+        resolveConflictsBySelectingPreferredIslands(fixedIslands, analysis);
       }
     }
-    return result;
+    return fixedIslands;
   }
   
   /*
@@ -107,12 +112,11 @@ public class IslandConflictResolver {
    * This method analyzes the relationship between all the islands of the same
    * size that have yet to be selected. They can compete with one another
    * (choosing one locks out the other), some of them can be on the ideal line.
-   * 
-   * Parameters: fixedIslands: the already committed islands possibleIslands:
-   * the islands to select the next islands to commit from. They all have the
-   * same size
+   *
+   * Parameters: the size of the islands that you want to analyze
    */
-  private Multimap<IslandCompetition, Island> analyze(Archipelago fixedIslands, List<Island> possibleIslands) {
+  public Multimap<IslandCompetition, Island> analyzeConflictsBetweenPossibleIslands(int islandSize) {
+    List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
     Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
     Set<Island> competingIslands = getCompetingIslands(possibleIslands, fixedIslands);
     for (Island island : competingIslands) {
