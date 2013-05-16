@@ -19,20 +19,20 @@
 
 package eu.interedition.collatex.matching;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.simple.SimpleToken;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
 
 public class Matches {
 

@@ -58,6 +58,19 @@ public class MatchesTest extends AbstractTest {
     int expected_ambiguous = 0;
     assertMatches(matches, expected_unmatched, expected_unique, expected_ambiguous);
   }
+  
+  // This test tests overlapping islands
+  @Test
+  public void test3OverlappingIslands() {
+    String witnessA = "the cat and the dog";
+    String witnessB = "the dog and the cat";
+    SimpleWitness[] sw = createWitnesses(witnessA, witnessB);
+    VariantGraph vg = collate(sw[0]);
+    final Matches matches = Matches.between(vg.vertices(), sw[1].getTokens(), new EqualityTokenComparator());
+    assertMatches(matches, 0, 3, 2);
+    assertEquals(7, matches.getAll().size());
+  }
+
 
   private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
     Set<Token> unmatched = matches.getUnmatched();
