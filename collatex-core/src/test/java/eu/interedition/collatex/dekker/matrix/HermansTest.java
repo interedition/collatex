@@ -91,7 +91,7 @@ public class HermansTest extends AbstractTest {
     // assertEquals(500,archipelago.getVersion(0).value());
     // assertEquals(497,archipelago.getVersion(4).value());
 
-    Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
+    Archipelago firstVersion = archipelago.createNonConflictingVersion();
     for (Island isl : firstVersion.getIslands()) {
       LOG.fine(" " + isl.size());
     }
@@ -129,7 +129,7 @@ public class HermansTest extends AbstractTest {
     IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
-    Archipelago firstVersion = archipelago.createNonConflictingVersion(matchTable.getIslands());
+    Archipelago firstVersion = archipelago.createNonConflictingVersion();
     for (Island isl : firstVersion.getIslands()) {
       LOG.fine(" " + isl.size());
     }
@@ -219,7 +219,7 @@ public class HermansTest extends AbstractTest {
     when(result.islandsCompete(i8, i9)).thenReturn(true);
  
     //TODO: push mock into createNonConflictingVersion
-    creator.createNonConflictingVersion(matchTable.getIslands());
+    creator.createNonConflictingVersion();
     verify(result).add(new Island(new Coordinate(40, 39), new Coordinate(58, 57)));
     verify(result).add(new Island(new Coordinate(8, 8), new Coordinate(15, 15)));
     verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));

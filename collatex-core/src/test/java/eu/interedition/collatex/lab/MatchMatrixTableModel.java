@@ -20,14 +20,12 @@
 package eu.interedition.collatex.lab;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.Archipelago;
-import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -90,12 +88,10 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   }
 
   private Archipelago preferred(MatchTable matchTable) {
-    // detect islands
-    Set<Island> islands = matchTable.getIslands();
     // prepare
     IslandConflictResolver resolver = new IslandConflictResolver(matchTable, outlierTranspositionsSizeLimit);
     // find preferred islands
-    Archipelago preferred = resolver.createNonConflictingVersion(islands);
+    Archipelago preferred = resolver.createNonConflictingVersion();
     return preferred;
   }
 

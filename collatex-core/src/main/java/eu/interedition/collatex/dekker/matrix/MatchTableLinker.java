@@ -21,7 +21,6 @@ package eu.interedition.collatex.dekker.matrix;
 
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,10 +45,6 @@ public class MatchTableLinker implements TokenLinker {
     LOG.fine("create MatchTable and fill it with matches");
     MatchTable table = MatchTable.create(base, witness, comparator);
 
-    // the MatchTable getIslands() method does the pattern finding
-    LOG.fine("getIslands()");
-    Set<Island> islands = table.getIslands();
-
     // create IslandConflictResolver
     LOG.fine("create island conflict resolver");
 	  IslandConflictResolver resolver = new IslandConflictResolver(table, outlierTranspositionsSizeLimit);
@@ -57,7 +52,7 @@ public class MatchTableLinker implements TokenLinker {
 	  // The IslandConflictResolver createNonConflictingVersion() method
 	  // selects the optimal islands
 	  LOG.fine("select the optimal islands");
-	  Archipelago preferredIslands = resolver.createNonConflictingVersion(islands);
+	  Archipelago preferredIslands = resolver.createNonConflictingVersion();
 	  if (LOG.isLoggable(Level.FINE)) {
 	    LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
 	  }

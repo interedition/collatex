@@ -61,9 +61,8 @@ public class IslandConflictResolver {
    * Create a non-conflicting version by simply taken all the islands that do
    * not conflict with each other, largest first. 
    */
-  //TODO: remove islands parameter here!
-  public Archipelago createNonConflictingVersion(Set<Island> islands) {
-    if (islands.isEmpty()) {
+  public Archipelago createNonConflictingVersion() {
+    if (islandMultimap.isEmpty()) {
       return fixedIslands;
     }
     // find the maximum island size and traverse groups in descending order
@@ -72,8 +71,7 @@ public class IslandConflictResolver {
       LOG.fine("Checking islands of size: "+islandSize);
       // check the possible islands of a certain size against 
       // the already committed islands.
-      //TODO: remove this method to IMpossibleIslands
-      removeOrSplitPossibleIslands(islandSize, islandMultimap);
+      removeOrSplitImpossibleIslands(islandSize, islandMultimap);
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
@@ -95,7 +93,7 @@ public class IslandConflictResolver {
    * and then put in back into the map
    * Note that this method changes the possible islands multimap.
    */
-  private void removeOrSplitPossibleIslands(Integer islandSize, Multimap<Integer, Island> islandMultimap) {
+  private void removeOrSplitImpossibleIslands(Integer islandSize, Multimap<Integer, Island> islandMultimap) {
     Collection<Island> islandsToCheck = Lists.newArrayList(islandMultimap.get(islandSize));
     for (Island island : islandsToCheck) {
       if (!table.isIslandPossibleCandidate(island)) {
