@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Ronald Haentjens Dekker
  */
 public class SimpleTokenNormalizers {
 
@@ -68,4 +69,6 @@ public class SimpleTokenNormalizers {
   };
 
   public static final Function<String, String> LC_TRIM_WS_PUNCT = Functions.compose(LOWER_CASE, TRIM_WS_PUNCT);
+  
+  public static final Function<String, String> LC_TRIM_WS = Functions.compose(LOWER_CASE, TRIM_WS);
 }

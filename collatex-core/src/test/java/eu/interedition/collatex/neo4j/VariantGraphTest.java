@@ -144,8 +144,8 @@ public class VariantGraphTest extends AbstractTest {
     edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
     assertHasWitnesses(edge, w[1], w[2]);
 
-    assertEquals(16, Iterables.size(graph.vertices())); // start and end vertices included
-    assertEquals(18, Iterables.size(graph.edges()));
+    assertEquals(17, Iterables.size(graph.vertices())); // start and end vertices included
+    assertEquals(20, Iterables.size(graph.edges()));
   }
 
   @Test
@@ -195,7 +195,7 @@ public class VariantGraphTest extends AbstractTest {
 
     final VariantGraph.Vertex blackieVertex = vertexWith(graph, "blackie", w[0]);
     final VariantGraph.Vertex whitneyVertex = vertexWith(graph, "whitney", w[1]);
-    final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
+    final VariantGraph.Vertex theVertex = vertexWith(graph, ", the", w[0]);
     final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
     final VariantGraph.Vertex whiteVertex = vertexWith(graph, "white", w[1]);
     final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);

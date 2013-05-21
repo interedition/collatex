@@ -68,9 +68,9 @@ public class TranspositionTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
 
-    assertEquals("| |he|was|agast|so|", toString(table, w[0]));
-    assertEquals("| |he|was|agast| |", toString(table, w[1]));
-    assertEquals("|so|he|was|agast| |", toString(table, w[2]));
+    assertEquals("| |he|was|agast|,|so|", toString(table, w[0]));
+    assertEquals("| |he|was|agast| | |", toString(table, w[1]));
+    assertEquals("|so|he|was|agast| | |", toString(table, w[2]));
   }
 
   @Test
@@ -78,9 +78,8 @@ public class TranspositionTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
 
-    // TODO: it would be nice if He was agast stayed in one place!
-    assertEquals("| | | |so|he|was|agast|", toString(table, w[0]));
-    assertEquals("| | | | |he|was|agast|", toString(table, w[1]));
-    assertEquals("|he|was|agast|so| | | |", toString(table, w[2]));
+    assertEquals("|so|he|was|agast| | |", toString(table, w[0]));
+    assertEquals("| |he|was|agast| | |", toString(table, w[1]));
+    assertEquals("| |he|was|agast|,|so|", toString(table, w[2]));
   }
 }

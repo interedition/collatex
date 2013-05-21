@@ -155,7 +155,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     List<String> l = Lists.newArrayList(tokensAsString);
     Collections.sort(l);
     LOG.log(Level.FINE, Joiner.on('\n').join(l));
-    assertTrue(tokensAsString.contains("B:77:'onder'"));
+    assertTrue(tokensAsString.contains("B:87:'onder'"));
     assertTrue(tokensAsString.contains("B:0:'over'"));
     assertTrue(tokensAsString.contains("B:1:'de'"));
     assertTrue(tokensAsString.contains("B:2:'atlantische'"));

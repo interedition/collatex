@@ -70,7 +70,9 @@ public class VariantGraphRankerTest extends AbstractTest {
     assertEquals(3, (long) ranking.apply(vertices.get(3)));
     assertVertexEquals("agast", vertices.get(4));
     assertEquals(4, (long) ranking.apply(vertices.get(4)));
-    assertVertexEquals("so", vertices.get(5));
+    assertVertexEquals(",", vertices.get(5));
     assertEquals(5, (long) ranking.apply(vertices.get(5)));
+    assertVertexEquals("so", vertices.get(6));
+    assertEquals(6, (long) ranking.apply(vertices.get(6)));
   }
 }

@@ -60,7 +60,7 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
   public static String toString(Iterable<? extends Token> tokens) {
     final StringBuilder normalized = new StringBuilder();
     for (SimpleToken token : Iterables.filter(tokens, SimpleToken.class)) {
-      normalized.append(token.getNormalized()).append(" ");
+      normalized.append(token.getContent());
     }
     return normalized.toString().trim();
   }

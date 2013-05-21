@@ -105,7 +105,7 @@ public class BeckettTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     VariantGraph graph = collate(w);
-    assertPhraseMatches("its soft","light", "any light he could remember from the days", "nights when day followed", "night", "vice versa");
+    assertPhraseMatches("Its soft","light", "any light he could remember from the days", "nights when day followed", "night", "vice versa.");
     assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
   }
 
@@ -195,14 +195,14 @@ public class BeckettTest extends AbstractTest {
     collate(graph, w[4]);
     final List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
     final List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
-    assertEquals("the same", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
+    assertEquals("The same", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
     assertEquals("as when", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
-    assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));
+    assertEquals("Darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));
     assertEquals("among others", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(3))));
     assertEquals("once died", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(4))));
     assertEquals("left him", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(5))));
     assertEquals(1, transpositions.size());
-    assertEquals("darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(transpositions.get(0))));
+    assertEquals("Darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(transpositions.get(0))));
   }
 
   private static void assertGraphContains(VariantGraph graph, String... expected) {

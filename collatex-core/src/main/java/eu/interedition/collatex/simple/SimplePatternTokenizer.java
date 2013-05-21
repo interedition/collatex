@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Ronald Haentjens Dekker
  */
 public class SimplePatternTokenizer implements Function<String, Iterable<String>> {
 
@@ -56,5 +57,9 @@ public class SimplePatternTokenizer implements Function<String, Iterable<String>
 
   public static final SimplePatternTokenizer BY_WS_AND_PUNCT = new SimplePatternTokenizer(
           Pattern.compile("[\\s" + PUNCT + "]*?[^\\s" + PUNCT + "]+[\\s" + PUNCT + "]*")
+  );
+  
+  public static final SimplePatternTokenizer BY_WS_OR_PUNCT = new SimplePatternTokenizer(
+          Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*")
   );
 }
