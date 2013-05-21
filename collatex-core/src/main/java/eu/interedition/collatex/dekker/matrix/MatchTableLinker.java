@@ -20,7 +20,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -31,11 +30,8 @@ import com.google.common.collect.Maps;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.TokenLinker;
-import eu.interedition.collatex.dekker.matrix.VectorConflictResolver.Vector;
 
-//Note: This class is intended to be the replacement for the MatchMatrixLinker class
 public class MatchTableLinker implements TokenLinker {
-  private static final boolean USE_ARCHIPELAGO = true;
 	static Logger LOG = Logger.getLogger(MatchTableLinker.class.getName());
   private final int outlierTranspositionsSizeLimit;
 
@@ -54,9 +50,8 @@ public class MatchTableLinker implements TokenLinker {
     LOG.fine("getIslands()");
     Set<Island> islands = table.getIslands();
 
-    if (USE_ARCHIPELAGO==true) {
-	  // create IslandConflictResolver
-      LOG.fine("create island conflict resolver");
+    // create IslandConflictResolver
+    LOG.fine("create island conflict resolver");
 	  IslandConflictResolver resolver = new IslandConflictResolver(table, outlierTranspositionsSizeLimit);
 	
 	  // The IslandConflictResolver createNonConflictingVersion() method
@@ -75,19 +70,5 @@ public class MatchTableLinker implements TokenLinker {
 	    }
 	  }
 	  return map;
-    } else {
-      LOG.fine("create the vector space from the matches");
-	    Set<Vector> vectors = table.getVectors();
-	    VectorConflictResolver resolver = new VectorConflictResolver(vectors);
-	    List<Vector> resolved = resolver.resolveConflicts();
-	    // Here the result is put in a map
-	    Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
-	    for (Vector v2 : resolved) {
-	      for (int i=0; i < v2.length; i++) {
-	        map.put(table.tokenAt(v2.y+i, v2.x+i), table.vertexAt(v2.y+i, v2.x+i));
-	      }
-	    }
-	  	return map;
-    }
   }
 }
