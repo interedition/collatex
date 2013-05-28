@@ -219,10 +219,19 @@ public class MatchTableLinkerTest extends AbstractTest {
   @Ignore
   @Test
   public void testOutlierTranspositionLimitAndPunctuation() {
-    int outlierTranspositionsSizeLimit = 2;
+    int outlierTranspositionsSizeLimit = 200;
     String w1 = "a b c .";
     String w2 = "a b c Natuurlijk, alles mag relatief zijn.";
     SimpleWitness[] sw = createWitnesses(w1, w2);
+    
+    // assert that punctuation are separate tokens
+    List<Token> tokensA = sw[0].getTokens();
+    assertEquals("A:0:'a'", tokensA.get(0).toString());
+    assertEquals("A:1:'b'", tokensA.get(1).toString());
+    assertEquals("A:2:'c'", tokensA.get(2).toString());
+    assertEquals("A:3:'.'", tokensA.get(3).toString());
+    assertEquals(4, tokensA.size());
+    
     VariantGraph vg = collate(sw[0]);
     Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
     
