@@ -19,7 +19,8 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,17 +30,18 @@ import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import eu.interedition.collatex.VariantGraph;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.PhraseMatchDetector;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -210,4 +212,33 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertTrue(tokensAsString.contains("C:6:'suscepto'"));
   }
 
+  /**
+   * TODO: fix this test, but re-implementing the outlier
+   * transposition limit in a different way.
+   */
+  @Ignore
+  @Test
+  public void testOutlierTranspositionLimitAndPunctuation() {
+    int outlierTranspositionsSizeLimit = 2;
+    String w1 = "a b c .";
+    String w2 = "a b c Natuurlijk, alles mag relatief zijn.";
+    SimpleWitness[] sw = createWitnesses(w1, w2);
+    VariantGraph vg = collate(sw[0]);
+    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
+    
+    // assert linked tokens; helper method
+    Set<Token> tokens = linkedTokens.keySet();
+    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    for (Token token : tokens) {
+      tokensAsString.add(token.toString());
+    }
+    List<String> l = Lists.newArrayList(tokensAsString);
+    Collections.sort(l);
+    
+    assertTrue(l.contains("B:0:'a'"));
+    assertTrue(l.contains("B:1:'b'"));
+    assertTrue(l.contains("B:2:'c'"));
+    assertTrue(l.contains("B:9:'.'"));
+    assertEquals(4, l.size());
+  }
 }
