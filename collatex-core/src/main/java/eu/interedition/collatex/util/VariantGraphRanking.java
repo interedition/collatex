@@ -19,6 +19,14 @@
 
 package eu.interedition.collatex.util;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -31,19 +39,15 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeBasedTable;
 import com.google.common.collect.TreeMultimap;
+
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.Witness;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author Ronald Haentjens Dekker
  */
 public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<VariantGraph.Vertex,Integer>, Comparator<VariantGraph.Vertex> {
 
@@ -69,6 +73,22 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
         rank = Math.max(rank, ranking.byVertex.get(e.from()));
       }
       rank++;
+      ranking.byVertex.put(v, rank);
+      ranking.byRank.put(rank, v);
+    }
+    return ranking;
+  }
+
+  public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<Witness> witnesses, Set<VariantGraph.Vertex> vertices) {
+    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
+    for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
+      int rank = -1;
+      for (VariantGraph.Edge e : v.incoming(witnesses)) {
+        rank = Math.max(rank, ranking.byVertex.get(e.from()));
+      }
+      if (vertices.contains(v)) {
+        rank++;
+      }
       ranking.byVertex.put(v, rank);
       ranking.byRank.put(rank, v);
     }

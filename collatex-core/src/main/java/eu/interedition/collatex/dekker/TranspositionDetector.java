@@ -20,6 +20,7 @@ package eu.interedition.collatex.dekker;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
@@ -41,7 +43,11 @@ public class TranspositionDetector {
 
   public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     // rank the variant graph
-    final VariantGraphRanking ranking = VariantGraphRanking.of(base);
+    Set<VariantGraph.Vertex> matchedVertices = Sets.newHashSet();
+    for (List<Match> phraseMatch : phraseMatches) {
+      matchedVertices.add(phraseMatch.get(0).vertex);
+    }
+    final VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(base, null, matchedVertices);
 
     // gather matched ranks into a list ordered by their natural order
     final List<Integer> phraseRanks = Lists.newArrayList();

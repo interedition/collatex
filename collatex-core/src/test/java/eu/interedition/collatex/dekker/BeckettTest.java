@@ -19,9 +19,23 @@
 
 package eu.interedition.collatex.dekker;
 
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -31,20 +45,28 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class BeckettTest extends AbstractTest {
 
+  /**
+   * The ranking of vertices in the transposition detector should only
+   * rank matched vertices!!!
+   */
+  @Test
+  public void testBeckettStrangeTransposition() {
+    SimpleWitness[] w = createWitnesses("People with things, people without things, things without people, what does it matter. I'm confident I can soon scatter them.", "People with things, people without things, things without people, what does it matter, it will not take me long to scatter them.", "People with things, people without things, things without people, what does it matter, I flatter myself it will not take me long to scatter them, whenever I choose, to the winds.");
+    final VariantGraph graph = collate(w[0], w[1]);
+    DekkerAlgorithm algo = new DekkerAlgorithm(new EqualityTokenComparator());
+    algo.collate(graph, w[2]);
+//    List<List<Match>> phraseMatches = algo.getPhraseMatches();
+//    for (List<Match> phraseMatch: phraseMatches) {
+//      System.out.println(SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch)));
+//    }
+
+    assertEquals(0, algo.getTranspositions().size());
+  }
+	
+	
   @Test
   public void dirkVincent() {
     final SimpleWitness[] w = createWitnesses(//
