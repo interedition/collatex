@@ -36,6 +36,7 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -114,8 +115,9 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
         if (!contentNode.isTextual()) {
           throw JsonMappingException.from(jp, String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
+        final String textContent = contentNode.getTextValue();
         witness.setTokenContents(
-                SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(contentNode.getTextValue()),
+                (textContent.isEmpty() ? Collections.singleton("") : SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(textContent)),
                 SimpleTokenNormalizers.LC_TRIM_WS_PUNCT
         );
       }
@@ -123,6 +125,7 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
       if (witness.getTokens().isEmpty()) {
         throw JsonMappingException.from(jp, String.format("No tokens in witness \"%s\"", witness));
       }
+
       witnesses.add(witness);
     }
 

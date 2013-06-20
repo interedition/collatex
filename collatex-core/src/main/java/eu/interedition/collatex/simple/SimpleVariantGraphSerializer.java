@@ -201,15 +201,18 @@ public class SimpleVariantGraphSerializer {
   }
 
   public void toDot(Writer writer) {
-      final PrintWriter out = new PrintWriter(writer);
-      final String indent = "  ";
-      final String connector = " -> ";
+    final PrintWriter out = new PrintWriter(writer);
+    final String indent = "  ";
+    final String connector = " -> ";
 
-      out.println("digraph G {");
+    out.println("digraph G {");
 
-      for (VariantGraph.Vertex v : graph.vertices()) {
+    final VariantGraph.Vertex start = graph.getStart();
+    final VariantGraph.Vertex end = graph.getEnd();
+
+    for (VariantGraph.Vertex v : graph.vertices()) {
         out.print(indent + id(v));
-        out.print(" [label = \"" + toDotLabel(v) + "\"]");
+        out.print(" [label = \"" + toDotLabel(v) + "\"" + (start.equals(v) || end.equals(v) ? " color = \"lightgray\"" : "") + "]");
         out.println(";");
       }
 
@@ -227,7 +230,7 @@ public class SimpleVariantGraphSerializer {
         out.println(";");
       }
 
-      out.print(indent + id(graph.getStart()) + connector + id(graph.getEnd()));
+      out.print(indent + id(start) + connector + id(end));
       out.print(" [color =  \"white\"]");
       out.println(";");
 
