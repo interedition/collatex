@@ -21,8 +21,8 @@ package eu.interedition.collatex.http;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import eu.interedition.collatex.io.CollateXModule;
 import eu.interedition.collatex.io.IOExceptionMapper;
@@ -32,11 +32,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
@@ -73,13 +74,14 @@ public class Server extends DefaultResourceConfig implements Runnable {
       objectMapper = new ObjectMapper();
       objectMapper.registerModule(new CollateXModule());
 
-      final URI context = UriBuilder.fromUri("http://localhost/").port(httpPort).path(contextPath).build();
-
       if (LOG.isLoggable(Level.INFO)) {
-        LOG.info("Starting HTTP server at " + context.toString());
+        LOG.info("Starting HTTP server at " + UriBuilder.fromUri("http://localhost/").port(httpPort).path(contextPath).build());
       }
 
-      final HttpServer httpServer = GrizzlyServerFactory.createHttpServer(context, this);
+      final HttpServer httpServer = new HttpServer();
+      httpServer.addListener(new NetworkListener("grizzly", NetworkListener.DEFAULT_NETWORK_HOST, httpPort));
+      httpServer.getServerConfiguration().addHttpHandler(ContainerFactory.createContainer(HttpHandler.class, this), contextPath);
+
       Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
         @Override
         public void run() {
