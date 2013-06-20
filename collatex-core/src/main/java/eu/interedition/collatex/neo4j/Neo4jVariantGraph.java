@@ -114,13 +114,13 @@ public class Neo4jVariantGraph implements VariantGraph {
   public Edge connect(VariantGraph.Vertex from, VariantGraph.Vertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
-    if (LOG.isLoggable(Level.FINER)) {
-      LOG.log(Level.FINER, "Connected {0} and {1} with {2}", new Object[]{ from, to, witnesses });
-    }
-
+    witnesses = Sets.newHashSet(witnesses);
     if (from.equals(start)) {
       final Edge startEndEdge = edgeBetween(start, end);
       if (startEndEdge != null) {
+        if (to.equals(end)) {
+          witnesses.addAll(startEndEdge.witnesses());
+        }
         startEndEdge.delete();
       }
     }
@@ -131,6 +131,11 @@ public class Neo4jVariantGraph implements VariantGraph {
       }
     }
     return new Neo4jVariantGraphEdge(this, (Neo4jVariantGraphVertex) from, (Neo4jVariantGraphVertex) to, witnesses);
+  }
+
+  @Override
+  public Edge register(Witness witness) {
+    return connect(start, end, Collections.singleton(witness));
   }
 
   @Override

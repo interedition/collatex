@@ -27,7 +27,7 @@ import com.google.common.io.Files;
 import com.sun.jersey.api.NotFoundException;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.io.Collation;
+import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -106,7 +106,7 @@ public class CollateResource {
 
   @Path("collate")
   @POST
-  public Response collate(final Collation collation, @Context HttpHeaders hh) throws ExecutionException, InterruptedException {
+  public Response collate(final SimpleCollation collation, @Context HttpHeaders hh) throws ExecutionException, InterruptedException {
     if (maxCollationSize > 0) {
       int witnessLength = 0;
       for (Iterable<Token> witness : collation.getWitnesses()) {
@@ -137,19 +137,8 @@ public class CollateResource {
     return corsSupport(hh, Response.ok(executor.submit(new Callable<VariantGraph>() {
       @Override
       public VariantGraph call() throws Exception {
-        VariantGraph graph = new JungVariantGraph();
-
-        if (collation != null) {
-          // merge
-          collation.getAlgorithm().collate(graph, collation.getWitnesses());
-
-          // post-process
-          if (collation.isJoined()) {
-            graph = VariantGraph.JOIN.apply(graph);
-          }
-        }
-
-        return graph;
+        final JungVariantGraph graph = new JungVariantGraph();
+        return (collation == null ? graph : collation.collate(graph));
       }
     }).get())).build();
   }

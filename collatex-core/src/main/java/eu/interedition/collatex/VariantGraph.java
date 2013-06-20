@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.simple.SimpleWitness;
 
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
@@ -52,11 +53,14 @@ public interface VariantGraph {
 
   Edge connect(Vertex from, Vertex to, Set<Witness> witnesses);
 
+  Edge register(Witness witness);
+
   Transposition transpose(Set<Vertex> vertices);
 
   Edge edgeBetween(Vertex a, Vertex b);
 
   Set<Witness> witnesses();
+
 
   /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

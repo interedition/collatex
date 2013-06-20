@@ -25,6 +25,7 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
@@ -36,17 +37,16 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class CollationDeserializer extends JsonDeserializer<Collation> {
+public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollation> {
 
   @Override
-  public Collation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+  public SimpleCollation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
     final JsonNode collationNode = jp.readValueAsTree();
 
     final JsonNode witnessesNode = collationNode.path("witnesses");
@@ -115,17 +115,11 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
         if (!contentNode.isTextual()) {
           throw JsonMappingException.from(jp, String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
-        final String textContent = contentNode.getTextValue();
         witness.setTokenContents(
-                (textContent.isEmpty() ? Collections.singleton("") : SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(textContent)),
+                SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(contentNode.getTextValue()),
                 SimpleTokenNormalizers.LC_TRIM_WS_PUNCT
         );
       }
-
-      if (witness.getTokens().isEmpty()) {
-        throw JsonMappingException.from(jp, String.format("No tokens in witness \"%s\"", witness));
-      }
-
       witnesses.add(witness);
     }
 
@@ -165,6 +159,6 @@ public class CollationDeserializer extends JsonDeserializer<Collation> {
       joined = joinedNode.getBooleanValue();
     }
 
-    return new Collation(witnesses, collationAlgorithm, joined);
+    return new SimpleCollation(witnesses, collationAlgorithm, joined);
   }
 }

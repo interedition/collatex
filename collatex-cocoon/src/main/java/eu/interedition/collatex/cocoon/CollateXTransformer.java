@@ -35,6 +35,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.ParallelSegmentationApparatus;
@@ -69,7 +70,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
   private Format format = Format.ALIGNMENT_TABLE;
   private CollationAlgorithm algorithm;
   private boolean joined;
-  private final List<Iterable<Token>> witnesses = Lists.newArrayList();
+  private final List<SimpleWitness> witnesses = Lists.newArrayList();
   private String sigil;
 
   @Override
@@ -126,11 +127,7 @@ public class CollateXTransformer extends AbstractSAXTransformer {
     }
     if ("collation".equals(name) && !witnesses.isEmpty()) {
       ignoreHooksCount++;
-      final VariantGraph graph = new JungVariantGraph();
-      this.algorithm.collate(graph, witnesses);
-      if (this.joined) {
-        VariantGraph.JOIN.apply(graph);
-      }
+      final VariantGraph graph = new SimpleCollation(witnesses, algorithm, joined).collate(new JungVariantGraph());
       switch (format) {
         case TEI_APPARATUS:
           sendTeiApparatus(graph);

@@ -26,7 +26,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
@@ -39,7 +38,6 @@ import eu.interedition.collatex.util.ParallelSegmentationApparatus;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import javax.annotation.Nullable;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
@@ -207,12 +205,9 @@ public class SimpleVariantGraphSerializer {
 
     out.println("digraph G {");
 
-    final VariantGraph.Vertex start = graph.getStart();
-    final VariantGraph.Vertex end = graph.getEnd();
-
     for (VariantGraph.Vertex v : graph.vertices()) {
         out.print(indent + id(v));
-        out.print(" [label = \"" + toDotLabel(v) + "\"" + (start.equals(v) || end.equals(v) ? " color = \"lightgray\"" : "") + "]");
+        out.print(" [label = \"" + toDotLabel(v) + "\"]");
         out.println(";");
       }
 
@@ -230,7 +225,7 @@ public class SimpleVariantGraphSerializer {
         out.println(";");
       }
 
-      out.print(indent + id(start) + connector + id(end));
+      out.print(indent + id(graph.getStart()) + connector + id(graph.getEnd()));
       out.print(" [color =  \"white\"]");
       out.println(";");
 

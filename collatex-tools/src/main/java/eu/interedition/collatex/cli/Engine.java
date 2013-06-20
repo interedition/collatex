@@ -29,7 +29,7 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.io.CollateXModule;
-import eu.interedition.collatex.io.Collation;
+import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
@@ -154,7 +154,7 @@ public class Engine implements Closeable {
 
   Engine read() throws IOException, XPathExpressionException, SAXException {
     if (inputResources.size() < 2) {
-      this.witnesses = objectMapper.readValue(inputResources.get(0), Collation.class).getWitnesses();
+      this.witnesses = objectMapper.readValue(inputResources.get(0), SimpleCollation.class).getWitnesses();
     } else {
       this.witnesses = Lists.newArrayListWithExpectedSize(inputResources.size());
       for (URL witnessURL : inputResources) {
@@ -166,12 +166,7 @@ public class Engine implements Closeable {
   }
 
   Engine collate() {
-    for (SimpleWitness witness : witnesses) {
-      collationAlgorithm.collate(variantGraph, witness);
-    }
-    if (joined) {
-      VariantGraph.JOIN.apply(variantGraph);
-    }
+    new SimpleCollation(witnesses, collationAlgorithm, joined).collate(variantGraph);
     return this;
   }
 

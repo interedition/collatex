@@ -17,22 +17,20 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.io;
+package eu.interedition.collatex.simple;
 
 import eu.interedition.collatex.CollationAlgorithm;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.VariantGraph;
 
 import java.util.List;
 
-public class Collation {
+public class SimpleCollation {
 
   private final List<SimpleWitness> witnesses;
   private final CollationAlgorithm algorithm;
   private final boolean joined;
 
-  public Collation(List<SimpleWitness> witnesses, CollationAlgorithm algorithm, boolean joined) {
+  public SimpleCollation(List<SimpleWitness> witnesses, CollationAlgorithm algorithm, boolean joined) {
     this.witnesses = witnesses;
     this.algorithm = algorithm;
     this.joined = joined;
@@ -48,5 +46,19 @@ public class Collation {
 
   public boolean isJoined() {
     return joined;
+  }
+
+  public VariantGraph collate(VariantGraph graph) {
+    for (SimpleWitness witness : witnesses) {
+      if (witness.getTokens().isEmpty()) {
+        graph.register(witness);
+      } else {
+        algorithm.collate(graph, witness);
+      }
+    }
+    if (joined) {
+      VariantGraph.JOIN.apply(graph);
+    }
+    return graph;
   }
 }

@@ -20,7 +20,7 @@
 package eu.interedition.collatex.io;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.http.Server;
+import eu.interedition.collatex.simple.SimpleCollation;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.module.SimpleModule;
 
@@ -31,7 +31,7 @@ public class CollateXModule extends SimpleModule {
 
   public CollateXModule() {
     super(CollateXModule.class.getPackage().getName(), Version.unknownVersion());
-    addDeserializer(Collation.class, new CollationDeserializer());
+    addDeserializer(SimpleCollation.class, new SimpleCollationDeserializer());
     addSerializer(VariantGraph.class, new VariantGraphSerializer());
   }
 }
