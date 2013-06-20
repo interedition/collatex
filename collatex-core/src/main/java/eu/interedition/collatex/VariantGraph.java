@@ -23,7 +23,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import eu.interedition.collatex.simple.SimpleWitness;
 
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;

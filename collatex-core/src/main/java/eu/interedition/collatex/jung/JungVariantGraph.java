@@ -95,11 +95,11 @@ public class JungVariantGraph extends DirectedSparseGraph<JungVariantGraphVertex
   public Edge connect(Vertex from, Vertex to, Set<Witness> witnesses) {
     Preconditions.checkArgument(!from.equals(to));
 
-    witnesses = Sets.newHashSet(witnesses);
     if (from.equals(start)) {
       final Edge startEndEdge = edgeBetween(start, end);
       if (startEndEdge != null) {
         if (to.equals(end)) {
+          witnesses = Sets.newHashSet(witnesses);
           witnesses.addAll(startEndEdge.witnesses());
         }
         startEndEdge.delete();
