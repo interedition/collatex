@@ -19,6 +19,18 @@
 
 package eu.interedition.collatex;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.neo4j.Neo4jVariantGraph;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,13 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import eu.interedition.collatex.dekker.Match;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -107,6 +112,15 @@ public interface CollationAlgorithm {
         }
         into.transpose(transposed);
       }
+    }
+    
+    protected void mergeTokens(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, Token> alignments) {
+      Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
+      for (Entry<Token, Token> entry : alignments.entrySet()) {
+        Vertex vertex = witnessTokenVertices.get(entry.getValue());
+        al.put(entry.getKey(), vertex);
+      }
+      merge(into, witnessTokens, al);
     }
   }
 }
