@@ -28,12 +28,12 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
 
   @Test
   public void testCreatingOfVectorSpace() {
-    SimpleWitness a = createWitness("A", " a b c x y z");
-    SimpleWitness b = createWitness("B", " e a b c f g");
+    SimpleWitness a = createWitness("A", "a b c x y z");
+    SimpleWitness b = createWitness("B", "e a b c f g");
     VectorSpace s = new VectorSpace();
     DekkerVectorSpaceAlgorithm.fill(s, a, b, new EqualityTokenComparator());
     List<Vector> vectors = s.getVectors();
-    assertTrue(vectors.contains(s.new Vector(1, 2, 3)));
+    assertTrue(vectors.contains(s.new Vector(3, 1, 2)));
     assertEquals(1, vectors.size());
   }
 
@@ -43,7 +43,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     SimpleWitness b = new SimpleWitness("B", "e a b c f g");
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm();
     VectorSpace s = new VectorSpace();
-    Vector v = s.new Vector(1, 2, 3);
+    Vector v = s.new Vector(3, 1, 2);
     assertPhrase("a b c", algo.getTokensFromVector(v, 0, a));
     assertPhrase("a b c", algo.getTokensFromVector(v, 1, b));
   }
@@ -84,8 +84,8 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
-    assertTrue(alignment.contains(s.new Vector(1, 1, 2)));
-    assertTrue(alignment.contains(s.new Vector(3, 5, 1)));
+    assertTrue(alignment.contains(s.new Vector(2, 1, 1)));
+    assertTrue(alignment.contains(s.new Vector(1, 3, 5)));
     assertEquals(2, alignment.size());
   }
   
@@ -101,7 +101,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
-    assertTrue(alignment.contains(s.new Vector(1, 1, 7)));
+    assertTrue(alignment.contains(s.new Vector(7, 1, 1)));
     assertEquals(1, alignment.size());
   }
 
@@ -116,25 +116,29 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
-    assertTrue(alignment.contains(s.new Vector(5, 1, 3)));
+    assertTrue(alignment.contains(s.new Vector(3, 5, 1)));
     assertEquals(1, alignment.size());
   }
   
-//  // test taken from match table linker test
-//  @Test
-//  public void testHermansAllesIsBetrekkelijk1() {
-//    int outlierTranspositionsSizeLimit = 1;
-//    String textD1 = "natuurlijk is alles betrekkelijk";
-//    String textD9 = "Natuurlijk, alles mag relatief zijn";
-//    String textDmd1 = "Natuurlijk, alles is betrekkelijk";
-//    VariantGraph graph = new JungVariantGraph();
-//    VectorSpace s = new VectorSpace();
-//    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
-//    algo.collate(graph, textD1, textD9, textDmd1);
-//    List<Vector> alignment = algo.getAlignment();
-//    //TODO: update asserts
-//    assertTrue(alignment.contains(s.new Vector(5, 1, 3)));
-//    assertEquals(1, alignment.size());
-//  }
-
+  // test taken from match table linker test
+  /*
+   * This tests test the creation of a 3d dimension vector space by comparing 3 witnesses against each other.
+   */
+  @Test
+  public void testHermansAllesIsBetrekkelijk1() {
+    SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
+    SimpleWitness textD9 = createWitness("D9", "Natuurlijk, alles mag relatief zijn");
+    SimpleWitness textDmd1 = createWitness("textDmd1", "Natuurlijk, alles is betrekkelijk");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, textD1, textD9, textDmd1);
+    List<Vector> alignment = algo.getAlignment();
+    assertTrue(alignment.contains(s.new Vector(1, 1, 1, 1)));
+    assertTrue(alignment.contains(s.new Vector(1, 3, 3, 3)));
+    assertTrue(alignment.contains(s.new Vector(1, 2, 0, 4)));
+    assertTrue(alignment.contains(s.new Vector(1, 4, 0, 5)));
+    assertTrue(alignment.contains(s.new Vector(1, 0, 2, 2)));
+    assertEquals(5, alignment.size());
+  }
 }

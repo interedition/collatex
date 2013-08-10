@@ -17,8 +17,7 @@ import com.google.common.collect.Ranges;
  * vectors represent phrase matches (=sequences of token matches)
  * between witnesses.
  * 
- *  
- *  To test out the idea we first start with a 2d vector space
+ * To test out the idea we first start with a 2d vector space
  */
 
 public class VectorSpace {
@@ -29,14 +28,19 @@ public class VectorSpace {
 		public int length;
 		
 		public Vector(int x, int y) {
-		  this(x, y, 1);
+		  this(1, x, y);
 		}
 
-    public Vector(int x, int y, int l) {
+    public Vector(int l, int x, int y) {
       this.startCoordinate = new int[] {x, y};
       this.length = l;
     }
     
+    public Vector(int l, int x, int y, int z) {
+      this.startCoordinate = new int[] {x, y, z};
+      this.length = l;
+    }
+
     @Override
     public String toString() {
       String result = String.format("V: Start coordinates: %s, length %d", Arrays.toString(startCoordinate), length);
@@ -89,6 +93,32 @@ public class VectorSpace {
       }
       return false;
     }
+
+    // I am not sure that isParallel is the right name for this method
+    // Note: this method can be more defensive!
+    // for example check that the number of dimensions are equal
+    public boolean isParallel(Vector other) {
+      if (length!=other.length) {
+        return false;
+      }
+      boolean parallel = true;
+      for (int i=0; i < startCoordinate.length; i++) {
+        int thisCoordinate = this.startCoordinate[i];
+        int otherCoordinate = other.startCoordinate[i];
+        parallel=parallel&&(thisCoordinate==0||otherCoordinate==0||thisCoordinate==otherCoordinate);
+      }
+      return parallel;
+    }
+
+    //NOTE: I could make this method more defensive
+    //however that would mean doing stuff twice
+    public Vector merge(Vector other) {
+      int[] coordinates = new int[3];
+      for (int i=0; i < startCoordinate.length; i++) {
+        coordinates[i] = other.startCoordinate[i]==0 ? this.startCoordinate[i]:other.startCoordinate[i];
+      }
+      return new Vector(length, coordinates[0], coordinates[1], coordinates[2]);
+    }
 	}
 	
 	private List<Vector> vectors;
@@ -99,6 +129,23 @@ public class VectorSpace {
 	
   public List<Vector> getVectors() {
     return vectors;
+  }
+
+  /*
+   * Add a Vector of length 1 and n-dimensions to the vector space
+   * this methods check whether a parallel vector already exists
+   * in the vector space. if yes, the two vectors will be merged.
+   * Returns the newly created vector object.
+   */
+  public Vector addVector(int... coordinates) {
+    Vector vector = new Vector(1, coordinates[0], coordinates[1], coordinates[2]);
+    Vector parallel = findParallelVector(vector);
+    if (parallel!=null) {
+      vector = vector.merge(parallel);
+      vectors.remove(parallel);
+    }
+    vectors.add(vector);
+    return vector;
   }
 
   // add the matches tokens as a new vector to the vector space
@@ -125,6 +172,19 @@ public class VectorSpace {
 		    return v;
 		  }
 		}
+    return null;
+  }
+
+  /*
+   * find a parallel vector in the vector space to the other vector
+   * returns null if none is found 
+   */
+  private Vector findParallelVector(Vector other) {
+    for (Vector v : vectors) {
+      if (v.isParallel(other)) {
+        return v;
+      }
+    }
     return null;
   }
 

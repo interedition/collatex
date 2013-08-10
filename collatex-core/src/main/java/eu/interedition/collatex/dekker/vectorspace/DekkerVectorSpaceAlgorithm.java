@@ -66,9 +66,35 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     throw new RuntimeException("Not yet implemented!");
   }
 
-  public void collate(VariantGraph graph, String textD1, String textD9, String textDmd1) {
-    // TODO Auto-generated method stub
+  public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b, SimpleWitness c) {
+    // Step 1: do the matching and fill the vector space
+    // first compare witness 1 and 2
+    // then compare 1 and 3
+    // then 2 and 3
+    
+    
+    compareWitnesses(a, b, 0, 1);
+    compareWitnesses(a, c, 0, 2);
+    compareWitnesses(b, c, 1, 2);
+  }
 
+  private void compareWitnesses(SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
+    //System.out.println("Comparing witness "+a.getSigil()+" and "+b.getSigil());
+    Comparator<Token> comparator = new EqualityTokenComparator();
+    int yCounter = 0;
+    for (Token bToken : b) {
+      yCounter++;
+      int xCounter = 0;
+      for (Token aToken : a) {
+        xCounter++;
+        if (comparator.compare(aToken, bToken) == 0) {
+          int[] coordinates = new int[3];
+          coordinates[dimensionA] = xCounter;
+          coordinates[dimensionB] = yCounter;
+          s.addVector(coordinates);
+        }
+      }
+    }
   }
 
   public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
@@ -127,6 +153,9 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
    * the vector space.
    */
   private void optimizeAlignment() {
+    if (s.getVectors().isEmpty()) {
+      throw new RuntimeException("Vector space is empty! There is nothing to align!");
+    }
     // group the vectors together by length; vectors may change after commit
     final Multimap<Integer, Vector> vectorMultimap;
     // sort the vectors based on length
