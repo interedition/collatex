@@ -1,6 +1,7 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -57,4 +58,36 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertEquals(a2, b2);
     assertEquals(a3, b3);
   }
+  
+  // test taken from match table linker
+  @Test
+  public void testUsecase1() {
+    final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, w[0], w[1]);
+    List<Vector> alignment = algo.getAlignment();
+    assertTrue(alignment.contains(s.new Vector(1, 1, 2)));
+    assertTrue(alignment.contains(s.new Vector(3, 5, 1)));
+    assertEquals(2, alignment.size());
+  }
+  
+  // test taken from match table linker
+  @Test
+  public void testGapsEverythingEqual() {
+    // All the witness are equal
+    // There are choices to be made however, since there is duplication of tokens
+    // Optimal alignment has no gaps
+    final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, w[0], w[1]);
+    List<Vector> alignment = algo.getAlignment();
+    assertTrue(alignment.contains(s.new Vector(1, 1, 7)));
+    assertEquals(1, alignment.size());
+  }
+
+
 }

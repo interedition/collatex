@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.Ranges;
 
 import eu.interedition.collatex.Token;
 
@@ -81,6 +83,26 @@ public class VectorSpace {
       int yDistance = Math.abs(startCoordinate[1]+length - other.startCoordinate[1]);
       return xDistance == 0 && yDistance == 0;
     }
+
+    /*
+     * This method checks whether one or more dimensions of this
+     * vector and the other vector conflict with each other.
+     */
+    public boolean conflictsWith(Vector other) {
+      // check x dimension
+      Range<Integer> thisXRange = Ranges.closed(this.startCoordinate[0], this.startCoordinate[0]+this.length-1);
+      Range<Integer> otherXRange = Ranges.closed(other.startCoordinate[0], other.startCoordinate[0]+other.length-1);
+      if (thisXRange.encloses(otherXRange)) {
+        return true;
+      }
+      // check y dimension
+      Range<Integer> thisYRange = Ranges.closed(this.startCoordinate[1], this.startCoordinate[1]+this.length-1);
+      Range<Integer> otherYRange = Ranges.closed(other.startCoordinate[1], other.startCoordinate[1]+other.length-1);
+      if (thisYRange.encloses(otherYRange)) {
+        return true;
+      }
+      return false;
+    }
 	}
 	
 	private List<Vector> vectors;
@@ -136,5 +158,12 @@ public class VectorSpace {
 		  }
 		}
     return null;
+  }
+
+  public void remove(Vector v) {
+    boolean removed = vectors.remove(v);
+    if (!removed) {
+      throw new RuntimeException("Vector "+v+" not present in vector space");
+    }
   }
 }
