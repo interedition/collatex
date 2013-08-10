@@ -1,15 +1,12 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
-
-import eu.interedition.collatex.Token;
 
 /*
  * Class: VectorSpace
@@ -20,17 +17,6 @@ import eu.interedition.collatex.Token;
  * vectors represent phrase matches (=sequences of token matches)
  * between witnesses.
  * 
- * Steps: 
- * 1. Tokenize, normalize the witnesses
- * 2. Do the matching
- *    Match every witness with every other witness
- *    Match every token from one witness with every token from
- *    the other witness.
- * 3. Build the vector space from the matches
- * 4. Find the optimal alignment in the vector space
- *    based on the length of the vectors and possible
- *    conflicts between vectors.
- * 5. Build the variant graph from the optimal vectors.      
  *  
  *  To test out the idea we first start with a 2d vector space
  */
@@ -115,29 +101,11 @@ public class VectorSpace {
     return vectors;
   }
 
-  /*
-	 * Do the matching between tokens of two witness and
-	 * add vectors for the matches.
-	 */
-	public void fill(final Iterable<Token> witnessA, final Iterable<Token> witnessB,  Comparator<Token> comparator) {
-		int yCounter = 0;
-		for (Token bToken: witnessB) {
-			yCounter++;
-	    int xCounter = 0;
-			for (Token aToken: witnessA) {
-				xCounter++;
-				if (comparator.compare(aToken, bToken)==0) {
-					addVector(xCounter, yCounter);
-				}
-			}
-		}
-	}
-
-	// add the matches tokens as a new vector to the vector space
+  // add the matches tokens as a new vector to the vector space
 	// if there is an adjacent vector already exists in the space
 	// add to it
 	// first check whether there is an existing vector to add to
-	private void addVector(int x, int y) {
+	void addVector(int x, int y) {
     Vector match = new Vector(x, y);
 		Vector adjacentVector = findAdjacentVector(match);
 		if (adjacentVector!=null) {

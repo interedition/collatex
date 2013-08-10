@@ -2,6 +2,7 @@ package eu.interedition.collatex.dekker.vectorspace;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,26 @@ import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
+/*
+ * @author: Ronald Haentjens Dekker
+ * 
+ * Steps: 
+ * 1. Tokenize, normalize the witnesses
+ * 2. Do the matching
+ *    Match every witness with every other witness
+ *    Match every token from one witness with every token from
+ *    the other witness.
+ * 3. Build the vector space from the matches
+ * 4. Find the optimal alignment in the vector space
+ *    based on the length of the vectors and possible
+ *    conflicts between dimensions of vectors.
+ * 5. Build the variant graph from the optimal vectors.  
+ * 
+ * NOTE: steps 2 and 3 are logically separate steps, but the
+ * implementation performs them together, so that the matches
+ * do not have to be stored.
+ * 
+ */
 public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   private VectorSpace s;
 
@@ -45,9 +66,14 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     throw new RuntimeException("Not yet implemented!");
   }
 
+  public void collate(VariantGraph graph, String textD1, String textD9, String textDmd1) {
+    // TODO Auto-generated method stub
+
+  }
+
   public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
     // Step 1: do the matching and fill the vector space
-    s.fill(a, b, new EqualityTokenComparator());
+    DekkerVectorSpaceAlgorithm.fill(s, a, b, new EqualityTokenComparator());
 
     // Step 2: optimize the alignment...
     // TODO: skipped for now
@@ -97,25 +123,25 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   }
 
   /*
-   * This method find the optimal alignment by reducing the number of
-   * vectors in the vector space. 
+   * This method find the optimal alignment by reducing the number of vectors in
+   * the vector space.
    */
   private void optimizeAlignment() {
-    // group the vectors together by length; vectors may change after commit 
+    // group the vectors together by length; vectors may change after commit
     final Multimap<Integer, Vector> vectorMultimap;
     // sort the vectors based on length
     vectorMultimap = ArrayListMultimap.create();
     for (Vector v : s.getVectors()) {
       vectorMultimap.put(v.length, v);
     }
-    // find the maximum vector size 
+    // find the maximum vector size
     Integer max = Collections.max(vectorMultimap.keySet());
-    
+
     // traverse groups in descending order
     List<Vector> fixedVectors = Lists.newArrayList();
-    for (int vectorLength=max; vectorLength > 0; vectorLength--) {
-      LOG.fine("Checking vectors of size: "+vectorLength);
-      // check the possible vectors of a certain length against 
+    for (int vectorLength = max; vectorLength > 0; vectorLength--) {
+      LOG.fine("Checking vectors of size: " + vectorLength);
+      // check the possible vectors of a certain length against
       // the already committed vectors.
       removeImpossibleVectors(vectorLength, vectorMultimap, fixedVectors);
       // commit possible vectors
@@ -123,18 +149,15 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
       for (Vector v : possibleVectors) {
         fixedVectors.add(v);
       }
-    }  
+    }
   }
 
   /*
-   * For all the possible vectors of a certain length
-   * this method checks whether they conflict with one of the
-   * previously committed vectors.
-   * If so, the possible vector is removed from the map.
-   * TODO:
-   * Or in case of overlap, split into a smaller vector
-   * and then put in back into the map
-   * Note that this method changes the possible vectors map.
+   * For all the possible vectors of a certain length this method checks whether
+   * they conflict with one of the previously committed vectors. If so, the
+   * possible vector is removed from the map. TODO: Or in case of overlap, split
+   * into a smaller vector and then put in back into the map Note that this
+   * method changes the possible vectors map.
    */
   private void removeImpossibleVectors(int islandSize, Multimap<Integer, Vector> vectorMultimap, List<Vector> fixedVectors) {
     Collection<Vector> vectorsToCheck = Lists.newArrayList(vectorMultimap.get(islandSize));
@@ -143,6 +166,24 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
         if (f.conflictsWith(v)) {
           vectorMultimap.remove(islandSize, v);
           s.remove(v);
+        }
+      }
+    }
+  }
+
+  /*
+   * Do the matching between tokens of two witness and add vectors for the
+   * matches.
+   */
+  protected static void fill(VectorSpace s, final Iterable<Token> witnessA, final Iterable<Token> witnessB, Comparator<Token> comparator) {
+    int yCounter = 0;
+    for (Token bToken : witnessB) {
+      yCounter++;
+      int xCounter = 0;
+      for (Token aToken : witnessA) {
+        xCounter++;
+        if (comparator.compare(aToken, bToken) == 0) {
+          s.addVector(xCounter, yCounter);
         }
       }
     }

@@ -1,23 +1,14 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.List;
 
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.simple.SimpleWitness;
 
 public class VectorSpaceTest extends AbstractTest {
-	private SimpleWitness createWitness(String sigil, String content) {
-		return new SimpleWitness(sigil, content);
-	}
-	
 	@Test
 	public void testVectorEquals() {
     VectorSpace s = new VectorSpace();
@@ -38,16 +29,5 @@ public class VectorSpaceTest extends AbstractTest {
 	  Vector v1 = s.new Vector(1, 2);
 	  Vector v2 = s.new Vector(2, 3);
 	  assertTrue(v1.isAdjacent(v2));
-	}
-	
-	@Test
-	public void testMatching1() {
-		SimpleWitness a = createWitness("A", " a b c x y z");
-		SimpleWitness b = createWitness("B", " e a b c f g");
-		VectorSpace s = new VectorSpace();
-		s.fill(a, b, new EqualityTokenComparator());
-		List<Vector> vectors = s.getVectors();
-		assertTrue(vectors.contains(s.new Vector(1, 2, 3)));
-		assertEquals(1, vectors.size());
 	}
 }

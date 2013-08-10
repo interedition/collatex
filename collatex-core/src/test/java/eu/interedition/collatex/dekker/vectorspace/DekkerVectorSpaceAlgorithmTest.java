@@ -12,13 +12,29 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
 
+  private SimpleWitness createWitness(String sigil, String content) {
+    return new SimpleWitness(sigil, content);
+  }
+  
   private void assertPhrase(String expectedPhrase, List<Token> tokensFromVector) {
     assertEquals(expectedPhrase, SimpleToken.toString(tokensFromVector));
+  }
+
+  @Test
+  public void testCreatingOfVectorSpace() {
+    SimpleWitness a = createWitness("A", " a b c x y z");
+    SimpleWitness b = createWitness("B", " e a b c f g");
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm.fill(s, a, b, new EqualityTokenComparator());
+    List<Vector> vectors = s.getVectors();
+    assertTrue(vectors.contains(s.new Vector(1, 2, 3)));
+    assertEquals(1, vectors.size());
   }
 
   @Test
@@ -89,5 +105,36 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertEquals(1, alignment.size());
   }
 
+  // test taken from match table linker
+  @Test
+  public void testGapsOmission() {
+    // There is an omission
+    // Optimal alignment has 1 gap
+    final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, w[0], w[1]);
+    List<Vector> alignment = algo.getAlignment();
+    assertTrue(alignment.contains(s.new Vector(5, 1, 3)));
+    assertEquals(1, alignment.size());
+  }
+  
+//  // test taken from match table linker test
+//  @Test
+//  public void testHermansAllesIsBetrekkelijk1() {
+//    int outlierTranspositionsSizeLimit = 1;
+//    String textD1 = "natuurlijk is alles betrekkelijk";
+//    String textD9 = "Natuurlijk, alles mag relatief zijn";
+//    String textDmd1 = "Natuurlijk, alles is betrekkelijk";
+//    VariantGraph graph = new JungVariantGraph();
+//    VectorSpace s = new VectorSpace();
+//    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+//    algo.collate(graph, textD1, textD9, textDmd1);
+//    List<Vector> alignment = algo.getAlignment();
+//    //TODO: update asserts
+//    assertTrue(alignment.contains(s.new Vector(5, 1, 3)));
+//    assertEquals(1, alignment.size());
+//  }
 
 }
