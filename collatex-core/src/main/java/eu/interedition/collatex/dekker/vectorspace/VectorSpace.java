@@ -110,6 +110,22 @@ public class VectorSpace {
       return parallel;
     }
 
+    public boolean overlapsPartially(Vector other) {
+      // check x dimension
+      Range<Integer> thisXRange = Ranges.closed(this.startCoordinate[0], this.startCoordinate[0]+this.length-1);
+      Range<Integer> otherXRange = Ranges.closed(other.startCoordinate[0], other.startCoordinate[0]+other.length-1);
+      if (this.startCoordinate[0]!=0&&other.startCoordinate[0]!=0&&thisXRange.isConnected(otherXRange)) {
+        return true;
+      }
+      // check y dimension
+      Range<Integer> thisYRange = Ranges.closed(this.startCoordinate[1], this.startCoordinate[1]+this.length-1);
+      Range<Integer> otherYRange = Ranges.closed(other.startCoordinate[1], other.startCoordinate[1]+other.length-1);
+      if (this.startCoordinate[1]!=0&&other.startCoordinate[1]!=0&&thisYRange.isConnected(otherYRange)) {
+        return true;
+      }
+      return false;
+    }
+
     //NOTE: I could make this method more defensive
     //however that would mean doing stuff twice
     public Vector merge(Vector other) {

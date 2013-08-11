@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
@@ -95,7 +98,6 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
         alignments.put(witnessTokenToAdd, tokenAlreadyInGraph);
       }
     }
-
     // now construct vertices/edges for witness b
     mergeTokens(graph, b, alignments);
   }
@@ -126,7 +128,6 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     }
     // find the maximum vector size
     Integer max = Collections.max(vectorMultimap.keySet());
-
     // traverse groups in descending order
     List<Vector> fixedVectors = Lists.newArrayList();
     for (int vectorLength = max; vectorLength > 0; vectorLength--) {
@@ -136,10 +137,36 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
       removeImpossibleVectors(vectorLength, vectorMultimap, fixedVectors);
       // commit possible vectors
       List<Vector> possibleVectors = Lists.newArrayList(vectorMultimap.get(vectorLength));
+      // check for conflicts between the possible vectors
+      checkConflicts(possibleVectors, vectorMultimap);
       for (Vector v : possibleVectors) {
         fixedVectors.add(v);
       }
     }
+  }
+
+  // check for partially overlap
+  // the element that has the most conflicts should be removed
+  private void checkConflicts(List<Vector> possibleVectors, Multimap<Integer, Vector> vectorMultimap) {
+    Multiset<Vector> conflicts = HashMultiset.create();
+    // TODO: this can be performed with less checks
+    for (Vector v: possibleVectors) {
+      for (Vector o: possibleVectors) {
+        if (v==o) {
+          continue;
+        }
+        if (v.overlapsPartially(o)) {
+          LOG.info("Vector "+v+" partially overlaps with "+o);
+          conflicts.add(v);
+        }
+      }
+    }
+    if (conflicts.isEmpty()) {
+      return;
+    }
+    Vector cause = Multisets.copyHighestCountFirst(conflicts).iterator().next();
+    // hack
+    cause.length--;
   }
 
   /*
@@ -154,8 +181,10 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     for (Vector v : vectorsToCheck) {
       for (Vector f : fixedVectors) {
         if (f.conflictsWith(v)) {
+          LOG.fine(String.format("%s conflicts with %s", f, v));
           vectorMultimap.remove(islandSize, v);
           s.remove(v);
+          break;
         }
       }
     }

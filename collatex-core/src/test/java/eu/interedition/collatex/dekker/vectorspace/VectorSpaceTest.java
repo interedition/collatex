@@ -78,4 +78,26 @@ public class VectorSpaceTest extends AbstractTest {
     assertTrue(vectors.contains(s.new Vector(1, 1, 1, 1)));
     assertEquals(1, vectors.size());
   }
+  
+  @Test
+  public void testVectorOverlapsPartially() {
+    VectorSpace s = new VectorSpace();
+    Vector v1 = s.addVector(4, 1, 0);
+    Vector v2 = s.addVector(3, 3, 0);
+    Vector v3 = s.addVector(1, 4, 0);
+    v1.extendLength();
+    v2.extendLength();
+    v3.extendLength();
+    assertTrue(v1.overlapsPartially(v2));
+    assertFalse(v1.overlapsPartially(v3));
+    assertTrue(v2.overlapsPartially(v3));
+  }
+  
+  @Test
+  public void testEmptyDimensionDoNotPartiallyOverlap() {
+    VectorSpace s = new VectorSpace();
+    Vector v1 = s.addVector(4, 0, 5);
+    Vector v2 = s.addVector(2, 0, 4);
+    assertFalse(v1.overlapsPartially(v2));
+  }
 }
