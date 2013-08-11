@@ -30,11 +30,13 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
   public void testCreatingOfVectorSpace() {
     SimpleWitness a = createWitness("A", "a b c x y z");
     SimpleWitness b = createWitness("B", "e a b c f g");
+    VariantGraph graph = new JungVariantGraph();
     VectorSpace s = new VectorSpace();
-    DekkerVectorSpaceAlgorithm.fill(s, a, b, new EqualityTokenComparator());
-    List<Vector> vectors = s.getVectors();
-    assertTrue(vectors.contains(s.new Vector(3, 1, 2)));
-    assertEquals(1, vectors.size());
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, a, b);
+    List<Vector> alignment = algo.getAlignment();
+    assertTrue(alignment.contains(s.new Vector(3, 1, 2, 0)));
+    assertEquals(1, alignment.size());
   }
 
   @Test
@@ -75,6 +77,34 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertEquals(a3, b3);
   }
   
+  @Test
+  public void testCreationOfVGWith3WitnessesAndATransposition() {
+    SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
+    SimpleWitness textD9 = createWitness("D9", "Natuurlijk, alles mag relatief zijn");
+    SimpleWitness textDmd1 = createWitness("textDmd1", "Natuurlijk, alles is betrekkelijk");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, textD1, textD9, textDmd1);
+    // to start we test the creation of the variant graph with the first
+    // witnesses
+    // check the first witness
+    VariantGraph.Vertex a1 = vertexWith(graph, "natuurlijk", textD1);
+    vertexWith(graph, "is", textD1);
+    VariantGraph.Vertex a3 = vertexWith(graph, "alles", textD1);
+    vertexWith(graph, "betrekkelijk", textD1);
+    // check the second witness
+    VariantGraph.Vertex b1 = vertexWith(graph, "natuurlijk", textD9);
+    vertexWith(graph, ",", textD9);
+    VariantGraph.Vertex b3 = vertexWith(graph, "alles", textD9);
+    vertexWith(graph, "mag", textD9);
+    vertexWith(graph, "relatief", textD9);
+    vertexWith(graph, "zijn", textD9);
+    // check alignment
+    assertEquals(a1, b1);
+    assertEquals(a3, b3);
+  }
+  
   // test taken from match table linker
   @Test
   public void testUsecase1() {
@@ -84,8 +114,8 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
-    assertTrue(alignment.contains(s.new Vector(2, 1, 1)));
-    assertTrue(alignment.contains(s.new Vector(1, 3, 5)));
+    assertTrue(alignment.contains(s.new Vector(2, 1, 1, 0)));
+    assertTrue(alignment.contains(s.new Vector(1, 3, 5, 0)));
     assertEquals(2, alignment.size());
   }
   
@@ -101,7 +131,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
-    assertTrue(alignment.contains(s.new Vector(7, 1, 1)));
+    assertTrue(alignment.contains(s.new Vector(7, 1, 1, 0)));
     assertEquals(1, alignment.size());
   }
 
@@ -116,7 +146,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
-    assertTrue(alignment.contains(s.new Vector(3, 5, 1)));
+    assertTrue(alignment.contains(s.new Vector(3, 5, 1, 0)));
     assertEquals(1, alignment.size());
   }
   
@@ -141,4 +171,5 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertTrue(alignment.contains(s.new Vector(1, 0, 2, 2)));
     assertEquals(5, alignment.size());
   }
+
 }

@@ -71,47 +71,22 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     // first compare witness 1 and 2
     // then compare 1 and 3
     // then 2 and 3
-    
-    
     compareWitnesses(a, b, 0, 1);
     compareWitnesses(a, c, 0, 2);
     compareWitnesses(b, c, 1, 2);
-  }
-
-  private void compareWitnesses(SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
-    //System.out.println("Comparing witness "+a.getSigil()+" and "+b.getSigil());
-    Comparator<Token> comparator = new EqualityTokenComparator();
-    int yCounter = 0;
-    for (Token bToken : b) {
-      yCounter++;
-      int xCounter = 0;
-      for (Token aToken : a) {
-        xCounter++;
-        if (comparator.compare(aToken, bToken) == 0) {
-          int[] coordinates = new int[3];
-          coordinates[dimensionA] = xCounter;
-          coordinates[dimensionB] = yCounter;
-          s.addVector(coordinates);
-        }
-      }
-    }
-  }
-
-  public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
-    // Step 1: do the matching and fill the vector space
-    DekkerVectorSpaceAlgorithm.fill(s, a, b, new EqualityTokenComparator());
-
     // Step 2: optimize the alignment...
-    // TODO: skipped for now
-
+    optimizeAlignment();
     // Step 3: build the variant graph from the vector space
     // merge the first witness in
     // there are no alignments
     merge(graph, a, Collections.<Token, VariantGraph.Vertex> emptyMap());
-
     // convert vectors to <Token, Token> (Witness, other)
     Map<Token, Token> alignments = Maps.newHashMap();
     for (VectorSpace.Vector v : s.getVectors()) {
+      //check whether this vector is present in both dimensions
+      if (!(v.isPresentIn(0)&&v.isPresentIn(1))) {
+        continue;
+      }
       List<Token> tokensDimension1 = getTokensFromVector(v, 0, a);
       List<Token> tokensDimension2 = getTokensFromVector(v, 1, b);
       for (int i = 0; i < v.length; i++) {
@@ -125,26 +100,12 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     mergeTokens(graph, b, alignments);
   }
 
-  // dimension 0 = x
-  // dimension 1 = y
-  protected List<Token> getTokensFromVector(Vector v, int dimension, Iterable<Token> a) {
-    int start = v.startCoordinate[dimension];
-    // iterate over the witness until the start position is reached.
-    Iterator<Token> it = a.iterator();
-    for (int i = 1; i < start; i++) {
-      it.next();
-    }
-    // fetch the tokens in the range of the vector from the witness
-    List<Token> tokens = Lists.newArrayListWithCapacity(v.length);
-    for (int i = 1; i <= v.length; i++) {
-      Token t = it.next();
-      tokens.add(t);
-    }
-    return tokens;
+  public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
+    SimpleWitness c = new SimpleWitness("c");
+    collate(graph, a, b, c);
   }
 
   public List<Vector> getAlignment() {
-    optimizeAlignment();
     return s.getVectors();
   }
 
@@ -204,17 +165,43 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
    * Do the matching between tokens of two witness and add vectors for the
    * matches.
    */
-  protected static void fill(VectorSpace s, final Iterable<Token> witnessA, final Iterable<Token> witnessB, Comparator<Token> comparator) {
+  private void compareWitnesses(SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
+    //System.out.println("Comparing witness "+a.getSigil()+" and "+b.getSigil());
+    Comparator<Token> comparator = new EqualityTokenComparator();
     int yCounter = 0;
-    for (Token bToken : witnessB) {
+    for (Token bToken : b) {
       yCounter++;
       int xCounter = 0;
-      for (Token aToken : witnessA) {
+      for (Token aToken : a) {
         xCounter++;
         if (comparator.compare(aToken, bToken) == 0) {
-          s.addVector(xCounter, yCounter);
+          int[] coordinates = new int[3];
+          coordinates[dimensionA] = xCounter;
+          coordinates[dimensionB] = yCounter;
+          s.addVector(coordinates);
         }
       }
     }
+  }
+  
+  // dimension 0 = x
+  // dimension 1 = y
+  protected List<Token> getTokensFromVector(Vector v, int dimension, Iterable<Token> a) {
+    int start = v.startCoordinate[dimension];
+    if (start==0) {
+      throw new RuntimeException("Vector "+v+" does not exist in dimension "+dimension);
+    }
+    // iterate over the witness until the start position is reached.
+    Iterator<Token> it = a.iterator();
+    for (int i = 1; i < start; i++) {
+      it.next();
+    }
+    // fetch the tokens in the range of the vector from the witness
+    List<Token> tokens = Lists.newArrayListWithCapacity(v.length);
+    for (int i = 1; i <= v.length; i++) {
+      Token t = it.next();
+      tokens.add(t);
+    }
+    return tokens;
   }
 }

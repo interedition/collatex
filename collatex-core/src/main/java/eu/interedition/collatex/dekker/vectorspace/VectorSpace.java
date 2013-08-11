@@ -119,6 +119,10 @@ public class VectorSpace {
       }
       return new Vector(length, coordinates[0], coordinates[1], coordinates[2]);
     }
+
+    public boolean isPresentIn(int dimension) {
+      return startCoordinate[dimension]!=0;
+    }
 	}
 	
 	private List<Vector> vectors;
@@ -132,9 +136,11 @@ public class VectorSpace {
   }
 
   /*
-   * Add a Vector of length 1 and n-dimensions to the vector space
-   * this methods check whether a parallel vector already exists
-   * in the vector space. if yes, the two vectors will be merged.
+   * Add a Vector of length 1 and n-dimensions to the vector space.
+   * This method checks whether a parallel vector already exists
+   * in the vector space. If yes, the two vectors will be merged.
+   * This method checks whether there is an adjacent vector 
+   * already exists in the space. If yes, add the new vector to it.
    * Returns the newly created vector object.
    */
   public Vector addVector(int... coordinates) {
@@ -144,23 +150,14 @@ public class VectorSpace {
       vector = vector.merge(parallel);
       vectors.remove(parallel);
     }
+    Vector adjacentVector = findAdjacentVector(vector);
+    if (adjacentVector!=null) {
+      adjacentVector.extendLength();
+      return adjacentVector;
+    } 
     vectors.add(vector);
     return vector;
   }
-
-  // add the matches tokens as a new vector to the vector space
-	// if there is an adjacent vector already exists in the space
-	// add to it
-	// first check whether there is an existing vector to add to
-	void addVector(int x, int y) {
-    Vector match = new Vector(x, y);
-		Vector adjacentVector = findAdjacentVector(match);
-		if (adjacentVector!=null) {
-		  adjacentVector.extendLength();
-		} else {
-	    vectors.add(match);
-		}
-	}
 
 	/*
 	 * find an adjacent vector in the vector space to the other vector
