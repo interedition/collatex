@@ -19,6 +19,7 @@
 package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.RowSortedTable;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -28,11 +29,14 @@ import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,13 +89,19 @@ public class AlignmentTest extends AbstractTest {
     assertEquals("|very|delitied|and|happy|is|the|cat|", toString(t, w[2]));
   }
 
+  /*
+   * A transposition causes duplicated vertices in the variant graph
+   * This make this alignment decision process harder
+   * Only solvable with the n-space vector based aligner
+   */
+  @Ignore
   @Test
   public void additionInCombinationWithTransposition2() {
     final SimpleWitness[] w = createWitnesses(//
         "the cat is black",//
         "black is the cat",//
         "black and white is the cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w[0], w[1], w[2]));
     assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
     assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
     assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));

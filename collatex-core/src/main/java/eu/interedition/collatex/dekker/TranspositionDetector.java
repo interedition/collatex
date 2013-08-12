@@ -30,7 +30,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 /**
@@ -89,11 +91,33 @@ public class TranspositionDetector {
        * Otherwise, do nothing.
        */
       List<Match> lastTransposition = transpositions.peek();
-      if (lastTransposition.size() > transposition.size()) {
+      int lastTranspositionSize = determineSize(lastTransposition);
+      int transpositionSize = determineSize(transposition);
+      if (lastTranspositionSize > transpositionSize) {
         transpositions.pop();
         transpositions.add(transposition);
       }
     }
+  }
+
+  /*
+   * in case of an a, b / b, a transposition
+   * we have to determine whether a or b stays put.
+   * the phrase with the most character stays still
+   * if the tokens are not simple tokens the phrase
+   * with the most tokens stays put
+   */
+  private int determineSize(List<Match> t) {
+    Match firstMatch = t.get(0);
+    if (!(firstMatch.token instanceof SimpleToken)) {
+      return t.size();
+    }  
+    int charLength = 0;
+    for (Match m : t) {
+      SimpleToken token = (SimpleToken) m.token;
+      charLength += token.getNormalized().length();
+    }
+    return charLength;
   }
 
   private boolean isMirrored(Tuple<Integer> previousTuple, Tuple<Integer> tuple) {
