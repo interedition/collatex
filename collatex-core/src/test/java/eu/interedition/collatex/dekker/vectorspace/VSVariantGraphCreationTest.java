@@ -2,10 +2,13 @@ package eu.interedition.collatex.dekker.vectorspace;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Set;
+
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraph.Transposition;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -71,20 +74,14 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(a3, b3);
   }
 
-// TODO: integrate transposition detection
-//  //Test taken from IslandConflictResolverTest
-//  @Test
-//  public void testTransposition() {
-//    SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
-//    VariantGraph graph = new JungVariantGraph();
-//    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm();
-//    algo.collate(graph, w[0], w[1]);
-//    List<Vector> alignment = algo.getAlignment();
-//    System.out.println(alignment);
-//    fail();
-//    // check the first witness
-//    VariantGraph.Vertex a1 = vertexWith(graph, "a", a);
-//    VariantGraph.Vertex a2 = vertexWith(graph, "b", a);
-//    VariantGraph.Vertex a3 = vertexWith(graph, "c", a);
-//  }
+  //Test taken from IslandConflictResolverTest
+  @Test
+  public void testTransposition() {
+    SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
+    VariantGraph graph = new JungVariantGraph();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm();
+    algo.collate(graph, w[0], w[1]);
+    Set<Transposition> transpositions = graph.transpositions();
+    assertEquals(2, transpositions.size());
+  }
 }
