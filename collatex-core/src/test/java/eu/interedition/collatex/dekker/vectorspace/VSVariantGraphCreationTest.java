@@ -1,14 +1,20 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
 
+import com.google.common.collect.Iterables;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Transposition;
+import eu.interedition.collatex.VariantGraph.Vertex;
+import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -45,7 +51,6 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   }
   
   // test taken from match table linker test
-  // TODO: add asserts third witness
   @Test
   public void testCreationOfVGWith3WitnessesAndATransposition() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -61,7 +66,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     VariantGraph.Vertex a1 = vertexWith(graph, "natuurlijk", textD1);
     vertexWith(graph, "is", textD1);
     VariantGraph.Vertex a3 = vertexWith(graph, "alles", textD1);
-    vertexWith(graph, "betrekkelijk", textD1);
+    VariantGraph.Vertex a4 = vertexWith(graph, "betrekkelijk", textD1);
     // check the second witness
     VariantGraph.Vertex b1 = vertexWith(graph, "natuurlijk", textD9);
     vertexWith(graph, ",", textD9);
@@ -72,6 +77,14 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     // check alignment
     assertEquals(a1, b1);
     assertEquals(a3, b3);
+    // check third witness
+    vertexWith(graph, "natuurlijk", textDmd1);
+    vertexWith(graph, ",", textDmd1);
+    vertexWith(graph, "alles", textDmd1);
+    vertexWith(graph, "is", textDmd1);
+    VariantGraph.Vertex c5 = vertexWith(graph, "betrekkelijk", textDmd1);
+    // check alignment
+    assertEquals(a4, c5);
   }
 
   //Test taken from IslandConflictResolverTest
@@ -84,4 +97,17 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     Set<Transposition> transpositions = graph.transpositions();
     assertEquals(2, transpositions.size());
   }
+  
+  @Test
+  public void testAlignmentThreeWitnesses() {
+    SimpleWitness textD1 = createWitness("D1", "a b");
+    SimpleWitness textD9 = createWitness("D9", "a");
+    SimpleWitness textDmd1 = createWitness("textDmd1", "b");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, textD1, textD9, textDmd1);
+    assertEquals(4, Iterables.size(graph.vertices()));
+  }
+
 }

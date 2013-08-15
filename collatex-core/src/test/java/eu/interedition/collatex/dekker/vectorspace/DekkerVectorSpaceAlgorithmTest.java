@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -132,4 +131,18 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertEquals(5, alignment.size());
   }
 
+  @Test
+  public void testAlignmentThreeWitnesses() {
+    SimpleWitness textD1 = createWitness("D1", "a b");
+    SimpleWitness textD9 = createWitness("D9", "a");
+    SimpleWitness textDmd1 = createWitness("textDmd1", "b");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, textD1, textD9, textDmd1);
+    List<Vector> alignment = algo.getAlignment();
+    assertTrue(alignment.contains(s.new Vector(1, 1, 1, 0)));
+    assertTrue(alignment.contains(s. new Vector(1, 2, 0, 1)));
+    assertEquals(2, alignment.size());
+  }
 }

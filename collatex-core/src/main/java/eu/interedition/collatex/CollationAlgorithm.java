@@ -52,7 +52,7 @@ public interface CollationAlgorithm {
 
   abstract class Base implements CollationAlgorithm {
     protected final Logger LOG = Logger.getLogger(getClass().getName());
-    protected Map<Token, VariantGraph.Vertex> witnessTokenVertices;
+    private Map<Token, VariantGraph.Vertex> witnessTokenVertices;
 
     @Override
     public void collate(VariantGraph against, Iterable<Token>... witnesses) {
@@ -114,13 +114,10 @@ public interface CollationAlgorithm {
       }
     }
     
-    protected void mergeTokens(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, Token> alignments) {
-      Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
-      for (Entry<Token, Token> entry : alignments.entrySet()) {
-        Vertex vertex = witnessTokenVertices.get(entry.getValue());
-        al.put(entry.getKey(), vertex);
-      }
-      merge(into, witnessTokens, al);
+    // returns the created vertices for each witness token
+    protected Map<Token, Vertex> mergeTokens(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
+      merge(into, witnessTokens, alignments);
+      return witnessTokenVertices;
     }
   }
 }

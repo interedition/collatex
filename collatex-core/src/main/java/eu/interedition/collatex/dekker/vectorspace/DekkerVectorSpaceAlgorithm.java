@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -23,6 +24,7 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -51,14 +53,17 @@ import eu.interedition.collatex.util.VariantGraphRanking;
  */
 public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   private VectorSpace s;
-
+  private Map<Token, VariantGraph.Vertex> tokenToVertexMap;
+  
   public DekkerVectorSpaceAlgorithm() {
     this(new VectorSpace());
+    this.tokenToVertexMap = Maps.newHashMap();
   }
 
   // for testing purposes
   protected DekkerVectorSpaceAlgorithm(VectorSpace s) {
     this.s = s;
+    this.tokenToVertexMap = Maps.newHashMap();
   }
 
   @Override
@@ -73,7 +78,15 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
 
   @Override
   public void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses) {
-    throw new RuntimeException("Not yet implemented!");
+    SimpleWitness a = (SimpleWitness) witnesses.get(0);
+    SimpleWitness b = (SimpleWitness) witnesses.get(1);
+    SimpleWitness c;
+    if (witnesses.size()>2) {
+      c = (SimpleWitness) witnesses.get(2);
+    } else {
+      c = new SimpleWitness("c");
+    }
+    collate(against, a, b, c);
   }
 
   public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b, SimpleWitness c) {
@@ -87,25 +100,34 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     // Step 2: optimize the alignment...
     optimizeAlignment();
     // Step 3: build the variant graph from the vector space
-    createVariantGraph(graph, a, b);
+    createVariantGraph(graph, a, b, c);
   }
 
-  private void createVariantGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
+  private void createVariantGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b, SimpleWitness c) {
     if (!graph.witnesses().isEmpty()) {
       throw new RuntimeException("Graph is not empty! This algorithm is not a progressive algorithm.");
     }
     // merge the first witness in
     // there are no alignments
-    merge(graph, a, Collections.<Token, VariantGraph.Vertex> emptyMap());
-    
-    Map<Token, Token> alignments = fillTokenTokenAlignmentsMap(a, b);
+    tokenToVertexMap.putAll(mergeTokens(graph, a, Collections.<Token, Vertex> emptyMap()));
+    addCollationResultForWitnessPairToGraph(graph, a, b, 0, 1);
+    // LOG.info("Merging the result from a and c");
+    addCollationResultForWitnessPairToGraph(graph, a, c, 0, 2);
+    // TODO: add b, c (this is more tricky)
+  }
+
+  private void addCollationResultForWitnessPairToGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
+    if (!b.iterator().hasNext()) {
+      return;
+    }
+    Map<Token, Token> alignments = fillTokenTokenAlignmentsMap(a, b, dimensionA, dimensionB);
 
     // first we have to select all the vectors from the vectorspace
     // that are present in the dimensions of witness a & b
     List<Vector> vs = Lists.newArrayList();
     for (VectorSpace.Vector v : s.getVectors()) {
       //check whether this vector is present in both dimensions
-      if (v.isPresentIn(0)&&v.isPresentIn(1)) {
+      if (v.isPresentIn(dimensionA)&&v.isPresentIn(dimensionB)) {
         vs.add(v);
       }
     }
@@ -118,9 +140,9 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     for (Vector v: vs) {
       List<Match> phrase = Lists.newArrayList();
       for (int i=0; i< v.length; i++) {
-        Token tokenGraph = getTokensFromVector(v, 0, a).get(i);
-        Token tokenWitness = getTokensFromVector(v, 1, b).get(i);
-        VariantGraph.Vertex vx = witnessTokenVertices.get(tokenGraph);
+        Token tokenGraph = getTokensFromVector(v, dimensionA, a).get(i);
+        Token tokenWitness = getTokensFromVector(v, dimensionB, b).get(i);
+        VariantGraph.Vertex vx = tokenToVertexMap.get(tokenGraph);
         phrase.add(new Match(vx, tokenWitness));
       }
       phrases.add(phrase);
@@ -149,8 +171,12 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
       previousRank++;
     }
     // now construct vertices/edges for witness b
-    mergeTokens(graph, b, alignments);
-    
+    Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
+    for (Entry<Token, Token> entry : alignments.entrySet()) {
+      Vertex vertex = tokenToVertexMap.get(entry.getValue());
+      al.put(entry.getKey(), vertex);
+    }
+    tokenToVertexMap.putAll(mergeTokens(graph, b, al));
     mergeTranspositions(graph, transpositions);
   }
 
@@ -160,15 +186,15 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   }
 
   // convert vectors to <Token, Token> (Witness, other)
-  private Map<Token, Token> fillTokenTokenAlignmentsMap(SimpleWitness a, SimpleWitness b) {
+  private Map<Token, Token> fillTokenTokenAlignmentsMap(SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
     Map<Token, Token> alignments = Maps.newHashMap();
     for (VectorSpace.Vector v : s.getVectors()) {
       //check whether this vector is present in both dimensions
-      if (!(v.isPresentIn(0)&&v.isPresentIn(1))) {
+      if (!(v.isPresentIn(dimensionA)&&v.isPresentIn(dimensionB))) {
         continue;
       }
-      List<Token> tokensDimension1 = getTokensFromVector(v, 0, a);
-      List<Token> tokensDimension2 = getTokensFromVector(v, 1, b);
+      List<Token> tokensDimension1 = getTokensFromVector(v, dimensionA, a);
+      List<Token> tokensDimension2 = getTokensFromVector(v, dimensionB, b);
       for (int i = 0; i < v.length; i++) {
         Token witnessTokenToAdd = tokensDimension2.get(i);
         Token tokenAlreadyInGraph = tokensDimension1.get(i);
