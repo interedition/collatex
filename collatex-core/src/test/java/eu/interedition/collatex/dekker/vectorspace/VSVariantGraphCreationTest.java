@@ -1,9 +1,7 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -12,9 +10,8 @@ import com.google.common.collect.Iterables;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraph.Edge;
 import eu.interedition.collatex.VariantGraph.Transposition;
-import eu.interedition.collatex.VariantGraph.Vertex;
-import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -23,6 +20,12 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     return new SimpleWitness(sigil, content);
   }
   
+  void debugEdges(VariantGraph graph) {
+    for (Edge e : graph.edges()) {
+      System.out.println(e.from()+":"+e.to());
+    }
+  }
+
   @Test
   public void testCreationOfVGFromVectorSpace() {
     SimpleWitness a = new SimpleWitness("A", "a b c x y z");
@@ -50,7 +53,21 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(a3, b3);
   }
   
-  // test taken from match table linker test
+  //TODO: this is an a, b / b, a transpositon
+  //TODO: instead of 2 transpositons only 1 should be detected
+  @Test
+  public void testTransposition3Witnesses() {
+    SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
+    SimpleWitness textD9 = createWitness("D9", "Natuurlijk, alles mag relatief zijn");
+    SimpleWitness textDmd1 = createWitness("textDmd1", "Natuurlijk, alles is betrekkelijk");
+    VariantGraph graph = new JungVariantGraph();
+    VectorSpace s = new VectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, textD1, textD9, textDmd1);
+    assertEquals(2, graph.transpositions().size());
+  }
+    
+    // test taken from match table linker test
   @Test
   public void testCreationOfVGWith3WitnessesAndATransposition() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -78,13 +95,15 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(a1, b1);
     assertEquals(a3, b3);
     // check third witness
-    vertexWith(graph, "natuurlijk", textDmd1);
+    VariantGraph.Vertex c1 = vertexWith(graph, "natuurlijk", textDmd1);
     vertexWith(graph, ",", textDmd1);
     vertexWith(graph, "alles", textDmd1);
     vertexWith(graph, "is", textDmd1);
     VariantGraph.Vertex c5 = vertexWith(graph, "betrekkelijk", textDmd1);
     // check alignment
+    assertEquals(a1, c1);
     assertEquals(a4, c5);
+    //TODO: check (b: is) -> (c: is)
   }
 
   //Test taken from IslandConflictResolverTest
@@ -96,10 +115,11 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     algo.collate(graph, w[0], w[1]);
     Set<Transposition> transpositions = graph.transpositions();
     assertEquals(2, transpositions.size());
+    assertEquals(12, Iterables.size(graph.edges()));
   }
   
   @Test
-  public void testAlignmentThreeWitnesses() {
+  public void testVariantGraphThreeWitnesses() {
     SimpleWitness textD1 = createWitness("D1", "a b");
     SimpleWitness textD9 = createWitness("D9", "a");
     SimpleWitness textDmd1 = createWitness("textDmd1", "b");

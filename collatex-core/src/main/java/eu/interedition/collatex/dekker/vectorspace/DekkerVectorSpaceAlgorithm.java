@@ -116,7 +116,7 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     // TODO: add b, c (this is more tricky)
   }
 
-  private void addCollationResultForWitnessPairToGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
+  private void addCollationResultForWitnessPairToGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b, int dimensionA, final int dimensionB) {
     if (!b.iterator().hasNext()) {
       return;
     }
@@ -131,6 +131,12 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
         vs.add(v);
       }
     }
+    // we order the vectors by their coordinate in dimension B
+    Collections.sort(vs, new Comparator<Vector>(){
+      @Override
+      public int compare(Vector v1, Vector v2) {
+        return v1.startCoordinate[dimensionB] - v2.startCoordinate[dimensionB];
+      }});
     // now we have to check the order of the vectors to add
     // with the order in the variant graph
     // for this purpose we look at the ranking of the graph
@@ -175,6 +181,12 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     for (Entry<Token, Token> entry : alignments.entrySet()) {
       Vertex vertex = tokenToVertexMap.get(entry.getValue());
       al.put(entry.getKey(), vertex);
+    }
+    // remove transposed vertices from the alignment map
+    for (List<Match> t : transpositions) {
+      for (Match m : t) {
+        al.remove(m.token);
+      }
     }
     tokenToVertexMap.putAll(mergeTokens(graph, b, al));
     mergeTranspositions(graph, transpositions);
