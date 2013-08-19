@@ -20,10 +20,13 @@
 package eu.interedition.collatex.dekker;
 
 import com.google.common.collect.RowSortedTable;
+
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleWitness;
+
 import org.junit.Test;
 
 import java.util.Set;
@@ -82,4 +85,47 @@ public class TranspositionTest extends AbstractTest {
     assertEquals("| |he|was|agast| | |", toString(table, w[1]));
     assertEquals("| |he|was|agast|,|so|", toString(table, w[2]));
   }
+  
+  @Test
+  public void testTranspositionLimiter1() {
+    final SimpleWitness a = new SimpleWitness("A","X a b");
+    final SimpleWitness b = new SimpleWitness("B","a b X");
+    VariantGraph graph = collate(a,b);
+    assertEquals(1, graph.transpositions().size());
+    final RowSortedTable<Integer, Witness, Set<Token>> table = table(graph);
+    assertEquals("|x|a|b| |", toString(table, a));
+    assertEquals("| |a|b|x|", toString(table, b));
+  }
+  
+  @Test
+  public void testTranspositionLimiter2() {
+    final SimpleWitness a = new SimpleWitness("A","a b c .");
+    final SimpleWitness b = new SimpleWitness("B","a b c d e f g h i j k l m n o p q r s t u v w .");
+    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(a,b));
+    assertEquals("|a|b|c| | | | | | | | | | | | | | | | | | | | |.|", toString(table, a));
+    assertEquals("|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|.|", toString(table, b));
+  }
+
+  @Test
+  public void testTranspositionLimiter3() {
+    final SimpleWitness a = new SimpleWitness("A","X a b c d e f g h i j k l m n o p");
+    final SimpleWitness b = new SimpleWitness("B","a b c d e f g h i j k l m n o p X");
+    VariantGraph graph = collate(a,b);
+    assertEquals(0, graph.transpositions().size());
+    final RowSortedTable<Integer, Witness, Set<Token>> table = table(graph);
+    assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, a));
+    assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, b));
+  }
+  
+  @Test
+  public void testTranspositionLimiter4() {
+    final SimpleWitness a = new SimpleWitness("A","a b c d e f g h i j k l m n o p X");
+    final SimpleWitness b = new SimpleWitness("B","X a b c d e f g h i j k l m n o p");
+    VariantGraph graph = collate(a,b);
+    assertEquals(0, graph.transpositions().size());
+    final RowSortedTable<Integer, Witness, Set<Token>> table = table(graph);
+    assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, a));
+    assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, b));
+  }
+
 }

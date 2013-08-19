@@ -20,6 +20,7 @@ package eu.interedition.collatex.dekker;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -32,18 +33,19 @@ import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 /**
-*
-* @author Ronald Haentjens Dekker
-*/
+ * 
+ * @author Ronald Haentjens Dekker
+ */
 public class TranspositionDetector {
 
   private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
 
-  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
+  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base, Map<Token, Vertex> tokenLinks) {
     // rank the variant graph
     Set<VariantGraph.Vertex> matchedVertices = Sets.newHashSet();
     for (List<Match> phraseMatch : phraseMatches) {
@@ -51,28 +53,63 @@ public class TranspositionDetector {
     }
     final VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(base, null, matchedVertices);
 
-    // gather matched ranks into a list ordered by their natural order
-    final List<Integer> phraseRanks = Lists.newArrayList();
-    for (List<Match> phraseMatch : phraseMatches) {
-      phraseRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
-    }
-    Collections.sort(phraseRanks);
-
-    // detect transpositions
+    boolean falseTranspositions;
     final Stack<List<Match>> transpositions = new Stack<List<Match>>();
-    int previousRank = 0;
-    Tuple<Integer> previous = new Tuple<Integer>(0, 0);
 
-    for (List<Match> phraseMatch : phraseMatches) {
-      int rank = ranking.apply(phraseMatch.get(0).vertex);
-      int expectedRank = phraseRanks.get(previousRank);
-      Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
-      if (expectedRank != rank) { 
-        addNewTransposition(transpositions, phraseMatch, isMirrored(previous, current));
+    do {
+      falseTranspositions = false;
+      transpositions.clear();
+
+      // gather matched ranks into a list ordered by their natural order
+      final List<Integer> phraseWitnessRanks = Lists.newArrayList();
+      for (List<Match> phraseMatch : phraseMatches) {
+        phraseWitnessRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
       }
-      previousRank++;
-      previous = current;
-    }
+      List<Integer> phraseGraphRanks = Lists.newArrayList(phraseWitnessRanks);
+      Collections.sort(phraseGraphRanks);
+      
+      // detect transpositions
+      int previousRank = 0;
+      Tuple<Integer> previous = new Tuple<Integer>(0, 0);
+      for (List<Match> phraseMatch : phraseMatches) {
+        int rank = ranking.apply(phraseMatch.get(0).vertex);
+        int expectedRank = phraseGraphRanks.get(previousRank);
+        Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
+        if (expectedRank != rank) {
+          addNewTransposition(transpositions, phraseMatch, isMirrored(previous, current));
+        }
+        previousRank++;
+        previous = current;
+      }
+
+      // filter away small transposed phrase over long distances
+      for (List<Match> transposition : transpositions) {
+        int rank = ranking.apply(transposition.get(0).vertex);
+        // calculate the distance between the transposed phrases
+        int indexInGraphRanks = phraseGraphRanks.indexOf(rank);
+        int indexInWitnessRanks = phraseWitnessRanks.indexOf(rank);
+        int distanceInTokens = 0;
+        if (indexInGraphRanks > indexInWitnessRanks) {
+          for (int i = indexInGraphRanks; i > indexInWitnessRanks; i--) {
+            distanceInTokens += phraseMatches.get(i).size();
+          }
+        } else {
+          for (int i = indexInGraphRanks; i < indexInWitnessRanks; i++) {
+            List<Match> phraseMatchInBetween = phraseMatches.get(i);
+            distanceInTokens += phraseMatchInBetween.size();
+          }
+        }
+        // check transposed phrase / transposed distance ratio
+        if (distanceInTokens > transposition.size() * 3) {
+          for (Match m : transposition) {
+            tokenLinks.remove(m.token);
+          }
+          phraseMatches.remove(transposition);
+          falseTranspositions = true;
+          break;
+        }
+      }
+    } while (falseTranspositions);
     if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> transposition : transpositions) {
         LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
@@ -85,10 +122,10 @@ public class TranspositionDetector {
     if (!isMirrored) {
       transpositions.add(transposition);
     } else {
-      /* A mirrored transposition is detected.
-       * We have to check size:
-       * If previous > current -> remove previous, add current.
-       * Otherwise, do nothing.
+      /*
+       * A mirrored transposition is detected. We have to check size: If
+       * previous > current -> remove previous, add current. Otherwise, do
+       * nothing.
        */
       List<Match> lastTransposition = transpositions.peek();
       int lastTranspositionSize = determineSize(lastTransposition);
@@ -101,17 +138,15 @@ public class TranspositionDetector {
   }
 
   /*
-   * in case of an a, b / b, a transposition
-   * we have to determine whether a or b stays put.
-   * the phrase with the most character stays still
-   * if the tokens are not simple tokens the phrase
-   * with the most tokens stays put
+   * in case of an a, b / b, a transposition we have to determine whether a or b
+   * stays put. the phrase with the most character stays still if the tokens are
+   * not simple tokens the phrase with the most tokens stays put
    */
   private int determineSize(List<Match> t) {
     Match firstMatch = t.get(0);
     if (!(firstMatch.token instanceof SimpleToken)) {
       return t.size();
-    }  
+    }
     int charLength = 0;
     for (Match m : t) {
       SimpleToken token = (SimpleToken) m.token;

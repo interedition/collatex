@@ -244,11 +244,6 @@ public class IslandConflictResolver {
   }
 
   private boolean islandIsNoOutlier(Archipelago a, Island isl) {
-    double smallestDistance = a.smallestDistanceToIdealLine(isl);
-    if (LOG.isLoggable(Level.FINE)) {
-      LOG.log(Level.FINE, "island {0}, distance={1}", new Object[] { isl, smallestDistance });
-    }
-    int islandSize = isl.size();
-    return (!(a.size() > 0 && islandSize <= outlierTranspositionsSizeLimit && smallestDistance >= islandSize * MINIMUM_OUTLIER_DISTANCE_FACTOR));
+    return true;
   }
 }
