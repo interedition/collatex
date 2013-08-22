@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Map.Entry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -23,7 +22,6 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
@@ -118,95 +116,12 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   }
 
   private void addCollationResultForWitnessPairToGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b, int dimensionA, final int dimensionB) {
-    if (!b.iterator().hasNext()) {
-      return;
-    }
-    Map<Token, Token> alignments = fillTokenTokenAlignmentsMap(a, b, dimensionA, dimensionB);
-
-    List<Vector> vs = findAllVectorForADimension(dimensionA, dimensionB);
-    // we order the vectors by their coordinate in dimension B
-    Collections.sort(vs, new Comparator<Vector>(){
-      @Override
-      public int compare(Vector v1, Vector v2) {
-        return v1.startCoordinate[dimensionB] - v2.startCoordinate[dimensionB];
-      }});
-    // now we have to check the order of the vectors to add
-    // with the order in the variant graph
-    // for this purpose we look at the ranking of the graph
-    // for the first vertices of each of the vectors.
-    List<List<Match>> phrases = Lists.newArrayList();
-    Set<VariantGraph.Vertex> firstVertices = Sets.newHashSet();
-    for (Vector v: vs) {
-      List<Match> phrase = Lists.newArrayList();
-      for (int i=0; i< v.length; i++) {
-        Token tokenGraph = getTokensFromVector(v, dimensionA, a).get(i);
-        Token tokenWitness = getTokensFromVector(v, dimensionB, b).get(i);
-        VariantGraph.Vertex vx = tokenToVertexMap.get(tokenGraph);
-        phrase.add(new Match(vx, tokenWitness));
-      }
-      phrases.add(phrase);
-      firstVertices.add(phrase.get(0).vertex);
-    }
-    Set<Witness> witnesses = Sets.newHashSet();
-    witnesses.add(a);
-    witnesses.add(b);
-    // rank vertices
-    VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(graph, witnesses, firstVertices);
-    // gather matched ranks into a list ordered by their natural order
-    final List<Integer> phraseRanks = Lists.newArrayList();
-    for (List<Match> phrase : phrases) {
-      phraseRanks.add(Preconditions.checkNotNull(ranking.apply(phrase.get(0).vertex)));
-    }
-    Collections.sort(phraseRanks);
-    // detect transpositions
-    final Stack<List<Match>> transpositions = new Stack<List<Match>>();
-    int previousRank = 0;
-    for (List<Match> phrase: phrases) {
-      int rank = ranking.apply(phrase.get(0).vertex);
-      int expectedRank = phraseRanks.get(previousRank);
-      if (expectedRank != rank) { 
-        addNewTransposition(phrase, transpositions);
-      }
-      previousRank++;
-    }
-    // now construct vertices/edges for witness b
-    Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
-    for (Entry<Token, Token> entry : alignments.entrySet()) {
-      Vertex vertex = tokenToVertexMap.get(entry.getValue());
-      al.put(entry.getKey(), vertex);
-    }
-    // remove transposed vertices from the alignment map
-    for (List<Match> t : transpositions) {
-      for (Match m : t) {
-        al.remove(m.token);
-      }
-    }
-    tokenToVertexMap.putAll(mergeTokens(graph, b, al));
-    mergeTranspositions(graph, transpositions);
+    return;
   }
 
   private void addNewTransposition(List<Match> phrase, Stack<List<Match>> transpositions) {
     LOG.fine("Transposition found! "+phrase);
     transpositions.add(phrase);
-  }
-
-  // convert vectors to <Token, Token> (Witness, other)
-  private Map<Token, Token> fillTokenTokenAlignmentsMap(SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
-    Map<Token, Token> alignments = Maps.newHashMap();
-    for (VectorSpace.Vector v : s.getVectors()) {
-      //check whether this vector is present in both dimensions
-      if (!(v.isPresentIn(dimensionA)&&v.isPresentIn(dimensionB))) {
-        continue;
-      }
-      List<Token> tokensDimension1 = getTokensFromVector(v, dimensionA, a);
-      List<Token> tokensDimension2 = getTokensFromVector(v, dimensionB, b);
-      for (int i = 0; i < v.length; i++) {
-        Token witnessTokenToAdd = tokensDimension2.get(i);
-        Token tokenAlreadyInGraph = tokensDimension1.get(i);
-        alignments.put(witnessTokenToAdd, tokenAlreadyInGraph);
-      }
-    }
-    return alignments;
   }
 
   public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
@@ -341,20 +256,19 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     return tokens;
   }
   
-  public void build(VariantGraph graph, Iterable<Token> a, Iterable<Token> b, int dimensionA, int dimensionB) {
-    /*
-     *  take the vectors from the vectorspace.
-     *  they represent the alignment
-     *  build a Vector -> List<vertex> representation
-     *  1)Building the graph for the first witness is
-     *  1) easy --> a vertex for every token
-     *  2)then build the initial vector to vertex map
-     *  find all the vector that have a coordinate in the 
-     *  first dimension (that is the dimension related to
-     *  the first witness)  
-     *  3) Merge in witness b
-     */
-    
+  /*
+   *  take the vectors from the vectorspace.
+   *  they represent the alignment
+   *  build a Vector -> List<vertex> representation
+   *  1)Building the graph for the first witness is
+   *  1) easy --> a vertex for every token
+   *  2)then build the initial vector to vertex map
+   *  find all the vector that have a coordinate in the 
+   *  first dimension (that is the dimension related to
+   *  the first witness)  
+   *  3) Merge in witness b
+   */
+  public void build(VariantGraph graph, Iterable<Token> a, Iterable<Token> b, int dimensionA, final int dimensionB) {
     //1
     Map<Token, Vertex> newVertices = mergeTokens(graph, a, Collections.<Token, Vertex> emptyMap());
     //2
@@ -362,19 +276,71 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     //3
     
     // fetch all vectors for witness B
-    List<Vector> vectorsWitnessB = findAllVectorForADimension(1, 0);
+    List<Vector> vs = findAllVectorForADimension(1, 0);
     // the idea here is to add vector after vector to the VG.
     // most important first (meaning: sorted on length, depth)
     // this ways causes the least amount of transpositions.
-    Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
-    for (Vector v: vectorsWitnessB) {
+    // we order the vectors by their coordinate in dimension B
+    Collections.sort(vs, new Comparator<Vector>(){
+      @Override
+      public int compare(Vector v1, Vector v2) {
+        return v1.startCoordinate[dimensionB] - v2.startCoordinate[dimensionB];
+      }});
+    // now we have to check the order of the vectors to add
+    // with the order in the variant graph
+    // for this purpose we look at the ranking of the graph
+    // for the first vertices of each of the vectors.
+    List<List<Match>> phrases = Lists.newArrayList();
+    Set<VariantGraph.Vertex> firstVertices = Sets.newHashSet();
+    for (Vector v: vs) {
+      // build a phrase for each vector
+      List<Match> phrase = Lists.newArrayList();
       List<Token> tokensFromVector = getTokensFromVector(v, 1, b);
-      List<Vertex> vertices = getVerticesFromVector(v, vrvx);
-      for (int i=0; i < tokensFromVector.size(); i++) {
-        al.put(tokensFromVector.get(i), vertices.get(i));
+      List<Vertex> verticesFromVector = getVerticesFromVector(v, vrvx);
+      for (int i=0; i< v.length; i++) {
+        Vertex vx = verticesFromVector.get(i);
+        Token tokenWitness = tokensFromVector.get(i);
+        phrase.add(new Match(vx, tokenWitness));
+      }
+      phrases.add(phrase);
+      firstVertices.add(phrase.get(0).vertex);
+    }
+    // convert the phrases to a alignment map
+    Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
+    for (List<Match> phrase : phrases) {  
+      for (int i=0; i < phrase.size(); i++) {
+        al.put(phrase.get(i).token, phrase.get(i).vertex);
       }
     }
+    // prepare for transposition detection
+    // rank vertices
+    VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(graph, null, firstVertices);
+    // gather matched ranks into a list ordered by their natural order
+    final List<Integer> phraseRanks = Lists.newArrayList();
+    for (List<Match> phrase : phrases) {
+      phraseRanks.add(Preconditions.checkNotNull(ranking.apply(phrase.get(0).vertex)));
+    }
+    Collections.sort(phraseRanks);
+    // detect transpositions
+    final Stack<List<Match>> transpositions = new Stack<List<Match>>();
+    int previousRank = 0;
+    for (List<Match> phrase: phrases) {
+      int rank = ranking.apply(phrase.get(0).vertex);
+      int expectedRank = phraseRanks.get(previousRank);
+      if (expectedRank != rank) { 
+        addNewTransposition(phrase, transpositions);
+      }
+      previousRank++;
+    }
+    // remove transposed vertices from the alignment map
+    for (List<Match> t : transpositions) {
+      for (Match m : t) {
+        al.remove(m.token);
+      }
+    }
+    // and merge tokens and transpositions in
     mergeTokens(graph, b, al);
+    mergeTranspositions(graph, transpositions);
   }
 
   private List<Vertex> getVerticesFromVector(Vector v, Map<Vector, List<Vertex>> vrvx) {

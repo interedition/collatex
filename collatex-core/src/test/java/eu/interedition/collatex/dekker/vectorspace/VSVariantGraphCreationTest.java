@@ -110,7 +110,6 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   }
 
   //Test taken from IslandConflictResolverTest
-  @Ignore
   @Test
   public void testTransposition() {
     SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
