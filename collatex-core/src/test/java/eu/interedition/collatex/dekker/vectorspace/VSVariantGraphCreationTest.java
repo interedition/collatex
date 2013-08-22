@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
@@ -55,6 +56,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   
   //TODO: this is an a, b / b, a transpositon
   //TODO: instead of 2 transpositons only 1 should be detected
+  @Ignore
   @Test
   public void testTransposition3Witnesses() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -68,6 +70,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   }
     
     // test taken from match table linker test
+  @Ignore
   @Test
   public void testCreationOfVGWith3WitnessesAndATransposition() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -107,6 +110,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   }
 
   //Test taken from IslandConflictResolverTest
+  @Ignore
   @Test
   public void testTransposition() {
     SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
@@ -118,6 +122,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(12, Iterables.size(graph.edges()));
   }
   
+  //TODO: add extra asserts!
   @Test
   public void testVariantGraphThreeWitnesses() {
     SimpleWitness textD1 = createWitness("D1", "a b");

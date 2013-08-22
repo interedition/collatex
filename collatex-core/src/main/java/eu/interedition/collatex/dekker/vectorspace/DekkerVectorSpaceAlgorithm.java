@@ -100,7 +100,8 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     // Step 2: optimize the alignment...
     optimizeAlignment();
     // Step 3: build the variant graph from the vector space
-    createVariantGraph(graph, a, b, c);
+    //createVariantGraph(graph, a, b, c);
+    build(graph, a, b, 0, 1);
   }
 
   private void createVariantGraph(VariantGraph graph, SimpleWitness a, SimpleWitness b, SimpleWitness c) {
@@ -122,15 +123,7 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     }
     Map<Token, Token> alignments = fillTokenTokenAlignmentsMap(a, b, dimensionA, dimensionB);
 
-    // first we have to select all the vectors from the vectorspace
-    // that are present in the dimensions of witness a & b
-    List<Vector> vs = Lists.newArrayList();
-    for (VectorSpace.Vector v : s.getVectors()) {
-      //check whether this vector is present in both dimensions
-      if (v.isPresentIn(dimensionA)&&v.isPresentIn(dimensionB)) {
-        vs.add(v);
-      }
-    }
+    List<Vector> vs = findAllVectorForADimension(dimensionA, dimensionB);
     // we order the vectors by their coordinate in dimension B
     Collections.sort(vs, new Comparator<Vector>(){
       @Override
@@ -347,4 +340,91 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     }
     return tokens;
   }
+  
+  public void build(VariantGraph graph, Iterable<Token> a, Iterable<Token> b, int dimensionA, int dimensionB) {
+    /*
+     *  take the vectors from the vectorspace.
+     *  they represent the alignment
+     *  build a Vector -> List<vertex> representation
+     *  1)Building the graph for the first witness is
+     *  1) easy --> a vertex for every token
+     *  2)then build the initial vector to vertex map
+     *  find all the vector that have a coordinate in the 
+     *  first dimension (that is the dimension related to
+     *  the first witness)  
+     *  3) Merge in witness b
+     */
+    
+    //1
+    Map<Token, Vertex> newVertices = mergeTokens(graph, a, Collections.<Token, Vertex> emptyMap());
+    //2
+    Map<VectorSpace.Vector, List<VariantGraph.Vertex>> vrvx = putAllTheVerticesForThisWitnessInVectorMap(a, dimensionA, dimensionB, newVertices);
+    //3
+    
+    // fetch all vectors for witness B
+    List<Vector> vectorsWitnessB = findAllVectorForADimension(1, 0);
+    // the idea here is to add vector after vector to the VG.
+    // most important first (meaning: sorted on length, depth)
+    // this ways causes the least amount of transpositions.
+    Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
+    for (Vector v: vectorsWitnessB) {
+      List<Token> tokensFromVector = getTokensFromVector(v, 1, b);
+      List<Vertex> vertices = getVerticesFromVector(v, vrvx);
+      for (int i=0; i < tokensFromVector.size(); i++) {
+        al.put(tokensFromVector.get(i), vertices.get(i));
+      }
+    }
+    mergeTokens(graph, b, al);
+  }
+
+  private List<Vertex> getVerticesFromVector(Vector v, Map<Vector, List<Vertex>> vrvx) {
+    if (!vrvx.containsKey(v)) {
+      throw new RuntimeException("Vector "+v+" was expected to be present in the map, but wasn't!");
+    }
+    return vrvx.get(v);
+  }
+
+  private Map<VectorSpace.Vector, List<VariantGraph.Vertex>> putAllTheVerticesForThisWitnessInVectorMap(Iterable<Token> a, int dimensionA, int dimensionB, Map<Token, Vertex> newVertices) {
+    // first we have to select all the vectors from the vectorspace
+    // that are present in the dimensions of witness a & b
+    List<Vector> vs = findAllVectorForADimension(dimensionA, dimensionB);
+    // put vertices by the vector
+    // dit doe ik aan de hand van witness a
+    Map<VectorSpace.Vector, List<VariantGraph.Vertex>> vrvx = Maps.newHashMap();
+    // TODO: dit moet een multimap worden
+    int counterToken = 0;
+    for (Token t: a) {
+      counterToken++;
+      for (VectorSpace.Vector v : vs) {
+        if (counterToken >= v.startCoordinate[dimensionA] && counterToken <= (v.startCoordinate[dimensionA]+v.length-1)) {
+          // get the vertex for this token
+          VariantGraph.Vertex vx = newVertices.get(t);
+          if (vrvx.containsKey(v)) {
+            List<VariantGraph.Vertex> ex = vrvx.get(v);
+            ex.add(vx);
+          } else {
+            List<VariantGraph.Vertex> ne = Lists.newArrayList();
+            ne.add(vx);
+            vrvx.put(v, ne);
+          }
+        }
+      }
+    }
+    return vrvx;
+  }
+  
+  //TODO: dimensionB should be removed
+  // it should be present in dimension A and a dimension higher or
+  // lower
+  private List<Vector> findAllVectorForADimension(int dimensionA, int dimensionB) {
+    List<Vector> vs = Lists.newArrayList();
+    for (VectorSpace.Vector v : s.getVectors()) {
+      //check whether this vector is present in both dimensions
+      if (v.isPresentIn(dimensionA)&&v.isPresentIn(dimensionB)) {
+        vs.add(v);
+      }
+    }
+    return vs;
+  }
+
 }
