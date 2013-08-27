@@ -4,10 +4,10 @@
     <parent>
         <groupId>eu.interedition</groupId>
         <artifactId>collatex</artifactId>
-        <version>1.4</version>
+        <version>1.5-SNAPSHOT</version>
     </parent>
     <artifactId>collatex-cocoon</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
     <name>CollateX Cocoon Block</name>
     <description>Apache Cocoon block exposing CollateX' functionality as a transformer.</description>
     <dependencies>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>eu.interedition</groupId>
             <artifactId>collatex-core</artifactId>
-            <version>1.4</version>
+            <version>1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.sf.jung</groupId>
