@@ -21,6 +21,7 @@ package eu.interedition.collatex.simple;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.vectorspace.DekkerVectorSpaceAlgorithm;
 
 import java.util.List;
 
@@ -49,13 +50,22 @@ public class SimpleCollation {
   }
 
   public VariantGraph collate(VariantGraph graph) {
-    for (SimpleWitness witness : witnesses) {
-      if (witness.getTokens().isEmpty()) {
-        graph.register(witness);
-      } else {
-        algorithm.collate(graph, witness);
-      }
+    // non progressive collation
+    DekkerVectorSpaceAlgorithm algo = (DekkerVectorSpaceAlgorithm) algorithm;
+    if (witnesses.size()==2) {
+      algo.collate(graph, witnesses.get(0), witnesses.get(1));
+    } else {
+      algo.collate(graph, witnesses.get(0), witnesses.get(1), witnesses.get(2));
     }
+    
+//  progressive collation    
+//    for (SimpleWitness witness : witnesses) {
+//      if (witness.getTokens().isEmpty()) {
+//        graph.register(witness);
+//      } else {
+//        algorithm.collate(graph, witness);
+//      }
+//    }
     if (joined) {
       VariantGraph.JOIN.apply(graph);
     }
