@@ -1,12 +1,15 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
+import com.google.common.collect.Sets;
 
 /*
  * Class: VectorSpace
@@ -139,6 +142,17 @@ public class VectorSpace {
     public boolean isPresentIn(int dimension) {
       return startCoordinate[dimension]!=0;
     }
+
+    //TODO: add test
+    public Set<Integer> getDimensions() {
+      Set<Integer> dimensions = Sets.newHashSet();
+      for (int i=0; i< startCoordinate.length; i++) {
+        if (startCoordinate[i]!=0) {
+          dimensions.add(i);
+        }
+      }
+      return dimensions;
+    }
 	}
 	
 	private List<Vector> vectors;
@@ -206,5 +220,42 @@ public class VectorSpace {
     if (!removed) {
       throw new RuntimeException("Vector "+v+" not present in vector space");
     }
+  }
+
+  List<Vector> getAllVectorsWithAMinimumDImension(int minDimension) {
+    // filter all the vectors, keep the vectors that have minDimension as minimum dimension
+    List<Vector> result = Lists.newArrayList();
+    for (Vector v : vectors) {
+      Set<Integer> dimensions = v.getDimensions();
+      Integer minDimensionThisVector = Collections.min(dimensions);
+      if (minDimensionThisVector>=minDimension) {
+        result.add(v);
+      }
+    }
+    return result;
+  }
+
+  public List<Vector> getAllVectorsWithMaximumDimension(int maxDimension) {
+    // filter all the vectors, keep the vectors that have maxDimension as maximum dimension
+    List<Vector> result = Lists.newArrayList();
+    for (Vector v : vectors) {
+      Set<Integer> dimensions = v.getDimensions();
+      Integer maxDimensionThisVector = Collections.max(dimensions);
+      if (maxDimensionThisVector<=maxDimension) {
+        result.add(v);
+      }
+    }
+    return result;
+  }
+
+  public List<Vector> getVectorsWithDimension(int dimension) {
+    List<Vector> vs = Lists.newArrayList();
+    for (VectorSpace.Vector v : vectors) {
+      //check whether this vector is present in <dimension>
+      if (v.isPresentIn(dimension)) {
+        vs.add(v);
+      }
+    } 
+    return vs;
   }
 }

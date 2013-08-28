@@ -56,7 +56,6 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   
   //TODO: this is an a, b / b, a transpositon
   //TODO: instead of 2 transpositons only 1 should be detected
-  @Ignore
   @Test
   public void testTransposition3Witnesses() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -69,7 +68,9 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(2, graph.transpositions().size());
   }
     
-    // test taken from match table linker test
+  // test taken from match table linker test
+  //TODO: alignment ('natuurlijk') seems to be going wrong at the moment!
+  //TODO: a/b, b/a transpositions should be handled to succeed!
   @Ignore
   @Test
   public void testCreationOfVGWith3WitnessesAndATransposition() {
