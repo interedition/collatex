@@ -155,7 +155,7 @@ public class VectorSpace {
     }
 	}
 	
-	private List<Vector> vectors;
+	protected List<Vector> vectors;
 	
 	public VectorSpace() {
 		this.vectors = Lists.newArrayList();
@@ -175,16 +175,11 @@ public class VectorSpace {
    */
   public Vector addVector(int... coordinates) {
     Vector vector = new Vector(1, coordinates[0], coordinates[1], coordinates[2]);
-    Vector parallel = findParallelVector(vector);
-    if (parallel!=null) {
-      vector = vector.merge(parallel);
-      vectors.remove(parallel);
-    }
-    Vector adjacentVector = findAdjacentVector(vector);
-    if (adjacentVector!=null) {
-      adjacentVector.extendLength();
-      return adjacentVector;
-    } 
+    add(vector);
+    return vector;
+  }
+
+  protected Vector add(Vector vector) {
     vectors.add(vector);
     return vector;
   }
@@ -193,7 +188,7 @@ public class VectorSpace {
 	 * find an adjacent vector in the vector space to the other vector
 	 * returns null if none is found 
 	 */
-  private Vector findAdjacentVector(Vector other) {
+  protected Vector findAdjacentVector(Vector other) {
     for (Vector v : vectors) {
 		  if (v.isAdjacent(other)) {
 		    return v;
@@ -206,7 +201,7 @@ public class VectorSpace {
    * find a parallel vector in the vector space to the other vector
    * returns null if none is found 
    */
-  private Vector findParallelVector(Vector other) {
+  protected Vector findParallelVector(Vector other) {
     for (Vector v : vectors) {
       if (v.isParallel(other)) {
         return v;

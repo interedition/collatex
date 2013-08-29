@@ -26,7 +26,6 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
@@ -51,14 +50,14 @@ import eu.interedition.collatex.util.VariantGraphRanking;
  * 
  */
 public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
-  private VectorSpace s;
+  private TokenVectorSpace s;
   
   public DekkerVectorSpaceAlgorithm() {
-    this(new VectorSpace());
+    this(new TokenVectorSpace());
   }
 
   // for testing purposes
-  protected DekkerVectorSpaceAlgorithm(VectorSpace s) {
+  protected DekkerVectorSpaceAlgorithm(TokenVectorSpace s) {
     this.s = s;
   }
 
@@ -86,13 +85,8 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   }
 
   public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b, SimpleWitness c) {
-    // Step 1: do the matching and fill the vector space
-    // first compare witness 1 and 2
-    // then compare 1 and 3
-    // then 2 and 3
-    compareWitnesses(a, b, 0, 1);
-    compareWitnesses(a, c, 0, 2);
-    compareWitnesses(b, c, 1, 2);
+    // Step 1:
+    s.addWitnesses(a, b, c);
     // Step 2: optimize the alignment...
     optimizeAlignment();
     // Step 3: build the variant graph from the vector space
@@ -193,28 +187,6 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     }
   }
 
-  /*
-   * Do the matching between tokens of two witness and add vectors for the
-   * matches.
-   */
-  private void compareWitnesses(SimpleWitness a, SimpleWitness b, int dimensionA, int dimensionB) {
-    //System.out.println("Comparing witness "+a.getSigil()+" and "+b.getSigil());
-    Comparator<Token> comparator = new EqualityTokenComparator();
-    int yCounter = 0;
-    for (Token bToken : b) {
-      yCounter++;
-      int xCounter = 0;
-      for (Token aToken : a) {
-        xCounter++;
-        if (comparator.compare(aToken, bToken) == 0) {
-          int[] coordinates = new int[3];
-          coordinates[dimensionA] = xCounter;
-          coordinates[dimensionB] = yCounter;
-          s.addVector(coordinates);
-        }
-      }
-    }
-  }
   
   // dimension 0 = x
   // dimension 1 = y

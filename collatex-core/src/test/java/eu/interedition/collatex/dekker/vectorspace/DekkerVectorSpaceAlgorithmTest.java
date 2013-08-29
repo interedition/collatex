@@ -29,7 +29,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     SimpleWitness a = createWitness("A", "a b c x y z");
     SimpleWitness b = createWitness("B", "e a b c f g");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, a, b);
     List<Vector> alignment = algo.getAlignment();
@@ -54,7 +54,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
   public void testPartlyOverlappingIslands() {
     SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
@@ -69,7 +69,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
   public void testUsecase1() {
     final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
@@ -86,7 +86,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     // Optimal alignment has no gaps
     final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
@@ -101,7 +101,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     // Optimal alignment has 1 gap
     final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, w[0], w[1]);
     List<Vector> alignment = algo.getAlignment();
@@ -119,7 +119,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     SimpleWitness textD9 = createWitness("D9", "Natuurlijk, alles mag relatief zijn");
     SimpleWitness textDmd1 = createWitness("textDmd1", "Natuurlijk, alles is betrekkelijk");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, textD1, textD9, textDmd1);
     List<Vector> alignment = algo.getAlignment();
@@ -137,7 +137,7 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     SimpleWitness textD9 = createWitness("D9", "a");
     SimpleWitness textDmd1 = createWitness("textDmd1", "b");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, textD1, textD9, textDmd1);
     List<Vector> alignment = algo.getAlignment();
@@ -145,4 +145,6 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertTrue(alignment.contains(s. new Vector(1, 2, 0, 1)));
     assertEquals(2, alignment.size());
   }
+  
+
 }

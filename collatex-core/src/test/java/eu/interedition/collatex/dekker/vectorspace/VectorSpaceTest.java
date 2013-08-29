@@ -68,17 +68,6 @@ public class VectorSpaceTest extends AbstractTest {
     assertEquals(1, vectors.size());
 	}
 	
-	 // test parallel vectors will be merging when adding 3d vector 
-  @Test
-  public void testAddVectorMergeParallelVectors() {
-    VectorSpace s = new VectorSpace();
-    s.addVector(1, 1, 0);
-    s.addVector(1, 0, 1);
-    List<Vector> vectors = s.getVectors();
-    assertTrue(vectors.contains(s.new Vector(1, 1, 1, 1)));
-    assertEquals(1, vectors.size());
-  }
-  
   @Test
   public void testVectorOverlapsPartially() {
     VectorSpace s = new VectorSpace();

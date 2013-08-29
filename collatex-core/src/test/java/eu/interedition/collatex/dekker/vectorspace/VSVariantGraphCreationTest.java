@@ -62,7 +62,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     SimpleWitness textD9 = createWitness("D9", "Natuurlijk, alles mag relatief zijn");
     SimpleWitness textDmd1 = createWitness("textDmd1", "Natuurlijk, alles is betrekkelijk");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, textD1, textD9, textDmd1);
     assertEquals(2, graph.transpositions().size());
@@ -78,7 +78,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     SimpleWitness textD9 = createWitness("D9", "Natuurlijk, alles mag relatief zijn");
     SimpleWitness textDmd1 = createWitness("textDmd1", "Natuurlijk, alles is betrekkelijk");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, textD1, textD9, textDmd1);
     // to start we test the creation of the variant graph with the first
@@ -129,7 +129,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     SimpleWitness textD9 = createWitness("D9", "a");
     SimpleWitness textDmd1 = createWitness("textDmd1", "b");
     VariantGraph graph = new JungVariantGraph();
-    VectorSpace s = new VectorSpace();
+    TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, textD1, textD9, textDmd1);
     assertEquals(4, Iterables.size(graph.vertices()));
