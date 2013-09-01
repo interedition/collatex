@@ -1,5 +1,6 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,18 +31,18 @@ public class TokenVectorSpace extends VectorSpace {
   void mergeAdjacentVectors() {
     List<Vector> mergedVectors = Lists.newArrayList();
     for (Vector v : vectors) {
-      Vector adjecent = findAdjecentVector(mergedVectors, v);
-      if (adjecent==null) {
+      Vector adjacent = findAdjacentVector(mergedVectors, v);
+      if (adjacent==null) {
         mergedVectors.add(v);
       } else {
-        adjecent.extendLength();
+        adjacent.extendLength();
       }
     }
     vectors.clear();
     vectors.addAll(mergedVectors);
   }
 
-  private Vector findAdjecentVector(List<Vector> mergedVectors, Vector v) {
+  private Vector findAdjacentVector(List<Vector> mergedVectors, Vector v) {
     for (Vector v2 : mergedVectors) {
       if (v2.isAdjacent(v)) {
         return v2;
@@ -82,5 +83,18 @@ public class TokenVectorSpace extends VectorSpace {
       remove(parallel);
     }
     return super.add(vector);
+  }
+
+  public List<Vector> getAllVectorsContainingDimensionButNotAsMinimum(int dimension) {
+    List<Vector> result = Lists.newArrayList();
+    for (Vector v : vectors) {
+      if (v.isPresentIn(dimension)) {
+        Integer min = Collections.min(v.getDimensions());
+        if (min != dimension) {
+          result.add(v);
+        }
+      }
+    }
+    return result;
   }
 }

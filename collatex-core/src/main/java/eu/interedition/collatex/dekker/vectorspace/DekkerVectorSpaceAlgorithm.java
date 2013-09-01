@@ -231,7 +231,6 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     List<Vector> vectorToDoA = s.getAllVectorsWithAMinimumDImension(dimensionA);
      Map<VectorSpace.Vector, List<VariantGraph.Vertex>> vrvx = generateVectorToVertexMap(a, 0, newVertices, vectorToDoA);
     //3
-    
     // add witness b to the graph
     newVertices = addCollationResultToGraph(graph, b, dimensionB, vrvx);
     // find all the vertices that are present in the dimension of b and have b as the minimal dimension
@@ -246,19 +245,14 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
 
   private Map<Token, Vertex> addCollationResultToGraph(VariantGraph graph, Iterable<Token> b, final int dimension, Map<VectorSpace.Vector, List<VariantGraph.Vertex>> vrvx) {
     LOG.fine("Adding "+dimension+" to graph.");
-    // fetch all vectors for witness B
-    // List<Vector> vs = s.getAllVectorsWithAMinimumDImension(dimensionB);
-    List<Vector> vsWithDimension = s.getVectorsWithDimension(dimension);
-    List<Vector> vsWithMaxDimension = s.getAllVectorsWithMaximumDimension(dimension);
-    Set<Vector> vsSet = Sets.newHashSet();
-    vsSet.addAll(vsWithDimension);
-    vsSet.retainAll(vsWithMaxDimension);
+    // fetch all vectors for witness
+    List<Vector> vs = s.getAllVectorsContainingDimensionButNotAsMinimum(dimension);
+    LOG.fine("Vector(s) to add for dimension "+dimension+": "+vs);
     /* the idea here is to add vector after vector to the VG.
     * most important first (meaning: sorted on length, depth)
     * this ways causes the least amount of transpositions.
     * we order the vectors by their coordinate in dimension B
     */
-    List<Vector> vs = Lists.newArrayList(vsSet);
     Collections.sort(vs, new Comparator<Vector>(){
       @Override
       public int compare(Vector v1, Vector v2) {
@@ -371,5 +365,4 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     }
     return vrvx;
   }
-
 }

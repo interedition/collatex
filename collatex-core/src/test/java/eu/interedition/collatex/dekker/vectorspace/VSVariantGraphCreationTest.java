@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
@@ -69,9 +68,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
   }
     
   // test taken from match table linker test
-  //TODO: alignment ('natuurlijk') seems to be going wrong at the moment!
   //TODO: a/b, b/a transpositions should be handled to succeed!
-  @Ignore
   @Test
   public void testCreationOfVGWith3WitnessesAndATransposition() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -122,7 +119,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(12, Iterables.size(graph.edges()));
   }
   
-  //TODO: add extra asserts!
+  //TODO: add extra asserts! (edges)
   @Test
   public void testVariantGraphThreeWitnesses() {
     SimpleWitness textD1 = createWitness("D1", "a b");
@@ -134,5 +131,26 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     algo.collate(graph, textD1, textD9, textDmd1);
     assertEquals(4, Iterables.size(graph.vertices()));
   }
-
+  
+  //TODO: add more asserts! (black, cat)
+  @Test
+  public void testCreationVariantGraphThreeWitnesses() {
+    SimpleWitness a = createWitness("A", "The black cat");
+    SimpleWitness b = createWitness("B", "The black and white cat");
+    SimpleWitness c = createWitness("C", "The black and green cat");
+    VariantGraph graph = new JungVariantGraph();
+    TokenVectorSpace s = new TokenVectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, a, b, c);
+    // first assert that the is the same vertex in all three witnesses
+    VariantGraph.Vertex the1 = vertexWith(graph, "the", a);
+    VariantGraph.Vertex the2 = vertexWith(graph, "the", b);
+    VariantGraph.Vertex the3 = vertexWith(graph, "the", c);
+    assertEquals(the1, the2);
+    assertEquals(the2, the3);
+    // second assert that the and is same vertex in b and c
+    VariantGraph.Vertex and1 = vertexWith(graph, "and", b);
+    VariantGraph.Vertex and2 = vertexWith(graph, "and", c);
+    assertEquals(and1, and2);
+  }
 }
