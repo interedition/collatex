@@ -31,7 +31,7 @@ public class VectorSpace {
 		public int length;
 		
 		public Vector(int x, int y) {
-		  this(1, x, y);
+		  this(1, x, y, 0);
 		}
 
     public Vector(int l, int x, int y) {
@@ -42,6 +42,11 @@ public class VectorSpace {
     public Vector(int l, int x, int y, int z) {
       this.startCoordinate = new int[] {x, y, z};
       this.length = l;
+    }
+
+    public Vector(int[] coordinates) {
+      this.startCoordinate = coordinates;
+      this.length = 1;
     }
 
     @Override
@@ -74,9 +79,24 @@ public class VectorSpace {
     public boolean isAdjacent(Vector other) {
       int xDistance = Math.abs(startCoordinate[0]+length - other.startCoordinate[0]);
       int yDistance = Math.abs(startCoordinate[1]+length - other.startCoordinate[1]);
-      return xDistance == 0 && yDistance == 0;
+      int zDistance = Math.abs(startCoordinate[2]+length - other.startCoordinate[2]);
+      boolean adjacent=true;
+      if (startCoordinate[0]==0 && other.startCoordinate[0] != 0) {
+        return false;
+      }
+      if (startCoordinate[1]==0 && other.startCoordinate[1] != 0) {
+        return false;
+      }
+      if (startCoordinate[2]==0 && other.startCoordinate[2] != 0) {
+        return false;
+      }
+      adjacent=adjacent&&((startCoordinate[0]==0&&other.startCoordinate[0]==0)||xDistance==0);
+      adjacent=adjacent&&((startCoordinate[1]==0&&other.startCoordinate[1]==0)||yDistance==0);
+      adjacent=adjacent&&((startCoordinate[2]==0&&other.startCoordinate[2]==0)||zDistance==0);
+      return adjacent;
     }
 
+    //TODO: need to check z dimension!
     /*
      * This method checks whether one or more dimensions of this
      * vector and the other vector conflict with each other.

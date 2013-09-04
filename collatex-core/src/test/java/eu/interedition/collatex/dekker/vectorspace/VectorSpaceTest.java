@@ -23,7 +23,9 @@ public class VectorSpaceTest extends AbstractTest {
     assertFalse(v1.equals(null));
     assertFalse(v1.equals(v4));
 	}
-	
+
+	//TODO: add more tests
+  //TODO: check partial dimensions (vectors containing 0's)
 	@Test
 	public void testVectorIsAdjacent() {
 	  VectorSpace s = new VectorSpace();
@@ -33,6 +35,24 @@ public class VectorSpaceTest extends AbstractTest {
 	}
 	
 	@Test
+	public void testVectorIsAdjacent2() {
+	  VectorSpace s = new VectorSpace();
+	  Vector v1 = s.new Vector(1, 1, 4, 4);
+	  Vector v2 = s.new Vector(1, 2, 5, 5);
+	  Vector v3 = s.new Vector(1, 1, 4, 1);
+	  assertTrue(v1.isAdjacent(v2));
+	  assertFalse(v3.isAdjacent(v2));
+	}
+	
+  @Test
+  public void testVectorIsAdjacent3() {
+    VectorSpace s = new VectorSpace();
+    Vector v1 = s.new Vector(1, 0, 3, 3);
+    Vector v2 = s.new Vector(1, 1, 4, 4);
+    assertFalse(v1.isAdjacent(v2));
+  }
+
+  @Test
 	public void testVectorIsParallel() {
 	  VectorSpace s = new VectorSpace();
 	  Vector v1 = s.addVector(1, 1, 0);

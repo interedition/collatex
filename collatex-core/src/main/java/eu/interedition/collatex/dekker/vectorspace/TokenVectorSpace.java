@@ -22,10 +22,46 @@ public class TokenVectorSpace extends VectorSpace {
   // then compare 1 and 3
   // then 2 and 3
   public void addWitnesses(Iterable<Token> a, Iterable<Token> b, Iterable<Token> c) {
-    compareWitnesses(a, b, 0, 1);
-    compareWitnesses(a, c, 0, 2);
-    compareWitnesses(b, c, 1, 2);
+    List<Vector> newV = compareWitnesses(a, b, 0, 1);
+    addVectors(newV);
+    List<Vector> newV2 = compareWitnesses(a, c, 0, 2);
+    mergeParallelVectors(newV2);
+    List<Vector> newV3 = compareWitnesses(b, c, 1, 2);
+    mergeParallelVectors(newV3);
     mergeAdjacentVectors();
+  }
+
+  private void addVectors(List<Vector> newV) {
+    vectors.addAll(newV);
+  }
+
+  private void mergeParallelVectors(List<Vector> newVectors) {
+    List<Vector> result = Lists.newArrayList();
+    List<Vector> tobeRemoved = Lists.newArrayList();
+    for (Vector nv : newVectors) {
+      List<Vector> parallelV = findParallelVectors(nv);
+      if (parallelV.isEmpty()) {
+        result.add(nv);
+      } else {
+        for (Vector p : parallelV) {
+          Vector m = p.merge(nv);
+          tobeRemoved.add(p);
+          result.add(m);
+        }
+      }
+    }
+    vectors.removeAll(tobeRemoved);
+    vectors.addAll(result);
+  }
+
+  private List<Vector> findParallelVectors(Vector nv) {
+    List<Vector> result = Lists.newArrayList();
+    for (Vector v : vectors) {
+      if (nv.isParallel(v)) {
+        result.add(v);
+      }
+    }
+    return result;
   }
 
   void mergeAdjacentVectors() {
@@ -55,10 +91,11 @@ public class TokenVectorSpace extends VectorSpace {
    * Do the matching between tokens of two witness and add vectors for the
    * matches.
    */
-  private void compareWitnesses(Iterable<Token> a, Iterable<Token> b, int dimensionA, int dimensionB) {
-    // System.out.println("Comparing witness "+a.getSigil()+" and "+b.getSigil());
+  private List<Vector> compareWitnesses(Iterable<Token> a, Iterable<Token> b, int dimensionA, int dimensionB) {
+    //System.out.println("Comparing dimension: "+a + " and "+b);
     Comparator<Token> comparator = new EqualityTokenComparator();
     int yCounter = 0;
+    List<Vector> result = Lists.newArrayList();
     for (Token bToken : b) {
       yCounter++;
       int xCounter = 0;
@@ -68,20 +105,16 @@ public class TokenVectorSpace extends VectorSpace {
           int[] coordinates = new int[3];
           coordinates[dimensionA] = xCounter;
           coordinates[dimensionB] = yCounter;
-          addVector(coordinates);
+          result.add(new Vector(coordinates));
         }
       }
     }
+    return result;
   }
 
   @Override
   public Vector addVector(int... coordinates) {
     Vector vector = new Vector(1, coordinates[0], coordinates[1], coordinates[2]);
-    Vector parallel = findParallelVector(vector);
-    if (parallel != null) {
-      vector = vector.merge(parallel);
-      remove(parallel);
-    }
     return super.add(vector);
   }
 
