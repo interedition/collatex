@@ -1,11 +1,12 @@
 package eu.interedition.collatex.dekker.vectorspace;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -174,13 +175,24 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
    * method changes the possible vectors map.
    */
   private void removeImpossibleVectors(int islandSize, Multimap<Integer, Vector> vectorMultimap, List<Vector> fixedVectors) {
-    Collection<Vector> vectorsToCheck = Lists.newArrayList(vectorMultimap.get(islandSize));
-    for (Vector v : vectorsToCheck) {
+    Queue<Vector> q = new LinkedList<Vector>(vectorMultimap.get(islandSize));
+    while(!q.isEmpty()) {
+      Vector v = q.remove();
       for (Vector f : fixedVectors) {
         if (f.conflictsWith(v)) {
           LOG.fine(String.format("%s conflicts with %s", f, v));
           vectorMultimap.remove(islandSize, v);
           s.remove(v);
+          Vector newV = v.generateNonConflictingVector(f);
+          // when the non conflicting vector
+          // has at least two dimensions
+          // it should be added to s
+          // and the vectorMultimap
+          if (newV.getDimensions().size()>1) {
+            vectorMultimap.put(newV.length, newV);
+            s.add(newV);
+            q.add(newV);
+          } 
           break;
         }
       }
@@ -188,6 +200,7 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
   }
 
   
+
   // dimension 0 = x
   // dimension 1 = y
   protected List<Token> getTokensFromVector(Vector v, int dimension, Iterable<Token> a) {

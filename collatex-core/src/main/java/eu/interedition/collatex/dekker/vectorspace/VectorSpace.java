@@ -96,6 +96,7 @@ public class VectorSpace {
       return adjacent;
     }
 
+    //TODO: add tests for zero dimensions. (Already implemented)
     //TODO: need to check z dimension!
     /*
      * This method checks whether one or more dimensions of this
@@ -105,13 +106,13 @@ public class VectorSpace {
       // check x dimension
       Range<Integer> thisXRange = Ranges.closed(this.startCoordinate[0], this.startCoordinate[0]+this.length-1);
       Range<Integer> otherXRange = Ranges.closed(other.startCoordinate[0], other.startCoordinate[0]+other.length-1);
-      if (thisXRange.encloses(otherXRange)) {
+      if (this.startCoordinate[0] != 0 && thisXRange.encloses(otherXRange)) {
         return true;
       }
       // check y dimension
       Range<Integer> thisYRange = Ranges.closed(this.startCoordinate[1], this.startCoordinate[1]+this.length-1);
       Range<Integer> otherYRange = Ranges.closed(other.startCoordinate[1], other.startCoordinate[1]+other.length-1);
-      if (thisYRange.encloses(otherYRange)) {
+      if (this.startCoordinate[1] != 0 && thisYRange.encloses(otherYRange)) {
         return true;
       }
       return false;
@@ -172,6 +173,39 @@ public class VectorSpace {
         }
       }
       return dimensions;
+    }
+
+    
+    // TODO: add a test!
+    Vector generateNonConflictingVector(Vector f) {
+      // Vector v needs to be split up for each dimension
+      // looking at the fixed vector f
+      int[] newCoordinates = new int[startCoordinate.length];
+      List<Range<Integer>> s = findAllConflictingRanges(f);
+      for (int i=0; i< startCoordinate.length; i++) {
+        if (s.get(i)!=null) {
+          newCoordinates[i]=0;
+        } else {
+          newCoordinates[i]=startCoordinate[i];
+        }
+      }
+      Vector nonConflicting = new Vector(newCoordinates);
+      nonConflicting.length = this.length;
+      return nonConflicting;
+    }
+
+    public List<Range<Integer>> findAllConflictingRanges(Vector other) {
+      List<Range<Integer>> conflictingRanges = Lists.newArrayList();
+      for (int i=0; i < startCoordinate.length; i++) {
+        Range<Integer> thisRange = Ranges.closed(this.startCoordinate[i], this.startCoordinate[i]+this.length-1);
+        Range<Integer> otherRange = Ranges.closed(other.startCoordinate[i], other.startCoordinate[i]+other.length-1);
+        if (otherRange.encloses(thisRange)) {
+          conflictingRanges.add(thisRange.intersection(otherRange));
+        } else {
+          conflictingRanges.add(null);
+        }
+      }
+      return conflictingRanges;
     }
 	}
 	

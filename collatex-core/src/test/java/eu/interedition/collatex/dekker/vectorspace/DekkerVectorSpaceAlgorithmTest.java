@@ -23,6 +23,29 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
   private void assertPhrase(String expectedPhrase, List<Token> tokensFromVector) {
     assertEquals(expectedPhrase, SimpleToken.toString(tokensFromVector));
   }
+  
+  private void assertContains(List<Vector> vectors, Vector vector) {
+    assertTrue(vectors.contains(vector));
+  }
+
+
+  //Note: repetition in tokens causes causes conflicts in dimensions
+  @Test
+  public void testAlignmentRepetition() {
+    SimpleWitness a = createWitness("A", "The black cat on the table");
+    SimpleWitness b = createWitness("B", "The black saw the black cat on the table");
+    SimpleWitness c = createWitness("C", "The black saw the black cat on the table");
+    VariantGraph graph = new JungVariantGraph();
+    TokenVectorSpace s = new TokenVectorSpace();
+    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
+    algo.collate(graph, a, b, c);
+    List<Vector> alignment = algo.getAlignment();
+    assertContains(alignment, s.new Vector(6, 1, 4, 4));
+    assertContains(alignment, s.new Vector(2, 0, 1, 1));
+    assertContains(alignment, s.new Vector(1, 0, 3, 3));
+    assertEquals(3, alignment.size());
+  }
+
 
   @Test
   public void testCreatingOfVectorSpace() {

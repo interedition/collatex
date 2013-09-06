@@ -83,5 +83,6 @@ public class TokenVectorSpaceTest {
     assertContains(vectors, s.new Vector(6, 1, 4, 4));
     assertContains(vectors, s.new Vector(2, 1, 1, 1));
     assertContains(vectors, s.new Vector(1, 0, 3, 3));
+    //NOTE: some more noise
   }
 }
