@@ -85,4 +85,18 @@ public class TokenVectorSpaceTest {
     assertContains(vectors, s.new Vector(1, 0, 3, 3));
     //NOTE: some more noise
   }
+  
+  
+  @Test
+  public void testCreationVSRepetition3() {
+    SimpleWitness a = createWitness("A", "the black cat and the black mat");   
+    SimpleWitness b = createWitness("B", "the black dog and the black mat");   
+    SimpleWitness c = createWitness("C", "the black dog and the black mat");
+    TokenVectorSpace s = new TokenVectorSpace();
+    s.addWitnesses(a, b, c);
+    List<Vector> vectors = s.getVectors();
+    assertContains(vectors, s.new Vector(4, 4, 4, 4));
+    assertContains(vectors, s.new Vector(2, 1, 1, 1));
+    assertContains(vectors, s.new Vector(1, 0, 3, 3));
+  }
 }

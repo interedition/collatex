@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 
@@ -108,5 +110,20 @@ public class VectorSpaceTest extends AbstractTest {
     Vector v1 = s.addVector(4, 0, 5);
     Vector v2 = s.addVector(2, 0, 4);
     assertFalse(v1.overlapsPartially(v2));
+  }
+  
+  @Test
+  public void testGetDimensionsInConflict() {
+    VectorSpace s = new VectorSpace();
+    Vector v1 = s.add(s.new Vector(2, 1, 1, 1));
+    Vector v2 = s.add(s.new Vector(2, 0, 1, 1));
+    Vector v3 = s.add(s.new Vector(2, 1, 0, 1));
+    Vector v4 = s.add(s.new Vector(2, 1, 1, 0));
+    Vector v5 = s.add(s.new Vector(4, 4, 4, 4));
+    assertEquals(Lists.newArrayList(true, true, true), s.getDimensionsInConflictFor(v1));
+    assertEquals(Lists.newArrayList(false, true, true), s.getDimensionsInConflictFor(v2));
+    assertEquals(Lists.newArrayList(true, false, true), s.getDimensionsInConflictFor(v3));
+    assertEquals(Lists.newArrayList(true, true, false), s.getDimensionsInConflictFor(v4));
+    assertEquals(Lists.newArrayList(false, false, false), s.getDimensionsInConflictFor(v5));
   }
 }

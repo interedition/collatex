@@ -135,17 +135,51 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
       removeImpossibleVectors(vectorLength, vectorMultimap, fixedVectors);
       // commit possible vectors
       List<Vector> possibleVectors = Lists.newArrayList(vectorMultimap.get(vectorLength));
-      // check for conflicts between the possible vectors
-      checkConflicts(possibleVectors, vectorMultimap);
-      for (Vector v : possibleVectors) {
-        fixedVectors.add(v);
+      if (possibleVectors.isEmpty()) {
+        continue;
+      }
+      if (possibleVectors.size()==1) {
+        Vector vector = possibleVectors.get(0);
+        commitVector(vector, vectorMultimap, fixedVectors, possibleVectors);
+      } else {
+        addBestOfCompetingVectors(possibleVectors, vectorMultimap, fixedVectors);
       }
     }
   }
 
+  private void addBestOfCompetingVectors(List<Vector> possibleVectors, Multimap<Integer, Vector> vectorMultimap, List<Vector> fixedVectors) {
+    LOG.fine("Vectors to check for local conflicts: "+possibleVectors);
+    Multimap<Integer, Vector> vectorConflictMap = makeVectorConflictMap(possibleVectors);
+    for (Integer cd : highestToLowestNumberOfConflicts(vectorConflictMap)) {
+      for (Vector v : vectorConflictMap.get(cd)) {
+        if (isVectorPossibleAgainstFixedVectors(v, fixedVectors)) {
+          commitVector(v, vectorMultimap, fixedVectors, possibleVectors);
+        } else {
+          removeVector(v, vectorMultimap);
+        }
+      }
+    }
+  }
+
+ private Multimap<Integer, Vector> makeVectorConflictMap(List<Vector> possibleVectors) {
+   Multimap<Integer, Vector> numberConfVector = ArrayListMultimap.create();
+   for (Vector v: possibleVectors) {
+     numberConfVector.put(s.getNumberOfDimensionsInConflict(v), v);
+   }
+   return numberConfVector;
+ }
+ 
+ private List<Integer> highestToLowestNumberOfConflicts(Multimap<Integer, Vector> conflictMap) {
+   List<Integer> conflicts = Lists.newArrayList(conflictMap.keySet());
+   Collections.sort(conflicts);
+   Collections.reverse(conflicts);
+   return conflicts;
+ }
+ 
+  //TODO: re-enable this check!
   // check for partially overlap
   // the element that has the most conflicts should be removed
-  private void checkConflicts(List<Vector> possibleVectors, Multimap<Integer, Vector> vectorMultimap) {
+  private void checkForPartiallyConflictingVectors(List<Vector> possibleVectors) {
     Multiset<Vector> conflicts = HashMultiset.create();
     // TODO: this can be performed with less checks
     for (Vector v: possibleVectors) {
@@ -197,6 +231,28 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
         }
       }
     }
+  }
+
+  private void commitVector(Vector vector, final Multimap<Integer, Vector> vectorMultimap, List<Vector> fixedVectors, List<Vector> possibleVectors) {
+    LOG.fine("Committing Vector: "+vector);
+    fixedVectors.add(vector);
+    possibleVectors.remove(vector);
+    vectorMultimap.remove(vector.length, vector);
+  }
+
+  private void removeVector(Vector vector, Multimap<Integer, Vector> vectorMultimap) {
+    LOG.fine("Removing vector: "+vector);
+    s.remove(vector);
+    vectorMultimap.remove(vector.length, vector);
+  }
+
+  private boolean isVectorPossibleAgainstFixedVectors(Vector v, List<Vector> fixedVectors) {
+    for (Vector f : fixedVectors) {
+      if (f.conflictsWith(v)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   

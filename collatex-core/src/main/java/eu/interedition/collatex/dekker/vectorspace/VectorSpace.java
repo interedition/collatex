@@ -97,7 +97,6 @@ public class VectorSpace {
     }
 
     //TODO: add tests for zero dimensions. (Already implemented)
-    //TODO: need to check z dimension!
     /*
      * This method checks whether one or more dimensions of this
      * vector and the other vector conflict with each other.
@@ -113,6 +112,12 @@ public class VectorSpace {
       Range<Integer> thisYRange = Ranges.closed(this.startCoordinate[1], this.startCoordinate[1]+this.length-1);
       Range<Integer> otherYRange = Ranges.closed(other.startCoordinate[1], other.startCoordinate[1]+other.length-1);
       if (this.startCoordinate[1] != 0 && thisYRange.encloses(otherYRange)) {
+        return true;
+      }
+      // check z dimension
+      Range<Integer> thisZRange = Ranges.closed(this.startCoordinate[2], this.startCoordinate[2]+this.length-1);
+      Range<Integer> otherZRange = Ranges.closed(other.startCoordinate[2], other.startCoordinate[2]+other.length-1);
+      if (this.startCoordinate[2] != 0 && thisZRange.encloses(otherZRange)) {
         return true;
       }
       return false;
@@ -306,5 +311,37 @@ public class VectorSpace {
       }
     } 
     return vs;
+  }
+
+  public List<Boolean> getDimensionsInConflictFor(Vector vector) {
+    Boolean[] result = new Boolean[3];
+    Arrays.fill(result, Boolean.FALSE);
+    for (Vector v : vectors) {
+      if (v == vector) {
+        continue;
+      }
+      if (vector.startCoordinate[0]!=0 && v.startCoordinate[0] == vector.startCoordinate[0]) {
+        result[0]=true;
+      }
+      if (vector.startCoordinate[1]!=0 && v.startCoordinate[1] == vector.startCoordinate[1]) {
+        result[1]=true;
+      }
+      if (vector.startCoordinate[2]!=0 && v.startCoordinate[2] == vector.startCoordinate[2]) {
+        result[2]=true;
+      }
+    }
+    return Arrays.asList(result);
+  }
+  
+  //TODO: add test
+  public int getNumberOfDimensionsInConflict(Vector v) {
+    List<Boolean> dimensionsInConflict = getDimensionsInConflictFor(v);
+    int dimensions = 0;
+    for (Boolean b : dimensionsInConflict) {
+      if (b==true) {
+        dimensions++;
+      }
+    }
+    return dimensions;
   }
 }
