@@ -53,8 +53,6 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     assertEquals(a3, b3);
   }
   
-  //TODO: this is an a, b / b, a transpositon
-  //TODO: instead of 2 transpositons only 1 should be detected
   @Test
   public void testTransposition3Witnesses() {
     SimpleWitness textD1 = createWitness("D1", "natuurlijk is alles betrekkelijk");
@@ -64,7 +62,7 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     TokenVectorSpace s = new TokenVectorSpace();
     DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm(s);
     algo.collate(graph, textD1, textD9, textDmd1);
-    assertEquals(2, graph.transpositions().size());
+    assertEquals(1, graph.transpositions().size());
   }
     
   // test taken from match table linker test

@@ -7,10 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
@@ -19,16 +16,15 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.dekker.TranspositionDetector;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.simple.SimpleWitness;
-import eu.interedition.collatex.util.VariantGraphRanking;
 
 /*
  * @author: Ronald Haentjens Dekker
@@ -93,11 +89,6 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     // Step 3: build the variant graph from the vector space
     //createVariantGraph(graph, a, b, c);
     build(graph, a, b, c, 0, 1, 2);
-  }
-
-  private void addNewTransposition(List<Match> phrase, Stack<List<Match>> transpositions) {
-    LOG.fine("Transposition found! "+phrase);
-    transpositions.add(phrase);
   }
 
   public void collate(VariantGraph graph, SimpleWitness a, SimpleWitness b) {
@@ -328,7 +319,8 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
         return v1.startCoordinate[dimension] - v2.startCoordinate[dimension];
       }});
     List<List<Match>> phrases = generatePhrasesFromVectors(b, vrvx, vs, dimension);
-    final Stack<List<Match>> transpositions = detectTranspositions(graph, phrases);
+    TranspositionDetector detector = new TranspositionDetector();
+    final List<List<Match>> transpositions = detector.detect(phrases, graph);
     Map<Token, Vertex> newVertices = mergeWitnessIntoGraph(graph, b, phrases, transpositions);
     return newVertices;
   }
@@ -354,35 +346,7 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
     return phrases;
   }
 
-  private Stack<List<Match>> detectTranspositions(VariantGraph graph, List<List<Match>> phrases) {
-    Set<VariantGraph.Vertex> firstVertices = Sets.newHashSet();
-    for (List<Match> phrase : phrases) {
-      firstVertices.add(phrase.get(0).vertex);
-    }
-    // prepare for transposition detection
-    // rank vertices
-    VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(graph, null, firstVertices);
-    // gather matched ranks into a list ordered by their natural order
-    final List<Integer> phraseRanks = Lists.newArrayList();
-    for (List<Match> phrase : phrases) {
-      phraseRanks.add(Preconditions.checkNotNull(ranking.apply(phrase.get(0).vertex)));
-    }
-    Collections.sort(phraseRanks);
-    // detect transpositions
-    final Stack<List<Match>> transpositions = new Stack<List<Match>>();
-    int previousRank = 0;
-    for (List<Match> phrase: phrases) {
-      int rank = ranking.apply(phrase.get(0).vertex);
-      int expectedRank = phraseRanks.get(previousRank);
-      if (expectedRank != rank) { 
-        addNewTransposition(phrase, transpositions);
-      }
-      previousRank++;
-    }
-    return transpositions;
-  }
-
-  private Map<Token, Vertex> mergeWitnessIntoGraph(VariantGraph graph, Iterable<Token> witness, List<List<Match>> phrases, final Stack<List<Match>> transpositions) {
+  private Map<Token, Vertex> mergeWitnessIntoGraph(VariantGraph graph, Iterable<Token> witness, List<List<Match>> phrases, final List<List<Match>> transpositions) {
     // convert the phrases to a alignment map
     Map<Token, VariantGraph.Vertex> al = Maps.newHashMap();
     for (List<Match> phrase : phrases) {  
