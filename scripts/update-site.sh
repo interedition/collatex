@@ -1,3 +1,3 @@
 #!/bin/bash
 #
-rsync -avz site/ collatex:/var/www
+rsync -avz site/ collatex:htdocs
