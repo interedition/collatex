@@ -38,18 +38,16 @@ import com.google.common.collect.Sets;
  * @author Meindert Kroese
  */
 public class IslandConflictResolver {
-  private static final int MINIMUM_OUTLIER_DISTANCE_FACTOR = 5;
   Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
   private final MatchTable table;
-  private final int outlierTranspositionsSizeLimit;
   // group the islands together by size; islands may change after commit islands
   private final Multimap<Integer, Island> islandMultimap;
   // fixed islands contains all the islands that are selected for the final alignment
   private final Archipelago fixedIslands;
 
+  //NOTE: outlierTranspositionLimit is ignored for now
   public IslandConflictResolver(MatchTable table, int outlierTranspositionsSizeLimit) {
     this.table = table;
-    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
     islandMultimap = ArrayListMultimap.create();
     for (Island isl : table.getIslands()) {
       islandMultimap.put(isl.size(), isl);
@@ -71,6 +69,7 @@ public class IslandConflictResolver {
       LOG.fine("Checking islands of size: "+islandSize);
       // check the possible islands of a certain size against 
       // the already committed islands.
+      
       removeOrSplitImpossibleIslands(islandSize, islandMultimap);
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
@@ -99,7 +98,7 @@ public class IslandConflictResolver {
       if (!table.isIslandPossibleCandidate(island)) {
         islandMultimap.remove(islandSize, island);
         removeConflictingEndCoordinates(island);
-        if (island.size() > 1) {
+        if (island.size() > 0) {
           islandMultimap.put(island.size(), island);
         }
       }
@@ -230,20 +229,10 @@ public class IslandConflictResolver {
   }
 
   private void addIslandToResult(Island isl, Archipelago result) {
-    if (islandIsNoOutlier(result, isl)) {
-      if (LOG.isLoggable(Level.FINE)) {
-        LOG.log(Level.FINE, "adding island: '{0}'", isl);
-      }
-      table.commitIsland(isl);
-      result.add(isl);
-    } else {
-      if (LOG.isLoggable(Level.FINE)) {
-        LOG.log(Level.FINE, "island: '{0}' is an outlier, not added", isl);
-      }
+    if (LOG.isLoggable(Level.FINE)) {
+      LOG.log(Level.FINE, "adding island: '{0}'", isl);
     }
-  }
-
-  private boolean islandIsNoOutlier(Archipelago a, Island isl) {
-    return true;
+    table.commitIsland(isl);
+    result.add(isl);
   }
 }
