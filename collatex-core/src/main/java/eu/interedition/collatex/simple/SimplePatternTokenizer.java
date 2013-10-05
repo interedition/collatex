@@ -62,4 +62,8 @@ public class SimplePatternTokenizer implements Function<String, Iterable<String>
   public static final SimplePatternTokenizer BY_WS_OR_PUNCT = new SimplePatternTokenizer(
           Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*")
   );
+  
+  public static final SimplePatternTokenizer BY_CHARACTERS_OR_WS_OR_PUNCT = new SimplePatternTokenizer( 
+          Pattern.compile("[" + PUNCT + "]+|[^"+PUNCT+"\\s]+|[\\s]+")
+  );
 }

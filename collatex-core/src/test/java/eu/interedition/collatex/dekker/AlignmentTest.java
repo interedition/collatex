@@ -27,6 +27,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -42,7 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.*;
 
 /**
  * 
@@ -178,5 +180,24 @@ public class AlignmentTest extends AbstractTest {
     swriter.writeStartDocument();
     new SimpleVariantGraphSerializer(graph).toGraphML(swriter);
     swriter.writeEndDocument();
+  }
+  
+  /*
+   * Note: this test tests the handling of separate whitespace tokens
+   */
+  @Test
+  public void testSimpleCollation() {
+    final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
+    collate(w[0], w[1]);
+    debugPhraseMatches();
+    fail();
+  }
+
+  private void debugPhraseMatches() {
+    DekkerAlgorithm dekker = (DekkerAlgorithm) collationAlgorithm;
+    List<List<Match>> phraseMatches = dekker.getPhraseMatches();
+    for (List<Match> phraseMatch : phraseMatches) {
+      System.out.println(">"+SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch))+"<");
+    }
   }
 }

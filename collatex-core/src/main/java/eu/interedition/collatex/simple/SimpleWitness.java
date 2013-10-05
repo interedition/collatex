@@ -43,7 +43,7 @@ public class SimpleWitness implements Iterable<Token>, Witness, Comparator<Simpl
   }
 
   public SimpleWitness(String sigil, String content) {
-    this(sigil, content, SimplePatternTokenizer.BY_WS_OR_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS);
+    this(sigil, content, SimplePatternTokenizer.BY_CHARACTERS_OR_WS_OR_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS);
   }
 
   public SimpleWitness(String sigil,
