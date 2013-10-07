@@ -89,7 +89,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     if (LOG.isLoggable(Level.FINE)) {
       LOG.log(Level.FINE, "{0} + {1}: Detect transpositions", new Object[] { graph, witness });
     }
-    transpositions = transpositionDetector.detect(phraseMatches, graph, tokenLinks);
+    transpositions = transpositionDetector.detect(phraseMatches, graph);
     if (LOG.isLoggable(Level.FINE)) {
       LOG.log(Level.FINE, "transpositions:{0}", transpositions);
     }
@@ -103,7 +103,12 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     if (LOG.isLoggable(Level.FINE)) {
       LOG.log(Level.FINE, "{0} + {1}: Determine aligned tokens by filtering transpositions", new Object[] { graph, witness });
     }
-    alignments = Maps.newHashMap(tokenLinks);
+    alignments = Maps.newHashMap();
+    for (List<Match> phrase : phraseMatches) {
+      for (Match match : phrase) {
+        alignments.put(match.token, match.vertex);
+      }
+    }
 
     for (List<Match> transposedPhrase : transpositions) {
       for (Match match : transposedPhrase) {

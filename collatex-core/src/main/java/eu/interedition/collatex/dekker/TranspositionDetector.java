@@ -20,7 +20,6 @@ package eu.interedition.collatex.dekker;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -31,9 +30,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
@@ -45,7 +42,7 @@ public class TranspositionDetector {
 
   private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
 
-  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base, Map<Token, Vertex> tokenLinks) {
+  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     // rank the variant graph
     Set<VariantGraph.Vertex> matchedVertices = Sets.newHashSet();
     for (List<Match> phraseMatch : phraseMatches) {
@@ -101,9 +98,6 @@ public class TranspositionDetector {
         }
         // check transposed phrase / transposed distance ratio
         if (distanceInTokens > transposition.size() * 3) {
-          for (Match m : transposition) {
-            tokenLinks.remove(m.token);
-          }
           phraseMatches.remove(transposition);
           falseTranspositions = true;
           break;
