@@ -19,6 +19,7 @@
 package eu.interedition.collatex.dekker;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -43,92 +44,167 @@ public class TranspositionDetector {
   private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
 
   public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
+    // if there are no phrase matches it is not possible
+    // to detect transpositions, return an empty list
+    if (phraseMatches.isEmpty()) {
+      return Lists.newArrayList();
+    }
+    
+    // we moeten de ranks van de phrase matches bepalen
+    // zowel in de graph als in de witness
+    VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
+    List<Integer> phraseWitnessRanks = getRankingForPhraseMatchesWitnessOrder(phraseMatches, ranking);
+    
+    // dan moeten we de phrasematches op size sorteren
+    // (Let daarbij op het Greek example van Troy)
+    List<List<Match>> sortedPhraseMatches = sortPhraseMatchesBySizeLargestFirst(phraseMatches);
+    
+    // we have to find the largest non transposed phrase match
+    // if, on first view, there are no non transposed phrase matches we take the largest transposed phrase match
+    
+    // dan moeten we een verzameling aanmaken met
+    // niet getranspositieneerde phrases
+    List<List<Match>> nonTransposedPhrases = getNonTransposedPhraseMatches(phraseWitnessRanks, phraseMatches);
+    
+    if (nonTransposedPhrases.isEmpty()) {
+      // throw new UnsupportedOperationException("not yet implemented!");
+
+      /*
+       * At first glance all the phrases seemed to have moved
+       * As the first phrase to lock down we choose 
+       * the one with the greatest size
+       * and if that is not unique the one with
+       * the lowest ranked phrase in the graph
+       */
+      
+      // TODO: dit moet met een comparator functie!
+      // En volgens mij moet dat dan op de hele lijst van 
+      // nog te onderzoeken phrasematches gebeuren
+      
+      
+      // select by lowest rank
+      // int index = phraseWitnessRanks.indexOf(0);
+      // List<Match> firstPhrase = phraseMatches.get(index);
+      
+      // select by largest size
+      List<Match> firstPhrase = sortedPhraseMatches.remove(0);
+
+      nonTransposedPhrases.add(firstPhrase);
+    }
+
+    //NOTE: we zouden eigenlijk de nonTransposedPhrases uit de 
+    //sortedphrasematches moeten halen (voor perf reasons).
+    
+    List<List<Match>> transpositions = Lists.newArrayList();
+
+    while(!sortedPhraseMatches.isEmpty()) {
+      List<Match> candidate = sortedPhraseMatches.remove(0);
+      boolean transposed = isCandidateTransposed(phraseMatches, phraseWitnessRanks, nonTransposedPhrases, candidate);
+      if (!transposed) {
+        nonTransposedPhrases.add(candidate);
+      } else {
+        transpositions.add(candidate);
+      }
+    }
+    return transpositions;
+  }
+
+  private List<List<Match>> getNonTransposedPhraseMatches(List<Integer> phraseWitnessRanks, List<List<Match>> phraseMatches) {
+    List<Integer> phraseGraphRanks = Lists.newArrayList(phraseWitnessRanks);
+    Collections.sort(phraseGraphRanks);
+    
+    List<List<Match>> nonTransposedPhraseMatches = Lists.newArrayList();
+    
+    for (int i=0; i< phraseGraphRanks.size(); i++) {
+      if (phraseGraphRanks.get(i)==phraseWitnessRanks.get(i)) {
+        nonTransposedPhraseMatches.add(phraseMatches.get(i));
+      }
+    }
+    return nonTransposedPhraseMatches;
+  }
+
+  private boolean isCandidateTransposed(List<List<Match>> phraseMatches, List<Integer> phraseWitnessRanks, List<List<Match>> nonTransposedPhrases, List<Match> candidate) {
+    List<List<Match>> phrasesToMask = Lists.newArrayList(nonTransposedPhrases);
+    phrasesToMask.add(candidate);
+    
+    // daarna moeten we de integer lijsten masken
+    // met alleen diegene die niet getranspositioneerd bleken
+    List<Integer> maskedWitnessRanks = maskWitnessRanks(phraseMatches, phraseWitnessRanks, phrasesToMask);
+
+    // nu de graph ranks nog doen
+    List<Integer> maskedGraphRanks = maskGraphRanks(maskedWitnessRanks);
+    
+    // nu gaan we de masked ranks vergelijken...
+    return areMaskedRanksTransposed(maskedWitnessRanks, maskedGraphRanks);
+  }
+
+  private boolean areMaskedRanksTransposed(List<Integer> maskedWitnessRanks, List<Integer> maskedGraphRanks) {
+    boolean transposed = false;
+    for (int i=0; i < maskedWitnessRanks.size(); i++) {
+      if (maskedGraphRanks.get(i)!=maskedWitnessRanks.get(i)) {
+        transposed=true;
+        break;
+      }
+    }
+    return transposed;
+  }
+
+  private List<Integer> maskGraphRanks(List<Integer> maskedWitnessRanks) {
+    List<Integer> maskedGraphRanks = Lists.newArrayList();
+    maskedGraphRanks.addAll(maskedWitnessRanks);
+    Collections.sort(maskedGraphRanks);
+    return maskedGraphRanks;
+  }
+
+  private List<Integer> maskWitnessRanks(List<List<Match>> phraseMatches, List<Integer> phraseWitnessRanks, List<List<Match>> phrasesToMask) {
+    List<Integer> maskedWitnessRanks = Lists.newArrayList();
+    for (int i=0; i < phraseMatches.size(); i++) {
+      List<Match> pm = phraseMatches.get(i);
+      if (phrasesToMask.contains(pm)) {
+        int witnessRank = phraseWitnessRanks.get(i);
+        maskedWitnessRanks.add(witnessRank);
+      }
+    }
+    return maskedWitnessRanks;
+  }
+
+  private List<List<Match>> sortPhraseMatchesBySizeLargestFirst(List<List<Match>> phraseMatches) {
+    List<List<Match>> sortedPhraseMatches = Lists.newArrayList(phraseMatches);
+    Collections.sort(sortedPhraseMatches, new Comparator<List<Match>>() {
+      @Override
+      public int compare(List<Match> pm1, List<Match> pm2) {
+        return pm2.size() - pm1.size();
+      }
+    });
+    return sortedPhraseMatches;
+  }
+
+  private VariantGraphRanking rankTheGraph(List<List<Match>> phraseMatches, VariantGraph base) {
     // rank the variant graph
     Set<VariantGraph.Vertex> matchedVertices = Sets.newHashSet();
     for (List<Match> phraseMatch : phraseMatches) {
       matchedVertices.add(phraseMatch.get(0).vertex);
     }
     final VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(base, null, matchedVertices);
+    return ranking;
+  }
 
-    boolean falseTranspositions;
-    final Stack<List<Match>> transpositions = new Stack<List<Match>>();
-
-    do {
-      falseTranspositions = false;
-      transpositions.clear();
-
-      // gather matched ranks into a list ordered by their natural order
-      final List<Integer> phraseWitnessRanks = Lists.newArrayList();
-      for (List<Match> phraseMatch : phraseMatches) {
-        phraseWitnessRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
-      }
-      List<Integer> phraseGraphRanks = Lists.newArrayList(phraseWitnessRanks);
-      Collections.sort(phraseGraphRanks);
-      
-      // detect transpositions
-      int previousRank = 0;
-      Tuple<Integer> previous = new Tuple<Integer>(0, 0);
-      for (List<Match> phraseMatch : phraseMatches) {
-        int rank = ranking.apply(phraseMatch.get(0).vertex);
-        int expectedRank = phraseGraphRanks.get(previousRank);
-        Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
-        if (expectedRank != rank) {
-          addNewTransposition(transpositions, phraseMatch, isMirrored(previous, current));
-        }
-        previousRank++;
-        previous = current;
-      }
-
-      // filter away small transposed phrase over long distances
-      for (List<Match> transposition : transpositions) {
-        int rank = ranking.apply(transposition.get(0).vertex);
-        // calculate the distance between the transposed phrases
-        int indexInGraphRanks = phraseGraphRanks.indexOf(rank);
-        int indexInWitnessRanks = phraseWitnessRanks.indexOf(rank);
-        int distanceInTokens = 0;
-        if (indexInGraphRanks > indexInWitnessRanks) {
-          for (int i = indexInGraphRanks; i > indexInWitnessRanks; i--) {
-            distanceInTokens += phraseMatches.get(i).size();
-          }
-        } else {
-          for (int i = indexInGraphRanks; i < indexInWitnessRanks; i++) {
-            List<Match> phraseMatchInBetween = phraseMatches.get(i);
-            distanceInTokens += phraseMatchInBetween.size();
-          }
-        }
-        // check transposed phrase / transposed distance ratio
-        if (distanceInTokens > transposition.size() * 3) {
-          phraseMatches.remove(transposition);
-          falseTranspositions = true;
-          break;
-        }
-      }
-    } while (falseTranspositions);
+  private void logTranspositions(final Stack<List<Match>> transpositions) {
     if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> transposition : transpositions) {
         LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
       }
     }
-    return transpositions;
   }
 
-  private void addNewTransposition(final Stack<List<Match>> transpositions, List<Match> transposition, boolean isMirrored) {
-    if (!isMirrored) {
-      transpositions.add(transposition);
-    } else {
-      /*
-       * A mirrored transposition is detected. We have to check size: If
-       * previous > current -> remove previous, add current. Otherwise, do
-       * nothing.
-       */
-      List<Match> lastTransposition = transpositions.peek();
-      int lastTranspositionSize = determineSize(lastTransposition);
-      int transpositionSize = determineSize(transposition);
-      if (lastTranspositionSize > transpositionSize) {
-        transpositions.pop();
-        transpositions.add(transposition);
-      }
+
+  private List<Integer> getRankingForPhraseMatchesWitnessOrder(List<List<Match>> phraseMatches, final VariantGraphRanking ranking) {
+    // gather matched ranks into a list ordered by their natural order
+    final List<Integer> phraseWitnessRanks = Lists.newArrayList();
+    for (List<Match> phraseMatch : phraseMatches) {
+      phraseWitnessRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
     }
+    return phraseWitnessRanks;
   }
 
   /*
@@ -147,9 +223,5 @@ public class TranspositionDetector {
       charLength += token.getNormalized().length();
     }
     return charLength;
-  }
-
-  private boolean isMirrored(Tuple<Integer> previousTuple, Tuple<Integer> tuple) {
-    return previousTuple.left.equals(tuple.right) && previousTuple.right.equals(tuple.left);
   }
 }

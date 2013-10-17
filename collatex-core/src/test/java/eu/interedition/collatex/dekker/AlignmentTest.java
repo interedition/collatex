@@ -65,16 +65,16 @@ public class AlignmentTest extends AbstractTest {
   public void doubleTransposition2() {
     final SimpleWitness[] w = createWitnesses("a b", "b a");
     final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
-    assertEquals("| |a|b|", toString(t, w[0]));
-    assertEquals("|b|a| |", toString(t, w[1]));
+    assertEquals("|a|b| |", toString(t, w[0]));
+    assertEquals("| |b|a|", toString(t, w[1]));
   }
 
   @Test
   public void doubleTransposition3() {
     final SimpleWitness[] w = createWitnesses("a b c", "b a c");
     final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
-    assertEquals("| |a|b|c|", toString(t, w[0]));
-    assertEquals("|b|a| |c|", toString(t, w[1]));
+    assertEquals("|a|b| |c|", toString(t, w[0]));
+    assertEquals("| |b|a|c|", toString(t, w[1]));
   }
 
   @Test
