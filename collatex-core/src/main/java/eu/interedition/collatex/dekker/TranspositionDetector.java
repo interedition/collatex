@@ -57,7 +57,7 @@ public class TranspositionDetector {
     
     // dan moeten we de phrasematches op size sorteren
     // (Let daarbij op het Greek example van Troy)
-    List<List<Match>> sortedPhraseMatches = sortPhraseMatchesBySizeLargestFirst(phraseMatches);
+    List<List<Match>> sortedPhraseMatches = sortPhraseMatchesBySizeLargestFirst(phraseMatches, base);
     
     // we have to find the largest non transposed phrase match
     // if, on first view, there are no non transposed phrase matches we take the largest transposed phrase match
@@ -67,29 +67,7 @@ public class TranspositionDetector {
     List<List<Match>> nonTransposedPhrases = getNonTransposedPhraseMatches(phraseWitnessRanks, phraseMatches);
     
     if (nonTransposedPhrases.isEmpty()) {
-      // throw new UnsupportedOperationException("not yet implemented!");
-
-      /*
-       * At first glance all the phrases seemed to have moved
-       * As the first phrase to lock down we choose 
-       * the one with the greatest size
-       * and if that is not unique the one with
-       * the lowest ranked phrase in the graph
-       */
-      
-      // TODO: dit moet met een comparator functie!
-      // En volgens mij moet dat dan op de hele lijst van 
-      // nog te onderzoeken phrasematches gebeuren
-      
-      
-      // select by lowest rank
-      // int index = phraseWitnessRanks.indexOf(0);
-      // List<Match> firstPhrase = phraseMatches.get(index);
-      
-      // select by largest size
-      List<Match> firstPhrase = sortedPhraseMatches.remove(0);
-
-      nonTransposedPhrases.add(firstPhrase);
+      nonTransposedPhrases.add(sortedPhraseMatches.remove(0));
     }
 
     //NOTE: we zouden eigenlijk de nonTransposedPhrases uit de 
@@ -168,12 +146,29 @@ public class TranspositionDetector {
     return maskedWitnessRanks;
   }
 
-  private List<List<Match>> sortPhraseMatchesBySizeLargestFirst(List<List<Match>> phraseMatches) {
+  /*
+   * At first glance all the phrases seemed to have moved
+   * As the first phrase to lock down we choose 
+   * the one with the greatest size
+   * and if that is not unique the one with
+   * the lowest ranked phrase in the graph
+   */
+  private List<List<Match>> sortPhraseMatchesBySizeLargestFirst(List<List<Match>> phraseMatches, VariantGraph graph) {
     List<List<Match>> sortedPhraseMatches = Lists.newArrayList(phraseMatches);
+    //NOTE: ranking is calculated twice in the TranspositionDetector class
+    final VariantGraphRanking ranking = rankTheGraph(phraseMatches, graph);
     Collections.sort(sortedPhraseMatches, new Comparator<List<Match>>() {
       @Override
       public int compare(List<Match> pm1, List<Match> pm2) {
-        return pm2.size() - pm1.size();
+        // first compare phrase match size
+        int result = determineSize(pm2) - determineSize(pm1);
+        if (result != 0) {
+          return result;
+        }
+        // second compare rank in graph difference
+        int rank1 = ranking.apply(pm1.get(0).vertex);
+        int rank2 = ranking.apply(pm2.get(0).vertex);
+        return rank1 - rank2;
       }
     });
     return sortedPhraseMatches;
@@ -188,15 +183,6 @@ public class TranspositionDetector {
     final VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(base, null, matchedVertices);
     return ranking;
   }
-
-  private void logTranspositions(final Stack<List<Match>> transpositions) {
-    if (LOG.isLoggable(Level.FINER)) {
-      for (List<Match> transposition : transpositions) {
-        LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
-      }
-    }
-  }
-
 
   private List<Integer> getRankingForPhraseMatchesWitnessOrder(List<List<Match>> phraseMatches, final VariantGraphRanking ranking) {
     // gather matched ranks into a list ordered by their natural order
@@ -223,5 +209,13 @@ public class TranspositionDetector {
       charLength += token.getNormalized().length();
     }
     return charLength;
+  }
+
+  private void logTranspositions(final Stack<List<Match>> transpositions) {
+    if (LOG.isLoggable(Level.FINER)) {
+      for (List<Match> transposition : transpositions) {
+        LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
+      }
+    }
   }
 }
