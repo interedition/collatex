@@ -161,7 +161,7 @@ public class TranspositionDetector {
       @Override
       public int compare(List<Match> pm1, List<Match> pm2) {
         // first compare phrase match size
-        int result = determineSize(pm2) - determineSize(pm1);
+        int result = pm2.size() - pm1.size();
         if (result != 0) {
           return result;
         }
