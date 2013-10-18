@@ -21,6 +21,7 @@ package eu.interedition.collatex.dekker;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.VariantGraph;
@@ -42,6 +44,7 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 public class TranspositionDetector {
 
   private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
+  private Map<List<Match>, Integer> phraseMatchToRank;
 
   public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
     // if there are no phrase matches it is not possible
@@ -55,10 +58,21 @@ public class TranspositionDetector {
     VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
     List<Integer> phraseWitnessRanks = getRankingForPhraseMatchesWitnessOrder(phraseMatches, ranking);
     
+    phraseMatchToRank = Maps.newHashMap();
+    
+    for (int i=0; i < phraseWitnessRanks.size(); i++) {
+      phraseMatchToRank.put(phraseMatches.get(i), phraseWitnessRanks.get(i));
+    }
+    
     // dan moeten we de phrasematches op size sorteren
     // (Let daarbij op het Greek example van Troy)
     List<List<Match>> sortedPhraseMatches = sortPhraseMatchesBySizeLargestFirst(phraseMatches, base);
     
+//    List<Integer> ranksOrderToDo = Lists.newArrayList();
+//    for (List<Match> phraseMatch : sortedPhraseMatches) {
+//      ranksOrderToDo.add(phraseMatchToRank.get(phraseMatch));
+//    }
+
     // we have to find the largest non transposed phrase match
     // if, on first view, there are no non transposed phrase matches we take the largest transposed phrase match
     
@@ -70,6 +84,11 @@ public class TranspositionDetector {
       nonTransposedPhrases.add(sortedPhraseMatches.remove(0));
     }
 
+//    List<Integer> nonTransposedPhrasesRanks = Lists.newArrayList();
+//    for (List<Match> phraseMatch : nonTransposedPhrases) {
+//      nonTransposedPhrasesRanks.add(phraseMatchToRank.get(phraseMatch));
+//    }
+    
     //NOTE: we zouden eigenlijk de nonTransposedPhrases uit de 
     //sortedphrasematches moeten halen (voor perf reasons).
     
@@ -112,6 +131,11 @@ public class TranspositionDetector {
     // nu de graph ranks nog doen
     List<Integer> maskedGraphRanks = maskGraphRanks(maskedWitnessRanks);
     
+//    if (phraseMatchToRank.get(candidate)==50) {
+//      LOG.info(maskedWitnessRanks);
+//      LOG.info(maskedGraphRanks);
+//    }
+
     // nu gaan we de masked ranks vergelijken...
     return areMaskedRanksTransposed(maskedWitnessRanks, maskedGraphRanks);
   }
