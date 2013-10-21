@@ -27,9 +27,6 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -46,129 +43,143 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 public class TranspositionDetector {
 
   private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
-  private BiMap<List<Match>, Integer> phraseMatchToRank;
-
-  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
+  private Map<List<Match>, Integer> phraseMatchToIndex;
+  
+  public List<List<Match>> detect(final List<List<Match>> phraseMatches, VariantGraph base) {
     // if there are no phrase matches it is not possible
     // to detect transpositions, return an empty list
     if (phraseMatches.isEmpty()) {
       return Lists.newArrayList();
     }
 
-    // we moeten de ranks van de phrase matches bepalen
-    // zowel in de graph als in de witness
-    VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
-    List<Integer> phraseWitnessRanks = getRankingForPhraseMatchesWitnessOrder(phraseMatches, ranking);
-    List<Integer> phraseGraphRanks = maskGraphRanks(phraseWitnessRanks);
+    /*
+     * We order the phrase matches in the topological order
+     * of the graph (called rank). When the rank is equal
+     * for two phrase matches, the witness order is used
+     * to differentiate.
+     */
+    final VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
 
-    // NOTE: Multiple phrase matches can have to same rank..
-    // For the transposition detection we can work our way
-    // around it
-    // TODO: deal with it!
+    Comparator<List<Match>> comp = new Comparator<List<Match>>() {
+      @Override
+      public int compare(List<Match> pm1, List<Match> pm2) {
+        int rank1 = ranking.apply(pm1.get(0).vertex);
+        int rank2 = ranking.apply(pm2.get(0).vertex);
+        int difference = rank1 - rank2;
+        if (difference != 0) {
+          return difference;
+        }
+        int index1 = phraseMatches.indexOf(pm1);
+        int index2 = phraseMatches.indexOf(pm2);
+        return index1 - index2;
+      }
+    };
 
-    // Map 0
-    phraseMatchToRank = HashBiMap.create();
-    for (int i = 0; i < phraseWitnessRanks.size(); i++) {
-      // System.out.println("Trying to put: "+phraseMatches.get(i)+":"+phraseWitnessRanks.get(i));
-      phraseMatchToRank.forcePut(phraseMatches.get(i), phraseWitnessRanks.get(i));
+    List<List<Match>> phraseMatchesGraphOrder = Lists.newArrayList(phraseMatches);
+    Collections.sort(phraseMatchesGraphOrder, comp);
+    // System.out.println(phraseMatchesGraphOrder);
+    
+    // Map 1
+    phraseMatchToIndex = Maps.newHashMap();
+    for (int i = 0; i < phraseMatchesGraphOrder.size(); i++) {
+      phraseMatchToIndex.put(phraseMatchesGraphOrder.get(i), i);
     }
 
     /*
+     * We calculate the index for all the phrase matches 
+     * First in witness order, then in graph order 
+     */
+    List<Integer> phraseMatchesGraphIndex = Lists.newArrayList();
+    List<Integer> phraseMatchesWitnessIndex = Lists.newArrayList();
+
+    for (int i=0; i < phraseMatches.size(); i++) {
+      phraseMatchesGraphIndex.add(i);
+    }
+    
+    for (List<Match> phraseMatch : phraseMatches) {
+      phraseMatchesWitnessIndex.add(phraseMatchToIndex.get(phraseMatch));
+    }
+    
+    /*
      * Initialize result variables
      */
-
     List<List<Match>> nonTransposedPhraseMatches = Lists.newArrayList(phraseMatches);
     List<List<Match>> transpositions = Lists.newArrayList();
 
     /*
-     * Hier gaan we loopen
+     * loop here until the maximum distance == 0
      */
     while (true) {
-      System.out.println(phraseGraphRanks);
-      System.out.println(phraseWitnessRanks);
-
-      // Map 1
-      Map<Integer, Integer> graphRankToWitnessRankMap = Maps.newLinkedHashMap();
-      for (Integer rank : phraseGraphRanks) {
-        Integer graphRankIndex = phraseGraphRanks.indexOf(rank);
-        Integer witnessRank = phraseWitnessRanks.get(graphRankIndex);
-        graphRankToWitnessRankMap.put(rank, witnessRank);
-      }
-      // System.out.println(graphRankToWitnessRankMap);
-
+      // System.out.println(phraseMatchesGraphIndex);
+      // System.out.println(phraseMatchesWitnessIndex);
+      
       // Map 2
-      final Map<Integer, Integer> rankToDistanceMap = Maps.newLinkedHashMap();
-      for (Integer rank : phraseGraphRanks) {
-        Integer graphRankIndex = phraseGraphRanks.indexOf(rank);
-        Integer witnessRankIndex = phraseWitnessRanks.indexOf(rank);
-        Integer distance = Math.abs(graphRankIndex - witnessRankIndex);
-        rankToDistanceMap.put(rank, distance);
+      final Map<List<Match>, Integer> phraseMatchToDistanceMap = Maps.newLinkedHashMap();
+      for (int i=0; i < nonTransposedPhraseMatches.size(); i++) {
+        Integer graphIndex = phraseMatchesGraphIndex.get(i);
+        Integer witnessIndex = phraseMatchesWitnessIndex.get(i);
+        Integer distance = Math.abs(graphIndex - witnessIndex);
+        List<Match> phraseMatch = nonTransposedPhraseMatches.get(i);
+        phraseMatchToDistanceMap.put(phraseMatch, distance);
       }
-      // System.out.println(rankToDistanceMap);
+      //System.out.println(phraseMatchToDistanceMap);
 
-      List<Integer> distanceList = Lists.newArrayList(rankToDistanceMap.values());
-      System.out.println(distanceList);
+      List<Integer> distanceList = Lists.newArrayList(phraseMatchToDistanceMap.values());
+      // System.out.println(distanceList);
 
       if (Collections.max(distanceList) == 0) {
         break;
       }
 
-      // sort phrase matches on distance
-      Comparator<List<Match>> comp = new Comparator<List<Match>>() {
+      // sort phrase matches on distance, size
+      // TODO: order by 3) graph rank?
+      Comparator<List<Match>> comp2 = new Comparator<List<Match>>() {
         @Override
         public int compare(List<Match> pm1, List<Match> pm2) {
           // first order by distance
-          int distance1 = rankToDistanceMap.get(phraseMatchToRank.get(pm1));
-          int distance2 = rankToDistanceMap.get(phraseMatchToRank.get(pm2));
+          int distance1 = phraseMatchToDistanceMap.get(pm1);
+          int distance2 = phraseMatchToDistanceMap.get(pm2);
           int difference = distance2 - distance1;
           if (difference != 0) {
             return difference;
           }
           // second order by size
-          // TODO: order by 3) graph rank
           return pm1.size() - pm2.size();
         }
       };
 
       List<List<Match>> sortedPhraseMatches = Lists.newArrayList(nonTransposedPhraseMatches);
-      Collections.sort(sortedPhraseMatches, comp);
-      System.out.println(sortedPhraseMatches);
+      Collections.sort(sortedPhraseMatches, comp2);
+      // System.out.println(sortedPhraseMatches);
 
       List<Match> transposedPhrase = sortedPhraseMatches.remove(0);
-      System.out.println(transposedPhrase);
+      // System.out.println(transposedPhrase);
 
-      addTransposition(phraseWitnessRanks, phraseGraphRanks, nonTransposedPhraseMatches, transpositions, transposedPhrase);
+      Integer transposedIndex = phraseMatchToIndex.get(transposedPhrase);
+      Integer graphIndex = phraseMatchesGraphIndex.indexOf(transposedIndex);
+      Integer transposedWithIndex = phraseMatchesWitnessIndex.get(graphIndex);
+      List<Match> linkedTransposedPhrase = phraseMatchesGraphOrder.get(transposedWithIndex);
+      
+      addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase);
 
-      Integer transposedRank = phraseMatchToRank.get(transposedPhrase);
-      Integer transposedWithRank = graphRankToWitnessRankMap.get(transposedRank);
-
-      Integer distance = rankToDistanceMap.get(transposedRank);
-      // System.out.println(transposedWithRank+":"+distance);
-      if (distance == rankToDistanceMap.get(transposedWithRank) && distance > 1) {
-        System.out.println("We need to also remove rank: " + transposedWithRank);
-        List<Match> linkedTransposedPhrase = phraseMatchToRank.inverse().get(transposedWithRank);
-        addTransposition(phraseWitnessRanks, phraseGraphRanks, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase);
+      Integer distance = phraseMatchToDistanceMap.get(transposedPhrase);
+      if (distance == phraseMatchToDistanceMap.get(linkedTransposedPhrase) && distance > 1) {
+        // System.out.println("We need to also remove index: " + transposedWithIndex);
+        addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase);
       }
     }
     return transpositions;
   }
 
   private void addTransposition(List<Integer> phraseWitnessRanks, List<Integer> phraseGraphRanks, List<List<Match>> nonTransposedPhraseMatches, List<List<Match>> transpositions, List<Match> transposedPhrase) {
-    Integer rankToRemove = phraseMatchToRank.get(transposedPhrase);
-    System.out.println("Removing rank:" + rankToRemove);
+    Integer indexToRemove = phraseMatchToIndex.get(transposedPhrase);
+    // System.out.println("Removing index:" + indexToRemove);
     nonTransposedPhraseMatches.remove(transposedPhrase);
     transpositions.add(transposedPhrase);
-    phraseGraphRanks.remove(rankToRemove);
-    phraseWitnessRanks.remove(rankToRemove);
-//    System.out.println(phraseGraphRanks);
-//    System.out.println(phraseWitnessRanks);
-  }
-
-  private List<Integer> maskGraphRanks(List<Integer> maskedWitnessRanks) {
-    List<Integer> maskedGraphRanks = Lists.newArrayList();
-    maskedGraphRanks.addAll(maskedWitnessRanks);
-    Collections.sort(maskedGraphRanks);
-    return maskedGraphRanks;
+    phraseGraphRanks.remove(indexToRemove);
+    phraseWitnessRanks.remove(indexToRemove);
+    //    System.out.println("Graph after remove: "+phraseGraphRanks);
+    //    System.out.println("Witness after remove: "+phraseWitnessRanks);
   }
 
   private VariantGraphRanking rankTheGraph(List<List<Match>> phraseMatches, VariantGraph base) {
@@ -179,15 +190,6 @@ public class TranspositionDetector {
     }
     final VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(base, null, matchedVertices);
     return ranking;
-  }
-
-  private List<Integer> getRankingForPhraseMatchesWitnessOrder(List<List<Match>> phraseMatches, final VariantGraphRanking ranking) {
-    // gather matched ranks into a list ordered by their natural order
-    final List<Integer> phraseWitnessRanks = Lists.newArrayList();
-    for (List<Match> phraseMatch : phraseMatches) {
-      phraseWitnessRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
-    }
-    return phraseWitnessRanks;
   }
 
   /*

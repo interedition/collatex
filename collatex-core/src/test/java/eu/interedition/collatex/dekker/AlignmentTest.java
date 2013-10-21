@@ -54,7 +54,7 @@ import static org.junit.Assert.assertEquals;
 public class AlignmentTest extends AbstractTest {
 
   @Test
-  public void transposition() {
+  public void doubleTransposition1() {
     final SimpleWitness[] w = createWitnesses("the cat is black", "black is the cat");
     final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w));
     assertEquals("|the|cat|is|black| |", toString(t, w[0]));
@@ -89,12 +89,6 @@ public class AlignmentTest extends AbstractTest {
     assertEquals("|very|delitied|and|happy|is|the|cat|", toString(t, w[2]));
   }
 
-  /*
-   * A transposition causes duplicated vertices in the variant graph
-   * This make this alignment decision process harder
-   * Only solvable with the n-space vector based aligner
-   */
-  @Ignore
   @Test
   public void additionInCombinationWithTransposition2() {
     final SimpleWitness[] w = createWitnesses(//
