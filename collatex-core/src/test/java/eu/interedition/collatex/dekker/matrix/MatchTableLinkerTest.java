@@ -212,11 +212,6 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertTrue(tokensAsString.contains("C:6:'suscepto'"));
   }
 
-  /**
-   * TODO: fix this test, but re-implementing the outlier
-   * transposition limit in a different way.
-   */
-  @Ignore
   @Test
   public void testOutlierTranspositionLimitAndPunctuation() {
     int outlierTranspositionsSizeLimit = 200;
