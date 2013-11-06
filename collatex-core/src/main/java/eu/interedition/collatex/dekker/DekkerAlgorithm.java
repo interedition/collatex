@@ -46,7 +46,8 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private List<List<Match>> phraseMatches;
   private List<List<Match>> transpositions;
   private Map<Token, VariantGraph.Vertex> alignments;
-
+  private boolean mergeTranspositions = false;
+  
   public DekkerAlgorithm(Comparator<Token> comparator) {
     this(comparator, new MatchTableLinker(3));
   }
@@ -71,7 +72,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       LOG.log(Level.FINE, "{0} + {1}: Match and link tokens", new Object[] { graph, witness });
     }
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
-    //    new SimpleVariantGraphSerializer(graph).toDot(graph, writer);
+
     if (LOG.isLoggable(Level.FINER)) {
       for (Map.Entry<Token, VariantGraph.Vertex> tokenLink : tokenLinks.entrySet()) {
         LOG.log(Level.FINER, "{0} + {1}: Token match: {2} = {3}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
@@ -144,16 +145,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       transpositions.remove(transposition);
     }
 
-    /*
-     * This check disables transposition rendering in the variant
-     * graph when the variant graph contains more then two witnesses.
-     * Transposition detection is done in a progressive manner
-     * (witness by witness). When viewing the resulting graph
-     * containing the variation for all witnesses
-     * the detected transpositions can look strange, since segments
-     * may have split into smaller or larger parts.
-     */
-    if (graph.witnesses().size() <= 2) {
+    if (mergeTranspositions) {
       mergeTranspositions(graph, transpositions);
     }
     
@@ -176,5 +168,18 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
   public Map<Token, VariantGraph.Vertex> getAlignments() {
     return Collections.unmodifiableMap(alignments);
+  }
+
+ /*
+  * This check disables transposition rendering in the variant
+  * graph when the variant graph contains more then two witnesses.
+  * Transposition detection is done in a progressive manner
+  * (witness by witness). When viewing the resulting graph
+  * containing the variation for all witnesses
+  * the detected transpositions can look strange, since segments
+  * may have split into smaller or larger parts.
+  */
+  public void setMergeTranspositions(boolean b) {
+    this.mergeTranspositions = b;
   }
 }

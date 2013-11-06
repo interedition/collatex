@@ -36,23 +36,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TranspositionTest extends AbstractTest {
-  @Test
-  public void noTransposition() {
-    assertEquals(0, collate("no transposition", "no transposition").transpositions().size());
-    assertEquals(0, collate("a b", "c a").transpositions().size());
-  }
-
-  @Test
-  public void oneTransposition() {
-    assertEquals(1, collate("a b", "b a").transpositions().size());
-  }
-
-  @Test
-  public void multipleTranspositions() {
-    assertEquals(1, collate("a b c", "b c a").transpositions().size());
-  }
-
+public class TranspositionRenderingTest extends AbstractTest {
   @Test
   public void transposition1() {
     final SimpleWitness[] w = createWitnesses(//
@@ -91,7 +75,6 @@ public class TranspositionTest extends AbstractTest {
     final SimpleWitness a = new SimpleWitness("A","X a b");
     final SimpleWitness b = new SimpleWitness("B","a b X");
     VariantGraph graph = collate(a,b);
-    assertEquals(1, graph.transpositions().size());
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(graph);
     assertEquals("|x|a|b| |", toString(table, a));
     assertEquals("| |a|b|x|", toString(table, b));
