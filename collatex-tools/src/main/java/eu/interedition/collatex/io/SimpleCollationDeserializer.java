@@ -116,8 +116,8 @@ public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollatio
           throw JsonMappingException.from(jp, String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
         witness.setTokenContents(
-                SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(contentNode.getTextValue()),
-                SimpleTokenNormalizers.LC_TRIM_WS_PUNCT
+                SimplePatternTokenizer.BY_WS_OR_PUNCT.apply(contentNode.getTextValue()),
+                SimpleTokenNormalizers.TRIM_WS
         );
       }
       witnesses.add(witness);
