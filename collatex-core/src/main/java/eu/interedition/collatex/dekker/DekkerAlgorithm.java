@@ -144,8 +144,19 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       transpositions.remove(transposition);
     }
 
-    mergeTranspositions(graph, transpositions);
-
+    /*
+     * This check disables transposition rendering in the variant
+     * graph when the variant graph contains more then two witnesses.
+     * Transposition detection is done in a progressive manner
+     * (witness by witness). When viewing the resulting graph
+     * containing the variation for all witnesses
+     * the detected transpositions can look strange, since segments
+     * may have split into smaller or larger parts.
+     */
+    if (graph.witnesses().size() <= 2) {
+      mergeTranspositions(graph, transpositions);
+    }
+    
     if (LOG.isLoggable(Level.FINER)) {
       LOG.log(Level.FINER, "!{0}: {1}", new Object[] {graph, Iterables.toString(graph.vertices())});
     }
