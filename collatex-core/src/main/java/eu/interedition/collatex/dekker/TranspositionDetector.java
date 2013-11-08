@@ -23,11 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -41,8 +37,6 @@ import eu.interedition.collatex.util.VariantGraphRanking;
  * @author Ronald Haentjens Dekker
  */
 public class TranspositionDetector {
-
-  private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
   private Map<List<Match>, Integer> phraseMatchToIndex;
   
   public List<List<Match>> detect(final List<List<Match>> phraseMatches, VariantGraph base) {
@@ -77,7 +71,6 @@ public class TranspositionDetector {
 
     List<List<Match>> phraseMatchesGraphOrder = Lists.newArrayList(phraseMatches);
     Collections.sort(phraseMatchesGraphOrder, comp);
-    // System.out.println(phraseMatchesGraphOrder);
     
     // Map 1
     phraseMatchToIndex = Maps.newHashMap();
@@ -110,9 +103,6 @@ public class TranspositionDetector {
      * loop here until the maximum distance == 0
      */
     while (true) {
-      // System.out.println(phraseMatchesGraphIndex);
-      // System.out.println(phraseMatchesWitnessIndex);
-      
       // Map 2
       final Map<List<Match>, Integer> phraseMatchToDistanceMap = Maps.newLinkedHashMap();
       for (int i=0; i < nonTransposedPhraseMatches.size(); i++) {
@@ -122,10 +112,8 @@ public class TranspositionDetector {
         List<Match> phraseMatch = nonTransposedPhraseMatches.get(i);
         phraseMatchToDistanceMap.put(phraseMatch, distance);
       }
-      //System.out.println(phraseMatchToDistanceMap);
 
       List<Integer> distanceList = Lists.newArrayList(phraseMatchToDistanceMap.values());
-      // System.out.println(distanceList);
 
       if (Collections.max(distanceList) == 0) {
         break;
@@ -133,6 +121,8 @@ public class TranspositionDetector {
 
       // sort phrase matches on distance, size
       // TODO: order by 3) graph rank?
+      // TODO: I have not yet found evidence/a use case that
+      // TODO: indicates that it is needed.
       Comparator<List<Match>> comp2 = new Comparator<List<Match>>() {
         @Override
         public int compare(List<Match> pm1, List<Match> pm2) {
@@ -144,16 +134,15 @@ public class TranspositionDetector {
             return difference;
           }
           // second order by size
-          return pm1.size() - pm2.size();
+          // return pm1.size() - pm2.size();
+          return determineSize(pm1) - determineSize(pm2);
         }
       };
 
       List<List<Match>> sortedPhraseMatches = Lists.newArrayList(nonTransposedPhraseMatches);
       Collections.sort(sortedPhraseMatches, comp2);
-      // System.out.println(sortedPhraseMatches);
 
       List<Match> transposedPhrase = sortedPhraseMatches.remove(0);
-      // System.out.println(transposedPhrase);
 
       Integer transposedIndex = phraseMatchToIndex.get(transposedPhrase);
       Integer graphIndex = phraseMatchesGraphIndex.indexOf(transposedIndex);
@@ -164,7 +153,6 @@ public class TranspositionDetector {
 
       Integer distance = phraseMatchToDistanceMap.get(transposedPhrase);
       if (distance == phraseMatchToDistanceMap.get(linkedTransposedPhrase) && distance > 1) {
-        // System.out.println("We need to also remove index: " + transposedWithIndex);
         addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase);
       }
     }
@@ -173,13 +161,10 @@ public class TranspositionDetector {
 
   private void addTransposition(List<Integer> phraseWitnessRanks, List<Integer> phraseGraphRanks, List<List<Match>> nonTransposedPhraseMatches, List<List<Match>> transpositions, List<Match> transposedPhrase) {
     Integer indexToRemove = phraseMatchToIndex.get(transposedPhrase);
-    // System.out.println("Removing index:" + indexToRemove);
     nonTransposedPhraseMatches.remove(transposedPhrase);
     transpositions.add(transposedPhrase);
     phraseGraphRanks.remove(indexToRemove);
     phraseWitnessRanks.remove(indexToRemove);
-    //    System.out.println("Graph after remove: "+phraseGraphRanks);
-    //    System.out.println("Witness after remove: "+phraseWitnessRanks);
   }
 
   private VariantGraphRanking rankTheGraph(List<List<Match>> phraseMatches, VariantGraph base) {
@@ -208,13 +193,5 @@ public class TranspositionDetector {
       charLength += token.getNormalized().length();
     }
     return charLength;
-  }
-
-  private void logTranspositions(final Stack<List<Match>> transpositions) {
-    if (LOG.isLoggable(Level.FINER)) {
-      for (List<Match> transposition : transpositions) {
-        LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
-      }
-    }
   }
 }

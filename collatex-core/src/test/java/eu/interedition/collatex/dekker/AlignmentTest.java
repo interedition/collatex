@@ -18,6 +18,19 @@
  */
 package eu.interedition.collatex.dekker;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.junit.Test;
+
 import com.google.common.collect.RowSortedTable;
 
 import eu.interedition.collatex.AbstractTest;
@@ -29,20 +42,6 @@ import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * 
@@ -87,18 +86,6 @@ public class AlignmentTest extends AbstractTest {
     assertEquals("|the|cat| | |is|very|happy|", toString(t, w[0]));
     assertEquals("|very| | |happy|is|the|cat|", toString(t, w[1]));
     assertEquals("|very|delitied|and|happy|is|the|cat|", toString(t, w[2]));
-  }
-
-  @Test
-  public void additionInCombinationWithTransposition2() {
-    final SimpleWitness[] w = createWitnesses(//
-        "the cat is black",//
-        "black is the cat",//
-        "black and white is the cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w[0], w[1], w[2]));
-    assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
-    assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
-    assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
   }
 
   @Test

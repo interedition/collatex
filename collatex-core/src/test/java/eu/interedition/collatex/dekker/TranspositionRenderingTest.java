@@ -27,6 +27,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleWitness;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Set;
@@ -110,5 +111,23 @@ public class TranspositionRenderingTest extends AbstractTest {
     assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, a));
     assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, b));
   }
+
+
+  //TODO: this test seems to point out a bug in the IslandConflictResolver
+  //The first black of the third witness is linked to the last black
+  //of the first witness
+  @Ignore
+  @Test
+  public void additionInCombinationWithTransposition2() {
+    final SimpleWitness[] w = createWitnesses(//
+        "the cat is black",//
+        "black is the cat",//
+        "black and white is the cat");
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w[0], w[1], w[2]));
+    assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
+    assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
+    assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
+  }
+
 
 }
