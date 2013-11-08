@@ -112,11 +112,6 @@ public class TranspositionRenderingTest extends AbstractTest {
     assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, b));
   }
 
-
-  //TODO: this test seems to point out a bug in the IslandConflictResolver
-  //The first black of the third witness is linked to the last black
-  //of the first witness
-  @Ignore
   @Test
   public void additionInCombinationWithTransposition2() {
     final SimpleWitness[] w = createWitnesses(//

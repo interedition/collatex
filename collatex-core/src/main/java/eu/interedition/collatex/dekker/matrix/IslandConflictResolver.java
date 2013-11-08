@@ -155,7 +155,6 @@ public class IslandConflictResolver {
     }
   }
 
-   // TODO: find a better way to determine the best choice of island
   private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
@@ -166,10 +165,17 @@ public class IslandConflictResolver {
     }
   }
 
+  // TODO: This method calculates the distance from the ideal line
+  // TODO: by calculating the ratio x/y.
+  // TODO: but the ideal line may have moved (due to additions/deletions).
   private Multimap<Double, Island> makeDistanceMap(Collection<Island> competingIslands, Archipelago archipelago) {
     Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
     for (Island isl : competingIslands) {
-      distanceMap.put(archipelago.smallestDistance(isl), isl);
+      Coordinate leftEnd = isl.getLeftEnd();
+      double ratio = ((leftEnd.column+1) / (double) (leftEnd.row+1));
+      double b2 = Math.log(ratio)/Math.log(2);
+      double distanceToIdealLine = Math.abs(b2);
+      distanceMap.put(distanceToIdealLine, isl);
     }
     return distanceMap;
   }

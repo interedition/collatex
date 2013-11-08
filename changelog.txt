@@ -3,6 +3,7 @@ Release 1.5
 - The transposition detector is rewritten. It no longer works from left to right, but from largest
  moved distance to smallest moved distance. This improves the alignment result in case of longer witnesses. 
 - Punctuation is now treated as separate tokens by default in the web-service.
+- Improved handling of competing blocks of text in the IslandConflictResolver.
 
 Release 1.4
 - Workaround for a, b / b, a transpositions and Greek witnesses, where a segment of a single word

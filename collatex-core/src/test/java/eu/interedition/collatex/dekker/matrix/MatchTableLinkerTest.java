@@ -30,12 +30,12 @@ import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.AbstractTest;
@@ -50,7 +50,22 @@ import eu.interedition.collatex.simple.SimpleWitness;
 
 public class MatchTableLinkerTest extends AbstractTest {
 
-	
+  @Test
+  public void additionInCombinationWithTransposition2() {
+    final SimpleWitness[] w = createWitnesses(//
+        "the cat is black",//
+        "black is the cat",//
+        "black and white is the cat");
+    final VariantGraph graph = collate(w[0], w[1]);
+    MatchTableLinker linker = new MatchTableLinker(3);
+    Map<Token, VariantGraph.Vertex> link = linker.link(graph, w[2], new EqualityTokenComparator());
+    Set<Token> tokens = link.keySet();
+    Map<String, String> tokensAsString = Maps.newHashMap();
+    for (Token token : tokens) {
+      tokensAsString.put(token.toString(), link.get(token).toString());
+    }
+    assertEquals("[B:0:'black']", tokensAsString.get("C:0:'black'"));
+  }  
 	
   @Test
   public void testUsecase1() {
