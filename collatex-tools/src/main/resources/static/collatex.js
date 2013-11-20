@@ -104,7 +104,7 @@ YUI.add('collatex', function(Y) {
                     Y.each(r, function (c) {
                         cellContents.push(c.length == 0 ? null : Y.Array.reduce(c, "", function (str, next) {
                             next = Y.Lang.isString(next) ? next : Y.dump(next);
-                            return str + (str.length == 0 ? "" : " ") + next;
+                            return str + next;
                         }));
                     });
                     cells.push(cellContents);
