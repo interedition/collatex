@@ -108,9 +108,13 @@ YUI.add('collatex', function(Y) {
                         }));
                     });
                     cells.push(cellContents);
-                    variantStatus.push(Y.Array.dedupe(Y.Array.filter(cellContents, function (c) {
+                    var cellContentsFiltered = Y.Array.filter(cellContents, function (c) {
                         return (c != null);
-                    })).length == 1);
+                    });
+                    var cellContentsTrimmed = Y.Array.map(cellContentsFiltered, function (c) {
+                    	return Y.Lang.trimRight(c);
+                    });
+                    variantStatus.push(Y.Array.dedupe(cellContentsTrimmed).length == 1);
                 });
                 for (var wc = 0; wc < at.witnesses.length; wc++) {
                     var column = table.appendChild(Y.Node.create("<tr/>").append('<th>' + Y.Escape.html(at.witnesses[wc]) + '</th>'));
