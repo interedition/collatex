@@ -25,6 +25,7 @@ YUI.add('collatex', function(Y) {
         this.algorithm = (config.algorithm || "dekker");
         this.tokenComparator = (config.tokenComparator || { type: "equality" });
         this.joined = (config.joined || true);
+        this.transpositions = (config.transpositions || true);
     };
     Y.CollateX.prototype = {
         collate: function(resultType, witnesses, callback) {
@@ -38,7 +39,8 @@ YUI.add('collatex', function(Y) {
                     witnesses: witnesses,
                     algorithm: this.algorithm,
                     tokenComparator: this.tokenComparator,
-                    joined: this.joined
+                    joined: this.joined,
+                    transpositions: this.transpositions
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
