@@ -120,7 +120,7 @@ public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollatio
         }
         witness.setTokenContents(
                 SimplePatternTokenizer.BY_WS_OR_PUNCT.apply(contentNode.getTextValue()),
-                SimpleTokenNormalizers.TRIM_WS
+                SimpleTokenNormalizers.LC_TRIM_WS
         );
       }
       witnesses.add(witness);
