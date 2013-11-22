@@ -4,10 +4,10 @@
     <parent>
         <groupId>eu.interedition</groupId>
         <artifactId>collatex</artifactId>
-        <version>1.5</version>
+        <version>1.6-SNAPSHOT</version>
     </parent>
     <artifactId>collatex-core</artifactId>
-    <version>1.5</version>
+    <version>1.6-SNAPSHOT</version>
     <name>CollateX Core</name>
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
     <dependencies>
