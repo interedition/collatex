@@ -26,7 +26,6 @@ import java.util.logging.Level;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.CollationAlgorithm;
@@ -34,7 +33,6 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
-import eu.interedition.collatex.util.VariantGraphRanking;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
@@ -126,24 +124,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
     merge(graph, tokens, alignments);
 
-    // we filter out small transposed phrases over large distances
-    List<List<Match>> falseTranspositions = Lists.newArrayList();
-    
-    VariantGraphRanking ranking = VariantGraphRanking.of(graph);
-    
-    for (List<Match> transposedPhrase : transpositions) {
-      Match match = transposedPhrase.get(0);
-      VariantGraph.Vertex v1 = witnessTokenVertices.get(match.token);
-      VariantGraph.Vertex v2 = match.vertex;
-      int distance = Math.abs(ranking.apply(v1)-ranking.apply(v2))-1;
-      if (distance > transposedPhrase.size()*3) {
-        falseTranspositions.add(transposedPhrase);
-      }
-    }
-
-    for (List<Match> transposition : falseTranspositions) {
-      transpositions.remove(transposition);
-    }
+    TranspositionFilter.filter(graph, transpositions, witnessTokenVertices);
 
     if (mergeTranspositions) {
       mergeTranspositions(graph, transpositions);

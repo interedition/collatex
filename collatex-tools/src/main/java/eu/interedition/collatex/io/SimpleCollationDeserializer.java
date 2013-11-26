@@ -20,9 +20,12 @@
 package eu.interedition.collatex.io;
 
 import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
+import eu.interedition.collatex.dekker.vectorspace.DekkerVectorSpaceAlgorithm;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleCollation;
@@ -30,6 +33,7 @@ import eu.interedition.collatex.simple.SimplePatternTokenizer;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
 import eu.interedition.collatex.simple.SimpleWitness;
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationContext;

@@ -23,6 +23,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.TranspositionDetector;
+import eu.interedition.collatex.dekker.TranspositionFilter;
 import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -360,8 +361,11 @@ public class DekkerVectorSpaceAlgorithm extends CollationAlgorithm.Base {
         al.remove(m.token);
       }
     }
-    // and merge tokens and transpositions in
+    // and merge tokens in
     Map<Token, Vertex> newVertices = mergeTokens(graph, witness, al);
+    // filter away moves that humans would not regard as transpositions
+    TranspositionFilter.filter(graph, transpositions, witnessTokenVertices);
+    // merge transpositions in
     mergeTranspositions(graph, transpositions);
     return newVertices;
   }
