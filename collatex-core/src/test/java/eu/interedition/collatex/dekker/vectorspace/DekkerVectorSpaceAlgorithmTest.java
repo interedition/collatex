@@ -22,10 +22,6 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     return new SimpleWitness(sigil, content);
   }
   
-  private void assertPhrase(String expectedPhrase, List<Token> tokensFromVector) {
-    assertEquals(expectedPhrase, SimpleToken.toString(tokensFromVector));
-  }
-  
   private void assertContains(List<Vector> vectors, Vector vector) {
     assertTrue(vectors.contains(vector));
   }
@@ -62,17 +58,6 @@ public class DekkerVectorSpaceAlgorithmTest extends AbstractTest {
     assertEquals(1, alignment.size());
   }
 
-  @Test
-  public void testGetTokensFromVector() {
-    SimpleWitness a = new SimpleWitness("A", "a b c x y z");
-    SimpleWitness b = new SimpleWitness("B", "e a b c f g");
-    DekkerVectorSpaceAlgorithm algo = new DekkerVectorSpaceAlgorithm();
-    VectorSpace s = new VectorSpace();
-    Vector v = s.new Vector(3, 1, 2);
-    assertPhrase("a b c", algo.getTokensFromVector(v, 0, a));
-    assertPhrase("a b c", algo.getTokensFromVector(v, 1, b));
-  }
-  
   // TODO: Add support for partially overlapping vectors
   // Test taken from IslandConflictResolverTest
   // Note: the 3 vectors of size 2 overlap partly

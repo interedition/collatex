@@ -2,6 +2,7 @@ package eu.interedition.collatex.dekker.vectorspace;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -9,15 +10,22 @@ import org.junit.Test;
 import com.google.common.collect.Iterables;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Edge;
 import eu.interedition.collatex.VariantGraph.Transposition;
+import eu.interedition.collatex.dekker.vectorspace.VectorSpace.Vector;
 import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 public class VSVariantGraphCreationTest extends AbstractTest {
   private SimpleWitness createWitness(String sigil, String content) {
     return new SimpleWitness(sigil, content);
+  }
+  
+  private void assertPhrase(String expectedPhrase, List<Token> tokensFromVector) {
+    assertEquals(expectedPhrase, SimpleToken.toString(tokensFromVector));
   }
   
   void debugEdges(VariantGraph graph) {
@@ -150,5 +158,16 @@ public class VSVariantGraphCreationTest extends AbstractTest {
     VariantGraph.Vertex and1 = vertexWith(graph, "and", b);
     VariantGraph.Vertex and2 = vertexWith(graph, "and", c);
     assertEquals(and1, and2);
+  }
+  
+  @Test
+  public void testGetTokensFromVector() {
+    SimpleWitness a = new SimpleWitness("A", "a b c x y z");
+    SimpleWitness b = new SimpleWitness("B", "e a b c f g");
+    TokenVectorSpace s = new TokenVectorSpace();
+    VSToVGBuilder builder = new VSToVGBuilder(s);
+    Vector v = s.new Vector(3, 1, 2);
+    assertPhrase("a b c", builder.getTokensFromVector(v, 0, a));
+    assertPhrase("a b c", builder.getTokensFromVector(v, 1, b));
   }
 }
