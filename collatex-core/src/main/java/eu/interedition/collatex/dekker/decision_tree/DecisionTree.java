@@ -35,25 +35,35 @@ public class DecisionTree extends DirectedSparseGraph<DecisionNode, AlternativeE
     this();
     VariantGraph graph = new JungVariantGraph();
     addFirstWitnessToGraph(a, graph);
+    createDecisionTree(graph, b);
+  }
+
+  private void createDecisionTree(VariantGraph graph, SimpleWitness b) {
     MatchTable table = MatchTable.create(graph, b);
     Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
     for (Island isl : table.getIslands()) {
       islandMultimap.put(isl.size(), isl);
     }
-    Integer max = Collections.max(islandMultimap.keySet());
-    List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(max));
-    if (possibleIslands.size()>1) {
-      throw new RuntimeException("Not yet implemented!");
-    }
-    Island alternative = possibleIslands.get(0);
-    addAlternative(alternative, getStart());
+    DecisionNode from = getStart();
+    do {
+      Integer max = Collections.max(islandMultimap.keySet());
+      List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(max));
+      if (possibleIslands.size()>1) {
+        throw new RuntimeException("Not yet implemented!");
+      }
+      Island alternative = possibleIslands.get(0);
+      DecisionNode to = addAlternative(alternative, from);
+      islandMultimap.remove(max, alternative);
+      from = to;
+    } while (!islandMultimap.isEmpty());
   }
 
-  private void addAlternative(Island alternative, DecisionNode from) {
+  private DecisionNode addAlternative(Island alternative, DecisionNode from) {
     DecisionNode node = new DecisionNode();
-    AlternativeEdge edge = new AlternativeEdge();
+    AlternativeEdge edge = new AlternativeEdge(alternative);
     addVertex(node);
     addEdge(edge, from, node);
+    return node;
   }
 
   public DecisionNode getStart() {
