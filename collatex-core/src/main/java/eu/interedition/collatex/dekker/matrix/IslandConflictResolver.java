@@ -70,7 +70,7 @@ public class IslandConflictResolver {
       // check the possible islands of a certain size against 
       // the already committed islands.
       
-      removeOrSplitImpossibleIslands(islandSize, islandMultimap);
+      MatchTableModifier.removeOrSplitImpossibleIslands(table, islandSize, islandMultimap);
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
@@ -83,28 +83,6 @@ public class IslandConflictResolver {
     return fixedIslands;
   }
   
-  /*
-   * For all the possible islands of a certain size
-   * this method checks whether they conflict with one of the
-   * previously committed islands.
-   * If so, the possible island is removed from the multimap.
-   * Or in case of overlap, split into a smaller island
-   * and then put in back into the map
-   * Note that this method changes the possible islands multimap.
-   */
-  private void removeOrSplitImpossibleIslands(Integer islandSize, Multimap<Integer, Island> islandMultimap) {
-    Collection<Island> islandsToCheck = Lists.newArrayList(islandMultimap.get(islandSize));
-    for (Island island : islandsToCheck) {
-      if (!table.isIslandPossibleCandidate(island)) {
-        islandMultimap.remove(islandSize, island);
-        removeConflictingEndCoordinates(island);
-        if (island.size() > 0) {
-          islandMultimap.put(island.size(), island);
-        }
-      }
-    }
-  }
-
   /*
    * This method analyzes the relationship between all the islands of the same
    * size that have yet to be selected. They can compete with one another
@@ -205,33 +183,6 @@ public class IslandConflictResolver {
       }
     }
     return competingIslands;
-  }
-
-  private void removeConflictingEndCoordinates(Island island) {
-    boolean goOn = true;
-    while (goOn) {
-      Coordinate leftEnd = island.getLeftEnd();
-      if (table.doesCoordinateOverlapWithCommittedCoordinate(leftEnd)) {
-        island.removeCoordinate(leftEnd);
-        if (island.size() == 0) {
-          return;
-        }
-      } else {
-        goOn = false;
-      }
-    }
-    goOn = true;
-    while (goOn) {
-      Coordinate rightEnd = island.getRightEnd();
-      if (table.doesCoordinateOverlapWithCommittedCoordinate(rightEnd)) {
-        island.removeCoordinate(rightEnd);
-        if (island.size() == 0) {
-          return;
-        }
-      } else {
-        goOn = false;
-      }
-    }
   }
 
   private void addIslandToResult(Island isl, Archipelago result) {
