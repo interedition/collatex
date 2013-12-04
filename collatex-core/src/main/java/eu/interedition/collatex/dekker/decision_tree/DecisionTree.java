@@ -15,6 +15,7 @@ import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
+import eu.interedition.collatex.dekker.matrix.MatchTableModifier;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -27,7 +28,7 @@ public class DecisionTree extends DirectedSparseGraph<DecisionNode, AlternativeE
   private final DecisionNode start;
   
   public DecisionTree() {
-    this.start = new DecisionNode();
+    this.start = new DecisionNode(this.vertices.size());
     addVertex(start);
   }
 
@@ -47,20 +48,30 @@ public class DecisionTree extends DirectedSparseGraph<DecisionNode, AlternativeE
     DecisionNode from = getStart();
     do {
       Integer max = Collections.max(islandMultimap.keySet());
-      List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(max));
-      if (possibleIslands.size()>1) {
-        throw new RuntimeException("Not yet implemented!");
-      }
-      Island alternative = possibleIslands.get(0);
-      DecisionNode to = addAlternative(alternative, from);
-      islandMultimap.remove(max, alternative);
-      from = to;
+      MatchTableModifier.removeOrSplitImpossibleIslands(table, max, islandMultimap);
+      List<DecisionNode> createdNodes = createNodesForPossibleIslands(table, islandMultimap, from, max);
+      //TODO: The from node should be the optimal nodes of
+      //the created nodes; for now we select the first one
+      from = createdNodes.get(0);
     } while (!islandMultimap.isEmpty());
   }
 
+  private List<DecisionNode> createNodesForPossibleIslands(MatchTable table, Multimap<Integer, Island> islandMultimap, DecisionNode from, Integer max) {
+    List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(max));
+    List<DecisionNode> createdNodes = Lists.newArrayList();
+    for (Island alternative : possibleIslands) {
+      DecisionNode to = addAlternative(alternative, from);
+      createdNodes.add(to);
+      //TODO: this is a bit too broad: only selected island should be counted!
+      islandMultimap.remove(max, alternative);
+      table.commitIsland(alternative);
+    }
+    return createdNodes;
+  }
+
   private DecisionNode addAlternative(Island alternative, DecisionNode from) {
-    DecisionNode node = new DecisionNode();
-    AlternativeEdge edge = new AlternativeEdge(alternative);
+    DecisionNode node = new DecisionNode(this.vertices.size());
+    AlternativeEdge edge = new AlternativeEdge(this, alternative);
     addVertex(node);
     addEdge(edge, from, node);
     return node;
