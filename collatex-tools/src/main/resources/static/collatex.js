@@ -113,10 +113,10 @@ YUI.add('collatex', function(Y) {
                     var cellContentsFiltered = Y.Array.filter(cellContents, function (c) {
                         return (c != null);
                     });
-                    var cellContentsTrimmed = Y.Array.map(cellContentsFiltered, function (c) {
-                    	return Y.Lang.trimRight(c);
+                    var cellContentsNormalized = Y.Array.map(cellContentsFiltered, function (c) {
+                    	return Y.Lang.trimRight(c).toLowerCase();
                     });
-                    variantStatus.push(Y.Array.dedupe(cellContentsTrimmed).length == 1);
+                    variantStatus.push(Y.Array.dedupe(cellContentsNormalized).length == 1);
                 });
                 for (var wc = 0; wc < at.witnesses.length; wc++) {
                     var column = table.appendChild(Y.Node.create("<tr/>").append('<th>' + Y.Escape.html(at.witnesses[wc]) + '</th>'));
