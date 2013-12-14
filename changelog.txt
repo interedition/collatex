@@ -1,3 +1,8 @@
+Release 1.5.1
+- Extended the normalization in the javascript alignment table rendering to not only trim
+ whitespace but also lowercase the tokens.
+- Update of Google Guava to v15.0.
+
 Release 1.5
 - Feature: The merging and rendering of transpositions is now switchable in the web-service.
 - Feature: Punctuation is now treated as separate tokens by default in the web-service and command-line tool.
