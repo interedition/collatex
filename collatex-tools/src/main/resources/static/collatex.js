@@ -25,6 +25,7 @@ YUI.add('collatex', function(Y) {
         this.algorithm = (config.algorithm || "dekker");
         this.tokenComparator = (config.tokenComparator || { type: "equality" });
         this.joined = (config.joined || true);
+        this.transpositions = (config.transpositions || true);
     };
     Y.CollateX.prototype = {
         collate: function(resultType, witnesses, callback) {
@@ -38,7 +39,8 @@ YUI.add('collatex', function(Y) {
                     witnesses: witnesses,
                     algorithm: this.algorithm,
                     tokenComparator: this.tokenComparator,
-                    joined: this.joined
+                    joined: this.joined,
+                    transpositions: this.transpositions
                 }),
                 on:{
                     success: function(transactionId, resp) { callback(resp); },
@@ -104,13 +106,17 @@ YUI.add('collatex', function(Y) {
                     Y.each(r, function (c) {
                         cellContents.push(c.length == 0 ? null : Y.Array.reduce(c, "", function (str, next) {
                             next = Y.Lang.isString(next) ? next : Y.dump(next);
-                            return str + (str.length == 0 ? "" : " ") + next;
+                            return str + next;
                         }));
                     });
                     cells.push(cellContents);
-                    variantStatus.push(Y.Array.dedupe(Y.Array.filter(cellContents, function (c) {
+                    var cellContentsFiltered = Y.Array.filter(cellContents, function (c) {
                         return (c != null);
-                    })).length == 1);
+                    });
+                    var cellContentsNormalized = Y.Array.map(cellContentsFiltered, function (c) {
+                    	return Y.Lang.trimRight(c).toLowerCase();
+                    });
+                    variantStatus.push(Y.Array.dedupe(cellContentsNormalized).length == 1);
                 });
                 for (var wc = 0; wc < at.witnesses.length; wc++) {
                     var column = table.appendChild(Y.Node.create("<tr/>").append('<th>' + Y.Escape.html(at.witnesses[wc]) + '</th>'));

@@ -27,6 +27,7 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleWitness;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Set;
@@ -36,23 +37,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TranspositionTest extends AbstractTest {
-  @Test
-  public void noTransposition() {
-    assertEquals(0, collate("no transposition", "no transposition").transpositions().size());
-    assertEquals(0, collate("a b", "c a").transpositions().size());
-  }
-
-  @Test
-  public void oneTransposition() {
-    assertEquals(1, collate("a b", "b a").transpositions().size());
-  }
-
-  @Test
-  public void multipleTranspositions() {
-    assertEquals(1, collate("a b c", "b c a").transpositions().size());
-  }
-
+public class TranspositionRenderingTest extends AbstractTest {
   @Test
   public void transposition1() {
     final SimpleWitness[] w = createWitnesses(//
@@ -91,7 +76,6 @@ public class TranspositionTest extends AbstractTest {
     final SimpleWitness a = new SimpleWitness("A","X a b");
     final SimpleWitness b = new SimpleWitness("B","a b X");
     VariantGraph graph = collate(a,b);
-    assertEquals(1, graph.transpositions().size());
     final RowSortedTable<Integer, Witness, Set<Token>> table = table(graph);
     assertEquals("|x|a|b| |", toString(table, a));
     assertEquals("| |a|b|x|", toString(table, b));
@@ -127,5 +111,18 @@ public class TranspositionTest extends AbstractTest {
     assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, a));
     assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, b));
   }
+
+  @Test
+  public void additionInCombinationWithTransposition2() {
+    final SimpleWitness[] w = createWitnesses(//
+        "the cat is black",//
+        "black is the cat",//
+        "black and white is the cat");
+    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate(w[0], w[1], w[2]));
+    assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
+    assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
+    assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
+  }
+
 
 }

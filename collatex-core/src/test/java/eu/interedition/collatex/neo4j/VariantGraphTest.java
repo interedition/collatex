@@ -115,18 +115,6 @@ public class VariantGraphTest extends AbstractTest {
   }
 
   @Test
-  public void transpositions() {
-    final SimpleWitness[] w = createWitnesses("the black and white cat", "the white and black cat", "the black and black cat");
-    final VariantGraph graph = collate(w[0], w[1]);
-
-    assertEquals(2, graph.transpositions().size());
-
-    collate(graph, w[2]);
-    final Set<VariantGraph.Transposition> transposed = graph.transpositions();
-    assertEquals(2, transposed.size());
-  }
-
-  @Test
   public void transpositions1() {
     final VariantGraph graph = collate("the nice black and white cat", "the friendly white and black cat");
     assertEquals(12, Iterables.size(graph.edges()));

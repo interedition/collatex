@@ -278,6 +278,14 @@ YUI().use("event", "node", "button", "collatex", function(Y) {
         }
     }
 
+    function selectTranspositions() {
+        var newValue = this.get("checked");
+        if (collator.transpositions != newValue) {
+            collator.transpositions =  newValue;
+            collate();
+        }
+    }
+
     function clearResults() {
         svgContainer.empty();
         tableContainer.empty();
@@ -304,6 +312,7 @@ YUI().use("event", "node", "button", "collatex", function(Y) {
         });
 
         Y.on("change", selectJoined, "#joined");
+        Y.on("change", selectTranspositions, "#transpositions");
         Y.on("change", selectAlgorithm, "#algorithm");
         Y.on("change", selectExample, "#examples");
 

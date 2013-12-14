@@ -26,6 +26,7 @@ import java.util.logging.Level;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.CollationAlgorithm;
@@ -33,6 +34,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
+import eu.interedition.collatex.util.VariantGraphRanking;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
@@ -44,7 +46,8 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private List<List<Match>> phraseMatches;
   private List<List<Match>> transpositions;
   private Map<Token, VariantGraph.Vertex> alignments;
-
+  private boolean mergeTranspositions = false;
+  
   public DekkerAlgorithm(Comparator<Token> comparator) {
     this(comparator, new MatchTableLinker(3));
   }
@@ -69,7 +72,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
       LOG.log(Level.FINE, "{0} + {1}: Match and link tokens", new Object[] { graph, witness });
     }
     tokenLinks = tokenLinker.link(graph, tokens, comparator);
-    //    new SimpleVariantGraphSerializer(graph).toDot(graph, writer);
+
     if (LOG.isLoggable(Level.FINER)) {
       for (Map.Entry<Token, VariantGraph.Vertex> tokenLink : tokenLinks.entrySet()) {
         LOG.log(Level.FINER, "{0} + {1}: Token match: {2} = {3}", new Object[] { graph, witness, tokenLink.getValue(), tokenLink.getKey() });
@@ -122,8 +125,30 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
 
     merge(graph, tokens, alignments);
-    mergeTranspositions(graph, transpositions);
 
+    // we filter out small transposed phrases over large distances
+    List<List<Match>> falseTranspositions = Lists.newArrayList();
+    
+    VariantGraphRanking ranking = VariantGraphRanking.of(graph);
+    
+    for (List<Match> transposedPhrase : transpositions) {
+      Match match = transposedPhrase.get(0);
+      VariantGraph.Vertex v1 = witnessTokenVertices.get(match.token);
+      VariantGraph.Vertex v2 = match.vertex;
+      int distance = Math.abs(ranking.apply(v1)-ranking.apply(v2))-1;
+      if (distance > transposedPhrase.size()*3) {
+        falseTranspositions.add(transposedPhrase);
+      }
+    }
+
+    for (List<Match> transposition : falseTranspositions) {
+      transpositions.remove(transposition);
+    }
+
+    if (mergeTranspositions) {
+      mergeTranspositions(graph, transpositions);
+    }
+    
     if (LOG.isLoggable(Level.FINER)) {
       LOG.log(Level.FINER, "!{0}: {1}", new Object[] {graph, Iterables.toString(graph.vertices())});
     }
@@ -145,4 +170,16 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     return Collections.unmodifiableMap(alignments);
   }
 
+ /*
+  * This check disables transposition rendering in the variant
+  * graph when the variant graph contains more then two witnesses.
+  * Transposition detection is done in a progressive manner
+  * (witness by witness). When viewing the resulting graph
+  * containing the variation for all witnesses
+  * the detected transpositions can look strange, since segments
+  * may have split into smaller or larger parts.
+  */
+  public void setMergeTranspositions(boolean b) {
+    this.mergeTranspositions = b;
+  }
 }

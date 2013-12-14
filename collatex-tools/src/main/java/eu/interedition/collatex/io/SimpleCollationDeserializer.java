@@ -20,9 +20,11 @@
 package eu.interedition.collatex.io;
 
 import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleCollation;
@@ -30,6 +32,7 @@ import eu.interedition.collatex.simple.SimplePatternTokenizer;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
 import eu.interedition.collatex.simple.SimpleWitness;
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationContext;
@@ -116,8 +119,8 @@ public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollatio
           throw JsonMappingException.from(jp, String.format("Expected 'content' text field in witness \"%s\"", witness));
         }
         witness.setTokenContents(
-                SimplePatternTokenizer.BY_WS_AND_PUNCT.apply(contentNode.getTextValue()),
-                SimpleTokenNormalizers.LC_TRIM_WS_PUNCT
+                SimplePatternTokenizer.BY_WS_OR_PUNCT.apply(contentNode.getTextValue()),
+                SimpleTokenNormalizers.LC_TRIM_WS
         );
       }
       witnesses.add(witness);
@@ -158,7 +161,15 @@ public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollatio
     if (joinedNode.isBoolean()) {
       joined = joinedNode.getBooleanValue();
     }
-
+    
+    boolean mergeTranspositions = true;
+    final JsonNode transpositionsNode = collationNode.path("transpositions");
+    if (transpositionsNode.isBoolean()) {
+      mergeTranspositions = transpositionsNode.getBooleanValue();
+    }
+    if (collationAlgorithm instanceof DekkerAlgorithm) {
+      ((DekkerAlgorithm) collationAlgorithm).setMergeTranspositions(mergeTranspositions);
+    }
     return new SimpleCollation(witnesses, collationAlgorithm, joined);
   }
 }

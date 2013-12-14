@@ -1,0 +1,26 @@
+Release 1.5
+- Feature: The merging and rendering of transpositions is now switchable in the web-service.
+- Feature: Punctuation is now treated as separate tokens by default in the web-service and command-line tool.
+- Transposition limiter is moved from the Transposition Detector class to the DekkerAlgorithm class.
+- The transposition detector is rewritten. It no longer works from left to right, but from largest
+ moved distance to smallest moved distance. This improves the alignment result in case of longer witnesses. 
+- Improved handling of competing blocks of text in the IslandConflictResolver.
+- Fix: When splitting island in the IslandConflictResolver resulting islands were only
+kept if there were of size two and up. Now they are kept if they are of size one and up.
+
+Release 1.4
+- Workaround for a, b / b, a transpositions and Greek witnesses, where a segment of a single word
+ can be longer than a segment containing lots of small words.
+- Transposition limiter is moved from IslandConflictResolver to
+ the transposition detector class.
+- Fix: PhraseMatches in the TranspositionDetector are now normalized in size. This fixes a problem where false
+ positives where detected in cases where there are more than 2 witnesses
+ and a specific case of variation between witnesses.
+
+Release 1.3
+- First release with alignment based on the MatchTable approach.
+This approach improves the alignment quality greatly in case of longer witnesses.
+- Major API cleanup.
+- New ColateX Tools package, containing a web-service based on JAX-RS.
+- New Command-line interface.
+

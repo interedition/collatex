@@ -104,7 +104,7 @@ public class Engine implements Closeable {
               : PluginScript.read(argumentToResource(script)));
 
       this.tokenizer = Objects.firstNonNull(pluginScript.tokenizer(), SimplePatternTokenizer.BY_WS_OR_PUNCT);
-      this.normalizer = Objects.firstNonNull(pluginScript.normalizer(), SimpleTokenNormalizers.TRIM_WS);
+      this.normalizer = Objects.firstNonNull(pluginScript.normalizer(), SimpleTokenNormalizers.LC_TRIM_WS);
       this.comparator = Objects.firstNonNull(pluginScript.comparator(), new EqualityTokenComparator());
     } catch (IOException e) {
       throw new ParseException("Failed to read script '" + script + "' - " + e.getMessage());

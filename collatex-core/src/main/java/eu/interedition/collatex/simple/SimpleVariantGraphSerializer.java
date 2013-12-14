@@ -99,9 +99,8 @@ public class SimpleVariantGraphSerializer {
         public void segment(SortedMap<Witness, Iterable<Token>> contents) {
           final SetMultimap<String, Witness> segments = LinkedHashMultimap.create();
           for (Map.Entry<Witness, Iterable<Token>> cell : contents.entrySet()) {
-            //TODO: consider adding trim() after apply(cell.getValue())
-        	//we don't want trailing whitespace before an endtag
-        	segments.put(tokensToString.apply(cell.getValue()), cell.getKey());
+            //NOTE: we don't want trailing whitespace before an end tag
+            segments.put(tokensToString.apply(cell.getValue()).trim(), cell.getKey());
           }
 
           final Set<String> segmentContents = segments.keySet();

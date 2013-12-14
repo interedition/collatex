@@ -19,15 +19,13 @@
 package eu.interedition.collatex.dekker;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.VariantGraph;
@@ -39,96 +37,144 @@ import eu.interedition.collatex.util.VariantGraphRanking;
  * @author Ronald Haentjens Dekker
  */
 public class TranspositionDetector {
+  private Map<List<Match>, Integer> phraseMatchToIndex;
+  
+  public List<List<Match>> detect(final List<List<Match>> phraseMatches, VariantGraph base) {
+    // if there are no phrase matches it is not possible
+    // to detect transpositions, return an empty list
+    if (phraseMatches.isEmpty()) {
+      return Lists.newArrayList();
+    }
 
-  private static final Logger LOG = Logger.getLogger(TranspositionDetector.class.getName());
+    /*
+     * We order the phrase matches in the topological order
+     * of the graph (called rank). When the rank is equal
+     * for two phrase matches, the witness order is used
+     * to differentiate.
+     */
+    final VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
 
-  public List<List<Match>> detect(List<List<Match>> phraseMatches, VariantGraph base) {
+    Comparator<List<Match>> comp = new Comparator<List<Match>>() {
+      @Override
+      public int compare(List<Match> pm1, List<Match> pm2) {
+        int rank1 = ranking.apply(pm1.get(0).vertex);
+        int rank2 = ranking.apply(pm2.get(0).vertex);
+        int difference = rank1 - rank2;
+        if (difference != 0) {
+          return difference;
+        }
+        int index1 = phraseMatches.indexOf(pm1);
+        int index2 = phraseMatches.indexOf(pm2);
+        return index1 - index2;
+      }
+    };
+
+    List<List<Match>> phraseMatchesGraphOrder = Lists.newArrayList(phraseMatches);
+    Collections.sort(phraseMatchesGraphOrder, comp);
+    
+    // Map 1
+    phraseMatchToIndex = Maps.newHashMap();
+    for (int i = 0; i < phraseMatchesGraphOrder.size(); i++) {
+      phraseMatchToIndex.put(phraseMatchesGraphOrder.get(i), i);
+    }
+
+    /*
+     * We calculate the index for all the phrase matches 
+     * First in witness order, then in graph order 
+     */
+    List<Integer> phraseMatchesGraphIndex = Lists.newArrayList();
+    List<Integer> phraseMatchesWitnessIndex = Lists.newArrayList();
+
+    for (int i=0; i < phraseMatches.size(); i++) {
+      phraseMatchesGraphIndex.add(i);
+    }
+    
+    for (List<Match> phraseMatch : phraseMatches) {
+      phraseMatchesWitnessIndex.add(phraseMatchToIndex.get(phraseMatch));
+    }
+    
+    /*
+     * Initialize result variables
+     */
+    List<List<Match>> nonTransposedPhraseMatches = Lists.newArrayList(phraseMatches);
+    List<List<Match>> transpositions = Lists.newArrayList();
+
+    /*
+     * loop here until the maximum distance == 0
+     */
+    while (true) {
+      // Map 2
+      final Map<List<Match>, Integer> phraseMatchToDistanceMap = Maps.newLinkedHashMap();
+      for (int i=0; i < nonTransposedPhraseMatches.size(); i++) {
+        Integer graphIndex = phraseMatchesGraphIndex.get(i);
+        Integer witnessIndex = phraseMatchesWitnessIndex.get(i);
+        Integer distance = Math.abs(graphIndex - witnessIndex);
+        List<Match> phraseMatch = nonTransposedPhraseMatches.get(i);
+        phraseMatchToDistanceMap.put(phraseMatch, distance);
+      }
+
+      List<Integer> distanceList = Lists.newArrayList(phraseMatchToDistanceMap.values());
+
+      if (Collections.max(distanceList) == 0) {
+        break;
+      }
+
+      // sort phrase matches on distance, size
+      // TODO: order by 3) graph rank?
+      // TODO: I have not yet found evidence/a use case that
+      // TODO: indicates that it is needed.
+      Comparator<List<Match>> comp2 = new Comparator<List<Match>>() {
+        @Override
+        public int compare(List<Match> pm1, List<Match> pm2) {
+          // first order by distance
+          int distance1 = phraseMatchToDistanceMap.get(pm1);
+          int distance2 = phraseMatchToDistanceMap.get(pm2);
+          int difference = distance2 - distance1;
+          if (difference != 0) {
+            return difference;
+          }
+          // second order by size
+          // return pm1.size() - pm2.size();
+          return determineSize(pm1) - determineSize(pm2);
+        }
+      };
+
+      List<List<Match>> sortedPhraseMatches = Lists.newArrayList(nonTransposedPhraseMatches);
+      Collections.sort(sortedPhraseMatches, comp2);
+
+      List<Match> transposedPhrase = sortedPhraseMatches.remove(0);
+
+      Integer transposedIndex = phraseMatchToIndex.get(transposedPhrase);
+      Integer graphIndex = phraseMatchesGraphIndex.indexOf(transposedIndex);
+      Integer transposedWithIndex = phraseMatchesWitnessIndex.get(graphIndex);
+      List<Match> linkedTransposedPhrase = phraseMatchesGraphOrder.get(transposedWithIndex);
+      
+      addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase);
+
+      Integer distance = phraseMatchToDistanceMap.get(transposedPhrase);
+      if (distance == phraseMatchToDistanceMap.get(linkedTransposedPhrase) && distance > 1) {
+        addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase);
+      }
+    }
+    return transpositions;
+  }
+
+  private void addTransposition(List<Integer> phraseWitnessRanks, List<Integer> phraseGraphRanks, List<List<Match>> nonTransposedPhraseMatches, List<List<Match>> transpositions, List<Match> transposedPhrase) {
+    Integer indexToRemove = phraseMatchToIndex.get(transposedPhrase);
+    nonTransposedPhraseMatches.remove(transposedPhrase);
+    transpositions.add(transposedPhrase);
+    phraseGraphRanks.remove(indexToRemove);
+    phraseWitnessRanks.remove(indexToRemove);
+  }
+
+  private VariantGraphRanking rankTheGraph(List<List<Match>> phraseMatches, VariantGraph base) {
     // rank the variant graph
     Set<VariantGraph.Vertex> matchedVertices = Sets.newHashSet();
     for (List<Match> phraseMatch : phraseMatches) {
       matchedVertices.add(phraseMatch.get(0).vertex);
     }
     final VariantGraphRanking ranking = VariantGraphRanking.ofOnlyCertainVertices(base, null, matchedVertices);
-
-    boolean falseTranspositions;
-    final Stack<List<Match>> transpositions = new Stack<List<Match>>();
-
-    do {
-      falseTranspositions = false;
-      transpositions.clear();
-
-      // gather matched ranks into a list ordered by their natural order
-      final List<Integer> phraseWitnessRanks = Lists.newArrayList();
-      for (List<Match> phraseMatch : phraseMatches) {
-        phraseWitnessRanks.add(Preconditions.checkNotNull(ranking.apply(phraseMatch.get(0).vertex)));
-      }
-      List<Integer> phraseGraphRanks = Lists.newArrayList(phraseWitnessRanks);
-      Collections.sort(phraseGraphRanks);
-      
-      // detect transpositions
-      int previousRank = 0;
-      Tuple<Integer> previous = new Tuple<Integer>(0, 0);
-      for (List<Match> phraseMatch : phraseMatches) {
-        int rank = ranking.apply(phraseMatch.get(0).vertex);
-        int expectedRank = phraseGraphRanks.get(previousRank);
-        Tuple<Integer> current = new Tuple<Integer>(expectedRank, rank);
-        if (expectedRank != rank) {
-          addNewTransposition(transpositions, phraseMatch, isMirrored(previous, current));
-        }
-        previousRank++;
-        previous = current;
-      }
-
-      // filter away small transposed phrase over long distances
-      for (List<Match> transposition : transpositions) {
-        int rank = ranking.apply(transposition.get(0).vertex);
-        // calculate the distance between the transposed phrases
-        int indexInGraphRanks = phraseGraphRanks.indexOf(rank);
-        int indexInWitnessRanks = phraseWitnessRanks.indexOf(rank);
-        int distanceInTokens = 0;
-        if (indexInGraphRanks > indexInWitnessRanks) {
-          for (int i = indexInGraphRanks; i > indexInWitnessRanks; i--) {
-            distanceInTokens += phraseMatches.get(i).size();
-          }
-        } else {
-          for (int i = indexInGraphRanks; i < indexInWitnessRanks; i++) {
-            List<Match> phraseMatchInBetween = phraseMatches.get(i);
-            distanceInTokens += phraseMatchInBetween.size();
-          }
-        }
-        // check transposed phrase / transposed distance ratio
-        if (distanceInTokens > transposition.size() * 3) {
-          phraseMatches.remove(transposition);
-          falseTranspositions = true;
-          break;
-        }
-      }
-    } while (falseTranspositions);
-    if (LOG.isLoggable(Level.FINER)) {
-      for (List<Match> transposition : transpositions) {
-        LOG.log(Level.FINER, "Detected transposition: {0}", Iterables.toString(transposition));
-      }
-    }
-    return transpositions;
-  }
-
-  private void addNewTransposition(final Stack<List<Match>> transpositions, List<Match> transposition, boolean isMirrored) {
-    if (!isMirrored) {
-      transpositions.add(transposition);
-    } else {
-      /*
-       * A mirrored transposition is detected. We have to check size: If
-       * previous > current -> remove previous, add current. Otherwise, do
-       * nothing.
-       */
-      List<Match> lastTransposition = transpositions.peek();
-      int lastTranspositionSize = determineSize(lastTransposition);
-      int transpositionSize = determineSize(transposition);
-      if (lastTranspositionSize > transpositionSize) {
-        transpositions.pop();
-        transpositions.add(transposition);
-      }
-    }
+    return ranking;
   }
 
   /*
@@ -147,9 +193,5 @@ public class TranspositionDetector {
       charLength += token.getNormalized().length();
     }
     return charLength;
-  }
-
-  private boolean isMirrored(Tuple<Integer> previousTuple, Tuple<Integer> tuple) {
-    return previousTuple.left.equals(tuple.right) && previousTuple.right.equals(tuple.left);
   }
 }
