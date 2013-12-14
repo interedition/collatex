@@ -26,7 +26,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.Ranges;
+import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
@@ -59,11 +59,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
   @Override
   public void collate(VariantGraph graph, Iterable<Token> witness) {
     final boolean logTimings = LOG.isLoggable(Level.FINE);
-    final Stopwatch stopwatch = (logTimings ? new Stopwatch() : null);
-
-    if (logTimings) {
-      stopwatch.start();
-    }
+    final Stopwatch stopwatch = (logTimings ? Stopwatch.createStarted() : null);
 
     final Token[] tokens = Iterables.toArray(witness, Token.class);
     final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
@@ -107,8 +103,8 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
         final Match.WithTokenIndex lastMatch = phrase.last();
 
         alignments.add(phrase);
-        rankFilter.add(Ranges.closed(firstMatch.vertexRank, lastMatch.vertexRank));
-        tokenFilter.add(Ranges.closed(firstMatch.token, lastMatch.token));
+        rankFilter.add(Range.closed(firstMatch.vertexRank, lastMatch.vertexRank));
+        tokenFilter.add(Range.closed(firstMatch.token, lastMatch.token));
       }
 
       Iterables.removeIf(matches, Match.filter(rankFilter, tokenFilter));

@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
+import com.google.common.io.Closer;
 import com.google.common.io.Files;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
@@ -255,7 +256,10 @@ public class Engine implements Closeable {
     } catch (PluginScript.PluginScriptExecutionException e) {
       engine.error("Script error", e);
     } finally {
-      Closeables.closeQuietly(engine);
+        try {
+            Closeables.close(engine, false);
+        } catch (IOException e) {
+        }
     }
   }
 
@@ -276,16 +280,16 @@ public class Engine implements Closeable {
 
   @Override
   public void close() throws IOException {
-    try {
+      final Closer closer = Closer.create();
+      try {
       if (out != null) {
-        out.flush();
+        closer.register(out).flush();
       }
       if (log != null) {
-        log.flush();
+        closer.register(log).flush();
       }
     } finally {
-      Closeables.closeQuietly(out);
-      Closeables.closeQuietly(log);
+      closer.close();
     }
     if (errorOccurred && (outFile != null) && outFile.isFile()) {
       outFile.delete();

@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.DiscreteDomains;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
-import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
@@ -149,8 +149,8 @@ public class MatchTable {
 
   private static MatchTable createEmptyTable(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness) {
     // -2 === ignore the start and the end vertex
-    Range<Integer> ranksRange = Ranges.closed(0, Math.max(0, ranking.apply(graph.getEnd()) - 2));
-    ImmutableList<Integer> ranksSet = ranksRange.asSet(DiscreteDomains.integers()).asList();
+    Range<Integer> ranksRange = Range.closed(0, Math.max(0, ranking.apply(graph.getEnd()) - 2));
+    ImmutableList<Integer> ranksSet = ContiguousSet.create(ranksRange, DiscreteDomain.integers()).asList();
     return new MatchTable(witness, ranksSet);
   }
 

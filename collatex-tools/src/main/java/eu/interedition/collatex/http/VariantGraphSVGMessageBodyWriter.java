@@ -24,6 +24,7 @@ import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
+import com.google.common.io.Closer;
 import com.google.common.io.FileBackedOutputStream;
 import eu.interedition.collatex.VariantGraph;
 
@@ -107,14 +108,14 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
       throw Throwables.propagate(e);
     }
 
-    InputStream svgSource = null;
+    final Closer closer = Closer.create();
     try {
       if (dotProc.waitFor() == 0) {
-        ByteStreams.copy(svgSource = svgBuf.getSupplier().getInput(), entityStream);
+        ByteStreams.copy(closer.register(svgBuf.asByteSource().openBufferedStream()), entityStream);
       }
     } catch (InterruptedException e) {
     } finally {
-      Closeables.closeQuietly(svgSource);
+      closer.close();
       svgBuf.reset();
       Closeables.close(entityStream, false);
     }
@@ -126,26 +127,33 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
     }
 
     dotPath = null;
-    InputStream stream = null;
+    Closer closer = Closer.create();
     try {
       final Process which = new ProcessBuilder("which", "dot").start();
-      dotPath = CharStreams.toString(new InputStreamReader(stream = which.getInputStream(), Charset.defaultCharset())).trim();
+      dotPath = CharStreams.toString(new InputStreamReader(closer.register(which.getInputStream()), Charset.defaultCharset())).trim();
       which.waitFor();
     } catch (IOException e) {
     } catch (InterruptedException e) {
     } finally {
-      Closeables.closeQuietly(stream);
+        try {
+          closer.close();
+        } catch (IOException e) {
+        }
     }
 
     if (Strings.isNullOrEmpty(dotPath)) {
+      closer = Closer.create();
       try {
         final Process where = new ProcessBuilder("where.exe", "dot.exe").start();
-        dotPath = CharStreams.toString(new InputStreamReader(stream = where.getInputStream(), Charset.defaultCharset())).trim();
+        dotPath = CharStreams.toString(new InputStreamReader(closer.register(where.getInputStream()), Charset.defaultCharset())).trim();
         where.waitFor();
       } catch (IOException e) {
       } catch (InterruptedException e) {
       } finally {
-        Closeables.closeQuietly(stream);
+        try {
+          closer.close();
+        } catch (IOException e) {
+        }
       }
     }
 

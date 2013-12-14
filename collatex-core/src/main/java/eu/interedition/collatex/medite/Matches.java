@@ -26,7 +26,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Ranges;
+import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
 import eu.interedition.collatex.Token;
@@ -159,8 +159,8 @@ public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
       Preconditions.checkState(maximalUniqueMatches.add(nextMum), "Duplicate MUM");
 
       Iterables.removeIf(allMatches, Match.filter(
-              new IndexRangeSet(Ranges.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
-              new IndexRangeSet(Ranges.closed(nextMum.first().token, nextMum.last().token))
+              new IndexRangeSet(Range.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
+              new IndexRangeSet(Range.closed(nextMum.first().token, nextMum.last().token))
       ));
     }
     return maximalUniqueMatches;
