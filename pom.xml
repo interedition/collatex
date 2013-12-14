@@ -87,6 +87,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>eu.interedition</groupId>
+                <artifactId>collatex-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>javax.servlet</groupId>
