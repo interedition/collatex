@@ -115,7 +115,7 @@ public class TranspositionDetector {
 
       List<Integer> distanceList = Lists.newArrayList(phraseMatchToDistanceMap.values());
 
-      if (Collections.max(distanceList) == 0) {
+      if (distanceList.isEmpty()||Collections.max(distanceList) == 0) {
         break;
       }
 
