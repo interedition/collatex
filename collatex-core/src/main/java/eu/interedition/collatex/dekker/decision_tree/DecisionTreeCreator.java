@@ -1,17 +1,15 @@
 package eu.interedition.collatex.dekker.decision_tree;
 
+import static eu.interedition.collatex.dekker.decision_tree.VariantGraphBuilder.addFirstWitnessToGraph;
+
 import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.dekker.matrix.MatchTableModifier;
@@ -30,7 +28,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 public class DecisionTreeCreator {
   public static DecisionTree createDecisionTree(SimpleWitness a, SimpleWitness b) {
     VariantGraph graph = new JungVariantGraph();
-    addFirstWitnessToGraph(a, graph);
+    addFirstWitnessToGraph(graph, a);
     return createDecisionTree(graph, b);
   }
 
@@ -66,18 +64,4 @@ public class DecisionTreeCreator {
     }
     return createdNodes;
   }
-
-  //Note: method looks like CollationAlgorithm.Base merge (can't use that method
-  // due to inheritance)
-  private static void addFirstWitnessToGraph(SimpleWitness a, VariantGraph graph) {
-    List<Token> tokens = a.getTokens();
-    Vertex from = graph.getStart();
-    for (Token token : tokens) {
-      Vertex to = graph.add(token);
-      graph.connect(from, to, Sets.newHashSet((Witness)a));
-      from = to;
-    }
-    graph.connect(from, graph.getEnd(), Sets.newHashSet((Witness)a));
-  }
-
 }
