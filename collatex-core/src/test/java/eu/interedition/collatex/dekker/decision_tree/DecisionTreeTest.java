@@ -2,7 +2,7 @@ package eu.interedition.collatex.dekker.decision_tree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static eu.interedition.collatex.dekker.decision_tree.DecisionTreeCreator.*;
 import java.util.List;
 
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class DecisionTreeTest {
   public void testNoRepetition() {
     SimpleWitness a = new SimpleWitness("a", "a b c d");
     SimpleWitness b = new SimpleWitness("b", "a b e d");
-    DecisionTree dt = new DecisionTree(a, b);
+    DecisionTree dt = createDecisionTree(a, b);
     // start node
     DecisionNode s = dt.getStart();
     assertEquals(1, dt.getOutEdges(s).size());
@@ -67,7 +67,7 @@ public class DecisionTreeTest {
   public void testSingleRepeatedPhrase() {
     SimpleWitness a = new SimpleWitness("a", "a a x b a a");
     SimpleWitness b = new SimpleWitness("b", "a a y b");
-    DecisionTree dt = new DecisionTree(a, b);
+    DecisionTree dt = createDecisionTree(a, b);
     // start node
     DecisionNode s = dt.getStart();
     assertEquals(2, dt.getOutEdges(s).size());
