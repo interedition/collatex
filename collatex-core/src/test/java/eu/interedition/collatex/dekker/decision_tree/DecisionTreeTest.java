@@ -1,14 +1,14 @@
 package eu.interedition.collatex.dekker.decision_tree;
 
+import static eu.interedition.collatex.dekker.decision_tree.DecisionTreeCreator.createDecisionTree;
+import static eu.interedition.collatex.dekker.decision_tree.DecisionTreeTraversal.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static eu.interedition.collatex.dekker.decision_tree.DecisionTreeCreator.*;
-import java.util.List;
 
 import org.junit.Test;
 import org.neo4j.helpers.collection.Iterables;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Function;
 
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -24,6 +24,23 @@ public class DecisionTreeTest {
     assertEquals(column-1, i.getLeftEnd().getColumn());
     assertEquals(row-1, i.getLeftEnd().getRow());
     assertEquals(size, i.size());
+  }
+
+  // for debug reasons we show the edges here
+  private void debugTree(DecisionTree dt) {
+    //System.out.println(dt.toString());
+    //System.out.println(dt.getVertices());
+    //System.out.println(dt.getEdges());
+    DecisionNode start = dt.getStart();
+    System.out.println("Start: "+start);
+    Function<AlternativeEdge, Void> f = new Function<AlternativeEdge, Void>() {
+      @Override
+      public Void apply(AlternativeEdge edge) {
+        System.out.println(edge);
+        return null;
+      }
+    };
+    traverseTree(dt, f);
   }
 
   @Test
@@ -74,38 +91,4 @@ public class DecisionTreeTest {
     //TODO: add extra asserts
   }
 
-  private void debugTree(DecisionTree dt) {
-    //System.out.println(dt.toString());
-    //System.out.println(dt.getVertices());
-    //System.out.println(dt.getEdges());
-    DecisionNode start = dt.getStart();
-    System.out.println("Start: "+start);
-    traverseTree(dt, start);
-  }
-  
-  private void traverseTree(DecisionTree dt, DecisionNode start) {
-    List<DecisionNode> nodesToTraverse = Lists.newArrayList();
-    nodesToTraverse.add(start);
-    while(!nodesToTraverse.isEmpty()) {
-      DecisionNode n = nodesToTraverse.remove(0);
-      determineChildrenAndAddToList(dt, n, nodesToTraverse);
-      handleNode(dt, n);
-    }
-  }
-
-  private void determineChildrenAndAddToList(DecisionTree tree, DecisionNode n, List<DecisionNode> nodesToTraverse) {
-    List<DecisionNode> childrenToTraverse = Lists.newArrayList();
-    for (AlternativeEdge e :tree.getOutEdges(n)) {
-      DecisionNode dest = tree.getDest(e);
-      childrenToTraverse.add(dest);
-    }
-    nodesToTraverse.addAll(0, childrenToTraverse);
-  }
-
-  private void handleNode(DecisionTree dt, DecisionNode n) {
-    // for debug reasons we show the edges here
-    for (AlternativeEdge e: dt.getOutEdges(n)) {
-      System.out.println(e);
-    }
-  }
 }
