@@ -5,6 +5,10 @@ import static eu.interedition.collatex.dekker.decision_tree.DecisionTreeTraversa
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.neo4j.helpers.collection.Iterables;
 
@@ -15,6 +19,19 @@ import eu.interedition.collatex.simple.SimpleWitness;
 
 // @author: Ronald Haentjens Dekker
 public class DecisionTreeTest {
+
+  private void assertContains(Collection<AlternativeEdge> edges, AlternativeEdge e1) {
+    boolean found = false;
+    for (AlternativeEdge e : edges) {
+      if (e.getSource().equals(e1.getSource()) && e.getCost().equals(e1.getCost())) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      Assert.fail("Edge "+e1+" not found, found: "+edges);
+    }
+  }
 
   // coordinates start at 0
   private void assertIsland(Island i, int column, int row, int size) {
@@ -88,7 +105,19 @@ public class DecisionTreeTest {
     // start node
     DecisionNode s = dt.getStart();
     assertEquals(2, dt.getOutEdges(s).size());
-    //TODO: add extra asserts
+    // I want to test the edges
+    // Edges have a cost associated to them.
+    // Also edges have a parent node
+    // Parent nodes have a rank
+    AlternativeEdge e1 = new AlternativeEdge(new DecisionNode(0), new Cost(0.0));
+    AlternativeEdge e2 = new AlternativeEdge(new DecisionNode(0), new Cost(2.2));
+    AlternativeEdge e3 = new AlternativeEdge(new DecisionNode(1), new Cost(0.0));
+    assertContains(dt.getEdges(), e1);
+    //TODO: problem is cost is a double with lots of numbers
+    //TODO: maybe hamcrest helps here
+    // assertContains(dt.getEdges(), e2);
+    assertContains(dt.getEdges(), e3);
+    assertEquals(3, dt.getEdges().size());
   }
 
 }
