@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.dekker.matrix.MatchTableModifier;
@@ -41,7 +42,7 @@ public class DecisionTreeCreator {
     for (Island isl : table.getIslands()) {
       islandMultimap.put(isl.size(), isl);
     }
-    MatchTableSelection selection = new MatchTableSelection(table);
+    MatchTableSelection selection = new MatchTableSelection(table, new Archipelago());
     DecisionNode from = tree.getStart();
     do {
       Integer max = Collections.max(islandMultimap.keySet());
@@ -62,7 +63,7 @@ public class DecisionTreeCreator {
       createdNodes.add(to);
       //TODO: this is a bit too broad: only selected island should be counted!
       islandMultimap.remove(max, alternative);
-      selection.commitIsland(alternative);
+      selection.addIsland(alternative);
     }
     return createdNodes;
   }
