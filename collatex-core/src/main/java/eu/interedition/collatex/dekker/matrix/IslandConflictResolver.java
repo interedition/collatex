@@ -77,7 +77,7 @@ public class IslandConflictResolver {
         selection.addIsland(possibleIslands.get(0));
       } else if (possibleIslands.size() > 1) {
         Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(islandSize);
-        resolveConflictsBySelectingPreferredIslands(selection, fixedIslands, analysis);
+        resolveConflictsBySelectingPreferredIslands(selection, analysis);
       }
     }
     return fixedIslands;
@@ -93,7 +93,7 @@ public class IslandConflictResolver {
   public Multimap<IslandCompetition, Island> analyzeConflictsBetweenPossibleIslands(int islandSize) {
     List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
     Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
-    Set<Island> competingIslands = getCompetingIslands(possibleIslands, fixedIslands);
+    Set<Island> competingIslands = getCompetingIslands(possibleIslands);
     for (Island island : competingIslands) {
       Coordinate leftEnd = island.getLeftEnd();
       if (fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
@@ -115,16 +115,16 @@ public class IslandConflictResolver {
    * we have to move this code out of this method and move it to the caller
    * class
    */
-  private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Archipelago archipelago, Multimap<IslandCompetition, Island> islandConflictMap) {
+  private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Multimap<IslandCompetition, Island> islandConflictMap) {
     // First select competing islands that are on the ideal line
-    Multimap<Double, Island> distanceMap1 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
+    Multimap<Double, Island> distanceMap1 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine));
     LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-    addBestOfCompeting(selection, archipelago, distanceMap1);
+    addBestOfCompeting(selection, distanceMap1);
     
     // Second select other competing islands
-    Multimap<Double, Island> distanceMap2 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIsland), archipelago);
+    Multimap<Double, Island> distanceMap2 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIsland));
     LOG.fine("addBestOfCompeting with otherCompetingIslands");
-    addBestOfCompeting(selection, archipelago, distanceMap2);
+    addBestOfCompeting(selection, distanceMap2);
 
     // Third select non competing islands
     LOG.fine("add non competing islands");
@@ -133,7 +133,7 @@ public class IslandConflictResolver {
     }
   }
 
-  private void addBestOfCompeting(MatchTableSelection selection, Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
+  private void addBestOfCompeting(MatchTableSelection selection, Multimap<Double, Island> distanceMap1) {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
         if (selection.isIslandPossibleCandidate(ci)) {
@@ -146,7 +146,7 @@ public class IslandConflictResolver {
   // TODO: This method calculates the distance from the ideal line
   // TODO: by calculating the ratio x/y.
   // TODO: but the ideal line may have moved (due to additions/deletions).
-  private Multimap<Double, Island> makeDistanceMap(Collection<Island> competingIslands, Archipelago archipelago) {
+  private Multimap<Double, Island> makeDistanceMap(Collection<Island> competingIslands) {
     Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
     for (Island isl : competingIslands) {
       Coordinate leftEnd = isl.getLeftEnd();
@@ -170,13 +170,13 @@ public class IslandConflictResolver {
     return nonCompetingIslands;
   }
 
-  private Set<Island> getCompetingIslands(List<Island> islands, Archipelago result) {
+  private Set<Island> getCompetingIslands(List<Island> islands) {
     Set<Island> competingIslands = Sets.newHashSet();
     for (int i = 0; i < islands.size(); i++) {
       Island i1 = islands.get(i);
       for (int j = 1; j < islands.size() - i; j++) {
         Island i2 = islands.get(i + j);
-        if (result.islandsCompete(i1, i2)) {
+        if (i1.isCompetitor(i2)) {
           competingIslands.add(i1);
           competingIslands.add(i2);
         }
@@ -184,5 +184,4 @@ public class IslandConflictResolver {
     }
     return competingIslands;
   }
-
 }

@@ -67,10 +67,6 @@ public class Archipelago {
     return Objects.equal(getCoordinatesMap().get(row), column);
   }
 
-  public boolean islandsCompete(Island i1, Island i2) {
-    return i1.isCompetitor(i2);
-  }
-
   public List<Island> getIslands() {
     return islands;
   }
