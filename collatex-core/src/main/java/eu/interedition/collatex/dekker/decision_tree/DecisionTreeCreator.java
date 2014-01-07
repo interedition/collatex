@@ -13,6 +13,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.dekker.matrix.MatchTableModifier;
+import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -40,11 +41,12 @@ public class DecisionTreeCreator {
     for (Island isl : table.getIslands()) {
       islandMultimap.put(isl.size(), isl);
     }
+    MatchTableSelection selection = new MatchTableSelection(table);
     DecisionNode from = tree.getStart();
     do {
       Integer max = Collections.max(islandMultimap.keySet());
-      MatchTableModifier.removeOrSplitImpossibleIslands(table, max, islandMultimap);
-      List<DecisionNode> createdNodes = createNodesForPossibleIslands(table, tree, islandMultimap, from, max);
+      MatchTableModifier.removeOrSplitImpossibleIslands(selection, max, islandMultimap);
+      List<DecisionNode> createdNodes = createNodesForPossibleIslands(selection, tree, islandMultimap, from, max);
       //TODO: The from node should be the optimal nodes of
       //the created nodes; for now we select the first one
       from = createdNodes.get(0);
@@ -52,7 +54,7 @@ public class DecisionTreeCreator {
     return tree;
   }
 
-  private static List<DecisionNode> createNodesForPossibleIslands(MatchTable table, DecisionTree tree, Multimap<Integer, Island> islandMultimap, DecisionNode from, Integer max) {
+  private static List<DecisionNode> createNodesForPossibleIslands(MatchTableSelection selection, DecisionTree tree, Multimap<Integer, Island> islandMultimap, DecisionNode from, Integer max) {
     List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(max));
     List<DecisionNode> createdNodes = Lists.newArrayList();
     for (Island alternative : possibleIslands) {
@@ -60,7 +62,7 @@ public class DecisionTreeCreator {
       createdNodes.add(to);
       //TODO: this is a bit too broad: only selected island should be counted!
       islandMultimap.remove(max, alternative);
-      table.commitIsland(alternative);
+      selection.commitIsland(alternative);
     }
     return createdNodes;
   }
