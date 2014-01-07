@@ -63,6 +63,7 @@ public class IslandConflictResolver {
     if (islandMultimap.isEmpty()) {
       return fixedIslands;
     }
+    MatchTableSelection selection = new MatchTableSelection(table);
     // find the maximum island size and traverse groups in descending order
     Integer max = Collections.max(islandMultimap.keySet());
     for (int islandSize=max; islandSize > 0; islandSize--) {
@@ -70,14 +71,14 @@ public class IslandConflictResolver {
       // check the possible islands of a certain size against 
       // the already committed islands.
       
-      MatchTableModifier.removeOrSplitImpossibleIslands(table, islandSize, islandMultimap);
+      MatchTableModifier.removeOrSplitImpossibleIslands(selection, islandSize, islandMultimap);
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
-        addIslandToResult(possibleIslands.get(0), fixedIslands);
+        addIslandToResult(possibleIslands.get(0), selection, fixedIslands);
       } else if (possibleIslands.size() > 1) {
         Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(islandSize);
-        resolveConflictsBySelectingPreferredIslands(fixedIslands, analysis);
+        resolveConflictsBySelectingPreferredIslands(selection, fixedIslands, analysis);
       }
     }
     return fixedIslands;
@@ -115,29 +116,29 @@ public class IslandConflictResolver {
    * we have to move this code out of this method and move it to the caller
    * class
    */
-  private void resolveConflictsBySelectingPreferredIslands(Archipelago archipelago, Multimap<IslandCompetition, Island> islandConflictMap) {
+  private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Archipelago archipelago, Multimap<IslandCompetition, Island> islandConflictMap) {
     // First select competing islands that are on the ideal line
     Multimap<Double, Island> distanceMap1 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine), archipelago);
     LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-    addBestOfCompeting(archipelago, distanceMap1);
+    addBestOfCompeting(selection, archipelago, distanceMap1);
     
     // Second select other competing islands
     Multimap<Double, Island> distanceMap2 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIsland), archipelago);
     LOG.fine("addBestOfCompeting with otherCompetingIslands");
-    addBestOfCompeting(archipelago, distanceMap2);
+    addBestOfCompeting(selection, archipelago, distanceMap2);
 
     // Third select non competing islands
     LOG.fine("add non competing islands");
     for (Island i : islandConflictMap.get(IslandCompetition.NonCompetingIsland)) {
-      addIslandToResult(i, archipelago);
+      addIslandToResult(i, selection, archipelago);
     }
   }
 
-  private void addBestOfCompeting(Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
+  private void addBestOfCompeting(MatchTableSelection selection, Archipelago archipelago, Multimap<Double, Island> distanceMap1) {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
-        if (table.isIslandPossibleCandidate(ci)) {
-          addIslandToResult(ci, archipelago);
+        if (selection.isIslandPossibleCandidate(ci)) {
+          addIslandToResult(ci, selection, archipelago);
         }
       }
     }
@@ -185,11 +186,11 @@ public class IslandConflictResolver {
     return competingIslands;
   }
 
-  private void addIslandToResult(Island isl, Archipelago result) {
+  private void addIslandToResult(Island isl, MatchTableSelection selection, Archipelago result) {
     if (LOG.isLoggable(Level.FINE)) {
       LOG.log(Level.FINE, "adding island: '{0}'", isl);
     }
-    table.commitIsland(isl);
+    selection.commitIsland(isl);
     result.add(isl);
   }
 }
