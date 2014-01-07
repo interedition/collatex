@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -63,7 +62,7 @@ public class IslandConflictResolver {
     if (islandMultimap.isEmpty()) {
       return fixedIslands;
     }
-    MatchTableSelection selection = new MatchTableSelection(table);
+    MatchTableSelection selection = new MatchTableSelection(table, fixedIslands);
     // find the maximum island size and traverse groups in descending order
     Integer max = Collections.max(islandMultimap.keySet());
     for (int islandSize=max; islandSize > 0; islandSize--) {
@@ -75,7 +74,7 @@ public class IslandConflictResolver {
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
-        addIslandToResult(possibleIslands.get(0), selection, fixedIslands);
+        selection.addIsland(possibleIslands.get(0));
       } else if (possibleIslands.size() > 1) {
         Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(islandSize);
         resolveConflictsBySelectingPreferredIslands(selection, fixedIslands, analysis);
@@ -130,7 +129,7 @@ public class IslandConflictResolver {
     // Third select non competing islands
     LOG.fine("add non competing islands");
     for (Island i : islandConflictMap.get(IslandCompetition.NonCompetingIsland)) {
-      addIslandToResult(i, selection, archipelago);
+      selection.addIsland(i);
     }
   }
 
@@ -138,7 +137,7 @@ public class IslandConflictResolver {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
         if (selection.isIslandPossibleCandidate(ci)) {
-          addIslandToResult(ci, selection, archipelago);
+          selection.addIsland(ci);
         }
       }
     }
@@ -186,11 +185,4 @@ public class IslandConflictResolver {
     return competingIslands;
   }
 
-  private void addIslandToResult(Island isl, MatchTableSelection selection, Archipelago result) {
-    if (LOG.isLoggable(Level.FINE)) {
-      LOG.log(Level.FINE, "adding island: '{0}'", isl);
-    }
-    selection.commitIsland(isl);
-    result.add(isl);
-  }
 }
