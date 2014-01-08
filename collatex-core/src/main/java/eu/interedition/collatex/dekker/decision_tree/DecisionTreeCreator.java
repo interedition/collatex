@@ -42,7 +42,7 @@ public class DecisionTreeCreator {
     for (Island isl : table.getIslands()) {
       islandMultimap.put(isl.size(), isl);
     }
-    MatchTableSelection selection = new MatchTableSelection(table, new Archipelago());
+    MatchTableSelection selection = new MatchTableSelection(table);
     DecisionNode from = tree.getStart();
     do {
       Integer max = Collections.max(islandMultimap.keySet());
