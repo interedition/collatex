@@ -1,10 +1,13 @@
 package eu.interedition.collatex.dekker.matrix;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.VariantGraph;
@@ -71,5 +74,54 @@ public class MatchTableSelection {
 
   public boolean containsCoordinate(int row, int column) {
     return fixedIslands.containsCoordinate(row, column);
+  }
+
+  /*
+   * For all the possible islands of a certain size this method checks whether
+   * they conflict with one of the previously committed islands. If so, the
+   * possible island is removed from the multimap. Or in case of overlap, split
+   * into a smaller island and then put in back into the map Note that this
+   * method changes the possible islands multimap.
+   */
+  //TODO: the original Island object is modified here
+  //TODO: That should not happen, if we want to build a decision tree.
+  public void removeOrSplitImpossibleIslands(Integer islandSize, Multimap<Integer, Island> islandMultimap) {
+    Collection<Island> islandsToCheck = Lists.newArrayList(islandMultimap.get(islandSize));
+    for (Island island : islandsToCheck) {
+      if (!isIslandPossibleCandidate(island)) {
+        islandMultimap.remove(islandSize, island);
+        removeConflictingEndCoordinates(island);
+        if (island.size() > 0) {
+          islandMultimap.put(island.size(), island);
+        }
+      }
+    }
+  }
+
+  private void removeConflictingEndCoordinates(Island island) {
+    boolean goOn = true;
+    while (goOn) {
+      Coordinate leftEnd = island.getLeftEnd();
+      if (doesCoordinateOverlapWithCommittedCoordinate(leftEnd)) {
+        island.removeCoordinate(leftEnd);
+        if (island.size() == 0) {
+          return;
+        }
+      } else {
+        goOn = false;
+      }
+    }
+    goOn = true;
+    while (goOn) {
+      Coordinate rightEnd = island.getRightEnd();
+      if (doesCoordinateOverlapWithCommittedCoordinate(rightEnd)) {
+        island.removeCoordinate(rightEnd);
+        if (island.size() == 0) {
+          return;
+        }
+      } else {
+        goOn = false;
+      }
+    }
   }
 }

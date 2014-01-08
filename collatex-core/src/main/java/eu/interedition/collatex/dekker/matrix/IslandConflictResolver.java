@@ -67,7 +67,7 @@ public class IslandConflictResolver {
       // check the possible islands of a certain size against 
       // the already committed islands.
       
-      MatchTableModifier.removeOrSplitImpossibleIslands(selection, islandSize, islandMultimap);
+      selection.removeOrSplitImpossibleIslands(islandSize, islandMultimap);
       List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
