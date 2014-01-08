@@ -38,31 +38,28 @@ import com.google.common.collect.Sets;
  */
 public class IslandConflictResolver {
   Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
-  private final MatchTable table;
   // group the islands together by size; islands may change after commit islands
   private final Multimap<Integer, Island> islandMultimap;
   // fixed islands contains all the islands that are selected for the final alignment
-  private final Archipelago fixedIslands;
-
+  private final MatchTableSelection selection;
+  
   //NOTE: outlierTranspositionLimit is ignored for now
   public IslandConflictResolver(MatchTable table, int outlierTranspositionsSizeLimit) {
-    this.table = table;
     islandMultimap = ArrayListMultimap.create();
     for (Island isl : table.getIslands()) {
       islandMultimap.put(isl.size(), isl);
     }
-    fixedIslands = new Archipelago();
+    selection = new MatchTableSelection(table);
   }
 
   /*
    * Create a non-conflicting version by simply taken all the islands that do
    * not conflict with each other, largest first. 
    */
-  public Archipelago createNonConflictingVersion() {
+  public MatchTableSelection createNonConflictingVersion() {
     if (islandMultimap.isEmpty()) {
-      return fixedIslands;
+      return selection;
     }
-    MatchTableSelection selection = new MatchTableSelection(table, fixedIslands);
     // find the maximum island size and traverse groups in descending order
     Integer max = Collections.max(islandMultimap.keySet());
     for (int islandSize=max; islandSize > 0; islandSize--) {
@@ -80,7 +77,7 @@ public class IslandConflictResolver {
         resolveConflictsBySelectingPreferredIslands(selection, analysis);
       }
     }
-    return fixedIslands;
+    return selection;
   }
   
   /*
@@ -95,8 +92,7 @@ public class IslandConflictResolver {
     Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
     Set<Island> competingIslands = getCompetingIslands(possibleIslands);
     for (Island island : competingIslands) {
-      Coordinate leftEnd = island.getLeftEnd();
-      if (fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column)) {
+      if (selection.doesCandidateLayOnVectorOfCommittedIsland(island)) {
         conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
       } else {
         conflictMap.put(IslandCompetition.CompetingIsland, island);

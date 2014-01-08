@@ -1,5 +1,6 @@
 package eu.interedition.collatex.dekker.matrix;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,12 +15,12 @@ public class MatchTableSelection {
   //this fields are needed for the locking of table cells
   private final Set<Integer> fixedRows = Sets.newHashSet();
   private final Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
-  private final Archipelago result;
+  private final Archipelago fixedIslands;
   private final MatchTable table;
 
-  public MatchTableSelection(MatchTable table, Archipelago result) {
+  public MatchTableSelection(MatchTable table) {
     this.table = table;
-    this.result = result;
+    this.fixedIslands = new Archipelago();
   }
   
   /*
@@ -52,6 +53,23 @@ public class MatchTableSelection {
       fixedRows.add(coordinate.row);
       fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
     }
-    result.add(isl);
+    fixedIslands.add(isl);
+  }
+  
+  public boolean doesCandidateLayOnVectorOfCommittedIsland(Island island) {
+    Coordinate leftEnd = island.getLeftEnd();
+    return fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column);
+  }
+
+  public int size() {
+    return fixedIslands.size();
+  }
+
+  public List<Island> getIslands() {
+    return fixedIslands.getIslands();
+  }
+
+  public boolean containsCoordinate(int row, int column) {
+    return fixedIslands.containsCoordinate(row, column);
   }
 }
