@@ -38,17 +38,11 @@ import com.google.common.collect.Sets;
  */
 public class IslandConflictResolver {
   Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
-  // group the islands together by size; islands may change after commit islands
-  private final Multimap<Integer, Island> islandMultimap;
   // fixed islands contains all the islands that are selected for the final alignment
   private final MatchTableSelection selection;
   
   //NOTE: outlierTranspositionLimit is ignored for now
   public IslandConflictResolver(MatchTable table, int outlierTranspositionsSizeLimit) {
-    islandMultimap = ArrayListMultimap.create();
-    for (Island isl : table.getIslands()) {
-      islandMultimap.put(isl.size(), isl);
-    }
     selection = new MatchTableSelection(table);
   }
 
@@ -57,26 +51,18 @@ public class IslandConflictResolver {
    * not conflict with each other, largest first. 
    */
   public MatchTableSelection createNonConflictingVersion() {
-    if (islandMultimap.isEmpty()) {
-      return selection;
-    }
-    // find the maximum island size and traverse groups in descending order
-    Integer max = Collections.max(islandMultimap.keySet());
-    for (int islandSize=max; islandSize > 0; islandSize--) {
-      LOG.fine("Checking islands of size: "+islandSize);
-      // check the possible islands of a certain size against 
-      // the already committed islands.
-      
-      selection.removeOrSplitImpossibleIslands(islandSize, islandMultimap);
-      List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
+    List<Island> possibleIslands;
+    do { 
+      possibleIslands = selection.getPossibleIslands();
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
         selection.addIsland(possibleIslands.get(0));
       } else if (possibleIslands.size() > 1) {
-        Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(islandSize);
+        Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(possibleIslands);
         resolveConflictsBySelectingPreferredIslands(selection, analysis);
       }
     }
+    while (!possibleIslands.isEmpty());
     return selection;
   }
   
@@ -87,8 +73,7 @@ public class IslandConflictResolver {
    *
    * Parameters: the size of the islands that you want to analyze
    */
-  public Multimap<IslandCompetition, Island> analyzeConflictsBetweenPossibleIslands(int islandSize) {
-    List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(islandSize));
+  public Multimap<IslandCompetition, Island> analyzeConflictsBetweenPossibleIslands(List<Island> possibleIslands) {
     Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
     Set<Island> competingIslands = getCompetingIslands(possibleIslands);
     for (Island island : competingIslands) {

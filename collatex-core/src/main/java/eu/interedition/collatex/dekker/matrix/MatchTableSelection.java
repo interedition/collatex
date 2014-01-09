@@ -1,11 +1,13 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -13,17 +15,26 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.VariantGraph;
 
 // @author: Ronald Haentjens Dekker
+// Unselected islands reside in the islandMultimap.
+// Selected islands reside in the fixedIsland Archipelago.
+// Group the islands together by size; 
+// islands may change after commit islands
 public class MatchTableSelection {
   Logger LOG = Logger.getLogger(MatchTableSelection.class.getName());
+  private final Multimap<Integer, Island> islandMultimap;
+  private final Archipelago fixedIslands;
   //this fields are needed for the locking of table cells
   private final Set<Integer> fixedRows = Sets.newHashSet();
   private final Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
-  private final Archipelago fixedIslands;
   private final MatchTable table;
 
   public MatchTableSelection(MatchTable table) {
     this.table = table;
     this.fixedIslands = new Archipelago();
+    islandMultimap = ArrayListMultimap.create();
+    for (Island isl : table.getIslands()) {
+      islandMultimap.put(isl.size(), isl);
+    }
   }
   
   /*
@@ -57,6 +68,7 @@ public class MatchTableSelection {
       fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
     }
     fixedIslands.add(isl);
+    islandMultimap.remove(isl.size(), isl);
   }
   
   public boolean doesCandidateLayOnVectorOfCommittedIsland(Island island) {
@@ -123,5 +135,19 @@ public class MatchTableSelection {
         goOn = false;
       }
     }
+  }
+
+  public List<Island> getPossibleIslands() {
+    List<Island> possibleIslands = Lists.newArrayList();
+    while(possibleIslands.isEmpty()&&!islandMultimap.isEmpty()) {
+      // find the maximum island size and traverse groups in descending order
+      Integer max = Collections.max(islandMultimap.keySet());
+      LOG.fine("Checking islands of size: "+max);
+      // check the possible islands of a certain size against 
+      // the already committed islands.
+      removeOrSplitImpossibleIslands(max, islandMultimap);
+      possibleIslands = Lists.newArrayList(islandMultimap.get(max));
+    }
+    return possibleIslands;
   }
 }
