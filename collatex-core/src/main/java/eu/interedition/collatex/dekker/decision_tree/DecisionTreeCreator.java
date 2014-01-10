@@ -2,18 +2,13 @@ package eu.interedition.collatex.dekker.decision_tree;
 
 import static eu.interedition.collatex.dekker.decision_tree.VariantGraphBuilder.addFirstWitnessToGraph;
 
-import java.util.Collections;
 import java.util.List;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.dekker.matrix.MatchTableModifier;
 import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -38,31 +33,25 @@ public class DecisionTreeCreator {
   public static DecisionTree createDecisionTree(VariantGraph graph, SimpleWitness b) {
     DecisionTree tree = new DecisionTree();
     MatchTable table = MatchTable.create(graph, b);
-    Multimap<Integer, Island> islandMultimap = ArrayListMultimap.create();
-    for (Island isl : table.getIslands()) {
-      islandMultimap.put(isl.size(), isl);
-    }
     MatchTableSelection selection = new MatchTableSelection(table);
     DecisionNode from = tree.getStart();
     do {
-      Integer max = Collections.max(islandMultimap.keySet());
-      MatchTableModifier.removeOrSplitImpossibleIslands(selection, max, islandMultimap);
-      List<DecisionNode> createdNodes = createNodesForPossibleIslands(selection, tree, islandMultimap, from, max);
+      List<DecisionNode> createdNodes = createNodesForPossibleIslands(selection, tree, from);
       //TODO: The from node should be the optimal nodes of
       //the created nodes; for now we select the first one
       from = createdNodes.get(0);
-    } while (!islandMultimap.isEmpty());
+      //Note: possible islands are fetched twice here!
+    } while (!selection.getPossibleIslands().isEmpty());
     return tree;
   }
 
-  private static List<DecisionNode> createNodesForPossibleIslands(MatchTableSelection selection, DecisionTree tree, Multimap<Integer, Island> islandMultimap, DecisionNode from, Integer max) {
-    List<Island> possibleIslands = Lists.newArrayList(islandMultimap.get(max));
+  private static List<DecisionNode> createNodesForPossibleIslands(MatchTableSelection selection, DecisionTree tree, DecisionNode from) {
+    List<Island> possibleIslands = selection.getPossibleIslands();
     List<DecisionNode> createdNodes = Lists.newArrayList();
     for (Island alternative : possibleIslands) {
       DecisionNode to = tree.addAlternative(alternative, from);
       createdNodes.add(to);
       //TODO: this is a bit too broad: only selected island should be counted!
-      islandMultimap.remove(max, alternative);
       selection.addIsland(alternative);
     }
     return createdNodes;
