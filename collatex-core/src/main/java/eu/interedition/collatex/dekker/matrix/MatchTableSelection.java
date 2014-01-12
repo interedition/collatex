@@ -24,11 +24,13 @@ public class MatchTableSelection {
   private final Multimap<Integer, Island> islandMultimap;
   private final Archipelago fixedIslands;
   //this fields are needed for the locking of table cells
-  private final Set<Integer> fixedRows = Sets.newHashSet();
-  private final Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
+  private final Set<Integer> fixedRows;
+  private final Set<VariantGraph.Vertex> fixedVertices;
   private final MatchTable table;
 
   public MatchTableSelection(MatchTable table) {
+    fixedRows = Sets.newHashSet();
+    fixedVertices = Sets.newHashSet();
     this.table = table;
     this.fixedIslands = new Archipelago();
     islandMultimap = ArrayListMultimap.create();
@@ -37,6 +39,16 @@ public class MatchTableSelection {
     }
   }
   
+  // copy constructor
+  public MatchTableSelection(MatchTableSelection orig) {
+    // table structure is read only, does not have to be copied
+    this.islandMultimap = ArrayListMultimap.create(orig.islandMultimap);
+    this.fixedIslands = new Archipelago(orig.fixedIslands);
+    this.fixedRows = Sets.newHashSet(orig.fixedRows);
+    this.fixedVertices = Sets.newHashSet(orig.fixedVertices);
+    this.table = orig.table;
+  }
+
   /*
    * Return whether a coordinate overlaps with an already committed coordinate
    */
