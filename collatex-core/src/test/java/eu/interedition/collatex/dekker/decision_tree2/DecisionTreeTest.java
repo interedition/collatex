@@ -17,6 +17,7 @@ public class DecisionTreeTest {
     SimpleWitness b = new SimpleWitness("b", "a b e d");
     DecisionTreeNode dc = DecisionTreeNode.createDecisionTree(a, b);
     List<DecisionTreeNode> al = dc.calculateAlternatives();
+    // assert first level of children
     // select first vector graph
     DecisionTreeNode a1 = al.get(0);
     assertEquals(1, a1.getNumberOfSelectedVectors());
@@ -37,5 +38,12 @@ public class DecisionTreeTest {
     assertEquals(0, a4.getNumberOfSelectedVectors());
     assertEquals(0, a4.getNumberOfAlignedTokens());
     assertEquals(3, a4.getNumberOfGapTokens());
+    // assert second level of children
+    List<DecisionTreeNode> al2 = a1.calculateAlternatives();
+    // select first vector graph
+    DecisionTreeNode a21 = al2.get(0);
+    assertEquals(2, a21.getNumberOfSelectedVectors());
+    assertEquals(3, a21.getNumberOfAlignedTokens());
+    assertEquals(1, a21.getNumberOfGapTokens());
   }
 }

@@ -67,11 +67,15 @@ public class DecisionTreeNode {
   //TODO: this implementation is too simple
   //TODO: one should take the delta since last aligned token into account
   public int getNumberOfGapTokens() {
-    Island firstVectorFromGraph = selection.getFirstVectorFromGraph();
-    //System.out.println("Next vector is: "+firstVectorFromGraph);
-    int column = firstVectorFromGraph.getLeftEnd().getColumn();
-    //System.out.println("DEBUG: "+column);
-    return column - getNumberOfAlignedTokens();
+    if (selection.getPossibleIslands().isEmpty()) {
+      Island lastIsland = selection.getIslands().get(selection.getIslands().size()-1);
+      int column = lastIsland.getRightEnd().getColumn() +1;
+      return column - getNumberOfAlignedTokens();
+    } else {
+      Island nextIsland = selection.getFirstVectorFromGraph();
+      int column = nextIsland.getLeftEnd().getColumn();
+      return column - getNumberOfAlignedTokens();
+    }
   }
 
   public int getNumberOfSelectedVectors() {
