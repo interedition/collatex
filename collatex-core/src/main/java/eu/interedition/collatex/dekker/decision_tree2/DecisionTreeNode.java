@@ -49,9 +49,9 @@ public class DecisionTreeNode {
     ExtendedMatchTableSelection copy3 = new ExtendedMatchTableSelection(selection);
     ExtendedMatchTableSelection copy4 = new ExtendedMatchTableSelection(selection);
     childNodes.add(copy1.selectFirstVectorFromGraph());
-    //childNodes.add(copy2.selectFirstVectorFromWitness());
-    //childNodes.add(copy3.skipFirstVectorFromGraph());
-    //childNodes.add(copy4.skipFirstVectorFromWitness());
+    childNodes.add(copy2.selectFirstVectorFromWitness());
+    childNodes.add(copy3.skipFirstVectorFromGraph());
+    childNodes.add(copy4.skipFirstVectorFromWitness());
     return childNodes;
   }
 

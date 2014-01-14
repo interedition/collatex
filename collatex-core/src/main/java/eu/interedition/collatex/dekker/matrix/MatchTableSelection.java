@@ -80,7 +80,7 @@ public class MatchTableSelection {
       fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
     }
     fixedIslands.add(isl);
-    islandMultimap.remove(isl.size(), isl);
+    removeIslandFromPossibilities(isl);
   }
   
   public boolean doesCandidateLayOnVectorOfCommittedIsland(Island island) {
@@ -161,5 +161,9 @@ public class MatchTableSelection {
       possibleIslands = Lists.newArrayList(islandMultimap.get(max));
     }
     return possibleIslands;
+  }
+
+  public void removeIslandFromPossibilities(Island island) {
+    islandMultimap.remove(island.size(), island);
   }
 }

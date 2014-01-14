@@ -40,6 +40,24 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     return new DecisionTreeNode(this);
   }
 
+  public DecisionTreeNode selectFirstVectorFromWitness() {
+    Island i = getFirstVectorFromWitness();
+    addIsland(i);
+    return new DecisionTreeNode(this);
+  }
+
+  public DecisionTreeNode skipFirstVectorFromGraph() {
+    Island first = getFirstVectorFromGraph();
+    removeIslandFromPossibilities(first);
+    return new DecisionTreeNode(this);
+  }
+
+  public DecisionTreeNode skipFirstVectorFromWitness() {
+    Island first = getFirstVectorFromWitness();
+    removeIslandFromPossibilities(first);
+    return new DecisionTreeNode(this);
+  }
+
   //TODO: check precondition (possibleIslands can be empty)
   public Island getFirstVectorFromGraph() {
     Comparator<Island> comp = new Comparator<Island> () {
@@ -55,23 +73,30 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     return vectorsSortedOnGraphOrder.get(0);
   }
   
+  //TODO: check precondition (possibleIslands can be empty)
+  public Island getFirstVectorFromWitness() {
+    Comparator<Island> comp = new Comparator<Island> () {
+      @Override
+      public int compare(Island arg0, Island arg1) {
+        // first sort on row
+        // TODO: second sort on size
+        return arg0.getLeftEnd().getRow() - arg1.getLeftEnd().getRow();
+      }
+    };
+    List<Island> vectorsSortedOnWitnessOrder = Lists.newArrayList(possibleIslands);
+    Collections.sort(vectorsSortedOnWitnessOrder, comp);
+    return vectorsSortedOnWitnessOrder.get(0);
+  }
+
   @Override
   public void addIsland(Island isl) {
     possibleIslands.remove(isl);
     super.addIsland(isl);
   }
 
-  public DecisionTreeNode selectFirstVectorFromWitness() {
-    throw new UnsupportedOperationException("Not yet implemented!");
+  @Override
+  public void removeIslandFromPossibilities(Island island) {
+    possibleIslands.remove(island);
+    super.removeIslandFromPossibilities(island);
   }
-
-  public DecisionTreeNode skipFirstVectorFromGraph() {
-    throw new UnsupportedOperationException("Not yet implemented!");
-  }
-
-  public DecisionTreeNode skipFirstVectorFromWitness() {
-    throw new UnsupportedOperationException("Not yet implemented!");
-  }
-  
-
 }
