@@ -1,16 +1,10 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
-import static eu.interedition.collatex.dekker.decision_tree2.VariantGraphBuilder.addFirstWitnessToGraph;
-
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.Island;
-import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.jung.JungVariantGraph;
-import eu.interedition.collatex.simple.SimpleWitness;
 
 /*
  * DecisionTreeNode class
@@ -21,27 +15,18 @@ import eu.interedition.collatex.simple.SimpleWitness;
  * 4 for progressive alignment.
  */
 public class DecisionTreeNode {
-
   private ExtendedMatchTableSelection selection;
 
   public DecisionTreeNode(ExtendedMatchTableSelection selection) {
     this.selection = selection;
   }
 
-  public static DecisionTreeNode createDecisionTree(SimpleWitness a, SimpleWitness b) {
-    VariantGraph graph = new JungVariantGraph();
-    addFirstWitnessToGraph(graph, a);
-    return createDecisionTree(graph, b);
-  }
-
-  public static DecisionTreeNode createDecisionTree(VariantGraph graph, SimpleWitness b) {
-    MatchTable table = MatchTable.create(graph, b);
-    ExtendedMatchTableSelection selection = new ExtendedMatchTableSelection(table);
-    DecisionTreeNode root = new DecisionTreeNode(selection);
-    return root;
-  }
-  
-  public List<DecisionTreeNode> calculateAlternatives() {
+  /*
+   * Note: child nodes are recalculated every time.
+   * It is expected that the caller will not walk twice over the tree, so that
+   * this will not be a problem.
+   */
+  public List<DecisionTreeNode> getChildNodes() {
     List<DecisionTreeNode> childNodes = Lists.newArrayList();
     // make 4 copies
     ExtendedMatchTableSelection copy1 = new ExtendedMatchTableSelection(selection);
@@ -67,6 +52,9 @@ public class DecisionTreeNode {
   //TODO: this implementation is too simple
   //TODO: one should take the delta since last aligned token into account
   public int getNumberOfGapTokens() {
+    if (selection.getIslands().isEmpty()&&!selection.skippedIslands) {
+      return 0;
+    }
     if (selection.getPossibleIslands().isEmpty()) {
       Island lastIsland = selection.getIslands().get(selection.getIslands().size()-1);
       int column = lastIsland.getRightEnd().getColumn() +1;
@@ -80,5 +68,9 @@ public class DecisionTreeNode {
 
   public int getNumberOfSelectedVectors() {
     return selection.getIslands().size();
+  }
+
+  public boolean hasSkippedIslands() {
+    return selection.skippedIslands;
   }
 }

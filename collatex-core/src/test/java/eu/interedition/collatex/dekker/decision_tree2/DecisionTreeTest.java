@@ -6,17 +6,26 @@ import java.util.List;
 
 import org.junit.Test;
 
+import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.simple.SimpleWitness;
 
-public class DecisionTreeTest {
+public class DecisionTreeTest extends AbstractTest {
+
+  
   // No repeated tokens means that there are no alternatives.
   // Islands are sorted on size.
   @Test
   public void testNoRepetition() {
     SimpleWitness a = new SimpleWitness("a", "a b c d");
     SimpleWitness b = new SimpleWitness("b", "a b e d");
-    DecisionTreeNode dc = DecisionTreeNode.createDecisionTree(a, b);
-    List<DecisionTreeNode> al = dc.calculateAlternatives();
+
+    collationAlgorithm = new DekkerDecisionTreeAlgorithm();
+    collate(a, b);
+    
+    DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
+    DecisionTreeNode root = dtalgo.getRoot();
+    
+    List<DecisionTreeNode> al = root.getChildNodes();
     // assert first level of children
     // select first vector graph
     DecisionTreeNode a1 = al.get(0);
@@ -39,7 +48,7 @@ public class DecisionTreeTest {
     assertEquals(0, a4.getNumberOfAlignedTokens());
     assertEquals(3, a4.getNumberOfGapTokens());
     // assert second level of children
-    List<DecisionTreeNode> al2 = a1.calculateAlternatives();
+    List<DecisionTreeNode> al2 = a1.getChildNodes();
     // select first vector graph
     DecisionTreeNode a21 = al2.get(0);
     assertEquals(2, a21.getNumberOfSelectedVectors());
