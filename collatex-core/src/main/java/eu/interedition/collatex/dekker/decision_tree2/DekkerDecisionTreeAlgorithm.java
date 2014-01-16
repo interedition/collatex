@@ -33,7 +33,7 @@ public class DekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base {
     List<DecisionTreeNode> possibleAlignments = Lists.newArrayList();
     possibleAlignments.add(root);
     List<DecisionTreeNode> more = expandPossibleAlignments(possibleAlignments);
-    listPossibleAlignments(more);
+    listPossibleAlignments(expandPossibleAlignments(more));
   }
 
   private void listPossibleAlignments(List<DecisionTreeNode> more) {

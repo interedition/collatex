@@ -55,10 +55,14 @@ public class DecisionTreeNode {
     if (selection.getIslands().isEmpty()&&!selection.skippedIslands) {
       return 0;
     }
+    if (selection.getIslands().isEmpty()&&selection.getPossibleIslands().isEmpty()) {
+      return 0;
+    }
     if (selection.getPossibleIslands().isEmpty()) {
-      Island lastIsland = selection.getIslands().get(selection.getIslands().size()-1);
-      int column = lastIsland.getRightEnd().getColumn() +1;
-      return column - getNumberOfAlignedTokens();
+      //TODO: the size of the witness can be greater than the size
+      //TODO: of the graph (Math.max etc.)
+      int width = selection.sizeOfGraph();
+      return width - getNumberOfAlignedTokens();
     } else {
       Island nextIsland = selection.getFirstVectorFromGraph();
       int column = nextIsland.getLeftEnd().getColumn();

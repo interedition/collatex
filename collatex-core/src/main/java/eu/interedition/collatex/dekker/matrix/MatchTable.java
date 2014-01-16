@@ -91,6 +91,11 @@ public class MatchTable {
     return ranks;
   }
 
+  public int horizontalSize() {
+    //TODO: check
+    return ranks.size();
+  }
+
   // Since the coordinates in allMatches are ordered from upper left to lower right, 
   // we don't need to check the lower right neighbor.
   public Set<Island> getIslands() {

@@ -9,13 +9,18 @@ import org.junit.Test;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.simple.SimpleWitness;
 
+/*
+ * Test the alternatives in the decision tree
+ * and the cost function.
+ * 
+ * @author: Ronald Haentjens Dekker
+ */
 public class DecisionTreeTest extends AbstractTest {
-
   
   // No repeated tokens means that there are no alternatives.
   // Islands are sorted on size.
   @Test
-  public void testNoRepetition() {
+  public void testNoRepetition1() {
     SimpleWitness a = new SimpleWitness("a", "a b c d");
     SimpleWitness b = new SimpleWitness("b", "a b e d");
 
@@ -25,8 +30,8 @@ public class DecisionTreeTest extends AbstractTest {
     DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
     DecisionTreeNode root = dtalgo.getRoot();
     
-    List<DecisionTreeNode> al = root.getChildNodes();
     // assert first level of children
+    List<DecisionTreeNode> al = root.getChildNodes();
     // select first vector graph
     DecisionTreeNode a1 = al.get(0);
     assertEquals(1, a1.getNumberOfSelectedVectors());
@@ -47,12 +52,33 @@ public class DecisionTreeTest extends AbstractTest {
     assertEquals(0, a4.getNumberOfSelectedVectors());
     assertEquals(0, a4.getNumberOfAlignedTokens());
     assertEquals(3, a4.getNumberOfGapTokens());
+  }
+  
+  // assert second level of children (16 alternatives)
+  @Test
+  public void testNoRepetition2() {
+    SimpleWitness a = new SimpleWitness("a", "a b c d");
+    SimpleWitness b = new SimpleWitness("b", "a b e d");
+
+    collationAlgorithm = new DekkerDecisionTreeAlgorithm();
+    collate(a, b);
+    
+    DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
+    DecisionTreeNode root = dtalgo.getRoot();
+    
     // assert second level of children
-    List<DecisionTreeNode> al2 = a1.getChildNodes();
+    List<DecisionTreeNode> al = root.getChildNodes();
+    List<DecisionTreeNode> al2 = al.get(0).getChildNodes();
     // select first vector graph
     DecisionTreeNode a21 = al2.get(0);
     assertEquals(2, a21.getNumberOfSelectedVectors());
     assertEquals(3, a21.getNumberOfAlignedTokens());
     assertEquals(1, a21.getNumberOfGapTokens());
+    // skip first vector graph
+    DecisionTreeNode a23 = al2.get(2);
+    assertEquals(1, a23.getNumberOfSelectedVectors());
+    assertEquals(2, a23.getNumberOfAlignedTokens());
+    assertEquals(2, a23.getNumberOfGapTokens());
   }
+
 }

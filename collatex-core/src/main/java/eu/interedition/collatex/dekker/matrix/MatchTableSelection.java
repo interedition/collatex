@@ -26,7 +26,7 @@ public class MatchTableSelection {
   //this fields are needed for the locking of table cells
   private final Set<Integer> fixedRows;
   private final Set<VariantGraph.Vertex> fixedVertices;
-  private final MatchTable table;
+  protected final MatchTable table;
 
   public MatchTableSelection(MatchTable table) {
     fixedRows = Sets.newHashSet();

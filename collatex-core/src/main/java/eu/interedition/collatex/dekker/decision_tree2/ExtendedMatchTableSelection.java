@@ -117,4 +117,8 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     possibleIslands.remove(island);
     super.removeIslandFromPossibilities(island);
   }
+  
+  public int sizeOfGraph() {
+    return table.horizontalSize();
+  }
 }
