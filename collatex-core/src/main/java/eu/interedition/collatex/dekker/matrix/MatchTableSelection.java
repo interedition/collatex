@@ -71,7 +71,7 @@ public class MatchTableSelection {
    * Commit an island in the match table
    * Island will be part of the final alignment
    */
-  public void addIsland(Island isl) {
+  public void selectIsland(Island isl) {
     if (LOG.isLoggable(Level.FINE)) {
       LOG.log(Level.FINE, "adding island: '{0}'", isl);
     }
@@ -122,7 +122,7 @@ public class MatchTableSelection {
     }
   }
 
-  private void removeConflictingEndCoordinates(Island island) {
+  protected void removeConflictingEndCoordinates(Island island) {
     boolean goOn = true;
     while (goOn) {
       Coordinate leftEnd = island.getLeftEnd();

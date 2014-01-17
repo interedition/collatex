@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -22,13 +23,16 @@ import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
  * @author: Ronald Haentjens Dekker
  */
 public class ExtendedMatchTableSelection extends MatchTableSelection {
-  private Set<Island> possibleIslands;
+  private final Set<Island> possibleIslands;
   boolean skippedIslands;
+  // temporary measure to track the results
+  private final List<String> log;
   
   public ExtendedMatchTableSelection(MatchTable table) {
     super(table);
     this.possibleIslands = table.getIslands();
     this.skippedIslands = false;
+    this.log = Lists.newArrayList();
   }
   
   //NOTE: copy constructor
@@ -36,6 +40,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     super(orig);
     this.possibleIslands = Sets.newHashSet(orig.possibleIslands);
     this.skippedIslands = orig.skippedIslands;
+    this.log = Lists.newArrayList(orig.log);
   }
 
   public DecisionTreeNode selectFirstVectorFromGraph() {
@@ -43,7 +48,8 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       return new DecisionTreeNode(this);
     }
     Island i = getFirstVectorFromGraph();
-    addIsland(i);
+    selectIsland(i);
+    log.add(String.format("svfg %s", i));
     return new DecisionTreeNode(this);
   }
 
@@ -52,7 +58,8 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       return new DecisionTreeNode(this);
     }
     Island i = getFirstVectorFromWitness();
-    addIsland(i);
+    selectIsland(i);
+    log.add(String.format("svfw %s", i));
     return new DecisionTreeNode(this);
   }
 
@@ -63,6 +70,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     }
     Island first = getFirstVectorFromGraph();
     removeIslandFromPossibilities(first);
+    log.add(String.format("skvfg %s", first));
     return new DecisionTreeNode(this);
   }
 
@@ -73,6 +81,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     }
     Island first = getFirstVectorFromWitness();
     removeIslandFromPossibilities(first);
+    log.add(String.format("skvfw %s", first));
     return new DecisionTreeNode(this);
   }
 
@@ -117,9 +126,13 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   }
 
   @Override
-  public void addIsland(Island isl) {
+  public void selectIsland(Island isl) {
     possibleIslands.remove(isl);
-    super.addIsland(isl);
+    super.selectIsland(isl);
+    removeOrSplitImpossibleIslands();
+    //Note: this does not call the super removeOrSplitImpossibleIslands
+    //this causes problems; 
+    //We have to remove the inheritance here
   }
 
   @Override
@@ -131,4 +144,31 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   public int sizeOfGraph() {
     return table.horizontalSize();
   }
+  
+  public String log() {
+    return Joiner.on(";").join(log);
+  }
+  
+  //TODO: this can be done faster by only checking the possible islands
+  //against the newly selected island!
+  //Note: implementation of this method differs from superclass.
+  private void removeOrSplitImpossibleIslands() {
+    for (Island island : possibleIslands) {
+      if (!isIslandPossibleCandidate(island)) {
+        possibleIslands.remove(island);
+        Island splitIsland = new Island(island);
+        super.removeConflictingEndCoordinates(splitIsland);
+        if (splitIsland.size() > 0) {
+          possibleIslands.add(splitIsland);
+        }
+      }
+    }
+  }
+  
+  //TODO: not nice!
+  //TODO: see comment on selectIsland(method)
+  @Override
+  public List<Island> getPossibleIslands() {
+    return Lists.newArrayList(possibleIslands);
+  }  
 }

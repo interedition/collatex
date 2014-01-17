@@ -16,7 +16,7 @@ import eu.interedition.collatex.dekker.matrix.MatchTable;
  */
 
 public class DekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base {
-  private DecisionTreeNode root;
+  protected List<DecisionTreeNode> possibleAlignments;
 
   @Override
   public void collate(VariantGraph against, Iterable<Token> witness) {
@@ -28,33 +28,22 @@ public class DekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base {
     }
     MatchTable table = MatchTable.create(against, witness);
     ExtendedMatchTableSelection selection = new ExtendedMatchTableSelection(table);
-    root = new DecisionTreeNode(selection);
-    // TODO: add comparison of cost for each of the alternatives
-    List<DecisionTreeNode> possibleAlignments = Lists.newArrayList();
-    possibleAlignments.add(root);
-    List<DecisionTreeNode> more = expandPossibleAlignments(possibleAlignments);
-    listPossibleAlignments(expandPossibleAlignments(more));
+    DecisionTreeNode root = new DecisionTreeNode(selection);
+    possibleAlignments = Lists.newArrayList(root);
   }
 
-  private void listPossibleAlignments(List<DecisionTreeNode> more) {
-    for (DecisionTreeNode alignment : more) {
-      System.out.println("Aligned tokens: "+alignment.getNumberOfAlignedTokens()+", Gap tokens: "+alignment.getNumberOfGapTokens()+", skipped islands: "+alignment.hasSkippedIslands());
+  void listPossibleAlignments() {
+    for (DecisionTreeNode alignment : possibleAlignments) {
+      System.out.println("Aligned tokens: "+alignment.getNumberOfAlignedTokens()+", Gap tokens: "+alignment.getNumberOfGapTokens()+", skipped islands: "+alignment.hasSkippedIslands()+", is finished: "+alignment.isFinished()+". "+alignment.log());
     }
     System.out.println("----");
   }
 
-  private List<DecisionTreeNode> expandPossibleAlignments(List<DecisionTreeNode> possibleAlignments) {
+  void expandPossibleAlignments() {
     List<DecisionTreeNode> result = Lists.newArrayList();
     for (DecisionTreeNode alignment : possibleAlignments) {
       result.addAll(alignment.getChildNodes());
     }
-    return result;
-  }
-
-  public DecisionTreeNode getRoot() {
-    if (root == null) {
-      throw new RuntimeException("Nothing has been collated yet! No decision tree has been created!");
-    }
-    return root;
+    possibleAlignments = result;
   }
 }

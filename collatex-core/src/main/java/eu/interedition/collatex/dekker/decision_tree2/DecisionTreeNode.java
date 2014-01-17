@@ -77,4 +77,12 @@ public class DecisionTreeNode {
   public boolean hasSkippedIslands() {
     return selection.skippedIslands;
   }
+
+  public boolean isFinished() {
+    return selection.getPossibleIslands().isEmpty();
+  }
+
+  public String log() {
+    return selection.log();
+  }
 }

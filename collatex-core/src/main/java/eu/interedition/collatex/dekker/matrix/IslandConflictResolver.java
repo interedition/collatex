@@ -56,7 +56,7 @@ public class IslandConflictResolver {
       possibleIslands = selection.getPossibleIslands();
       // check the possible islands of a certain size against each other.
       if (possibleIslands.size() == 1) {
-        selection.addIsland(possibleIslands.get(0));
+        selection.selectIsland(possibleIslands.get(0));
       } else if (possibleIslands.size() > 1) {
         Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(possibleIslands);
         resolveConflictsBySelectingPreferredIslands(selection, analysis);
@@ -110,7 +110,7 @@ public class IslandConflictResolver {
     // Third select non competing islands
     LOG.fine("add non competing islands");
     for (Island i : islandConflictMap.get(IslandCompetition.NonCompetingIsland)) {
-      selection.addIsland(i);
+      selection.selectIsland(i);
     }
   }
 
@@ -118,7 +118,7 @@ public class IslandConflictResolver {
     for (Double d : shortestToLongestDistances(distanceMap1)) {
       for (Island ci : distanceMap1.get(d)) {
         if (selection.isIslandPossibleCandidate(ci)) {
-          selection.addIsland(ci);
+          selection.selectIsland(ci);
         }
       }
     }
