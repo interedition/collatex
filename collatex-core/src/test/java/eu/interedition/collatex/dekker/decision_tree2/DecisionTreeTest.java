@@ -1,6 +1,7 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -81,4 +82,19 @@ public class DecisionTreeTest extends AbstractTest {
     assertEquals(2, a23.getNumberOfGapTokens());
   }
 
+ // Token a is repeated
+ // Decision tree should contain alternatives
+ @Test
+ public void testSingleRepeatedPhrase() {
+   SimpleWitness a = new SimpleWitness("a", "a x b a");
+   SimpleWitness b = new SimpleWitness("b", "a y b");
+
+   collationAlgorithm = new DekkerDecisionTreeAlgorithm();
+   collate(a, b);
+   
+   DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
+   DecisionTreeNode root = dtalgo.getRoot();
+   //TODO: add more asserts!
+   //fail();
+ }
 }

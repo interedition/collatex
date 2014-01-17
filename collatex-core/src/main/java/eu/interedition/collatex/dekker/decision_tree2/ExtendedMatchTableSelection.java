@@ -83,7 +83,12 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       public int compare(Island arg0, Island arg1) {
         // first sort on column
         // TODO: second sort on size
-        return arg0.getLeftEnd().getColumn() - arg1.getLeftEnd().getColumn();
+        int result = arg0.getLeftEnd().getColumn() - arg1.getLeftEnd().getColumn();
+        if (result==0) {
+          result = arg0.getLeftEnd().getRow() - arg1.getLeftEnd().getRow();
+        }
+        Preconditions.checkArgument(result!=0, "Islands are not sortable! %s %s", arg0, arg1);
+        return result;
       }
     };
     List<Island> vectorsSortedOnGraphOrder = Lists.newArrayList(possibleIslands);
@@ -98,7 +103,12 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       public int compare(Island arg0, Island arg1) {
         // first sort on row
         // TODO: second sort on size
-        return arg0.getLeftEnd().getRow() - arg1.getLeftEnd().getRow();
+        int result = arg0.getLeftEnd().getRow() - arg1.getLeftEnd().getRow();
+        if (result==0) {
+          result = arg0.getLeftEnd().getColumn() - arg1.getLeftEnd().getColumn();
+        }
+        Preconditions.checkArgument(result!=0, "Islands are not sortable! %s %s", arg0, arg1);
+        return result;
       }
     };
     List<Island> vectorsSortedOnWitnessOrder = Lists.newArrayList(possibleIslands);
