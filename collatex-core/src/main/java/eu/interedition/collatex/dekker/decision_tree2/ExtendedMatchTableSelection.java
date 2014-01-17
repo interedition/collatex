@@ -44,9 +44,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   }
 
   public DecisionTreeNode selectFirstVectorFromGraph() {
-    if (possibleIslands.isEmpty()) {
-      return new DecisionTreeNode(this);
-    }
     Island i = getFirstVectorFromGraph();
     selectIsland(i);
     log.add(String.format("svfg %s", i));
@@ -54,9 +51,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   }
 
   public DecisionTreeNode selectFirstVectorFromWitness() {
-    if (possibleIslands.isEmpty()) {
-      return new DecisionTreeNode(this);
-    }
     Island i = getFirstVectorFromWitness();
     selectIsland(i);
     log.add(String.format("svfw %s", i));
@@ -65,9 +59,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
 
   public DecisionTreeNode skipFirstVectorFromGraph() {
     skippedIslands = true;
-    if (possibleIslands.isEmpty()) {
-      return new DecisionTreeNode(this);
-    }
     Island first = getFirstVectorFromGraph();
     removeIslandFromPossibilities(first);
     log.add(String.format("skvfg %s", first));
@@ -76,9 +67,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
 
   public DecisionTreeNode skipFirstVectorFromWitness() {
     skippedIslands = true;
-    if (possibleIslands.isEmpty()) {
-      return new DecisionTreeNode(this);
-    }
     Island first = getFirstVectorFromWitness();
     removeIslandFromPossibilities(first);
     log.add(String.format("skvfw %s", first));

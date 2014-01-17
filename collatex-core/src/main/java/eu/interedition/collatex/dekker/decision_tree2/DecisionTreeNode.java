@@ -1,5 +1,6 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -21,22 +22,43 @@ public class DecisionTreeNode {
     this.selection = selection;
   }
 
+  // There are three situations:
+  // 1. There are no unallocated vectors, return this node.
+  // 2. The first vector of the graph and the witness
+  //    are the same. Return two nodes:
+  //    1. Select the vector.
+  // or 2. Skip the vector.
+  // 3. The first vector of the graph and the witness
+  //    are different. Return 4 nodes.
   /*
    * Note: child nodes are recalculated every time.
    * It is expected that the caller will not walk twice over the tree, so that
    * this will not be a problem.
    */
   public List<DecisionTreeNode> getChildNodes() {
+    if (selection.getPossibleIslands().isEmpty()) {
+      return Collections.singletonList(this);
+    }
+    Island firstVectorGraph = selection.getFirstVectorFromGraph();
+    Island firstVectorWitness = selection.getFirstVectorFromWitness();
     List<DecisionTreeNode> childNodes = Lists.newArrayList();
-    // make 4 copies
-    ExtendedMatchTableSelection copy1 = new ExtendedMatchTableSelection(selection);
-    ExtendedMatchTableSelection copy2 = new ExtendedMatchTableSelection(selection);
-    ExtendedMatchTableSelection copy3 = new ExtendedMatchTableSelection(selection);
-    ExtendedMatchTableSelection copy4 = new ExtendedMatchTableSelection(selection);
-    childNodes.add(copy1.selectFirstVectorFromGraph());
-    childNodes.add(copy2.selectFirstVectorFromWitness());
-    childNodes.add(copy3.skipFirstVectorFromGraph());
-    childNodes.add(copy4.skipFirstVectorFromWitness());
+    if (firstVectorGraph!=firstVectorWitness) {
+      // make 4 copies
+      ExtendedMatchTableSelection copy1 = new ExtendedMatchTableSelection(selection);
+      ExtendedMatchTableSelection copy2 = new ExtendedMatchTableSelection(selection);
+      ExtendedMatchTableSelection copy3 = new ExtendedMatchTableSelection(selection);
+      ExtendedMatchTableSelection copy4 = new ExtendedMatchTableSelection(selection);
+      childNodes.add(copy1.selectFirstVectorFromGraph());
+      childNodes.add(copy2.selectFirstVectorFromWitness());
+      childNodes.add(copy3.skipFirstVectorFromGraph());
+      childNodes.add(copy4.skipFirstVectorFromWitness());
+    } else {
+      // make 2 copies
+      ExtendedMatchTableSelection copy1 = new ExtendedMatchTableSelection(selection);
+      ExtendedMatchTableSelection copy2 = new ExtendedMatchTableSelection(selection);
+      childNodes.add(copy1.selectFirstVectorFromGraph());
+      childNodes.add(copy2.skipFirstVectorFromGraph());
+    }
     return childNodes;
   }
 
@@ -53,9 +75,6 @@ public class DecisionTreeNode {
   //TODO: one should take the delta since last aligned token into account
   public int getNumberOfGapTokens() {
     if (selection.getIslands().isEmpty()&&!selection.skippedIslands) {
-      return 0;
-    }
-    if (selection.getIslands().isEmpty()&&selection.getPossibleIslands().isEmpty()) {
       return 0;
     }
     if (selection.getPossibleIslands().isEmpty()) {

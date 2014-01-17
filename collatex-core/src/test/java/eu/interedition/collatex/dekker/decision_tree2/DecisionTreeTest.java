@@ -18,45 +18,8 @@ import eu.interedition.collatex.simple.SimpleWitness;
 public class DecisionTreeTest extends AbstractTest {
   
   // No repeated tokens means that there are no alternatives.
-  // Islands are sorted on size.
   @Test
-  public void testNoRepetition1() {
-    SimpleWitness a = new SimpleWitness("a", "a b c d");
-    SimpleWitness b = new SimpleWitness("b", "a b e d");
-
-    collationAlgorithm = new DekkerDecisionTreeAlgorithm();
-    collate(a, b);
-    
-    DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
-    // expand the tree once (1 candidate -> 4 candidates)
-    dtalgo.expandPossibleAlignments();
-    List<DecisionTreeNode> al = dtalgo.possibleAlignments;
-
-    // select first vector graph
-    DecisionTreeNode a1 = al.get(0);
-    assertEquals(1, a1.getNumberOfSelectedVectors());
-    assertEquals(2, a1.getNumberOfAlignedTokens());
-    assertEquals(1, a1.getNumberOfGapTokens());
-    // select first vector witness
-    DecisionTreeNode a2 = al.get(1);
-    assertEquals(1, a2.getNumberOfSelectedVectors());
-    assertEquals(2, a2.getNumberOfAlignedTokens());
-    assertEquals(1, a2.getNumberOfGapTokens());
-    // skip first vector graph
-    DecisionTreeNode a3 = al.get(2);
-    assertEquals(0, a3.getNumberOfSelectedVectors());
-    assertEquals(0, a3.getNumberOfAlignedTokens());
-    assertEquals(3, a3.getNumberOfGapTokens());
-    // skip first vector witness
-    DecisionTreeNode a4 = al.get(3);
-    assertEquals(0, a4.getNumberOfSelectedVectors());
-    assertEquals(0, a4.getNumberOfAlignedTokens());
-    assertEquals(3, a4.getNumberOfGapTokens());
-  }
-  
-  // assert second level of children (16 alternatives)
-  @Test
-  public void testNoRepetition2() {
+  public void testNoRepetition() {
     SimpleWitness a = new SimpleWitness("a", "a b c d");
     SimpleWitness b = new SimpleWitness("b", "a b e d");
 
@@ -65,20 +28,30 @@ public class DecisionTreeTest extends AbstractTest {
     
     DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
 
-    // expand the tree twice (1 candidate -> 4 candidates -> 16 candidates)
+    // expand the tree twice (1 candidate -> 2 candidates -> 4 candidates)
     dtalgo.expandPossibleAlignments();
     dtalgo.expandPossibleAlignments();
     
-    // select first vector graph
-    DecisionTreeNode a21 = dtalgo.possibleAlignments.get(0);
-    assertEquals(2, a21.getNumberOfSelectedVectors());
-    assertEquals(3, a21.getNumberOfAlignedTokens());
-    assertEquals(1, a21.getNumberOfGapTokens());
-    // skip first vector graph
-    DecisionTreeNode a23 = dtalgo.possibleAlignments.get(2);
-    assertEquals(1, a23.getNumberOfSelectedVectors());
-    assertEquals(2, a23.getNumberOfAlignedTokens());
-    assertEquals(2, a23.getNumberOfGapTokens());
+    // select first vector graph, select second vector graph
+    DecisionTreeNode c1 = dtalgo.possibleAlignments.get(0);
+    assertEquals(2, c1.getNumberOfSelectedVectors());
+    assertEquals(3, c1.getNumberOfAlignedTokens());
+    assertEquals(1, c1.getNumberOfGapTokens());
+    // select first vector graph, skip second vector graph
+    DecisionTreeNode c2 = dtalgo.possibleAlignments.get(1);
+    assertEquals(1, c2.getNumberOfSelectedVectors());
+    assertEquals(2, c2.getNumberOfAlignedTokens());
+    assertEquals(2, c2.getNumberOfGapTokens());
+    // skip first vector graph, select second vector graph
+    DecisionTreeNode c3 = dtalgo.possibleAlignments.get(2);
+    assertEquals(1, c3.getNumberOfSelectedVectors());
+    assertEquals(1, c3.getNumberOfAlignedTokens());
+    assertEquals(3, c3.getNumberOfGapTokens());
+    // skip first vector graph, skip second vector graph
+    DecisionTreeNode c4 = dtalgo.possibleAlignments.get(3);
+    assertEquals(0, c4.getNumberOfSelectedVectors());
+    assertEquals(0, c4.getNumberOfAlignedTokens());
+    assertEquals(4, c4.getNumberOfGapTokens());
   }
 
  // Token a is repeated
@@ -93,18 +66,19 @@ public class DecisionTreeTest extends AbstractTest {
    
    DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
    
-   // expand the tree twice (1 candidate -> 4 candidates -> 16 candidates)
+   // expand the tree twice (1 candidate -> ? candidates -> 6 candidates)
    dtalgo.expandPossibleAlignments();
    dtalgo.expandPossibleAlignments();
-   dtalgo.listPossibleAlignments();
+//   dtalgo.listPossibleAlignments();
 
    List<DecisionTreeNode> candidates = dtalgo.possibleAlignments;
    
-   // out of the 16 candidates, pick candidate 2
-   DecisionTreeNode c2 = candidates.get(1);
+   // best candidate
+   DecisionTreeNode c2 = candidates.get(0);
    assertEquals(2, c2.getNumberOfSelectedVectors());
    assertEquals(2, c2.getNumberOfAlignedTokens());
    assertEquals(2, c2.getNumberOfGapTokens());
    //TODO: add more asserts!
+   //fail();
  }
 }
