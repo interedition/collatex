@@ -34,7 +34,7 @@ public class DekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base {
 
   void listPossibleAlignments() {
     for (DecisionTreeNode alignment : possibleAlignments) {
-      System.out.println("Aligned tokens: "+alignment.getNumberOfAlignedTokens()+", Gap tokens: "+alignment.getNumberOfGapTokens()+", skipped islands: "+alignment.hasSkippedIslands()+", is finished: "+alignment.isFinished()+". "+alignment.log());
+      System.out.println("AT: "+alignment.getNumberOfAlignedTokens()+", GT: "+alignment.getNumberOfGapTokens()+", TT: "+alignment.getNumberOfTransposedTokens()+", skipped islands: "+alignment.hasSkippedIslands()+", is finished: "+alignment.isFinished()+". "+alignment.log());
     }
     System.out.println("----");
   }

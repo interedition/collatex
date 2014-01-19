@@ -1,6 +1,6 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -69,15 +69,28 @@ public class DecisionTreeTest extends AbstractTest {
    // expand the tree twice (1 candidate -> ? candidates -> 6 candidates)
    dtalgo.expandPossibleAlignments();
    dtalgo.expandPossibleAlignments();
-//   dtalgo.listPossibleAlignments();
+   //dtalgo.listPossibleAlignments();
 
    List<DecisionTreeNode> candidates = dtalgo.possibleAlignments;
    
    // best candidate
-   DecisionTreeNode c2 = candidates.get(0);
-   assertEquals(2, c2.getNumberOfSelectedVectors());
-   assertEquals(2, c2.getNumberOfAlignedTokens());
-   assertEquals(2, c2.getNumberOfGapTokens());
+   DecisionTreeNode c1 = candidates.get(0);
+   assertEquals(2, c1.getNumberOfSelectedVectors());
+   assertEquals(2, c1.getNumberOfAlignedTokens());
+   assertEquals(2, c1.getNumberOfGapTokens());
+   assertEquals(0, c1.getNumberOfTransposedTokens());
+   // transposition candidate 1
+   DecisionTreeNode c3 = candidates.get(2);
+   assertEquals(1, c3.getNumberOfSelectedVectors());
+   assertEquals(1, c3.getNumberOfAlignedTokens());
+   assertEquals(3, c3.getNumberOfGapTokens());
+   assertEquals(1, c3.getNumberOfTransposedTokens());
+   // transposition candidate 2
+   DecisionTreeNode c4 = candidates.get(3);
+   assertEquals(1, c4.getNumberOfSelectedVectors());
+   assertEquals(1, c4.getNumberOfAlignedTokens());
+   assertEquals(3, c4.getNumberOfGapTokens());
+   assertEquals(1, c4.getNumberOfTransposedTokens());
    //TODO: add more asserts!
    //fail();
  }

@@ -2,6 +2,7 @@ package eu.interedition.collatex.dekker.decision_tree2;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 
@@ -12,8 +13,9 @@ import eu.interedition.collatex.dekker.matrix.Island;
  * 
  * @Author: Ronald Haentjens Dekker
  * 
- * Every node has a fixed number of children.
- * 4 for progressive alignment.
+ * Every node has a fixed number of children (in case of progressive alignment).
+ * 1 child (no further possibilities), 2 (aligned) or 4 (transposition) children.
+ * 
  */
 public class DecisionTreeNode {
   private ExtendedMatchTableSelection selection;
@@ -48,8 +50,8 @@ public class DecisionTreeNode {
       ExtendedMatchTableSelection copy2 = new ExtendedMatchTableSelection(selection);
       ExtendedMatchTableSelection copy3 = new ExtendedMatchTableSelection(selection);
       ExtendedMatchTableSelection copy4 = new ExtendedMatchTableSelection(selection);
-      childNodes.add(copy1.selectFirstVectorFromGraph());
-      childNodes.add(copy2.selectFirstVectorFromWitness());
+      childNodes.add(copy1.selectFirstVectorGraphTransposeWitness());
+      childNodes.add(copy2.selectFirstVectorWitnessTransposeGraph());
       childNodes.add(copy3.skipFirstVectorFromGraph());
       childNodes.add(copy4.skipFirstVectorFromWitness());
     } else {
@@ -64,6 +66,15 @@ public class DecisionTreeNode {
 
   public int getNumberOfAlignedTokens() {
     List<Island> islands = selection.getIslands();
+    int numberOfSelectedTokens = 0;
+    for (Island selected : islands) {
+      numberOfSelectedTokens += selected.size();
+    }
+    return numberOfSelectedTokens;
+  }
+
+  public int getNumberOfTransposedTokens() {
+    Set<Island> islands = selection.getTransposedIslands();
     int numberOfSelectedTokens = 0;
     for (Island selected : islands) {
       numberOfSelectedTokens += selected.size();
@@ -104,4 +115,5 @@ public class DecisionTreeNode {
   public String log() {
     return selection.log();
   }
+
 }
