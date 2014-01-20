@@ -116,4 +116,8 @@ public class DecisionTreeNode {
     return selection.log();
   }
 
+  public List<Island> getIslands() {
+    return selection.getIslands();
+  }
+
 }

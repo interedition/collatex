@@ -177,14 +177,18 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   //against the newly selected island!
   //Note: implementation of this method differs from superclass.
   private void removeOrSplitImpossibleIslands() {
+    Set<Island> impossibleIslands = Sets.newHashSet();
     for (Island island : possibleIslands) {
       if (!isIslandPossibleCandidate(island)) {
-        possibleIslands.remove(island);
-        Island splitIsland = new Island(island);
-        super.removeConflictingEndCoordinates(splitIsland);
-        if (splitIsland.size() > 0) {
-          possibleIslands.add(splitIsland);
-        }
+        impossibleIslands.add(island);
+      }
+    }
+    for (Island island : impossibleIslands) {
+      possibleIslands.remove(island);
+      Island splitIsland = new Island(island);
+      super.removeConflictingEndCoordinates(splitIsland);
+      if (splitIsland.size() > 0) {
+        possibleIslands.add(splitIsland);
       }
     }
   }
