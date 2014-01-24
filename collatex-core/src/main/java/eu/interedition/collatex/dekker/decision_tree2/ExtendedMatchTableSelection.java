@@ -46,37 +46,33 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     this.log = Lists.newArrayList(orig.log);
   }
 
-  public DecisionTreeNode selectFirstVectorFromGraph() {
+  public void selectFirstVectorFromGraph() {
     Island i = getFirstVectorFromGraph();
     selectIsland(i);
     log.add(String.format("sel g %s", i));
-    return new DecisionTreeNode(this);
   }
 
-  public DecisionTreeNode selectFirstVectorFromWitness() {
+  public void selectFirstVectorFromWitness() {
     Island i = getFirstVectorFromWitness();
     selectIsland(i);
     log.add(String.format("sel w %s", i));
-    return new DecisionTreeNode(this);
   }
 
-  public DecisionTreeNode skipFirstVectorFromGraph() {
+  public void skipFirstVectorFromGraph() {
     skippedIslands = true;
     Island first = getFirstVectorFromGraph();
     removeIslandFromPossibilities(first);
     log.add(String.format("skip g %s", first));
-    return new DecisionTreeNode(this);
   }
 
-  public DecisionTreeNode skipFirstVectorFromWitness() {
+  public void skipFirstVectorFromWitness() {
     skippedIslands = true;
     Island first = getFirstVectorFromWitness();
     removeIslandFromPossibilities(first);
     log.add(String.format("skip w %s", first));
-    return new DecisionTreeNode(this);
   }
 
-  public DecisionTreeNode selectFirstVectorGraphTransposeWitness() {
+  public void selectFirstVectorGraphTransposeWitness() {
     Island firstVectorFromGraph = getFirstVectorFromGraph();
     // Find that vector in the witness
     // as long as you can't find that vector
@@ -87,10 +83,10 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       transposeVector(witness);
       witness = getFirstVectorFromWitness();
     } while (witness != firstVectorFromGraph);
-    return selectFirstVectorFromGraph();
+    selectFirstVectorFromGraph();
   }
   
-  public DecisionTreeNode selectFirstVectorWitnessTransposeGraph() {
+  public void selectFirstVectorWitnessTransposeGraph() {
     Island firstVectorFromWitness = getFirstVectorFromWitness();
     // Find that vector in the graph
     // as long as you can't find that vector
@@ -101,7 +97,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       transposeVector(graph);
       graph = getFirstVectorFromGraph();
     } while (graph != firstVectorFromWitness);
-    return selectFirstVectorFromWitness();
+    selectFirstVectorFromWitness();
   }
 
   public Island getFirstVectorFromGraph() {
@@ -204,6 +200,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     return transposedIslands;
   }
 
-
-
+  public ExtendedMatchTableSelection copy() {
+    return new ExtendedMatchTableSelection(this);
+  }
 }

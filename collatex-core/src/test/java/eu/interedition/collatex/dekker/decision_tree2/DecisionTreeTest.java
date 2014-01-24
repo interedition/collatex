@@ -23,10 +23,10 @@ public class DecisionTreeTest extends AbstractTest {
     SimpleWitness a = new SimpleWitness("a", "a b c d");
     SimpleWitness b = new SimpleWitness("b", "a b e d");
 
-    collationAlgorithm = new DekkerDecisionTreeAlgorithm();
+    collationAlgorithm = new PreviousDekkerDecisionTreeAlgorithm();
     collate(a, b);
     
-    DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
+    PreviousDekkerDecisionTreeAlgorithm dtalgo = (PreviousDekkerDecisionTreeAlgorithm) collationAlgorithm;
 
     // expand the tree twice (1 candidate -> 2 candidates -> 4 candidates)
     dtalgo.expandPossibleAlignments();
@@ -61,10 +61,10 @@ public class DecisionTreeTest extends AbstractTest {
    SimpleWitness a = new SimpleWitness("a", "a x b a");
    SimpleWitness b = new SimpleWitness("b", "a y b");
 
-   collationAlgorithm = new DekkerDecisionTreeAlgorithm();
+   collationAlgorithm = new PreviousDekkerDecisionTreeAlgorithm();
    collate(a, b);
    
-   DekkerDecisionTreeAlgorithm dtalgo = (DekkerDecisionTreeAlgorithm) collationAlgorithm;
+   PreviousDekkerDecisionTreeAlgorithm dtalgo = (PreviousDekkerDecisionTreeAlgorithm) collationAlgorithm;
    
    // expand the tree twice (1 candidate -> ? candidates -> 6 candidates)
    dtalgo.expandPossibleAlignments();
