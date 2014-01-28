@@ -16,7 +16,7 @@ import eu.interedition.collatex.dekker.matrix.Island;
  * @author: Ronald Haentjens Dekker
  */
 
-public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm {
+public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<AlignmentCost> {
 
   @Override
   public void collate(VariantGraph against, Iterable<Token> witness) {
@@ -73,13 +73,13 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm {
   }
 
   @Override
-  Integer heuristicCostEstimate(DecisionTreeNode node) {
+  AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  Integer distBetween(DecisionTreeNode current, DecisionTreeNode neighbor) {
+  AlignmentCost distBetween(DecisionTreeNode current, DecisionTreeNode neighbor) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -20,21 +20,21 @@ import eu.interedition.collatex.CollationAlgorithm;
  * 
  * @author: Ronald Haentjens Dekker
  */
-public abstract class AstarAlgorithm extends CollationAlgorithm.Base {
+public abstract class AstarAlgorithm<T extends Cost<T>> extends CollationAlgorithm.Base {
 
-  public List<DecisionTreeNode> aStar(DecisionTreeNode start) {
+  public List<DecisionTreeNode> aStar(DecisionTreeNode start, T startCost) {
     // The set of nodes already evaluated.
     Set<DecisionTreeNode> closed = Sets.newHashSet();
     // The map of navigated nodes.
     Map<DecisionTreeNode, DecisionTreeNode> cameFrom = Maps.newHashMap();
     
     // Cost from start along best known path.
-    Map<DecisionTreeNode, Integer> gScore = Maps.newHashMap();
-    gScore.put(start, 0);
+    Map<DecisionTreeNode, T> gScore = Maps.newHashMap();
+    gScore.put(start, startCost);
   
     // Estimated total cost from start to goal through y.
-    final Map<DecisionTreeNode, Integer> fScore = Maps.newHashMap();
-    fScore.put(start, gScore.get(start) + heuristicCostEstimate(start));
+    final Map<DecisionTreeNode, T> fScore = Maps.newHashMap();
+    fScore.put(start, gScore.get(start).plus(heuristicCostEstimate(start)));
     
     // The set of tentative nodes to be evaluated, initially containing the start node
     Comparator<DecisionTreeNode> comp = new Comparator<DecisionTreeNode>() {
@@ -56,11 +56,11 @@ public abstract class AstarAlgorithm extends CollationAlgorithm.Base {
         if (closed.contains(neighbor)) {
           continue;
         }
-        int tentativeGScore = gScore.get(current) + distBetween(current, neighbor);
-        if (!open.contains(neighbor)||tentativeGScore<gScore.get(neighbor)) {
+        T tentativeGScore = gScore.get(current).plus(distBetween(current, neighbor));
+        if (!open.contains(neighbor)||tentativeGScore.compareTo(gScore.get(neighbor))<0) {
           cameFrom.put(neighbor, current);
           gScore.put(neighbor, tentativeGScore);
-          fScore.put(neighbor, gScore.get(neighbor) + heuristicCostEstimate(neighbor));
+          fScore.put(neighbor, gScore.get(neighbor).plus(heuristicCostEstimate(neighbor)));
           if (!open.contains(neighbor)) {
             open.add(neighbor);
           }
@@ -81,10 +81,10 @@ public abstract class AstarAlgorithm extends CollationAlgorithm.Base {
 
   abstract boolean isGoal(DecisionTreeNode node);
 
-  abstract Integer heuristicCostEstimate(DecisionTreeNode node);
-
   abstract Iterable<DecisionTreeNode> neighborNodes(DecisionTreeNode current);
 
-  abstract Integer distBetween(DecisionTreeNode current, DecisionTreeNode neighbor);
+  abstract T heuristicCostEstimate(DecisionTreeNode node);
+
+  abstract T distBetween(DecisionTreeNode current, DecisionTreeNode neighbor);
 
 }
