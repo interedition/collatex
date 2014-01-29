@@ -46,31 +46,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     this.log = Lists.newArrayList(orig.log);
   }
 
-  public void selectFirstVectorFromGraph() {
-    Island i = getFirstVectorFromGraph();
-    selectIsland(i);
-    log.add(String.format("sel g %s", i));
-  }
 
-  public void selectFirstVectorFromWitness() {
-    Island i = getFirstVectorFromWitness();
-    selectIsland(i);
-    log.add(String.format("sel w %s", i));
-  }
-
-  public void skipFirstVectorFromGraph() {
-    skippedIslands = true;
-    Island first = getFirstVectorFromGraph();
-    removeIslandFromPossibilities(first);
-    log.add(String.format("skip g %s", first));
-  }
-
-  public void skipFirstVectorFromWitness() {
-    skippedIslands = true;
-    Island first = getFirstVectorFromWitness();
-    removeIslandFromPossibilities(first);
-    log.add(String.format("skip w %s", first));
-  }
 
   public void selectFirstVectorGraphTransposeWitness() {
     Island firstVectorFromGraph = getFirstVectorFromGraph();
@@ -83,7 +59,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       transposeVector(witness);
       witness = getFirstVectorFromWitness();
     } while (witness != firstVectorFromGraph);
-    selectFirstVectorFromGraph();
+    selectIsland(firstVectorFromGraph);
   }
   
   public void selectFirstVectorWitnessTransposeGraph() {
@@ -97,7 +73,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       transposeVector(graph);
       graph = getFirstVectorFromGraph();
     } while (graph != firstVectorFromWitness);
-    selectFirstVectorFromWitness();
+    selectIsland(firstVectorFromWitness);
   }
 
   public Island getFirstVectorFromGraph() {

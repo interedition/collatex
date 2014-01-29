@@ -1,9 +1,11 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -21,9 +23,12 @@ import eu.interedition.collatex.dekker.matrix.Island;
 
 public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode, AlignmentCost> {
   final Map<DecisionTreeNode, ExtendedMatchTableSelection> selection;
+  // temporary measure to track the results
+  private final List<String> log;
   
   public DekkerDecisionTreeAlgorithm() {
     this.selection = Maps.newHashMap();
+    this.log = Lists.newArrayList();
   }
   
   @Override
@@ -66,24 +71,49 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
     Set<DecisionTreeNode> childNodes = Sets.newHashSet();
     if (firstVectorGraph!=firstVectorWitness) {
       // make 4 copies
-      addNode(childNodes, current).selectFirstVectorGraphTransposeWitness();
-      addNode(childNodes, current).selectFirstVectorWitnessTransposeGraph();
-      addNode(childNodes, current).skipFirstVectorFromGraph();
-      addNode(childNodes, current).skipFirstVectorFromWitness();
+      DecisionTreeNode addNode = addNode(childNodes, current);
+      selection.get(addNode).selectFirstVectorGraphTransposeWitness();
+      DecisionTreeNode addNode2 = addNode(childNodes, current);
+      selection.get(addNode2).selectFirstVectorWitnessTransposeGraph();
+      DecisionTreeNode addNode3 = addNode(childNodes, current);
+      skipFirstVectorFromGraph(addNode3, firstVectorGraph);
+      DecisionTreeNode addNode4 = addNode(childNodes, current);
+      skipFirstVectorFromWitness(addNode4, firstVectorWitness);
     } else {
       // make 2 copies
-      addNode(childNodes, current).selectFirstVectorFromGraph();
-      addNode(childNodes, current).skipFirstVectorFromGraph();
+      DecisionTreeNode addNode = addNode(childNodes, current);
+      selectFirstVectorFromGraph(addNode, firstVectorGraph);
+      DecisionTreeNode addNode2 = addNode(childNodes, current);
+      skipFirstVectorFromGraph(addNode2, firstVectorGraph);
     }
     return childNodes;
   } 
 
-  private ExtendedMatchTableSelection addNode(Set<DecisionTreeNode> childNodes, DecisionTreeNode current) {
+  private void skipFirstVectorFromGraph(DecisionTreeNode node, Island firstVectorGraph) {
+    ExtendedMatchTableSelection sel = selection.get(node);
+    sel.removeIslandFromPossibilities(firstVectorGraph);
+    log.add(String.format("skip g %s", firstVectorGraph));
+  }
+
+  private void skipFirstVectorFromWitness(DecisionTreeNode node, Island firstVectorWitness) {
+    ExtendedMatchTableSelection sel = selection.get(node);
+    sel.removeIslandFromPossibilities(firstVectorWitness);
+    log.add(String.format("skip g %s", firstVectorWitness));
+  }
+
+  private void selectFirstVectorFromGraph(DecisionTreeNode node, Island i) {
+    ExtendedMatchTableSelection sel = selection.get(node);
+    sel.selectIsland(i);
+    node.setSelected(i);
+    log.add(String.format("sel g %s", i));
+  }
+
+  private DecisionTreeNode addNode(Set<DecisionTreeNode> childNodes, DecisionTreeNode current) {
     DecisionTreeNode child = new DecisionTreeNode();
-    ExtendedMatchTableSelection childSelection = selection.get(current).copy(); 
+    ExtendedMatchTableSelection childSelection = selection.get(current).copy();
     selection.put(child, childSelection);
     childNodes.add(child);
-    return childSelection;
+    return child;
   }
 
   @Override
