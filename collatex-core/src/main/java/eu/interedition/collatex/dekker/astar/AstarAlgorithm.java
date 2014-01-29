@@ -1,4 +1,4 @@
-package eu.interedition.collatex.dekker.decision_tree2;
+package eu.interedition.collatex.dekker.astar;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,43 +20,43 @@ import eu.interedition.collatex.CollationAlgorithm;
  * 
  * @author: Ronald Haentjens Dekker
  */
-public abstract class AstarAlgorithm<T extends Cost<T>> extends CollationAlgorithm.Base {
+public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgorithm.Base {
 
-  public List<DecisionTreeNode> aStar(DecisionTreeNode start, T startCost) {
+  public List<N> aStar(N startNode, C startCost) {
     // The set of nodes already evaluated.
-    Set<DecisionTreeNode> closed = Sets.newHashSet();
+    Set<N> closed = Sets.newHashSet();
     // The map of navigated nodes.
-    Map<DecisionTreeNode, DecisionTreeNode> cameFrom = Maps.newHashMap();
+    Map<N, N> cameFrom = Maps.newHashMap();
     
     // Cost from start along best known path.
-    Map<DecisionTreeNode, T> gScore = Maps.newHashMap();
-    gScore.put(start, startCost);
+    Map<N, C> gScore = Maps.newHashMap();
+    gScore.put(startNode, startCost);
   
     // Estimated total cost from start to goal through y.
-    final Map<DecisionTreeNode, T> fScore = Maps.newHashMap();
-    fScore.put(start, gScore.get(start).plus(heuristicCostEstimate(start)));
+    final Map<N, C> fScore = Maps.newHashMap();
+    fScore.put(startNode, gScore.get(startNode).plus(heuristicCostEstimate(startNode)));
     
     // The set of tentative nodes to be evaluated, initially containing the start node
-    Comparator<DecisionTreeNode> comp = new Comparator<DecisionTreeNode>() {
+    Comparator<N> comp = new Comparator<N>() {
       @Override
-      public int compare(DecisionTreeNode arg0, DecisionTreeNode arg1) {
-        return fScore.get(arg0).compareTo(fScore.get(arg1));
+      public int compare(N node0, N node1) {
+        return fScore.get(node0).compareTo(fScore.get(node1));
       }
     };
-    PriorityQueue<DecisionTreeNode> open = new PriorityQueue<DecisionTreeNode>(10, comp);
-    open.add(start);
+    PriorityQueue<N> open = new PriorityQueue<N>(10, comp);
+    open.add(startNode);
 
     while(!open.isEmpty()) {
-      DecisionTreeNode current = open.poll();
+      N current = open.poll();
       if (isGoal(current)) {
         return reconstructPath(cameFrom, current);
       }
       closed.add(current);
-      for (DecisionTreeNode neighbor : neighborNodes(current)) {
+      for (N neighbor : neighborNodes(current)) {
         if (closed.contains(neighbor)) {
           continue;
         }
-        T tentativeGScore = gScore.get(current).plus(distBetween(current, neighbor));
+        C tentativeGScore = gScore.get(current).plus(distBetween(current, neighbor));
         if (!open.contains(neighbor)||tentativeGScore.compareTo(gScore.get(neighbor))<0) {
           cameFrom.put(neighbor, current);
           gScore.put(neighbor, tentativeGScore);
@@ -70,8 +70,8 @@ public abstract class AstarAlgorithm<T extends Cost<T>> extends CollationAlgorit
     throw new IllegalStateException("No node found that suits goal condition!");
   }
 
-  private List<DecisionTreeNode> reconstructPath(Map<DecisionTreeNode, DecisionTreeNode> cameFrom, DecisionTreeNode current) {
-    ArrayList<DecisionTreeNode> path = Lists.newArrayList();
+  private List<N> reconstructPath(Map<N, N> cameFrom, N current) {
+    ArrayList<N> path = Lists.newArrayList();
     do {
       path.add(0, current);
       current = cameFrom.get(current);
@@ -79,12 +79,12 @@ public abstract class AstarAlgorithm<T extends Cost<T>> extends CollationAlgorit
     return path;
   }
 
-  abstract boolean isGoal(DecisionTreeNode node);
+  protected abstract boolean isGoal(N node);
 
-  abstract Iterable<DecisionTreeNode> neighborNodes(DecisionTreeNode current);
+  protected abstract Iterable<N> neighborNodes(N current);
 
-  abstract T heuristicCostEstimate(DecisionTreeNode node);
+  protected abstract C heuristicCostEstimate(N node);
 
-  abstract T distBetween(DecisionTreeNode current, DecisionTreeNode neighbor);
+  protected abstract C distBetween(N current, N neighbor);
 
 }

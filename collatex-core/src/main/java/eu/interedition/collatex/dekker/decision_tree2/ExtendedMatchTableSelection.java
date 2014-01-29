@@ -203,4 +203,8 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   public ExtendedMatchTableSelection copy() {
     return new ExtendedMatchTableSelection(this);
   }
+
+  public boolean isFinished() {
+    return getPossibleIslands().isEmpty();
+  }
 }

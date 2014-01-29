@@ -1,12 +1,15 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.astar.AstarAlgorithm;
 import eu.interedition.collatex.dekker.matrix.Island;
 
 /*
@@ -16,17 +19,26 @@ import eu.interedition.collatex.dekker.matrix.Island;
  * @author: Ronald Haentjens Dekker
  */
 
-public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<AlignmentCost> {
-
+public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode, AlignmentCost> {
+  final Map<DecisionTreeNode, ExtendedMatchTableSelection> selection;
+  
+  public DekkerDecisionTreeAlgorithm() {
+    this.selection = Maps.newHashMap();
+  }
+  
   @Override
   public void collate(VariantGraph against, Iterable<Token> witness) {
     // TODO Auto-generated method stub
     
   }
 
+  void associate(DecisionTreeNode node, ExtendedMatchTableSelection _selection) {
+    selection.put(node, _selection);
+  }
+
   @Override
-  boolean isGoal(DecisionTreeNode node) {
-    return node.isFinished();
+  protected boolean isGoal(DecisionTreeNode node) {
+    return selection.get(node).isFinished();
   }
 
   // There are three situations:
@@ -43,14 +55,14 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<AlignmentCost> {
    * this will not be a problem.
    */
   @Override
-  Set<DecisionTreeNode> neighborNodes(DecisionTreeNode current) {
+  protected Set<DecisionTreeNode> neighborNodes(DecisionTreeNode current) {
     //TODO: change next line; should be no neighbors
     //TODO: to test
-    if (current.selection.getPossibleIslands().isEmpty()) {
+    if (selection.get(current).isFinished()) {
       return Collections.singleton(current);
     }
-    Island firstVectorGraph = current.selection.getFirstVectorFromGraph();
-    Island firstVectorWitness = current.selection.getFirstVectorFromWitness();
+    Island firstVectorGraph = selection.get(current).getFirstVectorFromGraph();
+    Island firstVectorWitness = selection.get(current).getFirstVectorFromWitness();
     Set<DecisionTreeNode> childNodes = Sets.newHashSet();
     if (firstVectorGraph!=firstVectorWitness) {
       // make 4 copies
@@ -64,22 +76,24 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<AlignmentCost> {
       addNode(childNodes, current).skipFirstVectorFromGraph();
     }
     return childNodes;
-  }
+  } 
 
   private ExtendedMatchTableSelection addNode(Set<DecisionTreeNode> childNodes, DecisionTreeNode current) {
-    ExtendedMatchTableSelection childSelection = current.selection.copy(); 
-    childNodes.add(new DecisionTreeNode(childSelection));
+    DecisionTreeNode child = new DecisionTreeNode();
+    ExtendedMatchTableSelection childSelection = selection.get(current).copy(); 
+    selection.put(child, childSelection);
+    childNodes.add(child);
     return childSelection;
   }
 
   @Override
-  AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {
+  protected AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  AlignmentCost distBetween(DecisionTreeNode current, DecisionTreeNode neighbor) {
+  protected AlignmentCost distBetween(DecisionTreeNode current, DecisionTreeNode neighbor) {
     // TODO Auto-generated method stub
     return null;
   }

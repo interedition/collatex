@@ -14,13 +14,14 @@ import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 
 /*
+ * TO BE DELETED!
  * Alignment algorithm based on a decision tree with a fixed number of children per node.
  * 
  * @author: Ronald Haentjens Dekker
  */
 
 public class PreviousDekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base {
-  protected List<DecisionTreeNode> possibleAlignments;
+  protected List<PreviousDecisionTreeNode> possibleAlignments;
 
   @Override
   public void collate(VariantGraph against, Iterable<Token> witness) {
@@ -33,12 +34,12 @@ public class PreviousDekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base
     System.out.println("Building MatchTable");
     MatchTable table = MatchTable.create(against, witness);
     ExtendedMatchTableSelection selection = new ExtendedMatchTableSelection(table);
-    DecisionTreeNode root = new DecisionTreeNode(selection);
+    PreviousDecisionTreeNode root = new PreviousDecisionTreeNode(selection);
     possibleAlignments = Lists.newArrayList(root);
     System.out.println("Aligning...");
     align();
     System.out.println("Merging...");
-    DecisionTreeNode alignment = selectOptimalCandidate();
+    PreviousDecisionTreeNode alignment = selectOptimalCandidate();
     Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
     for (Island island : alignment.getIslands()) {
       for (Coordinate c : island) {
@@ -49,9 +50,9 @@ public class PreviousDekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base
     System.out.println("DONE");
   }
 
-  private DecisionTreeNode selectOptimalCandidate() {
-    DecisionTreeNode best = possibleAlignments.get(0);
-    for (DecisionTreeNode alignment : possibleAlignments) {
+  private PreviousDecisionTreeNode selectOptimalCandidate() {
+    PreviousDecisionTreeNode best = possibleAlignments.get(0);
+    for (PreviousDecisionTreeNode alignment : possibleAlignments) {
       if (alignment.getNumberOfGapTokens() < best.getNumberOfGapTokens()) {
         best = alignment;
       }
@@ -72,7 +73,7 @@ public class PreviousDekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base
       numberOfLoops++;
       // look for an unfinished candidate alignment
       unfinishedAlignmentFound = false;
-      for (DecisionTreeNode alignment : possibleAlignments) {
+      for (PreviousDecisionTreeNode alignment : possibleAlignments) {
         if (!alignment.isFinished()) {
           unfinishedAlignmentFound = true;
           break;
@@ -83,7 +84,7 @@ public class PreviousDekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base
   }
 
   void listPossibleAlignments() {
-    for (DecisionTreeNode alignment : possibleAlignments) {
+    for (PreviousDecisionTreeNode alignment : possibleAlignments) {
       System.out.println("AT: "+alignment.getNumberOfAlignedTokens()+", GT: "+alignment.getNumberOfGapTokens()+", TT: "+alignment.getNumberOfTransposedTokens()+", skipped islands: "+alignment.hasSkippedIslands()+", is finished: "+alignment.isFinished()+". "+alignment.log());
     }
     System.out.println("----");
@@ -92,10 +93,14 @@ public class PreviousDekkerDecisionTreeAlgorithm extends CollationAlgorithm.Base
   void expandPossibleAlignments() {
     //TEMP WORKAROUND!
     DekkerDecisionTreeAlgorithm algo = new DekkerDecisionTreeAlgorithm();
-    List<DecisionTreeNode> result = Lists.newArrayList();
-    for (DecisionTreeNode alignment : possibleAlignments) {
-      result.addAll(algo.neighborNodes(alignment));
-    }
+    List<PreviousDecisionTreeNode> result = Lists.newArrayList();
+    for (PreviousDecisionTreeNode alignment : possibleAlignments) {
+      algo.associate(alignment, alignment.selection);
+      for (DecisionTreeNode child : algo.neighborNodes(alignment)) {
+        ExtendedMatchTableSelection extendedMatchTableSelection = algo.selection.get(child);
+        result.add(new PreviousDecisionTreeNode(extendedMatchTableSelection));
+      }
+    }  
     possibleAlignments = result;
   }
 }

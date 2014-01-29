@@ -42,7 +42,7 @@ public class CollationAlgorithmFactory {
   }
 
   public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
-    return new PreviousDekkerDecisionTreeAlgorithm();
+    return new DekkerAlgorithm(comparator);
   }
 
   public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
