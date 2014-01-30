@@ -1,5 +1,9 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
+import java.util.Set;
+
+import com.google.common.collect.Sets;
+
 import eu.interedition.collatex.dekker.matrix.Island;
 
 /*
@@ -10,14 +14,18 @@ import eu.interedition.collatex.dekker.matrix.Island;
  * @Author: Ronald Haentjens Dekker
  */
 public class DecisionTreeNode {
-  //to be expanded with transposed vectors etc.
-  private Island selected;
+  private Island lastSelected;
+  private Set<Island> transposedVectors = Sets.newHashSet();
 
-  public Island getSelected() {
-    return selected;
+  public Island getLastSelected() {
+    return lastSelected;
   }
 
-  public void setSelected(Island selected) {
-    this.selected = selected;
+  public void setLastSelected(Island selected) {
+    this.lastSelected = selected;
   }
- }
+
+  public void addTransposed(Island transposed) {
+    transposedVectors.add(transposed);
+  }
+}

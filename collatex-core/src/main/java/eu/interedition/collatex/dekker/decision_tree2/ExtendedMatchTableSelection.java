@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -24,56 +23,16 @@ import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
  */
 public class ExtendedMatchTableSelection extends MatchTableSelection {
   private final Set<Island> possibleIslands;
-  private final Set<Island> transposedIslands;
-  boolean skippedIslands;
-  // temporary measure to track the results
-  private final List<String> log;
   
   public ExtendedMatchTableSelection(MatchTable table) {
     super(table);
     this.possibleIslands = table.getIslands();
-    this.transposedIslands = Sets.newHashSet();
-    this.skippedIslands = false;
-    this.log = Lists.newArrayList();
   }
   
   //NOTE: copy constructor
   public ExtendedMatchTableSelection(ExtendedMatchTableSelection orig) {
     super(orig);
     this.possibleIslands = Sets.newHashSet(orig.possibleIslands);
-    this.transposedIslands = Sets.newHashSet(orig.transposedIslands);
-    this.skippedIslands = orig.skippedIslands;
-    this.log = Lists.newArrayList(orig.log);
-  }
-
-
-
-  public void selectFirstVectorGraphTransposeWitness() {
-    Island firstVectorFromGraph = getFirstVectorFromGraph();
-    // Find that vector in the witness
-    // as long as you can't find that vector
-    // transpose the vectors in the witness
-    Island witness = getFirstVectorFromWitness();
-    do {
-      log.add(String.format("transposed w %s", witness));
-      transposeVector(witness);
-      witness = getFirstVectorFromWitness();
-    } while (witness != firstVectorFromGraph);
-    selectIsland(firstVectorFromGraph);
-  }
-  
-  public void selectFirstVectorWitnessTransposeGraph() {
-    Island firstVectorFromWitness = getFirstVectorFromWitness();
-    // Find that vector in the graph
-    // as long as you can't find that vector
-    // transpose the vectors in the graph
-    Island graph = getFirstVectorFromGraph();
-    do {
-      log.add(String.format("transposed g %s", graph));
-      transposeVector(graph);
-      graph = getFirstVectorFromGraph();
-    } while (graph != firstVectorFromWitness);
-    selectIsland(firstVectorFromWitness);
   }
 
   public Island getFirstVectorFromGraph() {
@@ -126,11 +85,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     //We have to remove the inheritance here
   }
 
-  public void transposeVector(Island island) {
-    transposedIslands.add(island);
-    removeIslandFromPossibilities(island);
-  }  
-  
   @Override
   public void removeIslandFromPossibilities(Island island) {
     possibleIslands.remove(island);
@@ -139,10 +93,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   
   public int sizeOfGraph() {
     return table.horizontalSize();
-  }
-  
-  public String log() {
-    return Joiner.on("; ").join(log);
   }
   
   //TODO: this can be done faster by only checking the possible islands
@@ -170,10 +120,6 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   @Override
   public List<Island> getPossibleIslands() {
     return Lists.newArrayList(possibleIslands);
-  }
-
-  public Set<Island> getTransposedIslands() {
-    return transposedIslands;
   }
 
   public ExtendedMatchTableSelection copy() {

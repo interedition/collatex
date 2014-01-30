@@ -72,9 +72,9 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
     if (firstVectorGraph!=firstVectorWitness) {
       // make 4 copies
       DecisionTreeNode addNode = addNode(childNodes, current);
-      selection.get(addNode).selectFirstVectorGraphTransposeWitness();
+      selectFirstVectorGraphTransposeWitness(addNode, firstVectorGraph, firstVectorWitness);
       DecisionTreeNode addNode2 = addNode(childNodes, current);
-      selection.get(addNode2).selectFirstVectorWitnessTransposeGraph();
+      selectFirstVectorWitnessTransposeGraph(addNode2, firstVectorGraph, firstVectorWitness);
       DecisionTreeNode addNode3 = addNode(childNodes, current);
       skipFirstVectorFromGraph(addNode3, firstVectorGraph);
       DecisionTreeNode addNode4 = addNode(childNodes, current);
@@ -89,6 +89,14 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
     return childNodes;
   } 
 
+  private DecisionTreeNode addNode(Set<DecisionTreeNode> childNodes, DecisionTreeNode current) {
+    DecisionTreeNode child = new DecisionTreeNode();
+    ExtendedMatchTableSelection childSelection = selection.get(current).copy();
+    selection.put(child, childSelection);
+    childNodes.add(child);
+    return child;
+  }
+  
   private void skipFirstVectorFromGraph(DecisionTreeNode node, Island firstVectorGraph) {
     ExtendedMatchTableSelection sel = selection.get(node);
     sel.removeIslandFromPossibilities(firstVectorGraph);
@@ -104,17 +112,43 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
   private void selectFirstVectorFromGraph(DecisionTreeNode node, Island i) {
     ExtendedMatchTableSelection sel = selection.get(node);
     sel.selectIsland(i);
-    node.setSelected(i);
+    node.setLastSelected(i);
     log.add(String.format("sel g %s", i));
   }
 
-  private DecisionTreeNode addNode(Set<DecisionTreeNode> childNodes, DecisionTreeNode current) {
-    DecisionTreeNode child = new DecisionTreeNode();
-    ExtendedMatchTableSelection childSelection = selection.get(current).copy();
-    selection.put(child, childSelection);
-    childNodes.add(child);
-    return child;
+  private void selectFirstVectorGraphTransposeWitness(DecisionTreeNode node, Island firstVectorGraph, Island firstVectorWitness) {
+    ExtendedMatchTableSelection sel = selection.get(node);
+    // Find that vector in the witness
+    // as long as you can't find that vector
+    // transpose the vectors in the witness
+    Island witness = firstVectorWitness;
+    do {
+      log.add(String.format("transposed w %s", witness));
+      node.addTransposed(witness);
+      sel.removeIslandFromPossibilities(witness);
+      witness = sel.getFirstVectorFromWitness();
+    } while (witness != firstVectorGraph);
+    node.setLastSelected(firstVectorGraph);
+    sel.selectIsland(firstVectorGraph);
   }
+  
+  private void selectFirstVectorWitnessTransposeGraph(DecisionTreeNode node, Island firstVectorGraph, Island firstVectorWitness) {
+    ExtendedMatchTableSelection sel = selection.get(node);
+    // Find that vector in the graph
+    // as long as you can't find that vector
+    // transpose the vectors in the graph
+    Island graph = firstVectorGraph;
+    do {
+      log.add(String.format("transposed g %s", graph));
+      node.addTransposed(graph);
+      sel.removeIslandFromPossibilities(graph);
+      graph = sel.getFirstVectorFromGraph();
+    } while (graph != firstVectorWitness);
+    node.setLastSelected(firstVectorWitness);
+    sel.selectIsland(firstVectorWitness);
+  }
+
+
 
   @Override
   protected AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {

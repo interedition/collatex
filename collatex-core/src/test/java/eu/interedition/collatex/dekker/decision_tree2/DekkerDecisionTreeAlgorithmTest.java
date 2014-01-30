@@ -67,15 +67,18 @@ public class DekkerDecisionTreeAlgorithmTest {
     when(currentSelection.getFirstVectorFromGraph()).thenReturn(iGraph);
     when(currentSelection.getFirstVectorFromWitness()).thenReturn(iWitness);
     when(currentSelection.copy()).thenReturn(child1selection).thenReturn(child2selection).thenReturn(child3selection).thenReturn(child4selection);
+    when(child1selection.getFirstVectorFromWitness()).thenReturn(iWitness).thenReturn(iGraph);
+    when(child2selection.getFirstVectorFromGraph()).thenReturn(iGraph).thenReturn(iWitness);
     DekkerDecisionTreeAlgorithm algorithm = new DekkerDecisionTreeAlgorithm();
     DecisionTreeNode current = new DecisionTreeNode();
     algorithm.associate(current, currentSelection);
     Set<DecisionTreeNode> neighborNodes = algorithm.neighborNodes(current);
     verify(currentSelection, times(4)).copy();
-    verify(child1selection).selectFirstVectorGraphTransposeWitness();
-    verify(child2selection).selectFirstVectorWitnessTransposeGraph();
-    //verify(child3selection).skipFirstVectorFromGraph();
-    //verify(child4selection).skipFirstVectorFromWitness();
+    verify(child1selection).selectIsland(iGraph);;
+    verify(child2selection).selectIsland(iWitness);
+    //TODO: verify remove island calls for transposed stuff
+    verify(child3selection).removeIslandFromPossibilities(iGraph);
+    verify(child4selection).removeIslandFromPossibilities(iWitness);
     Collection<ExtendedMatchTableSelection> values = algorithm.selection.values();
     assertTrue(values.contains(child1selection));
     assertTrue(values.contains(child2selection));

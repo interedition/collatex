@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
 import java.util.List;
-import java.util.Set;
 
 import eu.interedition.collatex.dekker.matrix.Island;
 
@@ -33,18 +32,19 @@ public class PreviousDecisionTreeNode extends DecisionTreeNode {
   }
 
   public int getNumberOfTransposedTokens() {
-    Set<Island> islands = selection.getTransposedIslands();
-    int numberOfSelectedTokens = 0;
-    for (Island selected : islands) {
-      numberOfSelectedTokens += selected.size();
-    }
-    return numberOfSelectedTokens;
+    return 0;
+//    Set<Island> islands = selection.getTransposedIslands();
+//    int numberOfSelectedTokens = 0;
+//    for (Island selected : islands) {
+//      numberOfSelectedTokens += selected.size();
+//    }
+//    return numberOfSelectedTokens;
   }
 
   //TODO: this implementation is too simple
   //TODO: one should take the delta since last aligned token into account
   public int getNumberOfGapTokens() {
-    if (selection.getIslands().isEmpty()&&!selection.skippedIslands) {
+    if (selection.getIslands().isEmpty()/*&&!selection.skippedIslands*/) {
       return 0;
     }
     if (selection.getPossibleIslands().isEmpty()) {
@@ -64,11 +64,11 @@ public class PreviousDecisionTreeNode extends DecisionTreeNode {
   }
 
   public boolean hasSkippedIslands() {
-    return selection.skippedIslands;
+    return false;
   }
 
   public String log() {
-    return selection.log();
+    return "no log";
   }
 
   public List<Island> getIslands() {
