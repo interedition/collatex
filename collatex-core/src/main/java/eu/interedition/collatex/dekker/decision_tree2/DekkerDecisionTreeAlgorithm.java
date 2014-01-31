@@ -7,7 +7,10 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
 import com.google.common.collect.Sets;
+import com.google.common.collect.TreeRangeSet;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -192,8 +195,33 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
 
   @Override
   protected AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {
-    // TODO Auto-generated method stub
-    return null;
+    // some vectors can overlap
+    // convert the vectors that are still possible into ranges
+    // put all the ranges in one set
+    // convert the set into integers and count...
+    ExtendedMatchTableSelection slc = selection.get(node);
+    List<Island> islands = slc.getPossibleIslands();
+    
+    //There are two dimensions: ranges in graph or witness
+    RangeSet<Integer> s = TreeRangeSet.create();
+    for (Island i : islands) {
+      Range<Integer> r = Range.closed(i.getLeftEnd().getRow(), i.getRightEnd().getRow());
+      s.add(r);
+    }
+    // now calculate gaps
+    // two ways to do this.. 
+    // 1) get total - aligned tokens - surface of possible vectors
+    // 2) find gaps between last select vector and possible vectors
+    Island last = node.getLastSelected();
+    int endCoordinateCurrentAlignment = last.getRightEnd().getRow();
+    
+    int end = endCoordinateCurrentAlignment;
+    int gaps = 0;
+    for (Range<Integer> r : s.asRanges()) {
+      int gap = r.lowerEndpoint() - end;
+      gaps += gap;
+    }
+    return new AlignmentCost(0, gaps);
   }
 
 }
