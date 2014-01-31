@@ -150,14 +150,48 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
 
 
 
-  @Override
-  protected AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   protected AlignmentCost distBetween(DecisionTreeNode current, DecisionTreeNode neighbor) {
+    Island prev = current.getLastSelected();
+    Island next = neighbor.getLastSelected();
+    // four cases
+    // 1) we are at the start node
+    // 2) we are in the middle
+    // 3) we are at the end node
+    // 4) no vector is chosen to be aligned, one vector is skipped instead
+    // we should also check whether there are possibilities left
+    // a vector is skipped
+    if (prev==next) {
+      //no new vector is selected... 
+      //but some vector has been skipped!
+      //depending on the potential vectors that are still selectable
+      // a penalty in the future cost will occur
+      return new AlignmentCost(0, 0);
+    }
+    // a vector is selected to be aligned
+    // and the previous node is not the start node
+    if (prev!=null) {
+      int distanceGraph = prev.getRightEnd().getColumn() - next.getLeftEnd().getColumn();
+      int distanceWitness = prev.getRightEnd().getRow() - next.getLeftEnd().getRow();
+      int gaps = Math.max(distanceGraph, distanceWitness);
+      return new AlignmentCost(1, gaps);
+    }
+    // a vector is selected to be aligned
+    // and the previous node is the start node
+    if (prev==null) {
+      int distanceGraph = next.getLeftEnd().getColumn();
+      int distanceWitness = next.getLeftEnd().getRow();
+      int gaps = Math.max(distanceGraph, distanceWitness);
+      return new AlignmentCost(1, gaps);
+    }
+    throw new IllegalStateException();
+    //TODO: if at the end of the decision tree
+    //TODO: calculate remaining gap (max graph/witness).
+  }
+
+  @Override
+  protected AlignmentCost heuristicCostEstimate(DecisionTreeNode node) {
     // TODO Auto-generated method stub
     return null;
   }
