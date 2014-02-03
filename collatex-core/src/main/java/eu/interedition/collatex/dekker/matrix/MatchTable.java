@@ -28,6 +28,7 @@ import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
@@ -96,6 +97,11 @@ public class MatchTable {
     return ranks.size();
   }
 
+  public int verticalSize() {
+    //TODO: not very efficient
+    return Iterables.size(witness);
+  }
+  
   // Since the coordinates in allMatches are ordered from upper left to lower right, 
   // we don't need to check the lower right neighbor.
   public Set<Island> getIslands() {

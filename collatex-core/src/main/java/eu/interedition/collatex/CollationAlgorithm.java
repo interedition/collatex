@@ -33,6 +33,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.dekker.decision_tree2.DecisionTreeNode;
+import eu.interedition.collatex.simple.SimpleWitness;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

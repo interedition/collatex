@@ -95,6 +95,10 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     return table.horizontalSize();
   }
   
+  public int sizeOfWitness() {
+    return table.verticalSize();
+  }
+  
   //TODO: this can be done faster by only checking the possible islands
   //against the newly selected island!
   //Note: implementation of this method differs from superclass.
@@ -129,4 +133,9 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   public boolean isFinished() {
     return getPossibleIslands().isEmpty();
   }
+
+  public MatchTable getTable() {
+    return table;
+  }
+
 }
