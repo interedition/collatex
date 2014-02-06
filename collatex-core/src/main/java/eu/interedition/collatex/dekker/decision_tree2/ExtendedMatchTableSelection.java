@@ -51,7 +51,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       @Override
       public int compare(Island arg0, Island arg1) {
         // first sort on column
-        // TODO: second sort on size
+        // second sort on row
         int result = arg0.getLeftEnd().getColumn() - arg1.getLeftEnd().getColumn();
         if (result==0) {
           result = arg0.getLeftEnd().getRow() - arg1.getLeftEnd().getRow();
@@ -76,7 +76,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
       @Override
       public int compare(Island arg0, Island arg1) {
         // first sort on row
-        // TODO: second sort on size
+        // second sort on column
         int result = arg0.getLeftEnd().getRow() - arg1.getLeftEnd().getRow();
         if (result==0) {
           result = arg0.getLeftEnd().getColumn() - arg1.getLeftEnd().getColumn();
