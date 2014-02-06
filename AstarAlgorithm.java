@@ -21,12 +21,13 @@ import eu.interedition.collatex.CollationAlgorithm;
  * @author: Ronald Haentjens Dekker
  */
 public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgorithm.Base {
+  // The map of navigated nodes.
+  protected Map<N, N> cameFrom;
 
   public List<N> aStar(N startNode, C startCost) {
     // The set of nodes already evaluated.
     Set<N> closed = Sets.newHashSet();
-    // The map of navigated nodes.
-    Map<N, N> cameFrom = Maps.newHashMap();
+    cameFrom = Maps.newHashMap();
     
     // Cost from start along best known path.
     Map<N, C> gScore = Maps.newHashMap();
@@ -70,7 +71,7 @@ public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgo
     throw new IllegalStateException("No node found that suits goal condition!");
   }
 
-  private List<N> reconstructPath(Map<N, N> cameFrom, N current) {
+  protected List<N> reconstructPath(Map<N, N> cameFrom, N current) {
     ArrayList<N> path = Lists.newArrayList();
     do {
       path.add(0, current);
