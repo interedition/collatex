@@ -1,9 +1,10 @@
 package eu.interedition.collatex.dekker.decision_tree2;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -19,6 +20,7 @@ import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 /*
@@ -32,6 +34,8 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
   final Map<DecisionTreeNode, ExtendedMatchTableSelection> selection;
   // temporary measure to track the results
   private final List<String> log;
+  private MatchTable table;
+  protected final static Logger LOG = Logger.getLogger(DekkerDecisionTreeAlgorithm.class.getName());
   
   public DekkerDecisionTreeAlgorithm() {
     this.selection = Maps.newHashMap();
@@ -44,18 +48,18 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
     DecisionTreeNode root = createRootNode(against, witness);
     
     //aligning
-    System.out.println("Aligning...");
+    LOG.fine("Aligning...");
     List<DecisionTreeNode> nodes = aStar(root, new AlignmentCost());
+    //debugAlignment(nodes);
     Set<Island> alignedIslands = Sets.newHashSet();
     for (DecisionTreeNode n : nodes) {
-      System.out.println(n.getLastSelected());
       if (n.getLastSelected()!=null) {
         alignedIslands.add(n.getLastSelected());
       }
     }
     
     //merging
-    System.out.println("Merging...");
+    LOG.fine("Merging...");
     MatchTable table = selection.get(root).getTable();
     Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
     for (Island island : alignedIslands) {
@@ -64,7 +68,7 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
       }
     }
     merge(against, witness, map);
-    System.out.println("DONE");
+    LOG.fine("DONE");
   }
 
   
@@ -81,8 +85,8 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
     if (against.witnesses().isEmpty()) {
       VariantGraphBuilder.addFirstWitnessToGraph(against, witness);
     }
-    System.out.println("Building MatchTable");
-    MatchTable table = MatchTable.create(against, witness);
+    LOG.fine("Building MatchTable");
+    table = MatchTable.create(against, witness);
     ExtendedMatchTableSelection selection = new ExtendedMatchTableSelection(table);
     DecisionTreeNode root = new DecisionTreeNode();
     associate(root, selection);
@@ -96,7 +100,11 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
 
   @Override
   protected boolean isGoal(DecisionTreeNode node) {
-    return selection.get(node).isFinished();
+    boolean finished = selection.get(node).isFinished();
+    //if (finished) {
+      //debugAlignmentSoFar(node);
+    //}
+    return finished;
   }
 
   // There are three situations:
@@ -114,10 +122,14 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
    */
   @Override
   protected Set<DecisionTreeNode> neighborNodes(DecisionTreeNode current) {
+    if (LOG.isLoggable(Level.FINER)) {
+      debugPath(current);
+      selection.get(current).debugPossibleVectors();
+    }
     //TODO: change next line; should be no neighbors
     //TODO: to test
     if (selection.get(current).isFinished()) {
-      return Collections.singleton(current);
+      throw new RuntimeException("THIS SHOULD NOT HAPPEN!");
     }
     Island firstVectorGraph = selection.get(current).getFirstVectorFromGraph();
     Island firstVectorWitness = selection.get(current).getFirstVectorFromWitness();
@@ -128,10 +140,10 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
       selectFirstVectorGraphTransposeWitness(addNode, firstVectorGraph, firstVectorWitness);
       DecisionTreeNode addNode2 = addNode(childNodes, current);
       selectFirstVectorWitnessTransposeGraph(addNode2, firstVectorGraph, firstVectorWitness);
-      DecisionTreeNode addNode3 = addNode(childNodes, current);
-      skipFirstVectorFromGraph(addNode3, firstVectorGraph);
-      DecisionTreeNode addNode4 = addNode(childNodes, current);
-      skipFirstVectorFromWitness(addNode4, firstVectorWitness);
+//      DecisionTreeNode addNode3 = addNode(childNodes, current);
+//      skipFirstVectorFromGraph(addNode3, firstVectorGraph);
+//      DecisionTreeNode addNode4 = addNode(childNodes, current);
+//      skipFirstVectorFromWitness(addNode4, firstVectorWitness);
     } else {
       // make 2 copies
       DecisionTreeNode addNode = addNode(childNodes, current);
@@ -139,17 +151,51 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
       DecisionTreeNode addNode2 = addNode(childNodes, current);
       skipFirstVectorFromGraph(addNode2, firstVectorGraph);
     }
-    //debug(current, childNodes);
+    if (LOG.isLoggable(Level.FINER)) {
+      debugCostChildren(current, childNodes);
+    }
     return childNodes;
   } 
 
-  private void debug(DecisionTreeNode current, Set<DecisionTreeNode> childNodes) {
-    System.out.println("Debug "+current.getLastSelected());
+  private void debugPath(DecisionTreeNode current) {
+    List<DecisionTreeNode> path = reconstructPath(cameFrom, current);
+    debugPath(path);
+  }
+
+  private void debugPath(List<DecisionTreeNode> path) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(">>");
+    Island previous = null;
+    for (DecisionTreeNode node : path) {
+      if (previous!=null) {
+        builder.append("{gap}");
+      }
+      if (previous!=node.getLastSelected()) {
+        Island last = node.getLastSelected();
+        String tokenString = islandToTokens(last);
+        builder.append(tokenString);
+      }
+      previous = node.getLastSelected();
+    }
+    builder.append("<<");
+    LOG.finer(builder.toString());
+  }
+
+  private String islandToTokens(Island last) {
+    List<Token> witnessTokens = Lists.newArrayList();
+    for (Coordinate c : last) {
+      witnessTokens.add(table.tokenAt(c.getRow(), c.getColumn()));
+    }
+    String tokenString = SimpleToken.toString(witnessTokens);
+    return tokenString;
+  }
+
+  private void debugCostChildren(DecisionTreeNode current, Set<DecisionTreeNode> childNodes) {
     // debug result
     for (DecisionTreeNode node : childNodes) {
       AlignmentCost cost = current == null ? new AlignmentCost() : distBetween(current, node);
       AlignmentCost heuristic = heuristicCostEstimate(node);
-      System.out.println("additional "+cost+"; heurestic: "+heuristic);
+      LOG.finer("additional "+cost+"; heurestic: "+heuristic);
     }
   }
 

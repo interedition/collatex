@@ -4,14 +4,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
+import eu.interedition.collatex.simple.SimpleToken;
 
 /*
  * Extended MatchTableSelection class,
@@ -22,6 +26,7 @@ import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
  * @author: Ronald Haentjens Dekker
  */
 public class ExtendedMatchTableSelection extends MatchTableSelection {
+  protected final static Logger LOG = Logger.getLogger(ExtendedMatchTableSelection.class.getName());
   private final Set<Island> possibleIslands;
   
   public ExtendedMatchTableSelection(MatchTable table) {
@@ -36,6 +41,11 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
   }
 
   public Island getFirstVectorFromGraph() {
+    List<Island> vectorsSortedOnGraphOrder = sortVectorsOnGraphOrder();
+    return vectorsSortedOnGraphOrder.get(0);
+  }
+
+  private List<Island> sortVectorsOnGraphOrder() {
     Preconditions.checkArgument(!possibleIslands.isEmpty(), "The possible islands is empty. Check before calling!");
     Comparator<Island> comp = new Comparator<Island> () {
       @Override
@@ -52,10 +62,15 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     };
     List<Island> vectorsSortedOnGraphOrder = Lists.newArrayList(possibleIslands);
     Collections.sort(vectorsSortedOnGraphOrder, comp);
-    return vectorsSortedOnGraphOrder.get(0);
+    return vectorsSortedOnGraphOrder;
   }
   
   public Island getFirstVectorFromWitness() {
+    List<Island> vectorsSortedOnWitnessOrder = sortVectorsOnWitnessOrder();
+    return vectorsSortedOnWitnessOrder.get(0);
+  }
+
+  private List<Island> sortVectorsOnWitnessOrder() {
     Preconditions.checkArgument(!possibleIslands.isEmpty(), "The possible islands is empty. Check before calling!");    
     Comparator<Island> comp = new Comparator<Island> () {
       @Override
@@ -72,7 +87,7 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     };
     List<Island> vectorsSortedOnWitnessOrder = Lists.newArrayList(possibleIslands);
     Collections.sort(vectorsSortedOnWitnessOrder, comp);
-    return vectorsSortedOnWitnessOrder.get(0);
+    return vectorsSortedOnWitnessOrder;
   }
 
   @Override
@@ -138,4 +153,43 @@ public class ExtendedMatchTableSelection extends MatchTableSelection {
     return table;
   }
 
+  public void debugPossibleVectors() {
+    List<Island> vectorsOnGraphOrder = sortVectorsOnGraphOrder();
+    int numberOfVectorsToShow = Math.min(vectorsOnGraphOrder.size(), 5);
+    List<Island> subList = vectorsOnGraphOrder.subList(0, numberOfVectorsToShow-1);
+    StringBuilder builder = new StringBuilder();
+    builder.append("Graph: [");
+    for (Island i : subList) {
+      builder.append(token(i));
+      builder.append(" (");
+      builder.append(i.toString());
+      builder.append(")");
+      builder.append(", ");
+    }
+    builder.append(" ]");
+    LOG.finer(builder.toString());
+    List<Island> vectorsOnWitnessOrder = sortVectorsOnWitnessOrder();
+    numberOfVectorsToShow = Math.min(vectorsOnWitnessOrder.size(), 5);
+    subList = vectorsOnWitnessOrder.subList(0, numberOfVectorsToShow-1);
+    builder = new StringBuilder();
+    builder.append("Witness: [");
+    for (Island i : subList) {
+      builder.append(token(i));
+      builder.append(" (");
+      builder.append(i.toString());
+      builder.append(")");
+      builder.append(", ");
+    }
+    builder.append(" ]");
+    LOG.finer(builder.toString());
+  }
+
+  private String token(Island i) {
+    List<Token> witnessTokens = Lists.newArrayList();
+    for (Coordinate c : i) {
+      witnessTokens.add(table.tokenAt(c.getRow(), c.getColumn()));
+    }
+    String tokenString = SimpleToken.toString(witnessTokens);
+    return tokenString;
+  }
 }
