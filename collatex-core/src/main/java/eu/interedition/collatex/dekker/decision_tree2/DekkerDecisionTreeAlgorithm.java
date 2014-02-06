@@ -320,31 +320,50 @@ public class DekkerDecisionTreeAlgorithm extends AstarAlgorithm<DecisionTreeNode
     // some vectors can overlap
     // convert the vectors that are still possible into ranges
     // put all the ranges in one set
-    // convert the set into integers and count...
+    // then calculate gaps
+    // two ways to do this.. 
+    // 1) get total - aligned tokens - surface of possible vectors
+    // 2) find gaps between last select vector and possible vectors
+    // second way is implemented here
     ExtendedMatchTableSelection slc = selection.get(node);
     List<Island> islands = slc.getPossibleIslands();
     
     //There are two dimensions: ranges in graph or witness
+    int gapsGraph = calculateFutureGapsGraph(node, islands);
+    int gapsWitness = calculateFutureGapsWitness(node, islands);
+    return new AlignmentCost(0, Math.max(gapsGraph, gapsWitness));
+  }
+
+  private int calculateFutureGapsGraph(DecisionTreeNode node, List<Island> islands) {
+    RangeSet<Integer> s = TreeRangeSet.create();
+    for (Island i : islands) {
+      Range<Integer> r = Range.closed(i.getLeftEnd().getColumn(), i.getRightEnd().getColumn());
+      s.add(r);
+    }
+    Island last = node.getLastSelected();
+    int end = last==null ? -1 : last.getRightEnd().getColumn();
+    return calculateGapsForAGivenRangeSet(s, end);
+  }
+
+  private int calculateFutureGapsWitness(DecisionTreeNode node, List<Island> islands) {
     RangeSet<Integer> s = TreeRangeSet.create();
     for (Island i : islands) {
       Range<Integer> r = Range.closed(i.getLeftEnd().getRow(), i.getRightEnd().getRow());
       s.add(r);
     }
-    // now calculate gaps
-    // two ways to do this.. 
-    // 1) get total - aligned tokens - surface of possible vectors
-    // 2) find gaps between last select vector and possible vectors
     Island last = node.getLastSelected();
-    int endCoordinateCurrentAlignment;
-    endCoordinateCurrentAlignment = last==null ? -1 : last.getRightEnd().getRow();
-    int end = endCoordinateCurrentAlignment;
+    int end = last==null ? -1 : last.getRightEnd().getRow();
+    return calculateGapsForAGivenRangeSet(s, end);
+  }
+
+  private int calculateGapsForAGivenRangeSet(RangeSet<Integer> s, int end) {
     int gaps = 0;
     for (Range<Integer> r : s.asRanges()) {
       int gap = r.lowerEndpoint() - end -1;
       gaps += gap;
       end = r.upperEndpoint();
     }
-    return new AlignmentCost(0, gaps);
+    return gaps;
   }
 
 }
