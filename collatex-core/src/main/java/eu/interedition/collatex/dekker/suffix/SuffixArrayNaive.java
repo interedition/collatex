@@ -15,4 +15,8 @@ public class SuffixArrayNaive {
     a = new int[len];
     for (int i = 0; i < len; i++) a[i] = suffixes[i].intValue();
   }
+
+  public int get(int i) {
+    return a[i];
+  }
 }

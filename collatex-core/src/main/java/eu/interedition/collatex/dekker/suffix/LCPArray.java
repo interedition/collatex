@@ -1,7 +1,7 @@
 package eu.interedition.collatex.dekker.suffix;
 
 public class LCPArray {
-  int lcp[];
+  public int lcp[];
   
   public LCPArray(String s, SuffixArrayNaive sa) {
     int[] a = sa.a;
