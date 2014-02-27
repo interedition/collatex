@@ -39,4 +39,8 @@ public class Sequence {
     return other.length() - length();
   }
 
+  public Token tokenAt(int i) {
+    return sequence.get(i);
+  }
+
 }

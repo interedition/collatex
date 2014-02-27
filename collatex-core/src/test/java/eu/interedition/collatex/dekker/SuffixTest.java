@@ -1,11 +1,9 @@
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -14,7 +12,6 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.suffix.LCPArray;
 import eu.interedition.collatex.dekker.suffix.Sequence;
 import eu.interedition.collatex.dekker.suffix.TokenSuffixArrayNaive;
-import eu.interedition.collatex.dekker.suffix.Utils;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -22,15 +19,14 @@ public class SuffixTest {
 
   // first we find the suffixes for one witness
   @Test
-  public void testHI() {
+  public void testSuffixArrayAndLCPArray() {
     String a = "a b c d a b";
     List<Token> tokens = createSequenceFromString(a);
     Sequence s = new Sequence(tokens, new EqualityTokenComparator());
     TokenSuffixArrayNaive sa = new TokenSuffixArrayNaive(s);
     assertTrue(sa.arrayEquals(new int[] { 0, 4, 1, 5, 2, 3 }));
-    
-    LCPArray lcp = new LCPArray("abcdab", sa);
-    Utils.debug(lcp);
+    LCPArray lcp = new LCPArray(s, sa, new EqualityTokenComparator());
+    assertTrue(lcp.arrayEquals(new int[] { -1, 2, 0, 1, 0, 0 }));
   }
 
   private List<Token> createSequenceFromString(String a) {
