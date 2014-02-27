@@ -3,7 +3,7 @@ package eu.interedition.collatex.dekker.suffix;
 public class LCPArray {
   public int lcp[];
   
-  public LCPArray(String s, SuffixArrayNaive sa) {
+  public LCPArray(String s, TokenSuffixArrayNaive sa) {
     int[] a = sa.a;
     int n = s.length();
     lcp = new int[n];

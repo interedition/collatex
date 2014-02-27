@@ -2,7 +2,7 @@ package eu.interedition.collatex.dekker.suffix;
 
 public class Utils {
 
-  public static void debug(SuffixArrayNaive sa) {
+  public static void debug(TokenSuffixArrayNaive sa) {
     for (int i = 0; i < sa.len; i++) {
       System.out.print(sa.a[i] + ",");
     }
