@@ -3,8 +3,14 @@ package eu.interedition.collatex.dekker.suffix;
 import java.util.Comparator;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.simple.SimpleToken;
+
 /*
+ * Class represents a sequence of tokens
+ * 
  * @author: Ronald Haentjens Dekker
  */
 public class Sequence {
@@ -43,4 +49,38 @@ public class Sequence {
     return sequence.get(i);
   }
 
+  /*
+   * Converts multiple token steams into a single token stream
+   * There are marker tokens in between the witness tokens.
+   * 
+   * Note: I don't like the marker tokens...
+   * It would be hard to add them when a token is a generic object
+   * This works for now..
+   * 
+   * Alternative would be to remember the positions where a token changes
+   * between witnesses and let the subsequence limit the range to a
+   * specific witness.
+   */
+  public static Sequence createSequenceFromMultipleWitnesses(Comparator<Token> tokenComparator, List<Token>... witnesses) {
+    List<Token> tokens = Lists.newArrayList();
+    int witnessNumber=1;
+    for (Iterable<Token> witness : witnesses) {
+      for (Token t : witness) {
+        tokens.add(t);
+      }
+      tokens.add(new MarkerToken(witnessNumber));
+      witnessNumber++;
+    }
+    return new Sequence(tokens, tokenComparator);
+  }
+  
+  @Override
+  public String toString() {
+    String result = "";
+    for (Token t : sequence) {
+      SimpleToken st = (SimpleToken) t;
+      result += st.getContent();
+    }
+    return result;
+  }
 }

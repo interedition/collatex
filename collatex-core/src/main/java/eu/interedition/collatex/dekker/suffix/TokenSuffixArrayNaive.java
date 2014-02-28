@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /*
  * Naive implementation of a token based suffix array
+ * 
  * @author: Ronald Haentjens Dekker
  */
 public class TokenSuffixArrayNaive {
@@ -26,5 +27,9 @@ public class TokenSuffixArrayNaive {
   
   public boolean arrayEquals(int[] other) {
     return Arrays.equals(a, other);
+  }
+
+  public int length() {
+    return len;
   }
 }
