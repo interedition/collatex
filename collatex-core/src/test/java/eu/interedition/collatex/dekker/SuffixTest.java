@@ -1,15 +1,17 @@
 package eu.interedition.collatex.dekker;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.suffix.Block;
+import eu.interedition.collatex.dekker.suffix.Collation;
 import eu.interedition.collatex.dekker.suffix.LCPArray;
 import eu.interedition.collatex.dekker.suffix.Sequence;
 import eu.interedition.collatex.dekker.suffix.TokenSuffixArrayNaive;
@@ -52,16 +54,19 @@ public class SuffixTest {
     List<Token> tokensW1 = createSequenceFromString(W1);
     List<Token> tokensW2 = createSequenceFromString(W2);
     @SuppressWarnings("unchecked")
-    Sequence s = Sequence.createSequenceFromMultipleWitnesses(new EqualityTokenComparator(), tokensW1, tokensW2);
+    Sequence s = Sequence.createSequenceFromMultipleWitnesses(new EqualityTokenComparator(), Lists.newArrayList(tokensW1, tokensW2));
     TokenSuffixArrayNaive sa = new TokenSuffixArrayNaive(s);
     assertTrue(sa.arrayEquals(new int[] { 8,10,24,15,29,4,20,9,0,16,1,17,2,18,3,19,5,21,6,22,7,23,11,25,12,26,13,27,14,28 }));
     LCPArray lcp = new LCPArray(s, sa, new EqualityTokenComparator());
     assertTrue(lcp.arrayEquals(new int[] {-1,1,5,0,0,0,5,0,0,9,0,8,0,7,0,6,0,4,0,3,0,2,0,4,0,3,0,2,0,1,}));
   }
 
-  @Ignore
   @Test
   public void testSMR() {
-    //  NonOverlappingRepeatableBlocksBuilder.calculateBlocks(sa, lcp);
+    Collation collation = Collation.create().addWitness("a b c d F g h i ! K ! q r s t").addWitness("a b c d F g h i ! q r s t");
+    List<Block> blocks = collation.getBlocks();
+    blocks.get(0).assertBlockAsString("a b c d F g h i !");
+    blocks.get(1).assertBlockAsString("q r s t");
+    assertEquals(2, blocks.size());
   }
 }

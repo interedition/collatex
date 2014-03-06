@@ -33,6 +33,10 @@ public class Sequence {
     return new Sequence(sequence.subList(index, length()), tokenComparator);
   }
 
+  public Sequence subsequence(Integer fromIndex, Integer toIndex) {
+    return new Sequence(sequence.subList(fromIndex, toIndex), tokenComparator);
+  }
+
   public int compareTo(Sequence other) {
     for (int i=0; i < Math.min(length(), other.length()); i++) {
       Token token1 = sequence.get(i);
@@ -61,10 +65,10 @@ public class Sequence {
    * between witnesses and let the subsequence limit the range to a
    * specific witness.
    */
-  public static Sequence createSequenceFromMultipleWitnesses(Comparator<Token> tokenComparator, List<Token>... witnesses) {
+  public static Sequence createSequenceFromMultipleWitnesses(Comparator<Token> tokenComparator, List<? extends Iterable<Token>> witnesses) {
     List<Token> tokens = Lists.newArrayList();
     int witnessNumber=1;
-    for (Iterable<Token> witness : witnesses) {
+    for (Iterable<? extends Token> witness : witnesses) {
       for (Token t : witness) {
         tokens.add(t);
       }
@@ -79,8 +83,9 @@ public class Sequence {
     String result = "";
     for (Token t : sequence) {
       SimpleToken st = (SimpleToken) t;
-      result += st.getContent();
+      result += " "+st.getContent();
     }
     return result;
   }
+
 }

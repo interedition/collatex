@@ -12,10 +12,10 @@ import com.google.common.collect.TreeRangeSet;
 */
 public class SuperMaximumRepeats {
 
-  public static List<Range<Integer>> calculateBlocks(TokenSuffixArrayNaive sa, LCPArray lcp) {
+  public List<Block> calculateBlocks(TokenSuffixArrayNaive sa, LCPArray lcp, Sequence s) {
     int bestFound;
     RangeSet<Integer> occupied = TreeRangeSet.create();
-    List<Range<Integer>> result = Lists.newArrayList();
+    List<Block> result = Lists.newArrayList();
     do {
       bestFound=0;
       int bestPosition=0;
@@ -40,13 +40,15 @@ public class SuperMaximumRepeats {
         if (occupied.contains(p2.lowerEndpoint())||occupied.contains(p2.upperEndpoint())) {
           continue;
         }
-        System.out.println(String.format("piece1: %s piece2: %s length: %s", p1, p2, bestFound));
+        //System.out.println(String.format("piece1: %s piece2: %s length: %s", p1, p2, bestFound));
         // add to rangeset
         occupied.add(p1);
         occupied.add(p2);
         // add ranges to result
-        result.add(p1);
-        result.add(p2);
+        Block block = new Block(s);
+        block.addOccurance(p1);
+        block.addOccurance(p2);
+        result.add(block);
       }
     } while(bestFound!=0);
     return result;
