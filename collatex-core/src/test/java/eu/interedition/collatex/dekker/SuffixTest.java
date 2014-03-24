@@ -1,7 +1,6 @@
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -11,8 +10,10 @@ import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.suffix.Block;
+import eu.interedition.collatex.dekker.suffix.BlockWitness;
 import eu.interedition.collatex.dekker.suffix.Collation;
 import eu.interedition.collatex.dekker.suffix.LCPArray;
+import eu.interedition.collatex.dekker.suffix.MultipleWitnessSequence;
 import eu.interedition.collatex.dekker.suffix.Sequence;
 import eu.interedition.collatex.dekker.suffix.TokenSuffixArrayNaive;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -54,7 +55,7 @@ public class SuffixTest {
     List<Token> tokensW1 = createSequenceFromString(W1);
     List<Token> tokensW2 = createSequenceFromString(W2);
     @SuppressWarnings("unchecked")
-    Sequence s = Sequence.createSequenceFromMultipleWitnesses(new EqualityTokenComparator(), Lists.newArrayList(tokensW1, tokensW2));
+    Sequence s = MultipleWitnessSequence.createSequenceFromMultipleWitnesses(new EqualityTokenComparator(), Lists.newArrayList(tokensW1, tokensW2));
     TokenSuffixArrayNaive sa = new TokenSuffixArrayNaive(s);
     assertTrue(sa.arrayEquals(new int[] { 8,10,24,15,29,4,20,9,0,16,1,17,2,18,3,19,5,21,6,22,7,23,11,25,12,26,13,27,14,28 }));
     LCPArray lcp = new LCPArray(s, sa, new EqualityTokenComparator());
@@ -68,5 +69,14 @@ public class SuffixTest {
     blocks.get(0).assertBlockAsString("a b c d F g h i !");
     blocks.get(1).assertBlockAsString("q r s t");
     assertEquals(2, blocks.size());
+  }
+  
+  // test the transformation of witnesses into block witnesses
+  @Test
+  public void testTransform() {
+    Collation collation = Collation.create().addWitness("a b c d F g h i ! K ! q r s t").addWitness("a b c d F g h i ! q r s t");
+    List<BlockWitness> witnesses = collation.getBlockWitnesses();
+    BlockWitness bw1 = witnesses.get(0);
+    bw1.assertTokens("a b c d F g h i ! :0-8", "q r s t:11-14");
   }
 }

@@ -46,8 +46,8 @@ public class SuperMaximumRepeats {
         occupied.add(p2);
         // add ranges to result
         Block block = new Block(s);
-        block.addOccurance(p1);
-        block.addOccurance(p2);
+        block.addOccurance(new Occurence(block, p1));
+        block.addOccurance(new Occurence(block, p2));
         result.add(block);
       }
     } while(bestFound!=0);

@@ -34,4 +34,11 @@ public class Collation {
     algorithm.collate(graph, witnesses);
     return algorithm.getBlocks();
   }
+
+  public List<BlockWitness> getBlockWitnesses() {
+    DekkerOrderIndependentAlgorithm algorithm = new DekkerOrderIndependentAlgorithm();
+    JungVariantGraph graph = new JungVariantGraph();
+    algorithm.collate(graph, witnesses);
+    return algorithm.getBlockWitnesses();
+  }
 }
