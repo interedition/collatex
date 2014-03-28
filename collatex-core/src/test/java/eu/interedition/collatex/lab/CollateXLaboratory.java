@@ -214,11 +214,14 @@ public class CollateXLaboratory extends JFrame {
         CollationAlgorithmFactory.dekkerMatchMatrix(comparator, outlierTranspositionsSizeLimit).collate(vg, witness);
       }
 
+      //TODO: Matches should be created outside the MatchTable!
+      //TOOD: comparator is at the moment not used!
+      
       SimpleWitness lastWitness = w.get(w.size() - 1);
       if (LOG.isLoggable(Level.FINE)) {
         LOG.log(Level.FINE, "Creating MatchTable for: {0}", lastWitness.getSigil());
       }
-      matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness, outlierTranspositionsSizeLimit));
+      matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness), vg, lastWitness, outlierTranspositionsSizeLimit));
 
       final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
       columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());

@@ -103,7 +103,7 @@ public class IslandTest extends AbstractTest {
   public void testArchipelagoRivalIslands() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
     VariantGraph vg = collate(sw[0]);
-    MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    MatchTable table = MatchTable.create(vg, sw[1]);
     Archipelago archipelago = new Archipelago();
     for (Island isl : table.getIslands()) {
       archipelago.add(isl);

@@ -3,6 +3,7 @@ package eu.interedition.collatex.dekker.suffix;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -13,14 +14,14 @@ import eu.interedition.collatex.simple.SimpleToken;
  */
 public class Block {
   private Sequence sequence;
-  private List<Occurence> occurances;
+  private List<Occurrence> occurances;
   
   public Block(Sequence s) {
     this.occurances = Lists.newArrayList();
     this.sequence = s;
   }
   
-  public void addOccurance(Occurence occurance) {
+  public void addOccurance(Occurrence occurance) {
     occurances.add(occurance);
   }
   
@@ -58,7 +59,12 @@ public class Block {
   }
 
   // not happy with this method; it is ask, instead of tell
-  protected List<Occurence> getOccurances() {
+  protected List<Occurrence> getOccurances() {
     return occurances;
+  }
+
+  // not happy with this method; it is ask, instead of tell
+  public Sequence getSubsequenceForRange(Range<Integer> range) {
+    return sequence.subsequence(range.lowerEndpoint(), range.upperEndpoint());
   }
 }

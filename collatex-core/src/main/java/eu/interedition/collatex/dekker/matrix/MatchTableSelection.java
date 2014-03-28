@@ -3,15 +3,18 @@ package eu.interedition.collatex.dekker.matrix;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
 // @author: Ronald Haentjens Dekker
@@ -161,5 +164,16 @@ public class MatchTableSelection {
       possibleIslands = Lists.newArrayList(islandMultimap.get(max));
     }
     return possibleIslands;
+  }
+
+  public Map<Token, VariantGraph.Vertex> getMatches() {
+    //   Here the result is put in a map
+    Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
+    for (Island island : getIslands()) {
+      for (Coordinate c : island) {
+        map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
+      }
+    }
+    return map;
   }
 }

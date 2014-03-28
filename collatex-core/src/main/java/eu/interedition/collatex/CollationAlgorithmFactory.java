@@ -20,8 +20,10 @@
 package eu.interedition.collatex;
 
 import com.google.common.base.Function;
+
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
+import eu.interedition.collatex.dekker.suffix.DekkerOrderIndependentAlgorithm;
 import eu.interedition.collatex.medite.Match;
 import eu.interedition.collatex.medite.MediteAlgorithm;
 import eu.interedition.collatex.medite.Phrase;
@@ -40,7 +42,7 @@ public class CollationAlgorithmFactory {
   }
 
   public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
-    return new DekkerAlgorithm(comparator, new MatchTableLinker(outlierTranspositionsSizeLimit));
+    return new DekkerOrderIndependentAlgorithm(comparator);
   }
 
   public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {

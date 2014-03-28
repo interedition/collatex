@@ -56,6 +56,10 @@ public class Matches {
       }
     }
 
+    return calculateSetsFromAll(vertices, witnessTokens, all);
+  }
+
+  public static Matches calculateSetsFromAll(final Iterable<VariantGraph.Vertex> vertices, final Iterable<Token> witnessTokens, final ListMultimap<Token, VariantGraph.Vertex> all) {
     // unmatched tokens
     Set<Token> unmatched = Sets.newLinkedHashSet();
     for (Token witnessToken : witnessTokens) {
@@ -97,7 +101,7 @@ public class Matches {
     return new Matches(all, unmatched, ambiguous, unique);
   }
 
-  private Matches(ListMultimap<Token, VariantGraph.Vertex> all, Set<Token> unmatched, Set<Token> ambiguous, Set<Token> unique) {
+  protected Matches(ListMultimap<Token, VariantGraph.Vertex> all, Set<Token> unmatched, Set<Token> ambiguous, Set<Token> unique) {
     this.all = all;
     this.unmatched = unmatched;
     this.ambiguous = ambiguous;

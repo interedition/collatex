@@ -68,7 +68,7 @@ public class HermansTest extends AbstractTest {
     String textD9 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>";
     SimpleWitness[] sw = createWitnesses(textD1, textD9);
     VariantGraph vg = collate(sw[0]);
-    MatchTable buildMatrix = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    MatchTable buildMatrix = MatchTable.create(vg, sw[1]);
     LOG.fine(new MatchTableSerializer(buildMatrix).toHtml());
   }
 
@@ -78,7 +78,7 @@ public class HermansTest extends AbstractTest {
     String textD9 = "Op de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.";
     SimpleWitness[] sw = createWitnesses(textD1, textD9);
     VariantGraph vg = collate(sw[0]);
-    MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    MatchTable matchTable = MatchTable.create(vg, sw[1]);
     // System.out.println(buildMatrix.toHtml());
     IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
 //    LOG.fine("archipelago: " + archipelago);
@@ -117,7 +117,7 @@ public class HermansTest extends AbstractTest {
     String textD4F = "Werumeus  Buning maakt artikelen van vijf pagina&APO+s  over de  geologie van de  diepzee, die  hij uit Engelse  boeken overschrijft,   wat hij  pas in de laatste  regel  vermeldt,   omdat hij   zo  goed kan koken.<p/>\n" + "J. W.Hofstra kan niet lezen en nauwelijks stotteren,   laat staan schrijven.   Hij  oefent het ambt van literair kritikus uit omdat hij uiterlijk veel weg heeft van een Duitse filmacteur (Adolf Wohlbrock).<p/>\n" + "Edouard  Bouquin is  het olijke  culturele  geweten.   Bouquin betekent:   1)  oud boek  van geringe  waarde,   2)  oude bok,   3)  mannetjeskonijn.   Ik kan het ook niet helpen,   het staat in Larousse.<p/>\n" + "Nu en dan koopt Elsevier een artikel van een echte professor, wiens naam en titels zu vet worden afgedrukt, dat zij allicht de andere copie ook iets professoraals geven, in het oog van de speksnijders.<p/>\n" + "\n" + "De politiek van dit blad  wordt geschreven door een der leeuwen uit het nederlandse wapen (ik geloof de   rechtse)  op een krakerige  gerechtszaaltoon in zeer korte  zinnetjes, omdat hij  tot zijn  spijt  de  syntaxis  onvoldoende  beheerst. <p/>";
     SimpleWitness[] sw = createWitnesses(textMZ_DJ233, textD4F);
     VariantGraph vg = collate(sw[0]);
-    MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+    MatchTable matchTable = MatchTable.create(vg, sw[1]);
     // try {
     // FileWriter fw = new
     // FileWriter("C:\\Documents and Settings\\meindert\\Mijn Documenten\\Project Hermans productielijn\\Materiaal input collateX\\Hulp1.html");
@@ -191,7 +191,7 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses(textD1, textD9);
 
     VariantGraph base = collate(witnesses[0]);
-    MatchTable matchTable = MatchTable.create(base, witnesses[1], new EqualityTokenComparator());
+    MatchTable matchTable = MatchTable.create(base, witnesses[1]);
     IslandConflictResolver creator = new IslandConflictResolver(matchTable, 1);
 
     //Mock Archipelago

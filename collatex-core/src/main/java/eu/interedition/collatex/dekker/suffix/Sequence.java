@@ -2,6 +2,7 @@ package eu.interedition.collatex.dekker.suffix;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -60,6 +61,12 @@ public class Sequence {
       result += " "+st.getContent();
     }
     return result;
+  }
+
+  public void mapTokensToBlock(Block block, Map<Token, Block> tokenToBlock) {
+    for (Token t : sequence) {
+      tokenToBlock.put(t, block);
+    }
   }
 
 }

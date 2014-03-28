@@ -58,15 +58,16 @@ public class MatchTable {
   // assumes default token comparator
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
     Comparator<Token> comparator = new EqualityTokenComparator();
-    return MatchTable.create(graph, witness, comparator);
+    Matches matches = Matches.between(graph.vertices(), witness, comparator);
+    return MatchTable.create(graph, witness, matches);
   }
 
-  public static MatchTable create(VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
+  public static MatchTable create(VariantGraph graph, Iterable<Token> witness, Matches matches) {
     final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
     // step 1: build the MatchTable
     MatchTable table = createEmptyTable(ranking, graph, witness);
     // step 2: do the matching and fill the table
-    table.fillTableWithMatches(ranking, graph, witness, comparator);
+    table.fillTableWithMatches(ranking, graph, witness, matches);
     return table;
   }
 
@@ -126,8 +127,7 @@ public class MatchTable {
   }
 
   // move parameters into fields?
-  private void fillTableWithMatches(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
-    Matches matches = Matches.between(graph.vertices(), witness, comparator);
+  private void fillTableWithMatches(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness, Matches matches) {
     Set<Token> unique = matches.getUnique();
     Set<Token> ambiguous = matches.getAmbiguous();
     int rowIndex=0;
@@ -196,4 +196,5 @@ public class MatchTable {
       this.vertex = vertex;
     }
  	}
+
 }
