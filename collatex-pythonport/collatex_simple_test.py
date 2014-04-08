@@ -1,5 +1,7 @@
 import unittest
-from collatex.collatex_simple import Tokenizer, Suffix
+
+from collatex_simple import Tokenizer, Suffix
+
 
 class Test(unittest.TestCase):
 
