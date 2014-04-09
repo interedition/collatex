@@ -6,7 +6,7 @@ Created on Apr 7, 2014
 import unittest
 from linsuffarr import SuffixArray
 from collatex_simple import SuperMaximumRe, Block
-from rangeset import RangeSet
+from ClusterShell.RangeSet import RangeSet
 
 
 
@@ -39,10 +39,8 @@ class Test(unittest.TestCase):
         smr = SuperMaximumRe()
         blocks = smr.find_blocks(sa)
         # we expect two blocks ("a b c d F g h i", "! q r s t")
-        #TODO: now the first block has size 9 instead of 8!
-        #NOTE: It at the moment finds the Maximum Repeats not the Super Maximal Repeats
-        block1 = Block(RangeSet(0,8).union(RangeSet(16,24)))
-        block2 = Block(RangeSet(10,14).union(RangeSet(24,28)))
+        block1 = Block(RangeSet("0-8, 16-24"))
+        block2 = Block(RangeSet("11-14, 25-28"))
         #print(blocks)
         self.assertEqual([block1, block2], blocks)
 

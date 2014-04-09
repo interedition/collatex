@@ -3,8 +3,8 @@ Created on Apr 7, 2014
 
 @author: Ronald Haentjens Dekker
 '''
-#using rangeset (0.0.5) from http://axiak.github.com/py-rangeset
-from rangeset import RangeSet
+#using RangeSet from ClusterShell project (install it first with pip)
+from ClusterShell.RangeSet import RangeSet
 
 class Block(object):
     
@@ -27,28 +27,22 @@ class SuperMaximumRe(object):
     def find_blocks(self, sa):
         lcp = sa._LCP_values
         blocks = []
-        # I can not seem to make an empty RangeSet, nor can I add to a RangeSet
-        # so we have to reassign the variable each time
-        # TODO: instead of using an occupied range set it would be better
+        # TODO: instead of using an occupied range set it might be better
         # to loop over the blocks and delegate this responsibility to them.
-        occupied = None
+        occupied = RangeSet()
         max_prefix = -1
         while(max_prefix!=0):
             max_position, max_prefix = self.find_max_prefix(lcp)
             if (max_prefix!=0):
                 piece1 = sa.SA[max_position-1]
                 piece2 = sa.SA[max_position]
-                p1 = RangeSet(piece1, piece1+max_prefix-1)
-                p2 = RangeSet(piece2, piece2+max_prefix-1)
-                # NOTE: it might be that issubset is not good enough
-                # and that overlap != empty has to be used instead
-                if occupied == None: 
-                    occupied = RangeSet.mutual_union(p1, p2) 
-                    blocks.append(Block(RangeSet.mutual_union(p1, p2)))
-                else:
-                    if p1.issubset(occupied) == False & p2.issubset(occupied) == False:
-                        blocks.append(Block(RangeSet.mutual_union(p1, p2)))
-                        occupied = RangeSet.mutual_union(occupied, p1, p2)
+                blockRanges = RangeSet()
+                blockRanges.add_range(piece1, piece1+max_prefix)
+                blockRanges.add_range(piece2, piece2+max_prefix)
+                if not (occupied.intersection(blockRanges)):
+                    block = Block(blockRanges)
+                    blocks.append(block)
+                    occupied = occupied.union(blockRanges)
                 # reset the lcp value to zero
                 # TODO: it is not nice to change the lcp value
                 lcp[max_position]=0
