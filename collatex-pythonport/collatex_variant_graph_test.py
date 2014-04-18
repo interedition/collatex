@@ -6,7 +6,9 @@ Created on Apr 10, 2014
 
 import unittest
 import networkx as nx
-from collatex_simple import Tokenizer
+from collatex_simple import Tokenizer, SuperMaximumRe, Block
+from linsuffarr import SuffixArray
+from ClusterShell.RangeSet import RangeSet
 
 class Witness(object):
     
@@ -43,6 +45,7 @@ class CollationAlgorithm(object):
             if (vertex == None):
                 graph.add_vertex(token)
             else:
+                #TODO: add Exception(msg)
                 raise("we need to add a token to a vertex, but we don't know how yet!")
                 #vertex.add_token
         # make new edge and connect the last vertex and the new vertex
@@ -81,6 +84,7 @@ class Collation(object):
     witnesses = []
     counter = 0
     witness_ranges = {}
+    combined_string = ""
     
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
@@ -91,18 +95,27 @@ class Collation(object):
         # the extra one is for the marker token
         self.counter += len(witness.tokens()) +1 
         self.witness_ranges[sigil] = witness_range
+        if not self.combined_string == "":
+            self.combined_string += " $ "
+        self.combined_string += content
+        
+    def get_blocks(self):
+        sa = SuffixArray(self.combined_string)
+        smr = SuperMaximumRe()
+        blocks = smr.find_blocks(sa)
+        return blocks
     
     def collate(self):
         self.graph = VariantGraph() 
         return self.graph
 
-    # add not
     def get_range_for_witness(self, witness_sigil):
         if not self.witness_ranges.has_key(witness_sigil):
             raise Exception("Witness "+witness_sigil+" is not added to the collation!")
-        
         return self.witness_ranges[witness_sigil]
     
+    def get_combined_string(self):
+        return self.combined_string
 
 
 
@@ -129,7 +142,20 @@ class Test(unittest.TestCase):
         self.assertEquals(range(0, 15), collation.get_range_for_witness("W1"))
         self.assertEquals(range(16, 29), collation.get_range_for_witness("W2"))
 
-    
+    def test_Hermans_case_blocks(self):
+        collation = Collation()
+        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_witness("W2", "a b c d F g h i ! q r s t")
+        # $ is meant to separate witnesses here
+        self.assertEquals("a b c d F g h i ! K ! q r s t $ a b c d F g h i ! q r s t", collation.get_combined_string())
+        blocks = collation.get_blocks()
+        # we expect two blocks ("a b c d F g h i !", "q r s t")
+        # both numbers are inclusive
+        block1 = Block(RangeSet("0-8, 16-24"))
+        block2 = Block(RangeSet("11-14, 25-28"))
+        #print(blocks)
+        self.assertEqual([block1, block2], blocks)
+
     
     
     
