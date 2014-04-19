@@ -5,6 +5,52 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
+from collatex_core import Witness, VariantGraph
+from linsuffarr import SuffixArray
+
+'''
+Suffix specific implementation of Collation object
+'''
+class Collation(object):
+    witnesses = []
+    counter = 0
+    witness_ranges = {}
+    combined_string = ""
+    
+    # the tokenization process happens multiple times
+    # and by different tokenizers. This should be fixed
+    def add_witness(self, sigil, content):
+        witness = Witness(sigil, content)
+        self.witnesses.append(witness)
+        witness_range = range(self.counter, self.counter+len(witness.tokens()))
+        # the extra one is for the marker token
+        self.counter += len(witness.tokens()) +1 
+        self.witness_ranges[sigil] = witness_range
+        if not self.combined_string == "":
+            self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
+        self.combined_string += content
+        
+    def get_blocks(self):
+        sa = self.get_sa()
+        smr = SuperMaximumRe()
+        blocks = smr.find_blocks(sa)
+        return blocks
+    
+    def collate(self):
+        self.graph = VariantGraph() 
+        return self.graph
+
+    def get_range_for_witness(self, witness_sigil):
+        if not self.witness_ranges.has_key(witness_sigil):
+            raise Exception("Witness "+witness_sigil+" is not added to the collation!")
+        return self.witness_ranges[witness_sigil]
+    
+    def get_combined_string(self):
+        return self.combined_string
+
+    
+    def get_sa(self):
+        return SuffixArray(self.combined_string)
 
 class Block(object):
     
@@ -58,14 +104,6 @@ class SuperMaximumRe(object):
         
         #print(max_prefix, max_position)
         return max_position, max_prefix
-
-# not used
-# Tokenizer inside suffix array library is used
-class Tokenizer(object):
-    
-    #by default the tokenizer splits on space characters    
-    def tokenize(self, contents):
-        return contents.split()
 
 # not used
 # external suffix library is used    

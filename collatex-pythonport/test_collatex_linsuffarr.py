@@ -5,8 +5,8 @@ Created on Apr 7, 2014
 '''
 import unittest
 from linsuffarr import SuffixArray
-from collatex_simple import SuperMaximumRe, Block
 from ClusterShell.RangeSet import RangeSet
+from collatex_suffix import SuperMaximumRe, Block
 
 
 
