@@ -55,7 +55,11 @@ class Collation(object):
 class Block(object):
     
     def __init__(self, ranges):
+        """
+        :type ranges: RangeSet
+        """
         self.ranges = ranges
+        
     
     def __eq__(self, other):
         if type(other) is type(self):
@@ -67,6 +71,9 @@ class Block(object):
     
     def __repr__(self):
         return "wowie a block: "+self.ranges.__str__()
+    
+    def is_in_range(self, position):
+        return position in self.ranges
     
 class SuperMaximumRe(object):
     
@@ -127,25 +134,65 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
         :type graph: VariantGraph
         :type collation: Collation
         '''
+        # step 1: Build the variant graph for the first witness
+        # this is easy: generate a vertex for every token
         first_witness = collation.witnesses[0]
         tokens = first_witness.tokens()
-        self.merge(graph, tokens)
+        token_to_vertex = self.merge(graph, tokens)
+        # step 2: Build the initial block to list vertex map 
+        block_to_vertices = {}
+        token_counter = 0
+        blocks = collation.get_blocks()
+        # note: this can be done faster by focusing on the blocks
+        # instead of the tokens
+        for token in tokens:
+            for block in blocks:
+                if block.is_in_range(token_counter):
+                    vertex = token_to_vertex[token]
+                    if block_to_vertices.has_key(block):
+                        existing_vertices = block_to_vertices[block]
+                        existing_vertices.append(vertex)
+                    else:
+                        block_to_vertices[block] = [vertex]
+            token_counter += 1
+        #print(block_to_vertices)    
         
-        
-#         for token in tokens:
-#             graph.
-#         #graph.
         pass
 
 #  /*
 # * take the vectors from the vectorspace.
 # * they represent the alignment
 # * build a Vector -> List<vertex> representation
-# * 1)Building the graph for the first witness is
-# * 1) easy --> a vertex for every token
 # * 2)then build the initial vector to vertex map
 # * find all the vector that have a coordinate in the
 # * first dimension (that is the dimension related to
 # * the first witness)
 # * 3) Merge in witness b
 # */
+
+
+#   private Map<VectorSpace.Vector, List<VariantGraph.Vertex>> generateVectorToVertexMap(Iterable<Token> witness, int dimension, Map<Token, Vertex> newVertices, List<Vector> vs) {
+#     // put vertices by the vector
+#     // dit doe ik aan de hand van witness a
+#     Map<VectorSpace.Vector, List<VariantGraph.Vertex>> vrvx = Maps.newHashMap();
+#     // TODO: dit moet een multimap worden
+#     int counterToken = 0;
+#     for (Token t: witness) {
+#       counterToken++;
+#       for (VectorSpace.Vector v : vs) {
+#         if (counterToken >= v.startCoordinate[dimension] && counterToken <= (v.startCoordinate[dimension]+v.length-1)) {
+#           // get the vertex for this token
+#           VariantGraph.Vertex vx = newVertices.get(t);
+#           if (vrvx.containsKey(v)) {
+#             List<VariantGraph.Vertex> ex = vrvx.get(v);
+#             ex.add(vx);
+#           } else {
+#             List<VariantGraph.Vertex> ne = Lists.newArrayList();
+#             ne.add(vx);
+#             vrvx.put(v, ne);
+#           }
+#         }
+#       }
+#     }
+#     return vrvx;
+#   }

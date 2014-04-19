@@ -77,49 +77,22 @@ class CollationAlgorithm(object):
         """
         :type graph: VariantGraph
         """
+        token_to_vertex = {}
         last = graph.start
         for token in witness_tokens:
             vertex = alignments.get(token, None)
-            if (vertex == None):
+            if vertex == None:
                 vertex = graph.add_vertex(token)
             else:
                 #TODO: add Exception(msg)
                 raise("we need to add a token to a vertex, but we don't know how yet!")
                 #vertex.add_token
-            # make new edge and connect the last vertex and the new vertex
+            token_to_vertex[token] = vertex
             #TODO: add witness set!
             graph.connect(last, vertex)
             last = vertex
         graph.connect(last, graph.end)
-
-        
-#     protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
-#       Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
-#       final Witness witness = Iterables.getFirst(witnessTokens, null).getWitness();
-# 
-#       if (LOG.isLoggable(Level.FINE)) {
-#         LOG.log(Level.FINE, "{0} + {1}: Merge comparand into graph", new Object[] { into, witness });
-#       }
-#       witnessTokenVertices = Maps.newHashMap();
-#       VariantGraph.Vertex last = into.getStart();
-#       final Set<Witness> witnessSet = Collections.singleton(witness);
-#       for (Token token : witnessTokens) {
-#         VariantGraph.Vertex matchingVertex = alignments.get(token);
-#         if (matchingVertex == null) {
-#           matchingVertex = into.add(token);
-#         } else {
-#           if (LOG.isLoggable(Level.FINE)) {
-#             LOG.log(Level.FINE, "Match: {0} to {1}", new Object[] { matchingVertex, token });
-#           }
-#           matchingVertex.add(Collections.singleton(token));
-#         }
-#         witnessTokenVertices.put(token, matchingVertex);
-# 
-#         into.connect(last, matchingVertex, witnessSet);
-#         last = matchingVertex;
-#       }
-#       into.connect(last, into.getEnd(), witnessSet);
-#     }
+        return token_to_vertex
 
 #TODO: define abstract collation class
 
