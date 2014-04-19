@@ -129,17 +129,8 @@ class Suffix(object):
 #TODO: check spelling!
 class DekkerSuffixAlgorithmn(CollationAlgorithm):
     
-    def buildVariantGraphFromBlocks(self, graph, collation):
-        '''
-        :type graph: VariantGraph
-        :type collation: Collation
-        '''
-        # step 1: Build the variant graph for the first witness
-        # this is easy: generate a vertex for every token
-        first_witness = collation.witnesses[0]
-        tokens = first_witness.tokens()
-        token_to_vertex = self.merge(graph, tokens)
-        # step 2: Build the initial block to list vertex map 
+
+    def build_block_to_vertices(self, collation, tokens, token_to_vertex):
         block_to_vertices = {}
         token_counter = 0
         blocks = collation.get_blocks()
@@ -154,45 +145,60 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
                         existing_vertices.append(vertex)
                     else:
                         block_to_vertices[block] = [vertex]
+            
             token_counter += 1
-        #print(block_to_vertices)    
+        #print(block_to_vertices)
+        return block_to_vertices
         
+    def build_block_to_tokens(self, collation, tokens):
+        block_to_tokens = {}
+        #TODO: witness hardcoded!
+        witness_range = collation.get_range_for_witness(collation.witnesses[1].sigil)
+        token_counter = witness_range[0]
+        blocks = collation.get_blocks()
+        # note: this can be done faster by focusing on the blocks
+        # instead of the tokens
+        for token in tokens:
+            for block in blocks:
+                if block.is_in_range(token_counter):
+                    if block_to_tokens.has_key(block):
+                        existing_tokens = block_to_tokens[block]
+                        existing_tokens.append(token)
+                    else:
+                        block_to_tokens[block] = [token]
+            
+            token_counter += 1
+        #print(block_to_tokens)
+        return block_to_tokens
+
+    def buildVariantGraphFromBlocks(self, graph, collation):
+        '''
+        :type graph: VariantGraph
+        :type collation: Collation
+        '''
+        # step 1: Build the variant graph for the first witness
+        # this is easy: generate a vertex for every token
+        first_witness = collation.witnesses[0]
+        tokens = first_witness.tokens()
+        token_to_vertex = self.merge(graph, tokens)
+        # step 2: Build the initial block to list vertex map 
+        block_to_vertices = self.build_block_to_vertices(collation, tokens, token_to_vertex)    
+        # step 3: Build the block to tokens map for the second witness
+        second_witness = collation.witnesses[1]
+        tokens = second_witness.tokens()
+        block_to_tokens = self.build_block_to_tokens(collation, tokens)
+        
+        # step 4: Generate token to vertex alignment map for second 
+        # witness, based on block to vertices map
+#         witness_range = collation.get_range_for_witness(collation.witnesses[1].sigil)
+#         # warning: this is done multiple times
+#         blocks = collation.get_blocks()
+#         print("Witness range "+witness_range.__str__())
+#         for block in blocks:
+#             print("Testing "+block.ranges.__str__())
+#             if block.ranges.intersection(witness_range):
+#                 print(block.__str__()+" is needed to align!")
         pass
 
-#  /*
-# * take the vectors from the vectorspace.
-# * they represent the alignment
-# * build a Vector -> List<vertex> representation
-# * 2)then build the initial vector to vertex map
-# * find all the vector that have a coordinate in the
-# * first dimension (that is the dimension related to
-# * the first witness)
-# * 3) Merge in witness b
-# */
 
 
-#   private Map<VectorSpace.Vector, List<VariantGraph.Vertex>> generateVectorToVertexMap(Iterable<Token> witness, int dimension, Map<Token, Vertex> newVertices, List<Vector> vs) {
-#     // put vertices by the vector
-#     // dit doe ik aan de hand van witness a
-#     Map<VectorSpace.Vector, List<VariantGraph.Vertex>> vrvx = Maps.newHashMap();
-#     // TODO: dit moet een multimap worden
-#     int counterToken = 0;
-#     for (Token t: witness) {
-#       counterToken++;
-#       for (VectorSpace.Vector v : vs) {
-#         if (counterToken >= v.startCoordinate[dimension] && counterToken <= (v.startCoordinate[dimension]+v.length-1)) {
-#           // get the vertex for this token
-#           VariantGraph.Vertex vx = newVertices.get(t);
-#           if (vrvx.containsKey(v)) {
-#             List<VariantGraph.Vertex> ex = vrvx.get(v);
-#             ex.add(vx);
-#           } else {
-#             List<VariantGraph.Vertex> ne = Lists.newArrayList();
-#             ne.add(vx);
-#             vrvx.put(v, ne);
-#           }
-#         }
-#       }
-#     }
-#     return vrvx;
-#   }
