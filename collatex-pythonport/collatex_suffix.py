@@ -60,6 +60,8 @@ class Block(object):
         """
         self.ranges = ranges
         
+    def __hash__(self):
+        return hash(self.ranges.__str__())
     
     def __eq__(self, other):
         if type(other) is type(self):
@@ -171,6 +173,17 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
         #print(block_to_tokens)
         return block_to_tokens
 
+
+    def get_alignment(self, block_to_vertices, block_to_tokens):
+        alignment = {}
+        for block in block_to_tokens:
+            tokens = block_to_tokens[block]
+            vertices = block_to_vertices[block]
+            for token, vertex in zip(tokens, vertices):
+                alignment[token]=vertex
+        return alignment        
+    
+    
     def buildVariantGraphFromBlocks(self, graph, collation):
         '''
         :type graph: VariantGraph
@@ -190,14 +203,10 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
         
         # step 4: Generate token to vertex alignment map for second 
         # witness, based on block to vertices map
-#         witness_range = collation.get_range_for_witness(collation.witnesses[1].sigil)
-#         # warning: this is done multiple times
-#         blocks = collation.get_blocks()
-#         print("Witness range "+witness_range.__str__())
-#         for block in blocks:
-#             print("Testing "+block.ranges.__str__())
-#             if block.ranges.intersection(witness_range):
-#                 print(block.__str__()+" is needed to align!")
+        alignment = self.get_alignment(block_to_vertices, block_to_tokens)
+        #print(alignment)
+        self.merge(graph, tokens, alignment)
+
         pass
 
 

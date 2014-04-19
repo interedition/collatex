@@ -84,9 +84,8 @@ class CollationAlgorithm(object):
             if vertex == None:
                 vertex = graph.add_vertex(token)
             else:
-                #TODO: add Exception(msg)
-                raise("we need to add a token to a vertex, but we don't know how yet!")
-                #vertex.add_token
+                raise Exception("we need to add a token to a vertex, but we don't know how yet!")
+                #TODO: add vertex.add(token)
             token_to_vertex[token] = vertex
             #TODO: add witness set!
             graph.connect(last, vertex)
