@@ -5,7 +5,7 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from collatex_core import Witness, VariantGraph
+from collatex_core import Witness, VariantGraph, CollationAlgorithm
 from linsuffarr import SuffixArray
 
 '''
@@ -119,5 +119,33 @@ class Suffix(object):
         return suffixes
     
 
+#TODO: check spelling!
+class DekkerSuffixAlgorithmn(CollationAlgorithm):
+    
+    def buildVariantGraphFromBlocks(self, graph, collation):
+        '''
+        :type graph: VariantGraph
+        :type collation: Collation
+        '''
+        first_witness = collation.witnesses[0]
+        tokens = first_witness.tokens()
+        self.merge(graph, tokens)
+        
+        
+#         for token in tokens:
+#             graph.
+#         #graph.
+        pass
 
-
+#  /*
+# * take the vectors from the vectorspace.
+# * they represent the alignment
+# * build a Vector -> List<vertex> representation
+# * 1)Building the graph for the first witness is
+# * 1) easy --> a vertex for every token
+# * 2)then build the initial vector to vertex map
+# * find all the vector that have a coordinate in the
+# * first dimension (that is the dimension related to
+# * the first witness)
+# * 3) Merge in witness b
+# */

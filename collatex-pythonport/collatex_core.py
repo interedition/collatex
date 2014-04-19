@@ -32,30 +32,66 @@ class VariantGraph(object):
     def __init__(self):
         self.graph = nx.Graph()
         # hmm they are too similar now
-        self.start = self.graph.add_node("")
-        self.end = self.graph.add_node("")
+        self.start = self.add_vertex("")
+        self.end = self.add_vertex("")
         
+    def add_vertex(self, token_content):
+        '''
+        :type token_content: string
+        '''
+        #print("Adding node: "+token_content)
+        self.graph.add_node(token_content)
+        return token_content
+    
+    def connect(self, source, target):
+        """
+        :type source: vertex
+        :type target: vertex
+        """
+        #print("Adding Edge: "+source+":"+target)
+        self.graph.add_edge(source, target)
         
     def vertices(self):
-        return self.graph.nodes_iter()
+        return self.graph.nodes()
+    
+    def edges(self):
+        return self.graph.edges()
     
     def edge_between(self, node, node2):
         #return self.graph.get_edge_data(node, node2)
         return self.graph.has_edge(node, node2)
   
+    # ugly implementation
+    def vertexWith(self, content):
+        vertex_to_find = None
+        for vertex in self.vertices():
+            if vertex == content:
+                vertex_to_find = vertex
+                break
+        if vertex_to_find == None:
+            raise Exception("Vertex with "+content+" not found!")    
+        return vertex_to_find    
   
 class CollationAlgorithm(object):
     def merge(self, graph, witness_tokens, alignments = {}):  
+        """
+        :type graph: VariantGraph
+        """
         last = graph.start
         for token in witness_tokens:
-            vertex = alignments[token]
+            vertex = alignments.get(token, None)
             if (vertex == None):
-                graph.add_vertex(token)
+                vertex = graph.add_vertex(token)
             else:
                 #TODO: add Exception(msg)
                 raise("we need to add a token to a vertex, but we don't know how yet!")
                 #vertex.add_token
-        # make new edge and connect the last vertex and the new vertex
+            # make new edge and connect the last vertex and the new vertex
+            #TODO: add witness set!
+            graph.connect(last, vertex)
+            last = vertex
+        graph.connect(last, graph.end)
+
         
 #     protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
 #       Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
@@ -93,14 +129,4 @@ class CollationAlgorithm(object):
 
 
 
-# ugly
-# move to variant graph class
-def vertexWith(graph, content):
-    vertex_to_find = None
-    for vertex in graph.vertices():
-        print(type(vertex))
-        if vertex == content:
-            vertex_to_find = vertex
-            break
-    return vertex_to_find    
 
