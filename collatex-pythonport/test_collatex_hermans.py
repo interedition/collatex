@@ -8,6 +8,7 @@ import unittest
 from ClusterShell.RangeSet import RangeSet
 from collatex_suffix import Collation, Block, DekkerSuffixAlgorithmn
 from collatex_core import VariantGraph
+from networkx.drawing.nx_pydot import to_pydot
 
 
 class Test(unittest.TestCase):
@@ -54,6 +55,13 @@ class Test(unittest.TestCase):
         #print(len(graph.vertices()))
         #print(len(graph.edges()))
         
+        # display graph
+        #print(graph.graph.nodes())
+        #view_pygraphviz(graph.graph)
+        
+        dot = to_pydot(graph.graph)
+        dot.write("rawoutput")
+  
         pass
          
             
