@@ -6,32 +6,23 @@ Created on Apr 7, 2014
 import unittest
 from linsuffarr import SuffixArray
 from ClusterShell.RangeSet import RangeSet
-from collatex_suffix import SuperMaximumRe, Block
-
-
-
-
-    
-    
-    
-
-
+from collatex_suffix import SuperMaximumRe, Block, calculate_Burrows_Wheelers_transform
+from collatex_core import Tokenizer
 
 class Test(unittest.TestCase):
 
-
-    #TODO: write asserts
-    def testLineairSuffixArray(self):
-        sa = SuffixArray("The Quick Brown Fox Jumped Over")
-        print(sa)
-        pass
-
-    #TODO: write asserts
-    def testSA2(self):
-        # $ is meant to separate witnesses here
-        sa = SuffixArray("a b c d F g h i ! K ! q r s t $ a b c d F g h i ! q r s t")
-        print(sa)
-        print(sa._LCP_values)
+#     #TODO: write asserts
+#     def testLineairSuffixArray(self):
+#         sa = SuffixArray("The Quick Brown Fox Jumped Over")
+#         print(sa)
+#         pass
+# 
+#     #TODO: write asserts
+#     def testSA2(self):
+#         # $ is meant to separate witnesses here
+#         sa = SuffixArray("a b c d F g h i ! K ! q r s t $ a b c d F g h i ! q r s t")
+#         print(sa)
+#         print(sa._LCP_values)
         
     def test_blocks(self):
         # $ is meant to separate witnesses here
@@ -45,6 +36,18 @@ class Test(unittest.TestCase):
         #print(blocks)
         self.assertEqual([block1, block2], blocks)
 
+    def test_BWT(self):
+        # $ is meant to end witness
+        contents = "a p p e l l e e $"
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(contents)
+        sa = SuffixArray(contents)
+        bwt = calculate_Burrows_Wheelers_transform(tokens, sa)
+        # print(tokens)
+        # print(sa)
+        # print(bwt)
+        self.assertEqual(['e', '$', 'e', 'l', 'p', 'l', 'e', 'p', 'a'], bwt)
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

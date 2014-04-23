@@ -8,6 +8,18 @@ from ClusterShell.RangeSet import RangeSet
 from collatex_core import Witness, VariantGraph, CollationAlgorithm
 from linsuffarr import SuffixArray
 
+
+# calculate the Burrows and Wheelers transform from the SA
+# BWT contains tokens
+# SA contains positions in tokens array
+def calculate_Burrows_Wheelers_transform(tokens, sa):
+    #TODO: We have to think what happens
+    #when the suffix_position is zero!
+    bwt = []
+    for suffix_position in sa.SA:
+        bwt.append(tokens[suffix_position - 1])
+    return bwt
+
 '''
 Suffix specific implementation of Collation object
 '''
