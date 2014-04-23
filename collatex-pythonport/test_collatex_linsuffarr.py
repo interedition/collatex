@@ -6,7 +6,7 @@ Created on Apr 7, 2014
 import unittest
 from linsuffarr import SuffixArray
 from ClusterShell.RangeSet import RangeSet
-from collatex_suffix import SuperMaximumRe, Block, calculate_Burrows_Wheelers_transform
+from collatex_suffix import SuperMaximumRe, Block, calculate_Burrows_Wheeler_transform
 from collatex_core import Tokenizer
 
 class Test(unittest.TestCase):
@@ -42,11 +42,23 @@ class Test(unittest.TestCase):
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(contents)
         sa = SuffixArray(contents)
-        bwt = calculate_Burrows_Wheelers_transform(tokens, sa)
+        bwt = calculate_Burrows_Wheeler_transform(tokens, sa)
         # print(tokens)
         # print(sa)
         # print(bwt)
         self.assertEqual(['e', '$', 'e', 'l', 'p', 'l', 'e', 'p', 'a'], bwt)
+
+    def test_BWT_2(self):
+        # $ is meant to end witness
+        contents = "b a n a n a $"
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(contents)
+        sa = SuffixArray(contents)
+        bwt = calculate_Burrows_Wheeler_transform(tokens, sa)
+        # print(tokens)
+        # print(sa)
+        # print(bwt)
+        self.assertEqual(['a', 'n', 'n', 'b', '$', 'a', 'a'], bwt)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

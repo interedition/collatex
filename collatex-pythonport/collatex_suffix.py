@@ -5,14 +5,14 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from collatex_core import Witness, VariantGraph, CollationAlgorithm
+from collatex_core import Witness, VariantGraph, CollationAlgorithm, Tokenizer
 from linsuffarr import SuffixArray
 
 
-# calculate the Burrows and Wheelers transform from the SA
+# calculate the Burrows and Wheeler transform from the SA
 # BWT contains tokens
 # SA contains positions in tokens array
-def calculate_Burrows_Wheelers_transform(tokens, sa):
+def calculate_Burrows_Wheeler_transform(tokens, sa):
     #TODO: We have to think what happens
     #when the suffix_position is zero!
     bwt = []
@@ -63,6 +63,39 @@ class Collation(object):
     
     def get_sa(self):
         return SuffixArray(self.combined_string)
+
+    
+    def get_BWT(self):
+        # we need the tokens here and the SA
+        sa = self.get_sa()
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.combined_string)
+        bwt = calculate_Burrows_Wheeler_transform(tokens, sa)
+        return bwt
+
+    
+    def get_lcp_array(self):
+        sa = self.get_sa()
+        return sa._LCP_values
+    
+    def get_lcp_intervals(self):
+        lcp = self.get_lcp_array()
+        lcp_intervals = []
+        start_position = 0
+        previous_prefix = 0
+        for index, prefix in enumerate(lcp):
+            if prefix < previous_prefix:
+                # first end last interval
+                lcp_intervals.append(lcp[start_position:index])
+                # create new interval
+                start_position = index 
+            previous_prefix = prefix
+        # add the final interval
+        #TODO: this one can be empty!
+        lcp_intervals.append(lcp[start_position:])        
+        return lcp_intervals
+    
+    
 
 class Block(object):
     
