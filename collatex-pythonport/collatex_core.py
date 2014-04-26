@@ -30,18 +30,21 @@ class Witness(object):
 class VariantGraph(object):
     
     def __init__(self):
+        #TODO: make it a DiGraph
         self.graph = nx.Graph()
-        # hmm they are too similar now
         self.start = self.add_vertex("")
         self.end = self.add_vertex("")
-        
+    
+    # vertex creation uses a unique ID, since the token_content does not have to be unique   
+    # we store the token content in the label 
     def add_vertex(self, token_content):
         '''
         :type token_content: string
         '''
-        #print("Adding node: "+token_content)
-        self.graph.add_node(token_content)
-        return token_content
+        node_id = self.graph.number_of_nodes()
+        #print("Adding node: "+node_id+":"+token_content)
+        self.graph.add_node(node_id, label= token_content)
+        return node_id
     
     def connect(self, source, target):
         """
@@ -61,16 +64,13 @@ class VariantGraph(object):
         #return self.graph.get_edge_data(node, node2)
         return self.graph.has_edge(node, node2)
   
-    # ugly implementation
+    # Note: generator implementation
     def vertexWith(self, content):
-        vertex_to_find = None
-        for vertex in self.vertices():
-            if vertex == content:
-                vertex_to_find = vertex
-                break
-        if vertex_to_find == None:
+        try:
+            vertex_to_find = (n for n in self.graph if self.graph.node[n]['label']==content).next()
+            return vertex_to_find    
+        except StopIteration:
             raise Exception("Vertex with "+content+" not found!")    
-        return vertex_to_find    
   
 class CollationAlgorithm(object):
     def merge(self, graph, witness_tokens, alignments = {}):  
@@ -83,9 +83,9 @@ class CollationAlgorithm(object):
             vertex = alignments.get(token, None)
             if vertex == None:
                 vertex = graph.add_vertex(token)
-            else:
-                raise Exception("we need to add a token to a vertex, but we don't know how yet!")
-                #TODO: add vertex.add(token)
+            #TODO: add vertex.add(token)
+            #else:
+            #    raise Exception("we need to add a token to a vertex, but we don't know how yet!")
             token_to_vertex[token] = vertex
             #TODO: add witness set!
             graph.connect(last, vertex)
