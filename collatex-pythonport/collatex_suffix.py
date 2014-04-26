@@ -9,17 +9,6 @@ from collatex_core import Witness, VariantGraph, CollationAlgorithm, Tokenizer
 from linsuffarr import SuffixArray
 
 
-# calculate the Burrows and Wheeler transform from the SA
-# BWT contains tokens
-# SA contains positions in tokens array
-def calculate_Burrows_Wheeler_transform(tokens, sa):
-    #TODO: We have to think what happens
-    #when the suffix_position is zero!
-    bwt = []
-    for suffix_position in sa.SA:
-        bwt.append(tokens[suffix_position - 1])
-    return bwt
-
 '''
 Suffix specific implementation of Collation object
 '''
@@ -42,12 +31,6 @@ class Collation(object):
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
         self.combined_string += content
         
-    def get_blocks(self):
-        sa = self.get_sa()
-        smr = SuperMaximumRe()
-        blocks = smr.find_blocks(sa)
-        return blocks
-    
     def collate(self):
         self.graph = VariantGraph() 
         return self.graph
@@ -64,39 +47,39 @@ class Collation(object):
     def get_sa(self):
         return SuffixArray(self.combined_string)
 
-    
-    def get_BWT(self):
-        # we need the tokens here and the SA
-        sa = self.get_sa()
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(self.combined_string)
-        bwt = calculate_Burrows_Wheeler_transform(tokens, sa)
-        return bwt
-
-    
     def get_lcp_array(self):
         sa = self.get_sa()
         return sa._LCP_values
-    
-    def get_lcp_intervals(self):
-        lcp = self.get_lcp_array()
-        lcp_intervals = []
-        start_position = 0
-        previous_prefix = 0
-        for index, prefix in enumerate(lcp):
-            if prefix < previous_prefix:
-                # first end last interval
-                lcp_intervals.append(lcp[start_position:index])
-                # create new interval
-                start_position = index 
-            previous_prefix = prefix
-        # add the final interval
-        #TODO: this one can be empty!
-        lcp_intervals.append(lcp[start_position:])        
-        return lcp_intervals
-    
-    
 
+    def get_non_overlapping_repeating_blocks(self):
+        SA = self.get_sa().SA
+        LCP = self.get_lcp_array()
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string()) 
+        print(SA)
+        print(LCP)
+        # step one find potential blocks
+        potential_blocks = []
+        prev_lcp_value = 0
+        for idx, lcp in enumerate(LCP):
+            if lcp > 0 and prev_lcp_value == 0:
+                block_occurence = [SA[idx-1], SA[idx]]
+                block_length = lcp
+            if not lcp == 0 and not prev_lcp_value == 0:
+                block_occurence.append(SA[idx])    
+            if lcp == 0 and not prev_lcp_value == 0:
+                potential_blocks.append((block_length, block_occurence))
+            prev_lcp_value = lcp
+        # step two list potential blocks                
+        for block_length, block_occurence in potential_blocks:
+            print("block found", tokens[block_occurence[0]:block_occurence[0]+block_length])
+            for block in block_occurence:
+                print(block, block+block_length-1)
+        return []
+            
+            
+            
+  
 class Block(object):
     
     def __init__(self, ranges):
@@ -122,42 +105,6 @@ class Block(object):
     def is_in_range(self, position):
         return position in self.ranges
     
-class SuperMaximumRe(object):
-    
-    def find_blocks(self, sa):
-        lcp = sa._LCP_values
-        blocks = []
-        # TODO: instead of using an occupied range set it might be better
-        # to loop over the blocks and delegate this responsibility to them.
-        occupied = RangeSet()
-        max_prefix = -1
-        while(max_prefix!=0):
-            max_position, max_prefix = self.find_max_prefix(lcp)
-            if (max_prefix!=0):
-                piece1 = sa.SA[max_position-1]
-                piece2 = sa.SA[max_position]
-                blockRanges = RangeSet()
-                blockRanges.add_range(piece1, piece1+max_prefix)
-                blockRanges.add_range(piece2, piece2+max_prefix)
-                if not (occupied.intersection(blockRanges)):
-                    block = Block(blockRanges)
-                    blocks.append(block)
-                    occupied = occupied.union(blockRanges)
-                # reset the lcp value to zero
-                # TODO: it is not nice to change the lcp value
-                lcp[max_position]=0
-        return blocks
-
-    def find_max_prefix(self, lcp):
-        max_prefix = 0
-        max_position = 0
-        for index, prefix in enumerate(lcp):
-            if (prefix > max_prefix):
-                max_prefix = prefix
-                max_position = index
-        
-        #print(max_prefix, max_position)
-        return max_position, max_prefix
 
 # not used
 # external suffix library is used    

@@ -9,13 +9,9 @@ from ClusterShell.RangeSet import RangeSet
 from collatex_suffix import Collation, Block, DekkerSuffixAlgorithmn
 from collatex_core import VariantGraph
 from networkx.drawing.nx_pydot import to_pydot
-from array import array
 
 
 class Test(unittest.TestCase):
-    '''
-    classdocs
-    '''
     # test whether the witness->range mapping works
     def test_Hermans_case_witness(self):
         collation = Collation()
@@ -24,24 +20,33 @@ class Test(unittest.TestCase):
         self.assertEquals(range(0, 15), collation.get_range_for_witness("W1"))
         self.assertEquals(range(16, 29), collation.get_range_for_witness("W2"))
 
-    def test_Hermans_case_BWT(self):
+    def test_Hermans_non_overlapping_blocks(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        self.assertEquals(['i', 'i', 'K', 't', 'd', 'd', '!', 't', '$1', 'a', 'a', 'b', 'b', 'c', 'c', 'F', 'F', 'g', 'g', 'h', 'h', '!', '!', 'q', 'q', 'r', 'r', 's', 's'], collation.get_BWT())
+        repeats = collation.get_non_overlapping_repeating_blocks()
+        print(repeats)
+        self.fail("TESTING")
+    
+    def test_black_cat_non_overlapping_blocks(self):
+        collation = Collation()
+        collation.add_witness("W1", "the black cat")
+        collation.add_witness("W2", "the black cat")
+        repeats = collation.get_non_overlapping_repeating_blocks()
+        print(repeats)
+        self.fail("TESTING")
 
-    def test_Hermans_case_LCP_intervals(self):
+    def test_Hermans_case_blocks_three_witnesses(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        lcp_intervals = collation.get_lcp_intervals()
-        self.assertEquals(array('i', [0,1,5]), lcp_intervals[0])
-        self.assertEquals(array('i', [0,0,5]), lcp_intervals[1])
-        self.assertEquals(array('i', [0,1]), lcp_intervals[12])
-        self.assertEquals(13, len(lcp_intervals))
+        collation.add_witness("W3", "a b c d E g h i ! q r s t")
+        repeats = collation.get_non_overlapping_repeating_blocks()
+        print(repeats)
+        self.fail("TESTING")
 
-
-
+    
+    
     def test_Hermans_case_blocks(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -55,6 +60,7 @@ class Test(unittest.TestCase):
         block1 = Block(RangeSet("0-8, 16-24"))
         block2 = Block(RangeSet("11-14, 25-28"))
         #print(blocks)
+        print(collation.get_lcp_array())
         self.assertEqual([block1, block2], blocks)
      
     #TODO: this test is not finished! 
@@ -139,3 +145,7 @@ class Test(unittest.TestCase):
 #     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0], w[1]);
 #     assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0], w[1]);
 #     assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1]);
+
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
