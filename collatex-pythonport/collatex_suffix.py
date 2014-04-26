@@ -7,6 +7,7 @@ Created on Apr 7, 2014
 from ClusterShell.RangeSet import RangeSet
 from collatex_core import Witness, VariantGraph, CollationAlgorithm, Tokenizer
 from linsuffarr import SuffixArray
+from operator import itemgetter
 
 
 '''
@@ -63,19 +64,50 @@ class Collation(object):
         prev_lcp_value = 0
         for idx, lcp in enumerate(LCP):
             if lcp > 0 and prev_lcp_value == 0:
-                block_occurence = [SA[idx-1], SA[idx]]
+                block_occurrences = [SA[idx-1], SA[idx]]
                 block_length = lcp
+                #this check is not nice! (could be move to after for)
+                if idx == len(LCP)-1:
+                    potential_blocks.append((block_length, block_occurrences, len(block_occurrences)))
             if not lcp == 0 and not prev_lcp_value == 0:
-                block_occurence.append(SA[idx])    
+                block_occurrences.append(SA[idx])    
             if lcp == 0 and not prev_lcp_value == 0:
-                potential_blocks.append((block_length, block_occurence))
+                potential_blocks.append((block_length, block_occurrences, len(block_occurrences)))
             prev_lcp_value = lcp
-        # step two list potential blocks                
-        for block_length, block_occurence in potential_blocks:
-            print("block found", tokens[block_occurence[0]:block_occurence[0]+block_length])
-            for block in block_occurence:
-                print(block, block+block_length-1)
-        return []
+        # step two.. sort on depth (length of occurrences), length
+        pbs = sorted(potential_blocks, key=itemgetter(2,0), reverse=True)
+        # step three: select the definitive blocks
+        occupied = RangeSet()
+        real_blocks = []
+#         # debug: list potential blocks (move to string method on Block class)                
+#         for block_length, block_occurrences, depth in pbs:
+#             print("block found", tokens[block_occurrences[0]:block_occurrences[0]+block_length])
+#             for block in block_occurrences:
+#                 print(block, block+block_length-1)
+        # process tuples, depth first
+        for block_length, block_occurrences, depth in pbs:
+            # convert block occurrences into ranges
+            potential_block_range=RangeSet()
+            for occurrence in block_occurrences:
+                potential_block_range.add_range(occurrence, occurrence+block_length)
+            
+            # calculate the difference with the already occupied ranges
+            block_range=potential_block_range.difference(occupied)
+            if block_range:
+                occupied = occupied.union(block_range)
+                real_blocks.append((Block(block_range), block_length, block_occurrences))
+            
+#         # debug: list final blocks (move to string method on Block class)                
+#         print("Final blocks!")
+#         for block, block_length, block_occurrences in real_blocks:
+#             print("block found", tokens[block_occurrences[0]:block_occurrences[0]+block_length])
+#             for block in block_occurrences:
+#                 print(block, block+block_length-1)
+        
+        result = []
+        for block, block_length, block_occurrences in real_blocks:
+            result.append(block)        
+        return result
             
             
             
@@ -127,7 +159,7 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
     def build_block_to_vertices(self, collation, tokens, token_to_vertex):
         block_to_vertices = {}
         token_counter = 0
-        blocks = collation.get_blocks()
+        blocks = collation.get_non_overlapping_repeating_blocks()
         # note: this can be done faster by focusing on the blocks
         # instead of the tokens
         for token in tokens:
@@ -149,7 +181,7 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
         #TODO: witness hardcoded!
         witness_range = collation.get_range_for_witness(collation.witnesses[1].sigil)
         token_counter = witness_range[0]
-        blocks = collation.get_blocks()
+        blocks = collation.get_non_overlapping_repeating_blocks()
         # note: this can be done faster by focusing on the blocks
         # instead of the tokens
         for token in tokens:
