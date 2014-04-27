@@ -7,8 +7,61 @@ Created on Apr 7, 2014
 from ClusterShell.RangeSet import RangeSet
 from collatex_core import Witness, VariantGraph, CollationAlgorithm, Tokenizer
 from linsuffarr import SuffixArray
-from operator import itemgetter
+from operator import itemgetter, methodcaller
 
+
+class Block(object):
+    
+    def __init__(self, ranges):
+        """
+        :type ranges: RangeSet
+        """
+        self.ranges = ranges
+        
+    def __hash__(self):
+        return hash(self.ranges.__str__())
+    
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return self.__dict__ == other.__dict__
+        return False
+    
+    def __str__(self):
+        return "Block with occurrences "+str(self.ranges)
+    
+    def __repr__(self):
+        return "wowie a block: "+str(self.ranges)
+    
+    def is_in_range(self, position):
+        return position in self.ranges
+    
+# Class represents a range within one witness that is associated with a block
+class Occurrence(object):
+
+    def __init__(self, token_range, block):
+        self.token_range = token_range
+        self.block = block
+    
+    def __repr__(self):
+        return str(self.token_range)
+    
+    def lower_end(self):
+        return self.token_range[0]
+    
+# Class represents a witness which consists of occurrences of blocks            
+class BlockWitness(object):
+    
+    def __init__(self, occurrences, tokens):
+        self.occurrences = occurrences
+        self.tokens = tokens
+
+    def debug(self):
+        result = []
+        for occurrence in self.occurrences:
+            result.append(' '.join(self.tokens[occurrence.token_range.slices().next()]))
+        return result
+    
+  
 
 '''
 Suffix specific implementation of Collation object
@@ -24,7 +77,8 @@ class Collation(object):
     def add_witness(self, sigil, content):
         witness = Witness(sigil, content)
         self.witnesses.append(witness)
-        witness_range = range(self.counter, self.counter+len(witness.tokens()))
+        witness_range = RangeSet()
+        witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
         # the extra one is for the marker token
         self.counter += len(witness.tokens()) +1 
         self.witness_ranges[sigil] = witness_range
@@ -57,8 +111,8 @@ class Collation(object):
         LCP = self.get_lcp_array()
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string()) 
-        print(SA)
-        print(LCP)
+#         print(SA)
+#         print(LCP)
         # step one find potential blocks
         potential_blocks = []
         prev_lcp_value = 0
@@ -106,36 +160,29 @@ class Collation(object):
         
         result = []
         for block, block_length, block_occurrences in real_blocks:
-            result.append(block)        
+            result.append(block)
         return result
-            
-            
-            
-  
-class Block(object):
+
     
-    def __init__(self, ranges):
-        """
-        :type ranges: RangeSet
-        """
-        self.ranges = ranges
-        
-    def __hash__(self):
-        return hash(self.ranges.__str__())
+    def get_first_block_witness(self):
+        # prepare the witnesses -> convert witnesses into block witnesses
+        sigil_first_witness = self.witnesses[0].sigil
+        range_first_witness = self.get_range_for_witness(sigil_first_witness)
+        blocks = self.get_non_overlapping_repeating_blocks()
+        # make a selection of blocks and occurrences of these blocks in the first witness
+        occurrences = []
+        for block in blocks:
+            block_ranges_in_witness = block.ranges & range_first_witness
+            # note this are multiple ranges
+            # we need to iterate over every single one
+            for block_range in block_ranges_in_witness.contiguous():
+                occurrence = Occurrence(block_range, block)
+                occurrences.append(occurrence)
+        # sort occurrences on position
+        sorted_o = sorted(occurrences, key=methodcaller('lower_end'))
+        block_witness = BlockWitness(sorted_o, self.witnesses[0].tokens())
+        return block_witness
     
-    def __eq__(self, other):
-        if type(other) is type(self):
-            return self.__dict__ == other.__dict__
-        return False
-    
-    def __str__(self):
-        return "Block with occurrences "+self.ranges.__str__()
-    
-    def __repr__(self):
-        return "wowie a block: "+self.ranges.__str__()
-    
-    def is_in_range(self, position):
-        return position in self.ranges
     
 
 # not used
