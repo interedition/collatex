@@ -98,14 +98,53 @@ class Collation(object):
     def get_combined_string(self):
         return self.combined_string
 
-    
     def get_sa(self):
         return SuffixArray(self.combined_string)
 
     def get_lcp_array(self):
         sa = self.get_sa()
         return sa._LCP_values
+    
+    # Note: LCP intervals can overlap.. for now we solve this with a two pass algorithm
+    def get_lcp_intervals(self):
+        lcp = self.get_lcp_array()
+        temp_lcp_intervals = []
+        # first detect the intervals based on zero's
+        start_position = 0
+        previous_prefix = 0
+        for index, prefix in enumerate(lcp):
+            if prefix == 0 and previous_prefix == 0:
+                start_position = index
+            if prefix == 0 and not previous_prefix == 0:
+                # first end last interval
+                temp_lcp_intervals.append((start_position, index-1))
+                # create new interval
+                start_position = index 
+            previous_prefix = prefix
+        # add the final interval
+        #TODO: this one can be empty!
+        temp_lcp_intervals.append((start_position, len(lcp)-1))    
+        # step 2
+        lcp_intervals = list(temp_lcp_intervals) 
+        for start_position, end_position in temp_lcp_intervals:
+            previous_prefix = 0
+            created_new = False
+            for index in range(start_position, end_position):
+                prefix = lcp[index]
+                if prefix < previous_prefix:
+                    # first end last interval
+                    lcp_intervals.append((start_position, index-1))
+                    # create new interval
+                    start_position = index
+                    created_new=True 
+                previous_prefix = prefix
+            # add the final interval
+            #TODO: this one can be empty!
+            if created_new:
+                lcp_intervals.append((start_position, len(lcp)-1))        
+        return lcp_intervals
 
+    #TODO: use lcp_intervals here
     def get_non_overlapping_repeating_blocks(self):
         SA = self.get_sa().SA
         LCP = self.get_lcp_array()
