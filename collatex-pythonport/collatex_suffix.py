@@ -108,7 +108,7 @@ class Collation(object):
     # Note: LCP intervals can overlap.. for now we solve this with a two pass algorithm
     def get_lcp_intervals(self):
         lcp = self.get_lcp_array()
-        temp_lcp_intervals = []
+        parent_lcp_intervals = []
         # first detect the intervals based on zero's
         start_position = 0
         previous_prefix = 0
@@ -117,23 +117,24 @@ class Collation(object):
                 start_position = index
             if prefix == 0 and not previous_prefix == 0:
                 # first end last interval
-                temp_lcp_intervals.append((start_position, index-1))
+                parent_lcp_intervals.append((start_position, index-1))
                 # create new interval
                 start_position = index 
             previous_prefix = prefix
         # add the final interval
         #TODO: this one can be empty!
-        temp_lcp_intervals.append((start_position, len(lcp)-1))    
+        parent_lcp_intervals.append((start_position, len(lcp)-1))    
         # step 2
-        lcp_intervals = list(temp_lcp_intervals) 
-        for start_position, end_position in temp_lcp_intervals:
+        child_lcp_intervals = {} 
+        for start_position, end_position in parent_lcp_intervals:
+            parent_start_position = start_position
             previous_prefix = 0
             created_new = False
             for index in range(start_position, end_position):
                 prefix = lcp[index]
                 if prefix < previous_prefix:
                     # first end last interval
-                    lcp_intervals.append((start_position, index-1))
+                    child_lcp_intervals.setdefault(parent_start_position, []).append((start_position, index-1))
                     # create new interval
                     start_position = index
                     created_new=True 
@@ -141,8 +142,8 @@ class Collation(object):
             # add the final interval
             #TODO: this one can be empty!
             if created_new:
-                lcp_intervals.append((start_position, len(lcp)-1))        
-        return lcp_intervals
+                child_lcp_intervals[parent_start_position].append((start_position, len(lcp)-1))        
+        return parent_lcp_intervals, child_lcp_intervals
 
     #TODO: use lcp_intervals here
     def get_non_overlapping_repeating_blocks(self):

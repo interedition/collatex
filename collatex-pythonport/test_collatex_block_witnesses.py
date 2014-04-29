@@ -23,13 +23,13 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "the cat and the dog")
         collation.add_witness("W2", "the dog and the cat")
-        lcp_intervals = collation.get_lcp_intervals()
-        self.assertIn((1,2), lcp_intervals) 
-        self.assertIn((3,4), lcp_intervals)
-        self.assertIn((5,6), lcp_intervals)
-        self.assertIn((7, 10), lcp_intervals)
-        self.assertIn((7,8), lcp_intervals)
-        self.assertIn((9,10), lcp_intervals)
+        parent_lcp_intervals, child_lcp_intervals = collation.get_lcp_intervals()
+        self.assertIn((1,2), parent_lcp_intervals) 
+        self.assertIn((3,4), parent_lcp_intervals)
+        self.assertIn((5,6), parent_lcp_intervals)
+        self.assertIn((7, 10), parent_lcp_intervals)
+        self.assertIn((7,8), child_lcp_intervals[7])
+        self.assertIn((9,10), child_lcp_intervals[7])
         
 # TODO: make this test work using the LCP intervals!
 #     def test_failing_use_case_old_algorithm(self):
