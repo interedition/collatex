@@ -5,7 +5,7 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from collatex_core import Witness, VariantGraph, CollationAlgorithm
+from collatex_core import Witness, VariantGraph, CollationAlgorithm, Tokenizer
 from linsuffarr import SuffixArray
 from operator import itemgetter, methodcaller
 
@@ -144,9 +144,10 @@ class Collation(object):
             # add the final interval
             #TODO: this one can be empty!
             if created_new:
-                child_lcp_intervals[parent_start_position].append((start_position, len(lcp)-1))
+                #TODO: add test for test (= only integration tested at the moment)
+                child_lcp_intervals[parent_start_position].append((start_position, end_position))
                 # design decision --> sub intervals are also present in parent list!
-                parent_lcp_intervals.append((start_position, index-1))        
+                parent_lcp_intervals.append((start_position, end_position))        
         return parent_lcp_intervals, child_lcp_intervals
 
     def add_potential_block_to_real_blocks(self, block_length, block_occurrences, occupied, real_blocks):
@@ -182,8 +183,11 @@ class Collation(object):
         occupied = RangeSet()
         real_blocks = []
         for number_of_occurrences, block_length, block_occurrences, start, end in sorted_blocks_on_priority:
+#             print("looking at", number_of_occurrences, block_length, block_occurrences)
+#             print(lcp[start: end+1])
             sub_intervals = lcp_sub_intervals.get(start, None)
             if sub_intervals:
+#                 print(sub_intervals)
                 for start, end in sub_intervals:
                     number_of_occurrences = end - start +1
                     block_length = lcp[start+1]
@@ -195,8 +199,8 @@ class Collation(object):
                 self.add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
              
 #         # debug: list final blocks (move to string method on Block class)
-#        tokenizer = Tokenizer()
-#        tokens = tokenizer.tokenize(self.get_combined_string()) 
+#         tokenizer = Tokenizer()
+#         tokens = tokenizer.tokenize(self.get_combined_string()) 
 #         #TODO: block_length is calculated wrong here!                
 #         print("Final blocks!")
 #         for block, block_length, block_occurrences in real_blocks:
