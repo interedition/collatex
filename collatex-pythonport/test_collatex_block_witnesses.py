@@ -40,17 +40,17 @@ class Test(unittest.TestCase):
         block3 = Block(RangeSet("2, 8"))
         self.assertEqual([block1, block2, block3], blocks)
 
-
     def test_Hermans_case_block_witnesses(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
-        block_witness = collation.get_first_block_witness()
+        block_witness = collation.get_block_witness(collation.witnesses[0])
         self.assertEquals(["a b c d", "F", "g h i", "!", "!", "q r s t"], block_witness.debug())
-        #self.ass
-        #TODO add more asserts!
- 
+        block_witness = collation.get_block_witness(collation.witnesses[1])
+        self.assertEquals(["a b c d", "F", "g h i", "!", "q r s t"], block_witness.debug())
+        block_witness = collation.get_block_witness(collation.witnesses[2])
+        self.assertEquals(["a b c d", "g h i", "!", "q r s t"], block_witness.debug())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

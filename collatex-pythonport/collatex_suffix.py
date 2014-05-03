@@ -54,7 +54,7 @@ class BlockWitness(object):
     def __init__(self, occurrences, tokens):
         self.occurrences = occurrences
         self.tokens = tokens
-
+        
     def debug(self):
         result = []
         for occurrence in self.occurrences:
@@ -213,27 +213,27 @@ class Collation(object):
             result.append(block)
         return result
 
-
-    
-    def get_first_block_witness(self):
-        # prepare the witnesses -> convert witnesses into block witnesses
-        sigil_first_witness = self.witnesses[0].sigil
-        range_first_witness = self.get_range_for_witness(sigil_first_witness)
-        blocks = self.get_non_overlapping_repeating_blocks()
-        # make a selection of blocks and occurrences of these blocks in the first witness
+    def get_block_witness(self, witness):
+        sigil_witness = witness.sigil
+        range_witness = self.get_range_for_witness(sigil_witness)
+        #TODO: block calculation is repeated here!
+        blocks = self.get_non_overlapping_repeating_blocks() 
+        # make a selection of blocks and occurrences of these blocks in the selected witness
         occurrences = []
         for block in blocks:
-            block_ranges_in_witness = block.ranges & range_first_witness
+            block_ranges_in_witness = block.ranges & range_witness
             # note this are multiple ranges
             # we need to iterate over every single one
             for block_range in block_ranges_in_witness.contiguous():
                 occurrence = Occurrence(block_range, block)
-                occurrences.append(occurrence)
+                occurrences.append(occurrence) 
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=methodcaller('lower_end'))
-        block_witness = BlockWitness(sorted_o, self.witnesses[0].tokens())
+        #TODO: complete set of witnesses is retokenized here!
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string())
+        block_witness = BlockWitness(sorted_o, tokens)
         return block_witness
-    
     
 
 # not used
@@ -311,6 +311,8 @@ class DekkerSuffixAlgorithmn(CollationAlgorithm):
         :type graph: VariantGraph
         :type collation: Collation
         '''
+        # TODO: prepare the witnesses -> convert witnesses into block witnesses
+
         # step 1: Build the variant graph for the first witness
         # this is easy: generate a vertex for every token
         first_witness = collation.witnesses[0]
