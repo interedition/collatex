@@ -43,20 +43,19 @@ class Witness(object):
 class VariantGraph(object):
     
     def __init__(self):
-        #TODO: make it a DiGraph
-        self.graph = nx.Graph()
-        self.start = self.add_vertex("")
-        self.end = self.add_vertex("")
+        self.graph = nx.DiGraph()
+        self.start = self.add_vertex(Token(""))
+        self.end = self.add_vertex(Token(""))
     
     # vertex creation uses a unique ID, since the token_content does not have to be unique   
     # we store the token content in the label 
-    def add_vertex(self, token_content):
+    def add_vertex(self, token):
         '''
-        :type token_content: string
+        :type token: Token
         '''
         node_id = self.graph.number_of_nodes()
         #print("Adding node: "+node_id+":"+token_content)
-        self.graph.add_node(node_id, label= token_content)
+        self.graph.add_node(node_id, label= token.token_string)
         return node_id
     
     def connect(self, source, target):

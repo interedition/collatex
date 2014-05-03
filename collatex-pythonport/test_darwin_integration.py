@@ -6,11 +6,10 @@ Darwin Integration test
 @author: Ronald Haentjens Dekker
 '''
 import json
-from collatex_suffix import Collation, DekkerSuffixAlgorithm
+from collatex_suffix import Collation
 from collatex_core import VariantGraph
-from networkx.drawing.nx_pydot import to_pydot
-from linsuffarr import LCP
-from pprint import pprint
+from collatex_dekker_algorithm import DekkerSuffixAlgorithm
+from networkx.drawing.nx_agraph import write_dot
 
 if __name__ == '__main__':
     # read source data
@@ -27,28 +26,14 @@ if __name__ == '__main__':
     collation.add_witness(first_witness["id"], first_witness["content"])
     collation.add_witness(second_witness["id"], second_witness["content"])
     
-#     print(collation.get_lcp_array())
-    lcp_intervals = collation.get_lcp_intervals()
-#     print(lcp_intervals)
-
-    blocks = collation.get_non_overlapping_repeating_blocks()
+    graph = VariantGraph()
+    collationAlgorithm = DekkerSuffixAlgorithm()
+    collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
      
-    #pprint(blocks)
-    
-    block_witness = collation.get_first_block_witness()
-    
-    print(block_witness.debug())
-    
-    
-# #     
-#     graph = VariantGraph()
-#     collationAlgorithm = DekkerSuffixAlgorithm()
-#     collationAlgorithm.buildVariantGraphFromBlocks(graph, collation)
-#     
-#     #THIS DOES NOT WORK FOR SOME REASON!
-#     #install pygraphviz first
-#     #view_pygraphviz(graph.graph)
-#     
+    #install pygraphviz first
+    #view_pygraphviz(graph.graph)
+    write_dot(graph.graph, "rawoutput") 
+     
 #     #trying pydot
 #     dot = to_pydot(graph.graph)
 #     dot.write("rawoutput")
