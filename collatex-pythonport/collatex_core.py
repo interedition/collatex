@@ -17,15 +17,28 @@ class Tokenizer(object):
     def tokenize(self, contents):
         return contents.split()
 
+
+class Token(object):
+    
+    def __init__(self, tokenstring):
+        self.token_string = tokenstring
+
+    def __repr__(self):
+        return self.token_string
+
 class Witness(object):
     
     def __init__(self, sigil, content):
         self.sigil = sigil
         self.content = content
-
-    def tokens(self):
         tokenizer = Tokenizer()
-        return tokenizer.tokenize(self.content)
+        self._tokens = []
+        tokens_as_strings = tokenizer.tokenize(self.content)
+        for token_string in tokens_as_strings:
+            self._tokens.append(Token(token_string))
+            
+    def tokens(self):
+        return self._tokens
 
 class VariantGraph(object):
     

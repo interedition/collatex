@@ -5,7 +5,7 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from collatex_core import Witness, VariantGraph, CollationAlgorithm, Tokenizer
+from collatex_core import Witness, VariantGraph, Tokenizer
 from linsuffarr import SuffixArray
 from operator import itemgetter, methodcaller
 
@@ -32,9 +32,6 @@ class Block(object):
     def __repr__(self):
         return "wowie a block: "+str(self.ranges)
     
-    def is_in_range(self, position):
-        return position in self.ranges
-    
 # Class represents a range within one witness that is associated with a block
 class Occurrence(object):
 
@@ -47,6 +44,9 @@ class Occurrence(object):
     
     def lower_end(self):
         return self.token_range[0]
+    
+    def is_in_range(self, position):
+        return position in self.token_range
     
 # Class represents a witness which consists of occurrences of blocks            
 class BlockWitness(object):
@@ -250,88 +250,6 @@ class Suffix(object):
         return suffixes
     
 
-#TODO: check spelling!
-class DekkerSuffixAlgorithmn(CollationAlgorithm):
-    
-
-    def build_block_to_vertices(self, collation, tokens, token_to_vertex):
-        block_to_vertices = {}
-        token_counter = 0
-        blocks = collation.get_non_overlapping_repeating_blocks()
-        # note: this can be done faster by focusing on the blocks
-        # instead of the tokens
-        for token in tokens:
-            for block in blocks:
-                if block.is_in_range(token_counter):
-                    vertex = token_to_vertex[token]
-                    if block_to_vertices.has_key(block):
-                        existing_vertices = block_to_vertices[block]
-                        existing_vertices.append(vertex)
-                    else:
-                        block_to_vertices[block] = [vertex]
-            
-            token_counter += 1
-        #print(block_to_vertices)
-        return block_to_vertices
-        
-    def build_block_to_tokens(self, collation, tokens):
-        block_to_tokens = {}
-        #TODO: witness hardcoded!
-        witness_range = collation.get_range_for_witness(collation.witnesses[1].sigil)
-        token_counter = witness_range[0]
-        blocks = collation.get_non_overlapping_repeating_blocks()
-        # note: this can be done faster by focusing on the blocks
-        # instead of the tokens
-        for token in tokens:
-            for block in blocks:
-                if block.is_in_range(token_counter):
-                    if block_to_tokens.has_key(block):
-                        existing_tokens = block_to_tokens[block]
-                        existing_tokens.append(token)
-                    else:
-                        block_to_tokens[block] = [token]
-            
-            token_counter += 1
-        #print(block_to_tokens)
-        return block_to_tokens
-
-
-    def get_alignment(self, block_to_vertices, block_to_tokens):
-        alignment = {}
-        for block in block_to_tokens:
-            tokens = block_to_tokens[block]
-            vertices = block_to_vertices[block]
-            for token, vertex in zip(tokens, vertices):
-                alignment[token]=vertex
-        return alignment        
-    
-    
-    def buildVariantGraphFromBlocks(self, graph, collation):
-        '''
-        :type graph: VariantGraph
-        :type collation: Collation
-        '''
-        # TODO: prepare the witnesses -> convert witnesses into block witnesses
-
-        # step 1: Build the variant graph for the first witness
-        # this is easy: generate a vertex for every token
-        first_witness = collation.witnesses[0]
-        tokens = first_witness.tokens()
-        token_to_vertex = self.merge(graph, tokens)
-        # step 2: Build the initial block to list vertex map 
-        block_to_vertices = self.build_block_to_vertices(collation, tokens, token_to_vertex)    
-        # step 3: Build the block to tokens map for the second witness
-        second_witness = collation.witnesses[1]
-        tokens = second_witness.tokens()
-        block_to_tokens = self.build_block_to_tokens(collation, tokens)
-        
-        # step 4: Generate token to vertex alignment map for second 
-        # witness, based on block to vertices map
-        alignment = self.get_alignment(block_to_vertices, block_to_tokens)
-        #print(alignment)
-        self.merge(graph, tokens, alignment)
-
-        pass
 
 
 

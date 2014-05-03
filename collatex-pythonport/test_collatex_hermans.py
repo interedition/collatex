@@ -6,9 +6,7 @@ Created on Apr 10, 2014
 
 import unittest
 from ClusterShell.RangeSet import RangeSet
-from collatex_suffix import Collation, Block, DekkerSuffixAlgorithmn
-from collatex_core import VariantGraph
-from networkx.drawing.nx_pydot import to_pydot
+from collatex_suffix import Collation, Block
 
 
 class Test(unittest.TestCase):
@@ -61,33 +59,6 @@ class Test(unittest.TestCase):
 #         print(collation.get_lcp_array())
 #         self.assertEqual([block1, block2], blocks)
 #      
-    #TODO: this test is not finished! 
-    def test_Hermans_case_variantgraph(self):
-        collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        graph = VariantGraph()
-        algorithm = DekkerSuffixAlgorithmn()
-        algorithm.buildVariantGraphFromBlocks(graph, collation)
-        start_vertex = graph.start
-        a = graph.vertexWith("a")
-        b = graph.vertexWith("b")
-        t = graph.vertexWith("t")
-        end_vertex = graph.end
-        self.assert_(graph.edge_between(start_vertex, a))
-        self.assert_(graph.edge_between(a, b))
-        self.assert_(graph.edge_between(t, end_vertex))
-        #print(len(graph.vertices()))
-        #print(len(graph.edges()))
-        
-        # display graph
-        #print(graph.graph.nodes())
-        #view_pygraphviz(graph.graph)
-        
-        dot = to_pydot(graph.graph)
-        dot.write("rawoutput")
-  
-        pass
          
             
 
@@ -96,35 +67,6 @@ class Test(unittest.TestCase):
     
     
     
-#     def test_variant_graph_two_equal_witnesses(self):
-#         collation = Collation()
-#         collation.add_witness('A', 'the black cat')
-#         collation.add_witness('B', 'the black cat')
-#         graph = collation.collate()
-#         the_vertex = vertexWith(graph, 'the')
-#         black_vertex = vertexWith(graph, 'black')
-#         cat_vertex = vertexWith(graph, 'cat')
-#         
-#         self.assert_(graph.edge_between(graph.start, the_vertex))
-#         self.assert_(graph.edge_between(the_vertex, black_vertex))
-#         self.assert_(graph.edge_between(cat_vertex, graph.end))
-#       
-#         @Test
-#   public void twoWitnesses() {
-#     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
-#     final VariantGraph graph = collate(w);
-# 
-#     assertEquals(5, Iterables.size(graph.vertices()));
-#     assertEquals(4, Iterables.size(graph.edges()));
-# 
-#     final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
-#     final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
-#     final VariantGraph.Vertex catVertex = vertexWith(graph, "cat", w[0]);
-# 
-#     assertHasWitnesses(edgeBetween(graph.getStart(), theVertex), w[0], w[1]);
-#     assertHasWitnesses(edgeBetween(theVertex, blackVertex), w[0], w[1]);
-#     assertHasWitnesses(edgeBetween(blackVertex, catVertex), w[0], w[1]);
-#     assertHasWitnesses(edgeBetween(catVertex, graph.getEnd()), w[0], w[1]);
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

@@ -6,7 +6,7 @@ Darwin Integration test
 @author: Ronald Haentjens Dekker
 '''
 import json
-from collatex_suffix import Collation, DekkerSuffixAlgorithmn
+from collatex_suffix import Collation, DekkerSuffixAlgorithm
 from collatex_core import VariantGraph
 from networkx.drawing.nx_pydot import to_pydot
 from linsuffarr import LCP
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     
 # #     
 #     graph = VariantGraph()
-#     collationAlgorithm = DekkerSuffixAlgorithmn()
+#     collationAlgorithm = DekkerSuffixAlgorithm()
 #     collationAlgorithm.buildVariantGraphFromBlocks(graph, collation)
 #     
 #     #THIS DOES NOT WORK FOR SOME REASON!
