@@ -134,17 +134,17 @@ def join(graph):
     processed = set()
     end = graph.end
     queue = deque()
-    for (node, neighbor) in graph.out_edges(graph.start):
+    for (_, neighbor) in graph.out_edges(graph.start):
         queue.appendleft(neighbor)
     while queue:
         vertex = queue.popleft()
         out_edges = graph.out_edges(vertex)
         if len(out_edges) is 1:
-            (node, join_candidate) = out_edges[0]
+            (_, join_candidate) = out_edges[0]
             can_join = join_candidate != end and len(graph.in_edges(join_candidate))==1
             if can_join:
                 graph.vertex_attributes(vertex)["label"]+=" "+graph.vertex_attributes(join_candidate)["label"]
-                for (node, neighbor) in graph.out_edges(join_candidate):
+                for (_, neighbor) in graph.out_edges(join_candidate):
                     graph.remove_edge(join_candidate, neighbor)
                     graph.connect(vertex, neighbor)
                 graph.remove_edge(vertex, join_candidate)
@@ -152,7 +152,7 @@ def join(graph):
                 queue.appendleft(vertex);
                 continue;
         processed.add(vertex)
-        for (node, neighbor) in out_edges:
+        for (_, neighbor) in out_edges:
             # FIXME: Why do we run out of memory in some cases here, if this is not checked?
             if not neighbor in processed:
                 queue.appendleft(neighbor)

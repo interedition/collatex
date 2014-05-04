@@ -30,7 +30,7 @@ class Block(object):
         return "Block with occurrences "+str(self.ranges)
     
     def __repr__(self):
-        return "wowie a block: "+str(self.ranges)
+        return "Block: "+str(self.ranges)
     
 # Class represents a range within one witness that is associated with a block
 class Occurrence(object):
@@ -244,7 +244,7 @@ class Suffix(object):
     def gather_suffices(self, tokens):
         i = 0
         suffixes = []
-        for t in tokens:
+        for _ in tokens:
             suffixes.append(tokens[i:])
             i=i+1
         return suffixes
