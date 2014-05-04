@@ -7,7 +7,7 @@ Darwin Integration test
 '''
 import json
 from collatex_suffix import Collation
-from collatex_core import VariantGraph
+from collatex_core import VariantGraph, join
 from collatex_dekker_algorithm import DekkerSuffixAlgorithm
 from networkx.drawing.nx_agraph import write_dot
 
@@ -29,6 +29,8 @@ if __name__ == '__main__':
     graph = VariantGraph()
     collationAlgorithm = DekkerSuffixAlgorithm()
     collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
+    
+    join(graph)
      
     #install pygraphviz first
     #view_pygraphviz(graph.graph)

@@ -8,6 +8,7 @@ This module defines the core collation concepts of CollateX
 Tokenizer, Witness, VariantGraph, CollationAlgorithm
 '''
 import networkx as nx
+from _collections import deque
 
 # not used in the suffix implementation
 # Tokenizer inside suffix array library is used
@@ -60,11 +61,17 @@ class VariantGraph(object):
     
     def connect(self, source, target):
         """
-        :type source: vertex
-        :type target: vertex
+        :type source: integer
+        :type target: integer
         """
         #print("Adding Edge: "+source+":"+target)
         self.graph.add_edge(source, target)
+        
+    def remove_edge(self, source, target):
+        self.graph.remove_edge(source, target)
+        
+    def remove_node(self, node):
+        self.graph.remove_node(node)      
         
     def vertices(self):
         return self.graph.nodes()
@@ -75,6 +82,15 @@ class VariantGraph(object):
     def edge_between(self, node, node2):
         #return self.graph.get_edge_data(node, node2)
         return self.graph.has_edge(node, node2)
+    
+    def in_edges(self, node):
+        return self.graph.in_edges(nbunch=node)
+    
+    def out_edges(self, node):
+        return self.graph.out_edges(nbunch=node)
+    
+    def vertex_attributes(self, node):
+        return self.graph.node[node]
   
     # Note: generator implementation
     def vertexWith(self, content):
@@ -106,6 +122,44 @@ class CollationAlgorithm(object):
         return token_to_vertex
 
 #TODO: define abstract collation class
+
+
+'''
+ This function joins the variant graph in place.
+ This function is a straight port of the Java version of CollateX.
+    :type graph: VariantGraph
+ TODO: add transposition support!   
+'''
+def join(graph):
+    processed = set()
+    end = graph.end
+    queue = deque()
+    for (node, neighbor) in graph.out_edges(graph.start):
+        queue.appendleft(neighbor)
+    while queue:
+        vertex = queue.popleft()
+        out_edges = graph.out_edges(vertex)
+        if len(out_edges) is 1:
+            (node, join_candidate) = out_edges[0]
+            can_join = join_candidate != end and len(graph.in_edges(join_candidate))==1
+            if can_join:
+                graph.vertex_attributes(vertex)["label"]+=" "+graph.vertex_attributes(join_candidate)["label"]
+                for (node, neighbor) in graph.out_edges(join_candidate):
+                    graph.remove_edge(join_candidate, neighbor)
+                    graph.connect(vertex, neighbor)
+                graph.remove_edge(vertex, join_candidate)
+                graph.remove_node(join_candidate) 
+                queue.appendleft(vertex);
+                continue;
+        processed.add(vertex)
+        for (node, neighbor) in out_edges:
+            # FIXME: Why do we run out of memory in some cases here, if this is not checked?
+            if not neighbor in processed:
+                queue.appendleft(neighbor)
+                
+        
+
+
 
 
     
