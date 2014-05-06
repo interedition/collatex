@@ -32,7 +32,19 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         for graph_occurrence in graph_occurrence_to_vertices:
             block = graph_occurrence.block
             graph_block_to_occurrences.setdefault(block, []).append(graph_occurrence)
-            
+        
+        alignment = self._align(graph_block_to_occurrences, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
+        self.merge(graph, second_witness.tokens(), alignment)
+        pass
+
+    #===========================================================================
+    # graph block to occurrences: every block that is present in the graph mapped to
+    # its occurrences
+    # graph occurrence to vertices: maps every graph occurrence of a block to a list
+    # of vertices 
+    # block_witness: a witness represented as a list of occurrences of blocks
+    #===========================================================================
+    def _align(self, graph_block_to_occurrences, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness):
         # step 4: Generate token to vertex alignment map for second 
         # witness, based on block to vertices map
         alignment = {}
@@ -53,9 +65,8 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             for token, vertex in zip(tokens, vertices):
                 alignment[token]=vertex
 #         print(alignment)
-        self.merge(graph, second_witness.tokens(), alignment)
-        pass
-
+        return alignment
+        
     def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex):
         occurrence_to_vertices = {}
         #TODO: for any witness outside of the first witness the token counter needs to start at lower end of the witness range!
