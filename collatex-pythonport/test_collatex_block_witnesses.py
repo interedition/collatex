@@ -8,6 +8,13 @@ from collatex_suffix import Collation, Block
 from ClusterShell.RangeSet import RangeSet
 
 class Test(unittest.TestCase):
+    # test whether the witness->range mapping works
+    def test_Witness_Ranges_Hermans_case(self):
+        collation = Collation()
+        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_witness("W2", "a b c d F g h i ! q r s t")
+        self.assertEquals(RangeSet("0-14"), collation.get_range_for_witness("W1"))
+        self.assertEquals(RangeSet("16-28"), collation.get_range_for_witness("W2"))
 
     def test_black_cat_non_overlapping_blocks(self):
         collation = Collation()

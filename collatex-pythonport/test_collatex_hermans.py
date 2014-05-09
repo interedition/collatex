@@ -10,14 +10,6 @@ from collatex_suffix import Collation, Block
 
 
 class Test(unittest.TestCase):
-    # test whether the witness->range mapping works
-    def test_Hermans_case_witness(self):
-        collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        self.assertEquals(range(0, 15), collation.get_range_for_witness("W1"))
-        self.assertEquals(range(16, 29), collation.get_range_for_witness("W2"))
-
     def test_Hermans_non_overlapping_blocks(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")

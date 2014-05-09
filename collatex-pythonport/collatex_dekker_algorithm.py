@@ -97,4 +97,40 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         return occurrence_to_tokens
 
     
-    
+
+
+    #===========================================================================
+    # Direct port from Java code
+    #===========================================================================
+class PhraseMatchDetector(object):
+    def _add_new_phrase_match_and_clear_buffer(self, phrase_matches, base_phrase, witness_phrase):
+        if base_phrase:
+            phrase_matches.append(zip(base_phrase, witness_phrase)) 
+            del base_phrase[:]
+            del witness_phrase[:]
+
+    def detect(self, linked_tokens, base, tokens):
+        phrase_matches = []
+        base_phrase = []
+        witness_phrase = []
+        previous = base.get_start()
+        
+        for token in tokens:
+            if not token in linked_tokens:
+                self._add_new_phrase_match_and_clear_buffer(phrase_matches, base_phrase, witness_phrase)
+                continue
+            base_vertex = linked_tokens[token]
+            # requirements:
+            # - see comments in java class
+            same_transpositions = True #TODO
+            same_witnesses = True #TODO
+            directed_edge = base.edge_between(previous, base_vertex)
+            is_near = same_transpositions and same_witnesses and directed_edge and len(base.out_edges(previous))==1 and len(base.in_edges(base_vertex))==1
+            if not is_near:
+                self._add_new_phrase_match_and_clear_buffer(phrase_matches, base_phrase, witness_phrase)
+            base_phrase.append(base_vertex)
+            witness_phrase.append(token)
+            previous = base_vertex
+        if base_phrase:
+            phrase_matches.append(zip(base_phrase, witness_phrase)) 
+
