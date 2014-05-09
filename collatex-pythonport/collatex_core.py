@@ -157,10 +157,27 @@ def join(graph):
             if not neighbor in processed:
                 queue.appendleft(neighbor)
                 
-        
-
-
-
+# Port of VariantGraphRanking class from Java
+# This is a minimal port; only bare bones
+class VariantGraphRanking(object):
+    # Do not class the constructor, use the of class method instead!
+    def __init__(self):
+        #Note: A vertex can have only one rank
+        #however, a rank can be assigned to multiple vertices
+        self.byVertex = {}
+        self.byRank = {}
+    
+    @classmethod
+    def of(cls, graph):
+        variant_graph_ranking = VariantGraphRanking(graph)                
+        for v in graph.vertices():
+            rank = -1
+            for (source, _) in graph.in_edges(v):
+                rank = max(rank, variant_graph_ranking.byVertex[source])
+            rank += 1
+            variant_graph_ranking.byVertex[v]=rank
+            variant_graph_ranking.byRank.setdefault(rank, []).append(v)
+        return variant_graph_ranking
 
     
     
