@@ -67,10 +67,12 @@ class BlockWitness(object):
 Suffix specific implementation of Collation object
 '''
 class Collation(object):
-    witnesses = []
-    counter = 0
-    witness_ranges = {}
-    combined_string = ""
+    
+    def __init__(self):
+        self.witnesses = []
+        self.counter = 0
+        self.witness_ranges = {}
+        self.combined_string = ""
     
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
@@ -105,9 +107,33 @@ class Collation(object):
         sa = self.get_sa()
         return sa._LCP_values
     
+    def calculate_child_lcp_intervals(self, lcp, parent_lcp_intervals):
+        parent_child_lcp_intervals = {}
+        for start_position, end_position in parent_lcp_intervals:
+            child_lcp_intervals = []
+            child_interval_start = None
+            previous_prefix = 0
+            for index in range(start_position, end_position+1):
+                prefix = lcp[index]
+                if prefix > previous_prefix and lcp[index-2] > previous_prefix:
+                    # first end last interval
+                    if child_interval_start:
+                        child_lcp_intervals.append((child_interval_start, index - 2))
+                    # create new interval
+                    child_interval_start = index - 1
+                previous_prefix = prefix 
+            # add the final interval
+            #NOTE: this one can be empty?
+            child_lcp_intervals.append((child_interval_start, end_position))
+            # map the child intervals to the parent_interval
+            # only if there are more child intervals than one (-> the parent interval)
+            if len(child_lcp_intervals)>1:
+                parent_child_lcp_intervals[start_position]=child_lcp_intervals
+        return parent_child_lcp_intervals
+
     # Note: LCP intervals can overlap.. for now we solve this with a two pass algorithm
-    def get_lcp_intervals(self):
-        lcp = self.get_lcp_array()
+    def get_lcp_intervals(self, lcp = None):
+        lcp = lcp if lcp else self.get_lcp_array()
         parent_lcp_intervals = []
         # first detect the intervals based on zero's
         start_position = 0
@@ -125,29 +151,7 @@ class Collation(object):
         #TODO: this one can be empty!
         parent_lcp_intervals.append((start_position, len(lcp)-1))    
         # step 2
-        child_lcp_intervals = {} 
-        for start_position, end_position in parent_lcp_intervals:
-            parent_start_position = start_position
-            previous_prefix = 0
-            created_new = False
-            for index in range(start_position, end_position):
-                prefix = lcp[index]
-                if prefix < previous_prefix:
-                    # first end last interval
-                    child_lcp_intervals.setdefault(parent_start_position, []).append((start_position, index-1))
-                    # design decision --> sub intervals are also present in parent list!
-                    parent_lcp_intervals.append((start_position, index-1))
-                    # create new interval
-                    start_position = index
-                    created_new=True 
-                previous_prefix = prefix
-            # add the final interval
-            #TODO: this one can be empty!
-            if created_new:
-                #TODO: add test for test (= only integration tested at the moment)
-                child_lcp_intervals[parent_start_position].append((start_position, end_position))
-                # design decision --> sub intervals are also present in parent list!
-                parent_lcp_intervals.append((start_position, end_position))        
+        child_lcp_intervals = self.calculate_child_lcp_intervals(lcp, parent_lcp_intervals)        
         return parent_lcp_intervals, child_lcp_intervals
 
     def add_potential_block_to_real_blocks(self, block_length, block_occurrences, occupied, real_blocks):

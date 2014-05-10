@@ -10,7 +10,6 @@ Tests for `collatex` module.
 
 import unittest
 
-from collatex import collatex
 
 
 class TestCollateX(unittest.TestCase):
