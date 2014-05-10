@@ -5,9 +5,9 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from collatex_core import Witness, VariantGraph, Tokenizer
-from linsuffarr import SuffixArray
 from operator import itemgetter, methodcaller
+from collatex.collatex_core import Witness, VariantGraph, Tokenizer
+from collatex.linsuffarr import SuffixArray
 
 
 class Block(object):

@@ -3,7 +3,7 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 '''
-from collatex_core import CollationAlgorithm
+from collatex.collatex_core import CollationAlgorithm
 
 class DekkerSuffixAlgorithm(CollationAlgorithm):
     

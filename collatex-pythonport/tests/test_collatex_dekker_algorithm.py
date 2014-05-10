@@ -4,10 +4,10 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 '''
 import unittest
-from collatex_suffix import Collation
-from collatex_core import VariantGraph
-from collatex_dekker_algorithm import DekkerSuffixAlgorithm
 from networkx.drawing.nx_pydot import to_pydot
+from collatex.collatex_suffix import Collation
+from collatex.collatex_core import VariantGraph
+from collatex.collatex_dekker_algorithm import DekkerSuffixAlgorithm
 
 
 class Test(unittest.TestCase):

@@ -4,8 +4,8 @@ Created on Apr 27, 2014
 @author: Ronald Haentjens Dekker
 '''
 import unittest
-from collatex_suffix import Collation, Block
 from ClusterShell.RangeSet import RangeSet
+from collatex.collatex_suffix import Collation, Block
 
 class Test(unittest.TestCase):
     # test whether the witness->range mapping works
