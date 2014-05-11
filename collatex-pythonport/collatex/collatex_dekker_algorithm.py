@@ -45,15 +45,31 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
     # block_witness: a witness represented as a list of occurrences of blocks
     #===========================================================================
     def _align(self, graph_block_to_occurrences, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness):
+        # generate the witness block to occurrence map to check whether some blocks occur multiple times
+        # in the witness
+        witness_block_to_occurrence={}
+        for witness_occurrence in block_witness.occurrences:
+            witness_block = witness_occurrence.block
+            witness_block_to_occurrence.setdefault(witness_block, []).append(witness_occurrence)
         # step 4: Generate token to vertex alignment map for second 
         # witness, based on block to vertices map
         alignment = {}
         for witness_occurrence in block_witness.occurrences:
             witness_block = witness_occurrence.block
+            #NOTE: the witness_block could also not be present.
             if not witness_block in graph_block_to_occurrences:
                 continue
+            # check number of occurrences of block in witness
+            # if larger than 1 we have to make a decision
+            witness_occurrences = witness_block_to_occurrence[witness_block]
+            if len(witness_occurrences)>1:
+                print(witness_block)
+                #TODO: we have to make a decision here!
+                continue        
+            
+            # check number of occurrences of block in graph 
+            # if larger than 1 we have to make a decision
             graph_occurrences = graph_block_to_occurrences[witness_block]
-            #TODO: the witness_block could also not be present!
             if len(graph_occurrences)>1:
                 print(witness_block)
                 #TODO: we have to make a decision here!
