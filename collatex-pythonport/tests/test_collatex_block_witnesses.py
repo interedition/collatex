@@ -96,6 +96,20 @@ class Test(unittest.TestCase):
         block5 = Block(RangeSet("4, 20")) # F
         self.assertEquals([block1, block2, block3, block4, block5], blocks)
 
+    # The token C splits the "a c b" sequence into two blocks (a, b) 
+    # C gets prioritized because the token appears three times
+    def test_blocks_splitting_token_case(self):
+        collation = Collation()
+        collation.add_witness("W1", "a c b c")
+        collation.add_witness("W2", "a c b")
+        blocks = collation.get_non_overlapping_repeating_blocks()
+        block1 = Block(RangeSet("1, 3, 6")) # c
+        block2 = Block(RangeSet("0, 5")) # a
+        block3 = Block(RangeSet("2, 7")) # b
+        self.assertIn(block1, blocks)
+        self.assertIn(block2, blocks)
+        self.assertIn(block3, blocks)
+    
     def test_block_witnesses_Hermans_case_two_witnesses(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")

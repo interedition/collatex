@@ -204,13 +204,23 @@ class Collation(object):
         potential_block_range = RangeSet()
         for occurrence in block_occurrences:
             potential_block_range.add_range(occurrence, occurrence + block_length)
-        
-        # calculate the difference with the already occupied ranges
-        block_range = potential_block_range.difference(occupied)
-        if block_range:
-#             print("Adding block: "+str(block_range))
-            occupied.union_update(block_range)
-            real_blocks.append((Block(block_range), block_length, block_occurrences))
+        #check the intersection with the already occupied ranges
+        block_intersection = potential_block_range.intersection(occupied)
+        if block_intersection:
+            # print("was: "+str(potential_block_range))
+            # print("intersection: "+str(block_intersection))
+            real_block_range = RangeSet()
+            for (lower, upper) in zip(potential_block_range.contiguous(), block_intersection.contiguous()):
+                # print(lower, upper)
+                if lower[0] != upper[0]:
+                    real_block_range.add_range(lower[0], upper[0])
+            # print("real: "+str(real_block_range))
+            if real_block_range:
+                occupied.union_update(real_block_range)
+                real_blocks.append((Block(real_block_range), block_length, block_occurrences))
+        else:
+            occupied.union_update(potential_block_range)
+            real_blocks.append((Block(potential_block_range), block_length, block_occurrences))
 
     def get_block_witness(self, witness):
         sigil_witness = witness.sigil
