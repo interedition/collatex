@@ -27,18 +27,23 @@ if __name__ == '__main__':
     collation.add_witness(first_witness["id"], first_witness["content"])
     collation.add_witness(second_witness["id"], second_witness["content"])
     collation.add_witness(third_witness["id"], third_witness["content"])
+#     
+    #print(collation.get_lcp_array())
+    #    print(collation.get_non_overlapping_repeating_blocks())
+
+    print(collation.get_block_witness(collation.witnesses[0]).debug())
+    print(collation.get_block_witness(collation.witnesses[1]).debug())
+    print(collation.get_block_witness(collation.witnesses[2]).debug())
     
-    print(collation.get_lcp_array())
-    
-    graph = VariantGraph()
-    collationAlgorithm = DekkerSuffixAlgorithm()
-    collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
-    
-    join(graph)
+#     graph = VariantGraph()
+#     collationAlgorithm = DekkerSuffixAlgorithm()
+#     collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
+#     
+#     join(graph)
      
     #install pygraphviz first
     #view_pygraphviz(graph.graph)
-    write_dot(graph.graph, "rawoutput") 
+#     write_dot(graph.graph, "rawoutput") 
      
 #     #trying pydot
 #     dot = to_pydot(graph.graph)

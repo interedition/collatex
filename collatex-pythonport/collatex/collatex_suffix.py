@@ -107,29 +107,6 @@ class Collation(object):
         sa = self.get_sa()
         return sa._LCP_values
     
-    def calculate_child_lcp_intervals(self, lcp, parent_lcp_intervals):
-        parent_child_lcp_intervals = {}
-        for start_position, end_position in parent_lcp_intervals:
-            child_lcp_intervals = []
-            child_interval_start = None
-            previous_prefix = 0
-            for index in range(start_position, end_position+1):
-                prefix = lcp[index]
-                if prefix > previous_prefix and lcp[index-2] >= previous_prefix:
-                    # first end last interval
-                    if child_interval_start:
-                        child_lcp_intervals.append((child_interval_start, index - 2))
-                    # create new interval
-                    child_interval_start = index - 1
-                previous_prefix = prefix 
-            # add the final interval
-            #NOTE: this one can be empty?
-            child_lcp_intervals.append((child_interval_start, end_position))
-            # map the child intervals to the parent_interval
-            # only if there are more child intervals than one (-> the parent interval)
-            if len(child_lcp_intervals)>1:
-                parent_child_lcp_intervals[start_position]=child_lcp_intervals
-        return parent_child_lcp_intervals
 
     # Note: LCP intervals can overlap.. for now we solve this with a two pass algorithm
     def get_lcp_intervals(self, lcp = None):
@@ -148,63 +125,64 @@ class Collation(object):
                 start_position = index 
             previous_prefix = prefix
         # add the final interval
-        #TODO: this one can be empty!
+        #NOTE: this one can be empty?
         parent_lcp_intervals.append((start_position, len(lcp)-1))    
-        # step 2
-        child_lcp_intervals = self.calculate_child_lcp_intervals(lcp, parent_lcp_intervals)        
-        return parent_lcp_intervals, child_lcp_intervals
+        return parent_lcp_intervals
 
-    def add_potential_block_to_real_blocks(self, block_length, block_occurrences, occupied, real_blocks):
-        # convert block occurrences into ranges
-        potential_block_range = RangeSet()
-        for occurrence in block_occurrences:
-            potential_block_range.add_range(occurrence, occurrence + block_length)
-        
-        # calculate the difference with the already occupied ranges
-        block_range = potential_block_range.difference(occupied)
-        if block_range:
-#             print("Adding block: "+str(block_range))
-            occupied.union_update(block_range)
-            real_blocks.append((Block(block_range), block_length, block_occurrences))
+    def calculate_sub_lcp_intervals(self, lcp, parent_lcp_intervals):
+        sub_lcp_intervals = []
+        for start_position, end_position in parent_lcp_intervals:
+            child_lcp_intervals = []
+            child_interval_start = None
+            previous_prefix = 0
+            for index in range(start_position, end_position+1):
+                prefix = lcp[index]
+                if prefix > previous_prefix and lcp[index-2] >= previous_prefix:
+                    # first end last interval
+                    if child_interval_start:
+                        child_lcp_intervals.append((child_interval_start, index - 2))
+                    # create new interval
+                    child_interval_start = index - 1
+                previous_prefix = prefix 
+            # add the final interval
+            #NOTE: this one can be empty?
+            child_lcp_intervals.append((child_interval_start, end_position))
+            # add all the child_lcp_intervals to the sub_lcp_intervals list
+            # with as third parameter the number of parent prefix occurrences
+            for start, end in child_lcp_intervals:
+                sub_lcp_intervals.append((start, end, len(child_lcp_intervals)))
+        return sub_lcp_intervals
 
     def get_non_overlapping_repeating_blocks(self):
         SA = self.get_sa().SA
         lcp = self.get_lcp_array()
-        lcp_intervals, lcp_sub_intervals = self.get_lcp_intervals()
-        
-        # step 1: process LCP array
+        # step 1: calculate the sub LCP intervals
+        lcp_intervals = self.get_lcp_intervals()
+        sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals)        
+        # step 2: process the LCP sub intervals
+        # and generate potential blocks
         potential_blocks = []
-        for start, end in lcp_intervals:
+        for start, end, parent_prefix_occurrences in sub_lcp_intervals:
             number_of_occurrences = end - start +1
             #NOTE: LCP intervals can be ascending or descending.
             block_length = min(lcp[start+1], lcp[end])
             block_occurrences = []
             for idx in range(start, end+1):
                 block_occurrences.append(SA[idx])
-            potential_blocks.append((number_of_occurrences, block_length, block_occurrences, start, end)) 
-        # step 2: sort the blocks based on depth (number of repetitions) first,
-        # second length of LCP interval
-        sorted_blocks_on_priority = sorted(potential_blocks, key=itemgetter(0, 1), reverse=True)
-        # step 3: select the definitive blocks
-        # Tokenizer is for debug reasons only!
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(self.get_combined_string()) 
+            potential_blocks.append((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start)) 
+        # step 3: sort the blocks based on depth (number of repetitions) first,
+        # second length of LCP interval,
+        # third sort on parent LCP interval occurrences.
+        sorted_blocks_on_priority = sorted(potential_blocks, key=itemgetter(0, 1, 2), reverse=True)
+        # step 4: select the definitive blocks
+        # NOTE: Tokenizer is for debug reasons only!
+#         tokenizer = Tokenizer()
+#         tokens = tokenizer.tokenize(self.get_combined_string()) 
         occupied = RangeSet()
         real_blocks = []
-        for number_of_occurrences, block_length, block_occurrences, parent_start, end in sorted_blocks_on_priority:
-            # print("looking at: "+tokens[SA[parent_start]]+" with "+str(number_of_occurrences)+" and length: "+str(block_length))
-            sub_intervals = lcp_sub_intervals.get(parent_start, None)
-            if sub_intervals:
-                for start, end in sub_intervals:
-                    number_of_occurrences = end - start +1
-                    block_length = lcp[end]
-                    block_occurrences = []
-                    # print("sub interval: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with length "+str(block_length)+" and "+str(number_of_occurrences))
-                    for idx in range(start, end+1):
-                        block_occurrences.append(SA[idx])
-                    self.add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
-            else:
-                self.add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
+        for number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start in sorted_blocks_on_priority:
+#             print("looking at: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with "+str(number_of_occurrences)+" occurrences and length: "+str(block_length)+" and parent prefix occurrences: "+str(parent_prefix_occurrences))
+            self._add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
              
 #         # debug: list final blocks (move to string method on Block class)
 #         tokenizer = Tokenizer()
@@ -220,6 +198,19 @@ class Collation(object):
         for block, block_length, block_occurrences in real_blocks:
             result.append(block)
         return result
+
+    def _add_potential_block_to_real_blocks(self, block_length, block_occurrences, occupied, real_blocks):
+        # convert block occurrences into ranges
+        potential_block_range = RangeSet()
+        for occurrence in block_occurrences:
+            potential_block_range.add_range(occurrence, occurrence + block_length)
+        
+        # calculate the difference with the already occupied ranges
+        block_range = potential_block_range.difference(occupied)
+        if block_range:
+#             print("Adding block: "+str(block_range))
+            occupied.union_update(block_range)
+            real_blocks.append((Block(block_range), block_length, block_occurrences))
 
     def get_block_witness(self, witness):
         sigil_witness = witness.sigil
