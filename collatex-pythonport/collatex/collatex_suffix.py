@@ -163,6 +163,7 @@ class Collation(object):
         # calculate the difference with the already occupied ranges
         block_range = potential_block_range.difference(occupied)
         if block_range:
+#             print("Adding block: "+str(block_range))
             occupied.union_update(block_range)
             real_blocks.append((Block(block_range), block_length, block_occurrences))
 
@@ -175,7 +176,8 @@ class Collation(object):
         potential_blocks = []
         for start, end in lcp_intervals:
             number_of_occurrences = end - start +1
-            block_length = lcp[start+1]
+            #NOTE: LCP intervals can be ascending or descending.
+            block_length = min(lcp[start+1], lcp[end])
             block_occurrences = []
             for idx in range(start, end+1):
                 block_occurrences.append(SA[idx])
@@ -184,17 +186,20 @@ class Collation(object):
         # second length of LCP interval
         sorted_blocks_on_priority = sorted(potential_blocks, key=itemgetter(0, 1), reverse=True)
         # step 3: select the definitive blocks
+        # Tokenizer is for debug reasons only!
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string()) 
         occupied = RangeSet()
         real_blocks = []
         for number_of_occurrences, block_length, block_occurrences, parent_start, end in sorted_blocks_on_priority:
-#             print("looking at", number_of_occurrences, block_length, block_occurrences)
-#             print(lcp[start: end+1])
+            # print("looking at: "+tokens[SA[parent_start]]+" with "+str(number_of_occurrences)+" and length: "+str(block_length))
             sub_intervals = lcp_sub_intervals.get(parent_start, None)
             if sub_intervals:
                 for start, end in sub_intervals:
                     number_of_occurrences = end - start +1
                     block_length = lcp[end]
                     block_occurrences = []
+                    # print("sub interval: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with length "+str(block_length)+" and "+str(number_of_occurrences))
                     for idx in range(start, end+1):
                         block_occurrences.append(SA[idx])
                     self.add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
