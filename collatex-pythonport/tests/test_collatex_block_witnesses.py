@@ -42,6 +42,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         _, child_lcp_intervals = collation.get_lcp_intervals(lcp=lcp_array)
         self.assertEqual([(5, 7), (8, 10)], child_lcp_intervals[5])
+        self.assertEqual([(513, 515),(516, 518),(519, 521),(522, 524),(525,527)], child_lcp_intervals[513])
 
     def test_lcp_child_intervals_hermans_case(self):    
         collation = Collation()

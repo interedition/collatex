@@ -115,7 +115,7 @@ class Collation(object):
             previous_prefix = 0
             for index in range(start_position, end_position+1):
                 prefix = lcp[index]
-                if prefix > previous_prefix and lcp[index-2] > previous_prefix:
+                if prefix > previous_prefix and lcp[index-2] >= previous_prefix:
                     # first end last interval
                     if child_interval_start:
                         child_lcp_intervals.append((child_interval_start, index - 2))
@@ -186,15 +186,14 @@ class Collation(object):
         # step 3: select the definitive blocks
         occupied = RangeSet()
         real_blocks = []
-        for number_of_occurrences, block_length, block_occurrences, start, end in sorted_blocks_on_priority:
+        for number_of_occurrences, block_length, block_occurrences, parent_start, end in sorted_blocks_on_priority:
 #             print("looking at", number_of_occurrences, block_length, block_occurrences)
 #             print(lcp[start: end+1])
-            sub_intervals = lcp_sub_intervals.get(start, None)
+            sub_intervals = lcp_sub_intervals.get(parent_start, None)
             if sub_intervals:
-#                 print(sub_intervals)
                 for start, end in sub_intervals:
                     number_of_occurrences = end - start +1
-                    block_length = lcp[start+1]
+                    block_length = lcp[end]
                     block_occurrences = []
                     for idx in range(start, end+1):
                         block_occurrences.append(SA[idx])
