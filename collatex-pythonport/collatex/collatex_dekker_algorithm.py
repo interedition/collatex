@@ -16,7 +16,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         # this is easy: generate a vertex for every token
         first_witness = collation.witnesses[0]
         tokens = first_witness.tokens()
-        token_to_vertex = self.merge(graph, tokens)
+        token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
         # step 2: Build the initial occurrence to list vertex map 
         graph_occurrence_to_vertices = self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex)    
         # step 3: Build the occurrence to tokens map for the second witness
@@ -34,7 +34,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             graph_block_to_occurrences.setdefault(block, []).append(graph_occurrence)
         
         alignment = self._align(graph_block_to_occurrences, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-        self.merge(graph, second_witness.tokens(), alignment)
+        self.merge(graph, second_witness.sigil, second_witness.tokens(), alignment)
         pass
 
     #===========================================================================

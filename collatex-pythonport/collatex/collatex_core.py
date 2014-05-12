@@ -59,13 +59,16 @@ class VariantGraph(object):
         self.graph.add_node(node_id, label= token.token_string)
         return node_id
     
-    def connect(self, source, target):
+    def connect(self, source, target, witnesses):
         """
         :type source: integer
         :type target: integer
         """
         #print("Adding Edge: "+source+":"+target)
-        self.graph.add_edge(source, target)
+        if self.graph.has_edge(source, target):
+            self.graph[source][target]["label"]+=", "+str(witnesses)
+        else:    
+            self.graph.add_edge(source, target, label=witnesses)
         
     def remove_edge(self, source, target):
         self.graph.remove_edge(source, target)
@@ -86,8 +89,8 @@ class VariantGraph(object):
     def in_edges(self, node):
         return self.graph.in_edges(nbunch=node)
     
-    def out_edges(self, node):
-        return self.graph.out_edges(nbunch=node)
+    def out_edges(self, node, data=False):
+        return self.graph.out_edges(nbunch=node, data=data)
     
     def vertex_attributes(self, node):
         return self.graph.node[node]
@@ -101,7 +104,7 @@ class VariantGraph(object):
             raise Exception("Vertex with "+content+" not found!")    
   
 class CollationAlgorithm(object):
-    def merge(self, graph, witness_tokens, alignments = {}):  
+    def merge(self, graph, witness_sigil, witness_tokens, alignments = {}):  
         """
         :type graph: VariantGraph
         """
@@ -115,10 +118,9 @@ class CollationAlgorithm(object):
             #else:
             #    raise Exception("we need to add a token to a vertex, but we don't know how yet!")
             token_to_vertex[token] = vertex
-            #TODO: add witness set!
-            graph.connect(last, vertex)
+            graph.connect(last, vertex, witness_sigil)
             last = vertex
-        graph.connect(last, graph.end)
+        graph.connect(last, graph.end, witness_sigil)
         return token_to_vertex
 
 #TODO: define abstract collation class
@@ -144,9 +146,9 @@ def join(graph):
             can_join = join_candidate != end and len(graph.in_edges(join_candidate))==1
             if can_join:
                 graph.vertex_attributes(vertex)["label"]+=" "+graph.vertex_attributes(join_candidate)["label"]
-                for (_, neighbor) in graph.out_edges(join_candidate):
+                for (_, neighbor, data) in graph.out_edges(join_candidate, data=True):
                     graph.remove_edge(join_candidate, neighbor)
-                    graph.connect(vertex, neighbor)
+                    graph.connect(vertex, neighbor, data["label"])
                 graph.remove_edge(vertex, join_candidate)
                 graph.remove_node(join_candidate) 
                 queue.appendleft(vertex);
