@@ -108,16 +108,15 @@ class CollationAlgorithm(object):
         """
         :type graph: VariantGraph
         """
+        #NOTE: token_to_vertex only contains newly generated vertices
         token_to_vertex = {}
         last = graph.start
         for token in witness_tokens:
             vertex = alignments.get(token, None)
             if vertex == None:
                 vertex = graph.add_vertex(token)
-            #TODO: add vertex.add(token)
-            #else:
-            #    raise Exception("we need to add a token to a vertex, but we don't know how yet!")
-            token_to_vertex[token] = vertex
+                token_to_vertex[token] = vertex
+            #TODO: add token to vertex, for example: vertex.add(token)
             graph.connect(last, vertex, witness_sigil)
             last = vertex
         graph.connect(last, graph.end, witness_sigil)

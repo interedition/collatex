@@ -18,24 +18,27 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         tokens = first_witness.tokens()
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
         # step 2: Build the initial occurrence to list vertex map 
-        graph_occurrence_to_vertices = self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex)    
+        graph_occurrence_to_vertices = {}
+        self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex, graph_occurrence_to_vertices) 
         # step 3: Build the occurrence to tokens map for the second witness
         second_witness = collation.witnesses[1]
         block_witness = collation.get_block_witness(second_witness)
         witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, second_witness, block_witness)
-        
-#         print(graph_occurrence_to_vertices)
-#         print(witness_occurrence_to_tokens)
-        
-        # map graph occurrences to their block
-        graph_block_to_occurrences = {}
-        for graph_occurrence in graph_occurrence_to_vertices:
-            block = graph_occurrence.block
-            graph_block_to_occurrences.setdefault(block, []).append(graph_occurrence)
-        
-        alignment = self._align(graph_block_to_occurrences, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-        self.merge(graph, second_witness.sigil, second_witness.tokens(), alignment)
-        pass
+        # step 4: align and merge second witness
+        alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
+        token_to_vertex = self.merge(graph, second_witness.sigil, second_witness.tokens(), alignment)
+        # step 5: update the occurrences to vertex map with the new vertices created for the second witness
+        self._build_occurrences_to_vertices(collation, second_witness, token_to_vertex, graph_occurrence_to_vertices)    
+        # step 6: add third witness
+        # NOTE: third witness might not have to be there!
+        if len(collation.witnesses)>2:
+            third_witness = collation.witnesses[2]
+            block_witness = collation.get_block_witness(third_witness)
+            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, third_witness, block_witness)
+            # step 6: align and merge third witness
+            alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
+            token_to_vertex = self.merge(graph, third_witness.sigil, third_witness.tokens(), alignment)
+            pass
 
     #===========================================================================
     # graph block to occurrences: every block that is present in the graph mapped to
@@ -44,55 +47,57 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
     # of vertices 
     # block_witness: a witness represented as a list of occurrences of blocks
     #===========================================================================
-    def _align(self, graph_block_to_occurrences, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness):
+    def _align(self, graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness):
+        # map graph occurrences to their block
+        graph_block_to_occurrences = {}
+        for graph_occurrence in graph_occurrence_to_vertices:
+            block = graph_occurrence.block
+            graph_block_to_occurrences.setdefault(block, []).append(graph_occurrence)
         # generate the witness block to occurrence map to check whether some blocks occur multiple times
         # in the witness
         witness_block_to_occurrence={}
         for witness_occurrence in block_witness.occurrences:
             witness_block = witness_occurrence.block
             witness_block_to_occurrence.setdefault(witness_block, []).append(witness_occurrence)
-        # step 4: Generate token to vertex alignment map for second 
+        # Generate token to vertex alignment map for second 
         # witness, based on block to vertices map
         alignment = {}
         for witness_occurrence in block_witness.occurrences:
             witness_block = witness_occurrence.block
-            #NOTE: the witness_block could also not be present.
+            #NOTE: the witness_block could also not be present
             if not witness_block in graph_block_to_occurrences:
+#                 print(str(witness_block)+" missing in graph!")
                 continue
             # check number of occurrences of block in witness
             # if larger than 1 we have to make a decision
             witness_occurrences = witness_block_to_occurrence[witness_block]
             if len(witness_occurrences)>1:
-                print(witness_block)
+                print(str(witness_block)+" occurring multiple times in witness!")
                 #TODO: we have to make a decision here!
                 continue        
-            
             # check number of occurrences of block in graph 
             # if larger than 1 we have to make a decision
             graph_occurrences = graph_block_to_occurrences[witness_block]
             if len(graph_occurrences)>1:
-                print(witness_block)
+                print(str(witness_block)+" occurring multiple times in graph!")
                 #TODO: we have to make a decision here!
                 continue        
             graph_occurrence = graph_occurrences[0]
             tokens = witness_occurrence_to_tokens[witness_occurrence]
             vertices = graph_occurrence_to_vertices[graph_occurrence]
-    
             for token, vertex in zip(tokens, vertices):
                 alignment[token]=vertex
-#         print(alignment)
         return alignment
         
-    def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex):
-        occurrence_to_vertices = {}
-        #TODO: for any witness outside of the first witness the token counter needs to start at lower end of the witness range!
-        token_counter = 0 
+    def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex, occurrence_to_vertices):
+        witness_range = collation.get_range_for_witness(witness.sigil)
+        token_counter = witness_range[0]
         block_witness = collation.get_block_witness(witness)
         # note: this can be done faster by focusing on the occurrences
         # instead of the tokens
         for token in witness.tokens():
             for occurrence in block_witness.occurrences:
-                if occurrence.is_in_range(token_counter):
+                if occurrence.is_in_range(token_counter) and token in token_to_vertex:
                     vertex = token_to_vertex[token]
                     occurrence_to_vertices.setdefault(occurrence, []).append(vertex)
             token_counter += 1
@@ -113,8 +118,6 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         return occurrence_to_tokens
 
     
-
-
     #===========================================================================
     # Direct port from Java code
     #===========================================================================
