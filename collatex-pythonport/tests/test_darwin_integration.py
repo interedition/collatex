@@ -21,14 +21,14 @@ if __name__ == '__main__':
     first_witness = data["witnesses"][0]
     second_witness = data["witnesses"][1]
     third_witness = data["witnesses"][2]
-    fourd_witness = data["witnesses"][3]
+    fourth_witness = data["witnesses"][3]
 
     # generate collation object from json_data    
     collation = Collation()
     collation.add_witness(first_witness["id"], first_witness["content"])
     collation.add_witness(second_witness["id"], second_witness["content"])
     collation.add_witness(third_witness["id"], third_witness["content"])
-#     collation.add_witness(fourd_witness["id"], fourd_witness["content"])
+    collation.add_witness(fourth_witness["id"], fourth_witness["content"])
 
 #     
     #print(collation.get_lcp_array())
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     print(collation.get_block_witness(collation.witnesses[0]).debug())
     print(collation.get_block_witness(collation.witnesses[1]).debug())
     print(collation.get_block_witness(collation.witnesses[2]).debug())
-#     print(collation.get_block_witness(collation.witnesses[3]).debug())
+    print(collation.get_block_witness(collation.witnesses[3]).debug())
 
     
     graph = VariantGraph()
