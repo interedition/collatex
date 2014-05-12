@@ -73,6 +73,7 @@ class Collation(object):
         self.counter = 0
         self.witness_ranges = {}
         self.combined_string = ""
+        self.blocks = None
     
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
@@ -207,13 +208,18 @@ class Collation(object):
         #check the intersection with the already occupied ranges
         block_intersection = potential_block_range.intersection(occupied)
         if block_intersection:
-            # print("was: "+str(potential_block_range))
-            # print("intersection: "+str(block_intersection))
+#             print("was: "+str(potential_block_range))
+#             print("occupied: "+str(occupied))
+#             print("intersection: "+str(block_intersection))
             real_block_range = RangeSet()
-            for (lower, upper) in zip(potential_block_range.contiguous(), block_intersection.contiguous()):
-                # print(lower, upper)
-                if lower[0] != upper[0]:
-                    real_block_range.add_range(lower[0], upper[0])
+            for lower in potential_block_range.contiguous():
+                # TODO: what I really want here is a find first over a generator
+                upper = [x for x in block_intersection.contiguous() if x[0] >= lower[0]]
+                if upper:
+                    lower = lower[0]
+                    upper = upper[0][0]
+                    if lower != upper:
+                        real_block_range.add_range(lower, upper)
             # print("real: "+str(real_block_range))
             if real_block_range:
                 occupied.union_update(real_block_range)
@@ -225,8 +231,10 @@ class Collation(object):
     def get_block_witness(self, witness):
         sigil_witness = witness.sigil
         range_witness = self.get_range_for_witness(sigil_witness)
-        #TODO: block calculation is repeated here!
-        blocks = self.get_non_overlapping_repeating_blocks() 
+        #NOTE: to prevent recalculation of blocks
+        if not self.blocks:
+            self.blocks = self.get_non_overlapping_repeating_blocks() 
+        blocks = self.blocks 
         # make a selection of blocks and occurrences of these blocks in the selected witness
         occurrences = []
         for block in blocks:
