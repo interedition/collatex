@@ -41,13 +41,22 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             self._build_occurrences_to_vertices(collation, third_witness, token_to_vertex, graph_occurrence_to_vertices)    
         # step 7: add fourth witness
         if len(collation.witnesses)>3:
-            fourd_witness = collation.witnesses[3]
-            block_witness = collation.get_block_witness(fourd_witness)
-            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, fourd_witness, block_witness)
-            # step 8: align and merge third witness
+            fourth_witness = collation.witnesses[3]
+            block_witness = collation.get_block_witness(fourth_witness)
+            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, fourth_witness, block_witness)
+            # step 8: align and merge witness
             alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-            token_to_vertex = self.merge(graph, fourd_witness.sigil, fourd_witness.tokens(), alignment)
-            # self._build_occurrences_to_vertices(collation, third_witness, token_to_vertex, graph_occurrence_to_vertices)    
+            token_to_vertex = self.merge(graph, fourth_witness.sigil, fourth_witness.tokens(), alignment)
+            self._build_occurrences_to_vertices(collation, fourth_witness, token_to_vertex, graph_occurrence_to_vertices)    
+        # step 9: add fifth witness
+        if len(collation.witnesses)>4:
+            fifth_witness = collation.witnesses[4]
+            block_witness = collation.get_block_witness(fifth_witness)
+            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, fifth_witness, block_witness)
+            # step 10: align and merge witness
+            alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
+            token_to_vertex = self.merge(graph, fifth_witness.sigil, fifth_witness.tokens(), alignment)
+            # self._build_occurrences_to_vertices(collation, fifth_witness, token_to_vertex, graph_occurrence_to_vertices)    
         
     #===========================================================================
     # graph block to occurrences: every block that is present in the graph mapped to
@@ -81,14 +90,14 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             # if larger than 1 we have to make a decision
             witness_occurrences = witness_block_to_occurrence[witness_block]
             if len(witness_occurrences)>1:
-                print(str(witness_block)+" occurring multiple times in witness!")
+#                 print(str(witness_block)+" occurring multiple times in witness!")
                 #TODO: we have to make a decision here!
                 continue        
             # check number of occurrences of block in graph 
             # if larger than 1 we have to make a decision
             graph_occurrences = graph_block_to_occurrences[witness_block]
             if len(graph_occurrences)>1:
-                print(str(witness_block)+" occurring multiple times in graph!")
+#                 print(str(witness_block)+" occurring multiple times in graph!")
                 #TODO: we have to make a decision here!
                 continue        
             graph_occurrence = graph_occurrences[0]
