@@ -149,25 +149,12 @@ class Collation(object):
             #NOTE: this one can be empty?
             child_lcp_intervals.append((child_interval_start, end_position))
             
-            # Check whether one of the sub-intervals has length 1
-            # if so, cancel all the sub-intervals and add one LCP interval with length 1
-            min_length = 100.00 #TODO: magic number, not nice
-            #TODO: is there a collection min method in Python? I would guess so
+            # add all the child_lcp_intervals to the sub_lcp_intervals list
+            # with as third parameter the number of parent prefix occurrences
             for start, end in child_lcp_intervals:
                 #NOTE: LCP intervals can be ascending or descending.
                 child_lcp_interval_length = min(lcp[start+1], lcp[end])
-                min_length = min(child_lcp_interval_length, min_length)
-            if min_length == 1:
-                t = (start_position, end_position, 1, 1, lcp[start_position:end_position+1])
-                sub_lcp_intervals.append(t)
-                # print("Adding: "+str(t))
-            else:
-                # add all the child_lcp_intervals to the sub_lcp_intervals list
-                # with as third parameter the number of parent prefix occurrences
-                for start, end in child_lcp_intervals:
-                    #NOTE: LCP intervals can be ascending or descending.
-                    child_lcp_interval_length = min(lcp[start+1], lcp[end])
-                    sub_lcp_intervals.append((start, end, len(child_lcp_intervals), child_lcp_interval_length, lcp[start_position:end_position+1]))
+                sub_lcp_intervals.append((start, end, len(child_lcp_intervals), child_lcp_interval_length, lcp[start_position:end_position+1]))
         return sub_lcp_intervals
 
     def get_non_overlapping_repeating_blocks(self):
@@ -191,15 +178,19 @@ class Collation(object):
         sorted_blocks_on_priority = sorted(potential_blocks, key=itemgetter(0, 1, 2), reverse=True)
         # step 4: select the definitive blocks
         # NOTE: Tokenizer is for debug reasons only!
-#         tokenizer = Tokenizer()
-#         tokens = tokenizer.tokenize(self.get_combined_string()) 
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string()) 
         occupied = RangeSet()
         real_blocks = []
         for number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp in sorted_blocks_on_priority:
-#             print("looking at: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with "+str(number_of_occurrences)+" occurrences and length: "+str(block_length)+" and parent prefix occurrences: "+str(parent_prefix_occurrences)+" lcp: "+str(lcp_interval))
-#             print(" parent LCP: "+str(parent_lcp))
-#             for SA_index in range(start, start+len(parent_lcp)):
-#                 print(" ".join(tokens[SA[SA_index]:SA[SA_index]+10]))
+            if number_of_occurrences > len(self.witnesses):
+                print("Skipped one!")
+                continue
+            print("looking at: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with "+str(number_of_occurrences)+" occurrences and length: "+str(block_length)+" and parent prefix occurrences: "+str(parent_prefix_occurrences)+" lcp: "+str(lcp_interval))
+            if SA[start]=="cause":
+                print(" parent LCP: "+str(parent_lcp))
+                for SA_index in range(start, start+len(parent_lcp)):
+                    print(" ".join(tokens[SA[SA_index]:SA[SA_index]+10]))
             self._add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
              
 #         # debug: list final blocks (move to string method on Block class)

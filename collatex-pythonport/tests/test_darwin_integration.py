@@ -23,14 +23,16 @@ if __name__ == '__main__':
     third_witness = data["witnesses"][2]
     fourth_witness = data["witnesses"][3]
     fifth_witness = data["witnesses"][4]
+    sixth_witness = data["witnesses"][5]
 
     # generate collation object from json_data    
     collation = Collation()
     collation.add_witness(first_witness["id"], first_witness["content"])
     collation.add_witness(second_witness["id"], second_witness["content"])
-    collation.add_witness(third_witness["id"], third_witness["content"])
-    collation.add_witness(fourth_witness["id"], fourth_witness["content"])
-    collation.add_witness(fifth_witness["id"], fifth_witness["content"])
+#     collation.add_witness(third_witness["id"], third_witness["content"])
+#     collation.add_witness(fourth_witness["id"], fourth_witness["content"])
+#     collation.add_witness(fifth_witness["id"], fifth_witness["content"])
+#     collation.add_witness(sixth_witness["id"], sixth_witness["content"])
 
 #     
     #print(collation.get_lcp_array())
@@ -38,9 +40,10 @@ if __name__ == '__main__':
 
     print(collation.get_block_witness(collation.witnesses[0]).debug())
     print(collation.get_block_witness(collation.witnesses[1]).debug())
-    print(collation.get_block_witness(collation.witnesses[2]).debug())
-    print(collation.get_block_witness(collation.witnesses[3]).debug())
-    print(collation.get_block_witness(collation.witnesses[4]).debug())
+#     print(collation.get_block_witness(collation.witnesses[2]).debug())
+#     print(collation.get_block_witness(collation.witnesses[3]).debug())
+#     print(collation.get_block_witness(collation.witnesses[4]).debug())
+#     print(collation.get_block_witness(collation.witnesses[5]).debug())
 
     
     graph = VariantGraph()
