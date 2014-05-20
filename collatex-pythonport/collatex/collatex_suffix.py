@@ -157,21 +157,26 @@ class Collation(object):
                 sub_lcp_intervals.append((start, end, len(child_lcp_intervals), child_lcp_interval_length, lcp[start_position:end_position+1]))
         return sub_lcp_intervals
 
-    def get_non_overlapping_repeating_blocks(self):
+
+    def calculate_potential_blocks(self):
         SA = self.get_sa().SA
-        lcp = self.get_lcp_array()
-        # step 1: calculate the sub LCP intervals
+        lcp = self.get_lcp_array() # step 1: calculate the sub LCP intervals
         lcp_intervals = self.get_lcp_intervals()
-        sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals)        
-        # step 2: process the LCP sub intervals
-        # and generate potential blocks
+        sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals) # step 2: process the LCP sub intervals
+    # and generate potential blocks
         potential_blocks = []
         for start, end, parent_prefix_occurrences, block_length, parent_lcp in sub_lcp_intervals:
-            number_of_occurrences = end - start +1
+            number_of_occurrences = end - start + 1
             block_occurrences = []
-            for idx in range(start, end+1):
+            for idx in range(start, end + 1):
                 block_occurrences.append(SA[idx])
-            potential_blocks.append((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end+1], parent_lcp)) 
+            
+            potential_blocks.append((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end + 1], parent_lcp))
+        
+        return potential_blocks
+
+    def get_non_overlapping_repeating_blocks(self):
+        potential_blocks = self.calculate_potential_blocks() 
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
         # third sort on parent LCP interval occurrences.
@@ -180,6 +185,8 @@ class Collation(object):
         # NOTE: Tokenizer is for debug reasons only!
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string()) 
+        #Note: SA is for debug reasons only
+        SA = self.get_sa().SA
         occupied = RangeSet()
         real_blocks = []
         for number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp in sorted_blocks_on_priority:
@@ -232,10 +239,10 @@ class Collation(object):
                 # Assert: check that the first slice is not larger than potential block length!
                 first_range = real_block_range.contiguous().next()
                 if first_range[-1]-first_range[0]+1>block_length:
-#                     print("was: "+str(potential_block_range))
-#                     print("occupied: "+str(occupied))
-#                     print("intersection: "+str(block_intersection))
-#                     print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
+                    print("was: "+str(potential_block_range))
+                    print("occupied: "+str(occupied))
+                    print("intersection: "+str(block_intersection))
+                    print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
                     assert(first_range[-1]-first_range[0]+1<=block_length)
                 
 #                 print("real: "+str(real_block_range))

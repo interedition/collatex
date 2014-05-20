@@ -29,9 +29,9 @@ if __name__ == '__main__':
     collation = Collation()
     collation.add_witness(first_witness["id"], first_witness["content"])
     collation.add_witness(second_witness["id"], second_witness["content"])
-#     collation.add_witness(third_witness["id"], third_witness["content"])
-#     collation.add_witness(fourth_witness["id"], fourth_witness["content"])
-#     collation.add_witness(fifth_witness["id"], fifth_witness["content"])
+    collation.add_witness(third_witness["id"], third_witness["content"])
+    collation.add_witness(fourth_witness["id"], fourth_witness["content"])
+    collation.add_witness(fifth_witness["id"], fifth_witness["content"])
 #     collation.add_witness(sixth_witness["id"], sixth_witness["content"])
 
 #     
@@ -40,9 +40,9 @@ if __name__ == '__main__':
 
     print(collation.get_block_witness(collation.witnesses[0]).debug())
     print(collation.get_block_witness(collation.witnesses[1]).debug())
-#     print(collation.get_block_witness(collation.witnesses[2]).debug())
-#     print(collation.get_block_witness(collation.witnesses[3]).debug())
-#     print(collation.get_block_witness(collation.witnesses[4]).debug())
+    print(collation.get_block_witness(collation.witnesses[2]).debug())
+    print(collation.get_block_witness(collation.witnesses[3]).debug())
+    print(collation.get_block_witness(collation.witnesses[4]).debug())
 #     print(collation.get_block_witness(collation.witnesses[5]).debug())
 
     
