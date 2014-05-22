@@ -5,7 +5,7 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from operator import itemgetter, methodcaller
+from operator import methodcaller, attrgetter
 from collatex.collatex_core import Witness, VariantGraph, Tokenizer
 from collatex.linsuffarr import SuffixArray
 
@@ -32,6 +32,20 @@ class Block(object):
     def __repr__(self):
         return "Block: "+str(self.ranges)
     
+# parts of the LCP array become potential blocks.
+# block_length: the number of tokens a single occurrence of this block spans
+# block_occurrences: the ranges within the suffix array that this block spans
+class PotentialBlock(object):
+    
+    def __init__(self, number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp):
+        self.number_of_occurrences = number_of_occurrences
+        self.block_length = block_length
+        self.parent_prefix_occurrences = parent_prefix_occurrences
+        self.block_occurrences = block_occurrences
+        self.start = start
+        self.lcp_interval = lcp_interval
+        self.parent_lcp = parent_lcp
+
 # Class represents a range within one witness that is associated with a block
 class Occurrence(object):
 
@@ -171,20 +185,18 @@ class Collation(object):
             for idx in range(start, end + 1):
                 block_occurrences.append(SA[idx])
             
-            potential_blocks.append((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end + 1], parent_lcp))
+            potential_blocks.append(PotentialBlock(number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end + 1], parent_lcp))
         return potential_blocks
 
     # filter out all the blocks that have more than one occurrence within a witness
     def filter_potential_blocks(self, potential_blocks):
-        for (number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp) in potential_blocks:
+        for potential_block in potential_blocks:
             for witness in self.witnesses:
                 witness_sigil = witness.sigil
                 witness_range = self.get_range_for_witness(witness_sigil)
-                inter = witness_range.intersection(block_occurrences)
-                print(inter)
-                if len(inter)> block_length:
-                    print("Say hi!")
-                    potential_blocks.remove((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp))
+                inter = witness_range.intersection(potential_block.block_occurrences)
+                if len(inter)> potential_block.block_length:
+                    potential_blocks.remove(potential_block)
                     break
     
     def get_non_overlapping_repeating_blocks(self):
@@ -193,7 +205,7 @@ class Collation(object):
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
         # third sort on parent LCP interval occurrences.
-        sorted_blocks_on_priority = sorted(potential_blocks, key=itemgetter(0, 1, 2), reverse=True)
+        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_occurrences", "block_length", "parent_prefix_occurrences"), reverse=True)
         # step 4: select the definitive blocks
         # NOTE: Tokenizer is for debug reasons only!
         tokenizer = Tokenizer()
@@ -202,16 +214,16 @@ class Collation(object):
         SA = self.get_sa().SA
         occupied = RangeSet()
         real_blocks = []
-        for number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp in sorted_blocks_on_priority:
+        for potential_block in sorted_blocks_on_priority:
 #             if number_of_occurrences > len(self.witnesses):
 #                 print("Skipped one!")
 #                 continue
-            print("looking at: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with "+str(number_of_occurrences)+" occurrences and length: "+str(block_length)+" and parent prefix occurrences: "+str(parent_prefix_occurrences)+" lcp: "+str(lcp_interval))
-            if tokens[SA[start]]=="cease":
-                print(" parent LCP: "+str(parent_lcp))
-                for SA_index in range(start, start+len(parent_lcp)):
-                    print(" ".join(tokens[SA[SA_index]:SA[SA_index]+10]))
-            self._add_potential_block_to_real_blocks(block_length, block_occurrences, occupied, real_blocks)
+            print("looking at: <"+" ".join(tokens[SA[potential_block.start]:SA[potential_block.start]+min(10, potential_block.block_length)])+"> with "+str(potential_block.number_of_occurrences)+" occurrences and length: "+str(potential_block.block_length)+" and parent prefix occurrences: "+str(potential_block.parent_prefix_occurrences)+" lcp: "+str(potential_block.lcp_interval))
+#             if tokens[SA[start]]=="cease":
+#                 print(" parent LCP: "+str(parent_lcp))
+#                 for SA_index in range(start, start+len(parent_lcp)):
+#                     print(" ".join(tokens[SA[SA_index]:SA[SA_index]+10]))
+            self._add_potential_block_to_real_blocks(potential_block, occupied, real_blocks)
              
 #         # debug: list final blocks (move to string method on Block class)
 #         tokenizer = Tokenizer()
@@ -223,16 +235,13 @@ class Collation(object):
 #             for block in block_occurrences:
 #                 print(block, block+block_length-1)
         
-        result = []
-        for block, block_length, block_occurrences in real_blocks:
-            result.append(block)
-        return result
+        return real_blocks
 
-    def _add_potential_block_to_real_blocks(self, block_length, block_occurrences, occupied, real_blocks):
+    def _add_potential_block_to_real_blocks(self, potential_block, occupied, real_blocks):
         # convert block occurrences into ranges
         potential_block_range = RangeSet()
-        for occurrence in block_occurrences:
-            potential_block_range.add_range(occurrence, occurrence + block_length)
+        for occurrence in potential_block.block_occurrences:
+            potential_block_range.add_range(occurrence, occurrence + potential_block.block_length)
         #check the intersection with the already occupied ranges
         block_intersection = potential_block_range.intersection(occupied)
         if block_intersection:
@@ -251,17 +260,17 @@ class Collation(object):
             if real_block_range:
                 # Assert: check that the first slice is not larger than potential block length!
                 first_range = real_block_range.contiguous().next()
-                if first_range[-1]-first_range[0]+1>block_length:
+                if first_range[-1]-first_range[0]+1>potential_block.block_length:
                     print("was: "+str(potential_block_range))
                     print("occupied: "+str(occupied))
                     print("intersection: "+str(block_intersection))
                     print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
                 else:
                     occupied.union_update(real_block_range)
-                    real_blocks.append((Block(real_block_range), block_length, block_occurrences))
+                    real_blocks.append(Block(real_block_range))
         else:
             occupied.union_update(potential_block_range)
-            real_blocks.append((Block(potential_block_range), block_length, block_occurrences))
+            real_blocks.append(Block(potential_block_range))
 
     def get_block_witness(self, witness):
         sigil_witness = witness.sigil
