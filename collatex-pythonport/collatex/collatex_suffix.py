@@ -207,7 +207,7 @@ class Collation(object):
 #                 print("Skipped one!")
 #                 continue
             print("looking at: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with "+str(number_of_occurrences)+" occurrences and length: "+str(block_length)+" and parent prefix occurrences: "+str(parent_prefix_occurrences)+" lcp: "+str(lcp_interval))
-            if SA[start]=="cause":
+            if tokens[SA[start]]=="cease":
                 print(" parent LCP: "+str(parent_lcp))
                 for SA_index in range(start, start+len(parent_lcp)):
                     print(" ".join(tokens[SA[SA_index]:SA[SA_index]+10]))
@@ -256,13 +256,10 @@ class Collation(object):
                     print("occupied: "+str(occupied))
                     print("intersection: "+str(block_intersection))
                     print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
-                    assert(first_range[-1]-first_range[0]+1<=block_length)
-                
-#                 print("real: "+str(real_block_range))
-                occupied.union_update(real_block_range)
-                real_blocks.append((Block(real_block_range), block_length, block_occurrences))
+                else:
+                    occupied.union_update(real_block_range)
+                    real_blocks.append((Block(real_block_range), block_length, block_occurrences))
         else:
-#             print("real: "+str(potential_block_range))
             occupied.union_update(potential_block_range)
             real_blocks.append((Block(potential_block_range), block_length, block_occurrences))
 
