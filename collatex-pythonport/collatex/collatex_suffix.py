@@ -9,6 +9,12 @@ from operator import methodcaller, attrgetter
 from collatex.collatex_core import Witness, VariantGraph, Tokenizer
 from collatex.linsuffarr import SuffixArray
 
+class LCPInterval(object):
+    
+    def __init__(self, LCP, begin, end):
+        self.LCP = LCP
+        self.start_position = begin
+        self.end_position = end
 
 class Block(object):
     
@@ -135,22 +141,22 @@ class Collation(object):
                 start_position = index
             if prefix == 0 and not previous_prefix == 0:
                 # first end last interval
-                parent_lcp_intervals.append((start_position, index-1))
+                parent_lcp_intervals.append(LCPInterval(lcp, start_position, index-1))
                 # create new interval
                 start_position = index 
             previous_prefix = prefix
         # add the final interval
         #NOTE: this one can be empty?
-        parent_lcp_intervals.append((start_position, len(lcp)-1))    
+        parent_lcp_intervals.append(LCPInterval(lcp, start_position, len(lcp)-1))    
         return parent_lcp_intervals
 
     def calculate_sub_lcp_intervals(self, lcp, parent_lcp_intervals):
         sub_lcp_intervals = []
-        for start_position, end_position in parent_lcp_intervals:
+        for lcp_interval in parent_lcp_intervals:
             child_lcp_intervals = []
             child_interval_start = None
             previous_prefix = 0
-            for index in range(start_position, end_position+1):
+            for index in range(lcp_interval.start_position, lcp_interval.end_position+1):
                 prefix = lcp[index]
                 if prefix > previous_prefix and lcp[index-2] >= previous_prefix:
                     # first end last interval
@@ -161,14 +167,14 @@ class Collation(object):
                 previous_prefix = prefix 
             # add the final interval
             #NOTE: this one can be empty?
-            child_lcp_intervals.append((child_interval_start, end_position))
+            child_lcp_intervals.append((child_interval_start, lcp_interval.end_position))
             
             # add all the child_lcp_intervals to the sub_lcp_intervals list
             # with as third parameter the number of parent prefix occurrences
             for start, end in child_lcp_intervals:
                 #NOTE: LCP intervals can be ascending or descending.
                 child_lcp_interval_length = min(lcp[start+1], lcp[end])
-                sub_lcp_intervals.append((start, end, len(child_lcp_intervals), child_lcp_interval_length, lcp[start_position:end_position+1]))
+                sub_lcp_intervals.append((start, end, len(child_lcp_intervals), child_lcp_interval_length, lcp[lcp_interval.start_position:lcp_interval.end_position+1]))
         return sub_lcp_intervals
 
 
