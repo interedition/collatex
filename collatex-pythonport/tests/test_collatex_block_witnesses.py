@@ -124,6 +124,14 @@ class Test(unittest.TestCase):
         block_witness3 = collation.get_block_witness(collation.witnesses[2])
         self.assertEquals(["a b c d", "g h i !", "q r s t"], block_witness3.debug())
         
+    def test_filter_potential_blocks(self):
+        collation = Collation()
+        collation.add_witness("W1", "a a")
+        collation.add_witness("w2", "a")
+        potential_blocks = collation.calculate_potential_blocks()
+        collation.filter_potential_blocks(potential_blocks)
+        self.assertFalse(potential_blocks)
+
 #     def test_filter_potential_blocks(self):
 #         collation = Collation()
 #         collation.add_witness("W1", "the fox jumps over the fox")

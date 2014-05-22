@@ -174,19 +174,22 @@ class Collation(object):
             potential_blocks.append((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end + 1], parent_lcp))
         return potential_blocks
 
-#     # filter out all the blocks that have more than one occurrence within a witness
-#     def filter_potential_blocks(self, potential_blocks):
-#         for witness in self.witnesses:
-#             witness_sigil = witness.sigil
-#             range = self.get_range_for_witness(witness_sigil)
-#             for (number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp) in potential_blocks:
-#                 inter = range.intersection(block_occurrences)
-#                 pass
-    
+    # filter out all the blocks that have more than one occurrence within a witness
+    def filter_potential_blocks(self, potential_blocks):
+        for (number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp) in potential_blocks:
+            for witness in self.witnesses:
+                witness_sigil = witness.sigil
+                witness_range = self.get_range_for_witness(witness_sigil)
+                inter = witness_range.intersection(block_occurrences)
+                print(inter)
+                if len(inter)> block_length:
+                    print("Say hi!")
+                    potential_blocks.remove((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp))
+                    break
     
     def get_non_overlapping_repeating_blocks(self):
         potential_blocks = self.calculate_potential_blocks() 
-#         self.filter_potential_blocks(potential_blocks)
+        self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
         # third sort on parent LCP interval occurrences.
@@ -200,9 +203,9 @@ class Collation(object):
         occupied = RangeSet()
         real_blocks = []
         for number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp in sorted_blocks_on_priority:
-            if number_of_occurrences > len(self.witnesses):
-                print("Skipped one!")
-                continue
+#             if number_of_occurrences > len(self.witnesses):
+#                 print("Skipped one!")
+#                 continue
             print("looking at: <"+" ".join(tokens[SA[start]:SA[start]+min(10, block_length)])+"> with "+str(number_of_occurrences)+" occurrences and length: "+str(block_length)+" and parent prefix occurrences: "+str(parent_prefix_occurrences)+" lcp: "+str(lcp_interval))
             if SA[start]=="cause":
                 print(" parent LCP: "+str(parent_lcp))
