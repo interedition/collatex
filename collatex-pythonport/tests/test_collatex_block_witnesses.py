@@ -78,10 +78,8 @@ class Test(unittest.TestCase):
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         blocks = collation.get_non_overlapping_repeating_blocks()
-        block1 = Block(RangeSet("8, 10, 24")) # !
-        block2 = Block(RangeSet("0-7, 16-23")) # a b c d F g h i
-        block3 = Block(RangeSet("11-14, 25-28")) # q r s t
-        self.assertEquals([block1, block2, block3], blocks)
+        self.assertIn(Block(RangeSet("0-8, 16-24")), blocks) # a b c d F g h i !
+        self.assertIn(Block(RangeSet("11-14, 25-28")), blocks) # q r s t
    
     def test_blocks_Hermans_case_three_witnesses(self):
         collation = Collation()
@@ -89,35 +87,30 @@ class Test(unittest.TestCase):
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
         blocks = collation.get_non_overlapping_repeating_blocks()
-        block1 = Block(RangeSet("8, 10, 24, 38")) # !
-        block2 = Block(RangeSet("0-3, 16-19, 30-33")) # a b c d
-        block3 = Block(RangeSet("5-7, 21-23, 35-37")) # g h i
-        block4 = Block(RangeSet("11-14, 25-28, 39-42")) # q r s t
-        block5 = Block(RangeSet("4, 20")) # F
-        self.assertEquals([block1, block2, block3, block4, block5], blocks)
+        self.assertIn(Block(RangeSet("0-3, 16-19, 30-33")), blocks) # a b c d
+        self.assertIn(Block(RangeSet("5-8, 21-24, 35-38")), blocks) # g h i !
+        self.assertIn(Block(RangeSet("11-14, 25-28, 39-42")), blocks) # q r s t
+        self.assertIn(Block(RangeSet("4, 20")), blocks) # F
+        
 
-    # The token C splits the "a c b" sequence into two blocks (a, b) 
-    # C gets prioritized because the token appears three times
+    # In the new approach nothing should be split 
     def test_blocks_splitting_token_case(self):
         collation = Collation()
         collation.add_witness("W1", "a c b c")
         collation.add_witness("W2", "a c b")
         blocks = collation.get_non_overlapping_repeating_blocks()
-        block1 = Block(RangeSet("1, 3, 6")) # c
-        block2 = Block(RangeSet("0, 5")) # a
-        block3 = Block(RangeSet("2, 7")) # b
+        block1 = Block(RangeSet("0-2, 5-7")) # a c b
         self.assertIn(block1, blocks)
-        self.assertIn(block2, blocks)
-        self.assertIn(block3, blocks)
+
     
     def test_block_witnesses_Hermans_case_two_witnesses(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         block_witness = collation.get_block_witness(collation.witnesses[0])
-        self.assertEquals(["a b c d F g h i", "!", "!", "q r s t"], block_witness.debug())
+        self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
         block_witness = collation.get_block_witness(collation.witnesses[1])
-        self.assertEquals(["a b c d F g h i", "!", "q r s t"], block_witness.debug())
+        self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
  
     def test_block_witnesses_Hermans_case(self):
         collation = Collation()
@@ -125,11 +118,19 @@ class Test(unittest.TestCase):
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
         block_witness1 = collation.get_block_witness(collation.witnesses[0])
-        self.assertEquals(["a b c d", "F", "g h i", "!", "!", "q r s t"], block_witness1.debug())
+        self.assertEquals(["a b c d", "F", "g h i !", "q r s t"], block_witness1.debug())
         block_witness2 = collation.get_block_witness(collation.witnesses[1])
-        self.assertEquals(["a b c d", "F", "g h i", "!", "q r s t"], block_witness2.debug())
+        self.assertEquals(["a b c d", "F", "g h i !", "q r s t"], block_witness2.debug())
         block_witness3 = collation.get_block_witness(collation.witnesses[2])
-        self.assertEquals(["a b c d", "g h i", "!", "q r s t"], block_witness3.debug())
+        self.assertEquals(["a b c d", "g h i !", "q r s t"], block_witness3.debug())
+        
+#     def test_filter_potential_blocks(self):
+#         collation = Collation()
+#         collation.add_witness("W1", "the fox jumps over the fox")
+#         collation.add_witness("w2", "the fox jumps over the dog")
+#         potential_blocks = collation.calculate_potential_blocks()
+#         collation.filter_potential_blocks(potential_blocks)
+#         self.fail("TESTING!")
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

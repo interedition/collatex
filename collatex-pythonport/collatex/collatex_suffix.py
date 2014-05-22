@@ -172,11 +172,21 @@ class Collation(object):
                 block_occurrences.append(SA[idx])
             
             potential_blocks.append((number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end + 1], parent_lcp))
-        
         return potential_blocks
 
+#     # filter out all the blocks that have more than one occurrence within a witness
+#     def filter_potential_blocks(self, potential_blocks):
+#         for witness in self.witnesses:
+#             witness_sigil = witness.sigil
+#             range = self.get_range_for_witness(witness_sigil)
+#             for (number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp) in potential_blocks:
+#                 inter = range.intersection(block_occurrences)
+#                 pass
+    
+    
     def get_non_overlapping_repeating_blocks(self):
         potential_blocks = self.calculate_potential_blocks() 
+#         self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
         # third sort on parent LCP interval occurrences.
