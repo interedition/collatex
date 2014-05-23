@@ -16,6 +16,32 @@ class LCPInterval(object):
         self.start_position = begin
         self.end_position = end
 
+class LCPSubinterval(object):
+    
+    def __init__(self, LCP, start, end, number_of_siblings, parent_lcp_interval):
+        self.LCP = LCP
+        self.start = start
+        self.end = end
+        self.number_of_siblings = number_of_siblings
+        self.parent_lcp_interval = parent_lcp_interval
+        
+    def minimum_block_length(self):
+        #NOTE: LCP intervals can be ascending or descending.
+        return min(self.LCP[self.start+1], self.LCP[self.end])
+
+# parts of the LCP array become potential blocks.
+# block_length: the number of tokens a single occurrence of this block spans
+# block_occurrences: the ranges within the suffix array that this block spans
+class PotentialBlock(object):
+    
+    def __init__(self, number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start):
+        self.number_of_occurrences = number_of_occurrences
+        self.block_length = block_length
+        self.parent_prefix_occurrences = parent_prefix_occurrences
+        self.block_occurrences = block_occurrences
+        self.start = start
+
+
 class Block(object):
     
     def __init__(self, ranges):
@@ -38,20 +64,6 @@ class Block(object):
     def __repr__(self):
         return "Block: "+str(self.ranges)
     
-# parts of the LCP array become potential blocks.
-# block_length: the number of tokens a single occurrence of this block spans
-# block_occurrences: the ranges within the suffix array that this block spans
-class PotentialBlock(object):
-    
-    def __init__(self, number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp_interval, parent_lcp):
-        self.number_of_occurrences = number_of_occurrences
-        self.block_length = block_length
-        self.parent_prefix_occurrences = parent_prefix_occurrences
-        self.block_occurrences = block_occurrences
-        self.start = start
-        self.lcp_interval = lcp_interval
-        self.parent_lcp = parent_lcp
-
 # Class represents a range within one witness that is associated with a block
 class Occurrence(object):
 
@@ -172,9 +184,7 @@ class Collation(object):
             # add all the child_lcp_intervals to the sub_lcp_intervals list
             # with as third parameter the number of parent prefix occurrences
             for start, end in child_lcp_intervals:
-                #NOTE: LCP intervals can be ascending or descending.
-                child_lcp_interval_length = min(lcp[start+1], lcp[end])
-                sub_lcp_intervals.append((start, end, len(child_lcp_intervals), child_lcp_interval_length, lcp[lcp_interval.start_position:lcp_interval.end_position+1]))
+                sub_lcp_intervals.append(LCPSubinterval(lcp, start, end, len(child_lcp_intervals), lcp_interval))
         return sub_lcp_intervals
 
 
@@ -185,13 +195,13 @@ class Collation(object):
         sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals) # step 2: process the LCP sub intervals
     # and generate potential blocks
         potential_blocks = []
-        for start, end, parent_prefix_occurrences, block_length, parent_lcp in sub_lcp_intervals:
-            number_of_occurrences = end - start + 1
+        for lcp_sub_interval in sub_lcp_intervals:
+            number_of_occurrences = lcp_sub_interval.end - lcp_sub_interval.start + 1
             block_occurrences = []
-            for idx in range(start, end + 1):
+            for idx in range(lcp_sub_interval.start, lcp_sub_interval.end + 1):
                 block_occurrences.append(SA[idx])
             
-            potential_blocks.append(PotentialBlock(number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start, lcp[start:end + 1], parent_lcp))
+            potential_blocks.append(PotentialBlock(number_of_occurrences, lcp_sub_interval.minimum_block_length(), lcp_sub_interval.number_of_siblings, block_occurrences, lcp_sub_interval.start))
         return potential_blocks
 
     # filter out all the blocks that have more than one occurrence within a witness
@@ -224,7 +234,7 @@ class Collation(object):
 #             if number_of_occurrences > len(self.witnesses):
 #                 print("Skipped one!")
 #                 continue
-            print("looking at: <"+" ".join(tokens[SA[potential_block.start]:SA[potential_block.start]+min(10, potential_block.block_length)])+"> with "+str(potential_block.number_of_occurrences)+" occurrences and length: "+str(potential_block.block_length)+" and parent prefix occurrences: "+str(potential_block.parent_prefix_occurrences)+" lcp: "+str(potential_block.lcp_interval))
+            print("looking at: <"+" ".join(tokens[SA[potential_block.start]:SA[potential_block.start]+min(10, potential_block.block_length)])+"> with "+str(potential_block.number_of_occurrences)+" occurrences and length: "+str(potential_block.block_length)+" and parent prefix occurrences: "+str(potential_block.parent_prefix_occurrences))
 #             if tokens[SA[start]]=="cease":
 #                 print(" parent LCP: "+str(parent_lcp))
 #                 for SA_index in range(start, start+len(parent_lcp)):
