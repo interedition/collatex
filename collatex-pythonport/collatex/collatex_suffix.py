@@ -48,6 +48,12 @@ class LCPSubinterval(object):
     def info(self):
         return "looking at: <"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
 
+    def list_prefixes(self):
+        for idx in range(self.start, self.end + 1):
+            if self.LCP[idx] > 0:
+                prefix = " ".join(self.tokens[self.SA[idx]:self.SA[idx]+self.LCP[idx]])
+                print(prefix)
+            
 class Block(object):
     
     def __init__(self, ranges):
