@@ -324,6 +324,17 @@ class Collation(object):
                     real_blocks.append(Block(non_overlapping_range))
             except PartialOverlapException:          
                 print("Skip due to conflict: "+str(potential_block))
+                # retry with a different length: one less
+                for idx in range(potential_block.start+1, potential_block.end+1):
+                    potential_block.LCP[idx] -= 1
+                try:
+                    non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+                    if non_overlapping_range:
+                        print("Retried and selecting: "+str(potential_block))
+                        occupied.union_update(non_overlapping_range)
+                        real_blocks.append(Block(non_overlapping_range))
+                except PartialOverlapException:          
+                    print("Failed again")
         return real_blocks
 
     def get_block_witness(self, witness):
