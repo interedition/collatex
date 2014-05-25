@@ -16,31 +16,37 @@ class LCPInterval(object):
         self.start_position = begin
         self.end_position = end
 
+# parts of the LCP array become potential blocks.
+# block_length: the number of tokens a single occurrence of this block spans
+# block_occurrences: the ranges within the suffix array that this block spans
 class LCPSubinterval(object):
     
-    def __init__(self, LCP, start, end, number_of_siblings, parent_lcp_interval):
+    def __init__(self, tokens, SA, LCP, start, end, number_of_siblings, parent_lcp_interval):
+        self.tokens = tokens
+        self.SA = SA
         self.LCP = LCP
         self.start = start
         self.end = end
         self.number_of_siblings = number_of_siblings
         self.parent_lcp_interval = parent_lcp_interval
         
+    @property
     def minimum_block_length(self):
         #NOTE: LCP intervals can be ascending or descending.
         return min(self.LCP[self.start+1], self.LCP[self.end])
-
-# parts of the LCP array become potential blocks.
-# block_length: the number of tokens a single occurrence of this block spans
-# block_occurrences: the ranges within the suffix array that this block spans
-class PotentialBlock(object):
     
-    def __init__(self, number_of_occurrences, block_length, parent_prefix_occurrences, block_occurrences, start):
-        self.number_of_occurrences = number_of_occurrences
-        self.block_length = block_length
-        self.parent_prefix_occurrences = parent_prefix_occurrences
-        self.block_occurrences = block_occurrences
-        self.start = start
+    @property
+    def number_of_occurrences(self):
+        return self.end - self.start + 1
+    
+    def block_occurrences(self):
+        block_occurrences = []
+        for idx in range(self.start, self.end + 1):
+            block_occurrences.append(self.SA[idx])
+        return block_occurrences
 
+    def info(self):
+        return "looking at: <"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
 
 class Block(object):
     
@@ -163,6 +169,10 @@ class Collation(object):
         return parent_lcp_intervals
 
     def calculate_sub_lcp_intervals(self, lcp, parent_lcp_intervals):
+        # NOTE: Tokenizer is for debug reasons only!
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string()) 
+        SA = self.get_sa().SA
         sub_lcp_intervals = []
         for lcp_interval in parent_lcp_intervals:
             child_lcp_intervals = []
@@ -184,25 +194,19 @@ class Collation(object):
             # add all the child_lcp_intervals to the sub_lcp_intervals list
             # with as third parameter the number of parent prefix occurrences
             for start, end in child_lcp_intervals:
-                sub_lcp_intervals.append(LCPSubinterval(lcp, start, end, len(child_lcp_intervals), lcp_interval))
+                sub_lcp_intervals.append(LCPSubinterval(tokens, SA, lcp, start, end, len(child_lcp_intervals), lcp_interval))
         return sub_lcp_intervals
 
 
     def calculate_potential_blocks(self):
-        SA = self.get_sa().SA
-        lcp = self.get_lcp_array() # step 1: calculate the sub LCP intervals
+        # step 1: calculate the sub LCP intervals
+        lcp = self.get_lcp_array()
         lcp_intervals = self.get_lcp_intervals()
-        sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals) # step 2: process the LCP sub intervals
-    # and generate potential blocks
-        potential_blocks = []
-        for lcp_sub_interval in sub_lcp_intervals:
-            number_of_occurrences = lcp_sub_interval.end - lcp_sub_interval.start + 1
-            block_occurrences = []
-            for idx in range(lcp_sub_interval.start, lcp_sub_interval.end + 1):
-                block_occurrences.append(SA[idx])
-            
-            potential_blocks.append(PotentialBlock(number_of_occurrences, lcp_sub_interval.minimum_block_length(), lcp_sub_interval.number_of_siblings, block_occurrences, lcp_sub_interval.start))
-        return potential_blocks
+        sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals) 
+        # step 2: process the LCP sub intervals
+        # and generate more potential blocks
+        # TODO: more blocks can be generated here
+        return sub_lcp_intervals
 
     # filter out all the blocks that have more than one occurrence within a witness
     def filter_potential_blocks(self, potential_blocks):
@@ -210,8 +214,8 @@ class Collation(object):
             for witness in self.witnesses:
                 witness_sigil = witness.sigil
                 witness_range = self.get_range_for_witness(witness_sigil)
-                inter = witness_range.intersection(potential_block.block_occurrences)
-                if len(inter)> potential_block.block_length:
+                inter = witness_range.intersection(potential_block.block_occurrences())
+                if len(inter)> potential_block.minimum_block_length:
                     potential_blocks.remove(potential_block)
                     break
     
@@ -221,43 +225,20 @@ class Collation(object):
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
         # third sort on parent LCP interval occurrences.
-        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_occurrences", "block_length", "parent_prefix_occurrences"), reverse=True)
+        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_occurrences", "minimum_block_length", "number_of_siblings"), reverse=True)
         # step 4: select the definitive blocks
-        # NOTE: Tokenizer is for debug reasons only!
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(self.get_combined_string()) 
-        #Note: SA is for debug reasons only
-        SA = self.get_sa().SA
         occupied = RangeSet()
         real_blocks = []
         for potential_block in sorted_blocks_on_priority:
-#             if number_of_occurrences > len(self.witnesses):
-#                 print("Skipped one!")
-#                 continue
-            print("looking at: <"+" ".join(tokens[SA[potential_block.start]:SA[potential_block.start]+min(10, potential_block.block_length)])+"> with "+str(potential_block.number_of_occurrences)+" occurrences and length: "+str(potential_block.block_length)+" and parent prefix occurrences: "+str(potential_block.parent_prefix_occurrences))
-#             if tokens[SA[start]]=="cease":
-#                 print(" parent LCP: "+str(parent_lcp))
-#                 for SA_index in range(start, start+len(parent_lcp)):
-#                     print(" ".join(tokens[SA[SA_index]:SA[SA_index]+10]))
+            print(potential_block.info())
             self._add_potential_block_to_real_blocks(potential_block, occupied, real_blocks)
-             
-#         # debug: list final blocks (move to string method on Block class)
-#         tokenizer = Tokenizer()
-#         tokens = tokenizer.tokenize(self.get_combined_string()) 
-#         #TODO: block_length is calculated wrong here!                
-#         print("Final blocks!")
-#         for block, block_length, block_occurrences in real_blocks:
-#             print("block found", tokens[block_occurrences[0]:block_occurrences[0]+block_length])
-#             for block in block_occurrences:
-#                 print(block, block+block_length-1)
-        
         return real_blocks
 
     def _add_potential_block_to_real_blocks(self, potential_block, occupied, real_blocks):
         # convert block occurrences into ranges
         potential_block_range = RangeSet()
-        for occurrence in potential_block.block_occurrences:
-            potential_block_range.add_range(occurrence, occurrence + potential_block.block_length)
+        for occurrence in potential_block.block_occurrences():
+            potential_block_range.add_range(occurrence, occurrence + potential_block.minimum_block_length)
         #check the intersection with the already occupied ranges
         block_intersection = potential_block_range.intersection(occupied)
         if block_intersection:
@@ -276,7 +257,7 @@ class Collation(object):
             if real_block_range:
                 # Assert: check that the first slice is not larger than potential block length!
                 first_range = real_block_range.contiguous().next()
-                if first_range[-1]-first_range[0]+1>potential_block.block_length:
+                if first_range[-1]-first_range[0]+1>potential_block.minimum_block_length:
                     print("was: "+str(potential_block_range))
                     print("occupied: "+str(occupied))
                     print("intersection: "+str(block_intersection))
