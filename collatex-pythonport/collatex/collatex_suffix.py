@@ -46,8 +46,8 @@ class LCPSubinterval(object):
         return block_occurrences
 
     def info(self):
-        return "looking at: <"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
-
+        return "looking at: "+str(self)
+    
     def list_prefixes(self):
         for idx in range(self.start, self.end + 1):
             if self.LCP[idx] > 0:
@@ -57,7 +57,10 @@ class LCPSubinterval(object):
     @property            
     def token_start_position(self):
         return min(self.block_occurrences())
-        
+    
+    def __str__(self):
+        return "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
+ 
     def __repr__(self):
         return "LCPivl: "+str(self.token_start_position)+","+str(self.minimum_block_length)+","+str(self.number_of_occurrences)
             
@@ -235,6 +238,7 @@ class Collation(object):
                 witness_range = self.get_range_for_witness(witness_sigil)
                 inter = witness_range.intersection(potential_block.block_occurrences())
                 if len(inter)> potential_block.minimum_block_length:
+                    print("Removing block: "+str(potential_block))
                     potential_blocks.remove(potential_block)
                     break
     
@@ -249,7 +253,7 @@ class Collation(object):
         occupied = RangeSet()
         real_blocks = []
         for potential_block in sorted_blocks_on_priority:
-            print(potential_block.info())
+#             print(potential_block.info())
             self._add_potential_block_to_real_blocks(potential_block, occupied, real_blocks)
         return real_blocks
 
@@ -277,14 +281,17 @@ class Collation(object):
                 # Assert: check that the first slice is not larger than potential block length!
                 first_range = real_block_range.contiguous().next()
                 if first_range[-1]-first_range[0]+1>potential_block.minimum_block_length:
-                    print("was: "+str(potential_block_range))
-                    print("occupied: "+str(occupied))
-                    print("intersection: "+str(block_intersection))
-                    print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
+                    print("Skip due to conflict: "+str(potential_block))
+#                     print("was: "+str(potential_block_range))
+#                     print("occupied: "+str(occupied))
+#                     print("intersection: "+str(block_intersection))
+#                     print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
                 else:
+                    print("Selecting: "+str(potential_block))
                     occupied.union_update(real_block_range)
                     real_blocks.append(Block(real_block_range))
         else:
+            print("Selecting: "+str(potential_block))
             occupied.union_update(potential_block_range)
             real_blocks.append(Block(potential_block_range))
 
