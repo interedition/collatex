@@ -53,6 +53,13 @@ class LCPSubinterval(object):
             if self.LCP[idx] > 0:
                 prefix = " ".join(self.tokens[self.SA[idx]:self.SA[idx]+self.LCP[idx]])
                 print(prefix)
+    
+    @property            
+    def token_start_position(self):
+        return min(self.block_occurrences())
+        
+    def __repr__(self):
+        return "LCPivl: "+str(self.token_start_position)+","+str(self.minimum_block_length)+","+str(self.number_of_occurrences)
             
 class Block(object):
     
@@ -204,6 +211,12 @@ class Collation(object):
         return sub_lcp_intervals
 
 
+    def split_lcp_intervals(self):
+        lcp_intervals = self.calculate_potential_blocks()
+        #TODO: do interesting things here
+        return lcp_intervals
+        
+        
     def calculate_potential_blocks(self):
         # step 1: calculate the sub LCP intervals
         lcp = self.get_lcp_array()

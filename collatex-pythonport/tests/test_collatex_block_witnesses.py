@@ -6,9 +6,17 @@ Created on Apr 27, 2014
 import unittest
 from ClusterShell.RangeSet import RangeSet
 from collatex.collatex_suffix import Collation, Block
-from array import array
 
 class Test(unittest.TestCase):
+    def assertIntervalIn(self, start, length, nr_of_occurrences, intervals):
+        found = False
+        for lcp_interval in intervals:
+            if lcp_interval.token_start_position == start and lcp_interval.minimum_block_length == length and lcp_interval.number_of_occurrences == nr_of_occurrences:
+                found = True
+                break 
+        if not found:
+            self.fail("Interval with "+str(start)+" and "+str(length)+" and "+str(nr_of_occurrences)+" not found in "+str(intervals))
+    
     def test_combined_string_hermans_case(self):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -131,6 +139,40 @@ class Test(unittest.TestCase):
         potential_blocks = collation.calculate_potential_blocks()
         collation.filter_potential_blocks(potential_blocks)
         self.assertFalse(potential_blocks)
+        
+    def test_split_lcp_intervals_into_smaller_intervals(self):
+        collation = Collation()
+        collation.add_witness("W1", "the cat")
+        collation.add_witness("W2", "the cat")
+        collation.add_witness("W3", "the cat")
+        split_intervals = collation.split_lcp_intervals()
+        self.assertIntervalIn(0, 2, 3, split_intervals) # the cat
+        self.assertIntervalIn(1, 1, 3, split_intervals) # cat
+        self.assertEqual(2, len(split_intervals))
+        
+#     def test_split_lcp_intervals_into_smaller_intervals_2(self):
+#         collation = Collation()
+#         collation.add_witness("W1", "the")
+#         collation.add_witness("W2", "the cat")
+#         collation.add_witness("W3", "the cat sits")
+#         split_intervals = collation.split_lcp_intervals()
+#         self.assertIntervalIn(0, 1, 3, split_intervals) # the
+#         self.assertIntervalIn(0, 2, 2, split_intervals) # the cat
+#         #TODO: update this number (cat, sits)
+#         self.assertEqual(2, len(split_intervals))
+
+#     def test_multiple_potential_blocks(self):
+#         collation = Collation()
+#         collation.add_witness("W1", "the")
+#         collation.add_witness("w2", "the black")
+#         collation.add_witness("w3", "the black cat")
+#         collation.add_witness("w4", "the black cat sits")
+#         collation.add_witness("w5", "the black cat sits on")
+#         collation.add_witness("w6", "the black cat sits on a")
+#         potential_blocks = collation.calculate_potential_blocks()
+#         for pb in potential_blocks:
+#             pb.list_prefixes()
+#         self.fail("TESTING")
 
 #     def test_filter_potential_blocks(self):
 #         collation = Collation()
