@@ -16,6 +16,11 @@ class LCPInterval(object):
         self.start_position = begin
         self.end_position = end
 
+
+class PartialOverlapException(Exception):
+    pass
+
+
 # parts of the LCP array become potential blocks.
 # block_length: the number of tokens a single occurrence of this block spans
 # block_occurrences: the ranges within the suffix array that this block spans
@@ -58,6 +63,36 @@ class LCPSubinterval(object):
     def token_start_position(self):
         return min(self.block_occurrences())
     
+    def calculate_non_overlapping_range_with(self, occupied):
+        # convert block occurrences into ranges
+        potential_block_range = RangeSet()
+        for occurrence in self.block_occurrences():
+            potential_block_range.add_range(occurrence, occurrence + self.minimum_block_length)
+        #check the intersection with the already occupied ranges
+        block_intersection = potential_block_range.intersection(occupied)
+        if not block_intersection:
+            # no overlap, return complete block_range
+            return potential_block_range
+        # There is overlap with occupied range
+        # we need to deal with it
+        real_block_range = RangeSet()
+        for lower in potential_block_range.contiguous():
+            # TODO: what I really want here is a find first over a generator
+            upper = [x for x in block_intersection.contiguous() if x[0] >= lower[0]]
+            if upper:
+                lower = lower[0]
+                upper = upper[0][0]
+                if lower != upper:
+                    real_block_range.add_range(lower, upper)
+        if not real_block_range:
+            # There is complete overlap, so return None
+            return None
+        # Assert: check that the first slice is not larger than potential block length!
+        first_range = real_block_range.contiguous().next()
+        if first_range[-1]-first_range[0]+1>self.minimum_block_length:
+            raise PartialOverlapException()
+        return real_block_range
+
     def show_lcp_array(self):
         return self.LCP[self.start:self.end+1]
         
@@ -223,9 +258,12 @@ class Collation(object):
         for lcp_interval in lcp_intervals:
             array = lcp_interval.show_lcp_array()
             print("LCP array is "+str(array))
+            # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend.
+            # NOTE:The case of descending and then ascending is already handled in the sub_intervals method
             # Make sure that the LCP array is ascending!
             if lcp_interval.LCP[lcp_interval.start+1] > lcp_interval.LCP[lcp_interval.end]:
-                print("LCP array is descending: "+str(array))
+                print("LCP array is descending: ")
+                lcp_interval.list_prefixes()
                 result.append(lcp_interval)
                 continue
             # now we need to build up a stack of open intervals
@@ -265,7 +303,9 @@ class Collation(object):
                     break
     
     def get_non_overlapping_repeating_blocks(self):
-        potential_blocks = self.calculate_potential_blocks() 
+        potential_blocks = self.calculate_potential_blocks()
+        # TODO: activate!    
+        # potential_blocks = self.split_lcp_intervals() 
         self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
@@ -275,47 +315,16 @@ class Collation(object):
         occupied = RangeSet()
         real_blocks = []
         for potential_block in sorted_blocks_on_priority:
-#             print(potential_block.info())
-            self._add_potential_block_to_real_blocks(potential_block, occupied, real_blocks)
-        return real_blocks
-
-    def _add_potential_block_to_real_blocks(self, potential_block, occupied, real_blocks):
-        # convert block occurrences into ranges
-        potential_block_range = RangeSet()
-        for occurrence in potential_block.block_occurrences():
-            potential_block_range.add_range(occurrence, occurrence + potential_block.minimum_block_length)
-        #check the intersection with the already occupied ranges
-        block_intersection = potential_block_range.intersection(occupied)
-        if block_intersection:
-#             print("was: "+str(potential_block_range))
-#             print("occupied: "+str(occupied))
-#             print("intersection: "+str(block_intersection))
-            real_block_range = RangeSet()
-            for lower in potential_block_range.contiguous():
-                # TODO: what I really want here is a find first over a generator
-                upper = [x for x in block_intersection.contiguous() if x[0] >= lower[0]]
-                if upper:
-                    lower = lower[0]
-                    upper = upper[0][0]
-                    if lower != upper:
-                        real_block_range.add_range(lower, upper)
-            if real_block_range:
-                # Assert: check that the first slice is not larger than potential block length!
-                first_range = real_block_range.contiguous().next()
-                if first_range[-1]-first_range[0]+1>potential_block.minimum_block_length:
-                    print("Skip due to conflict: "+str(potential_block))
-#                     print("was: "+str(potential_block_range))
-#                     print("occupied: "+str(occupied))
-#                     print("intersection: "+str(block_intersection))
-#                     print("First range: "+str(first_range)+" "+str(first_range[0])+" "+str(first_range[-1]))
-                else:
+#           print(potential_block.info())
+            try:
+                non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+                if non_overlapping_range:
                     print("Selecting: "+str(potential_block))
-                    occupied.union_update(real_block_range)
-                    real_blocks.append(Block(real_block_range))
-        else:
-            print("Selecting: "+str(potential_block))
-            occupied.union_update(potential_block_range)
-            real_blocks.append(Block(potential_block_range))
+                    occupied.union_update(non_overlapping_range)
+                    real_blocks.append(Block(non_overlapping_range))
+            except PartialOverlapException:          
+                print("Skip due to conflict: "+str(potential_block))
+        return real_blocks
 
     def get_block_witness(self, witness):
         sigil_witness = witness.sigil
