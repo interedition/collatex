@@ -58,6 +58,9 @@ class LCPSubinterval(object):
     def token_start_position(self):
         return min(self.block_occurrences())
     
+    def show_lcp_array(self):
+        return self.LCP[self.start:self.end+1]
+        
     def __str__(self):
         return "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
  
@@ -216,8 +219,27 @@ class Collation(object):
 
     def split_lcp_intervals(self):
         lcp_intervals = self.calculate_potential_blocks()
-        #TODO: do interesting things here
-        return lcp_intervals
+        result = []
+        for lcp_interval in lcp_intervals:
+            array = lcp_interval.show_lcp_array()
+            print("LCP array is "+str(array))
+            # Make sure that the LCP array is ascending!
+            if lcp_interval.LCP[lcp_interval.start+1] > lcp_interval.LCP[lcp_interval.end]:
+                print("LCP array is descending: "+str(array))
+                result.append(lcp_interval)
+                continue
+            # now we need to build up a stack of open intervals
+            previous_lcp_value = 0
+            open_intervals = []
+            for idx in range(lcp_interval.start+1, lcp_interval.end+1):
+                lcp_value = lcp_interval.LCP[idx]
+                if lcp_value > previous_lcp_value:
+                    open_intervals.append(idx-1)
+                    previous_lcp_value = lcp_value
+            for o_i in open_intervals:
+                result.append(LCPSubinterval(lcp_interval.tokens, lcp_interval.SA, lcp_interval.LCP, o_i, lcp_interval.end, lcp_interval.number_of_siblings, lcp_interval.parent_lcp_interval))
+                print("new: "+str(result[-1]))
+        return result
         
         
     def calculate_potential_blocks(self):

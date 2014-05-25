@@ -150,16 +150,16 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(1, 1, 3, split_intervals) # cat
         self.assertEqual(2, len(split_intervals))
         
-#     def test_split_lcp_intervals_into_smaller_intervals_2(self):
-#         collation = Collation()
-#         collation.add_witness("W1", "the")
-#         collation.add_witness("W2", "the cat")
-#         collation.add_witness("W3", "the cat sits")
-#         split_intervals = collation.split_lcp_intervals()
-#         self.assertIntervalIn(0, 1, 3, split_intervals) # the
-#         self.assertIntervalIn(0, 2, 2, split_intervals) # the cat
-#         #TODO: update this number (cat, sits)
-#         self.assertEqual(2, len(split_intervals))
+    def test_split_lcp_intervals_into_smaller_intervals_2(self):
+        collation = Collation()
+        collation.add_witness("W1", "the")
+        collation.add_witness("W2", "the cat")
+        collation.add_witness("W3", "the cat sits")
+        split_intervals = collation.split_lcp_intervals()
+        self.assertIntervalIn(0, 1, 3, split_intervals) # the
+        self.assertIntervalIn(2, 2, 2, split_intervals) # the cat
+        self.assertIntervalIn(3, 1, 2, split_intervals) # cat
+        self.assertEqual(3, len(split_intervals))
 
 #     def test_multiple_potential_blocks(self):
 #         collation = Collation()
