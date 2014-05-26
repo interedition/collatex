@@ -336,9 +336,7 @@ class Collation(object):
                     break
     
     def get_non_overlapping_repeating_blocks(self):
-        potential_blocks = self.calculate_potential_blocks()
-        # TODO: activate!    
-#         potential_blocks = self.split_lcp_intervals() 
+        potential_blocks = self.split_lcp_intervals() 
         self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
@@ -357,6 +355,8 @@ class Collation(object):
                     real_blocks.append(Block(non_overlapping_range))
             except PartialOverlapException:          
                 print("Skip due to conflict: "+str(potential_block))
+                if potential_block.minimum_block_length == 1:
+                    continue
                 # retry with a different length: one less
                 for idx in range(potential_block.start+1, potential_block.end+1):
                     potential_block.LCP[idx] -= 1
@@ -367,7 +367,7 @@ class Collation(object):
                         occupied.union_update(non_overlapping_range)
                         real_blocks.append(Block(non_overlapping_range))
                 except PartialOverlapException:          
-                    print("Failed again")
+                    print("Retried and failed again")
         return real_blocks
 
     def get_block_witness(self, witness):
