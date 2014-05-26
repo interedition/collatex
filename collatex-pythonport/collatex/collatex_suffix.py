@@ -11,11 +11,29 @@ from collatex.linsuffarr import SuffixArray
 
 class LCPInterval(object):
     
-    def __init__(self, LCP, begin, end):
+    def __init__(self, tokens, SA, LCP, begin, end):
+        self.tokens = tokens
+        self.SA = SA
         self.LCP = LCP
-        self.start_position = begin
-        self.end_position = end
+        self.start = begin
+        self.end = end
 
+    @property
+    def minimum_block_length(self):
+        #NOTE: LCP intervals can be ascending or descending.
+        return min(self.LCP[self.start+1], self.LCP[self.end])
+
+    def show_lcp_array(self):
+        return self.LCP[self.start:self.end+1]
+        
+    def list_prefixes(self):
+        for idx in range(self.start, self.end + 1):
+            if self.LCP[idx] > 0:
+                prefix = " ".join(self.tokens[self.SA[idx]:self.SA[idx]+self.LCP[idx]])
+                print(prefix)
+    
+    def __str__(self):
+        return "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> and length: "+str(self.minimum_block_length)
 
 class PartialOverlapException(Exception):
     pass
@@ -92,6 +110,36 @@ class LCPSubinterval(object):
         if first_range[-1]-first_range[0]+1>self.minimum_block_length:
             raise PartialOverlapException()
         return real_block_range
+    
+    # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend.
+    # NOTE:The case of descending and then ascending is already handled in the sub_intervals method
+    def split_into_smaller_intervals(self):
+        result = []
+        array = self.show_lcp_array()
+        print("LCP array is "+str(array))
+        previous_lcp_value = 0
+        open_intervals = []
+        for idx in range(self.start+1, self.end+1):
+            lcp_value = self.LCP[idx]
+            if lcp_value > previous_lcp_value:
+                open_intervals.append((idx-1, lcp_value))
+                previous_lcp_value = lcp_value
+            if lcp_value < previous_lcp_value:
+                # close open intervals that are larger than current lcp_value
+                for start, length in open_intervals:
+                    if length > lcp_value:
+                        result.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, idx-1, self.number_of_siblings, self.parent_lcp_interval))
+                        print("new: "+repr(result[-1]))
+                        open_intervals.remove((start, length))
+                # then: open a new interval starting with start filter open intervals.
+                start = next(closed_interval.start for closed_interval in result if closed_interval.minimum_block_length >= lcp_value)
+                open_intervals.append((start, lcp_value))
+                previous_lcp_value = lcp_value
+        # add all the open intervals to the result
+        for start, length in open_intervals:
+            result.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, self.end, self.number_of_siblings, self.parent_lcp_interval))
+            print("new: "+repr(result[-1]))
+        return result
 
     def show_lcp_array(self):
         return self.LCP[self.start:self.end+1]
@@ -203,6 +251,10 @@ class Collation(object):
 
     # Note: LCP intervals can overlap.. for now we solve this with a two pass algorithm
     def get_lcp_intervals(self, lcp = None):
+        # NOTE: Tokenizer is for debug reasons only!
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string()) 
+        SA = self.get_sa().SA
         lcp = lcp if lcp else self.get_lcp_array()
         parent_lcp_intervals = []
         # first detect the intervals based on zero's
@@ -213,13 +265,13 @@ class Collation(object):
                 start_position = index
             if prefix == 0 and not previous_prefix == 0:
                 # first end last interval
-                parent_lcp_intervals.append(LCPInterval(lcp, start_position, index-1))
+                parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, index-1))
                 # create new interval
                 start_position = index 
             previous_prefix = prefix
         # add the final interval
         #NOTE: this one can be empty?
-        parent_lcp_intervals.append(LCPInterval(lcp, start_position, len(lcp)-1))    
+        parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, len(lcp)-1))    
         return parent_lcp_intervals
 
     def calculate_sub_lcp_intervals(self, lcp, parent_lcp_intervals):
@@ -232,7 +284,7 @@ class Collation(object):
             child_lcp_intervals = []
             child_interval_start = None
             previous_prefix = 0
-            for index in range(lcp_interval.start_position, lcp_interval.end_position+1):
+            for index in range(lcp_interval.start, lcp_interval.end+1):
                 prefix = lcp[index]
                 if prefix > previous_prefix and lcp[index-2] >= previous_prefix:
                     # first end last interval
@@ -243,7 +295,7 @@ class Collation(object):
                 previous_prefix = prefix 
             # add the final interval
             #NOTE: this one can be empty?
-            child_lcp_intervals.append((child_interval_start, lcp_interval.end_position))
+            child_lcp_intervals.append((child_interval_start, lcp_interval.end))
             
             # add all the child_lcp_intervals to the sub_lcp_intervals list
             # with as third parameter the number of parent prefix occurrences
@@ -256,27 +308,8 @@ class Collation(object):
         lcp_intervals = self.calculate_potential_blocks()
         result = []
         for lcp_interval in lcp_intervals:
-            array = lcp_interval.show_lcp_array()
-            print("LCP array is "+str(array))
-            # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend.
-            # NOTE:The case of descending and then ascending is already handled in the sub_intervals method
-            # Make sure that the LCP array is ascending!
-            if lcp_interval.LCP[lcp_interval.start+1] > lcp_interval.LCP[lcp_interval.end]:
-                print("LCP array is descending: ")
-                lcp_interval.list_prefixes()
-                result.append(lcp_interval)
-                continue
-            # now we need to build up a stack of open intervals
-            previous_lcp_value = 0
-            open_intervals = []
-            for idx in range(lcp_interval.start+1, lcp_interval.end+1):
-                lcp_value = lcp_interval.LCP[idx]
-                if lcp_value > previous_lcp_value:
-                    open_intervals.append(idx-1)
-                    previous_lcp_value = lcp_value
-            for o_i in open_intervals:
-                result.append(LCPSubinterval(lcp_interval.tokens, lcp_interval.SA, lcp_interval.LCP, o_i, lcp_interval.end, lcp_interval.number_of_siblings, lcp_interval.parent_lcp_interval))
-                print("new: "+str(result[-1]))
+            intervals = lcp_interval.split_into_smaller_intervals()
+            result.extend(intervals)
         return result
         
         
@@ -305,7 +338,7 @@ class Collation(object):
     def get_non_overlapping_repeating_blocks(self):
         potential_blocks = self.calculate_potential_blocks()
         # TODO: activate!    
-        # potential_blocks = self.split_lcp_intervals() 
+#         potential_blocks = self.split_lcp_intervals() 
         self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
@@ -356,10 +389,16 @@ class Collation(object):
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=methodcaller('lower_end'))
         #TODO: complete set of witnesses is retokenized here!
+        block_witness = BlockWitness(sorted_o, self.tokens())
+        return block_witness
+
+    
+    def tokens(self):
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string())
-        block_witness = BlockWitness(sorted_o, tokens)
-        return block_witness
+        return tokens
+    
+    
     
 
 # not used

@@ -5,7 +5,8 @@ Created on Apr 27, 2014
 '''
 import unittest
 from ClusterShell.RangeSet import RangeSet
-from collatex.collatex_suffix import Collation, Block
+from collatex.collatex_suffix import Collation, Block, LCPSubinterval
+from array import array
 
 class Test(unittest.TestCase):
     def assertIntervalIn(self, start, length, nr_of_occurrences, intervals):
@@ -150,6 +151,7 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(1, 1, 3, split_intervals) # cat
         self.assertEqual(2, len(split_intervals))
         
+    # LCP interval is ascending
     def test_split_lcp_intervals_into_smaller_intervals_2(self):
         collation = Collation()
         collation.add_witness("W1", "the")
@@ -161,19 +163,15 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(3, 1, 2, split_intervals) # cat
         self.assertEqual(3, len(split_intervals))
 
-#     def test_multiple_potential_blocks(self):
-#         collation = Collation()
-#         collation.add_witness("W1", "the")
-#         collation.add_witness("w2", "the black")
-#         collation.add_witness("w3", "the black cat")
-#         collation.add_witness("w4", "the black cat sits")
-#         collation.add_witness("w5", "the black cat sits on")
-#         collation.add_witness("w6", "the black cat sits on a")
-#         potential_blocks = collation.calculate_potential_blocks()
-#         for pb in potential_blocks:
-#             pb.list_prefixes()
-#         self.fail("TESTING")
-
+    def test_split_lcp_intervals_descending_LCP(self):
+        lcp_array = array('i', [0, 20, 20, 20, 4])
+        sa_array = array('i', [0, 1, 2, 3, 4]) # FAKED!
+        lcp_interval = LCPSubinterval(None, sa_array, lcp_array, 0, 4, 0, None)
+        split_intervals = lcp_interval.split_into_smaller_intervals()
+        self.assertIntervalIn(0, 20, 4, split_intervals)
+        self.assertIntervalIn(0, 4, 5, split_intervals)
+        self.assertEqual(2, len(split_intervals))
+        
 #     def test_filter_potential_blocks(self):
 #         collation = Collation()
 #         collation.add_witness("W1", "the fox jumps over the fox")
