@@ -9,6 +9,16 @@ from operator import methodcaller, attrgetter
 from collatex.collatex_core import Witness, VariantGraph, Tokenizer
 from collatex.linsuffarr import SuffixArray
 
+class Stack(list):
+    def push(self, item):
+        self.append(item)
+        
+    def peek(self):
+        return self[-1]
+    
+    def isEmpty(self):
+        return not self
+    
 class LCPInterval(object):
     
     def __init__(self, tokens, SA, LCP, begin, end):
@@ -114,32 +124,34 @@ class LCPSubinterval(object):
     # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend.
     # NOTE:The case of descending and then ascending is already handled in the sub_intervals method
     def split_into_smaller_intervals(self):
-        result = []
-        array = self.show_lcp_array()
-        print("LCP array is "+str(array))
+        closed_intervals = []
+#         array = self.show_lcp_array()
+#         print("LCP array is "+str(array))
         previous_lcp_value = 0
-        open_intervals = []
+        open_intervals = Stack()
         for idx in range(self.start+1, self.end+1):
             lcp_value = self.LCP[idx]
+#             print(lcp_value)
             if lcp_value > previous_lcp_value:
-                open_intervals.append((idx-1, lcp_value))
+                open_intervals.push((idx-1, lcp_value))
                 previous_lcp_value = lcp_value
             if lcp_value < previous_lcp_value:
                 # close open intervals that are larger than current lcp_value
-                for start, length in open_intervals:
-                    if length > lcp_value:
-                        result.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, idx-1, self.number_of_siblings, self.parent_lcp_interval))
-                        print("new: "+repr(result[-1]))
-                        open_intervals.remove((start, length))
+                while not open_intervals.isEmpty() and open_intervals.peek()[1] > lcp_value:
+#                     print("Peek: "+str(open_intervals.peek()))
+                    (start, _) = open_intervals.pop()
+                    closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, idx-1, self.number_of_siblings, self.parent_lcp_interval))
+#                     print("new: "+repr(closed_intervals[-1]))
                 # then: open a new interval starting with start filter open intervals.
-                start = next(closed_interval.start for closed_interval in result if closed_interval.minimum_block_length >= lcp_value)
-                open_intervals.append((start, lcp_value))
+                start = closed_intervals[-1].start
+                open_intervals.push((start, lcp_value))
                 previous_lcp_value = lcp_value
         # add all the open intervals to the result
-        for start, length in open_intervals:
-            result.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, self.end, self.number_of_siblings, self.parent_lcp_interval))
-            print("new: "+repr(result[-1]))
-        return result
+#         print("Closing remaining:")
+        for start, _ in open_intervals:
+            closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, self.end, self.number_of_siblings, self.parent_lcp_interval))
+#             print("new: "+repr(closed_intervals[-1]))
+        return closed_intervals
 
     def show_lcp_array(self):
         return self.LCP[self.start:self.end+1]
@@ -333,6 +345,12 @@ class Collation(object):
                 if len(inter)> potential_block.minimum_block_length:
                     print("Removing block: "+str(potential_block))
                     potential_blocks.remove(potential_block)
+#                     print("Before:")
+#                     potential_block.list_prefixes()
+#                     print("After:")
+#                     split = potential_block.split_into_smaller_intervals()
+#                     for interval in split:
+#                         print(str(interval))
                     break
     
     def get_non_overlapping_repeating_blocks(self):
@@ -355,19 +373,20 @@ class Collation(object):
                     real_blocks.append(Block(non_overlapping_range))
             except PartialOverlapException:          
                 print("Skip due to conflict: "+str(potential_block))
-                if potential_block.minimum_block_length == 1:
-                    continue
-                # retry with a different length: one less
-                for idx in range(potential_block.start+1, potential_block.end+1):
-                    potential_block.LCP[idx] -= 1
-                try:
-                    non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
-                    if non_overlapping_range:
-                        print("Retried and selecting: "+str(potential_block))
-                        occupied.union_update(non_overlapping_range)
-                        real_blocks.append(Block(non_overlapping_range))
-                except PartialOverlapException:          
-                    print("Retried and failed again")
+                condition = True # to fake do ... while
+                while potential_block.minimum_block_length > 1:
+                    # retry with a different length: one less
+                    for idx in range(potential_block.start+1, potential_block.end+1):
+                        potential_block.LCP[idx] -= 1
+                    try:
+                        non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+                        if non_overlapping_range:
+                            print("Retried and selecting: "+str(potential_block))
+                            occupied.union_update(non_overlapping_range)
+                            real_blocks.append(Block(non_overlapping_range))
+                            break
+                    except PartialOverlapException:          
+                        print("Retried and failed again")
         return real_blocks
 
     def get_block_witness(self, witness):

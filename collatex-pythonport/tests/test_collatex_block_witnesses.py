@@ -140,7 +140,8 @@ class Test(unittest.TestCase):
         potential_blocks = collation.calculate_potential_blocks()
         collation.filter_potential_blocks(potential_blocks)
         self.assertFalse(potential_blocks)
-        
+    
+    # LCP interval is not ascending nor descending    
     def test_split_lcp_intervals_into_smaller_intervals(self):
         collation = Collation()
         collation.add_witness("W1", "the cat")
@@ -163,6 +164,7 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(3, 1, 2, split_intervals) # cat
         self.assertEqual(3, len(split_intervals))
 
+    # LCP interval is descending
     def test_split_lcp_intervals_descending_LCP(self):
         lcp_array = array('i', [0, 20, 20, 20, 4])
         sa_array = array('i', [0, 1, 2, 3, 4]) # FAKED!
@@ -171,6 +173,19 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(0, 20, 4, split_intervals)
         self.assertIntervalIn(0, 4, 5, split_intervals)
         self.assertEqual(2, len(split_intervals))
+        
+    # LCP interval is first ascending, then descending
+    def test_split_lcp_intervals_ascending_then_descending_LCP(self):
+        lcp_array = array('i', [0, 10, 149, 93, 7, 1])
+        sa_array = array('i', [0, 1, 2, 3, 4, 5]) # FAKED!
+        lcp_interval = LCPSubinterval(None, sa_array, lcp_array, 0, 5, 0, None)
+        split_intervals = lcp_interval.split_into_smaller_intervals()
+        self.assertIntervalIn(0, 10, 4, split_intervals)
+        self.assertIntervalIn(1, 149, 2, split_intervals)
+        self.assertIntervalIn(1, 93, 3, split_intervals)
+        self.assertIntervalIn(0, 7, 5, split_intervals)
+        self.assertIntervalIn(0, 1, 6, split_intervals)
+        self.assertEqual(5, len(split_intervals))
         
 #     def test_filter_potential_blocks(self):
 #         collation = Collation()
