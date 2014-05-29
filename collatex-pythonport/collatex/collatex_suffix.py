@@ -54,19 +54,19 @@ class PartialOverlapException(Exception):
 # block_occurrences: the ranges within the suffix array that this block spans
 class LCPSubinterval(object):
     
-    def __init__(self, tokens, SA, LCP, start, end, number_of_siblings, parent_lcp_interval):
+    def __init__(self, tokens, SA, LCP, start, end, length, number_of_siblings, parent_lcp_interval):
         self.tokens = tokens
         self.SA = SA
         self.LCP = LCP
         self.start = start
         self.end = end
+        self.length = length
         self.number_of_siblings = number_of_siblings
         self.parent_lcp_interval = parent_lcp_interval
         
     @property
     def minimum_block_length(self):
-        #NOTE: LCP intervals can be ascending or descending.
-        return min(self.LCP[self.start+1], self.LCP[self.end])
+        return self.length
     
     @property
     def number_of_occurrences(self):
@@ -139,8 +139,8 @@ class LCPSubinterval(object):
                 # close open intervals that are larger than current lcp_value
                 while not open_intervals.isEmpty() and open_intervals.peek()[1] > lcp_value:
 #                     print("Peek: "+str(open_intervals.peek()))
-                    (start, _) = open_intervals.pop()
-                    closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, idx-1, self.number_of_siblings, self.parent_lcp_interval))
+                    (start, length) = open_intervals.pop()
+                    closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, idx-1, length, self.number_of_siblings, self.parent_lcp_interval))
 #                     print("new: "+repr(closed_intervals[-1]))
                 # then: open a new interval starting with start filter open intervals.
                 start = closed_intervals[-1].start
@@ -148,8 +148,8 @@ class LCPSubinterval(object):
                 previous_lcp_value = lcp_value
         # add all the open intervals to the result
 #         print("Closing remaining:")
-        for start, _ in open_intervals:
-            closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, self.end, self.number_of_siblings, self.parent_lcp_interval))
+        for start, length in open_intervals:
+            closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, self.end, length, self.number_of_siblings, self.parent_lcp_interval))
 #             print("new: "+repr(closed_intervals[-1]))
         return closed_intervals
 
@@ -294,33 +294,28 @@ class Collation(object):
         sub_lcp_intervals = []
         for lcp_interval in parent_lcp_intervals:
             child_lcp_intervals = []
-            child_interval_start = None
-            previous_prefix = 0
-            for index in range(lcp_interval.start, lcp_interval.end+1):
-                prefix = lcp[index]
-                if prefix > previous_prefix and lcp[index-2] >= previous_prefix:
-                    # first end last interval
-                    if child_interval_start:
-                        child_lcp_intervals.append((child_interval_start, index - 2))
-                    # create new interval
-                    child_interval_start = index - 1
-                previous_prefix = prefix 
-            # add the final interval
-            #NOTE: this one can be empty?
-            child_lcp_intervals.append((child_interval_start, lcp_interval.end))
+            child_lcp_intervals.append((lcp_interval.start, lcp_interval.end))
             
             # add all the child_lcp_intervals to the sub_lcp_intervals list
             # with as third parameter the number of parent prefix occurrences
             for start, end in child_lcp_intervals:
-                sub_lcp_intervals.append(LCPSubinterval(tokens, SA, lcp, start, end, len(child_lcp_intervals), lcp_interval))
+                length =  min(SA[start+1], SA[end])
+                sub_lcp_intervals.append(LCPSubinterval(tokens, SA, lcp, start, end, length, len(child_lcp_intervals), lcp_interval))
         return sub_lcp_intervals
 
 
     def split_lcp_intervals(self):
         lcp_intervals = self.calculate_potential_blocks()
+#         for lcp_interval in lcp_intervals:
+#         assert(False)
+            
         result = []
         for lcp_interval in lcp_intervals:
+#             print("New interval: "+str(lcp_interval.show_lcp_array()))
+#             lcp_interval.list_prefixes()
             intervals = lcp_interval.split_into_smaller_intervals()
+#             for result_s in intervals:
+#                 print(repr(result_s))
             result.extend(intervals)
         return result
         
@@ -337,12 +332,12 @@ class Collation(object):
 
     # filter out all the blocks that have more than one occurrence within a witness
     def filter_potential_blocks(self, potential_blocks):
-        for potential_block in potential_blocks:
+        for potential_block in potential_blocks[:]:
             for witness in self.witnesses:
                 witness_sigil = witness.sigil
                 witness_range = self.get_range_for_witness(witness_sigil)
                 inter = witness_range.intersection(potential_block.block_occurrences())
-                if len(inter)> potential_block.minimum_block_length:
+                if potential_block.number_of_occurrences > len(self.witnesses) or len(inter)> potential_block.minimum_block_length:
                     print("Removing block: "+str(potential_block))
                     potential_blocks.remove(potential_block)
 #                     print("Before:")
@@ -378,6 +373,7 @@ class Collation(object):
                     # retry with a different length: one less
                     for idx in range(potential_block.start+1, potential_block.end+1):
                         potential_block.LCP[idx] -= 1
+                    potential_block.length -= 1
                     try:
                         non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
                         if non_overlapping_range:
