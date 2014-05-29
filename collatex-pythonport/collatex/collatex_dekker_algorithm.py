@@ -56,6 +56,15 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             # step 10: align and merge witness
             alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
             token_to_vertex = self.merge(graph, fifth_witness.sigil, fifth_witness.tokens(), alignment)
+            self._build_occurrences_to_vertices(collation, fifth_witness, token_to_vertex, graph_occurrence_to_vertices)    
+        # step: add sixth witness
+        if len(collation.witnesses)>5:
+            sixth_witness = collation.witnesses[5]
+            block_witness = collation.get_block_witness(sixth_witness)
+            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, sixth_witness, block_witness)
+            # step: align and merge witness
+            alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
+            token_to_vertex = self.merge(graph, sixth_witness.sigil, sixth_witness.tokens(), alignment)
             # self._build_occurrences_to_vertices(collation, fifth_witness, token_to_vertex, graph_occurrence_to_vertices)    
         
     #===========================================================================

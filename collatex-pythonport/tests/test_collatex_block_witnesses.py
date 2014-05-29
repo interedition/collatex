@@ -187,6 +187,19 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(0, 1, 6, split_intervals)
         self.assertEqual(5, len(split_intervals))
         
+    def test_split_lcp_intervals_ascending_descending_ascending(self):
+        lcp_array =  array('i', [0, 4, 143, 87, 1, 1, 12, 93, 93, 37])
+        sa_array = array('i', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) # FAKED!
+        lcp_interval = LCPSubinterval(None, sa_array, lcp_array, 0, 9, 9, 0, None)
+        split_intervals = lcp_interval.split_into_smaller_intervals()
+        self.assertIntervalIn(1, 143, 2, split_intervals)
+        self.assertIntervalIn(1, 87, 3, split_intervals)
+        self.assertIntervalIn(0, 4, 4, split_intervals)
+        self.assertIntervalIn(6, 93, 3, split_intervals)
+        self.assertIntervalIn(0, 1, 10, split_intervals)
+        self.assertIntervalIn(5, 12, 5, split_intervals)
+        self.assertIntervalIn(6, 37, 4, split_intervals)
+        
 #     def test_filter_potential_blocks(self):
 #         collation = Collation()
 #         collation.add_witness("W1", "the fox jumps over the fox")
