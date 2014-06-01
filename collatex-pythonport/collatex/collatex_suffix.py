@@ -5,7 +5,7 @@ Created on Apr 7, 2014
 '''
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
-from operator import methodcaller, attrgetter
+from operator import attrgetter
 from collatex.collatex_core import Witness, VariantGraph, Tokenizer
 from collatex.linsuffarr import SuffixArray
 
@@ -172,6 +172,7 @@ class Occurrence(object):
     def __repr__(self):
         return str(self.token_range)
     
+    @property
     def lower_end(self):
         return self.token_range[0]
     
@@ -315,7 +316,7 @@ class Collation(object):
                 occurrence = Occurrence(block_range, block)
                 occurrences.append(occurrence) 
         # sort occurrences on position
-        sorted_o = sorted(occurrences, key=methodcaller('lower_end'))
+        sorted_o = sorted(occurrences, key=attrgetter('lower_end'))
         block_witness = BlockWitness(sorted_o, self.tokens)
         return block_witness
 
@@ -326,21 +327,6 @@ class Collation(object):
         tokens = tokenizer.tokenize(self.get_combined_string())
         return tokens
     
-    
-    
-
-# not used
-# external suffix library is used    
-class Suffix(object):
-    
-    #generate suffixes from a list of tokens
-    def gather_suffices(self, tokens):
-        i = 0
-        suffixes = []
-        for _ in tokens:
-            suffixes.append(tokens[i:])
-            i=i+1
-        return suffixes
     
 
 
