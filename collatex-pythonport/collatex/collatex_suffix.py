@@ -16,12 +16,54 @@ class Stack(list):
     def peek(self):
         return self[-1]
     
-    def isEmpty(self):
-        return not self
-    
 class PartialOverlapException(Exception):
     pass
 
+class ExtendedSuffixArray(object):
+    
+    def __init__(self, tokens, sa_array, lcp_array):
+        self.tokens = tokens
+        self.SA = sa_array
+        self.LCP = lcp_array
+
+    # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend. 4) descend, ascend
+    def split_lcp_array_into_intervals(self):
+        closed_intervals = []
+        previous_lcp_value = 0
+        open_intervals = Stack()
+        for idx in range(0, len(self.LCP)):
+            lcp_value = self.LCP[idx]
+#             print(lcp_value)
+            if lcp_value > previous_lcp_value:
+                open_intervals.push((idx-1, lcp_value))
+                previous_lcp_value = lcp_value
+            if lcp_value < previous_lcp_value:
+                # close open intervals that are larger than current lcp_value
+                while open_intervals and open_intervals.peek()[1] > lcp_value:
+#                     print("Peek: "+str(open_intervals.peek()))
+                    (start, length) = open_intervals.pop()
+                    #TODO: FIX NUMBER OF SIBLINGS!
+                    closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, idx-1, length, 0))
+#                     print("new: "+repr(closed_intervals[-1]))
+                # then: open a new interval starting with start filter open intervals.
+                start = closed_intervals[-1].start
+                open_intervals.push((start, lcp_value))
+                previous_lcp_value = lcp_value
+        # add all the open intervals to the result
+#         print("Closing remaining:")
+        for start, length in open_intervals:
+            #TODO: FIX NUMBER OF SIBLINGS!
+            closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, len(self.LCP)-1, length, 0))
+#             print("new: "+repr(closed_intervals[-1]))
+        return closed_intervals
+
+    def list_prefixes(self):
+        for idx in range(0, len(self.LCP)):
+            if self.LCP[idx] > 0:
+                prefix = " ".join(self.tokens[self.SA[idx]:self.SA[idx]+self.LCP[idx]])
+                print(prefix)
+            else:
+                print("--------")
 
 # parts of the LCP array become potential blocks.
 # minimum block_length: the number of tokens a single occurrence of this block spans
@@ -53,12 +95,6 @@ class LCPInterval(object):
 
     def info(self):
         return "looking at: "+str(self)
-    
-    def list_prefixes(self):
-        for idx in range(self.start, self.end + 1):
-            if self.LCP[idx] > 0:
-                prefix = " ".join(self.tokens[self.SA[idx]:self.SA[idx]+self.LCP[idx]])
-                print(prefix)
     
     @property            
     def token_start_position(self):
@@ -94,43 +130,12 @@ class LCPInterval(object):
             raise PartialOverlapException()
         return real_block_range
     
-    # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend.
-    # NOTE:The case of descending and then ascending is already handled in the sub_intervals method
-    def split_into_smaller_intervals(self):
-        closed_intervals = []
-#         array = self.show_lcp_array()
-#         print("LCP array is "+str(array))
-        previous_lcp_value = 0
-        open_intervals = Stack()
-        for idx in range(self.start+1, self.end+1):
-            lcp_value = self.LCP[idx]
-#             print(lcp_value)
-            if lcp_value > previous_lcp_value:
-                open_intervals.push((idx-1, lcp_value))
-                previous_lcp_value = lcp_value
-            if lcp_value < previous_lcp_value:
-                # close open intervals that are larger than current lcp_value
-                while not open_intervals.isEmpty() and open_intervals.peek()[1] > lcp_value:
-#                     print("Peek: "+str(open_intervals.peek()))
-                    (start, length) = open_intervals.pop()
-                    closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, idx-1, length, self.number_of_siblings))
-#                     print("new: "+repr(closed_intervals[-1]))
-                # then: open a new interval starting with start filter open intervals.
-                start = closed_intervals[-1].start
-                open_intervals.push((start, lcp_value))
-                previous_lcp_value = lcp_value
-        # add all the open intervals to the result
-#         print("Closing remaining:")
-        for start, length in open_intervals:
-            closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, self.end, length, self.number_of_siblings))
-#             print("new: "+repr(closed_intervals[-1]))
-        return closed_intervals
-
     def show_lcp_array(self):
         return self.LCP[self.start:self.end+1]
         
     def __str__(self):
-        return "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
+        part1= "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])
+        return part1+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
  
     def __repr__(self):
         return "LCPivl: "+str(self.token_start_position)+","+str(self.minimum_block_length)+","+str(self.number_of_occurrences)
@@ -227,82 +232,17 @@ class Collation(object):
         return self.combined_string
 
     def get_sa(self):
+        #TODO: make this lazy!
         return SuffixArray(self.combined_string)
+
+    def get_suffix_array(self):
+        sa = self.get_sa()
+        return sa.SA
 
     def get_lcp_array(self):
         sa = self.get_sa()
         return sa._LCP_values
     
-
-    # Note: LCP intervals can overlap.. for now we solve this with a two pass algorithm
-    def get_lcp_intervals(self, lcp = None):
-        # NOTE: Tokenizer is for debug reasons only!
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(self.get_combined_string()) 
-        SA = self.get_sa().SA
-        lcp = lcp if lcp else self.get_lcp_array()
-        parent_lcp_intervals = []
-        # first detect the intervals based on zero's
-        start_position = 0
-        previous_prefix = 0
-        for index, prefix in enumerate(lcp):
-            if prefix == 0 and previous_prefix == 0:
-                start_position = index
-            if prefix == 0 and not previous_prefix == 0:
-                # first end last interval
-                parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, index-1, 0, 0))
-                # create new interval
-                start_position = index 
-            previous_prefix = prefix
-        # add the final interval
-        #NOTE: this one can be empty?
-        parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, len(lcp)-1, 0, 0))    
-        return parent_lcp_intervals
-
-    def calculate_sub_lcp_intervals(self, lcp, parent_lcp_intervals):
-        # NOTE: Tokenizer is for debug reasons only!
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(self.get_combined_string()) 
-        SA = self.get_sa().SA
-        sub_lcp_intervals = []
-        for lcp_interval in parent_lcp_intervals:
-            child_lcp_intervals = []
-            child_lcp_intervals.append((lcp_interval.start, lcp_interval.end))
-            
-            # add all the child_lcp_intervals to the sub_lcp_intervals list
-            # with as third parameter the number of parent prefix occurrences
-            for start, end in child_lcp_intervals:
-                length =  min(SA[start+1], SA[end])
-                sub_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start, end, length, len(child_lcp_intervals)))
-        return sub_lcp_intervals
-
-
-    def split_lcp_intervals(self):
-        lcp_intervals = self.calculate_potential_blocks()
-#         for lcp_interval in lcp_intervals:
-#         assert(False)
-            
-        result = []
-        for lcp_interval in lcp_intervals:
-#             print("New interval: "+str(lcp_interval.show_lcp_array()))
-#             lcp_interval.list_prefixes()
-            intervals = lcp_interval.split_into_smaller_intervals()
-#             for result_s in intervals:
-#                 print(repr(result_s))
-            result.extend(intervals)
-        return result
-        
-        
-    def calculate_potential_blocks(self):
-        # step 1: calculate the sub LCP intervals
-        lcp = self.get_lcp_array()
-        lcp_intervals = self.get_lcp_intervals()
-        sub_lcp_intervals = self.calculate_sub_lcp_intervals(lcp, lcp_intervals) 
-        # step 2: process the LCP sub intervals
-        # and generate more potential blocks
-        # TODO: more blocks can be generated here
-        return sub_lcp_intervals
-
     # filter out all the blocks that have more than one occurrence within a witness
     def filter_potential_blocks(self, potential_blocks):
         for potential_block in potential_blocks[:]:
@@ -322,7 +262,8 @@ class Collation(object):
                     break
     
     def get_non_overlapping_repeating_blocks(self):
-        potential_blocks = self.split_lcp_intervals() 
+        extended_suffix_array = ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
+        potential_blocks = extended_suffix_array.split_lcp_array_into_intervals() 
         self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
         # second length of LCP interval,
@@ -341,7 +282,6 @@ class Collation(object):
                     real_blocks.append(Block(non_overlapping_range))
             except PartialOverlapException:          
                 print("Skip due to conflict: "+str(potential_block))
-                condition = True # to fake do ... while
                 while potential_block.minimum_block_length > 1:
                     # retry with a different length: one less
                     for idx in range(potential_block.start+1, potential_block.end+1):
@@ -376,12 +316,12 @@ class Collation(object):
                 occurrences.append(occurrence) 
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=methodcaller('lower_end'))
-        #TODO: complete set of witnesses is retokenized here!
-        block_witness = BlockWitness(sorted_o, self.tokens())
+        block_witness = BlockWitness(sorted_o, self.tokens)
         return block_witness
 
-    
+    @property
     def tokens(self):
+        #TODO: complete set of witnesses is retokenized here!
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string())
         return tokens

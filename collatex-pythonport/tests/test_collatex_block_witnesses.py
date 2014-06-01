@@ -5,8 +5,11 @@ Created on Apr 27, 2014
 '''
 import unittest
 from ClusterShell.RangeSet import RangeSet
-from collatex.collatex_suffix import Collation, Block, LCPInterval
+from collatex.collatex_suffix import Collation, Block, ExtendedSuffixArray
 from array import array
+
+
+
 
 class Test(unittest.TestCase):
     def assertIntervalIn(self, start, length, nr_of_occurrences, intervals):
@@ -72,6 +75,7 @@ class Test(unittest.TestCase):
         block1 = Block(RangeSet("0-2, 4-6"))
         self.assertEqual([block1], blocks)
 
+    #TODO: Fix number of siblings!
     def test_blocks_failing_transposition_use_case_old_algorithm(self):
         collation = Collation()
         collation.add_witness("W1", "the cat and the dog")
@@ -97,8 +101,8 @@ class Test(unittest.TestCase):
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
         blocks = collation.get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-3, 16-19, 30-33")), blocks) # a b c d
-        self.assertIn(Block(RangeSet("5-8, 21-24, 35-38")), blocks) # g h i !
-        self.assertIn(Block(RangeSet("11-14, 25-28, 39-42")), blocks) # q r s t
+        self.assertIn(Block(RangeSet("5-7, 21-23, 35-37")), blocks) # g h i
+        self.assertIn(Block(RangeSet("10-14, 24-28, 38-42")), blocks) # ! q r s t
         self.assertIn(Block(RangeSet("4, 20")), blocks) # F
         
 
@@ -127,17 +131,17 @@ class Test(unittest.TestCase):
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
         block_witness1 = collation.get_block_witness(collation.witnesses[0])
-        self.assertEquals(["a b c d", "F", "g h i !", "q r s t"], block_witness1.debug())
+        self.assertEquals(["a b c d", "F", "g h i", "! q r s t"], block_witness1.debug())
         block_witness2 = collation.get_block_witness(collation.witnesses[1])
-        self.assertEquals(["a b c d", "F", "g h i !", "q r s t"], block_witness2.debug())
+        self.assertEquals(["a b c d", "F", "g h i", "! q r s t"], block_witness2.debug())
         block_witness3 = collation.get_block_witness(collation.witnesses[2])
-        self.assertEquals(["a b c d", "g h i !", "q r s t"], block_witness3.debug())
+        self.assertEquals(["a b c d", "g h i", "! q r s t"], block_witness3.debug())
         
     def test_filter_potential_blocks(self):
         collation = Collation()
         collation.add_witness("W1", "a a")
         collation.add_witness("w2", "a")
-        potential_blocks = collation.calculate_potential_blocks()
+        potential_blocks = collation.split_lcp_array_into_intervals()
         collation.filter_potential_blocks(potential_blocks)
         self.assertFalse(potential_blocks)
     
@@ -168,8 +172,8 @@ class Test(unittest.TestCase):
     def test_split_lcp_intervals_descending_LCP(self):
         lcp_array = array('i', [0, 20, 20, 20, 4])
         sa_array = array('i', [0, 1, 2, 3, 4]) # FAKED!
-        lcp_interval = LCPInterval(None, sa_array, lcp_array, 0, 4, 0, None)
-        split_intervals = lcp_interval.split_into_smaller_intervals()
+        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
+        split_intervals = extsuffarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 20, 4, split_intervals)
         self.assertIntervalIn(0, 4, 5, split_intervals)
         self.assertEqual(2, len(split_intervals))
@@ -178,8 +182,8 @@ class Test(unittest.TestCase):
     def test_split_lcp_intervals_ascending_then_descending_LCP(self):
         lcp_array = array('i', [0, 10, 149, 93, 7, 1])
         sa_array = array('i', [0, 1, 2, 3, 4, 5]) # FAKED!
-        lcp_interval = LCPInterval(None, sa_array, lcp_array, 0, 5, 0, None)
-        split_intervals = lcp_interval.split_into_smaller_intervals()
+        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
+        split_intervals = extsuffarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 10, 4, split_intervals)
         self.assertIntervalIn(1, 149, 2, split_intervals)
         self.assertIntervalIn(1, 93, 3, split_intervals)
@@ -190,8 +194,8 @@ class Test(unittest.TestCase):
     def test_split_lcp_intervals_ascending_descending_ascending(self):
         lcp_array =  array('i', [0, 4, 143, 87, 1, 1, 12, 93, 93, 37])
         sa_array = array('i', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) # FAKED!
-        lcp_interval = LCPInterval(None, sa_array, lcp_array, 0, 9, 9, 0)
-        split_intervals = lcp_interval.split_into_smaller_intervals()
+        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
+        split_intervals = extsuffarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(1, 143, 2, split_intervals)
         self.assertIntervalIn(1, 87, 3, split_intervals)
         self.assertIntervalIn(0, 4, 4, split_intervals)
