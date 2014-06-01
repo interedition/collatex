@@ -141,7 +141,8 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "a a")
         collation.add_witness("w2", "a")
-        potential_blocks = collation.split_lcp_array_into_intervals()
+        extsufarr = collation.to_extended_suffix_array()
+        potential_blocks = extsufarr.split_lcp_array_into_intervals()
         collation.filter_potential_blocks(potential_blocks)
         self.assertFalse(potential_blocks)
     
@@ -151,10 +152,11 @@ class Test(unittest.TestCase):
         collation.add_witness("W1", "the cat")
         collation.add_witness("W2", "the cat")
         collation.add_witness("W3", "the cat")
-        split_intervals = collation.split_lcp_intervals()
+        extsufarr = collation.to_extended_suffix_array()
+        split_intervals = extsufarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 2, 3, split_intervals) # the cat
         self.assertIntervalIn(1, 1, 3, split_intervals) # cat
-        self.assertEqual(2, len(split_intervals))
+        self.assertEqual(2, len(split_intervals), "More items: "+str(split_intervals))
         
     # LCP interval is ascending
     def test_split_lcp_intervals_into_smaller_intervals_2(self):
@@ -162,11 +164,12 @@ class Test(unittest.TestCase):
         collation.add_witness("W1", "the")
         collation.add_witness("W2", "the cat")
         collation.add_witness("W3", "the cat sits")
-        split_intervals = collation.split_lcp_intervals()
+        extsufarr = collation.to_extended_suffix_array()
+        split_intervals = extsufarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 1, 3, split_intervals) # the
         self.assertIntervalIn(2, 2, 2, split_intervals) # the cat
         self.assertIntervalIn(3, 1, 2, split_intervals) # cat
-        self.assertEqual(3, len(split_intervals))
+        self.assertEqual(3, len(split_intervals), "More items: "+str(split_intervals))
 
     # LCP interval is descending
     def test_split_lcp_intervals_descending_LCP(self):
@@ -176,7 +179,7 @@ class Test(unittest.TestCase):
         split_intervals = extsuffarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 20, 4, split_intervals)
         self.assertIntervalIn(0, 4, 5, split_intervals)
-        self.assertEqual(2, len(split_intervals))
+        self.assertEqual(2, len(split_intervals), "More items: "+str(split_intervals))
         
     # LCP interval is first ascending, then descending
     def test_split_lcp_intervals_ascending_then_descending_LCP(self):
@@ -189,7 +192,7 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(1, 93, 3, split_intervals)
         self.assertIntervalIn(0, 7, 5, split_intervals)
         self.assertIntervalIn(0, 1, 6, split_intervals)
-        self.assertEqual(5, len(split_intervals))
+        self.assertEqual(5, len(split_intervals), "More items: "+str(split_intervals))
         
     def test_split_lcp_intervals_ascending_descending_ascending(self):
         lcp_array =  array('i', [0, 4, 143, 87, 1, 1, 12, 93, 93, 37])

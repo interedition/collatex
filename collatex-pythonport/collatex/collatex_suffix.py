@@ -46,8 +46,9 @@ class ExtendedSuffixArray(object):
                     closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, idx-1, length, 0))
 #                     print("new: "+repr(closed_intervals[-1]))
                 # then: open a new interval starting with start filter open intervals.
-                start = closed_intervals[-1].start
-                open_intervals.push((start, lcp_value))
+                if lcp_value > 0:
+                    start = closed_intervals[-1].start
+                    open_intervals.push((start, lcp_value))
                 previous_lcp_value = lcp_value
         # add all the open intervals to the result
 #         print("Closing remaining:")
@@ -261,9 +262,12 @@ class Collation(object):
 #                     for interval in split:
 #                         print(str(interval))
                     break
-    
+
+    def to_extended_suffix_array(self):
+        return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
+
     def get_non_overlapping_repeating_blocks(self):
-        extended_suffix_array = ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
+        extended_suffix_array = self.to_extended_suffix_array()
         potential_blocks = extended_suffix_array.split_lcp_array_into_intervals() 
         self.filter_potential_blocks(potential_blocks)
         # step 3: sort the blocks based on depth (number of repetitions) first,
