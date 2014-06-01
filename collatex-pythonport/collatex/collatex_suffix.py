@@ -19,42 +19,16 @@ class Stack(list):
     def isEmpty(self):
         return not self
     
-class LCPInterval(object):
-    
-    def __init__(self, tokens, SA, LCP, begin, end):
-        self.tokens = tokens
-        self.SA = SA
-        self.LCP = LCP
-        self.start = begin
-        self.end = end
-
-    @property
-    def minimum_block_length(self):
-        #NOTE: LCP intervals can be ascending or descending.
-        return min(self.LCP[self.start+1], self.LCP[self.end])
-
-    def show_lcp_array(self):
-        return self.LCP[self.start:self.end+1]
-        
-    def list_prefixes(self):
-        for idx in range(self.start, self.end + 1):
-            if self.LCP[idx] > 0:
-                prefix = " ".join(self.tokens[self.SA[idx]:self.SA[idx]+self.LCP[idx]])
-                print(prefix)
-    
-    def __str__(self):
-        return "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])+"> and length: "+str(self.minimum_block_length)
-
 class PartialOverlapException(Exception):
     pass
 
 
 # parts of the LCP array become potential blocks.
-# block_length: the number of tokens a single occurrence of this block spans
+# minimum block_length: the number of tokens a single occurrence of this block spans
 # block_occurrences: the ranges within the suffix array that this block spans
-class LCPSubinterval(object):
+class LCPInterval(object):
     
-    def __init__(self, tokens, SA, LCP, start, end, length, number_of_siblings, parent_lcp_interval):
+    def __init__(self, tokens, SA, LCP, start, end, length, number_of_siblings):
         self.tokens = tokens
         self.SA = SA
         self.LCP = LCP
@@ -62,7 +36,6 @@ class LCPSubinterval(object):
         self.end = end
         self.length = length
         self.number_of_siblings = number_of_siblings
-        self.parent_lcp_interval = parent_lcp_interval
         
     @property
     def minimum_block_length(self):
@@ -140,7 +113,7 @@ class LCPSubinterval(object):
                 while not open_intervals.isEmpty() and open_intervals.peek()[1] > lcp_value:
 #                     print("Peek: "+str(open_intervals.peek()))
                     (start, length) = open_intervals.pop()
-                    closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, idx-1, length, self.number_of_siblings, self.parent_lcp_interval))
+                    closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, idx-1, length, self.number_of_siblings))
 #                     print("new: "+repr(closed_intervals[-1]))
                 # then: open a new interval starting with start filter open intervals.
                 start = closed_intervals[-1].start
@@ -149,7 +122,7 @@ class LCPSubinterval(object):
         # add all the open intervals to the result
 #         print("Closing remaining:")
         for start, length in open_intervals:
-            closed_intervals.append(LCPSubinterval(self.tokens, self.SA, self.LCP, start, self.end, length, self.number_of_siblings, self.parent_lcp_interval))
+            closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, self.end, length, self.number_of_siblings))
 #             print("new: "+repr(closed_intervals[-1]))
         return closed_intervals
 
@@ -277,13 +250,13 @@ class Collation(object):
                 start_position = index
             if prefix == 0 and not previous_prefix == 0:
                 # first end last interval
-                parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, index-1))
+                parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, index-1, 0, 0))
                 # create new interval
                 start_position = index 
             previous_prefix = prefix
         # add the final interval
         #NOTE: this one can be empty?
-        parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, len(lcp)-1))    
+        parent_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start_position, len(lcp)-1, 0, 0))    
         return parent_lcp_intervals
 
     def calculate_sub_lcp_intervals(self, lcp, parent_lcp_intervals):
@@ -300,7 +273,7 @@ class Collation(object):
             # with as third parameter the number of parent prefix occurrences
             for start, end in child_lcp_intervals:
                 length =  min(SA[start+1], SA[end])
-                sub_lcp_intervals.append(LCPSubinterval(tokens, SA, lcp, start, end, length, len(child_lcp_intervals), lcp_interval))
+                sub_lcp_intervals.append(LCPInterval(tokens, SA, lcp, start, end, length, len(child_lcp_intervals)))
         return sub_lcp_intervals
 
 
