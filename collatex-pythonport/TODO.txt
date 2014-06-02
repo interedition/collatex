@@ -1,10 +1,11 @@
 General:
 	Optimize project format
-		make it a multi-file module
-		register project on pipy
+		DONE: make it a multi-file module
+		DONE: register project on pypi
+		DONE: pip based installation works on Mac
 
 Preparation:
-	Tokenization: based on whitespace, punctuation not as separate tokens
+	Tokenization: based on whitespace, punctuation not treated as separate tokens
 		Note: Tokenization is done again in the SuffixArray module
 	Normalization: None
 
@@ -15,14 +16,14 @@ Alignment:
 	Find LCP intervals: DONE
 	Find non overlapping repeating blocks: DONE
 	Build block witnesses: DONE
-	Deal with alignment choices using decision tree and a* search algorithm: TODO
-	Find phrases: TODO
-	Find transpositions: TODO
+	Find phrases: IMPLEMENTED, NOT YET TESTED
+	Find transpositions: TODO (port algorithm from v1.5)
 	Merge vertices into graph: DONE
 	Merge transpositions into graph: TODO
-	Handle 3, 4, N witnesses: TODO
+	Handle 3, 4, N witnesses: DONE
+	Deal with alignment choices using decision tree and a* search algorithm: NOT YET NEEDED
 	
-Presenation:
+Presentation:
 	Join variant graph (parallel segments): DONE
 	Rank the graph: TODO
 	Build alignment table: TODO

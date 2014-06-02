@@ -20,52 +20,18 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         # step 2: Build the initial occurrence to list vertex map 
         graph_occurrence_to_vertices = {}
         self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex, graph_occurrence_to_vertices) 
-        # step 3: Build the occurrence to tokens map for the second witness
-        second_witness = collation.witnesses[1]
-        block_witness = collation.get_block_witness(second_witness)
-        witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, second_witness, block_witness)
-        # step 4: align and merge second witness
-        alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-        token_to_vertex = self.merge(graph, second_witness.sigil, second_witness.tokens(), alignment)
-        # step 5: update the occurrences to vertex map with the new vertices created for the second witness
-        self._build_occurrences_to_vertices(collation, second_witness, token_to_vertex, graph_occurrence_to_vertices)    
-        # step 6: add third witness
-        # NOTE: third witness might not have to be there!
-        if len(collation.witnesses)>2:
-            third_witness = collation.witnesses[2]
-            block_witness = collation.get_block_witness(third_witness)
-            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, third_witness, block_witness)
-            # step 6: align and merge third witness
+        
+        # align witness 2 - n
+        for x in range(1, len(collation.witnesses)):
+            # step 3: Build the occurrence to tokens map for the next witness
+            next_witness = collation.witnesses[x]
+            block_witness = collation.get_block_witness(next_witness)
+            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, next_witness, block_witness)
+            # step 4: align and merge next witness
             alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-            token_to_vertex = self.merge(graph, third_witness.sigil, third_witness.tokens(), alignment)
-            self._build_occurrences_to_vertices(collation, third_witness, token_to_vertex, graph_occurrence_to_vertices)    
-        # step 7: add fourth witness
-        if len(collation.witnesses)>3:
-            fourth_witness = collation.witnesses[3]
-            block_witness = collation.get_block_witness(fourth_witness)
-            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, fourth_witness, block_witness)
-            # step 8: align and merge witness
-            alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-            token_to_vertex = self.merge(graph, fourth_witness.sigil, fourth_witness.tokens(), alignment)
-            self._build_occurrences_to_vertices(collation, fourth_witness, token_to_vertex, graph_occurrence_to_vertices)    
-        # step 9: add fifth witness
-        if len(collation.witnesses)>4:
-            fifth_witness = collation.witnesses[4]
-            block_witness = collation.get_block_witness(fifth_witness)
-            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, fifth_witness, block_witness)
-            # step 10: align and merge witness
-            alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-            token_to_vertex = self.merge(graph, fifth_witness.sigil, fifth_witness.tokens(), alignment)
-            self._build_occurrences_to_vertices(collation, fifth_witness, token_to_vertex, graph_occurrence_to_vertices)    
-        # step: add sixth witness
-        if len(collation.witnesses)>5:
-            sixth_witness = collation.witnesses[5]
-            block_witness = collation.get_block_witness(sixth_witness)
-            witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, sixth_witness, block_witness)
-            # step: align and merge witness
-            alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
-            token_to_vertex = self.merge(graph, sixth_witness.sigil, sixth_witness.tokens(), alignment)
-            # self._build_occurrences_to_vertices(collation, fifth_witness, token_to_vertex, graph_occurrence_to_vertices)    
+            token_to_vertex = self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment)
+            # step 5: update the occurrences to vertex map with the new vertices created for the second witness
+            self._build_occurrences_to_vertices(collation, next_witness, token_to_vertex, graph_occurrence_to_vertices)    
         
     #===========================================================================
     # graph block to occurrences: every block that is present in the graph mapped to
