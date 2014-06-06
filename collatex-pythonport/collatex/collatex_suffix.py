@@ -6,8 +6,10 @@ Created on Apr 7, 2014
 #using RangeSet from ClusterShell project (install it first with pip)
 from ClusterShell.RangeSet import RangeSet
 from operator import attrgetter
-from collatex.collatex_core import Witness, VariantGraph, Tokenizer
+from collatex.collatex_core import Witness, VariantGraph, Tokenizer,\
+    AlignmentTable, join
 from collatex.linsuffarr import SuffixArray
+from collatex.collatex_dekker_algorithm import DekkerSuffixAlgorithm
 
 class Stack(list):
     def push(self, item):
@@ -221,6 +223,17 @@ class Collation(object):
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
         self.combined_string += content
         
+    def get_alignment_table(self):
+        algorithm = DekkerSuffixAlgorithm()
+        # build graph
+        graph = VariantGraph()
+        algorithm.build_variant_graph_from_blocks(graph, self)
+        # join parallel segments
+        join(graph)
+        # create alignment table
+        table = AlignmentTable(self, graph)
+        return table
+    
     def collate(self):
         self.graph = VariantGraph() 
         return self.graph

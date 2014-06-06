@@ -9,6 +9,74 @@ Tokenizer, Witness, VariantGraph, CollationAlgorithm
 '''
 import networkx as nx
 from _collections import deque
+from networkx.algorithms.dag import topological_sort
+
+
+class Row(object):
+    
+    def __init__(self):
+        self.cells = []
+    
+    def append(self, cell):
+        self.cells.append(cell)
+        
+    def to_list(self):
+        return self.cells
+    
+
+class Column(object):
+    
+    def __init__(self):
+        self.tokens_per_witness = {}  
+
+    def put(self, sigil, token):
+        self.tokens_per_witness[sigil]=token
+                
+    pass
+
+
+class AlignmentTable(object):
+    
+    def __init__(self, collation, graph):
+        self.collation = collation
+        self.graph = graph
+        self.columns = []
+        self.rows = []
+        self._construct_table()
+
+    def _construct_table(self):
+        ranking = VariantGraphRanking.of(self.graph)
+        vertices_per_rank = ranking.byRank
+        # construct columns        
+        for rank in vertices_per_rank:
+            column = None
+            for vertex in vertices_per_rank[rank]:
+                if vertex == self.graph.start or vertex == self.graph.end:
+                    continue
+                if column == None:
+                    column = Column()
+                    self.columns.append(column)
+                #find incoming edges for this vertex and check their labels
+                edges = self.graph.in_edges(vertex, data=True)
+                for (_, _, attrs) in edges:
+                    sigli = attrs["label"]
+                    for sigil in sigli.split(", "):
+                        vertex_attrs = self.graph.graph.node[vertex]
+                        token = vertex_attrs["label"]
+                        column.put(sigil, token)
+        # construct rows
+        for witness in self.collation.witnesses:
+            sigil = witness.sigil
+            # we create a new Row for every witness
+            row = Row()
+            self.rows.append(row)
+            for column in self.columns:
+                if sigil in column.tokens_per_witness:
+                    row.append(column.tokens_per_witness[sigil])
+                else:
+                    row.append("-")
+        
+        
 
 # not used in the suffix implementation
 # Tokenizer inside suffix array library is used
@@ -48,6 +116,9 @@ class VariantGraph(object):
         self.start = self.add_vertex(Token(""))
         self.end = self.add_vertex(Token(""))
     
+#     def is_directed(self):
+#         return self.graph.is_directed()
+#     
     # vertex creation uses a unique ID, since the token_content does not have to be unique   
     # we store the token content in the label 
     def add_vertex(self, token):
@@ -86,8 +157,8 @@ class VariantGraph(object):
         #return self.graph.get_edge_data(node, node2)
         return self.graph.has_edge(node, node2)
     
-    def in_edges(self, node):
-        return self.graph.in_edges(nbunch=node)
+    def in_edges(self, node, data=False):
+        return self.graph.in_edges(nbunch=node, data=data)
     
     def out_edges(self, node, data=False):
         return self.graph.out_edges(nbunch=node, data=data)
@@ -170,8 +241,9 @@ class VariantGraphRanking(object):
     
     @classmethod
     def of(cls, graph):
-        variant_graph_ranking = VariantGraphRanking(graph)                
-        for v in graph.vertices():
+        variant_graph_ranking = VariantGraphRanking()                
+        topological_sorted_vertices = topological_sort(graph.graph)
+        for v in topological_sorted_vertices:
             rank = -1
             for (source, _) in graph.in_edges(v):
                 rank = max(rank, variant_graph_ranking.byVertex[source])
