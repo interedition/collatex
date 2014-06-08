@@ -3,7 +3,7 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 '''
-from collatex.collatex_core import CollationAlgorithm
+from collatex.collatex_core import CollationAlgorithm, VariantGraphRanking
 
 class DekkerSuffixAlgorithm(CollationAlgorithm):
     
@@ -19,7 +19,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
         # step 2: Build the initial occurrence to list vertex map 
         graph_occurrence_to_vertices = {}
-        self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex, graph_occurrence_to_vertices) 
+        self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex, [], graph_occurrence_to_vertices) 
         
         # align witness 2 - n
         for x in range(1, len(collation.witnesses)):
@@ -29,9 +29,25 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, next_witness, block_witness)
             # step 4: align and merge next witness
             alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
+            # determine phrase matches
+            phrase_match_detector = PhraseMatchDetector()
+            phrasematches = phrase_match_detector.detect(alignment, graph, next_witness.tokens())
+            #print(phrasematches)
+            # transposition detector
+            transposition_detector = TranspositionDetector()
+            transpositions = transposition_detector.detect(phrasematches, graph)
+            if transpositions:
+                print(transpositions)
+            # transposed tokens can not be aligned
+            transposed_tokens = []
+            for transposition in transpositions:
+                for (_, token) in transposition:
+                    del alignment[token]
+                    transposed_tokens.append(token)
+            # merge
             token_to_vertex = self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment)
             # step 5: update the occurrences to vertex map with the new vertices created for the second witness
-            self._build_occurrences_to_vertices(collation, next_witness, token_to_vertex, graph_occurrence_to_vertices)    
+            self._build_occurrences_to_vertices(collation, next_witness, token_to_vertex, transposed_tokens, graph_occurrence_to_vertices)    
         
     #===========================================================================
     # graph block to occurrences: every block that is present in the graph mapped to
@@ -82,7 +98,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
                 alignment[token]=vertex
         return alignment
         
-    def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex, occurrence_to_vertices):
+    def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex, transposed_tokens, occurrence_to_vertices):
         witness_range = collation.get_range_for_witness(witness.sigil)
         token_counter = witness_range[0]
         block_witness = collation.get_block_witness(witness)
@@ -90,12 +106,11 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         # instead of the tokens
         for token in witness.tokens():
             for occurrence in block_witness.occurrences:
-                if occurrence.is_in_range(token_counter) and token in token_to_vertex:
+                if occurrence.is_in_range(token_counter) and not token in transposed_tokens and token in token_to_vertex:
                     vertex = token_to_vertex[token]
                     occurrence_to_vertices.setdefault(occurrence, []).append(vertex)
             token_counter += 1
         return occurrence_to_vertices
-        
 
     def _build_occurrences_to_tokens(self, collation, witness, block_witness):
         occurrence_to_tokens = {}
@@ -111,9 +126,9 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         return occurrence_to_tokens
 
     
-    #===========================================================================
-    # Direct port from Java code
-    #===========================================================================
+#===========================================================================
+# Direct port from Java code
+#===========================================================================
 class PhraseMatchDetector(object):
     def _add_new_phrase_match_and_clear_buffer(self, phrase_matches, base_phrase, witness_phrase):
         if base_phrase:
@@ -125,7 +140,7 @@ class PhraseMatchDetector(object):
         phrase_matches = []
         base_phrase = []
         witness_phrase = []
-        previous = base.get_start()
+        previous = base.start
         
         for token in tokens:
             if not token in linked_tokens:
@@ -145,4 +160,102 @@ class PhraseMatchDetector(object):
             previous = base_vertex
         if base_phrase:
             phrase_matches.append(zip(base_phrase, witness_phrase)) 
+        return phrase_matches
 
+#=================================================
+# Almost fully direct port from Java code
+#=================================================
+class TranspositionDetector(object):
+    def detect(self, phrasematches, base):
+        if not phrasematches:
+            return []
+        
+        ranking = self._rank_the_graph(phrasematches, base)
+        
+        def compare_phrasematches(pm1, pm2):
+            (vertex1, _) = pm1[0]
+            (vertex2, _) = pm2[0]
+            rank1 = ranking.apply(vertex1)
+            rank2 = ranking.apply(vertex2)
+            difference = rank1 - rank2
+            
+            if difference != 0:
+                return difference
+            index1 = phrasematches.index(pm1)
+            index2 = phrasematches.index(pm2)
+            return index1 - index2
+        
+        phrasematches_graph_order = sorted(phrasematches, cmp=compare_phrasematches)
+        
+        # map 1
+        self.phrasematch_to_index = {}
+        for idx, val in enumerate(phrasematches_graph_order):
+            self.phrasematch_to_index[val[0]]=idx
+        
+        # We calculate the index for all the phrase matches
+        # First in witness order, then in graph order
+        phrasematches_graph_index = range(0, len(phrasematches))
+        
+        phrasematches_witness_index = []
+        for phrasematch in phrasematches:
+            phrasematches_witness_index.append(self.phrasematch_to_index[phrasematch[0]])
+        
+        # initialize result variables
+        non_transposed_phrasematches = list(phrasematches)
+        transpositions = []
+        
+        # loop here until the maximum distance == 0
+        while(True):
+            # map 2
+            phrasematch_to_distance = {}
+            for i, phrasematch in enumerate(non_transposed_phrasematches):
+                graph_index = phrasematches_graph_index[i]
+                witness_index = phrasematches_witness_index[i]
+                distance = abs(graph_index - witness_index)
+                phrasematch_to_distance[phrasematch[0]]=distance
+        
+            distance_list = list(phrasematch_to_distance.values())
+            
+            if not distance_list or max(distance_list) == 0:
+                break
+            
+            def comp2(pm1, pm2):
+                # first order by distance
+                distance1 = phrasematch_to_distance[pm1[0]]
+                distance2 = phrasematch_to_distance[pm2[0]]
+                difference = distance2 - distance1
+                if difference != 0:
+                    return difference
+                
+                # second order by size
+                #TODO: this does not work for Greek texts with lots of small words!
+                #TODO: it should determine which block this phrasematch is part of and
+                #TODO: the number of occurrences for that block
+                return len(pm1) - len(pm2)
+                
+            sorted_phrasematches = sorted(non_transposed_phrasematches, cmp = comp2) 
+            transposedphrase = sorted_phrasematches[0]
+            
+            transposed_index = self.phrasematch_to_index[transposedphrase[0]]
+            graph_index = phrasematches_graph_index.index(transposed_index)
+            transposed_with_index = phrasematches_witness_index[graph_index]
+            linked_transposed_phrase = phrasematches_graph_order[transposed_with_index]
+            
+            self._add_transposition(phrasematches_witness_index, phrasematches_graph_index, non_transposed_phrasematches, transpositions, transposedphrase)
+            
+            distance = phrasematch_to_distance[transposedphrase[0]]
+            if distance == phrasematch_to_distance[linked_transposed_phrase[0]] and distance > 1:
+                self._add_transposition(phrasematches_witness_index, phrasematches_graph_index, non_transposed_phrasematches, transpositions, linked_transposed_phrase)
+    
+        return transpositions
+    
+    def _add_transposition(self, phrasematches_witness_index, phrasematches_graph_index, non_transposed_phrasematches, transpositions, transposed_phrase):
+        index_to_remove = self.phrasematch_to_index[transposed_phrase[0]]
+        non_transposed_phrasematches.remove(transposed_phrase)
+        transpositions.append(transposed_phrase)
+        phrasematches_graph_index.remove(index_to_remove)
+        phrasematches_witness_index.remove(index_to_remove)
+
+    def _rank_the_graph(self, phrase_matches, base):
+        #TODO: rank the graph based on only the first vertex of each of the phrasematches!
+        return VariantGraphRanking.of(base)

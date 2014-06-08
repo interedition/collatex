@@ -16,8 +16,8 @@ Alignment:
 	Find LCP intervals: DONE
 	Find non overlapping repeating blocks: DONE
 	Build block witnesses: DONE
-	Find phrases: IMPLEMENTED, NOT YET TESTED
-	Find transpositions: TODO (port algorithm from v1.5)
+	Find match phrases: DONE
+	Find transpositions: DONE
 	Merge vertices into graph: DONE
 	Merge transpositions into graph: TODO
 	Handle 3, 4, N witnesses: DONE
@@ -25,8 +25,8 @@ Alignment:
 	
 Presentation:
 	Join variant graph (parallel segments): DONE
-	Rank the graph: TODO
-	Build alignment table: TODO
+	Rank the graph: DONE
+	Build alignment table: TODO (AT object is there, pretty print still needs to be done)
 	JSON output: TODO
 	XML output: TODO
 	TEI output: TODO

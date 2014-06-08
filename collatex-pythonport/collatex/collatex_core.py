@@ -238,6 +238,9 @@ class VariantGraphRanking(object):
         #however, a rank can be assigned to multiple vertices
         self.byVertex = {}
         self.byRank = {}
+        
+    def apply(self, vertex):
+        return self.byVertex[vertex]
     
     @classmethod
     def of(cls, graph):
