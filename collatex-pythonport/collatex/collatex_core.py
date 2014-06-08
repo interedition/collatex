@@ -10,6 +10,7 @@ Tokenizer, Witness, VariantGraph, CollationAlgorithm
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
+from prettytable import PrettyTable
 
 
 class Row(object):
@@ -77,7 +78,13 @@ class AlignmentTable(object):
                     row.append("-")
         
         
-
+    def print_plain_text(self):
+        # print the table vertically
+        x = PrettyTable()
+        for row in self.rows:
+            x.add_column("blah", row.cells)
+        print(x)
+    
 # not used in the suffix implementation
 # Tokenizer inside suffix array library is used
 class Tokenizer(object):

@@ -51,16 +51,8 @@ if __name__ == '__main__':
     collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
       
     join(graph)
-      
-    #install pygraphviz first
-    #view_pygraphviz(graph.graph)
+    
     write_dot(graph.graph, "rawoutput") 
-     
-#     #trying pydot
-#     dot = to_pydot(graph.graph)
-#     dot.write("rawoutput")
-#     
-#     #dot command
-#     #-Grankdir=LR -Gid=VariantGraph -Tsvg
-#     
-    pass
+
+    table = collation.get_alignment_table()
+    table.print_plain_text()

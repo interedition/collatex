@@ -18,6 +18,7 @@ class Test(unittest.TestCase):
         self.assertEquals(["The same", "clock", "as when for example Magee once died."], table.rows[0].to_list())
         self.assertEquals(["The same", "-", "as when for example Magee once died."], table.rows[1].to_list())
         
+        table.print_plain_text()
 #         "The same as when for example McKee once died .",//
 #         "The same as when among others Darly once died & left him.",//
 #       #  "The same as when Darly among others once died and left him.");
