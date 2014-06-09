@@ -7,9 +7,8 @@ Darwin Integration test
 '''
 import json
 from networkx.drawing.nx_agraph import write_dot
-from collatex.collatex_suffix import Collation
 from collatex.collatex_core import VariantGraph, join
-from collatex.collatex_dekker_algorithm import DekkerSuffixAlgorithm
+from collatex.collatex_dekker_algorithm import DekkerSuffixAlgorithm, Collation
 
 if __name__ == '__main__':
     # read source data

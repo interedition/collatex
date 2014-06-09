@@ -1,10 +1,10 @@
 '''
 Created on Jun 8, 2014
 
-@author: ronald
+@author: Ronald Haentjens Dekker
 '''
 import unittest
-from collatex.collatex_suffix import Collation
+from collatex.collatex_dekker_algorithm import Collation
 
 
 class Test(unittest.TestCase):

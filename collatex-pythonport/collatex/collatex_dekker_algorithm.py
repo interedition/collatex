@@ -3,10 +3,221 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 '''
-from collatex.collatex_core import CollationAlgorithm, VariantGraphRanking
+from collatex.collatex_core import CollationAlgorithm, VariantGraphRanking,\
+    VariantGraph, Tokenizer, Witness, join, AlignmentTable
+from operator import attrgetter
+from collatex.collatex_suffix import PartialOverlapException,\
+    ExtendedSuffixArray
+from collatex.linsuffarr import SuffixArray
+from ClusterShell.RangeSet import RangeSet
+
+'''
+Suffix specific implementation of Collation object
+'''
+class Collation(object):
+    
+    def __init__(self):
+        self.witnesses = []
+        self.counter = 0
+        self.witness_ranges = {}
+        self.combined_string = ""
+    
+    # the tokenization process happens multiple times
+    # and by different tokenizers. This should be fixed
+    def add_witness(self, sigil, content):
+        witness = Witness(sigil, content)
+        self.witnesses.append(witness)
+        witness_range = RangeSet()
+        witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
+        # the extra one is for the marker token
+        self.counter += len(witness.tokens()) +1 
+        self.witness_ranges[sigil] = witness_range
+        if not self.combined_string == "":
+            self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
+        self.combined_string += content
+        
+    def get_alignment_table(self):
+        algorithm = DekkerSuffixAlgorithm(self)
+        # build graph
+        graph = VariantGraph()
+        algorithm.build_variant_graph_from_blocks(graph, self)
+        # join parallel segments
+        join(graph)
+        # create alignment table
+        table = AlignmentTable(self, graph)
+        return table
+    
+    def collate(self):
+        self.graph = VariantGraph() 
+        return self.graph
+
+    def get_range_for_witness(self, witness_sigil):
+        if not self.witness_ranges.has_key(witness_sigil):
+            raise Exception("Witness "+witness_sigil+" is not added to the collation!")
+        return self.witness_ranges[witness_sigil]
+    
+    def get_combined_string(self):
+        return self.combined_string
+
+    def get_sa(self):
+        #TODO: make this lazy!
+        return SuffixArray(self.combined_string)
+
+    def get_suffix_array(self):
+        sa = self.get_sa()
+        return sa.SA
+
+    def get_lcp_array(self):
+        sa = self.get_sa()
+        return sa._LCP_values
+    
+
+    def to_extended_suffix_array(self):
+        return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
+
+    @property
+    def tokens(self):
+        #TODO: complete set of witnesses is retokenized here!
+        tokenizer = Tokenizer()
+        tokens = tokenizer.tokenize(self.get_combined_string())
+        return tokens
+    
+
+class Block(object):
+    
+    def __init__(self, ranges):
+        """
+        :type ranges: RangeSet
+        """
+        self.ranges = ranges
+        
+    def __hash__(self):
+        return hash(self.ranges.__str__())
+    
+    def __eq__(self, other):
+        if type(other) is type(self):
+            return self.__dict__ == other.__dict__
+        return False
+    
+    def __str__(self):
+        return "Block with occurrences "+str(self.ranges)
+    
+    def __repr__(self):
+        return "Block: "+str(self.ranges)
+    
+# Class represents a range within one witness that is associated with a block
+class Occurrence(object):
+
+    def __init__(self, token_range, block):
+        self.token_range = token_range
+        self.block = block
+    
+    def __repr__(self):
+        return str(self.token_range)
+    
+    @property
+    def lower_end(self):
+        return self.token_range[0]
+    
+    def is_in_range(self, position):
+        return position in self.token_range
+    
+# Class represents a witness which consists of occurrences of blocks            
+class BlockWitness(object):
+    
+    def __init__(self, occurrences, tokens):
+        self.occurrences = occurrences
+        self.tokens = tokens
+        
+    def debug(self):
+        result = []
+        for occurrence in self.occurrences:
+            result.append(' '.join(self.tokens[occurrence.token_range.slices().next()]))
+        return result
+    
 
 class DekkerSuffixAlgorithm(CollationAlgorithm):
+    def __init__(self, collation):
+        self.blocks = None
+        self.collation = collation
     
+    def get_block_witness(self, witness):
+        sigil_witness = witness.sigil
+        range_witness = self.collation.get_range_for_witness(sigil_witness)
+        #NOTE: to prevent recalculation of blocks
+        if not self.blocks:
+            self.blocks = self.get_non_overlapping_repeating_blocks() 
+        blocks = self.blocks 
+        # make a selection of blocks and occurrences of these blocks in the selected witness
+        occurrences = []
+        for block in blocks:
+            block_ranges_in_witness = block.ranges & range_witness
+            # note this are multiple ranges
+            # we need to iterate over every single one
+            for block_range in block_ranges_in_witness.contiguous():
+                occurrence = Occurrence(block_range, block)
+                occurrences.append(occurrence) 
+        # sort occurrences on position
+        sorted_o = sorted(occurrences, key=attrgetter('lower_end'))
+        block_witness = BlockWitness(sorted_o, self.collation.tokens)
+        return block_witness
+
+    def get_non_overlapping_repeating_blocks(self):
+        extended_suffix_array = self.collation.to_extended_suffix_array()
+        potential_blocks = extended_suffix_array.split_lcp_array_into_intervals() 
+        self.filter_potential_blocks(potential_blocks)
+        # step 3: sort the blocks based on depth (number of repetitions) first,
+        # second length of LCP interval,
+        # third sort on parent LCP interval occurrences.
+        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_occurrences", "minimum_block_length", "number_of_siblings"), reverse=True)
+        # step 4: select the definitive blocks
+        occupied = RangeSet()
+        real_blocks = []
+        for potential_block in sorted_blocks_on_priority:
+#           print(potential_block.info())
+            try:
+                non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+                if non_overlapping_range:
+                    print("Selecting: "+str(potential_block))
+                    occupied.union_update(non_overlapping_range)
+                    real_blocks.append(Block(non_overlapping_range))
+            except PartialOverlapException:          
+                print("Skip due to conflict: "+str(potential_block))
+                while potential_block.minimum_block_length > 1:
+                    # retry with a different length: one less
+                    for idx in range(potential_block.start+1, potential_block.end+1):
+                        potential_block.LCP[idx] -= 1
+                    potential_block.length -= 1
+                    try:
+                        non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+                        if non_overlapping_range:
+                            print("Retried and selecting: "+str(potential_block))
+                            occupied.union_update(non_overlapping_range)
+                            real_blocks.append(Block(non_overlapping_range))
+                            break
+                    except PartialOverlapException:          
+                        print("Retried and failed again")
+        return real_blocks
+
+
+        # filter out all the blocks that have more than one occurrence within a witness
+    def filter_potential_blocks(self, potential_blocks):
+        for potential_block in potential_blocks[:]:
+            for witness in self.collation.witnesses:
+                witness_sigil = witness.sigil
+                witness_range = self.collation.get_range_for_witness(witness_sigil)
+                inter = witness_range.intersection(potential_block.block_occurrences())
+                if potential_block.number_of_occurrences > len(self.collation.witnesses) or len(inter)> potential_block.minimum_block_length:
+                    print("Removing block: "+str(potential_block))
+                    potential_blocks.remove(potential_block)
+#                     print("Before:")
+#                     potential_block.list_prefixes()
+#                     print("After:")
+#                     split = potential_block.split_into_smaller_intervals()
+#                     for interval in split:
+#                         print(str(interval))
+                    break
+
     def build_variant_graph_from_blocks(self, graph, collation):
         '''
         :type graph: VariantGraph
@@ -25,7 +236,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         for x in range(1, len(collation.witnesses)):
             # step 3: Build the occurrence to tokens map for the next witness
             next_witness = collation.witnesses[x]
-            block_witness = collation.get_block_witness(next_witness)
+            block_witness = self.get_block_witness(next_witness)
             witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, next_witness, block_witness)
             # step 4: align and merge next witness
             alignment = self._align(graph_occurrence_to_vertices, witness_occurrence_to_tokens, block_witness)
@@ -101,7 +312,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
     def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex, transposed_tokens, occurrence_to_vertices):
         witness_range = collation.get_range_for_witness(witness.sigil)
         token_counter = witness_range[0]
-        block_witness = collation.get_block_witness(witness)
+        block_witness = self.get_block_witness(witness)
         # note: this can be done faster by focusing on the occurrences
         # instead of the tokens
         for token in witness.tokens():

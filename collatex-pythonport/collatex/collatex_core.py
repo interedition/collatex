@@ -11,7 +11,7 @@ import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
 from prettytable import PrettyTable
-from textwrap import wrap, fill
+from textwrap import fill
 
 
 class Row(object):
