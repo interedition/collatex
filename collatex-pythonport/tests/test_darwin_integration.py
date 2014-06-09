@@ -8,7 +8,8 @@ Darwin Integration test
 import json
 from networkx.drawing.nx_agraph import write_dot
 from collatex.collatex_core import VariantGraph, join
-from collatex.collatex_dekker_algorithm import DekkerSuffixAlgorithm, Collation
+from collatex.collatex_dekker_algorithm import DekkerSuffixAlgorithm, Collation,\
+    collate
 
 if __name__ == '__main__':
     # read source data
@@ -33,25 +34,27 @@ if __name__ == '__main__':
     collation.add_witness(fifth_witness["id"], fifth_witness["content"])
     collation.add_witness(sixth_witness["id"], sixth_witness["content"])
 
+    print(collate(collation))
+
+# #     
+#     #print(collation.get_lcp_array())
+#     #    print(collation.get_non_overlapping_repeating_blocks())
+# 
+#     print(collation.get_block_witness(collation.witnesses[0]).debug())
+#     print(collation.get_block_witness(collation.witnesses[1]).debug())
+#     print(collation.get_block_witness(collation.witnesses[2]).debug())
+#     print(collation.get_block_witness(collation.witnesses[3]).debug())
+#     print(collation.get_block_witness(collation.witnesses[4]).debug())
+#     print(collation.get_block_witness(collation.witnesses[5]).debug())
+# 
 #     
-    #print(collation.get_lcp_array())
-    #    print(collation.get_non_overlapping_repeating_blocks())
-
-    print(collation.get_block_witness(collation.witnesses[0]).debug())
-    print(collation.get_block_witness(collation.witnesses[1]).debug())
-    print(collation.get_block_witness(collation.witnesses[2]).debug())
-    print(collation.get_block_witness(collation.witnesses[3]).debug())
-    print(collation.get_block_witness(collation.witnesses[4]).debug())
-    print(collation.get_block_witness(collation.witnesses[5]).debug())
-
-    
-    graph = VariantGraph()
-    collationAlgorithm = DekkerSuffixAlgorithm()
-    collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
-      
-    join(graph)
-    
-    write_dot(graph.graph, "rawoutput") 
-
-    table = collation.get_alignment_table()
-    table.print_plain_text()
+#     graph = VariantGraph()
+#     collationAlgorithm = DekkerSuffixAlgorithm()
+#     collationAlgorithm.build_variant_graph_from_blocks(graph, collation)
+#       
+#     join(graph)
+#     
+#     write_dot(graph.graph, "rawoutput") 
+# 
+#     table = collation.get_alignment_table()
+#     table.print_plain_text()

@@ -10,6 +10,25 @@ from collatex.collatex_suffix import PartialOverlapException,\
     ExtendedSuffixArray
 from collatex.linsuffarr import SuffixArray
 from ClusterShell.RangeSet import RangeSet
+from prettytable import PrettyTable
+
+
+def collate(collation, layout="horizontal"):
+    algorithm = DekkerSuffixAlgorithm(collation)
+    # build graph
+    graph = VariantGraph()
+    algorithm.build_variant_graph_from_blocks(graph, collation)
+    # join parallel segments
+    join(graph)
+    # create alignment table
+    table = AlignmentTable(collation, graph)
+    # create visualization of alignment table    
+    # print the table vertically
+    x = PrettyTable()
+    x.hrules=1
+    for row in table.rows:
+        x.add_column(row.header, row.cells)
+    return x
 
 '''
 Suffix specific implementation of Collation object
@@ -36,17 +55,6 @@ class Collation(object):
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
         self.combined_string += content
         
-    def get_alignment_table(self):
-        algorithm = DekkerSuffixAlgorithm(self)
-        # build graph
-        graph = VariantGraph()
-        algorithm.build_variant_graph_from_blocks(graph, self)
-        # join parallel segments
-        join(graph)
-        # create alignment table
-        table = AlignmentTable(self, graph)
-        return table
-    
     def collate(self):
         self.graph = VariantGraph() 
         return self.graph

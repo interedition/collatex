@@ -10,14 +10,14 @@ Tokenizer, Witness, VariantGraph, CollationAlgorithm
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
-from prettytable import PrettyTable
 from textwrap import fill
 
 
 class Row(object):
     
-    def __init__(self):
+    def __init__(self, header):
         self.cells = []
+        self.header = header
     
     def append(self, cell):
         self.cells.append(cell)
@@ -70,7 +70,7 @@ class AlignmentTable(object):
         for witness in self.collation.witnesses:
             sigil = witness.sigil
             # we create a new Row for every witness
-            row = Row()
+            row = Row(sigil)
             self.rows.append(row)
             for column in self.columns:
                 if sigil in column.tokens_per_witness:
@@ -79,13 +79,6 @@ class AlignmentTable(object):
                     row.append("-")
         
         
-    def print_plain_text(self):
-        # print the table vertically
-        x = PrettyTable()
-        x.hrules=1
-        for row in self.rows:
-            x.add_column("blah", row.cells)
-        print(x)
     
 # not used in the suffix implementation
 # Tokenizer inside suffix array library is used
