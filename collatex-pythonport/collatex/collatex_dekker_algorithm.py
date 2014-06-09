@@ -186,11 +186,11 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             try:
                 non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
                 if non_overlapping_range:
-                    print("Selecting: "+str(potential_block))
+#                     print("Selecting: "+str(potential_block))
                     occupied.union_update(non_overlapping_range)
                     real_blocks.append(Block(non_overlapping_range))
             except PartialOverlapException:          
-                print("Skip due to conflict: "+str(potential_block))
+#                 print("Skip due to conflict: "+str(potential_block))
                 while potential_block.minimum_block_length > 1:
                     # retry with a different length: one less
                     for idx in range(potential_block.start+1, potential_block.end+1):
@@ -199,12 +199,13 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
                     try:
                         non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
                         if non_overlapping_range:
-                            print("Retried and selecting: "+str(potential_block))
+#                             print("Retried and selecting: "+str(potential_block))
                             occupied.union_update(non_overlapping_range)
                             real_blocks.append(Block(non_overlapping_range))
                             break
                     except PartialOverlapException:          
-                        print("Retried and failed again")
+#                         print("Retried and failed again")
+                        pass
         return real_blocks
 
 
@@ -216,14 +217,8 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
                 witness_range = self.collation.get_range_for_witness(witness_sigil)
                 inter = witness_range.intersection(potential_block.block_occurrences())
                 if potential_block.number_of_occurrences > len(self.collation.witnesses) or len(inter)> potential_block.minimum_block_length:
-                    print("Removing block: "+str(potential_block))
+#                     print("Removing block: "+str(potential_block))
                     potential_blocks.remove(potential_block)
-#                     print("Before:")
-#                     potential_block.list_prefixes()
-#                     print("After:")
-#                     split = potential_block.split_into_smaller_intervals()
-#                     for interval in split:
-#                         print(str(interval))
                     break
 
     def build_variant_graph_from_blocks(self, graph, collation):
@@ -255,8 +250,8 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             # transposition detector
             transposition_detector = TranspositionDetector()
             transpositions = transposition_detector.detect(phrasematches, graph)
-            if transpositions:
-                print(transpositions)
+#             if transpositions:
+#                 print(transpositions)
             # transposed tokens can not be aligned
             transposed_tokens = []
             for transposition in transpositions:
