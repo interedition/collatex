@@ -11,6 +11,7 @@ import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
 from prettytable import PrettyTable
+from textwrap import wrap, fill
 
 
 class Row(object):
@@ -73,7 +74,7 @@ class AlignmentTable(object):
             self.rows.append(row)
             for column in self.columns:
                 if sigil in column.tokens_per_witness:
-                    row.append(column.tokens_per_witness[sigil])
+                    row.append(fill(column.tokens_per_witness[sigil], 20))
                 else:
                     row.append("-")
         
@@ -81,6 +82,7 @@ class AlignmentTable(object):
     def print_plain_text(self):
         # print the table vertically
         x = PrettyTable()
+        x.hrules=1
         for row in self.rows:
             x.add_column("blah", row.cells)
         print(x)
