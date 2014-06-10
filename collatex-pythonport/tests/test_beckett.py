@@ -4,7 +4,7 @@ Created on Jun 6, 2014
 @author: Ronald Haentjens Dekker
 '''
 import unittest
-from collatex.collatex_dekker_algorithm import Collation
+from collatex import Collation
 
 
 class Test(unittest.TestCase):

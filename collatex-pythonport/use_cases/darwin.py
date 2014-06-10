@@ -6,7 +6,7 @@ Darwin Integration test
 @author: Ronald Haentjens Dekker
 '''
 import json
-from collatex.collatex_dekker_algorithm import Collation, collate
+from collatex import Collation, collate
 
 if __name__ == '__main__':
     # read source data

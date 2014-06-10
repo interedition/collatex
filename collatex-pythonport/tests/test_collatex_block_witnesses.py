@@ -6,9 +6,8 @@ Created on Apr 27, 2014
 import unittest
 from ClusterShell.RangeSet import RangeSet
 from array import array
-from collatex.collatex_dekker_algorithm import Collation, Block,\
-    DekkerSuffixAlgorithm
-from collatex.collatex_suffix import ExtendedSuffixArray
+from collatex import Collation, Block, DekkerSuffixAlgorithm
+from collatex import ExtendedSuffixArray
 
 
 

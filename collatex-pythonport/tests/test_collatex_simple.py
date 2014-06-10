@@ -1,5 +1,5 @@
 import unittest
-from collatex.collatex_core import Tokenizer
+from collatex import Tokenizer
 
 
 class Test(unittest.TestCase):
