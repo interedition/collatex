@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0pre3 (2014-06-10)
+++++++++++++++++++
+
+* Fixed imports, "from collatex import *" now works correctly
+* Added IPython HTML support
+
 2.0.0pre2 (2014-06-09)
 ++++++++++++++++++
 
