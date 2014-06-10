@@ -1,15 +1,15 @@
 ===============================
 CollateX-Python
 ===============================
+..
+  .. image:: https://badge.fury.io/py/collatex.png
+        :target: http://badge.fury.io/py/collatex
+    
+  .. image:: https://travis-ci.org/rhdekker/collatex.png?branch=master
+        :target: https://travis-ci.org/rhdekker/collatex
 
-# .. image:: https://badge.fury.io/py/collatex.png
-#        :target: http://badge.fury.io/py/collatex
-#    
-# .. image:: https://travis-ci.org/rhdekker/collatex.png?branch=master
-#        :target: https://travis-ci.org/rhdekker/collatex
-#
-# .. image:: https://pypip.in/d/collatex/badge.png
-#        :target: https://pypi.python.org/pypi/collatex
+  .. image:: https://pypip.in/d/collatex/badge.png
+        :target: https://pypi.python.org/pypi/collatex
 
 
 CollateX is a software to
@@ -37,14 +37,15 @@ sudo easy_install pip
 
 Simple example:
 ---------------
-from collatex import *
+::
 
-collation = Collation()
-collation.add_witness("A", "The quick brown fox jumps over the dog.")
-collation.add_witness("B", "The brown fox jumps over the lazy dog.")
+  from collatex import *
 
-alignment_table = collate(collation)
-print(alignment_table)
+  collation = Collation()
+  collation.add_witness("A", "The quick brown fox jumps over the dog.")
+  collation.add_witness("B", "The brown fox jumps over the lazy dog.")
 
-when using IPython Notebook a nice HTML representation of the alignment table
- is shown when the collate function is called.
+  alignment_table = collate(collation)
+  print(alignment_table)
+
+When using IPython Notebook a nice HTML representation of the alignment table is shown when the collate function is called.
