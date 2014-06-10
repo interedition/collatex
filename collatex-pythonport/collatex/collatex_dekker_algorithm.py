@@ -22,38 +22,21 @@ def in_ipython():
     except:
         return False
     
-#TODO: make more general
-def create_from_dict(data):
-    first_witness = data["witnesses"][0]
-    second_witness = data["witnesses"][1]
-    third_witness = data["witnesses"][2]
-    fourth_witness = data["witnesses"][3]
-    fifth_witness = data["witnesses"][4]
-    sixth_witness = data["witnesses"][5]
-    
-    # generate collation object from json_data
-    collation = Collation()
-    collation.add_witness(first_witness["id"], first_witness["content"])
-    collation.add_witness(second_witness["id"], second_witness["content"])
-    collation.add_witness(third_witness["id"], third_witness["content"])
-    collation.add_witness(fourth_witness["id"], fourth_witness["content"])
-    collation.add_witness(fifth_witness["id"], fifth_witness["content"])
-    collation.add_witness(sixth_witness["id"], sixth_witness["content"])
-    return collation
-
-# json_data can be a string or a file
-def create_from_json(json_data):
-    data = json.load(json_data)
-    collation = create_from_dict(data)
-    return collation
-
-def collate(collation, layout="horizontal"):
+def collate(collation, output="table", layout="horizontal"):
     algorithm = DekkerSuffixAlgorithm(collation)
     # build graph
     graph = VariantGraph()
     algorithm.build_variant_graph_from_blocks(graph, collation)
     # join parallel segments
     join(graph)
+    # check which output format is requested: graph or table
+    if output=="graph" and in_ipython:
+        # visualize the variant graph into SVG format
+        from networkx.drawing.nx_agraph import to_agraph
+        agraph = to_agraph(graph.graph)
+        svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
+        from IPython.display import SVG
+        return SVG(svg) 
     # create alignment table
     table = AlignmentTable(collation, graph)
     # create visualization of alignment table    
@@ -62,8 +45,7 @@ def collate(collation, layout="horizontal"):
         from IPython.display import HTML
         html = prettytable.get_html_string(formatting=True)
         return HTML(html)
-    else:
-        return prettytable
+    return prettytable
 
 def visualizeTableVertically(table):
     # print the table vertically
@@ -78,6 +60,22 @@ Suffix specific implementation of Collation object
 '''
 class Collation(object):
     
+    @classmethod
+    def create_from_dict(cls, data, limit=None):
+        witnesses = data["witnesses"]
+        collation = Collation()
+        for witness in witnesses[:limit]:
+            # generate collation object from json_data
+            collation.add_witness(witness["id"], witness["content"])
+        return collation
+    
+    @classmethod
+    # json_data can be a string or a file
+    def create_from_json(cls, json_data):
+        data = json.load(json_data)
+        collation = cls.create_from_dict(data)
+        return collation
+
     def __init__(self):
         self.witnesses = []
         self.counter = 0

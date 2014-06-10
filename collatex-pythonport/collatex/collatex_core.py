@@ -10,7 +10,6 @@ Tokenizer, Witness, VariantGraph, CollationAlgorithm
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
-from textwrap import fill
 
 
 class Row(object):
