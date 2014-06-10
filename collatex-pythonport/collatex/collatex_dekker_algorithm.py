@@ -11,6 +11,9 @@ from collatex.collatex_suffix import PartialOverlapException,\
 from collatex.linsuffarr import SuffixArray
 from ClusterShell.RangeSet import RangeSet
 from prettytable import PrettyTable
+from textwrap import fill
+
+
 
 
 def collate(collation, layout="horizontal"):
@@ -23,11 +26,15 @@ def collate(collation, layout="horizontal"):
     # create alignment table
     table = AlignmentTable(collation, graph)
     # create visualization of alignment table    
+    x = visualizeTableVertically(table)
+    return x
+
+def visualizeTableVertically(table):
     # print the table vertically
     x = PrettyTable()
-    x.hrules=1
+    x.hrules = 1
     for row in table.rows:
-        x.add_column(row.header, row.cells)
+        x.add_column(row.header, [fill(cell, 20) for cell in row.cells])
     return x
 
 '''

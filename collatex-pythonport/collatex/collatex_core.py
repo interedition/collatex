@@ -74,7 +74,7 @@ class AlignmentTable(object):
             self.rows.append(row)
             for column in self.columns:
                 if sigil in column.tokens_per_witness:
-                    row.append(fill(column.tokens_per_witness[sigil], 20))
+                    row.append(column.tokens_per_witness[sigil])
                 else:
                     row.append("-")
         
