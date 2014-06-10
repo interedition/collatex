@@ -39,13 +39,30 @@ def collate(collation, output="table", layout="horizontal"):
         return SVG(svg) 
     # create alignment table
     table = AlignmentTable(collation, graph)
-    # create visualization of alignment table    
-    prettytable = visualizeTableVertically(table)
+    # create visualization of alignment table
+    if layout == "vertical":    
+        prettytable = visualizeTableVertically(table)
+    else:
+        prettytable = visualizeTableHorizontal(table)
     if in_ipython():
         from IPython.display import HTML
         html = prettytable.get_html_string(formatting=True)
         return HTML(html)
     return prettytable
+
+
+def visualizeTableHorizontal(table):
+    # print the table horizontal
+    x = PrettyTable()
+    x.header=False
+    for row in table.rows:
+        cells = [row.header]
+        cells.extend(row.cells)
+        x.add_row(cells)
+    # alignment can only be set after the field names are known.
+    # since add_row sets the field names, it has to be set after x.add_row(cells)
+    x.align="l"
+    return x
 
 def visualizeTableVertically(table):
     # print the table vertically

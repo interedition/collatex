@@ -6,8 +6,11 @@ History
 2.0.0pre3 (2014-06-10)
 ++++++++++++++++++
 
-* Fixed imports, "from collatex import *" now works correctly
-* Added IPython HTML support
+* Fixed imports in init.py, "from collatex import *" now works correctly.
+* Added IPython HTML support for alignment table.
+* Added IPython SVG support for variant graph.
+* Added convenience constructors on Collation object. 
+* Added horizontal layout for the alignment table visualization, next to vertical one.
 
 2.0.0pre2 (2014-06-09)
 ++++++++++++++++++
