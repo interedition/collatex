@@ -25,6 +25,7 @@ Features
 --------
 
 * non progressive multiple sequence alignment
+* multiple output formats: alignment table, variant graph
 
 How to install:
 ---------------
@@ -49,3 +50,10 @@ Simple example:
   print(alignment_table)
 
 When using IPython Notebook a nice HTML representation of the alignment table is shown when the collate function is called.
+Output can also be shown as a graph instead of a table when graphviz and pygraphviz are installed:
+::
+
+  collate(collation, output="graph")
+  
+
+

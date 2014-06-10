@@ -26,7 +26,9 @@ Alignment:
 Presentation:
 	Join variant graph (parallel segments): DONE
 	Rank the graph: DONE
-	Build alignment table: TODO (AT object is there, pretty print still needs to be done)
+	Build alignment table: DONE
+	HTML output: DONE
+	SVG output: DONE
 	JSON output: TODO
 	XML output: TODO
 	TEI output: TODO
