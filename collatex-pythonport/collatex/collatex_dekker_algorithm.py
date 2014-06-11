@@ -4,7 +4,7 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 '''
 from collatex.collatex_core import CollationAlgorithm, VariantGraphRanking,\
-    VariantGraph, Tokenizer, Witness, join, AlignmentTable
+    VariantGraph, Tokenizer, Witness, join, AlignmentTable, Row
 from operator import attrgetter
 from collatex.collatex_suffix import PartialOverlapException,\
     ExtendedSuffixArray
@@ -21,7 +21,40 @@ def in_ipython():
         return True
     except:
         return False
+
+def collate_pretokenized_json(json):
+    witnesses = json["witnesses"]
+    normalized_witnesses = []
+    tokenized_witnesses = []
+    for witness in witnesses:
+        normalized_tokens = []
+        tokenized_witness = []
+        sigil = witness["id"]
+        for token in witness["tokens"]:
+            tokenized_witness.append(token)
+            if "n" in token:
+                normalized_tokens.append(token["n"])
+            else:
+                normalized_tokens.append(token["t"])
+            pass
+        normalized_witnesses.append(Witness(sigil, " ".join(normalized_tokens)))
+        tokenized_witnesses.append(tokenized_witness)
+    collation = Collation()
+    for normalized_witness in normalized_witnesses:
+        collation.add_witness(normalized_witness.sigil, normalized_witness.content)
+    at = collate(collation, output="novisualization")
+    tokenized_at = AlignmentTable(collation)
+    for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
+        new_row = Row(row.header)
+        tokenized_at.rows.append(new_row)
+        token_counter = 0
+        for cell in row.cells:
+            if cell != "-":
+                new_row.cells.append(tokenized_witness[token_counter])
+                token_counter+=1
+    return tokenized_at
     
+        
 def collate(collation, output="table", layout="horizontal"):
     algorithm = DekkerSuffixAlgorithm(collation)
     # build graph
@@ -39,6 +72,8 @@ def collate(collation, output="table", layout="horizontal"):
         return SVG(svg) 
     # create alignment table
     table = AlignmentTable(collation, graph)
+    if output == "novisualization":
+        return table
     # create visualization of alignment table
     if layout == "vertical":    
         prettytable = visualizeTableVertically(table)

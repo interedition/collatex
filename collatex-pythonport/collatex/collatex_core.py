@@ -38,12 +38,13 @@ class Column(object):
 
 class AlignmentTable(object):
     
-    def __init__(self, collation, graph):
+    def __init__(self, collation, graph=None):
         self.collation = collation
         self.graph = graph
         self.columns = []
         self.rows = []
-        self._construct_table()
+        if graph:
+            self._construct_table()
 
     def _construct_table(self):
         ranking = VariantGraphRanking.of(self.graph)
