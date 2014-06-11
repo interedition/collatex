@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         graph = VariantGraph()
-        algorithm = DekkerSuffixAlgorithm()
+        algorithm = DekkerSuffixAlgorithm(collation)
         algorithm.build_variant_graph_from_blocks(graph, collation)
         start_vertex = graph.start
         a = graph.vertexWith("a")
@@ -34,10 +34,8 @@ class Test(unittest.TestCase):
         #print(graph.graph.nodes())
         #view_pygraphviz(graph.graph)
         
-        dot = to_pydot(graph.graph)
-        dot.write("rawoutput")
-  
-        pass
+#         dot = to_pydot(graph.graph)
+#         dot.write("rawoutput")
 
 #     def test_variant_graph_two_equal_witnesses(self):
 #         collation = Collation()
