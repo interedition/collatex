@@ -6,14 +6,15 @@ Created on Jun 11, 2014
 import unittest
 from collatex.collatex_core import Witness, AlignmentTable, Row
 from collatex.collatex_dekker_algorithm import Collation, collate,\
-    visualizeTableHorizontal, collate_pretokenized_json
+    visualizeTableHorizontal, collate_pretokenized_json, alignmentTableToJSON
+import json
 
 
 class Test(unittest.TestCase):
 
 
     def testTokenizedJSON(self):
-        json = {
+        json_in = {
       "witnesses" : [
         {
           "id" : "A",
@@ -33,8 +34,7 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        tokenized_at = collate_pretokenized_json(json)
-        prettytable = visualizeTableHorizontal(tokenized_at)
-        print(prettytable)
-        pass
-                
+        expected_json = '{"witnesses": ["A", "B"], "table": [[[{"ref": 123, "t": "A"}], [{"adj": true, "t": "black"}], [{"t": "cat", "id": "xyz"}]], [[{"t": "A"}], [{"adj": true, "t": "white"}], [{"t": "kitten.", "n": "cat"}]]]}'
+        tokenized_at = collate_pretokenized_json(json_in)
+        json_out = alignmentTableToJSON(tokenized_at)
+        self.assertEqual(expected_json, json_out)
