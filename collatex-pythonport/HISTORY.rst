@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0pre4 (2014-06-11)
+++++++++++++++++++
+
+* Added pretokenized JSON support.
+* Added JSON visualization for the alignment table.
+
 2.0.0pre3 (2014-06-10)
 ++++++++++++++++++
 
