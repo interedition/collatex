@@ -26,6 +26,7 @@ def in_ipython():
 if in_ipython():
     from IPython.display import HTML
     from IPython.display import SVG
+    from IPython.core.display import JSON
     from IPython.core.display import display
 
 #TODO: this only works with a table output at the moment
@@ -67,6 +68,7 @@ def collate_pretokenized_json(json):
     
 # Valid options for output are "table" (default)
 # "graph" for the variant graph rendered as SVG
+# "json" for the alignment table rendered as JSON
 # "novisualization" to get the plain AlignmentTable object without any rendering         
 def collate(collation, output="table", layout="horizontal", segmentation=True):
     algorithm = DekkerSuffixAlgorithm(collation)
@@ -85,6 +87,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True):
         return display(SVG(svg)) 
     # create alignment table
     table = AlignmentTable(collation, graph)
+    if output == "json":
+        return display_alignment_table_as_json(table)
     if output == "novisualization":
         return table
     # create visualization of alignment table
@@ -97,7 +101,15 @@ def collate(collation, output="table", layout="horizontal", segmentation=True):
         return display(HTML(html))
     return prettytable
 
-
+def display_alignment_table_as_json(table):
+    json = alignmentTableToJSON(table)
+#     if in_ipython():
+#         return display(JSON(json))
+    if in_ipython():
+        print(json)
+        return
+    return json    
+        
 def visualizeTableHorizontal(table):
     # print the table horizontal
     x = PrettyTable()
@@ -127,7 +139,7 @@ def alignmentTableToJSON(table):
         sigli.append(row.header)
         json_output["table"].append([[cell] for cell in row.cells])
     json_output["witnesses"]=sigli
-    return json.dumps(json_output)
+    return json.dumps(json_output, indent=2)
 
 '''
 Suffix specific implementation of Collation object

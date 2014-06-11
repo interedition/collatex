@@ -10,6 +10,7 @@ History
 * Added option to collate method to enable or disable parallel segmentation.
 * Fixed compatibility issue when rendering HTML or SVG with IPython 2.1 instead of IPython 0.13.
 * Corrected RST syntax in package info description. 
+* Added JSON output to collate method.
 
 2.0.0pre4 (2014-06-11)
 ++++++++++++++++++++++
