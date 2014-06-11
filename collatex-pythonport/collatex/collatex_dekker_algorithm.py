@@ -14,6 +14,7 @@ from prettytable import PrettyTable
 from textwrap import fill
 import json
 
+
 def in_ipython():
     try:
         get_ipython().config  # @UndefinedVariable
@@ -21,6 +22,11 @@ def in_ipython():
         return True
     except:
         return False
+
+if in_ipython():
+    from IPython.display import HTML
+    from IPython.display import SVG
+    from IPython.core.display import display
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
@@ -59,7 +65,9 @@ def collate_pretokenized_json(json):
                 new_row.cells.append({"t":"-"})
     return tokenized_at
     
-        
+# Valid options for output are "table" (default)
+# "graph" for the variant graph rendered as SVG
+# "novisualization" to get the plain AlignmentTable object without any rendering         
 def collate(collation, output="table", layout="horizontal", segmentation=True):
     algorithm = DekkerSuffixAlgorithm(collation)
     # build graph
@@ -74,8 +82,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True):
         from networkx.drawing.nx_agraph import to_agraph
         agraph = to_agraph(graph.graph)
         svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
-        from IPython.display import SVG
-        return SVG(svg) 
+        return display(SVG(svg)) 
     # create alignment table
     table = AlignmentTable(collation, graph)
     if output == "novisualization":
@@ -86,9 +93,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True):
     else:
         prettytable = visualizeTableHorizontal(table)
     if in_ipython():
-        from IPython.display import HTML
         html = prettytable.get_html_string(formatting=True)
-        return HTML(html)
+        return display(HTML(html))
     return prettytable
 
 
