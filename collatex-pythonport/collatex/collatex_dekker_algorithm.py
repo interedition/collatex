@@ -60,13 +60,14 @@ def collate_pretokenized_json(json):
     return tokenized_at
     
         
-def collate(collation, output="table", layout="horizontal"):
+def collate(collation, output="table", layout="horizontal", segmentation=True):
     algorithm = DekkerSuffixAlgorithm(collation)
     # build graph
     graph = VariantGraph()
     algorithm.build_variant_graph_from_blocks(graph, collation)
     # join parallel segments
-    join(graph)
+    if segmentation:
+        join(graph)
     # check which output format is requested: graph or table
     if output=="graph" and in_ipython:
         # visualize the variant graph into SVG format
