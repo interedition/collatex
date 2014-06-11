@@ -180,10 +180,13 @@ class Collation(object):
         self.counter = 0
         self.witness_ranges = {}
         self.combined_string = ""
+        self.cached_suffix_array = None
     
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
     def add_witness(self, sigil, content):
+        # clear the suffix array and LCP array cache
+        self.cached_suffix_array = None
         witness = Witness(sigil, content)
         self.witnesses.append(witness)
         witness_range = RangeSet()
@@ -195,10 +198,6 @@ class Collation(object):
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
         self.combined_string += content
         
-    def collate(self):
-        self.graph = VariantGraph() 
-        return self.graph
-
     def get_range_for_witness(self, witness_sigil):
         if not self.witness_ranges.has_key(witness_sigil):
             raise Exception("Witness "+witness_sigil+" is not added to the collation!")
@@ -208,8 +207,10 @@ class Collation(object):
         return self.combined_string
 
     def get_sa(self):
-        #TODO: make this lazy!
-        return SuffixArray(self.combined_string)
+        #NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
+        if not self.cached_suffix_array:
+            self.cached_suffix_array = SuffixArray(self.combined_string)
+        return self.cached_suffix_array
 
     def get_suffix_array(self):
         sa = self.get_sa()

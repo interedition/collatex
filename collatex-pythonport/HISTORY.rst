@@ -9,6 +9,7 @@ History
 * Added JSON output to collate method.
 * Added option to collate method to enable or disable parallel segmentation.
 * Added table output to collate_pretokenized_json method, next to the already existing JSON output.
+* Cached the suffix and LCP arrays to prevent unnecessary recalculation
 * Fixed handling of empty cells in JSON output of pretokenized JSON.
 * Fixed compatibility issue when rendering HTML or SVG with IPython 2.1 instead of IPython 0.13.
 * Corrected RST syntax in package info description. 
