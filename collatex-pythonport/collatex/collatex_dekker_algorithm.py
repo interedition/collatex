@@ -26,12 +26,11 @@ def in_ipython():
 if in_ipython():
     from IPython.display import HTML
     from IPython.display import SVG
-    from IPython.core.display import JSON
     from IPython.core.display import display
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json):
+def collate_pretokenized_json(json, output="table", layout="horizontal"):
     witnesses = json["witnesses"]
     normalized_witnesses = []
     tokenized_witnesses = []
@@ -64,7 +63,21 @@ def collate_pretokenized_json(json):
             else:
                 #TODO: should probably be null or None instead, but that would break the rendering at the moment 
                 new_row.cells.append({"t":"-"})
-    return tokenized_at
+    if output=="json":
+        return display_alignment_table_as_json(tokenized_at)
+    if output=="table":
+        # transform JSON objects to "t" form.
+        for row in tokenized_at.rows:
+            row.cells = [cell["t"]  for cell in row.cells]
+        # create visualization of alignment table
+        if layout == "vertical":    
+            prettytable = visualizeTableVertically(tokenized_at)
+        else:
+            prettytable = visualizeTableHorizontal(tokenized_at)
+        if in_ipython():
+            html = prettytable.get_html_string(formatting=True)
+            return display(HTML(html))
+        return prettytable
     
 # Valid options for output are "table" (default)
 # "graph" for the variant graph rendered as SVG

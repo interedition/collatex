@@ -4,13 +4,12 @@ Created on Jun 11, 2014
 @author: Ronald Haentjens Dekker
 '''
 import unittest
-from collatex.collatex_dekker_algorithm import collate_pretokenized_json, alignmentTableToJSON
+from collatex.collatex_dekker_algorithm import collate_pretokenized_json
     
 
 class Test(unittest.TestCase):
 
-
-    def testTokenizedJSON(self):
+    def testJSONOutputPretokenizedJSON(self):
         json_in = {
       "witnesses" : [
         {
@@ -31,12 +30,11 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        expected_json = '{"witnesses": ["A", "B"], "table": [[[{"ref": 123, "t": "A"}], [{"adj": true, "t": "black"}], [{"t": "cat", "id": "xyz"}]], [[{"t": "A"}], [{"adj": true, "t": "white"}], [{"t": "kitten.", "n": "cat"}]]]}'
-        tokenized_at = collate_pretokenized_json(json_in)
-        json_out = alignmentTableToJSON(tokenized_at)
+        expected_json = '{\n  "witnesses": [\n    "A", \n    "B"\n  ], \n  "table": [\n    [\n      [\n        {\n          "ref": 123, \n          "t": "A"\n        }\n      ], \n      [\n        {\n          "adj": true, \n          "t": "black"\n        }\n      ], \n      [\n        {\n          "t": "cat", \n          "id": "xyz"\n        }\n      ]\n    ], \n    [\n      [\n        {\n          "t": "A"\n        }\n      ], \n      [\n        {\n          "adj": true, \n          "t": "white"\n        }\n      ], \n      [\n        {\n          "t": "kitten.", \n          "n": "cat"\n        }\n      ]\n    ]\n  ]\n}'
+        json_out = collate_pretokenized_json(json_in, output="json")
         self.assertEqual(expected_json, json_out)
 
-    def test_empty_cells_in_output(self):
+    def testJSONOutput_empty_cells_in_output(self):
         json_in = {
       "witnesses" : [
         {
@@ -56,9 +54,34 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        expected_json = '{"witnesses": ["A", "B"], "table": [[[{"ref": 123, "t": "A"}], [{"adj": true, "t": "black"}], [{"t": "cat", "id": "xyz"}]], [[{"t": "A"}], [{"t": "-"}], [{"t": "kitten.", "n": "cat"}]]]}'
-        tokenized_at = collate_pretokenized_json(json_in)
-        #print(visualizeTableHorizontal(tokenized_at))
-        json_out = alignmentTableToJSON(tokenized_at)
-        #print(json_out)
+        expected_json = '{\n  "witnesses": [\n    "A", \n    "B"\n  ], \n  "table": [\n    [\n      [\n        {\n          "ref": 123, \n          "t": "A"\n        }\n      ], \n      [\n        {\n          "adj": true, \n          "t": "black"\n        }\n      ], \n      [\n        {\n          "t": "cat", \n          "id": "xyz"\n        }\n      ]\n    ], \n    [\n      [\n        {\n          "t": "A"\n        }\n      ], \n      [\n        {\n          "t": "-"\n        }\n      ], \n      [\n        {\n          "t": "kitten.", \n          "n": "cat"\n        }\n      ]\n    ]\n  ]\n}'
+        json_out = collate_pretokenized_json(json_in, output="json")
         self.assertEqual(expected_json, json_out)
+
+    def testHTMLOutputPretokenizedJSON(self):
+        json_in = {
+      "witnesses" : [
+        {
+          "id" : "A",
+          "tokens" : [
+              { "t" : "A", "ref" : 123 },
+              { "t" : "black" , "adj" : True },
+              { "t" : "cat", "id" : "xyz" }
+          ]
+        },
+        {
+          "id" : "B",
+          "tokens" : [
+              { "t" : "A" },
+              { "t" : "white" , "adj" : True },
+              { "t" : "kitten.", "n" : "cat" }
+          ]
+        }
+      ]
+    }
+        expected_plain_table = """+---+---+-------+---------+
+| A | A | black | cat     |
+| B | A | white | kitten. |
++---+---+-------+---------+"""
+        plain_table = collate_pretokenized_json(json_in, output="table").get_string()
+        self.assertEqual(expected_plain_table, plain_table)
