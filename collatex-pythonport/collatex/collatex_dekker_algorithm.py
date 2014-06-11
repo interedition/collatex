@@ -22,6 +22,8 @@ def in_ipython():
     except:
         return False
 
+#TODO: this only works with a table output at the moment
+#TODO: store the tokens on the graph instead
 def collate_pretokenized_json(json):
     witnesses = json["witnesses"]
     normalized_witnesses = []
@@ -52,6 +54,9 @@ def collate_pretokenized_json(json):
             if cell != "-":
                 new_row.cells.append(tokenized_witness[token_counter])
                 token_counter+=1
+            else:
+                #TODO: should probably be null or None instead, but that would break the rendering at the moment 
+                new_row.cells.append({"t":"-"})
     return tokenized_at
     
         
