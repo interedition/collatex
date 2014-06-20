@@ -14,7 +14,14 @@ from prettytable import PrettyTable
 from textwrap import fill
 import json
 
-
+# optionally load the IPython dependencies
+try:
+    from IPython.display import HTML
+    from IPython.display import SVG
+    from IPython.core.display import display
+except:
+    pass
+    
 def in_ipython():
     try:
         get_ipython().config  # @UndefinedVariable
@@ -22,11 +29,6 @@ def in_ipython():
         return True
     except:
         return False
-
-if in_ipython():
-    from IPython.display import HTML
-    from IPython.display import SVG
-    from IPython.core.display import display
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
