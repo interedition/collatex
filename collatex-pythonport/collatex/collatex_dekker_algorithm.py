@@ -32,7 +32,7 @@ def in_ipython():
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json, output="table", layout="horizontal"):
+def collate_pretokenized_json(json, output="table", layout="horizontal", segmentation=False):
     witnesses = json["witnesses"]
     normalized_witnesses = []
     tokenized_witnesses = []
@@ -52,7 +52,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal"):
     collation = Collation()
     for normalized_witness in normalized_witnesses:
         collation.add_witness(normalized_witness.sigil, normalized_witness.content)
-    at = collate(collation, output="novisualization")
+    at = collate(collation, segmentation, output="novisualization")
     tokenized_at = AlignmentTable(collation)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
@@ -216,10 +216,13 @@ class Collation(object):
 
     def get_suffix_array(self):
         sa = self.get_sa()
+	print sa
+	print sa.SA
         return sa.SA
 
     def get_lcp_array(self):
         sa = self.get_sa()
+	print sa._LCP_values
         return sa._LCP_values
     
 
