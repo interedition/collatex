@@ -36,6 +36,14 @@ sudo pip install --pre collatex
 if you don't have pip installed, install it first with:
 sudo easy_install pip
 
+Windows:
+There is no official Windows binary distribution of pygraphviz, which is needed for SVG
+rendering of the variant graph. To add SVG support in Windows, before doing the above, 
+install an "unofficial" Windows pygraphviz binary from the link at 
+http://www.lfd.uci.edu/~gohlke/pythonlibs/, along with the main Graphviz file at the link
+provided there. Then add the path to the graphviz installation (specifically, to dot.exe) 
+to the system path.
+
 Simple example:
 ---------------
 ::
@@ -47,7 +55,6 @@ Simple example:
   collation.add_witness("B", "The brown fox jumps over the lazy dog.")
 
   alignment_table = collate(collation)
-  print(alignment_table)
 
 When using IPython Notebook a nice HTML representation of the alignment table is shown when the collate function is called.
 Output can also be shown as a graph instead of a table when graphviz and pygraphviz are installed:
