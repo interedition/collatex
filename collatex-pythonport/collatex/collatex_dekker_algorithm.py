@@ -4,10 +4,10 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 '''
 from collatex.collatex_core import CollationAlgorithm, VariantGraphRanking,\
-    VariantGraph, Tokenizer, Witness, join, AlignmentTable, Row
+     VariantGraph, Tokenizer, Witness, join, AlignmentTable, Row
 from operator import attrgetter
 from collatex.collatex_suffix import PartialOverlapException,\
-    ExtendedSuffixArray
+     ExtendedSuffixArray
 from collatex.linsuffarr import SuffixArray
 from ClusterShell.RangeSet import RangeSet
 from prettytable import PrettyTable
@@ -21,7 +21,7 @@ try:
     from IPython.core.display import display
 except:
     pass
-    
+
 def in_ipython():
     try:
         get_ipython().config  # @UndefinedVariable
@@ -32,7 +32,7 @@ def in_ipython():
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json, output="table", layout="horizontal"):
+def collate_pretokenized_json(json, output="table", layout="horizontal", segmentation=False):
     witnesses = json["witnesses"]
     normalized_witnesses = []
     tokenized_witnesses = []
@@ -52,7 +52,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal"):
     collation = Collation()
     for normalized_witness in normalized_witnesses:
         collation.add_witness(normalized_witness.sigil, normalized_witness.content)
-    at = collate(collation, output="novisualization")
+    at = collate(collation, segmentation, output="novisualization")
     tokenized_at = AlignmentTable(collation)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
@@ -80,7 +80,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal"):
             html = prettytable.get_html_string(formatting=True)
             return display(HTML(html))
         return prettytable
-    
+
 # Valid options for output are "table" (default)
 # "graph" for the variant graph rendered as SVG
 # "json" for the alignment table rendered as JSON
@@ -124,7 +124,7 @@ def display_alignment_table_as_json(table):
         print(json)
         return
     return json    
-        
+
 def visualizeTableHorizontal(table):
     # print the table horizontal
     x = PrettyTable()
@@ -160,7 +160,7 @@ def alignmentTableToJSON(table):
 Suffix specific implementation of Collation object
 '''
 class Collation(object):
-    
+
     @classmethod
     def create_from_dict(cls, data, limit=None):
         witnesses = data["witnesses"]
@@ -169,7 +169,7 @@ class Collation(object):
             # generate collation object from json_data
             collation.add_witness(witness["id"], witness["content"])
         return collation
-    
+
     @classmethod
     # json_data can be a string or a file
     def create_from_json(cls, json_data):
@@ -183,7 +183,7 @@ class Collation(object):
         self.witness_ranges = {}
         self.combined_string = ""
         self.cached_suffix_array = None
-    
+
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
     def add_witness(self, sigil, content):
@@ -199,12 +199,12 @@ class Collation(object):
         if not self.combined_string == "":
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
         self.combined_string += content
-        
+
     def get_range_for_witness(self, witness_sigil):
         if not self.witness_ranges.has_key(witness_sigil):
             raise Exception("Witness "+witness_sigil+" is not added to the collation!")
         return self.witness_ranges[witness_sigil]
-    
+
     def get_combined_string(self):
         return self.combined_string
 
@@ -216,12 +216,15 @@ class Collation(object):
 
     def get_suffix_array(self):
         sa = self.get_sa()
+        print sa
+        print sa.SA
         return sa.SA
 
     def get_lcp_array(self):
         sa = self.get_sa()
+        print sa._LCP_values
         return sa._LCP_values
-    
+
 
     def to_extended_suffix_array(self):
         return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
@@ -232,66 +235,66 @@ class Collation(object):
         tokenizer = Tokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string())
         return tokens
-    
+
 
 class Block(object):
-    
+
     def __init__(self, ranges):
         """
         :type ranges: RangeSet
         """
         self.ranges = ranges
-        
+
     def __hash__(self):
         return hash(self.ranges.__str__())
-    
+
     def __eq__(self, other):
         if type(other) is type(self):
             return self.__dict__ == other.__dict__
         return False
-    
+
     def __str__(self):
         return "Block with occurrences "+str(self.ranges)
-    
+
     def __repr__(self):
         return "Block: "+str(self.ranges)
-    
+
 # Class represents a range within one witness that is associated with a block
 class Occurrence(object):
 
     def __init__(self, token_range, block):
         self.token_range = token_range
         self.block = block
-    
+
     def __repr__(self):
         return str(self.token_range)
-    
+
     @property
     def lower_end(self):
         return self.token_range[0]
-    
+
     def is_in_range(self, position):
         return position in self.token_range
-    
+
 # Class represents a witness which consists of occurrences of blocks            
 class BlockWitness(object):
-    
+
     def __init__(self, occurrences, tokens):
         self.occurrences = occurrences
         self.tokens = tokens
-        
+
     def debug(self):
         result = []
         for occurrence in self.occurrences:
             result.append(' '.join(self.tokens[occurrence.token_range.slices().next()]))
         return result
-    
+
 
 class DekkerSuffixAlgorithm(CollationAlgorithm):
     def __init__(self, collation):
         self.blocks = None
         self.collation = collation
-    
+
     def get_block_witness(self, witness):
         sigil_witness = witness.sigil
         range_witness = self.collation.get_range_for_witness(sigil_witness)
@@ -377,7 +380,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
         # step 2: Build the initial occurrence to list vertex map 
         graph_occurrence_to_vertices = {}
         self._build_occurrences_to_vertices(collation, first_witness, token_to_vertex, [], graph_occurrence_to_vertices) 
-        
+
         # align witness 2 - n
         for x in range(1, len(collation.witnesses)):
             # step 3: Build the occurrence to tokens map for the next witness
@@ -405,7 +408,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             token_to_vertex = self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment)
             # step 5: update the occurrences to vertex map with the new vertices created for the second witness
             self._build_occurrences_to_vertices(collation, next_witness, token_to_vertex, transposed_tokens, graph_occurrence_to_vertices)    
-        
+
     #===========================================================================
     # graph block to occurrences: every block that is present in the graph mapped to
     # its occurrences
@@ -454,7 +457,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             for token, vertex in zip(tokens, vertices):
                 alignment[token]=vertex
         return alignment
-        
+
     def _build_occurrences_to_vertices(self, collation, witness, token_to_vertex, transposed_tokens, occurrence_to_vertices):
         witness_range = collation.get_range_for_witness(witness.sigil)
         token_counter = witness_range[0]
@@ -482,7 +485,7 @@ class DekkerSuffixAlgorithm(CollationAlgorithm):
             token_counter += 1
         return occurrence_to_tokens
 
-    
+
 #===========================================================================
 # Direct port from Java code
 #===========================================================================
@@ -498,7 +501,7 @@ class PhraseMatchDetector(object):
         base_phrase = []
         witness_phrase = []
         previous = base.start
-        
+
         for token in tokens:
             if not token in linked_tokens:
                 self._add_new_phrase_match_and_clear_buffer(phrase_matches, base_phrase, witness_phrase)
@@ -526,41 +529,41 @@ class TranspositionDetector(object):
     def detect(self, phrasematches, base):
         if not phrasematches:
             return []
-        
+
         ranking = self._rank_the_graph(phrasematches, base)
-        
+
         def compare_phrasematches(pm1, pm2):
             (vertex1, _) = pm1[0]
             (vertex2, _) = pm2[0]
             rank1 = ranking.apply(vertex1)
             rank2 = ranking.apply(vertex2)
             difference = rank1 - rank2
-            
+
             if difference != 0:
                 return difference
             index1 = phrasematches.index(pm1)
             index2 = phrasematches.index(pm2)
             return index1 - index2
-        
+
         phrasematches_graph_order = sorted(phrasematches, cmp=compare_phrasematches)
-        
+
         # map 1
         self.phrasematch_to_index = {}
         for idx, val in enumerate(phrasematches_graph_order):
             self.phrasematch_to_index[val[0]]=idx
-        
+
         # We calculate the index for all the phrase matches
         # First in witness order, then in graph order
         phrasematches_graph_index = range(0, len(phrasematches))
-        
+
         phrasematches_witness_index = []
         for phrasematch in phrasematches:
             phrasematches_witness_index.append(self.phrasematch_to_index[phrasematch[0]])
-        
+
         # initialize result variables
         non_transposed_phrasematches = list(phrasematches)
         transpositions = []
-        
+
         # loop here until the maximum distance == 0
         while(True):
             # map 2
@@ -570,12 +573,12 @@ class TranspositionDetector(object):
                 witness_index = phrasematches_witness_index[i]
                 distance = abs(graph_index - witness_index)
                 phrasematch_to_distance[phrasematch[0]]=distance
-        
+
             distance_list = list(phrasematch_to_distance.values())
-            
+
             if not distance_list or max(distance_list) == 0:
                 break
-            
+
             def comp2(pm1, pm2):
                 # first order by distance
                 distance1 = phrasematch_to_distance[pm1[0]]
@@ -583,29 +586,29 @@ class TranspositionDetector(object):
                 difference = distance2 - distance1
                 if difference != 0:
                     return difference
-                
+
                 # second order by size
                 #TODO: this does not work for Greek texts with lots of small words!
                 #TODO: it should determine which block this phrasematch is part of and
                 #TODO: the number of occurrences for that block
                 return len(pm1) - len(pm2)
-                
+
             sorted_phrasematches = sorted(non_transposed_phrasematches, cmp = comp2) 
             transposedphrase = sorted_phrasematches[0]
-            
+
             transposed_index = self.phrasematch_to_index[transposedphrase[0]]
             graph_index = phrasematches_graph_index.index(transposed_index)
             transposed_with_index = phrasematches_witness_index[graph_index]
             linked_transposed_phrase = phrasematches_graph_order[transposed_with_index]
-            
+
             self._add_transposition(phrasematches_witness_index, phrasematches_graph_index, non_transposed_phrasematches, transpositions, transposedphrase)
-            
+
             distance = phrasematch_to_distance[transposedphrase[0]]
             if distance == phrasematch_to_distance[linked_transposed_phrase[0]] and distance > 1:
                 self._add_transposition(phrasematches_witness_index, phrasematches_graph_index, non_transposed_phrasematches, transpositions, linked_transposed_phrase)
-    
+
         return transpositions
-    
+
     def _add_transposition(self, phrasematches_witness_index, phrasematches_graph_index, non_transposed_phrasematches, transpositions, transposed_phrase):
         index_to_remove = self.phrasematch_to_index[transposed_phrase[0]]
         non_transposed_phrasematches.remove(transposed_phrase)
