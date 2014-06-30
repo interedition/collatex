@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0pre6 (2014-06-30)
+++++++++++++++++++++++
+
+* Added Windows support. Thanks to David J. Birnbaum.
+* Fixed handling of IPython imports.
+
 2.0.0pre5 (2014-06-11)
 ++++++++++++++++++++++
 
