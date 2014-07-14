@@ -56,7 +56,18 @@ Simple example:
 
   alignment_table = collate(collation)
 
+When running from the command shell run the example script with:
+::
+
+	python ./nameofscript.py
+
 When using IPython Notebook a nice HTML representation of the alignment table is shown when the collate function is called.
+When using a textual Python prompt add
+::
+
+  print(aligment_table)
+	
+to show the results.
 Output can also be shown as a graph instead of a table when graphviz and pygraphviz are installed:
 ::
 

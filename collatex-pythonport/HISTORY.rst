@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.0pre7 (2014-07-14)
+++++++++++++++++++++++
+
+* Fixed handling of segmentation parameter in pretokenized JSON function.
+
 2.0.0pre6 (2014-06-30)
 ++++++++++++++++++++++
 
