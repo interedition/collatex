@@ -25,10 +25,16 @@ class Test(unittest.TestCase):
         aligner.align()
         table = aligner.table
 #         self.debug_table(aligner, table)
-        self.assertEqual(-1, table[0][0].g)
+        self.assertEqual(0, table[0][0].g)
         self.assertEqual(-1, table[0][1].g)
         self.assertEqual(-2, table[0][2].g)
-        self.assertEqual(-2, table[1][0].g)
+        self.assertEqual(-3, table[0][3].g)
+        self.assertEqual(-1, table[1][0].g)
         self.assertEqual(-2, table[1][1].g)
         self.assertEqual(-1, table[1][2].g)
+        self.assertEqual(-2, table[1][3].g)
+        self.assertEqual(-2, table[2][0].g)
+        self.assertEqual(-3, table[2][1].g)
+        self.assertEqual(-2, table[2][2].g)
+        self.assertEqual(-1, table[2][3].g)
         
