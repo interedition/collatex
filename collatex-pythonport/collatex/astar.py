@@ -14,7 +14,7 @@ class AStar(object):
     def heuristic(self, node, start, end):
         raise NotImplementedError
       
-    def create_childnodes(self):
+    def create_childnodes(self, node):
         raise NotImplementedError
       
     def search(self, start):
