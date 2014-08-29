@@ -7,7 +7,9 @@ from sets import Set
 
 class EditGraphNode(object):
     def __init__(self):
-        self.g = 0
+        self.g = 0 # global score 
+        self.segments = 0 # number of segments
+        self.match = False # this node represents a match or not
         self.parent = None
         
     def __repr__(self):
@@ -48,7 +50,7 @@ class EditGraphAligner(object):
         # per diagonal calculate the score (taking into account the three surrounding nodes)
         self.traverse_diagonally()
         
-            
+    # TODO: Count and score segments
     def score(self, y, x):
         # initialize root node score to zero (no edit operations have
         # been performed)
@@ -69,22 +71,27 @@ class EditGraphAligner(object):
         # it is either an add or a delete
         if x == 0 or y == 0:
             return parent_node.g - 1
-        # now we need to determine whether this node represents a match
-        token_a = self.tokens_witness_a[x-1]
-        token_b = self.tokens_witness_b[y-1]
-        match = token_a.token_string == token_b.token_string
-        # based on match or not and parent_node calculate new score
-        if match:
-            # do not change score for now 
-            # TODO: this should do +1 or +2 depending on already in a match or not
-            score = parent_node.g
-        else:
-            # it is either an add/delete or replacement (so an add and a delete)
-            # TODO: this should do -1 or -2 depending on already in a match or not
-            # it is a replacement
-            if parent_node == self.table[y-1][x-1]:
-                score = parent_node.g - 2
-            # it is an add/delete
+        
+        # it is either an add/delete or replacement (so an add and a delete)
+        # it is a replacement
+        if parent_node == self.table[y-1][x-1]:
+            # now we need to determine whether this node represents a match
+            token_a = self.tokens_witness_a[x-1]
+            token_b = self.tokens_witness_b[y-1]
+            match = token_a.token_string == token_b.token_string
+            # based on match or not and parent_node calculate new score
+            if match:
+                # mark the fact that this node is match
+                self.table[y][x].match = True
+                # do not change score for now 
+                score = parent_node.g
+                # count segments
+                if parent_node.match == False:
+                    self.table[y][x].segments = parent_node.segments + 1
+            
             else:
-                score = parent_node.g - 1
+                score = parent_node.g - 2
+        # it is an add/delete
+        else:
+            score = parent_node.g - 1
         return score
