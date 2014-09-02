@@ -10,13 +10,13 @@ from collatex.edit_graph_aligner import EditGraphAligner
 
 class Test(unittest.TestCase):
 
-
+    # global score
     def assertRow(self, expected, cell_data):
         actual = []
         for cell in cell_data:
             actual.append(cell.g)
         self.assertEqual(expected, actual)
-        
+    
     def debugRowSegments(self, cell_data):
         actual = []
         for cell in cell_data:
@@ -64,6 +64,18 @@ class Test(unittest.TestCase):
         self.assertRow([-1, 0, -1, -2, -3], table[1])
         self.assertRow([-2, -1, -2, -1, -2], table[2])
         self.assertRow([-3, -2, -3, -2, -1], table[3])
+        
+#     def test_path(self):
+#         a = Witness("A", "a b c")
+#         b = Witness("B", "a b c")
+#         aligner = EditGraphAligner(a, b)
+#         aligner.align()
+#         segments = aligner.get_segments()
+#         self.assertSegments(["a b c"], segments)
+        
+        
+#         path = aligner.get_path()
+#         self.assertPath([(0,0),(1,1),(2,2),(3,3)], path)
         
 #     def testOmission2SegmentsScore(self):
 #         a = Witness("A", "a a b c")
