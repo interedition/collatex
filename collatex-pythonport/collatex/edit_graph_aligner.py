@@ -65,21 +65,29 @@ class EditGraphAligner(CollationAlgorithm):
         # start lower right cell
         x = self.length_witness_a
         y = self.length_witness_b
+        # work our way to the upper left
         while x > 0 and y > 0:
-            cell = self._process_cell(token_to_vertex, self.tokens_witness_a, self.tokens_witness_b, alignment, x, y)
-            
-            # work our way to the upper left
-            if self.table[y-1][x-1].g <= cell.g:
-                # another match
+            self._process_cell(token_to_vertex, self.tokens_witness_a, self.tokens_witness_b, alignment, x, y)
+            # examine neighbor nodes
+            nodes_to_examine = Set()
+            nodes_to_examine.add(self.table[y][x-1])
+            nodes_to_examine.add(self.table[y-1][x])
+            nodes_to_examine.add(self.table[y-1][x-1])
+            # calculate the maximum scoring parent node
+            parent_node = max(nodes_to_examine, key=lambda x: x.g)
+            # move position
+            if self.table[y-1][x-1] == parent_node:
+                # another match or replacement
                 y = y -1
                 x = x -1
-            if self.table[y-1][x].g <= cell.g:
-                #omisison?
-                y = y -1
-            if self.table[y][x-1].g <= cell.g:
-                #addition?
-                x = x -1
-                
+            else:
+                if self.table[y-1][x] == parent_node:
+                    #omission?
+                    y = y -1
+                else:
+                    if self.table[y][x-1] == parent_node:
+                        #addition?
+                        x = x -1
         return alignment
         
     def _process_cell(self, token_to_vertex, witness_a, witness_b, alignment, x, y):
