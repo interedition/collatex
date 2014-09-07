@@ -4,8 +4,9 @@ Created on Aug 4, 2014
 @author: Ronald
 '''
 import unittest
-from collatex.collatex_core import Witness
+from collatex.collatex_core import VariantGraph
 from collatex.edit_graph_aligner import EditGraphAligner
+from collatex.collatex_dekker_algorithm import Collation
 
 
 class Test(unittest.TestCase):
@@ -16,6 +17,14 @@ class Test(unittest.TestCase):
         for cell in cell_data:
             actual.append(cell.g)
         self.assertEqual(expected, actual)
+    
+    def assertSuperbaseEquals(self, expected, superbase):
+        actual = ""
+        for token in superbase:
+            if actual:
+                actual += " "
+            actual += str(token)
+        self.assertEquals(expected, actual)    
     
     def debugRowSegments(self, cell_data):
         actual = []
@@ -28,12 +37,15 @@ class Test(unittest.TestCase):
             for x in range(aligner.length_witness_a+1):
                 print (y, x), table[y][x]
 
+
     # we need to introduce a gap here
     def testOmission(self):
-        a = Witness("A", "a b c")
-        b = Witness("B", "b c")
-        aligner = EditGraphAligner(a, b)
-        aligner.align()
+        collation = Collation()
+        collation.add_witness("A", "a b c")
+        collation.add_witness("B", "b c")
+        aligner = EditGraphAligner(collation)
+        graph = VariantGraph()
+        aligner.collate(graph, collation)
         table = aligner.table
 #         self.debug_table(aligner, table)
         self.assertEqual(0, table[0][0].g)
@@ -51,19 +63,34 @@ class Test(unittest.TestCase):
 
     # test number of segments (we want the solution that returns only one segment)
 
-    
-    
     def testOmission2GlobalScore(self):
-        a = Witness("A", "a a b c")
-        b = Witness("B", "a b c")
-        aligner = EditGraphAligner(a, b)
-        aligner.align()
+        collation = Collation()
+        collation.add_witness("A", "a a b c")
+        collation.add_witness("B", "a b c")
+        aligner = EditGraphAligner(collation)
+        graph = VariantGraph()
+        aligner.collate(graph, collation)
         table = aligner.table
-
+ 
         self.assertRow([0, -1, -2, -3, -4], table[0])
         self.assertRow([-1, 0, -1, -2, -3], table[1])
         self.assertRow([-2, -1, -2, -1, -2], table[2])
         self.assertRow([-3, -2, -3, -2, -1], table[3])
+
+
+    def test_superbase(self):
+        collation = Collation()
+        collation.add_witness("A", "X a b c d e f X g h i Y Z j k")
+        collation.add_witness("B", "a b c Y d e f Y Z g h i X j k")
+        aligner = EditGraphAligner(collation)
+        graph = VariantGraph()
+        aligner.collate(graph, collation)
+        superbase = aligner.new_superbase
+        self.assertSuperbaseEquals("X a b c Y d e f X Y Z g h i Y Z X j k", superbase)
+        
+        
+        # TODO: add Y to the witness B (to check end modification
+        
         
 #     def test_path(self):
 #         a = Witness("A", "a b c")

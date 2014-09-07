@@ -62,6 +62,12 @@ class EditGraphAligner(CollationAlgorithm):
 
         alignment = {}
 
+        # segment stuff
+        # note we traverse from right to left!
+        self.last_x = self.length_witness_a
+        self.last_y = self.length_witness_b
+        self.new_superbase=[]
+        
         # start lower right cell
         x = self.length_witness_a
         y = self.length_witness_b
@@ -88,15 +94,39 @@ class EditGraphAligner(CollationAlgorithm):
                     if self.table[y][x-1] == parent_node:
                         #addition?
                         x = x -1
+        # process additions/omissions in the begin of the superbase/witness
+        self.add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, 0, 0)
         return alignment
         
+
+    def add_to_superbase(self, witness_a, witness_b, x, y):
+#         print self.last_x - x - 1, self.last_y - y - 1
+        if self.last_x - x - 1 > 0 or self.last_y - y - 1 > 0:
+#             print x, self.last_x, y, self.last_y 
+            # create new segment
+            omitted_base = witness_a[x:self.last_x - 1]
+#             print omitted_base
+            added_witness = witness_b[y:self.last_y - 1]
+#             print added_witness
+            self.new_superbase = added_witness + self.new_superbase
+            self.new_superbase = omitted_base + self.new_superbase
+
     def _process_cell(self, token_to_vertex, witness_a, witness_b, alignment, x, y):
         cell = self.table[y][x]
+        # process segments
+        if cell.match == True:
+            self.add_to_superbase(witness_a, witness_b, x, y)
+            self.last_x = x
+            self.last_y = y
+        # process alignment
         if cell.match == True:
             token = witness_a[x-1]
             token2 = witness_b[y-1]
             vertex = token_to_vertex[token]
             alignment[token2] = vertex
+#             print("match")
+#             print(token2)
+            self.new_superbase.insert(0, token)
         return cell
 
     # This function traverses the table diagonally and scores each cell.
