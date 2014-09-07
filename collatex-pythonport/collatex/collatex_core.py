@@ -10,6 +10,7 @@ Tokenizer, Witness, VariantGraph, CollationAlgorithm
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
+import re
 
 
 class Row(object):
@@ -88,6 +89,12 @@ class Tokenizer(object):
     def tokenize(self, contents):
         return contents.split()
 
+class WordPunctuationTokenizer(object):
+    #tokenizer splits on punctuation or whitespace
+    def tokenize(self, contents):
+#       the remarked regular expression keeps the whitespace 
+#       return re.findall("[.?!,;:]+[\\s]*|[^.?!,;:\\s]+[\\s]*", contents)
+        return re.findall(r'\w+|[^\w\s]+', contents)
 
 class Token(object):
     
@@ -102,7 +109,7 @@ class Witness(object):
     def __init__(self, sigil, content):
         self.sigil = sigil
         self.content = content
-        tokenizer = Tokenizer()
+        tokenizer = WordPunctuationTokenizer()
         self._tokens = []
         tokens_as_strings = tokenizer.tokenize(self.content)
         for token_string in tokens_as_strings:
@@ -217,7 +224,13 @@ def join(graph):
             (_, join_candidate) = out_edges[0]
             can_join = join_candidate != end and len(graph.in_edges(join_candidate))==1
             if can_join:
-                graph.vertex_attributes(vertex)["label"]+=" "+graph.vertex_attributes(join_candidate)["label"]
+                # Note: since there is no normalized/non normalized content in the graph
+                # a space character is added here for non punctuation tokens
+                label = graph.vertex_attributes(join_candidate)["label"]
+                if re.match(r'^\W', label):
+                    graph.vertex_attributes(vertex)["label"]+=label
+                else:
+                    graph.vertex_attributes(vertex)["label"]+=" "+label
                 for (_, neighbor, data) in graph.out_edges(join_candidate, data=True):
                     graph.remove_edge(join_candidate, neighbor)
                     graph.connect(vertex, neighbor, data["label"])
