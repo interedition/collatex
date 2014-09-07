@@ -48,8 +48,24 @@ class EditGraphAligner(CollationAlgorithm):
         alignment = self._align(superbase, next_witness, token_to_vertex)
         
         # merge
-        token_to_vertex = self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment)
+        token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment))
+        
+        if len(collation.witnesses)>2:
+            # change superbase
+            superbase = self.new_superbase
+            print(superbase)
+            
+            # third witness
+            next_witness = collation.witnesses[2]
 
+            print(token_to_vertex.keys())
+
+            # alignment = token -> vertex
+            alignment = self._align(superbase, next_witness, token_to_vertex)
+        
+            # merge
+            token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment))
+        
     def _align(self, superbase, witness, token_to_vertex):
         self.tokens_witness_a = superbase
         self.tokens_witness_b = witness.tokens()
