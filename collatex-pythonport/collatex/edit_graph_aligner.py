@@ -41,30 +41,18 @@ class EditGraphAligner(CollationAlgorithm):
         # construct superbase
         superbase = tokens
         
-        # second witness
-        next_witness = collation.witnesses[1]
+        # align witness 2 - n
+        for x in range(1, len(collation.witnesses)):
+            next_witness = collation.witnesses[x]
         
-        # alignment = token -> vertex
-        alignment = self._align(superbase, next_witness, token_to_vertex)
-        
-        # merge
-        token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment))
-        
-        if len(collation.witnesses)>2:
-            # change superbase
-            superbase = self.new_superbase
-            print(superbase)
-            
-            # third witness
-            next_witness = collation.witnesses[2]
-
-            print(token_to_vertex.keys())
-
             # alignment = token -> vertex
             alignment = self._align(superbase, next_witness, token_to_vertex)
         
             # merge
             token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment))
+
+            # change superbase
+            superbase = self.new_superbase
         
     def _align(self, superbase, witness, token_to_vertex):
         self.tokens_witness_a = superbase
