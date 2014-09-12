@@ -7,8 +7,8 @@ import unittest
 from ClusterShell.RangeSet import RangeSet
 from array import array
 from collatex import Collation, Block
-from collatex import dekker_suffix_algorithm
 from collatex import ExtendedSuffixArray
+from collatex.dekker_suffix_algorithm import DekkerSuffixAlgorithm
 
 
 
@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "the black cat")
         collation.add_witness("W2", "the black cat")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         blocks = algorithm.get_non_overlapping_repeating_blocks()
         block1 = Block(RangeSet("0-2, 4-6"))
         self.assertEqual([block1], blocks)
@@ -83,7 +83,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "the cat and the dog")
         collation.add_witness("W2", "the dog and the cat")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         blocks = algorithm.get_non_overlapping_repeating_blocks()
         block1 = Block(RangeSet("0-1, 9-10"))
         block2 = Block(RangeSet("3-4, 6-7"))
@@ -94,7 +94,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         blocks = algorithm.get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-8, 16-24")), blocks) # a b c d F g h i !
         self.assertIn(Block(RangeSet("11-14, 25-28")), blocks) # q r s t
@@ -104,7 +104,7 @@ class Test(unittest.TestCase):
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         blocks = algorithm.get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-3, 16-19, 30-33")), blocks) # a b c d
         self.assertIn(Block(RangeSet("5-7, 21-23, 35-37")), blocks) # g h i
@@ -117,7 +117,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "a c b c")
         collation.add_witness("W2", "a c b")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         blocks = algorithm.get_non_overlapping_repeating_blocks()
         block1 = Block(RangeSet("0-2, 5-7")) # a c b
         self.assertIn(block1, blocks)
@@ -127,7 +127,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         block_witness = algorithm.get_block_witness(collation.witnesses[0])
         self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
         block_witness = algorithm.get_block_witness(collation.witnesses[1])
@@ -138,7 +138,7 @@ class Test(unittest.TestCase):
         collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_witness("W2", "a b c d F g h i ! q r s t")
         collation.add_witness("W3", "a b c d E g h i ! q r s t")
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         block_witness1 = algorithm.get_block_witness(collation.witnesses[0])
         self.assertEquals(["a b c d", "F", "g h i", "! q r s t"], block_witness1.debug())
         block_witness2 = algorithm.get_block_witness(collation.witnesses[1])
@@ -152,7 +152,7 @@ class Test(unittest.TestCase):
         collation.add_witness("w2", "a")
         extsufarr = collation.to_extended_suffix_array()
         potential_blocks = extsufarr.split_lcp_array_into_intervals()
-        algorithm = dekker_suffix_algorithm(collation)
+        algorithm = DekkerSuffixAlgorithm(collation)
         algorithm.filter_potential_blocks(potential_blocks)
         self.assertFalse(potential_blocks)
     

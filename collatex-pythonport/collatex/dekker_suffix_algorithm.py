@@ -4,11 +4,12 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 '''
 from collatex.collatex_core import CollationAlgorithm
-from collatex.collatex_dekker_algorithm import Occurrence, BlockWitness, Block,\
-    PhraseMatchDetector, TranspositionDetector
 from operator import attrgetter
-from collatex.collatex_suffix import PartialOverlapException
+from collatex.collatex_suffix import PartialOverlapException, Occurrence,\
+    BlockWitness, Block
 from ClusterShell.RangeSet import RangeSet
+from collatex.collatex_dekker_algorithm import PhraseMatchDetector,\
+    TranspositionDetector
 
 class DekkerSuffixAlgorithm(CollationAlgorithm):
     def __init__(self, collation):
