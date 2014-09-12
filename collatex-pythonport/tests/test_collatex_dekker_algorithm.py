@@ -6,7 +6,8 @@ Created on May 3, 2014
 import unittest
 from networkx.drawing.nx_pydot import to_pydot
 from collatex import VariantGraph
-from collatex import DekkerSuffixAlgorithm, Collation
+from collatex import Collation
+from collatex.dekker_suffix_algorithm import DekkerSuffixAlgorithm
 
 
 class Test(unittest.TestCase):
