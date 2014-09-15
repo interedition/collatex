@@ -104,9 +104,8 @@ class DekkerSuffixEditGraphAligner(CollationAlgorithm):
             # change superbase
             superbase = self.new_superbase
             #TODO: update graph occurrences to vertex map
-                       
-            #TODO: this is temporary!
-            break
+            self._build_occurrences_to_vertices(collation, next_witness, next_witness_as_blocks, token_to_vertex, [], graph_occurrence_to_vertices)    
+
         
             
             
