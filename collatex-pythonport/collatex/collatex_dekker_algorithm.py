@@ -4,9 +4,10 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 '''
 from collatex.collatex_core import VariantGraphRanking,\
-     VariantGraph, Tokenizer, Witness, join, AlignmentTable, Row
+     VariantGraph, Witness, join, AlignmentTable, Row,\
+    WordPunctuationTokenizer
 from collatex.collatex_suffix import ExtendedSuffixArray
-from collatex.linsuffarr import SuffixArray
+from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 from prettytable import PrettyTable
 from textwrap import fill
@@ -193,7 +194,7 @@ class Collation(object):
         witness_range = RangeSet()
         witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
         # the extra one is for the marker token
-        self.counter += len(witness.tokens()) +1 
+        self.counter += len(witness.tokens()) +2 # $ + number 
         self.witness_ranges[sigil] = witness_range
         if not self.combined_string == "":
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
@@ -210,7 +211,8 @@ class Collation(object):
     def get_sa(self):
         #NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
         if not self.cached_suffix_array:
-            self.cached_suffix_array = SuffixArray(self.combined_string)
+            # Unit byte is done to skip tokenization in third party library
+            self.cached_suffix_array = SuffixArray(self.tokens, unit=UNIT_BYTE)
         return self.cached_suffix_array
 
     def get_suffix_array(self):
@@ -227,8 +229,9 @@ class Collation(object):
 
     @property
     def tokens(self):
+        #print("COLLATION TOKENIZE IS CALLED!")
         #TODO: complete set of witnesses is retokenized here!
-        tokenizer = Tokenizer()
+        tokenizer = WordPunctuationTokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string())
         return tokens
 

@@ -109,7 +109,8 @@ class Witness(object):
     def __init__(self, sigil, content):
         self.sigil = sigil
         self.content = content
-        tokenizer = Tokenizer()
+        # print("Witness "+sigil+" TOKENIZER IS CALLED!")
+        tokenizer = WordPunctuationTokenizer()
         self._tokens = []
         tokens_as_strings = tokenizer.tokenize(self.content)
         for token_string in tokens_as_strings:
