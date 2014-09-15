@@ -58,7 +58,7 @@ class DekkerSuffixEditGraphAligner(CollationAlgorithm):
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
  
         first_witness_as_blocks = self._get_block_witness(first_witness)
-        print(first_witness_as_blocks.debug())
+#         print(first_witness_as_blocks.debug())
 
         # construct superbase
         # The superbase needs to consists of Blocks
@@ -81,13 +81,13 @@ class DekkerSuffixEditGraphAligner(CollationAlgorithm):
             next_witness_as_blocks = self._get_block_witness(next_witness)
             witness_occurrence_to_tokens = self._build_occurrences_to_tokens(collation, next_witness, next_witness_as_blocks)
             # debug
-            print(next_witness_as_blocks.debug())
+#             print(next_witness_as_blocks.debug())
             self._create_edit_graph_table(superbase, next_witness_as_blocks)
             # debug
-            self._debug_edit_graph_table()
+#             self._debug_edit_graph_table()
             occ_alignment = self._traverse_edit_graph_table_to_find_optimal_alignment()
             # debug
-            print(occ_alignment)
+#             print(occ_alignment)
             
             alignment = {}
             
@@ -251,7 +251,7 @@ class DekkerSuffixEditGraphAligner(CollationAlgorithm):
     Internal method to transform a Witness into a Block Witness.
     '''
     def _get_block_witness(self, witness):
-        print("Generating block witness for: "+witness.sigil)
+#         print("Generating block witness for: "+witness.sigil)
         sigil_witness = witness.sigil
         range_witness = self.collation.get_range_for_witness(sigil_witness)
         #NOTE: to prevent recalculation of blocks
