@@ -11,7 +11,7 @@ from ClusterShell.RangeSet import RangeSet
 from prettytable import PrettyTable
 from textwrap import fill
 import json
-from collatex.edit_graph_aligner import EditGraphAligner
+from collatex.edit_graph_aligner import DekkerSuffixEditGraphAligner
 
 # optionally load the IPython dependencies
 try:
@@ -85,7 +85,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
 # "json" for the alignment table rendered as JSON
 # "novisualization" to get the plain AlignmentTable object without any rendering         
 def collate(collation, output="table", layout="horizontal", segmentation=True):
-    algorithm = EditGraphAligner(collation)
+    algorithm = DekkerSuffixEditGraphAligner(collation)
     # build graph
     graph = VariantGraph()
     algorithm.collate(graph, collation)
