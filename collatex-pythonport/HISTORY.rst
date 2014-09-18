@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0pre8 (2014-09-18)
+++++++++++++++++++++++
+
+* Added WordPunctuationTokenizer (treats punctuation as separate tokens).
+* Combined suffix array and edit graph aligner approaches into one collation algorithm.
+
 2.0.0pre7 (2014-07-14)
 ++++++++++++++++++++++
 

@@ -8,7 +8,6 @@ Preparation:
 	DONE: Tokenization: There are two tokenizers:
 		One based on whitespace, punctuation not treated as separate tokens
 		Another based on whitespace or punctuation, punctuation is treated as separate tokens (default)
-	Note: Tokenization is done again in the SuffixArray module! TODO FIX THIS!
 	Normalization: None
 
 Alignment:
@@ -18,17 +17,18 @@ Alignment:
 	Find LCP intervals: DONE
 	Find non overlapping repeating blocks: DONE
 	Build block witnesses: DONE
-	TODO: combine dekker_suffix_alignment + edit graph aligner
-	
-	
-	Find match phrases: DONE
-	Find transpositions: DONE
 	Merge vertices into graph: DONE
 	Handle 3, 4, N witnesses: DONE
 	Deal with alignment choices using decision tree: DONE (implemented in EditGraphAligner)
-	a* search algorithm as optimization: NOT YET NEEDED
-	Merge transpositions into graph: TODO
+	Combine dekker_suffix_alignment + edit graph aligner approaches into one: DONE
 
+	Transposition detection:
+	Find match phrases: NOT YET NEEDED, optional
+	Find transpositions: NOT YET NEEDED, optional
+	Merge transpositions into graph: TODO
+	
+	Optimization:
+	a* search algorithm as optimization: NOT YET NEEDED
 	
 Presentation:
 	Join variant graph (parallel segments): DONE
