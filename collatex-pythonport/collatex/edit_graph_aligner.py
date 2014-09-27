@@ -27,9 +27,9 @@ class EditGraphNode(object):
     THE A* BASED ALIGNER WILL BE MUCH FASTER!
     '''
 class EditGraphAligner(CollationAlgorithm):
-    def __init__(self, collation):
+    def __init__(self, collation, near_match=False):
         self.collation = collation
-        self.scorer = Scorer(collation)
+        self.scorer = Scorer(collation, near_match)
         
     def collate(self, graph, collation):
         '''

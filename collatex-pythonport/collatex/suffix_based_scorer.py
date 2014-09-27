@@ -7,6 +7,7 @@ from collatex.collatex_suffix import Occurrence, BlockWitness, Block,\
     PartialOverlapException
 from operator import attrgetter
 from ClusterShell.RangeSet import RangeSet
+from Levenshtein import ratio
 
 '''
  This class scores cells in the edit graph table based on the largest non overlapping blocks
@@ -14,11 +15,14 @@ from ClusterShell.RangeSet import RangeSet
 '''
 
 class Scorer(object):
-    def __init__(self, collation):
+    def __init__(self, collation, near_match):
         self.collation = collation
         self.blocks = []
         self.global_tokens_to_occurrences = {}
-        self.match_function = self.match
+        if near_match:
+            self.match_function = self.near_match
+        else:
+            self.match_function = self.match
         
     def prepare_witness(self, witness):
         # this code can probably done more efficient, for now the main goal is to make it work
@@ -47,6 +51,18 @@ class Scorer(object):
         else:
             return -1
 
+    def near_match(self, token_a, token_b):
+        result = self.match(token_a, token_b)
+        if result==0:
+            return 0
+        r = ratio(token_a.token_string, token_b.token_string)
+        print(str(token_a)+" "+str(token_b)+" "+str(r))
+        if r > 0.6: 
+            return 1
+        else:
+            return -1
+        pass
+    
     # edit operation: 
     #    0 == match/replacement
     #    1 == addition/omission
@@ -73,6 +89,9 @@ class Scorer(object):
                 if parent_node.match == False:
                     table_node.segments = parent_node.segments + 1
                 return
+            if match==1:
+                table_node.g = parent_node.g - 0.5 #TODO: TEST TEST TEST
+                pass
             else:
                 table_node.g = parent_node.g - 2
                 return

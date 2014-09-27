@@ -85,8 +85,8 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
 # "graph" for the variant graph rendered as SVG
 # "json" for the alignment table rendered as JSON
 # "novisualization" to get the plain AlignmentTable object without any rendering         
-def collate(collation, output="table", layout="horizontal", segmentation=True):
-    algorithm = EditGraphAligner(collation)
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False):
+    algorithm = EditGraphAligner(collation, near_match=near_match)
     # build graph
     graph = VariantGraph()
     algorithm.collate(graph, collation)
