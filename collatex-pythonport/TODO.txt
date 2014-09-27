@@ -43,4 +43,7 @@ Presentation:
 Special cases:
 	TODO: failing use case in test_collatex_block_witnesses.py
 		name: test_blocks_failing_transposition_use_case_old_algorithm
+	TODO: Blocks should not start with punctuation
+	TODO: Scoring should take length of blocks into account
+	
 				

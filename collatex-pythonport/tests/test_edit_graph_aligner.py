@@ -5,7 +5,7 @@ Created on Aug 4, 2014
 '''
 import unittest
 from collatex.collatex_core import VariantGraph
-from collatex.edit_graph_aligner import DekkerSuffixEditGraphAligner
+from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.collatex_dekker_algorithm import Collation
 
 
@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("A", "a b c")
         collation.add_witness("B", "b c")
-        aligner = DekkerSuffixEditGraphAligner(collation)
+        aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)
         table = aligner.table
@@ -67,7 +67,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("A", "a a b c")
         collation.add_witness("B", "a b c")
-        aligner = DekkerSuffixEditGraphAligner(collation)
+        aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)
         table = aligner.table
@@ -82,7 +82,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("A", "X a b c d e f X g h i Y Z j k")
         collation.add_witness("B", "a b c Y d e f Y Z g h i X j k")
-        aligner = DekkerSuffixEditGraphAligner(collation)
+        aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)
         superbase = aligner.new_superbase

@@ -1,0 +1,21 @@
+'''
+Created on Sep 12, 2014
+
+@author: Ronald Haentjens Dekker
+'''
+import unittest
+from collatex.collatex_dekker_algorithm import Collation, collate
+
+
+class Test(unittest.TestCase):
+
+	def test_near_matching(self):
+		collation = Collation()
+		collation.add_witness("A", "I bought this glass, because it matches those dinner plates")
+		collation.add_witness("B", "I bought those glasses")
+		collate(collation)
+
+if __name__ == "__main__":
+	#import sys;sys.argv = ['', 'Test.testOmission']
+	unittest.main()
+		
