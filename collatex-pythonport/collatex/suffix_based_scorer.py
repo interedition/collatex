@@ -3,7 +3,6 @@ Created on Aug 5, 2014
 
 @author: Ronald Haentjens Dekker
 '''
-from sets import Set
 from collatex.collatex_suffix import Occurrence, BlockWitness, Block,\
     PartialOverlapException
 from operator import attrgetter
@@ -29,6 +28,48 @@ class Scorer(object):
         #NOTE: only the ones that are going to be aligned have to be stored in superbase dict.
         self.global_tokens_to_occurrences.update(tokens_to_occurrences)
         
+    # edit operation: 
+    #    0 == match/replacement
+    #    1 == addition/omission
+    def score_cell(self, table_node, parent_node, token_a, token_b, y, x, edit_operation):
+        # no matching possible in this case (always treated as a gap)
+        # it is either an add or a delete
+        if x == 0 or y == 0:
+            table_node.g = parent_node.g - 1
+            return
+        
+        # it is either an add/delete or replacement (so an add and a delete)
+        # it is a replacement
+        if edit_operation == 0:
+            # now we need to determine whether this node represents a match
+            # determine this based on whether token a and token b are part of the same block
+            occur_a = self.global_tokens_to_occurrences.setdefault(token_a, None)
+            occur_b = self.global_tokens_to_occurrences.setdefault(token_b, None)
+                                                                
+            if occur_a and occur_b:
+                match = occur_a.block == occur_b.block
+            else:
+                match = False
+#             print("testing "+token_a.token_string+" and "+token_b.token_string+" "+str(match))   
+            # match = token_a.token_string == token_b.token_string
+            # based on match or not and parent_node calculate new score
+            if match:
+                # mark the fact that this node is match
+                table_node.match = True
+                # do not change score for now 
+                table_node.g = parent_node.g
+                # count segments
+                if parent_node.match == False:
+                    table_node.segments = parent_node.segments + 1
+                return
+            else:
+                table_node.g = parent_node.g - 2
+                return
+        # it is an add/delete
+        else:
+            table_node.g = parent_node.g - 1
+            return 
+
     #TODO: it should be possible to do this simpler, faster
     # An occurrence should know its tokens, since it knows its token range
     def _build_tokens_to_occurrences(self, collation, witness, block_witness):
@@ -45,58 +86,6 @@ class Scorer(object):
         return tokens_to_occurrence
 
     
-    def score_cell(self, token_a, token_b, y, x, table):
-        # initialize root node score to zero (no edit operations have
-        # been performed)
-        if y == 0 and x == 0:
-            return 0 
-        # examine neighbor nodes
-        nodes_to_examine = Set()
-        # fetch existing score from the left node if possible
-        if x > 0:
-            nodes_to_examine.add(table[y][x-1])
-        if y > 0:
-            nodes_to_examine.add(table[y-1][x])
-        if x > 0 and y > 0:
-            nodes_to_examine.add(table[y-1][x-1])
-        # calculate the maximum scoring parent node
-        parent_node = max(nodes_to_examine, key=lambda x: x.g)
-        # no matching possible in this case (always treated as a gap)
-        # it is either an add or a delete
-        if x == 0 or y == 0:
-            return parent_node.g - 1
-         
-        # it is either an add/delete or replacement (so an add and a delete)
-        # it is a replacement
-        if parent_node == table[y-1][x-1]:
-            # now we need to determine whether this node represents a match
-            # determine this based on whether token a and token b are part of the same block
-            occur_a = self.global_tokens_to_occurrences.setdefault(token_a, None)
-            occur_b = self.global_tokens_to_occurrences.setdefault(token_b, None)
-                                                                
-            if occur_a and occur_b:
-                match = occur_a.block == occur_b.block
-            else:
-                match = False
-#             print("testing "+token_a.token_string+" and "+token_b.token_string+" "+str(match))   
-            # match = token_a.token_string == token_b.token_string
-            # based on match or not and parent_node calculate new score
-            if match:
-                # mark the fact that this node is match
-                table[y][x].match = True
-                # do not change score for now 
-                score = parent_node.g
-                # count segments
-                if parent_node.match == False:
-                    table[y][x].segments = parent_node.segments + 1
-             
-            else:
-                score = parent_node.g - 2
-        # it is an add/delete
-        else:
-            score = parent_node.g - 1
-        return score
-
 
     '''
     Internal method to transform a Witness into a Block Witness.

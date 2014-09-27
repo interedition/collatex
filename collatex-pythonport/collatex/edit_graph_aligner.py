@@ -155,10 +155,33 @@ class EditGraphAligner(CollationAlgorithm):
             while j >= z1:
                 x = _slice - j
                 y = j
-                token_a = self.tokens_witness_a[x-1]
-                token_b = self.tokens_witness_b[y-1]
-                self.table[y][x].g=self.scorer.score_cell(token_a, token_b, y, x, self.table)
+                self.score_cell(y, x)
                 j -= 1
+
+    def score_cell(self, y, x):
+        # initialize root node score to zero (no edit operations have
+        # been performed)
+        if y == 0 and x == 0:
+            self.table[y][x].g = 0
+            return 
+        # examine neighbor nodes
+        nodes_to_examine = Set()
+        # fetch existing score from the left node if possible
+        if x > 0:
+            nodes_to_examine.add(self.table[y][x-1])
+        if y > 0:
+            nodes_to_examine.add(self.table[y-1][x])
+        if x > 0 and y > 0:
+            nodes_to_examine.add(self.table[y-1][x-1])
+        # calculate the maximum scoring parent node
+        parent_node = max(nodes_to_examine, key=lambda x: x.g)
+        if parent_node == self.table[y-1][x-1]:
+            edit_operation = 0
+        else:
+            edit_operation = 1
+        token_a = self.tokens_witness_a[x-1]
+        token_b = self.tokens_witness_b[y-1]
+        self.scorer.score_cell(self.table[y][x], parent_node, token_a, token_b, y, x, edit_operation)
 
     def _debug_edit_graph_table(self):
         # print the table horizontal
