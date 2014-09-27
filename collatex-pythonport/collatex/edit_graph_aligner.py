@@ -6,51 +6,9 @@ Created on Aug 5, 2014
 
 from collatex.collatex_core import CollationAlgorithm
 from sets import Set
+from collatex.suffix_based_scorer import Scorer
+from prettytable import PrettyTable
 
-
-class Scorer(object):
-    def score_cell(self, token_a, token_b, y, x, table):
-        # initialize root node score to zero (no edit operations have
-        # been performed)
-        if y == 0 and x == 0:
-            return 0 
-        # examine neighbor nodes
-        nodes_to_examine = Set()
-        # fetch existing score from the left node if possible
-        if x > 0:
-            nodes_to_examine.add(table[y][x-1])
-        if y > 0:
-            nodes_to_examine.add(table[y-1][x])
-        if x > 0 and y > 0:
-            nodes_to_examine.add(table[y-1][x-1])
-        # calculate the maximum scoring parent node
-        parent_node = max(nodes_to_examine, key=lambda x: x.g)
-        # no matching possible in this case (always treated as a gap)
-        # it is either an add or a delete
-        if x == 0 or y == 0:
-            return parent_node.g - 1
-         
-        # it is either an add/delete or replacement (so an add and a delete)
-        # it is a replacement
-        if parent_node == table[y-1][x-1]:
-            # now we need to determine whether this node represents a match
-            match = token_a.token_string == token_b.token_string
-            # based on match or not and parent_node calculate new score
-            if match:
-                # mark the fact that this node is match
-                table[y][x].match = True
-                # do not change score for now 
-                score = parent_node.g
-                # count segments
-                if parent_node.match == False:
-                    table[y][x].segments = parent_node.segments + 1
-             
-            else:
-                score = parent_node.g - 2
-        # it is an add/delete
-        else:
-            score = parent_node.g - 1
-        return score
 
 class EditGraphNode(object):
     def __init__(self):
@@ -71,8 +29,8 @@ class EditGraphNode(object):
 class EditGraphAligner(CollationAlgorithm):
     def __init__(self, collation):
         self.collation = collation
-        self.scorer = Scorer()
-
+        self.scorer = Scorer(collation)
+        
     def collate(self, graph, collation):
         '''
         :type graph: VariantGraph
@@ -83,7 +41,10 @@ class EditGraphAligner(CollationAlgorithm):
         first_witness = collation.witnesses[0]
         tokens = first_witness.tokens()
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
-
+        
+        # let the scorer prepare the first witness
+        self.scorer.prepare_witness(first_witness)
+        
         # construct superbase
         superbase = tokens
         
@@ -91,6 +52,9 @@ class EditGraphAligner(CollationAlgorithm):
         for x in range(1, len(collation.witnesses)):
             next_witness = collation.witnesses[x]
         
+            # let the scorer prepare the next witness
+            self.scorer.prepare_witness(next_witness)
+            
             # alignment = token -> vertex
             alignment = self._align(superbase, next_witness, token_to_vertex)
         
@@ -196,4 +160,17 @@ class EditGraphAligner(CollationAlgorithm):
                 self.table[y][x].g=self.scorer.score_cell(token_a, token_b, y, x, self.table)
                 j -= 1
 
+    def _debug_edit_graph_table(self):
+        # print the table horizontal
+        x = PrettyTable()
+        x.header=False
+        for y in xrange(0, len(self.table)):
+            cells = self.table[y]
+            x.add_row(cells)
+        # alignment can only be set after the field names are known.
+        # since add_row sets the field names, it has to be set after x.add_row(cells)
+        x.align="l"
+        print(x)
+        return x
+    
 

@@ -61,8 +61,8 @@ class Test(unittest.TestCase):
         self.assertEqual(-2, table[2][2].g)
         self.assertEqual(-1, table[2][3].g)
 
-    # test number of segments (we want the solution that returns only one segment)
 
+    # note: the scoring table in this test is only correct when block detection is OFF
     def testOmission2GlobalScore(self):
         collation = Collation()
         collation.add_witness("A", "a a b c")
