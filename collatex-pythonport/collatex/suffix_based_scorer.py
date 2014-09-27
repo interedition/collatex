@@ -18,6 +18,7 @@ class Scorer(object):
         self.collation = collation
         self.blocks = []
         self.global_tokens_to_occurrences = {}
+        self.match_function = self.match
         
     def prepare_witness(self, witness):
         # this code can probably done more efficient, for now the main goal is to make it work
@@ -28,6 +29,24 @@ class Scorer(object):
         #NOTE: only the ones that are going to be aligned have to be stored in superbase dict.
         self.global_tokens_to_occurrences.update(tokens_to_occurrences)
         
+    # return values:
+    # 0 = FULL_MATCH
+    # -1 = NO MATCH
+    # 1 = PARTIAL MATCH
+    def match(self, token_a, token_b):
+        # now we need to determine whether this node represents a match
+        # determine this based on whether token a and token b are part of the same block
+        occur_a = self.global_tokens_to_occurrences.setdefault(token_a, None)
+        occur_b = self.global_tokens_to_occurrences.setdefault(token_b, None)
+        if occur_a and occur_b:
+            match = occur_a.block == occur_b.block
+        else:
+            match = False
+        if match:
+            return 0
+        else:
+            return -1
+
     # edit operation: 
     #    0 == match/replacement
     #    1 == addition/omission
@@ -41,19 +60,11 @@ class Scorer(object):
         # it is either an add/delete or replacement (so an add and a delete)
         # it is a replacement
         if edit_operation == 0:
-            # now we need to determine whether this node represents a match
-            # determine this based on whether token a and token b are part of the same block
-            occur_a = self.global_tokens_to_occurrences.setdefault(token_a, None)
-            occur_b = self.global_tokens_to_occurrences.setdefault(token_b, None)
-                                                                
-            if occur_a and occur_b:
-                match = occur_a.block == occur_b.block
-            else:
-                match = False
+            match = self.match_function(token_a, token_b)
 #             print("testing "+token_a.token_string+" and "+token_b.token_string+" "+str(match))   
             # match = token_a.token_string == token_b.token_string
             # based on match or not and parent_node calculate new score
-            if match:
+            if match==0:
                 # mark the fact that this node is match
                 table_node.match = True
                 # do not change score for now 
