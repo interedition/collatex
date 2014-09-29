@@ -87,8 +87,7 @@ class EditGraphNode(object):
     Aligner based on an edit graph.
     It needs a g function and a definition of a match.
     Since every node of the graph has three children the graph is represented as a table internally.
-    THIS CLASS IS ONLY HERE TO SHOW HOW THE SCORING WORKS AND THAT EVERY POSSIBLE COMBINATION IS CONSIDERED!
-    THE A* BASED ALIGNER WILL BE MUCH FASTER!
+    Default implementation is a* based.
     '''
 class EditGraphAligner(CollationAlgorithm):
     def __init__(self, collation, near_match=False):
@@ -113,7 +112,7 @@ class EditGraphAligner(CollationAlgorithm):
         superbase = tokens
         
         # align witness 2 - n
-        for x in range(1, 2): #len(collation.witnesses)):
+        for x in range(1, len(collation.witnesses)):
             next_witness = collation.witnesses[x]
         
             # let the scorer prepare the next witness
@@ -135,7 +134,7 @@ class EditGraphAligner(CollationAlgorithm):
 #             self._debug_edit_graph_table(self.table2)
             
             # change superbase
-            #superbase = self.new_superbase
+            superbase = self.new_superbase
         
     def _align_astar(self, superbase, witness, token_to_vertex, control_table=None):
         self.tokens_witness_a = superbase
@@ -152,23 +151,40 @@ class EditGraphAligner(CollationAlgorithm):
         # transform path into an alignment
         alignment = {}
 
+        # segment stuff
+        # note we traverse from left to right!
+        self.last_x = 0
+        self.last_y = 0
+        self.new_superbase=[]
+        
         for element in path:
 #             print(element.y, element.x)
             
             if element.match == True:
+                # process segments
+                self.newer_add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, element.x, element.y)
+                self.last_x = element.x
+                self.last_y = element.y
+                # process alignment
                 token = self.tokens_witness_a[element.x-1]
                 token2 = self.tokens_witness_b[element.y-1]
                 vertex = token_to_vertex[token]
                 alignment[token2] = vertex
+                # add match to superbase
+                self.new_superbase.append(token)
 
+        # process additions/omissions in the begin of the superbase/witness
+        self.newer_add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, self.length_witness_a, self.length_witness_b)
         return alignment
     
     
-    
-    
-    
-    
-    
+    def newer_add_to_superbase(self, witness_a, witness_b, x, y):
+        if x - self.last_x - 1 > 0 or y - self.last_y - 1 > 0:
+            # create new segment
+            omitted_base = witness_a[self.last_x:x - 1]
+            added_witness = witness_b[self.last_y:y - 1]
+            self.new_superbase += omitted_base
+            self.new_superbase += added_witness
     
     def _align_table(self, superbase, witness, token_to_vertex):
         self.tokens_witness_a = superbase

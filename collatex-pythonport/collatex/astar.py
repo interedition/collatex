@@ -50,7 +50,6 @@ class AStar(object):
         while current.parent:
             path.append(current)
             current = current.parent
-            path.append(current)
         return path[::-1]
 
  
