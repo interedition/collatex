@@ -90,8 +90,9 @@ class EditGraphNode(object):
     Default implementation is a* based.
     '''
 class EditGraphAligner(CollationAlgorithm):
-    def __init__(self, collation, near_match=False):
+    def __init__(self, collation, near_match=False, debug_scores=False):
         self.collation = collation
+        self.debug_scores = debug_scores
         self.scorer = Scorer(collation, near_match)
         
     def collate(self, graph, collation):
@@ -135,6 +136,9 @@ class EditGraphAligner(CollationAlgorithm):
             
             # change superbase
             superbase = self.new_superbase
+        
+        if self.debug_scores:
+            self._debug_edit_graph_table(self.table)
         
     def _align_astar(self, superbase, witness, token_to_vertex, control_table=None):
         self.tokens_witness_a = superbase
