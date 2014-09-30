@@ -90,11 +90,16 @@ class EditGraphNode(object):
     Default implementation is a* based.
     '''
 class EditGraphAligner(CollationAlgorithm):
-    def __init__(self, collation, near_match=False, debug_scores=False):
+    def __init__(self, collation, near_match=False, astar=False, debug_scores=False):
         self.collation = collation
         self.debug_scores = debug_scores
         self.scorer = Scorer(collation, near_match)
-        
+        if not astar:
+            self.align_function = self._align_table
+        else:
+            print("INFO: Aligning using a* search algorithm. BETA quality.")
+            self.align_function = self._align_astar
+            
     def collate(self, graph, collation):
         '''
         :type graph: VariantGraph
@@ -124,7 +129,7 @@ class EditGraphAligner(CollationAlgorithm):
 #             self.table2 = self.table
             
             # alignment = token -> vertex
-            alignment = self._align_astar(superbase, next_witness, token_to_vertex)
+            alignment = self.align_function(superbase, next_witness, token_to_vertex)
         
             # merge
             token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment))
