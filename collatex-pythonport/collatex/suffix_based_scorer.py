@@ -7,7 +7,15 @@ from collatex.collatex_suffix import Occurrence, BlockWitness, Block,\
     PartialOverlapException
 from operator import attrgetter
 from ClusterShell.RangeSet import RangeSet
-from Levenshtein import ratio
+# optionally load the Levenshtein dependency for near match functionality.
+# Consists of C code, needs to be compiled which is problematic on Windows.
+# There are pre-compiled binaries however, but this requires an extra step
+# during installation.
+try:
+    from Levenshtein import ratio
+except:
+    pass
+
 
 '''
  This class scores cells in the edit graph table based on the largest non overlapping blocks

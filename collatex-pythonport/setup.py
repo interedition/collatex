@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='collatex',
-    version='2.0.0pre8',
+    version='2.0.0pre9',
     description='CollateX is a collation tool.',
     long_description=readme + '\n\n' + history,
     author='Ronald Haentjens Dekker',
@@ -31,7 +31,7 @@ setup(
     package_dir={'collatex':
                  'collatex'},
     include_package_data=True,
-    install_requires=['networkx','prettytable','python-levenshtein'
+    install_requires=['networkx','prettytable'
     ],
     license="GPLv3",
     zip_safe=False,

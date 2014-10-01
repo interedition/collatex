@@ -3,6 +3,13 @@
 History
 -------
 
+2.0.0pre9 (2014-10-02)
+++++++++++++++++++++++
+
+* Added near matching option to collate function.
+* Added variant or invariant status to columns in alignment table object and JSON output.
+* Added experimental A* decision graph search optimization.  
+
 2.0.0pre8 (2014-09-18)
 ++++++++++++++++++++++
 

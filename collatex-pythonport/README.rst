@@ -26,6 +26,7 @@ Features
 
 * non progressive multiple sequence alignment
 * multiple output formats: alignment table, variant graph
+* near matching (optional)
 
 How to install:
 ---------------
@@ -35,6 +36,14 @@ sudo pip install --pre collatex
 
 if you don't have pip installed, install it first with:
 sudo easy_install pip
+
+For near matching functionality python-levensthein C library is required.
+
+Install it with (on Mac OS X and Linux):
+
+sudo pip install python-levensthein
+
+Windows users need a precompiled binary distribution of this library if they want to use near matching.
 
 Windows:
 There is no official Windows binary distribution of pygraphviz, which is needed for SVG
@@ -65,7 +74,7 @@ When using IPython Notebook a nice HTML representation of the alignment table is
 When using a textual Python prompt add
 ::
 
-  print(aligment_table)
+  print(alignment_table)
 	
 to show the results.
 Output can also be shown as a graph instead of a table when graphviz and pygraphviz are installed:
