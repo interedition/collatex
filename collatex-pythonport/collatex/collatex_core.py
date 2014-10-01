@@ -29,7 +29,8 @@ class Row(object):
 class Column(object):
     
     def __init__(self):
-        self.tokens_per_witness = {}  
+        self.tokens_per_witness = {}
+        self.variant = False  
 
     def put(self, sigil, token):
         self.tokens_per_witness[sigil]=token
@@ -53,7 +54,8 @@ class AlignmentTable(object):
         # construct columns        
         for rank in vertices_per_rank:
             column = None
-            for vertex in vertices_per_rank[rank]:
+            vertices = vertices_per_rank[rank]
+            for vertex in vertices:
                 if vertex == self.graph.start or vertex == self.graph.end:
                     continue
                 if column == None:
@@ -67,6 +69,9 @@ class AlignmentTable(object):
                         vertex_attrs = self.graph.graph.node[vertex]
                         token = vertex_attrs["label"]
                         column.put(sigil, token)
+                # set status: is a column variant or invariant
+                column.variant = len(vertices) > 1 or len(column.tokens_per_witness) != len(self.collation.witnesses)
+
         # construct rows
         for witness in self.collation.witnesses:
             sigil = witness.sigil

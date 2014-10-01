@@ -146,15 +146,19 @@ def visualizeTableVertically(table):
         x.add_column(row.header, [fill(cell, 20) for cell in row.cells])
     return x
 
-def alignmentTableToJSON(table):
+def alignmentTableToJSON(table, indent=None):
     json_output = {}
     json_output["table"]=[]
     sigli = []
+    variant_status = []
+    for column in table.columns:
+        variant_status.append(column.variant)
     for row in table.rows:
         sigli.append(row.header)
         json_output["table"].append([[cell] for cell in row.cells])
     json_output["witnesses"]=sigli
-    return json.dumps(json_output, indent=2)
+    json_output["status"]=variant_status
+    return json.dumps(json_output, indent=indent)
 
 '''
 Suffix specific implementation of Collation object
