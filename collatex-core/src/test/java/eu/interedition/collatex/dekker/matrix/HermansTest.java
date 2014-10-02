@@ -91,7 +91,7 @@ public class HermansTest extends AbstractTest {
     // assertEquals(500,archipelago.getVersion(0).value());
     // assertEquals(497,archipelago.getVersion(4).value());
 
-    Archipelago firstVersion = archipelago.createNonConflictingVersion();
+    MatchTableSelection firstVersion = archipelago.createNonConflictingVersion();
     for (Island isl : firstVersion.getIslands()) {
       LOG.fine(" " + isl.size());
     }
@@ -129,7 +129,7 @@ public class HermansTest extends AbstractTest {
     IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
-    Archipelago firstVersion = archipelago.createNonConflictingVersion();
+    MatchTableSelection firstVersion = archipelago.createNonConflictingVersion();
     for (Island isl : firstVersion.getIslands()) {
       LOG.fine(" " + isl.size());
     }
@@ -205,18 +205,6 @@ public class HermansTest extends AbstractTest {
     Island i7 = new Island(new Coordinate(73, 70), new Coordinate(74, 71));
     Island i8 = new Island(new Coordinate(0, 17), new Coordinate(0, 17));
     Island i9 = new Island(new Coordinate(17, 17), new Coordinate(17, 17));
-    when(result.islandsCompete(i1, i2)).thenReturn(true);
-    when(result.islandsCompete(i1, i3)).thenReturn(true);
-    when(result.islandsCompete(i1, i4)).thenReturn(false);
-    when(result.islandsCompete(i1, i5)).thenReturn(false);
-    when(result.islandsCompete(i2, i3)).thenReturn(false);
-    when(result.islandsCompete(i2, i4)).thenReturn(true);
-    when(result.islandsCompete(i2, i5)).thenReturn(false);
-    when(result.islandsCompete(i3, i4)).thenReturn(true);
-    when(result.islandsCompete(i3, i5)).thenReturn(false);
-    when(result.islandsCompete(i4, i5)).thenReturn(false);
-    when(result.islandsCompete(i6, i7)).thenReturn(false);
-    when(result.islandsCompete(i8, i9)).thenReturn(true);
  
     //TODO: push mock into createNonConflictingVersion
     creator.createNonConflictingVersion();
@@ -225,23 +213,11 @@ public class HermansTest extends AbstractTest {
     verify(result).add(new Island(new Coordinate(30, 31), new Coordinate(36, 37)));
     verify(result).add(new Island(new Coordinate(62, 59), new Coordinate(67, 64)));
     verify(result).add(new Island(new Coordinate(77, 74), new Coordinate(80, 77)));
-    verify(result).islandsCompete(i1, i2);
-    verify(result).islandsCompete(i1, i3);
-    verify(result).islandsCompete(i1, i4);
-    verify(result).islandsCompete(i1, i5);
-    verify(result).islandsCompete(i2, i3);
-    verify(result).islandsCompete(i2, i4);
-    verify(result).islandsCompete(i2, i5);
-    verify(result).islandsCompete(i3, i4);
-    verify(result).islandsCompete(i3, i5);
-    verify(result).islandsCompete(i4, i5);
     verify(result).add(i5);
     verify(result).add(i1);
     verify(result).add(i4);
-    verify(result).islandsCompete(i6, i7);
     verify(result).add(i6);
     verify(result).add(i7);
-    verify(result).islandsCompete(i8, i9);
     verifyNoMoreInteractions(result);
   }
 

@@ -1,0 +1,36 @@
+General:
+	Optimize project format
+		DONE: make it a multi-file module
+		DONE: register project on pypi
+		DONE: pip based installation works on Mac
+
+Preparation:
+	Tokenization: based on whitespace, punctuation not treated as separate tokens
+		Note: Tokenization is done again in the SuffixArray module
+	Normalization: None
+
+Alignment:
+	Build global string array: DONE
+	Build suffix array: DONE
+	Build LCP array: DONE
+	Find LCP intervals: DONE
+	Find non overlapping repeating blocks: DONE
+	Build block witnesses: DONE
+	Find match phrases: DONE
+	Find transpositions: DONE
+	Merge vertices into graph: DONE
+	Merge transpositions into graph: TODO
+	Handle 3, 4, N witnesses: DONE
+	Deal with alignment choices using decision tree and a* search algorithm: NOT YET NEEDED
+	
+Presentation:
+	Join variant graph (parallel segments): DONE
+	Rank the graph: DONE
+	Build alignment table: DONE
+	HTML output: DONE
+	SVG output: DONE
+	JSON output: TODO
+	XML output: TODO
+	TEI output: TODO
+		
+			

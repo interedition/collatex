@@ -39,21 +39,21 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-// @author: Ronald Haentjens Dekker
-//
-// This class represents a table of the matches
-// Since this table is sparse a Hashmap based implementation
-// is used rather than a Arraylist based one.
-// However the API of this class looks very much like an array based one
-// since you can use tokenAt(row, column) or vertexAt(row, column)
+/* @author: Ronald Haentjens Dekker
+*
+* This class represents a table of the matches.
+* Since this table is sparse a Hashmap based implementation
+* is used rather than a Arraylist based one.
+* However the API of this class looks very much like an array based one
+* since you can use tokenAt(row, column) or vertexAt(row, column).
+* This class is read only.
+* Selections of vectors from the table can be made using the 
+* MatchTableSelection class.
+*/
 public class MatchTable {
   private final HashBasedTable<Integer, Integer, MatchTableCell> table;
   private final Iterable<Token> witness;
   private final List<Integer> ranks;
-  //this fields are needed for the locking of table cells
-  private final Set<Integer> fixedRows = Sets.newHashSet();
-  private final Set<VariantGraph.Vertex> fixedVertices = Sets.newHashSet();
-
   
   // assumes default token comparator
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
@@ -109,35 +109,6 @@ public class MatchTable {
     }
     return Sets.newHashSet(coordinateMapper.values());
   }
-
-	/*
-	 * Commit an island in the match table
-	 * Island will be part of the final alignment
-	 */
-  public void commitIsland(Island isl) {
-  	for (Coordinate coordinate : isl) {
-      fixedRows.add(coordinate.row);
-      fixedVertices.add(vertexAt(coordinate.row, coordinate.column));
-	  }
-	}
-
-	/*
-	 * Return whether an island overlaps with an already committed island
-	 */
-  public boolean isIslandPossibleCandidate(Island island) {
-    for (Coordinate coordinate : island) {
-      if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) return false;
-    }
-		return true;
-	}
-  
-  /*
-	 * Return whether a coordinate overlaps with an already committed coordinate
-	 */
-	public boolean doesCoordinateOverlapWithCommittedCoordinate(Coordinate coordinate) {
-    return fixedRows.contains(coordinate.row) || //
-        fixedVertices.contains(vertexAt(coordinate.row, coordinate.column));
-	}
 
 
 	

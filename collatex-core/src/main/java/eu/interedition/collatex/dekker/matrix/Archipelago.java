@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -38,14 +39,21 @@ public class Archipelago {
   Logger LOG = Logger.getLogger(Archipelago.class.getName());
 
   private final List<Island> islands;
-  private final Set<Integer> islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
+  private final Set<Integer> islandvectors; 
 
   public Archipelago() {
     islands = new ArrayList<Island>();
+    this.islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
   }
 
+  //copy constructor
+  public Archipelago(Archipelago orig) {
+    this.islands = Lists.newArrayList(orig.islands);
+    this.islandvectors = Sets.newHashSet(orig.islandvectors);
+  }
+  
   public Archipelago(Island isl) {
-    islands = new ArrayList<Island>();
+    this();
     islands.add(isl);
   }
 
@@ -65,10 +73,6 @@ public class Archipelago {
 
   public boolean containsCoordinate(int row, int column) {
     return Objects.equal(getCoordinatesMap().get(row), column);
-  }
-
-  public boolean islandsCompete(Island i1, Island i2) {
-    return i1.isCompetitor(i2);
   }
 
   public List<Island> getIslands() {
