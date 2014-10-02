@@ -1,27 +1,17 @@
 package de.tud.kom.stringmatching.cli;
 
 
+import com.google.common.base.Functions;
+import de.tud.kom.stringmatching.gst.GST;
+import de.tud.kom.stringmatching.gst.GSTTile;
+import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collection;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import de.tud.kom.stringmatching.gst.GST;
-import de.tud.kom.stringmatching.gst.GSTTile;
-import de.tud.kom.stringmatching.gst.utils.GSTHighlighter;
-import de.tud.kom.stringmatching.gst.utils.XMLHighlighter;
-import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
-import de.tud.kom.stringmatching.shinglecloud.ShingleCloudMatch;
-import de.tud.kom.stringmatching.shinglecloud.ShingleCloud.ShingleCloudMarker;
-import de.tud.kom.stringutils.preprocessing.DummyPreprocess;
-import de.tud.kom.stringutils.preprocessing.EEBOPreprocessing;
-import de.tud.kom.stringutils.preprocessing.SimplePreprocessing;
-import de.tud.kom.stringutils.preprocessing.StopWordRemoval;
-import de.tud.kom.stringutils.preprocessing.StopWordRemovalAndSimplePreprocessing;
-import de.tud.kom.stringutils.tokenization.CharacterTokenizer;
-import de.tud.kom.stringutils.tokenization.WordTokenizer;
 
 /**
  * A command line interface for the gst algorithm.
@@ -112,8 +102,6 @@ public class GstCli {
 		else {
 			Collection<String> output = (Collection<String>) options.valuesOf("output");
 			for(String outputOpt : output){
-				if("highlight".equals(outputOpt))
-					displayHighlight(gst, options);
 				if("containmentneedle".equals(outputOpt))
 					System.out.println(gst.getContainmentInNeedle());
 				if("containmenthaystack".equals(outputOpt))
@@ -122,26 +110,6 @@ public class GstCli {
 		}
 	}
 
-
-
-	private static void displayHighlight(GST gst, OptionSet options) {
-		String needle = getNeedle(options);
-		String haystack = getHaystack(options);
-		
-		GSTHighlighter highlighter;
-		if(options.has("xml")){
-			highlighter = new XMLHighlighter();
-		} else {
-			highlighter = new GSTHighlighter();
-		}
-
-		highlighter.setOpeningDelimiter("<matchedTile>");
-		highlighter.setClosingDelimiter("</matchedTile>");
-		highlighter.setMinimumTileLength(gst.getMinimumTileLength());
-		highlighter.setPreprocessor(gst.getPreprocessingAlgorithm());
-		highlighter.setTokenizer(gst.getTokenizer());
-		System.out.println(highlighter.produceHighlightedText(haystack, needle));
-	}
 
 
 	private static void displayFullResults(GST gst) {
@@ -171,30 +139,9 @@ public class GstCli {
 			int tileLength = (Integer)options.valueOf("tilelength");
 			gst.setMinimumTileLength(tileLength);
 			
-			if(options.has("xml"))
-				gst.useXMLMode();
-			
-			String preprocess = (String) options.valueOf("preprocess");
-			if("simple".equals(preprocess))
-				gst.setPreprocessingAlgorithm(new SimplePreprocessing());
-			else if("stop".equals(preprocess))
-				gst.setPreprocessingAlgorithm(new StopWordRemoval());
-			else if("simple+stop".equals(preprocess))
-				gst.setPreprocessingAlgorithm(new StopWordRemovalAndSimplePreprocessing());
-			else if("eebo".equals(preprocess))
-				gst.setPreprocessingAlgorithm(new EEBOPreprocessing());
-			else if("none".equals(preprocess))
-				gst.setPreprocessingAlgorithm(new DummyPreprocess());
-			else
-				error("Unknown preprocessing algorithm");
-			
-			String tokenizer = (String) options.valueOf("tokenizer");
-			if("word".equals(tokenizer))
-				gst.setTokenizer(new WordTokenizer());
-			else if("character".equals(tokenizer))
-				gst.setTokenizer(new CharacterTokenizer());
-			else
-				error("Unknown tokenizer");
+      gst.setPreprocessingAlgorithm(Functions.<String>identity());
+
+      gst.setTokenizer(ShingleCloud.WORD_TOKENIZER);
 			
 		}catch(Exception e){
 			error(e + ": " + e.getMessage());

@@ -1,6 +1,6 @@
 package de.tud.kom.stringmatching.shinglecloud;
 
-import de.tud.kom.stringutils.utils.StringUtils;
+import com.google.common.base.Joiner;
 
 /**
 *
@@ -86,7 +86,7 @@ public class Shingle {
 	 */
 	public Shingle(String[] items){
 		this.items = items;
-		this.shingle = StringUtils.join(items, ' ');
+		this.shingle = Joiner.on(' ').join(items);
 		this.type = ShingleType.Shingle;
 	}
 	

@@ -21,17 +21,13 @@ package de.tud.kom.stringmatching.gst;
 */
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import de.tud.kom.stringutils.preprocessing.DummyPreprocess;
-import de.tud.kom.stringutils.preprocessing.Preprocess;
-import de.tud.kom.stringutils.preprocessing.RemoveXMLTagsPreprocessing;
-import de.tud.kom.stringutils.preprocessing.WhiteSpaceRemovalPreprocessing;
-import de.tud.kom.stringutils.tokenization.Tokenizer;
-import de.tud.kom.stringutils.tokenization.WordTokenizer;
-import de.tud.kom.stringutils.tokenization.XMLWordTokenizer;
 
 
 
@@ -56,8 +52,8 @@ public class GST {
 	private String[] tokenizedNeedle; 
 	private String[] preprocessedHaystack;
 
-	private Tokenizer tokenizer = new WordTokenizer();
-	private Preprocess preprocessingAlgorithm = new DummyPreprocess();
+	private Function<String, String[]> tokenizer = ShingleCloud.WORD_TOKENIZER;
+	private Function<String, String> preprocessingAlgorithm = Functions.identity();
 
 	private boolean preprocessFirst = false;
 	private boolean ignoreMode = false;
@@ -89,25 +85,24 @@ public class GST {
 			throw new IllegalStateException();
 
 		if(isPreprocessFirst())
-			haystack = preprocessingAlgorithm.preprocessInput(haystack);
+			haystack = preprocessingAlgorithm.apply(haystack);
 		
 		if(!ignoreMode){
-			tokenizedHaystack = tokenizer.tokenize(haystack);
-			haystack = preprocessingAlgorithm.preprocessInput(haystack);
+			tokenizedHaystack = tokenizer.apply(haystack);
+			haystack = preprocessingAlgorithm.apply(haystack);
 			preprocessedHaystack = new String[tokenizedHaystack.length];
 	        for(int i = 0; i < tokenizedHaystack.length; i++)
-	        	preprocessedHaystack[i] = preprocessingAlgorithm.preprocessInput(tokenizedHaystack[i]);
+	        	preprocessedHaystack[i] = preprocessingAlgorithm.apply(tokenizedHaystack[i]);
 	        
 		} else {
-			haystack = new WhiteSpaceRemovalPreprocessing().preprocessInput(haystack);
-			tokenizedHaystack = tokenizer.tokenize(haystack);
+			tokenizedHaystack = tokenizer.apply(haystack);
 			
 			preprocessedHaystack = new String[tokenizedHaystack.length];
 			for(int i = 0; i < tokenizedHaystack.length; i++)
 				if(tokenizedHaystack[i].charAt(0) == '<')
 					preprocessedHaystack[i] = tokenizedHaystack[i];
 				else
-					preprocessedHaystack[i] = preprocessingAlgorithm.preprocessInput(tokenizedHaystack[i]);
+					preprocessedHaystack[i] = preprocessingAlgorithm.apply(tokenizedHaystack[i]);
 		}
 		
 		// set flag
@@ -135,13 +130,10 @@ public class GST {
 	
 	private void matchIgnoringXML(String needle) {
 		if(isPreprocessFirst())
-			needle = preprocessingAlgorithm.preprocessInput(needle);
-		
-		// remove whitespace from needle
-		needle = new WhiteSpaceRemovalPreprocessing().preprocessInput(needle);
+			needle = preprocessingAlgorithm.apply(needle);
 		
 		// Extract Tokens
-        tokenizedNeedle = tokenizer.tokenize(needle);
+        tokenizedNeedle = tokenizer.apply(needle);
         
         // Create list of preprocessed tokens
         String[] preprocessedNeedle = new String[tokenizedNeedle.length];
@@ -149,7 +141,7 @@ public class GST {
         	if(tokenizedNeedle[i].charAt(0) == '<')
         		preprocessedNeedle[i] = tokenizedNeedle[i];
         	else
-        		preprocessedNeedle[i] = preprocessingAlgorithm.preprocessInput(tokenizedNeedle[i]);
+        		preprocessedNeedle[i] = preprocessingAlgorithm.apply(tokenizedNeedle[i]);
 
         // unmark all tokens
         boolean[] markedNeedle = new boolean[tokenizedNeedle.length];
@@ -279,15 +271,15 @@ public class GST {
 
 	private void matchNormally(String needle){
 		if(isPreprocessFirst())
-			needle = preprocessingAlgorithm.preprocessInput(needle);
+			needle = preprocessingAlgorithm.apply(needle);
 		
 		// Extract Tokens
-        tokenizedNeedle = tokenizer.tokenize(needle);
+        tokenizedNeedle = tokenizer.apply(needle);
         
         // Create list of preprocessed tokens
         String[] preprocessedNeedle = new String[tokenizedNeedle.length];
         for(int i = 0; i < tokenizedNeedle.length; i++)
-        	preprocessedNeedle[i] = preprocessingAlgorithm.preprocessInput(tokenizedNeedle[i]);
+        	preprocessedNeedle[i] = preprocessingAlgorithm.apply(tokenizedNeedle[i]);
 
         // unmark all tokens
         boolean[] markedNeedle = new boolean[tokenizedNeedle.length];
@@ -403,7 +395,7 @@ public class GST {
 	 * 
 	 * @return The tokenizer used to tokenize haystack and needle.
 	 */
-	public Tokenizer getTokenizer() {
+	public Function<String, String[]> getTokenizer() {
 		return tokenizer;
 	}
 
@@ -415,7 +407,7 @@ public class GST {
 	 * @param tokenizer
 	 * @see #compile()
 	 */
-	public void setTokenizer(Tokenizer tokenizer) {
+	public void setTokenizer(Function<String, String[]> tokenizer) {
 		if(isCompiled())
 			throw new IllegalStateException();
 		
@@ -442,7 +434,7 @@ public class GST {
 	 * 
 	 * @return The preprocessing algorithm used for preprocesseing needle and haystack.
 	 */
-	public Preprocess getPreprocessingAlgorithm() {
+	public Function<String, String> getPreprocessingAlgorithm() {
 		return preprocessingAlgorithm;
 	}
 
@@ -454,7 +446,7 @@ public class GST {
 	 * @param preprocessingAlgorithm
 	 * @see #compile()
 	 */
-	public void setPreprocessingAlgorithm(Preprocess preprocessingAlgorithm) {
+	public void setPreprocessingAlgorithm(Function<String, String> preprocessingAlgorithm) {
 		if(isCompiled())
 			throw new IllegalStateException();
 		
@@ -469,21 +461,6 @@ public class GST {
 		return ignoreMode;
 	}
 
-	/**
-	 * Enables the XML mode.
-	 * 
-	 * <p>Sets {@link XMLWordTokenizer} as tokenizer</p>
-	 * 
-	 * @see XMLWordTokenizer
-	 */
-	public void useXMLMode() {
-		if(isCompiled())
-			throw new IllegalStateException();
-		
-		this.ignoreMode = true;
-		tokenizer = new XMLWordTokenizer();
-	}
-	
 	/**
 	 * 
 	 * @return The tokenized needle (the last one that was searched for).
@@ -546,9 +523,6 @@ public class GST {
 		if(null == getTiles())
 			throw new IllegalStateException("So far no match operation was performed.");
 		
-		if(isXMLMode())
-			return getContainmentInHaystackInXMLMode();
-		
 		int tileLength = 0;
 		for(GSTTile tile : getTiles())
 			tileLength += tile.getLength();
@@ -563,53 +537,12 @@ public class GST {
 		if(null == getTiles())
 			throw new IllegalStateException("So far no match operation was performed.");
 		
-		if(isXMLMode())
-			return getContainmentInNeedleInXMLMode();
-		
 		int tileLength = 0;
 		for(GSTTile tile : getTiles())
 			tileLength += tile.getLength();
 		return (double) tileLength / (double)getNeedleLength();
 	}
 	
-	private double getContainmentInHaystackInXMLMode() {
-		RemoveXMLTagsPreprocessing xmlTagRemover = new RemoveXMLTagsPreprocessing();
-		int tileLength = 0;
-		for(GSTTile tile : getTiles()){
-			String removedTags = xmlTagRemover.preprocessInput(tile.getText());
-			String[] tokenizedTile = tokenizer.tokenize(removedTags);
-			tileLength +=  tokenizedTile.length;
-		}
-		
-		/* new needle */
-		String cleanedHaystack = new WhiteSpaceRemovalPreprocessing().preprocessInput(haystack);
-		cleanedHaystack = preprocessingAlgorithm.preprocessInput(cleanedHaystack);
-		cleanedHaystack = xmlTagRemover.preprocessInput(cleanedHaystack);
-		String[] tokenizedClenedNeedle = tokenizer.tokenize(cleanedHaystack);
-		
-		
-		return (double) tileLength / (double)tokenizedClenedNeedle.length;
-	}
-
-	private double getContainmentInNeedleInXMLMode() {
-		RemoveXMLTagsPreprocessing xmlTagRemover = new RemoveXMLTagsPreprocessing();
-		int tileLength = 0;
-		for(GSTTile tile : getTiles()){
-			String removedTags = xmlTagRemover.preprocessInput(tile.getText());
-			String[] tokenizedTile = tokenizer.tokenize(removedTags);
-			tileLength +=  tokenizedTile.length;
-		}
-		
-		/* new needle */
-		String cleanedNeedle = new WhiteSpaceRemovalPreprocessing().preprocessInput(needle);
-		cleanedNeedle = preprocessingAlgorithm.preprocessInput(cleanedNeedle);
-		cleanedNeedle = xmlTagRemover.preprocessInput(cleanedNeedle);
-		String[] tokenizedCleanedNeedle = tokenizer.tokenize(cleanedNeedle);
-		
-		
-		return (double) tileLength / (double)tokenizedCleanedNeedle.length;
-	}
-
 	public boolean isPreprocessFirst() {
 		return preprocessFirst;
 	}

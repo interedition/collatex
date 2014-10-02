@@ -21,19 +21,17 @@ package de.tud.kom.stringmatching.shinglecloud;
 */
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import de.tud.kom.stringutils.preprocessing.DummyPreprocess;
-import de.tud.kom.stringutils.preprocessing.Preprocess;
-import de.tud.kom.stringutils.tokenization.Tokenizer;
-import de.tud.kom.stringutils.tokenization.WordTokenizer;
 
 
 
@@ -83,7 +81,7 @@ public class ShingleCloud {
 	/**
 	 * The preprocessing algorithm.
 	 */
-	protected Preprocess preprocessingAlgorithm = new DummyPreprocess();
+	protected Function<String, String> preprocessingAlgorithm = Functions.identity();
 	
 	/**
 	 * Parameter that tells shingle cloud to use grouping
@@ -109,8 +107,15 @@ public class ShingleCloud {
 	 * Stores the shingle list for the last matche's needle 
 	 */
 	private ShingleList needleShingles;
-	
-	private Tokenizer tokenizer = new WordTokenizer();
+
+  public static final Function<String, String[]> WORD_TOKENIZER = new Function<String, String[]>() {
+    @Nullable
+    @Override
+    public String[] apply(@Nullable String input) {
+      return input.split("\\s+");
+    }
+  };
+  private Function<String, String[]> tokenizer = WORD_TOKENIZER;
 	
 	/**
 	 * Stores the length of each group (in shingles)
@@ -573,7 +578,7 @@ public class ShingleCloud {
 	 * 
 	 * @return The preprocessing algorithm that is used by this ShingleCloud algorithm.
 	 */
-	public Preprocess getPreprocessingAlgorithm() {
+	public Function<String, String> getPreprocessingAlgorithm() {
 		return preprocessingAlgorithm;
 	}
 
@@ -581,7 +586,7 @@ public class ShingleCloud {
 	 * Sets the preprocessing algorithm that is to be used with this 
 	 * @param preprocessingAlgorithm
 	 */
-	public void setPreprocessingAlgorithm(Preprocess preprocessingAlgorithm) {
+	public void setPreprocessingAlgorithm(Function<String, String> preprocessingAlgorithm) {
 		this.preprocessingAlgorithm = preprocessingAlgorithm;
 	}
 
@@ -621,7 +626,7 @@ public class ShingleCloud {
 	 * 
 	 * @return The tokenizer used when shingling haystack and needle.
 	 */
-	public Tokenizer getTokenizer() {
+	public Function<String, String[]> getTokenizer() {
 		return tokenizer;
 	}
 
@@ -630,7 +635,7 @@ public class ShingleCloud {
 	 * 
 	 * @param tokenizer
 	 */
-	public void setTokenizer(Tokenizer tokenizer) {
+	public void setTokenizer(Function<String, String[]> tokenizer) {
 		this.tokenizer = tokenizer;
 	}
 

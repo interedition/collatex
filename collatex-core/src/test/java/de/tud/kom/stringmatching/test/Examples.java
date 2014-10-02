@@ -1,13 +1,10 @@
 package de.tud.kom.stringmatching.test;
 
-import org.junit.Test;
-
 import de.tud.kom.stringmatching.gst.GST;
 import de.tud.kom.stringmatching.gst.GSTTile;
-import de.tud.kom.stringmatching.gst.utils.GSTHighlighter;
-import de.tud.kom.stringmatching.gst.utils.XMLHighlighter;
 import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
 import de.tud.kom.stringmatching.shinglecloud.ShingleCloudMatch;
+import org.junit.Test;
 
 /**
  * Simple examples on how to use ShingleCloud and GST.
@@ -74,33 +71,5 @@ public class Examples {
 		GSTTile secondTile = gst.getTiles().get(1);
 		System.out.println("The second tile consists of " + secondTile.getLength() + " tokens.");
 		System.out.println("The matching tokens were: " + secondTile.getText());
-	}
-	
-	@Test
-	public void gstHighlightingExample(){
-		String haystack = "This is some text that you want to search through";
-		String needle = "some text you want to find";
-		
-		GSTHighlighter highlighter = new GSTHighlighter();
-		highlighter.setOpeningDelimiter("[[");
-		highlighter.setClosingDelimiter("]]");
-		highlighter.setMinimumTileLength(2);
-		
-		String highlightedText = highlighter.produceHighlightedText(haystack, needle);
-		System.out.println(highlightedText);
-	}
-	
-	@Test
-	public void gstHighlightingXMLExample(){
-		String haystack = "This <italic>is some</italic> text that <marker arg1=\"value1\">you</marker> want to search through";
-		String needle = "some text you want to find";
-
-		XMLHighlighter highlighter = new XMLHighlighter();
-		highlighter.setOpeningDelimiter("<matchedTile>");
-		highlighter.setClosingDelimiter("</matchedTile>");
-		highlighter.setMinimumTileLength(2);
-
-		String highlightedText = highlighter.produceHighlightedText(haystack, needle);
-		System.out.println(highlightedText);
 	}
 }

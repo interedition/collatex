@@ -21,6 +21,10 @@ package de.tud.kom.stringmatching.shinglecloud;
 */
 
 
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import de.tud.kom.stringmatching.shinglecloud.Shingle.ShingleType;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,12 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-
-import de.tud.kom.stringmatching.shinglecloud.Shingle.ShingleType;
-import de.tud.kom.stringutils.preprocessing.DummyPreprocess;
-import de.tud.kom.stringutils.preprocessing.Preprocess;
-import de.tud.kom.stringutils.tokenization.Tokenizer;
-import de.tud.kom.stringutils.tokenization.WordTokenizer;
 
 
 
@@ -70,9 +68,9 @@ public class ShingleList implements Iterable<Shingle> {
 	/**
 	 * Stores the preprocessing algorithm that is used in this ShingleList
 	 */
-	private Preprocess preprocessingAlgorithm;
+	private Function<String, String> preprocessingAlgorithm;
 	
-	private Tokenizer tokenizer = new WordTokenizer();
+	private Function<String, String[]> tokenizer = ShingleCloud.WORD_TOKENIZER;
 	
 	/**
 	 * Stores the n-gram size that this object uses
@@ -100,7 +98,7 @@ public class ShingleList implements Iterable<Shingle> {
 	 * Creates a new ShingleList with no preprocessing algorithm.
 	 */
 	public ShingleList() {
-		preprocessingAlgorithm = new DummyPreprocess();
+		preprocessingAlgorithm = Functions.identity();
 	}
 	
 	/**
@@ -114,7 +112,7 @@ public class ShingleList implements Iterable<Shingle> {
 	 * 
 	 * @param preprocessingAlgorithm
 	 */
-	public ShingleList(Preprocess preprocessAlgorithm) {
+	public ShingleList(Function<String, String> preprocessAlgorithm) {
 		this.preprocessingAlgorithm = preprocessAlgorithm;
 	}
 	
@@ -294,9 +292,9 @@ public class ShingleList implements Iterable<Shingle> {
 	 * @param string
 	 */
 	private void shingleText(String input) {
-		String preprocessed = preprocessingAlgorithm.preprocessInput(input);
+		String preprocessed = preprocessingAlgorithm.apply(input);
 		
-		String[] words = tokenizer.tokenize(preprocessed);
+		String[] words = tokenizer.apply(preprocessed);
 		
 		for(int i = 0; i < words.length - nGramSize + 1; i++){
 			boolean magic = false;
@@ -335,7 +333,7 @@ public class ShingleList implements Iterable<Shingle> {
 	 * 
 	 * @return The preprocessing algorithm used
 	 */
-	public Preprocess getPreprocessingAlgorithm() {
+	public Function<String, String> getPreprocessingAlgorithm() {
 		return preprocessingAlgorithm;
 	}
 
@@ -344,7 +342,7 @@ public class ShingleList implements Iterable<Shingle> {
 	 * @param preprocessingAlgorithm
 	 * @throws IllegalStateException The preprocessing algorithm cannot be set if the object was already compiled
 	 */
-	public void setPreprocessingAlgorithm(Preprocess preprocessingAlgorithm) {
+	public void setPreprocessingAlgorithm(Function<String, String> preprocessingAlgorithm) {
 		if(isCompiled())
 			throw new IllegalStateException();
 		
@@ -389,15 +387,12 @@ public class ShingleList implements Iterable<Shingle> {
 	 * @param words
 	 */
 	public void setMagicWords(String[] words) {
-		if(! (getPreprocessingAlgorithm() instanceof Preprocess))
-			throw new IllegalStateException("No preprocessing algorithm defined");
-		
 		/* clear current list */
 		magicWords.clear();
 		
 		/* preprocess words and add them to the list */
 		for(int i = 0; i < words.length; i++){
-			String preprocessed = getPreprocessingAlgorithm().preprocessInput(words[i]);
+			String preprocessed = getPreprocessingAlgorithm().apply(words[i]);
 			magicWords.add(preprocessed);
 		}
 	}
@@ -406,7 +401,7 @@ public class ShingleList implements Iterable<Shingle> {
 	 * Returns the tokenizer used when shingling text.
 	 * @return
 	 */
-	public Tokenizer getTokenizer() {
+	public Function<String, String[]> getTokenizer() {
 		return tokenizer;
 	}
 
@@ -414,7 +409,7 @@ public class ShingleList implements Iterable<Shingle> {
 	 * Sets the tokenizer to be used, when shingling text.
 	 * @param tokenizer
 	 */
-	public void setTokenizer(Tokenizer tokenizer) {
+	public void setTokenizer(Function<String, String[]> tokenizer) {
 		this.tokenizer = tokenizer;
 	}
 

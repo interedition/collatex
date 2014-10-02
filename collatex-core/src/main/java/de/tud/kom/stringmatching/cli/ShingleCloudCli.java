@@ -1,23 +1,17 @@
 package de.tud.kom.stringmatching.cli;
 
 
+import com.google.common.base.Functions;
+import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
+import de.tud.kom.stringmatching.shinglecloud.ShingleCloud.ShingleCloudMarker;
+import de.tud.kom.stringmatching.shinglecloud.ShingleCloudMatch;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collection;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
-import de.tud.kom.stringmatching.shinglecloud.ShingleCloudMatch;
-import de.tud.kom.stringmatching.shinglecloud.ShingleCloud.ShingleCloudMarker;
-import de.tud.kom.stringutils.preprocessing.DummyPreprocess;
-import de.tud.kom.stringutils.preprocessing.EEBOPreprocessing;
-import de.tud.kom.stringutils.preprocessing.SimplePreprocessing;
-import de.tud.kom.stringutils.preprocessing.StopWordRemoval;
-import de.tud.kom.stringutils.preprocessing.StopWordRemovalAndSimplePreprocessing;
-import de.tud.kom.stringutils.tokenization.CharacterTokenizer;
-import de.tud.kom.stringutils.tokenization.WordTokenizer;
 
 /**
  * A command line interface for the shingle cloud algorithm.
@@ -187,27 +181,9 @@ public class ShingleCloudCli {
 			int maximum0 =(Integer)options.valueOf("maximum0");
 			shingleCloud.setMaximumNumberOfZerosBetweenMatches(maximum0);
 
-			String preprocess = (String) options.valueOf("preprocess");
-			if("simple".equals(preprocess))
-				shingleCloud.setPreprocessingAlgorithm(new SimplePreprocessing());
-			else if("stop".equals(preprocess))
-				shingleCloud.setPreprocessingAlgorithm(new StopWordRemoval());
-			else if("simple+stop".equals(preprocess))
-				shingleCloud.setPreprocessingAlgorithm(new StopWordRemovalAndSimplePreprocessing());
-			else if("eebo".equals(preprocess))
-				shingleCloud.setPreprocessingAlgorithm(new EEBOPreprocessing());
-			else if("none".equals(preprocess))
-				shingleCloud.setPreprocessingAlgorithm(new DummyPreprocess());
-			else
-				error("Unknown preprocessing algorithm");
-			
-			String tokenizer = (String) options.valueOf("tokenizer");
-			if("word".equals(tokenizer))
-				shingleCloud.setTokenizer(new WordTokenizer());
-			else if("character".equals(tokenizer))
-				shingleCloud.setTokenizer(new CharacterTokenizer());
-			else
-				error("Unknown tokenizer");
+      shingleCloud.setPreprocessingAlgorithm(Functions.<String>identity());
+
+      shingleCloud.setTokenizer(ShingleCloud.WORD_TOKENIZER);
 			
 		}catch(Exception e){
 			error(e + ": " + e.getMessage());
