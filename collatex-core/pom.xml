@@ -12,6 +12,11 @@
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
     <dependencies>
         <dependency>
+          <groupId>net.sf.jopt-simple</groupId>
+          <artifactId>jopt-simple</artifactId>
+          <version>4.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
             <optional>true</optional>
