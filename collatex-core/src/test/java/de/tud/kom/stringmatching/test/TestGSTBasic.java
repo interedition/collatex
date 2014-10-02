@@ -19,7 +19,7 @@ public class TestGSTBasic {
 		
 		assertEquals(1, gst.getTiles().size());
 		assertEquals(7, gst.getTiles().get(0).getLength());
-		assertEquals(1, gst.getContainmentInNeedle());
+		assertEquals(1, gst.getContainmentInNeedle(), 0);
 	}
 	
 	@Test
