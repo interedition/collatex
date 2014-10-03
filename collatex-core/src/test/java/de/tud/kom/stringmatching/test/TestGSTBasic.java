@@ -1,8 +1,8 @@
 package de.tud.kom.stringmatching.test;
 
+import de.tud.kom.stringmatching.gst.GreedyStringTilingAlgorithm;
 import org.junit.Test;
 
-import de.tud.kom.stringmatching.gst.GST;
 import static org.junit.Assert.*;
 
 
@@ -13,7 +13,7 @@ public class TestGSTBasic {
 		String haystack = "Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed placerat dui eget lorem laoreet pharetra. Phasellus feugiat tristique libero, ut sagittis purus rhoncus quis.";
 		String needle = "amet, consectetur adipiscing elit Sed placerat dui";
 
-		GST gst = new GST(haystack);
+		GreedyStringTilingAlgorithm gst = new GreedyStringTilingAlgorithm(haystack);
 		gst.setMinimumTileLength(3);
 		gst.match(needle);
 		
@@ -27,7 +27,7 @@ public class TestGSTBasic {
 		String haystack = "Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed placerat dui eget lorem laoreet pharetra. Phasellus feugiat tristique libero, ut sagittis purus rhoncus quis.";
 		String needle = "amet, consectetur abcdkef elit Sed placerat dui";
 
-		GST gst = new GST(haystack);
+		GreedyStringTilingAlgorithm gst = new GreedyStringTilingAlgorithm(haystack);
 		gst.setMinimumTileLength(2);
 		gst.match(needle);
 		

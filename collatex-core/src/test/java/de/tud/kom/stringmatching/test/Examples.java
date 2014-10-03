@@ -1,7 +1,5 @@
 package de.tud.kom.stringmatching.test;
 
-import de.tud.kom.stringmatching.gst.GST;
-import de.tud.kom.stringmatching.gst.GSTTile;
 import de.tud.kom.stringmatching.shinglecloud.ShingleCloud;
 import de.tud.kom.stringmatching.shinglecloud.ShingleCloudMatch;
 import org.junit.Test;
@@ -11,7 +9,7 @@ import org.junit.Test;
  *  
  * @author Arno Mittelbach
  * @see ShingleCloud
- * @see GST
+ * @see de.tud.kom.stringmatching.gst.GreedyStringTilingAlgorithm
  */
 public class Examples {
 
@@ -48,28 +46,5 @@ public class Examples {
 		System.out.println("The second match consists of " + secondMatch.getNumberOfMatchedShingles() + " shingle(s).");
 		System.out.println("Its indirect rating is " + secondMatch.getContainmentInNeedle());
 		System.out.println("The matching shingles were: " + secondMatch.getMatchedShingles());
-	}
-	
-	@Test
-	public void gstExample(){
-		String haystack = "This is some text that you want to search through";
-		String needle = "some text you want to find";
-
-		/* using the shingle cloud */
-		GST gst = new GST(haystack);
-		gst.setMinimumTileLength(2);
-		gst.match(needle);
-		
-		System.out.println("GST found " + gst.getTiles().size() + " tile(es).");
-		System.out.println("Containment in the needle " + gst.getContainmentInNeedle());
-		System.out.println("Containment in the haystack " + gst.getContainmentInHaystack());
-		
-		GSTTile firstTile = gst.getTiles().get(0);
-		System.out.println("The first tile consists of " + firstTile.getLength() + " tokens.");
-		System.out.println("The matching tokens were: " + firstTile.getText());
-		
-		GSTTile secondTile = gst.getTiles().get(1);
-		System.out.println("The second tile consists of " + secondTile.getLength() + " tokens.");
-		System.out.println("The matching tokens were: " + secondTile.getText());
 	}
 }
