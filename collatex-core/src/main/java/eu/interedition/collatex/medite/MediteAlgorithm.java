@@ -118,7 +118,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
       stopwatch.reset().start();
     }
 
-    final List<Phrase<Match.WithTokenIndex>> transpositions = transpositions(alignments, matchEvaluator, Math.max(tokens.length, ranking.size()));
+    final List<Phrase<Match.WithTokenIndex>> transpositions = transpositions(alignments, Math.max(tokens.length, ranking.size()));
 
     if (logTimings) {
       stopwatch.stop();
@@ -155,7 +155,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
   }
 
   @SuppressWarnings("unchecked")
-  List<Phrase<Match.WithTokenIndex>> transpositions(SortedSet<Phrase<Match.WithTokenIndex>> phraseMatches, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator, int penalty) {
+  List<Phrase<Match.WithTokenIndex>> transpositions(SortedSet<Phrase<Match.WithTokenIndex>> phraseMatches, int penalty) {
     final Phrase<Match.WithTokenIndex>[] vertexSorted = (Phrase<Match.WithTokenIndex>[]) phraseMatches.toArray(new Phrase[phraseMatches.size()]);
     final Phrase<Match.WithTokenIndex>[] tokenSorted = (Phrase<Match.WithTokenIndex>[]) Ordering.from(new Comparator<Phrase<Match.WithTokenIndex>>() {
       @Override
@@ -167,7 +167,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     final Set<Phrase<Match.WithTokenIndex>> aligned = NeedlemanWunschAlgorithm.align(
             vertexSorted,
             tokenSorted,
-            new TranspositionAlignmentScorer(matchEvaluator, penalty)
+            new TranspositionAlignmentScorer(penalty)
     ).keySet();
 
     final List<Phrase<Match.WithTokenIndex>> transpositions = Lists.newArrayList();
@@ -181,11 +181,9 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
 
   static class TranspositionAlignmentScorer implements NeedlemanWunschScorer<Phrase<Match.WithTokenIndex>, Phrase<Match.WithTokenIndex>> {
 
-    final Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator;
     final int penalty;
 
-    TranspositionAlignmentScorer(Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator, int penalty) {
-      this.matchEvaluator = matchEvaluator;
+    TranspositionAlignmentScorer(int penalty) {
       this.penalty = penalty;
     }
 
