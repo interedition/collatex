@@ -146,7 +146,7 @@ public abstract class AbstractTest {
   }
 
   protected static String toString(RowSortedTable<Integer, Witness, Set<Token>> table) {
-    final StringBuilder tableStr = new StringBuilder();
+    final StringBuilder tableStr = new StringBuilder("\n");
     for (Witness witness : table.columnKeySet()) {
       tableStr.append(witness.getSigil()).append(": ").append(toString(table, witness)).append("\n");
     }
