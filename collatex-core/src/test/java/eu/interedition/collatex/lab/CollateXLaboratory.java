@@ -75,7 +75,7 @@ public class CollateXLaboratory extends JFrame {
   public CollateXLaboratory() {
     super("CollateX Laboratory");
 
-    this.algorithm = new JComboBox<String>(new String[] { "Dekker", "Needleman-Wunsch", "MEDITE" });
+    this.algorithm = new JComboBox<String>(new String[] { "Dekker", "Needleman-Wunsch", "Greedy String Tiling", "MEDITE" });
     this.algorithm.setEditable(false);
     this.algorithm.setFocusable(false);
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
@@ -171,6 +171,8 @@ public class CollateXLaboratory extends JFrame {
         collator = CollationAlgorithmFactory.dekker(comparator);
       } else if ("Needleman-Wunsch".equals(algorithm.getSelectedItem())) {
         collator = CollationAlgorithmFactory.needlemanWunsch(comparator);
+      } else if ("Greedy String Tiling".equals(algorithm.getSelectedItem())) {
+        collator = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
       } else {
         collator = CollationAlgorithmFactory.medite(comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
       }

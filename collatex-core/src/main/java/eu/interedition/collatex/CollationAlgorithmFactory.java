@@ -20,6 +20,7 @@
 package eu.interedition.collatex;
 
 import com.google.common.base.Function;
+import de.tud.kom.stringmatching.GreedyStringTilingAlgorithm;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
 import eu.interedition.collatex.util.VertexMatch;
@@ -45,6 +46,10 @@ public class CollationAlgorithmFactory {
 
   public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
     return new NeedlemanWunschAlgorithm(comparator);
+  }
+
+  public static CollationAlgorithm greedyStringTiling(Comparator<Token> comparator, int minimumTileLength) {
+    return new GreedyStringTilingAlgorithm(comparator, minimumTileLength);
   }
 
   public static CollationAlgorithm medite(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {

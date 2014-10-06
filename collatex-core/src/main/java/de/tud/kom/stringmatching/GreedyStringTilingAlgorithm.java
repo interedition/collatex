@@ -1,31 +1,31 @@
-package de.tud.kom.stringmatching.gst;
-
-/**
+/*
+ * Copyright (c) 2014 The Interedition Development Group.
  *
- * This file is part of Shingle Cloud Library, Copyright (C) 2009 Arno Mittelbach, Lasse Lehmann
+ * This file is part of CollateX.
  *
- * Shingle Cloud Library is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * CollateX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Shingle Cloud Library is distributed in the hope that it will be useful,
+ * CollateX is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Shingle Cloud Library.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ * You should have received a copy of the GNU General Public License
+ * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package de.tud.kom.stringmatching;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +34,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -41,22 +42,56 @@ import java.util.TreeSet;
 /**
  * Greedy String Tiling.
  * <p/>
- * <p>
  * Implements the Greedy String Tiling algorithm as proposed by Michael J. Wise in his paper:
  * "String Similarity via Greedy String Tiling and Running Karp-Rabin Matching"
- * </p>
  *
  * @author Arno Mittelbach
+ * @author Lasse Lehmann
+ * @author Gregor Middell
  */
 public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
 
-  @Override
-  public void collate(VariantGraph graph, Iterable<Token> witness) {
-    //final Token[] tokens = Iterables.toArray(witness, Token.class);
-    throw new UnsupportedOperationException();
+  private final Comparator<Token> comparator;
+  private final int minimumTileLength;
+
+  private final Equality<VariantGraph.Vertex[], Token> equality = new Equality<VariantGraph.Vertex[], Token>() {
+
+    @Override
+    public boolean isEqual(VariantGraph.Vertex[] a, Token b) {
+      for (VariantGraph.Vertex vertex : a) {
+        final Set<Token> tokens = vertex.tokens();
+        if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), b) == 0) {
+          return true;
+        }
+      }
+      return false;
+    }
+  };
+
+  public GreedyStringTilingAlgorithm(Comparator<Token> comparator, int minimumTileLength) {
+    this.comparator = comparator;
+    this.minimumTileLength = minimumTileLength;
   }
 
-  public static <T> SortedSet<Match> match(T[] left, T[] right, Comparator<T> comparator, int minimumTileLength) {
+  @Override
+  public void collate(VariantGraph graph, Iterable<Token> witness) {
+    final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
+    final VariantGraph.Vertex[][] vertices = ranking.asArray();
+    final Token[] tokens = Iterables.toArray(witness, Token.class);
+
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<SortedSet<VertexMatch.WithTokenIndex>>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+    for (Match match : match(vertices, tokens, equality, minimumTileLength)) {
+      final TreeSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<VertexMatch.WithTokenIndex>();
+      for (int mc = 0, ml = match.length; mc < ml; mc++) {
+        final int rank = match.left + mc;
+        phrase.add(new VertexMatch.WithTokenIndex(vertices[rank][0], rank, match.right + mc));
+      }
+      matches.add(phrase);
+    }
+    merge(graph, ranking, tokens, matches);
+  }
+
+  public static <A,B> SortedSet<Match> match(A[] left, B[] right, Equality<A, B> equality, int minimumTileLength) {
     final boolean[] markedLeft = new boolean[left.length];
     final boolean[] markedRight = new boolean[right.length];
 
@@ -75,7 +110,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
           for (int tc = 0;
                (tc + lc) < left.length && (tc + rc) < right.length &&
                !markedLeft[lc + tc] && !markedRight[rc + tc] &&
-               comparator.compare(left[lc + tc], right[rc + tc]) == 0;
+               equality.isEqual(left[lc + tc], right[rc + tc]);
                tc++) {
             matchLength++;
           }
@@ -116,6 +151,10 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
     } while (maxMatchLength > minimumTileLength);
 
     return matches;
+  }
+
+  public static interface Equality<A, B> {
+    boolean isEqual(A a, B b);
   }
 
   public static class Match implements Comparable<Match> {

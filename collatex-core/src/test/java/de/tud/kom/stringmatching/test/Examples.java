@@ -9,7 +9,7 @@ import org.junit.Test;
  *  
  * @author Arno Mittelbach
  * @see ShingleCloud
- * @see de.tud.kom.stringmatching.gst.GreedyStringTilingAlgorithm
+ * @see de.tud.kom.stringmatching.GreedyStringTilingAlgorithm
  */
 public class Examples {
 

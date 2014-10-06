@@ -32,14 +32,14 @@ import java.util.HashSet;
  */
 public class IntegerRangeSet extends HashSet<Range<Integer>> implements Predicate<Integer> {
 
-  IntegerRangeSet() {
+  public IntegerRangeSet() {
   }
 
-  IntegerRangeSet(Range<Integer> c) {
+  public IntegerRangeSet(Range<Integer> c) {
     this(Collections.singleton(c));
   }
 
-  IntegerRangeSet(Collection<? extends Range<Integer>> c) {
+  public IntegerRangeSet(Collection<? extends Range<Integer>> c) {
     super(c);
   }
 

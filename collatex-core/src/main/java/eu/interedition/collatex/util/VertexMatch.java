@@ -74,7 +74,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
 
     public final Token token;
 
-    WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
+    public WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
       super(vertex, vertexRank);
       this.token = token;
     }
@@ -88,11 +88,11 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
   /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
-  static class WithTokenIndex extends VertexMatch {
+  public static class WithTokenIndex extends VertexMatch {
 
-    final int token;
+    public final int token;
 
-    WithTokenIndex(VariantGraph.Vertex vertex, int vertexRank, int token) {
+    public WithTokenIndex(VariantGraph.Vertex vertex, int vertexRank, int token) {
       super(vertex, vertexRank);
       this.token = token;
     }
@@ -103,7 +103,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
     }
   }
 
-  static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
+  public static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
     return new Function<WithTokenIndex, WithToken>() {
       @Override
       public WithToken apply(@Nullable WithTokenIndex input) {
@@ -112,7 +112,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
     };
   }
 
-  static final Predicate<SortedSet<WithTokenIndex>> filter(final IntegerRangeSet rankFilter, final IntegerRangeSet tokenFilter) {
+  public static final Predicate<SortedSet<WithTokenIndex>> filter(final IntegerRangeSet rankFilter, final IntegerRangeSet tokenFilter) {
     return new Predicate<SortedSet<WithTokenIndex>>() {
       @Override
       public boolean apply(@Nullable SortedSet<WithTokenIndex> input) {

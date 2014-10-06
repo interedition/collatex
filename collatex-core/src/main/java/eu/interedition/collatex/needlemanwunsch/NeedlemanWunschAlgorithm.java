@@ -36,21 +36,36 @@ import java.util.Set;
 public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
 
   private final Comparator<Token> comparator;
+  private final NeedlemanWunschScorer<VariantGraph.Vertex[], Token> scorer = new NeedlemanWunschScorer<VariantGraph.Vertex[], Token>() {
+
+    @Override
+    public float score(VariantGraph.Vertex[] a, Token b) {
+      for (VariantGraph.Vertex vertex : a) {
+        final Set<Token> tokens = vertex.tokens();
+        if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), b) == 0) {
+          return 1;
+        }
+      }
+      return -1;
+    }
+
+    @Override
+    public float gap() {
+      return -1;
+    }
+  };
 
   public NeedlemanWunschAlgorithm(Comparator<Token> comparator) {
     this.comparator = comparator;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void collate(VariantGraph against, Iterable<Token> witness) {
-    final DefaultNeedlemanWunschScorer scorer = new DefaultNeedlemanWunschScorer(comparator);
-
-    final Set<VariantGraph.Vertex>[] ranks = Iterables.toArray(VariantGraphRanking.of(against), Set.class);
+    final VariantGraph.Vertex[][] ranks = VariantGraphRanking.of(against).asArray();
     final Token[] tokens = Iterables.toArray(witness, Token.class);
 
     final Map<Token, VariantGraph.Vertex> alignments = Maps.newHashMap();
-    for (Map.Entry<Set<VariantGraph.Vertex>, Token> alignment : align(ranks, tokens, scorer).entrySet()) {
+    for (Map.Entry<VariantGraph.Vertex[], Token> alignment : align(ranks, tokens, scorer).entrySet()) {
       boolean aligned = false;
       final Token token = alignment.getValue();
       for (VariantGraph.Vertex vertex : alignment.getKey()) {

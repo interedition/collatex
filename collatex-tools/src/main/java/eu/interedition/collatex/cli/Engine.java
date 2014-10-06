@@ -116,6 +116,8 @@ public class Engine implements Closeable {
       this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
     } else if ("medite".equals(algorithm)) {
       this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
+    } else if ("gst".equals(algorithm)) {
+      this.collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
     } else {
       this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
     }
