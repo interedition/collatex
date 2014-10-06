@@ -33,7 +33,9 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschScorer;
+import eu.interedition.collatex.util.IntegerRangeSet;
 import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VertexMatch;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 /**
@@ -49,9 +52,9 @@ import java.util.logging.Level;
 public class MediteAlgorithm extends CollationAlgorithm.Base {
 
   private final Comparator<Token> comparator;
-  private final Function<Phrase<Match.WithToken>, Integer> matchEvaluator;
+  private final Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator;
 
-  public MediteAlgorithm(Comparator<Token> comparator, Function<Phrase<Match.WithToken>, Integer> matchEvaluator) {
+  public MediteAlgorithm(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {
     this.comparator = comparator;
     this.matchEvaluator = matchEvaluator;
   }
@@ -88,26 +91,27 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
       stopwatch.reset().start();
     }
 
-    final SortedSet<Phrase<Match.WithTokenIndex>> alignments = Sets.newTreeSet();
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> alignments = Sets.newTreeSet(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+
     while (true) {
-      final SortedSet<Phrase<Match.WithTokenIndex>> maximalUniqueMatches = matches.findMaximalUniqueMatches();
+      final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatches = matches.findMaximalUniqueMatches();
       if (maximalUniqueMatches.isEmpty()) {
         break;
       }
 
-      final IndexRangeSet rankFilter = new IndexRangeSet();
-      final IndexRangeSet tokenFilter = new IndexRangeSet();
+      final IntegerRangeSet rankFilter = new IntegerRangeSet();
+      final IntegerRangeSet tokenFilter = new IntegerRangeSet();
 
-      for (Phrase<Match.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches, matchEvaluator)) {
-        final Match.WithTokenIndex firstMatch = phrase.first();
-        final Match.WithTokenIndex lastMatch = phrase.last();
+      for (SortedSet<VertexMatch.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches, matchEvaluator)) {
+        final VertexMatch.WithTokenIndex firstMatch = phrase.first();
+        final VertexMatch.WithTokenIndex lastMatch = phrase.last();
 
         alignments.add(phrase);
         rankFilter.add(Range.closed(firstMatch.vertexRank, lastMatch.vertexRank));
         tokenFilter.add(Range.closed(firstMatch.token, lastMatch.token));
       }
 
-      Iterables.removeIf(matches, Match.filter(rankFilter, tokenFilter));
+      Iterables.removeIf(matches, VertexMatch.filter(rankFilter, tokenFilter));
     }
 
     if (logTimings) {
@@ -118,7 +122,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
       stopwatch.reset().start();
     }
 
-    final List<Phrase<Match.WithTokenIndex>> transpositions = transpositions(alignments, Math.max(tokens.length, ranking.size()));
+    final List<SortedSet<VertexMatch.WithTokenIndex>> transpositions = transpositions(alignments, Math.max(tokens.length, ranking.size()));
 
     if (logTimings) {
       stopwatch.stop();
@@ -129,16 +133,16 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     }
 
     final Map<Token, VariantGraph.Vertex> tokenMatches = Maps.newHashMap();
-    for (Phrase<Match.WithTokenIndex> phraseMatch : alignments) {
-      for (Match.WithTokenIndex tokenMatch : phraseMatch) {
+    for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : alignments) {
+      for (VertexMatch.WithTokenIndex tokenMatch : phraseMatch) {
         tokenMatches.put(tokens[tokenMatch.token], tokenMatch.vertex);
       }
     }
 
     final List<List<eu.interedition.collatex.dekker.Match>> transpositionMatches = Lists.newLinkedList();
-    for (Phrase<Match.WithTokenIndex> transposition : transpositions) {
+    for (SortedSet<VertexMatch.WithTokenIndex> transposition : transpositions) {
       final List<eu.interedition.collatex.dekker.Match> transpositionMatch = Lists.newLinkedList();
-      for (Match.WithTokenIndex match : transposition) {
+      for (VertexMatch.WithTokenIndex match : transposition) {
         tokenMatches.remove(tokens[match.token]);
         transpositionMatch.add(new eu.interedition.collatex.dekker.Match(match.vertex, tokens[match.token]));
       }
@@ -155,23 +159,23 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
   }
 
   @SuppressWarnings("unchecked")
-  List<Phrase<Match.WithTokenIndex>> transpositions(SortedSet<Phrase<Match.WithTokenIndex>> phraseMatches, int penalty) {
-    final Phrase<Match.WithTokenIndex>[] vertexSorted = (Phrase<Match.WithTokenIndex>[]) phraseMatches.toArray(new Phrase[phraseMatches.size()]);
-    final Phrase<Match.WithTokenIndex>[] tokenSorted = (Phrase<Match.WithTokenIndex>[]) Ordering.from(new Comparator<Phrase<Match.WithTokenIndex>>() {
+  List<SortedSet<VertexMatch.WithTokenIndex>> transpositions(SortedSet<SortedSet<VertexMatch.WithTokenIndex>> phraseMatches, int penalty) {
+    final SortedSet<VertexMatch.WithTokenIndex>[] vertexSorted = (SortedSet<VertexMatch.WithTokenIndex>[]) phraseMatches.toArray(new SortedSet[phraseMatches.size()]);
+    final SortedSet<VertexMatch.WithTokenIndex>[] tokenSorted = (SortedSet<VertexMatch.WithTokenIndex>[]) Ordering.from(new Comparator<SortedSet<VertexMatch.WithTokenIndex>>() {
       @Override
-      public int compare(Phrase<Match.WithTokenIndex> o1, Phrase<Match.WithTokenIndex> o2) {
+      public int compare(SortedSet<VertexMatch.WithTokenIndex> o1, SortedSet<VertexMatch.WithTokenIndex> o2) {
         return (o1.first().token - o2.first().token);
       }
-    }).immutableSortedCopy(phraseMatches).toArray(new Phrase[phraseMatches.size()]);
+    }).immutableSortedCopy(phraseMatches).toArray(new SortedSet[phraseMatches.size()]);
 
-    final Set<Phrase<Match.WithTokenIndex>> aligned = NeedlemanWunschAlgorithm.align(
+    final Set<SortedSet<VertexMatch.WithTokenIndex>> aligned = NeedlemanWunschAlgorithm.align(
             vertexSorted,
             tokenSorted,
             new TranspositionAlignmentScorer(penalty)
     ).keySet();
 
-    final List<Phrase<Match.WithTokenIndex>> transpositions = Lists.newArrayList();
-    for (Phrase<Match.WithTokenIndex> phraseMatch : phraseMatches) {
+    final List<SortedSet<VertexMatch.WithTokenIndex>> transpositions = Lists.newArrayList();
+    for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : phraseMatches) {
       if (!aligned.contains(phraseMatch)) {
         transpositions.add(phraseMatch);
       }
@@ -179,7 +183,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     return transpositions;
   }
 
-  static class TranspositionAlignmentScorer implements NeedlemanWunschScorer<Phrase<Match.WithTokenIndex>, Phrase<Match.WithTokenIndex>> {
+  static class TranspositionAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
 
     final int penalty;
 
@@ -188,7 +192,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     }
 
     @Override
-    public float score(Phrase<Match.WithTokenIndex> a, Phrase<Match.WithTokenIndex> b) {
+    public float score(SortedSet<VertexMatch.WithTokenIndex> a, SortedSet<VertexMatch.WithTokenIndex> b) {
       return (a.equals(b) ? 1 : -penalty);
     }
 
@@ -198,20 +202,20 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     }
   }
 
-  static class MatchEvaluatorWrapper implements Function<Phrase<Match.WithTokenIndex>, Integer> {
+  static class MatchEvaluatorWrapper implements Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> {
 
-    private final Function<Phrase<Match.WithToken>, Integer> wrapped;
-    private final Function<Match.WithTokenIndex,Match.WithToken> tokenResolver;
+    private final Function<SortedSet<VertexMatch.WithToken>, Integer> wrapped;
+    private final Function<VertexMatch.WithTokenIndex,VertexMatch.WithToken> tokenResolver;
 
-    MatchEvaluatorWrapper(final Function<Phrase<Match.WithToken>, Integer> wrapped, final Token[] tokens) {
+    MatchEvaluatorWrapper(final Function<SortedSet<VertexMatch.WithToken>, Integer> wrapped, final Token[] tokens) {
       this.wrapped = wrapped;
-      this.tokenResolver = Match.tokenResolver(tokens);
+      this.tokenResolver = VertexMatch.tokenResolver(tokens);
     }
 
     @Override
-    public Integer apply(@Nullable Phrase<Match.WithTokenIndex> input) {
-      final Phrase<Match.WithToken> tokenPhrase = new Phrase<Match.WithToken>();
-      for (Match.WithTokenIndex match : input) {
+    public Integer apply(@Nullable SortedSet<VertexMatch.WithTokenIndex> input) {
+      final SortedSet<VertexMatch.WithToken> tokenPhrase = new TreeSet<VertexMatch.WithToken>();
+      for (VertexMatch.WithTokenIndex match : input) {
         tokenPhrase.add(tokenResolver.apply(match));
       }
       return wrapped.apply(tokenPhrase);

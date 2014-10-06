@@ -23,10 +23,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.medite.Match;
-import eu.interedition.collatex.medite.Phrase;
+import eu.interedition.collatex.util.VertexMatch;
 
 import javax.annotation.Nullable;
+import java.util.SortedSet;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
   private final SimpleWitness witness;
@@ -70,11 +70,11 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
     return witness.compare(this, o);
   }
 
-  public static final Function<Phrase<Match.WithToken>, Integer> TOKEN_MATCH_EVALUATOR = new Function<Phrase<Match.WithToken>, Integer>() {
+  public static final Function<SortedSet<VertexMatch.WithToken>, Integer> TOKEN_MATCH_EVALUATOR = new Function<SortedSet<VertexMatch.WithToken>, Integer>() {
     @Override
-    public Integer apply(@Nullable Phrase<Match.WithToken> input) {
+    public Integer apply(@Nullable SortedSet<VertexMatch.WithToken> input) {
       int value = 0;
-      for (Match.WithToken match : input) {
+      for (VertexMatch.WithToken match : input) {
         value += ((SimpleToken) match.token).getContent().length();
       }
       return value;
