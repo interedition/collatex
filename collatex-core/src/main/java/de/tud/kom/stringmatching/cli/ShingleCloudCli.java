@@ -98,75 +98,13 @@ public class ShingleCloudCli {
 
 
 	private static void presentResults(ShingleCloud shingleCloud, OptionSet options) {
-		if(null == options.valuesOf("output") || (options.valuesOf("output") instanceof Collection && ((Collection)options.valuesOf("output")).isEmpty()))
-			displayFullResults(shingleCloud);
-		else {
-			Collection<String> output = (Collection<String>) options.valuesOf("output");
-			for(String outputOpt : output){
-				outputOpt = outputOpt.toLowerCase();
-				if("shinglecloud".equals(outputOpt))
-					displayShingleCloud(shingleCloud);
-				if("containmentneedle".equals(outputOpt))
-					System.out.println(shingleCloud.getContainmentInNeedle());
-				if("containmenthaystack".equals(outputOpt))
-					System.out.println(shingleCloud.getContainmentInHaystack());
-				if("matchedtokens".equals(outputOpt))
-					System.out.println(shingleCloud.getNumberOfMatchingTokens());
-				if("matchedshingles".equals(outputOpt))
-					System.out.println(shingleCloud.getNumberOfMatchingShingles());
-				if("jaccardshingle".equals(outputOpt))
-					System.out.println(shingleCloud.getJaccardMeasureForShingles());
-				if("jaccardtoken".equals(outputOpt))
-					System.out.println(shingleCloud.getJaccardMeasureForTokens());
-				if("tokensInNeedle".equals(outputOpt))
-					System.out.println(shingleCloud.getNeedleShingles().getNumberOfTokens());
-				if("shinglesInNeedle".equals(outputOpt))
-					System.out.println(shingleCloud.getNeedleShingles().size());
-				if("tokensInHaystack".equals(outputOpt))
-					System.out.println(shingleCloud.getHaystackShingles().getNumberOfTokens());
-				if("shinglesInHaystack".equals(outputOpt))
-					System.out.println(shingleCloud.getHaystackShingles().size());
-			}
-		}
+    for(ShingleCloudMarker marker : shingleCloud.getShingleCloud())
+      if(ShingleCloudMarker.NoMatch.equals(marker))
+        System.out.print("0, ");
+      else if(ShingleCloudMarker.Match.equals(marker))
+        System.out.print("1, ");
+    System.out.println();
 	}
-
-
-
-	private static void displayShingleCloud(ShingleCloud shingleCloud) {
-		for(ShingleCloudMarker marker : shingleCloud.getShingleCloud())
-			if(ShingleCloudMarker.NoMatch.equals(marker))
-				System.out.print("0, ");
-			else if(ShingleCloudMarker.Match.equals(marker))
-				System.out.print("1, ");
-		System.out.println();
-	}
-
-
-	private static void displayFullResults(ShingleCloud shingleCloud) {
-		System.out.println("Results ------------------------");
-		System.out.println("Tokens in haystack: " + shingleCloud.getHaystackShingles().getNumberOfTokens());
-		System.out.println("Tokens in needle: " + shingleCloud.getNeedleShingles().getNumberOfTokens());
-		System.out.println("Number of matches: " + shingleCloud.getMatches().size());
-		System.out.println("Number of matching shingles: " + shingleCloud.getNumberOfMatchingShingles());
-		System.out.println("Number of matching tokens: " + shingleCloud.getNumberOfMatchingTokens());
-		System.out.println("Containment in Needle: " + shingleCloud.getContainmentInNeedle());
-		System.out.println("Containment in Haystack: " + shingleCloud.getContainmentInHaystack());
-		
-		System.out.println();
-		System.out.println("Individual matchs -----------------------");
-		int i = 1;
-		for(ShingleCloudMatch match : shingleCloud.getMatches()){
-			System.out.println("Match " + i++ + " --------------------");
-			System.out.println("Matches rating: " + match.getRating());
-			System.out.println("Containment in Needle: " + match.getContainmentInNeedle());
-			System.out.println("Containment in Haystack: " + match.getContainmentInHaystack());
-			System.out.println("Matched text:");
-			System.out.println(match.getMatchedShingles());
-			System.out.println();
-			System.out.println();
-		}
-	}
-
 
 	private static void configureShingleCloud(ShingleCloud shingleCloud,
 			OptionSet options) {

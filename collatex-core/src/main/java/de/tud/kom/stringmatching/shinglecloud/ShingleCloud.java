@@ -28,10 +28,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 
 
@@ -109,9 +107,8 @@ public class ShingleCloud {
 	private ShingleList needleShingles;
 
   public static final Function<String, String[]> WORD_TOKENIZER = new Function<String, String[]>() {
-    @Nullable
     @Override
-    public String[] apply(@Nullable String input) {
+    public String[] apply(String input) {
       return input.split("\\s+");
     }
   };
@@ -127,7 +124,6 @@ public class ShingleCloud {
 	 */
 	protected boolean compiled = false;
 	
-	protected boolean allowMultipleNeedleMatches = false;
 	protected boolean allowNonIsolatedMultipleNeedleMatches = true;
 	
 	protected String[] magicWords;
@@ -231,7 +227,7 @@ public class ShingleCloud {
 	 * </p>
 	 * 
 	 * @param needle The needle to be searched for.
-	 * @see compile
+	 * @see #compile()
 	 */
 	public void match(String needle) {
 		// test if object is already compiled .. and if not compile it
@@ -269,85 +265,45 @@ public class ShingleCloud {
 	}
 	
 	private void doMatch(){
-		if(allowMultipleNeedleMatches)
-			doMatchSimple();
-		else
-			doMatchRemoveMultiple();
-	}
-	
-	private void doMatchRemoveMultiple(){
-		// build lookup table
-		HashMap<String, Integer> needleLookup = new HashMap<String, Integer>();
-		for(Shingle s : needleShingles){
-			if(! needleLookup.containsKey(s.getShingle()))
-				needleLookup.put(s.getShingle(), 1);
-			else
-				needleLookup.put(s.getShingle(), needleLookup.get(s.getShingle()) + 1);
-		}
-		
-		// build shingle cloud
-		shingleCloud = new ArrayList<ShingleCloudMarker>();
-		int currentGroupLength = 0;
-		for(Shingle s : haystackShingles){
-			if(s.isBasicShingle()){
-				currentGroupLength++;
-				
-				Integer n = needleLookup.get(s.getShingle());
-				if( n != null && n > 0 ){
-					shingleCloud.add(ShingleCloudMarker.Match);
-					needleLookup.put(s.getShingle(), n-1);
-				} else if (n != null && n < 1)
-					shingleCloud.add(ShingleCloudMarker.OutOfMatches);
-				else
-					shingleCloud.add(ShingleCloudMarker.NoMatch);
-			} else if (s.isMagicMatcher()) {
-				shingleCloud.add(ShingleCloudMarker.Magic);
-				currentGroupLength++;
-			} else if(isDetectGroups()) { // group marker
-				shingleCloud.add(ShingleCloudMarker.Group);
-				if(s.isGroupBegin()){
-					currentGroupLength = 0;
-				} else if(s.isGroupEnd()) {
-					if(null != s.getId())
-						groupLengthMap.put(s.getId(), currentGroupLength);
-				}
-			}
-		}
+    // build lookup table
+    HashMap<String, Integer> needleLookup = new HashMap<String, Integer>();
+    for(Shingle s : needleShingles){
+      if(! needleLookup.containsKey(s.getShingle()))
+        needleLookup.put(s.getShingle(), 1);
+      else
+        needleLookup.put(s.getShingle(), needleLookup.get(s.getShingle()) + 1);
+    }
 
-		interpretShingleCloud();
-	}
-	
-	private void doMatchSimple(){
-		// build lookup table
-		HashSet<String> needleLookup = new HashSet<String>();
-		for(Shingle s : needleShingles)
-			needleLookup.add(s.getShingle());
-		
-		// build shingle cloud
-		shingleCloud = new ArrayList<ShingleCloudMarker>();
-		int currentGroupLength = 0;
-		for(Shingle s : haystackShingles){
-			if(s.isBasicShingle() ){
-				currentGroupLength++;
-				if( needleLookup.contains(s.getShingle() ) )
-					shingleCloud.add(ShingleCloudMarker.Match);
-				else
-					shingleCloud.add(ShingleCloudMarker.NoMatch);
-			} else if (s.isMagicMatcher()) {
-				shingleCloud.add(ShingleCloudMarker.Magic);
-				currentGroupLength++;
-			} else if(isDetectGroups()){
-				shingleCloud.add(ShingleCloudMarker.Group);
-				if(s.isGroupBegin()){
-					currentGroupLength = 0;
-				} else if(s.isGroupEnd()) {
-					if(null != s.getId())
-						groupLengthMap.put(s.getId(), currentGroupLength);
-				}
-			}
-		}
+    // build shingle cloud
+    shingleCloud = new ArrayList<ShingleCloudMarker>();
+    int currentGroupLength = 0;
+    for(Shingle s : haystackShingles){
+      if(s.isBasicShingle()){
+        currentGroupLength++;
 
-		interpretShingleCloud();
+        Integer n = needleLookup.get(s.getShingle());
+        if( n != null && n > 0 ){
+          shingleCloud.add(ShingleCloudMarker.Match);
+          needleLookup.put(s.getShingle(), n-1);
+        } else if (n != null && n < 1)
+          shingleCloud.add(ShingleCloudMarker.OutOfMatches);
+        else
+          shingleCloud.add(ShingleCloudMarker.NoMatch);
+      } else if (s.isMagicMatcher()) {
+        shingleCloud.add(ShingleCloudMarker.Magic);
+        currentGroupLength++;
+      } else if(isDetectGroups()) { // group marker
+        shingleCloud.add(ShingleCloudMarker.Group);
+        if(s.isGroupBegin()){
+          currentGroupLength = 0;
+        } else if(s.isGroupEnd()) {
+          if(null != s.getId())
+            groupLengthMap.put(s.getId(), currentGroupLength);
+        }
+      }
+    }
+
+    interpretShingleCloud();
 	}
 
 	private void interpretShingleCloud() {
@@ -591,23 +547,6 @@ public class ShingleCloud {
 	}
 
 	/**
-	 * 
-	 * @return Whether or not multiple needle matches are allowed.
-	 */
-	public boolean isAllowMultipleNeedleMatches() {
-		return allowMultipleNeedleMatches;
-	}
-
-	/**
-	 * Defines whether or not multiple needle matches are allowed.
-	 * 
-	 * @param allowMultipleNeedleMatches
-	 */
-	public void setAllowMultipleNeedleMatches(boolean allowMultipleNeedleMatches) {
-		this.allowMultipleNeedleMatches = allowMultipleNeedleMatches;
-	}
-
-	/**
 	 * @return The shingle cloud that resulted from the last match operation
 	 */
 	public List<ShingleCloudMarker> getShingleCloud(){
@@ -806,133 +745,4 @@ public class ShingleCloud {
 		this.allowNonIsolatedMultipleNeedleMatches = allowNonIsolatedMultipleNeedleMatches;
 	}
 	
-	/**
-	 * The containment score accumulated over all matches.
-	 * @return
-	 * 
-	 * @see ShingleCloudMatch#getContainmentInHaystack()
-	 */
-	public double getContainmentInHaystack(){
-		double containment = 0;
-		
-		for(ShingleCloudMatch match : getMatches())
-			containment += match.getContainmentInHaystack();
-		
-		return containment;
-	}
-	
-	/**
-	 * The containment score accumulated over all matches.
-	 * @return
-	 * 
-	 * @see ShingleCloudMatch#getContainmentInNeedle()
-	 */
-	public double getContainmentInNeedle(){
-		double containment = 0;
-		
-		for(ShingleCloudMatch match : getMatches())
-			containment += match.getContainmentInNeedle();
-		
-		return containment;
-	}
-	
-	public int getNumberOfMatchingShingles(){
-		int matches = 0;
-		
-		for(ShingleCloudMatch match : getMatches())
-			matches += match.getNumberOfMatchedShingles();
-		
-		return matches;
-	}
-	
-	public int getNumberOfMatchingTokens(){
-		int matches = 0;
-		
-		for(ShingleCloudMatch match : getMatches())
-			matches += match.getNumberOfMatchedTokens();
-		
-		return matches;
-	}
-	
-	/**
-	 * Calculates the jaccard measure interpreting the documents as basic sets.
-	 * 
-	 * NumberOfMatchingShingles/NumberOfUniqueShingles
-	 * @return
-	 */
-	public double getJaccardMeasureForShingles(){
-		Map<String, Integer> haystackCount = new HashMap<String, Integer>();
-		Map<String, Integer> needleCount = new HashMap<String, Integer>();
-		
-		for(Shingle shingle : haystackShingles)
-			if(shingle.isBasicShingle())
-				if(! haystackCount.containsKey(shingle.getShingle()))
-					haystackCount.put(shingle.getShingle(), 1);
-				else
-					haystackCount.put(shingle.getShingle(), haystackCount.get(shingle.getShingle())+1);
-
-		for(Shingle shingle : needleShingles)
-			if(shingle.isBasicShingle())
-				if(! needleCount.containsKey(shingle.getShingle()))
-					needleCount.put(shingle.getShingle(), 1);
-				else
-					needleCount.put(shingle.getShingle(), needleCount.get(shingle.getShingle())+1);
-
-		int count = 0;
-		for(Entry<String, Integer> entry : haystackCount.entrySet()){
-			if(needleCount.containsKey(entry.getKey()))
-				count += Math.max(needleCount.remove(entry.getKey()), entry.getValue());
-			else
-				count += entry.getValue();
-		}
-		
-		for(Entry<String, Integer> entry : needleCount.entrySet()){
-			count +=entry.getValue();
-		}
-		
-		return getNumberOfMatchingShingles()/(double)count;
-	}
-	
-	/**
-	 * Calculates the jaccard measure interpreting the documents as basic sets.
-	 * 
-	 * NumberOfMatchingShingles/NumberOfUniqueTokens
-	 * @return
-	 */
-	public double getJaccardMeasureForTokens(){
-		Map<String, Integer> haystackCount = new HashMap<String, Integer>();
-		Map<String, Integer> needleCount = new HashMap<String, Integer>();
-		
-		for(Shingle shingle : haystackShingles)
-			if(shingle.isBasicShingle())
-				for(String item : shingle.getItems())
-					if(! haystackCount.containsKey(item))
-						haystackCount.put(item, 1);
-					else
-						haystackCount.put(item, haystackCount.get(item)+1);
-
-		for(Shingle shingle : needleShingles)
-			if(shingle.isBasicShingle())
-				for(String item : shingle.getItems())
-					if(! needleCount.containsKey(shingle.getShingle()))
-						needleCount.put(item, 1);
-					else
-						needleCount.put(item, needleCount.get(item)+1);
-
-		int count = 0;
-		for(Entry<String, Integer> entry : haystackCount.entrySet()){
-			if(needleCount.containsKey(entry.getKey()))
-				count += Math.max(needleCount.remove(entry.getKey()), entry.getValue());
-			else
-				count += entry.getValue();
-		}
-		
-		for(Entry<String, Integer> entry : needleCount.entrySet()){
-			count +=entry.getValue();
-		}
-		
-		return getNumberOfMatchingTokens()/(double)count;
-	}
-
-
 }
