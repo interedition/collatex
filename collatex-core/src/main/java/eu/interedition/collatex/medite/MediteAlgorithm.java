@@ -49,12 +49,13 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
 
   @Override
   public void collate(VariantGraph graph, Iterable<Token> witness) {
-    final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
+    final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
     final Token[] tokens = Iterables.toArray(witness, Token.class);
-    final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
 
+    final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
     final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, tokens);
-    final Matches matchCandidates = Matches.between(ranking, suffixTree, matchEvaluator);
+
+    final Matches matchCandidates = Matches.between(vertices, suffixTree, matchEvaluator);
     final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = Sets.newTreeSet(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
 
     while (true) {
@@ -78,7 +79,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
       Iterables.removeIf(matchCandidates, VertexMatch.filter(rankFilter, tokenFilter));
     }
 
-    merge(graph, ranking, tokens, matches);
+    merge(graph, vertices, tokens, matches);
   }
 
   static class MatchEvaluatorWrapper implements Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> {

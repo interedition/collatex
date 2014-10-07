@@ -131,7 +131,7 @@ public interface CollationAlgorithm {
       }
     }
 
-    protected void merge(VariantGraph graph, VariantGraphRanking ranking, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
+    protected void merge(VariantGraph graph, VariantGraph.Vertex[][] vertices, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
       final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = (SortedSet<VertexMatch.WithTokenIndex>[]) matches.toArray(new SortedSet[matches.size()]);
       final SortedSet<VertexMatch.WithTokenIndex>[] matchesTokenOrder = Arrays.copyOf(matchesVertexOrder, matchesVertexOrder.length);
 
@@ -142,7 +142,7 @@ public interface CollationAlgorithm {
         }
       });
 
-      final int mergedLength = Math.max(tokens.length, ranking.size());
+      final int mergedLength = Math.max(tokens.length, vertices.length);
       final Set<SortedSet<VertexMatch.WithTokenIndex>> inOrderMatches = NeedlemanWunschAlgorithm.align(
               matchesVertexOrder,
               matchesTokenOrder,

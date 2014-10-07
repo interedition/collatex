@@ -53,20 +53,18 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
     super(initialCapacity);
   }
 
-  public static Matches between(VariantGraphRanking ranking, SuffixTree<Token> suffixTree, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
+  public static Matches between(VariantGraph.Vertex[][] vertices, SuffixTree<Token> suffixTree, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
 
-    final SortedSetMultimap<Integer,VariantGraph.Vertex> rankMap = ranking.getByRank();
     final Multimap<Integer, MatchThreadElement> matchThreads = HashMultimap.create();
-    for (Integer rank : rankMap.keySet()) {
-      final SortedSet<VariantGraph.Vertex> vertices = rankMap.get(rank);
-      for (VariantGraph.Vertex vertex : vertices) {
+    for (int rank = 0; rank < vertices.length; rank++) {
+      for (VariantGraph.Vertex vertex : vertices[rank]) {
         final MatchThreadElement matchThreadElement = new MatchThreadElement(suffixTree).advance(vertex, rank);
         if (matchThreadElement != null) {
           matchThreads.put(rank, matchThreadElement);
         }
       }
       for (MatchThreadElement matchThreadElement : matchThreads.get(rank - 1)) {
-        for (VariantGraph.Vertex vertex : vertices) {
+        for (VariantGraph.Vertex vertex : vertices[rank]) {
           final MatchThreadElement advanced = matchThreadElement.advance(vertex, rank);
           if (advanced != null) {
             matchThreads.put(rank, advanced);

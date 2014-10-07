@@ -75,20 +75,20 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
 
   @Override
   public void collate(VariantGraph graph, Iterable<Token> witness) {
-    final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
-    final VariantGraph.Vertex[][] vertices = ranking.asArray();
+    final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
     final Token[] tokens = Iterables.toArray(witness, Token.class);
 
     final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<SortedSet<VertexMatch.WithTokenIndex>>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
     for (Match match : match(vertices, tokens, equality, minimumTileLength)) {
-      final TreeSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<VertexMatch.WithTokenIndex>();
+      final SortedSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<VertexMatch.WithTokenIndex>();
       for (int mc = 0, ml = match.length; mc < ml; mc++) {
         final int rank = match.left + mc;
         phrase.add(new VertexMatch.WithTokenIndex(vertices[rank][0], rank, match.right + mc));
       }
       matches.add(phrase);
     }
-    merge(graph, ranking, tokens, matches);
+
+    merge(graph, vertices, tokens, matches);
   }
 
   public static <A,B> SortedSet<Match> match(A[] left, B[] right, Equality<A, B> equality, int minimumTileLength) {
