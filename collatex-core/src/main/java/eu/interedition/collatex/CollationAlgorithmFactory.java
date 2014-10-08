@@ -20,9 +20,9 @@
 package eu.interedition.collatex;
 
 import com.google.common.base.Function;
-import de.tud.kom.stringmatching.GreedyStringTilingAlgorithm;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
+import eu.interedition.collatex.util.GreedyStringTilingAlgorithm;
 import eu.interedition.collatex.util.VertexMatch;
 import eu.interedition.collatex.medite.MediteAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;

@@ -17,15 +17,13 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.tud.kom.stringmatching;
+package eu.interedition.collatex.util;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.util.VariantGraphRanking;
-import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
