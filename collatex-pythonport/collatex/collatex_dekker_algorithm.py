@@ -205,7 +205,7 @@ class Collation(object):
         self.combined_string += content
 
     def get_range_for_witness(self, witness_sigil):
-        if not self.witness_ranges.has_key(witness_sigil):
+        if not witness_sigil in self.witness_ranges:
             raise Exception("Witness "+witness_sigil+" is not added to the collation!")
         return self.witness_ranges[witness_sigil]
 
