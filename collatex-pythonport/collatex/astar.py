@@ -1,5 +1,4 @@
 # author: by Ronald Haentjens Dekker (created 4 August 2014)
-from sets import Set
 
 class AStar(object):
         
@@ -14,7 +13,7 @@ class AStar(object):
         heap = [] 
         
         # Set to store previously visited nodes
-        visited = Set()
+        visited = set()
 
         # put the initial node on the queue
         heap.append(start)

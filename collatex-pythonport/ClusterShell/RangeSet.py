@@ -426,8 +426,7 @@ class RangeSet(set):
         elif isinstance(index, int):
             return self._sorted()[index]
         else:
-            raise TypeError, \
-                "%s indices must be integers" % self.__class__.__name__
+            raise TypeError("%s indices must be integers" % self.__class__.__name__)
 
     def split(self, nbr):
         """
@@ -616,7 +615,7 @@ class RangeSet(set):
         """Check that the other argument to a binary operation is also  a set,
         raising a TypeError otherwise."""
         if not isinstance(other, set):
-            raise TypeError, "Binary operation only permitted between sets"
+            raise TypeError("Binary operation only permitted between sets")
 
     # In-place union, intersection, differences.
     # Subtle:  The xyz_update() functions deliberately return None,
