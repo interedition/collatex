@@ -29,10 +29,10 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.io.CollateXModule;
-import eu.interedition.collatex.simple.SimpleCollation;
+import eu.interedition.collatex.http.JsonProcessor;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
@@ -43,7 +43,6 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.xml.sax.SAXException;
 
 import javax.script.ScriptException;
@@ -57,6 +56,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -91,8 +91,6 @@ public class Engine implements Closeable {
   PrintWriter log = new PrintWriter(System.err);
   boolean errorOccurred = false;
 
-  ObjectMapper objectMapper = new ObjectMapper().withModule(new CollateXModule());
-
   Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException, IOException {
     this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
     this.xmlMode = commandLine.hasOption("xml");
@@ -112,14 +110,19 @@ public class Engine implements Closeable {
     }
 
     final String algorithm = commandLine.getOptionValue("a", "dekker").toLowerCase();
-    if ("needleman-wunsch".equals(algorithm)) {
-      this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
-    } else if ("medite".equals(algorithm)) {
-      this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
-    } else if ("gst".equals(algorithm)) {
-      this.collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
-    } else {
-      this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
+    switch (algorithm) {
+      case "needleman-wunsch":
+        this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
+        break;
+      case "medite":
+        this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
+        break;
+      case "gst":
+        this.collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
+        break;
+      default:
+        this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
+        break;
     }
 
     this.variantGraph = new JungVariantGraph();
@@ -157,9 +160,12 @@ public class Engine implements Closeable {
 
   Engine read() throws IOException, XPathExpressionException, SAXException {
     if (inputResources.size() < 2) {
-      this.witnesses = objectMapper.readValue(inputResources.get(0), SimpleCollation.class).getWitnesses();
+      try (InputStream inputStream = inputResources.get(0).openStream()) {
+        this.witnesses = JsonProcessor.read(inputStream).getWitnesses();
+      }
     } else {
       this.witnesses = Lists.newArrayListWithExpectedSize(inputResources.size());
+      //noinspection Convert2streamapi
       for (URL witnessURL : inputResources) {
         this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL)
                 .read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null)));
@@ -202,7 +208,7 @@ public class Engine implements Closeable {
         }
       }
     } else {
-      objectMapper.writer().writeValue(out, variantGraph);
+      JsonProcessor.write(variantGraph, out);
     }
   }
 
@@ -253,9 +259,7 @@ public class Engine implements Closeable {
       engine.error("XML error", e);
     } catch (XPathExpressionException e) {
       engine.error("XPath error", e);
-    } catch (ScriptException e) {
-      engine.error("Script error", e);
-    } catch (PluginScript.PluginScriptExecutionException e) {
+    } catch (ScriptException | PluginScript.PluginScriptExecutionException e) {
       engine.error("Script error", e);
     } finally {
         try {
@@ -282,8 +286,8 @@ public class Engine implements Closeable {
 
   @Override
   public void close() throws IOException {
-      final Closer closer = Closer.create();
-      try {
+    final Closer closer = Closer.create();
+    try {
       if (out != null) {
         closer.register(out).flush();
       }
@@ -294,6 +298,7 @@ public class Engine implements Closeable {
       closer.close();
     }
     if (errorOccurred && (outFile != null) && outFile.isFile()) {
+      //noinspection ResultOfMethodCallIgnored
       outFile.delete();
     }
   }

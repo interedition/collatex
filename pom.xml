@@ -25,7 +25,7 @@
         <module>collatex-core</module>
         <module>collatex-cocoon</module>
         <module>collatex-tools</module>
-	<module>collatex-nodeps</module>
+	      <module>collatex-nodeps</module>
     </modules>
 
     <licenses>
@@ -113,6 +113,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-http-server</artifactId>
+                <version>2.3.8</version>
+            </dependency>
+
+            <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>2.6</version>
@@ -181,8 +187,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
