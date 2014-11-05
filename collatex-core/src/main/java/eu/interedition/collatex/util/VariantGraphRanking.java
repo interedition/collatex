@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import javax.annotation.Nullable;
 
@@ -138,6 +139,17 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
       }
     }
     return table;
+  }
+
+  public VariantGraph.Vertex[][] asArray() {
+    final Set<Integer> ranks = byRank.keySet();
+    final VariantGraph.Vertex[][] arr = new VariantGraph.Vertex[ranks.size()][];
+    for (final Iterator<Integer> it = ranks.iterator(); it.hasNext(); ) {
+      final Integer rank = it.next();
+      final SortedSet<Vertex> vertices = byRank.get(rank);
+      arr[rank] = vertices.toArray(new Vertex[vertices.size()]);
+    }
+    return arr;
   }
 
   @Override

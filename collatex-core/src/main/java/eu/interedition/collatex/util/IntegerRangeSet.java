@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.medite;
+package eu.interedition.collatex.util;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Range;
@@ -30,16 +30,16 @@ import java.util.HashSet;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-class IndexRangeSet extends HashSet<Range<Integer>> implements Predicate<Integer> {
+public class IntegerRangeSet extends HashSet<Range<Integer>> implements Predicate<Integer> {
 
-  IndexRangeSet() {
+  public IntegerRangeSet() {
   }
 
-  IndexRangeSet(Range<Integer> c) {
+  public IntegerRangeSet(Range<Integer> c) {
     this(Collections.singleton(c));
   }
 
-  IndexRangeSet(Collection<? extends Range<Integer>> c) {
+  public IntegerRangeSet(Collection<? extends Range<Integer>> c) {
     super(c);
   }
 

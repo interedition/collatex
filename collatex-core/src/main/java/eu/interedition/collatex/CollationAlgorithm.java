@@ -19,20 +19,28 @@
 
 package eu.interedition.collatex;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
+import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschScorer;
+import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VertexMatch;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import eu.interedition.collatex.dekker.Match;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -95,6 +103,20 @@ public interface CollationAlgorithm {
       into.connect(last, into.getEnd(), witnessSet);
     }
 
+    protected void mergeTranspositions(VariantGraph into, Iterable<SortedSet<VertexMatch.WithToken>> transpositions) {
+      for (SortedSet<VertexMatch.WithToken> transposedPhrase : transpositions) {
+        if (LOG.isLoggable(Level.FINE)) {
+          LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
+        }
+        final Set<VariantGraph.Vertex> transposed = Sets.newHashSet();
+        for (VertexMatch.WithToken match : transposedPhrase) {
+          transposed.add(witnessTokenVertices.get(match.token));
+          transposed.add(match.vertex);
+        }
+        into.transpose(transposed);
+      }
+    }
+
     protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
       for (List<Match> transposedPhrase : transpositions) {
         if (LOG.isLoggable(Level.FINE)) {
@@ -107,6 +129,64 @@ public interface CollationAlgorithm {
         }
         into.transpose(transposed);
       }
+    }
+
+    protected void merge(VariantGraph graph, VariantGraph.Vertex[][] vertices, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
+      final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = (SortedSet<VertexMatch.WithTokenIndex>[]) matches.toArray(new SortedSet[matches.size()]);
+      final SortedSet<VertexMatch.WithTokenIndex>[] matchesTokenOrder = Arrays.copyOf(matchesVertexOrder, matchesVertexOrder.length);
+
+      Arrays.sort(matchesTokenOrder, new Comparator<SortedSet<VertexMatch.WithTokenIndex>>() {
+        @Override
+        public int compare(SortedSet<VertexMatch.WithTokenIndex> o1, SortedSet<VertexMatch.WithTokenIndex> o2) {
+          return (o1.first().token - o2.first().token);
+        }
+      });
+
+      final int mergedLength = Math.max(tokens.length, vertices.length);
+      final Set<SortedSet<VertexMatch.WithTokenIndex>> inOrderMatches = NeedlemanWunschAlgorithm.align(
+              matchesVertexOrder,
+              matchesTokenOrder,
+              new NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>>() {
+
+                @Override
+                public float score(SortedSet<VertexMatch.WithTokenIndex> a, SortedSet<VertexMatch.WithTokenIndex> b) {
+                  return (a.equals(b) ? 1 : -mergedLength);
+                }
+
+                @Override
+                public float gap() {
+                  return -(1 / (mergedLength * 1.0f));
+                }
+              }
+      ).keySet();
+
+      final List<SortedSet<VertexMatch.WithTokenIndex>> transpositions = new ArrayList<SortedSet<VertexMatch.WithTokenIndex>>();
+      for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : matches) {
+        if (!inOrderMatches.contains(phraseMatch)) {
+          transpositions.add(phraseMatch);
+        }
+      }
+
+
+      final Map<Token, VariantGraph.Vertex> matchedTokens = Maps.newHashMap();
+      for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : matches) {
+        for (VertexMatch.WithTokenIndex tokenMatch : phraseMatch) {
+          matchedTokens.put(tokens[tokenMatch.token], tokenMatch.vertex);
+        }
+      }
+
+      final List<SortedSet<VertexMatch.WithToken>> transposedTokens = Lists.newLinkedList();
+      for (SortedSet<VertexMatch.WithTokenIndex> transposition : transpositions) {
+        final SortedSet<VertexMatch.WithToken> transpositionMatch = new TreeSet<VertexMatch.WithToken>();
+        for (VertexMatch.WithTokenIndex match : transposition) {
+          matchedTokens.remove(tokens[match.token]);
+          transpositionMatch.add(new VertexMatch.WithToken(match.vertex, match.vertexRank, tokens[match.token]));
+        }
+        transposedTokens.add(transpositionMatch);
+      }
+
+      merge(graph, Arrays.asList(tokens), matchedTokens);
+      mergeTranspositions(graph, transposedTokens);
     }
   }
 }

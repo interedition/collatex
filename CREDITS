@@ -1,0 +1,10 @@
+This software includes code from the Shingle Cloud Library,
+Copyright (C) 2009 Arno Mittelbach, Lasse Lehmann. The Shingle Cloud Library
+is free software and redistributed under the terms of the GNU Lesser General
+Public License.
+
+This software includes code from JSuffixArrays, a project which provides the
+implementation of a number of algorithms for computing Suffix Arrays over
+sequences of symbols of arbitrary size (not only strings).
+Copyright (C) 2014 Carrot Search s.c. JSuffixArrays is licensed under the
+Apache Software License, Version 2.0.

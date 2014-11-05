@@ -31,7 +31,9 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.IntegerRangeSet;
 import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,30 +42,29 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
+public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
 
   public Matches(int initialCapacity) {
     super(initialCapacity);
   }
 
-  public static Matches between(VariantGraphRanking ranking, SuffixTree<Token> suffixTree, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
+  public static Matches between(VariantGraph.Vertex[][] vertices, SuffixTree<Token> suffixTree, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
 
-    final SortedSetMultimap<Integer,VariantGraph.Vertex> rankMap = ranking.getByRank();
     final Multimap<Integer, MatchThreadElement> matchThreads = HashMultimap.create();
-    for (Integer rank : rankMap.keySet()) {
-      final SortedSet<VariantGraph.Vertex> vertices = rankMap.get(rank);
-      for (VariantGraph.Vertex vertex : vertices) {
+    for (int rank = 0; rank < vertices.length; rank++) {
+      for (VariantGraph.Vertex vertex : vertices[rank]) {
         final MatchThreadElement matchThreadElement = new MatchThreadElement(suffixTree).advance(vertex, rank);
         if (matchThreadElement != null) {
           matchThreads.put(rank, matchThreadElement);
         }
       }
       for (MatchThreadElement matchThreadElement : matchThreads.get(rank - 1)) {
-        for (VariantGraph.Vertex vertex : vertices) {
+        for (VariantGraph.Vertex vertex : vertices[rank]) {
           final MatchThreadElement advanced = matchThreadElement.advance(vertex, rank);
           if (advanced != null) {
             matchThreads.put(rank, advanced);
@@ -74,20 +75,20 @@ public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
 
     final Matches matches = new Matches(matchThreads.size());
     for (MatchThreadElement matchThreadElement : matchThreads.values()) {
-      final List<Phrase<Match.WithTokenIndex>> threadPhrases = Lists.newArrayList();
+      final List<SortedSet<VertexMatch.WithTokenIndex>> threadPhrases = Lists.newArrayList();
       boolean firstElement = true;
       for (MatchThreadElement threadElement : matchThreadElement.thread()) {
         final SuffixTree<Token>.EquivalenceClass equivalenceClass = threadElement.cursor.matchedClass();
         for (int mc = 0; mc < equivalenceClass.length; mc++) {
           final int tokenCandidate = equivalenceClass.members[mc];
           if (firstElement) {
-            final Phrase<Match.WithTokenIndex> phrase = new Phrase<Match.WithTokenIndex>();
-            phrase.add(new Match.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
+            final SortedSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<VertexMatch.WithTokenIndex>();
+            phrase.add(new VertexMatch.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
             threadPhrases.add(phrase);
           } else {
-            for (Phrase<Match.WithTokenIndex> phrase : threadPhrases) {
+            for (SortedSet<VertexMatch.WithTokenIndex> phrase : threadPhrases) {
               if ((phrase.last().token + 1) == tokenCandidate) {
-                phrase.add(new Match.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
+                phrase.add(new VertexMatch.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
               }
             }
           }
@@ -101,18 +102,18 @@ public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
     return matches;
   }
 
-  private static Comparator<Phrase<Match.WithTokenIndex>> maximalUniqueMatchOrdering(final Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
-    return new Comparator<Phrase<Match.WithTokenIndex>>() {
+  private static Comparator<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatchOrdering(final Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
+    return new Comparator<SortedSet<VertexMatch.WithTokenIndex>>() {
       @Override
-      public int compare(Phrase<Match.WithTokenIndex> o1, Phrase<Match.WithTokenIndex> o2) {
+      public int compare(SortedSet<VertexMatch.WithTokenIndex> o1, SortedSet<VertexMatch.WithTokenIndex> o2) {
         // 1. reverse ordering by match value
         int result = matchEvaluator.apply(o2) - matchEvaluator.apply(o1);
         if (result != 0) {
           return result;
         }
 
-        final Match.WithTokenIndex firstMatch1 = o1.first();
-        final Match.WithTokenIndex firstMatch2 = o2.first();
+        final VertexMatch.WithTokenIndex firstMatch1 = o1.first();
+        final VertexMatch.WithTokenIndex firstMatch2 = o2.first();
 
         // 2. ordering by match distance
         result = (Math.abs(firstMatch1.token - firstMatch1.vertexRank) - Math.abs(firstMatch2.token - firstMatch2.vertexRank));
@@ -134,13 +135,14 @@ public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
     };
   }
 
-  public SortedSet<Phrase<Match.WithTokenIndex>> findMaximalUniqueMatches() {
-    final List<Phrase<Match.WithTokenIndex>> allMatches = Lists.newArrayList(this);
-    final SortedSet<Phrase<Match.WithTokenIndex>> maximalUniqueMatches = Sets.newTreeSet();
+  public SortedSet<SortedSet<VertexMatch.WithTokenIndex>> findMaximalUniqueMatches() {
+    final List<SortedSet<VertexMatch.WithTokenIndex>> allMatches = Lists.newArrayList(this);
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatches = Sets.newTreeSet(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+
     while (true) {
-      Phrase<Match.WithTokenIndex> nextMum = null;
-      Phrase<Match.WithTokenIndex> candidate = null;
-      for (Phrase<Match.WithTokenIndex> successor : allMatches) {
+      SortedSet<VertexMatch.WithTokenIndex> nextMum = null;
+      SortedSet<VertexMatch.WithTokenIndex> candidate = null;
+      for (SortedSet<VertexMatch.WithTokenIndex> successor : allMatches) {
         if (candidate == null) {
           continue;
         }
@@ -158,9 +160,9 @@ public class Matches extends ArrayList<Phrase<Match.WithTokenIndex>> {
       }
       Preconditions.checkState(maximalUniqueMatches.add(nextMum), "Duplicate MUM");
 
-      Iterables.removeIf(allMatches, Match.filter(
-              new IndexRangeSet(Range.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
-              new IndexRangeSet(Range.closed(nextMum.first().token, nextMum.last().token))
+      Iterables.removeIf(allMatches, VertexMatch.filter(
+              new IntegerRangeSet(Range.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
+              new IntegerRangeSet(Range.closed(nextMum.first().token, nextMum.last().token))
       ));
     }
     return maximalUniqueMatches;

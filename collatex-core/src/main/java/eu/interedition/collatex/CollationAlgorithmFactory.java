@@ -22,12 +22,13 @@ package eu.interedition.collatex;
 import com.google.common.base.Function;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
-import eu.interedition.collatex.medite.Match;
+import eu.interedition.collatex.util.GreedyStringTilingAlgorithm;
+import eu.interedition.collatex.util.VertexMatch;
 import eu.interedition.collatex.medite.MediteAlgorithm;
-import eu.interedition.collatex.medite.Phrase;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 
 import java.util.Comparator;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -47,7 +48,11 @@ public class CollationAlgorithmFactory {
     return new NeedlemanWunschAlgorithm(comparator);
   }
 
-  public static CollationAlgorithm medite(Comparator<Token> comparator, Function<Phrase<Match.WithToken>, Integer> matchEvaluator) {
+  public static CollationAlgorithm greedyStringTiling(Comparator<Token> comparator, int minimumTileLength) {
+    return new GreedyStringTilingAlgorithm(comparator, minimumTileLength);
+  }
+
+  public static CollationAlgorithm medite(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {
     return new MediteAlgorithm(comparator, matchEvaluator);
   }
 }

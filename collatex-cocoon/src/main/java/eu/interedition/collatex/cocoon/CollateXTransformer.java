@@ -106,6 +106,8 @@ public class CollateXTransformer extends AbstractSAXTransformer {
         this.algorithm = CollationAlgorithmFactory.medite(tokenComparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
       } else if (algorithm.equals("needleman-wunsch")) {
         this.algorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
+      } else if (algorithm.equals("gst")) {
+        this.algorithm = CollationAlgorithmFactory.greedyStringTiling(tokenComparator, 2);
       } else {
         this.algorithm = CollationAlgorithmFactory.dekker(tokenComparator);
       }

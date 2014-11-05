@@ -148,6 +148,8 @@ public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollatio
       final String collationAlgorithmValue = collationAlgorithmNode.getTextValue();
       if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
         collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
+      } else if ("gst".equalsIgnoreCase(collationAlgorithmValue)) {
+        collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(tokenComparator, 2);
       } else if ("medite".equalsIgnoreCase(collationAlgorithmValue)) {
         collationAlgorithm = CollationAlgorithmFactory.medite(tokenComparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
       }

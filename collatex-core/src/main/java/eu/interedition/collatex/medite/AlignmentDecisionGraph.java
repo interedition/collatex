@@ -24,6 +24,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.Comparator;
 import java.util.List;
@@ -36,22 +37,22 @@ import java.util.SortedSet;
  */
 public class AlignmentDecisionGraph {
 
-  private final List<Phrase<Match.WithTokenIndex>> matches;
-  private final Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator;
+  private final List<SortedSet<VertexMatch.WithTokenIndex>> matches;
+  private final Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator;
   private final PriorityQueue<Node> bestPaths;
   private final Map<Node, Integer> minCosts;
 
-  AlignmentDecisionGraph(List<Phrase<Match.WithTokenIndex>> matches, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
+  AlignmentDecisionGraph(List<SortedSet<VertexMatch.WithTokenIndex>> matches, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
     this.matches = matches;
     this.matchEvaluator = matchEvaluator;
     this.bestPaths = new PriorityQueue<Node>(matches.size(), PATH_COST_COMPARATOR);
     this.minCosts = Maps.newHashMap();
   }
 
-  static SortedSet<Phrase<Match.WithTokenIndex>> filter(SortedSet<Phrase<Match.WithTokenIndex>> matches, Function<Phrase<Match.WithTokenIndex>, Integer> matchEvaluator) {
-    final SortedSet<Phrase<Match.WithTokenIndex>> alignments = Sets.newTreeSet();
+  static SortedSet<SortedSet<VertexMatch.WithTokenIndex>> filter(SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> alignments = Sets.newTreeSet(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
 
-    final List<Phrase<Match.WithTokenIndex>> matchList = Lists.newArrayList(matches);
+    final List<SortedSet<VertexMatch.WithTokenIndex>> matchList = Lists.newArrayList(matches);
     Node optimal = new AlignmentDecisionGraph(matchList, matchEvaluator).findBestPath();
     while (optimal.matchIndex >= 0) {
       if (optimal.aligned) {
@@ -86,12 +87,12 @@ public class AlignmentDecisionGraph {
   }
 
   private int heuristicCost(Node path) {
-    final Phrase<Match.WithTokenIndex> evaluated = matches.get(path.matchIndex);
-    final Match.WithTokenIndex lastMatch = evaluated.last();
+    final SortedSet<VertexMatch.WithTokenIndex> evaluated = matches.get(path.matchIndex);
+    final VertexMatch.WithTokenIndex lastMatch = evaluated.last();
 
     int cost = 0;
-    for (Phrase<Match.WithTokenIndex> following : matches.subList(path.matchIndex + 1, matches.size())) {
-      final Match.WithTokenIndex followingFirstMatch = following.first();
+    for (SortedSet<VertexMatch.WithTokenIndex> following : matches.subList(path.matchIndex + 1, matches.size())) {
+      final VertexMatch.WithTokenIndex followingFirstMatch = following.first();
       if (lastMatch.vertexRank < followingFirstMatch.vertexRank && lastMatch.token < followingFirstMatch.token) {
         // we still can align this following match as the matched components are to the right of this path's last match
         continue;
@@ -113,7 +114,7 @@ public class AlignmentDecisionGraph {
     return cost;
   }
 
-  private int value(Phrase<Match.WithTokenIndex> match) {
+  private int value(SortedSet<VertexMatch.WithTokenIndex> match) {
     return matchEvaluator.apply(match);
   }
 
