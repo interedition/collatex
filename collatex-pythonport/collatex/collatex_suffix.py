@@ -122,7 +122,7 @@ class LCPInterval(object):
             # There is complete overlap, so return None
             return None
         # Assert: check that the first slice is not larger than potential block length!
-        first_range = real_block_range.contiguous().next()
+        first_range = next(real_block_range.contiguous())
         if first_range[-1]-first_range[0]+1>self.minimum_block_length:
             raise PartialOverlapException()
         return real_block_range
