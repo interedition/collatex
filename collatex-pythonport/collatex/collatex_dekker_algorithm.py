@@ -9,26 +9,36 @@ from collatex.collatex_core import VariantGraphRanking,\
 from collatex.collatex_suffix import ExtendedSuffixArray
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
-from prettytable import PrettyTable
-from textwrap import fill
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
 
-# optionally load the IPython dependencies
-try:
-    from IPython.display import HTML
-    from IPython.display import SVG
-    from IPython.core.display import display
-except:
-    pass
 
-def in_ipython():
-    try:
-        get_ipython().config  # @UndefinedVariable
-#         print('Called by IPython.')
-        return True
-    except:
-        return False
+# TODO: update comments!
+# Valid options for output are "table" (default)
+# "graph" for the variant graph rendered as SVG
+# "json" for the alignment table rendered as JSON
+# "novisualization" to get the plain AlignmentTable object without any rendering         
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False):
+    algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
+    # build graph
+    graph = VariantGraph()
+    algorithm.collate(graph, collation)
+    # join parallel segments
+    if segmentation:
+        join(graph)
+    # check which output format is requested: graph or table
+    if output=="graph": 
+        return graph
+    # create alignment table
+    table = AlignmentTable(collation, graph)
+    if output == "json":
+        return display_alignment_table_as_json(table)
+    if output == "table":
+        return table
+    else:
+        raise Exception("Unknown output type: "+output)
+    
+
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
@@ -52,6 +62,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
     collation = Collation()
     for normalized_witness in normalized_witnesses:
         collation.add_witness(normalized_witness.sigil, normalized_witness.content)
+    #TODO: change!
     at = collate(collation, output="novisualization", segmentation=segmentation)
     tokenized_at = AlignmentTable(collation)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
@@ -68,83 +79,42 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
     if output=="json":
         return display_alignment_table_as_json(tokenized_at)
     if output=="table":
-        # transform JSON objects to "t" form.
-        for row in tokenized_at.rows:
-            row.cells = [cell["t"]  for cell in row.cells]
-        # create visualization of alignment table
-        if layout == "vertical":    
-            prettytable = visualizeTableVertically(tokenized_at)
-        else:
-            prettytable = visualizeTableHorizontal(tokenized_at)
-        if in_ipython():
-            html = prettytable.get_html_string(formatting=True)
-            return display(HTML(html))
-        return prettytable
+        return tokenized_at
+#         # transform JSON objects to "t" form.
+#         for row in tokenized_at.rows:
+#             row.cells = [cell["t"]  for cell in row.cells]
+#         # create visualization of alignment table
+#         if layout == "vertical":    
+#             prettytable = visualizeTableVertically(tokenized_at)
+#         else:
+#             prettytable = visualizeTableHorizontal(tokenized_at)
+#         if in_ipython():
+#             html = prettytable.get_html_string(formatting=True)
+#             return display(HTML(html))
+#         return prettytable
 
-# Valid options for output are "table" (default)
-# "graph" for the variant graph rendered as SVG
-# "json" for the alignment table rendered as JSON
-# "novisualization" to get the plain AlignmentTable object without any rendering         
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False):
-    algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
-    # build graph
-    graph = VariantGraph()
-    algorithm.collate(graph, collation)
-    # join parallel segments
-    if segmentation:
-        join(graph)
-    # check which output format is requested: graph or table
-    if output=="graph" and in_ipython:
-        # visualize the variant graph into SVG format
-        from networkx.drawing.nx_agraph import to_agraph
-        agraph = to_agraph(graph.graph)
-        svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
-        return display(SVG(svg)) 
-    # create alignment table
-    table = AlignmentTable(collation, graph)
-    if output == "json":
-        return display_alignment_table_as_json(table)
-    if output == "novisualization":
-        return table
-    # create visualization of alignment table
-    if layout == "vertical":    
-        prettytable = visualizeTableVertically(table)
-    else:
-        prettytable = visualizeTableHorizontal(table)
-    if in_ipython():
-        html = prettytable.get_html_string(formatting=True)
-        return display(HTML(html))
-    return prettytable
+
+
+# DISPLAY PART OF THE VARIANT_GRAPH IN SVG!
+# MOVE THIS!
+#     and in_ipython:
+#         # visualize the variant graph into SVG format
+#         from networkx.drawing.nx_agraph import to_agraph
+#         agraph = to_agraph(graph.graph)
+#         svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
+#         return display(SVG(svg)) 
+
+
+
 
 def display_alignment_table_as_json(table):
     json = alignmentTableToJSON(table)
 #     if in_ipython():
 #         return display(JSON(json))
-    if in_ipython():
-        print(json)
-        return
+#     if in_ipython():
+#         print(json)
+#         return
     return json    
-
-def visualizeTableHorizontal(table):
-    # print the table horizontal
-    x = PrettyTable()
-    x.header=False
-    for row in table.rows:
-        cells = [row.header]
-        cells.extend(row.cells)
-        x.add_row(cells)
-    # alignment can only be set after the field names are known.
-    # since add_row sets the field names, it has to be set after x.add_row(cells)
-    x.align="l"
-    return x
-
-def visualizeTableVertically(table):
-    # print the table vertically
-    x = PrettyTable()
-    x.hrules = 1
-    for row in table.rows:
-        x.add_column(row.header, [fill(cell, 20) for cell in row.cells])
-    return x
 
 def alignmentTableToJSON(table, indent=None):
     json_output = {}
