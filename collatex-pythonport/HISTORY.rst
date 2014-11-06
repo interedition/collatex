@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0pre10 (2014-11-06)
++++++++++++++++++++++++
+
+* Added support for Unicode character encoding
+* Ported codebase from Python 2 to Python 3
+
 2.0.0pre9 (2014-10-02)
 ++++++++++++++++++++++
 
