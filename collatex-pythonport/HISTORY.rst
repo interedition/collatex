@@ -8,8 +8,7 @@ History
 
 * Added support for Unicode character encoding
 * Ported codebase from Python 2 to Python 3
-* Separated IPython display logic from functional logic. No longer will the collate function try
- to determine whether you are running an environment that is capable of display HTML or SVG. 
+* Separated IPython display logic from functional logic. No longer will the collate function try to determine whether you are running an environment that is capable of display HTML or SVG. 
 
 2.0.0pre9 (2014-10-02)
 ++++++++++++++++++++++
