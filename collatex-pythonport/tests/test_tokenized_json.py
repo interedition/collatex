@@ -80,9 +80,44 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        expected_plain_table = """+---+---+-------+---------+
+        expected_plain_table = """\
++---+---+-------+---------+
 | A | A | black | cat     |
 | B | A | white | kitten. |
 +---+---+-------+---------+"""
         plain_table = str(collate_pretokenized_json(json_in, output="table"))
         self.assertEqual(expected_plain_table, plain_table)
+
+    def testHTMLOutputVerticalLayoutPretokenizedJSON(self):
+        json_in = {
+      "witnesses" : [
+        {
+          "id" : "A",
+          "tokens" : [
+              { "t" : "A", "ref" : 123 },
+              { "t" : "black" , "adj" : True },
+              { "t" : "cat", "id" : "xyz" }
+          ]
+        },
+        {
+          "id" : "B",
+          "tokens" : [
+              { "t" : "A" },
+              { "t" : "white" , "adj" : True },
+              { "t" : "kitten.", "n" : "cat" }
+          ]
+        }
+      ]
+    }
+        expected_output = """\
++-------+---------+
+|   A   |    B    |
++-------+---------+
+|   A   |    A    |
++-------+---------+
+| black |  white  |
++-------+---------+
+|  cat  | kitten. |
++-------+---------+"""
+        plain_text_output = str(collate_pretokenized_json(json_in, layout="vertical"))
+        self.assertEquals(expected_output, plain_text_output)

@@ -59,7 +59,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
     for normalized_witness in normalized_witnesses:
         collation.add_witness(normalized_witness.sigil, normalized_witness.content)
     at = collate(collation, output="table", segmentation=segmentation)
-    tokenized_at = AlignmentTable(collation)
+    tokenized_at = AlignmentTable(collation, layout=layout)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
         tokenized_at.rows.append(new_row)
