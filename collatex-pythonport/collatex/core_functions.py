@@ -58,8 +58,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
     collation = Collation()
     for normalized_witness in normalized_witnesses:
         collation.add_witness(normalized_witness.sigil, normalized_witness.content)
-    #TODO: change!
-    at = collate(collation, output="novisualization", segmentation=segmentation)
+    at = collate(collation, output="table", segmentation=segmentation)
     tokenized_at = AlignmentTable(collation)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
@@ -75,34 +74,25 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
     if output=="json":
         return export_alignment_table_as_json(tokenized_at)
     if output=="table":
+        # transform JSON objects to "t" form.
+        for row in tokenized_at.rows:
+            row.cells = [cell["t"]  for cell in row.cells]
         return tokenized_at
-#         # transform JSON objects to "t" form.
-#        TODO: REENABLE!
-#         for row in tokenized_at.rows:
-#             row.cells = [cell["t"]  for cell in row.cells]
-#         # create visualization of alignment table
-#         if layout == "vertical":    
-#             prettytable = visualizeTableVertically(tokenized_at)
-#         else:
-#             prettytable = visualizeTableHorizontal(tokenized_at)
-#         if in_ipython():
-#             html = prettytable.get_html_string(formatting=True)
-#             return display(HTML(html))
-#         return prettytable
 
-def export_alignment_table_as_json(table, indent=None):
+def export_alignment_table_as_json(table, indent=None, status=False):
     json_output = {}
     json_output["table"]=[]
     sigli = []
-    variant_status = []
-    for column in table.columns:
-        variant_status.append(column.variant)
     for row in table.rows:
         sigli.append(row.header)
         json_output["table"].append([[cell] for cell in row.cells])
     json_output["witnesses"]=sigli
-    json_output["status"]=variant_status
-    return json.dumps(json_output, indent=indent)
+    if status:
+        variant_status = []
+        for column in table.columns:
+            variant_status.append(column.variant)
+        json_output["status"]=variant_status
+    return json.dumps(json_output, sort_keys=True, indent=indent)
 
 '''
 Suffix specific implementation of Collation object
