@@ -40,7 +40,7 @@ class Test(unittest.TestCase):
         collation.add_witness("A", "This very quick very quick brown wombat")
         collation.add_witness("B", "That very quick brown koala")
         collation.add_witness("C", "That very quick brown kangaroo")
-        expected_output = '{"witnesses": ["A", "B", "C"], "table": [[["This very quick"], ["very quick brown"], ["wombat"]], [["That"], ["very quick brown"], ["koala"]], [["That"], ["very quick brown"], ["kangaroo"]]], "status": [true, false, true]}'
+        expected_output = '{"table": [[["This very quick"], ["very quick brown"], ["wombat"]], [["That"], ["very quick brown"], ["koala"]], [["That"], ["very quick brown"], ["kangaroo"]]], "witnesses": ["A", "B", "C"]}'
         json = collate(collation, output="json")
         self.assertEquals(expected_output, json)
 
