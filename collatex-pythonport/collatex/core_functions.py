@@ -26,7 +26,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if output=="graph": 
         return graph
     # create alignment table
-    table = AlignmentTable(collation, graph)
+    table = AlignmentTable(collation, graph, layout)
     if output == "json":
         return export_alignment_table_as_json(table)
     if output == "table":

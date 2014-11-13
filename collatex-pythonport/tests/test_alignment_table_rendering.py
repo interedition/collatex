@@ -27,12 +27,31 @@ class Test(unittest.TestCase):
         collation.add_witness("A", "This very quick very quick brown wombat")
         collation.add_witness("B", "That very quick brown koala")
         collation.add_witness("C", "That very quick brown kangaroo")
-        expected_output = """+---+------+------+-------+------+-------+-------+----------+
+        expected_output = """\
++---+------+------+-------+------+-------+-------+----------+
 | A | This | very | quick | very | quick | brown | wombat   |
 | B | That | -    | -     | very | quick | brown | koala    |
 | C | That | -    | -     | very | quick | brown | kangaroo |
 +---+------+------+-------+------+-------+-------+----------+"""
         plain_text_output = str(collate(collation, segmentation=False))
+        self.assertEquals(expected_output, plain_text_output)
+
+    def testPlainTableRenderingVertical(self):
+        collation = Collation()
+        collation.add_witness("A", "This very quick very quick brown wombat")
+        collation.add_witness("B", "That very quick brown koala")
+        collation.add_witness("C", "That very quick brown kangaroo")
+        expected_output = """\
++------------------+------------------+------------------+
+|        A         |        B         |        C         |
++------------------+------------------+------------------+
+| This very quick  |       That       |       That       |
++------------------+------------------+------------------+
+| very quick brown | very quick brown | very quick brown |
++------------------+------------------+------------------+
+|      wombat      |      koala       |     kangaroo     |
++------------------+------------------+------------------+"""
+        plain_text_output = str(collate(collation, layout="vertical"))
         self.assertEquals(expected_output, plain_text_output)
 
     def testJSONAlignmentTableRendering(self):

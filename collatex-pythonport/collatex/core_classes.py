@@ -14,23 +14,6 @@ import re
 from prettytable import PrettyTable
 from textwrap import fill
 
-# optionally load the IPython dependencies
-try:
-    from IPython.display import HTML
-    from IPython.display import SVG
-    from IPython.core.display import display
-except:
-    pass
-
-def in_ipython():
-    try:
-        get_ipython().config  # @UndefinedVariable
-#         print('Called by IPython.')
-        return True
-    except:
-        return False
-
-
 class Row(object):
     
     def __init__(self, header):
@@ -58,9 +41,10 @@ class Column(object):
 
 class AlignmentTable(object):
     
-    def __init__(self, collation, graph=None):
+    def __init__(self, collation, graph=None, layout="horizontal"):
         self.collation = collation
         self.graph = graph
+        self.layout = layout
         self.columns = []
         self.rows = []
         if graph:
@@ -105,22 +89,19 @@ class AlignmentTable(object):
                     row.append("-")
     
     def __str__(self, *args, **kwargs):
-        return create_html_for_table(self, layout="horizontal")
+        return create_html_for_table(self)
                     
 #TODO: move layout parameter to alignment table object
 # DISPLAY PART OF THE VARIANT GRAPH IN PLAIN/HTML AND VERTICAL OR HORIZONTAL!
-def create_html_for_table(table, layout):
+def create_html_for_table(table):
     # create visualization of alignment table
-    if layout == "vertical":    
+    if table.layout == "vertical":    
         prettytable = visualizeTableVertically(table)
-    else:
+    elif table.layout == "horizontal":
         prettytable = visualizeTableHorizontal(table)
+    else:
+        raise Exception("Unknown table layout: "+table.layout)
     return str(prettytable)
-
-# TODO: move HTML display to  display function!
-#     if in_ipython():
-#         html = prettytable.get_html_string(formatting=True)
-#         return display(HTML(html))
 
 def visualizeTableHorizontal(table):
     # print the table horizontal
