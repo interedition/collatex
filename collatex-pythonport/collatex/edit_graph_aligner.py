@@ -4,7 +4,7 @@ Created on Aug 5, 2014
 @author: Ronald Haentjens Dekker
 '''
 
-from collatex.collatex_core import CollationAlgorithm
+from collatex.core_classes import CollationAlgorithm
 from collatex.suffix_based_scorer import Scorer
 from prettytable import PrettyTable
 from collatex.astar import AStarNode, AStar

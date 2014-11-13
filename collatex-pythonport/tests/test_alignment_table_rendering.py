@@ -4,7 +4,7 @@ Created on Jun 11, 2014
 @author: Ronald Haentjens Dekker
 '''
 import unittest
-from collatex.collatex_dekker_algorithm import Collation, collate
+from collatex.core_functions import Collation, collate
 
 
 class Test(unittest.TestCase):
@@ -19,7 +19,7 @@ class Test(unittest.TestCase):
 | B | That            | very quick brown | koala    |
 | C | That            | very quick brown | kangaroo |
 +---+-----------------+------------------+----------+"""
-        plain_text_output = collate(collation).get_string()
+        plain_text_output = str(collate(collation))
         self.assertEquals(expected_output, plain_text_output)
 
     def testPlainTableRenderingNoParallelSegmentation(self):
@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
 | B | That | -    | -     | very | quick | brown | koala    |
 | C | That | -    | -     | very | quick | brown | kangaroo |
 +---+------+------+-------+------+-------+-------+----------+"""
-        plain_text_output = collate(collation, segmentation=False).get_string()
+        plain_text_output = str(collate(collation, segmentation=False))
         self.assertEquals(expected_output, plain_text_output)
 
     def testJSONAlignmentTableRendering(self):
@@ -48,14 +48,14 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("A", "The quick brown fox jumps over the dog.")
         collation.add_witness("B", "The brown fox jumps over the lazy dog.")
-        alignment_table = collate(collation, output="novisualization")
+        alignment_table = collate(collation)
         status_array = []
         for column in alignment_table.columns:
             status_array.append(column.variant)
         self.assertEqual([False, True, False, True, False], status_array)
         collation.add_witness("C", "The brown fox walks around the lazy dog.")
         collate(collation)    
-        alignment_table = collate(collation, output="novisualization")
+        alignment_table = collate(collation)
         status_array = []
         for column in alignment_table.columns:
             status_array.append(column.variant)

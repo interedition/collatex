@@ -10,12 +10,10 @@ from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
 
-
-# TODO: update comments!
-# Valid options for output are "table" (default)
-# "graph" for the variant graph rendered as SVG
-# "json" for the alignment table rendered as JSON
-# "novisualization" to get the plain AlignmentTable object without any rendering         
+# Valid options for output are:
+# "table" for the alignment table (default)
+# "graph" for the variant graph
+# "json" for the alignment table exported as JSON
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False):
     algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
     # build graph
@@ -30,7 +28,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     # create alignment table
     table = AlignmentTable(collation, graph)
     if output == "json":
-        return display_alignment_table_as_json(table)
+        return export_alignment_table_as_json(table)
     if output == "table":
         return table
     else:
@@ -75,7 +73,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
                 #TODO: should probably be null or None instead, but that would break the rendering at the moment 
                 new_row.cells.append({"t":"-"})
     if output=="json":
-        return display_alignment_table_as_json(tokenized_at)
+        return export_alignment_table_as_json(tokenized_at)
     if output=="table":
         return tokenized_at
 #         # transform JSON objects to "t" form.
@@ -92,30 +90,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
 #             return display(HTML(html))
 #         return prettytable
 
-
-
-# DISPLAY PART OF THE VARIANT_GRAPH IN SVG!
-# MOVE THIS!
-#     and in_ipython:
-#         # visualize the variant graph into SVG format
-#         from networkx.drawing.nx_agraph import to_agraph
-#         agraph = to_agraph(graph.graph)
-#         svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
-#         return display(SVG(svg)) 
-
-
-
-
-def display_alignment_table_as_json(table):
-    json = alignmentTableToJSON(table)
-#     if in_ipython():
-#         return display(JSON(json))
-#     if in_ipython():
-#         print(json)
-#         return
-    return json    
-
-def alignmentTableToJSON(table, indent=None):
+def export_alignment_table_as_json(table, indent=None):
     json_output = {}
     json_output["table"]=[]
     sigli = []
