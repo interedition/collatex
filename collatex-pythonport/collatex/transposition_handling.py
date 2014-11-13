@@ -3,7 +3,7 @@
         
     @author: Ronald Haentjens Dekker
 '''
-from collatex.collatex_core import VariantGraphRanking
+from collatex.core_classes import VariantGraphRanking
 #===========================================================================
 # Direct port from Java code
 #===========================================================================
