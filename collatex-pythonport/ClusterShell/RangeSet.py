@@ -30,6 +30,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL-C license and that you accept its terms.
 
+# This class has been modified to make it Python 3 compliant by Ronald Haentjens Dekker
+
 """
 Cluster range set module.
 
@@ -426,8 +428,7 @@ class RangeSet(set):
         elif isinstance(index, int):
             return self._sorted()[index]
         else:
-            raise TypeError, \
-                "%s indices must be integers" % self.__class__.__name__
+            raise TypeError("%s indices must be integers" % self.__class__.__name__)
 
     def split(self, nbr):
         """
@@ -538,7 +539,13 @@ class RangeSet(set):
 
         (I.e. all elements that are in both sets.)
         """
-        return self._wrap_set_op(set.intersection, other)
+        #NOTE: This is a work around 
+        # Python 3 return as the result of set.intersection a new set instance.
+        # Python 2 however returns as a the result a ClusterShell.RangeSet.RangeSet instance.
+        # ORIGINAL CODE: return self._wrap_set_op(set.intersection, other)
+        copy = self.copy()
+        copy.intersection_update(other)
+        return copy
 
     def __xor__(self, other):
         """Return the symmetric difference of two RangeSets as a new RangeSet.
@@ -616,7 +623,7 @@ class RangeSet(set):
         """Check that the other argument to a binary operation is also  a set,
         raising a TypeError otherwise."""
         if not isinstance(other, set):
-            raise TypeError, "Binary operation only permitted between sets"
+            raise TypeError("Binary operation only permitted between sets")
 
     # In-place union, intersection, differences.
     # Subtle:  The xyz_update() functions deliberately return None,

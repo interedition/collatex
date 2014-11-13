@@ -5,7 +5,7 @@ Created on Jun 8, 2014
 '''
 import unittest
 from collatex import Collation
-from collatex.collatex_dekker_algorithm import collate
+from collatex import collate
 
 
 class Test(unittest.TestCase):
@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
         collation = Collation()
         collation.add_witness("A", "the cat is black")
         collation.add_witness("B", "black is the cat")
-        alignment_table = collate(collation, output="novisualization")
+        alignment_table = collate(collation)
         self.assertEquals(["the cat", "is", "black"], alignment_table.rows[0].to_list())
         self.assertEquals(["black", "is", "the cat"], alignment_table.rows[1].to_list())
 

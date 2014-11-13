@@ -21,13 +21,15 @@ To get more information:
      
  - about the command line usage, type
      $ python linsuffarr.py --help
+
+Ported to Python 3 by Ronald Haentjens Dekker
      
 """
 
 from array    import array  as _array
-from cPickle  import HIGHEST_PROTOCOL as _HIGHEST_PROTOCOL
-from cPickle  import dumps  as _dumps
-from cPickle  import loads  as _loads
+from pickle  import HIGHEST_PROTOCOL as _HIGHEST_PROTOCOL
+from pickle  import dumps  as _dumps
+from pickle  import loads  as _loads
 from gzip     import GzipFile
 from inspect  import getargspec
 from optparse import OptionParser
@@ -77,7 +79,8 @@ def _open(filename, mode="r"):
         elif mode=="w":
             return _stdout
     else:
-        return file(filename, mode)
+        #TODO: set encoding to UTF-8?
+        return open(filename, mode=mode)
 
 
 
@@ -124,12 +127,12 @@ def _radixPass(a, b, r, n, K):
     """
     c = _array("i", [0]*(K+1))                # counter array
   
-    for i in xrange(n):                      # count occurrences
+    for i in range(n):                      # count occurrences
         c[r[a[i]]]+=1
 
     sum=0
 
-    for i in xrange(K+1):                    # exclusive prefix sums
+    for i in range(K+1):                    # exclusive prefix sums
         t = c[i]
         c[i] = sum
         sum += t
@@ -183,7 +186,7 @@ def _suffixArrayWithTrace(s, SA, n, K, operations, totalOperations):
     s0   = _array("i", [0]*n0)
     
     # s12 : positions of mod 1 and mod 2 suffixes
-    s12 = _array("i", [i for i in xrange(n+(n0-n1)) if i%3])# <- writing i%3 is more efficient than i%3!=0
+    s12 = _array("i", [i for i in range(n+(n0-n1)) if i%3])# <- writing i%3 is more efficient than i%3!=0
     s12.extend([0]*3)
   
     # lsb radix sort the mod 1 and mod 2 triples
@@ -202,10 +205,10 @@ def _suffixArrayWithTrace(s, SA, n, K, operations, totalOperations):
         operations+=n02
         _traceSuffixArray(operations, totalOperations)
     
-     # find lexicographic names of triples
+    # find lexicographic names of triples
     name = 0
     c= _array("i",[-1]*3)
-    for i in xrange(n02) :
+    for i in range(n02) :
         cSA12=s[SA12[i]:SA12[i]+3]
         if cSA12!=c:
             name+=1
@@ -349,7 +352,7 @@ def _longestCommonPrefix(seq1, seq2, start1=0, start2=0):
 
     i=0
     pos2=start2
-    for i in xrange(min(len1, len2)):
+    for i in range(min(len1, len2)):
         #print seq1, seq2, start1, start2
         if seq1[start1+i] != seq2[start2+i]:
             return i
@@ -826,11 +829,12 @@ class SuffixArray(object):
             middle=(lower+upper)//2
             
             middleSubString=string[SA[middle]:min(SA[middle]+lenSubString,self.length)]
-            cmpRes=cmp(subString, middleSubString)
             
-            if cmpRes == -1:
+            #NOTE: the cmp function is removed in Python 3
+            #Strictly speaking we are doing one comparison more now
+            if subString < middleSubString:
                 upper=middle
-            elif cmpRes == 1:
+            elif subString > middleSubString:
                 lower=middle+1
             else:
                 success=True

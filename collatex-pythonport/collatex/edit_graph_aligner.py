@@ -4,8 +4,7 @@ Created on Aug 5, 2014
 @author: Ronald Haentjens Dekker
 '''
 
-from collatex.collatex_core import CollationAlgorithm
-from sets import Set
+from collatex.core_classes import CollationAlgorithm
 from collatex.suffix_based_scorer import Scorer
 from prettytable import PrettyTable
 from collatex.astar import AStarNode, AStar
@@ -220,7 +219,7 @@ class EditGraphAligner(CollationAlgorithm):
         while x > 0 and y > 0:
             self._process_cell(token_to_vertex, self.tokens_witness_a, self.tokens_witness_b, alignment, x, y)
             # examine neighbor nodes
-            nodes_to_examine = Set()
+            nodes_to_examine = set()
             nodes_to_examine.add(self.table[y][x-1])
             nodes_to_examine.add(self.table[y-1][x])
             nodes_to_examine.add(self.table[y-1][x-1])
@@ -296,7 +295,7 @@ class EditGraphAligner(CollationAlgorithm):
             self.table[y][x].g = 0
             return 
         # examine neighbor nodes
-        nodes_to_examine = Set()
+        nodes_to_examine = set()
         # fetch existing score from the left node if possible
         if x > 0:
             nodes_to_examine.add(self.table[y][x-1])
@@ -318,7 +317,7 @@ class EditGraphAligner(CollationAlgorithm):
         # print the table horizontal
         x = PrettyTable()
         x.header=False
-        for y in xrange(0, len(table)):
+        for y in range(0, len(table)):
             cells = table[y]
             x.add_row(cells)
         # alignment can only be set after the field names are known.

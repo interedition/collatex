@@ -24,34 +24,30 @@ CollateX is a software to
 Features
 --------
 
-* non progressive multiple sequence alignment
-* multiple output formats: alignment table, variant graph
-* near matching (optional)
+* Non progressive multiple sequence alignment
+* Multiple output formats: alignment table, variant graph
+* Near matching (optional)
+* Supports Python 3
+* Supports unicode (Python 3 only)
+
 
 How to install:
 ---------------
 
 Mac/Linux:
-sudo pip install --pre collatex
+sudo pip3 install --pre collatex
 
 if you don't have pip installed, install it first with:
-sudo easy_install pip
+sudo easy_install3 pip
 
-For near matching functionality python-levensthein C library is required.
+For near matching functionality python-levenshtein C library is required.
 
 Install it with (on Mac OS X and Linux):
 
-sudo pip install python-levensthein
+sudo pip3 install python-levenshtein
 
 Windows users need a precompiled binary distribution of this library if they want to use near matching.
 
-Windows:
-There is no official Windows binary distribution of pygraphviz, which is needed for SVG
-rendering of the variant graph. To add SVG support in Windows, before doing the above, 
-install an "unofficial" Windows pygraphviz binary from the link at 
-http://www.lfd.uci.edu/~gohlke/pythonlibs/, along with the main Graphviz file at the link
-provided there. Then add the path to the graphviz installation (specifically, to dot.exe) 
-to the system path.
 
 Simple example:
 ---------------
@@ -65,22 +61,17 @@ Simple example:
 
   alignment_table = collate(collation)
 
-When running from the command shell run the example script with:
-::
-
-	python ./nameofscript.py
-
-When using IPython Notebook a nice HTML representation of the alignment table is shown when the collate function is called.
-When using a textual Python prompt add
+Add
 ::
 
   print(alignment_table)
 	
 to show the results.
-Output can also be shown as a graph instead of a table when graphviz and pygraphviz are installed:
+
+When running from the command shell run the example script with:
 ::
 
-  collate(collation, output="graph")
-  
+	python ./nameofscript.py
+
 
 

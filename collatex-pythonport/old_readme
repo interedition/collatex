@@ -1,0 +1,16 @@
+Windows:
+There is no official Windows binary distribution of pygraphviz, which is needed for SVG
+rendering of the variant graph. To add SVG support in Windows, before doing the above, 
+install an "unofficial" Windows pygraphviz binary from the link at 
+http://www.lfd.uci.edu/~gohlke/pythonlibs/, along with the main Graphviz file at the link
+provided there. Then add the path to the graphviz installation (specifically, to dot.exe) 
+to the system path.
+
+When using IPython Notebook a nice HTML representation of the alignment table is shown when the collate function is called.
+
+
+Output can also be shown as a graph instead of a table when graphviz and pygraphviz are installed:
+::
+
+  collate(collation, output="graph")
+  

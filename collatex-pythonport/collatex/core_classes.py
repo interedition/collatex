@@ -11,7 +11,8 @@ import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
 import re
-
+from prettytable import PrettyTable
+from textwrap import fill
 
 class Row(object):
     
@@ -40,9 +41,10 @@ class Column(object):
 
 class AlignmentTable(object):
     
-    def __init__(self, collation, graph=None):
+    def __init__(self, collation, graph=None, layout="horizontal"):
         self.collation = collation
         self.graph = graph
+        self.layout = layout
         self.columns = []
         self.rows = []
         if graph:
@@ -82,10 +84,47 @@ class AlignmentTable(object):
                 if sigil in column.tokens_per_witness:
                     row.append(column.tokens_per_witness[sigil])
                 else:
+                    #TODO: Nil would be nicer here
+                    # since the dash is part of the visualization
                     row.append("-")
-        
-        
     
+    def __str__(self, *args, **kwargs):
+        return create_html_for_table(self)
+                    
+#TODO: move layout parameter to alignment table object
+# DISPLAY PART OF THE VARIANT GRAPH IN PLAIN/HTML AND VERTICAL OR HORIZONTAL!
+def create_html_for_table(table):
+    # create visualization of alignment table
+    if table.layout == "vertical":    
+        prettytable = visualizeTableVertically(table)
+    elif table.layout == "horizontal":
+        prettytable = visualizeTableHorizontal(table)
+    else:
+        raise Exception("Unknown table layout: "+table.layout)
+    return str(prettytable)
+
+def visualizeTableHorizontal(table):
+    # print the table horizontal
+    x = PrettyTable()
+    x.header=False
+    for row in table.rows:
+        cells = [row.header]
+        cells.extend(row.cells)
+        x.add_row(cells)
+    # alignment can only be set after the field names are known.
+    # since add_row sets the field names, it has to be set after x.add_row(cells)
+    x.align="l"
+    return x
+
+def visualizeTableVertically(table):
+    # print the table vertically
+    x = PrettyTable()
+    x.hrules = 1
+    for row in table.rows:
+        x.add_column(row.header, [fill(cell, 20) for cell in row.cells])
+    return x
+
+   
 # not used in the suffix implementation
 # Tokenizer inside suffix array library is used
 class Tokenizer(object):

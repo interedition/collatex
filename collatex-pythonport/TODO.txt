@@ -3,7 +3,8 @@ General:
 		DONE: make it a multi-file module
 		DONE: register project on pypi
 		DONE: pip based installation works on Mac
-
+	Port code to Python 3 to support Unicode characters: DONE
+	
 Preparation:
 	DONE: Tokenization: There are two tokenizers:
 		One based on whitespace, punctuation not treated as separate tokens
