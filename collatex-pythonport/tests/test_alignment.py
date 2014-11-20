@@ -22,12 +22,20 @@ class Test(unittest.TestCase):
         self.assertEquals(["black", "is", "the cat"], alignment_table.rows[1].to_list())
 
     def testDoubleTransposition2(self):
+        # Either the 'a' can align or the 'b' can. See also #3 below.
         collation = Collation()
         collation.add_plain_witness("A", "a b")
         collation.add_plain_witness("B", "b a")
         alignment_table = collate(collation)
-        self.assertEquals(["-", "a", "b"], alignment_table.rows[0].to_list())
-        self.assertEquals(["b", "a", "-"], alignment_table.rows[1].to_list())
+        witness_a_list = alignment_table.rows[0].to_list()
+        self.assertEquals(len(witness_a_list), 3)
+        witness_b_list = alignment_table.rows[1].to_list()
+        self.assertEquals(len(witness_b_list), 3)
+        matching_tokens = []
+        for idx in range(3):
+            if witness_a_list[idx] == witness_b_list[idx]:
+                matching_tokens.append(witness_a_list[idx])
+        self.assertEquals(len(matching_tokens), 1)
 
     def testDoubleTransposition3(self):
         # Tricky. Aligning a and c can work; so can aligning b and c. Both
