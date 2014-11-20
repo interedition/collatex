@@ -5,7 +5,6 @@ Created on Nov 20, 2014
 '''
 
 import unittest
-from tests import unit_disabled
 from collatex import Collation
 from collatex.core_functions import collate_pretokenized_json
 
@@ -31,7 +30,6 @@ class Test(unittest.TestCase):
         c.add_witness(pt_witness)
         self.assertEqual(len(c.witnesses[0].tokens()), 4)
 
-    @unit_disabled
     def testPretokenizedWitness(self):
         pretokenized_witness = {
             "witnesses": [
