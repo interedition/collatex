@@ -10,8 +10,8 @@ from collatex import Collation, collate
 class Test(unittest.TestCase):
     def test_near_matching(self):
         collation = Collation()
-        collation.add_witness("A", "I bought this glass, because it matches those dinner plates")
-        collation.add_witness("B", "I bought those glasses")
+        collation.add_plain_witness("A", "I bought this glass, because it matches those dinner plates")
+        collation.add_plain_witness("B", "I bought those glasses")
         alignment_table = collate(collation, near_match=True)
         self.assertEquals(["I bought", "this glass, because it matches those dinner plates"],
                           alignment_table.rows[0].to_list())

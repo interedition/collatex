@@ -15,8 +15,8 @@ class Test(unittest.TestCase):
     #TODO: this test is not finished! 
     # def test_Hermans_case_variantgraph(self):
     #     collation = Collation()
-    #     collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-    #     collation.add_witness("W2", "a b c d F g h i ! q r s t")
+    #     collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+    #     collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
     #     graph = VariantGraph()
     #     algorithm = DekkerSuffixAlgorithm(collation)
     #     algorithm.build_variant_graph_from_blocks(graph, collation)
@@ -40,8 +40,8 @@ class Test(unittest.TestCase):
 
 #     def test_variant_graph_two_equal_witnesses(self):
 #         collation = Collation()
-#         collation.add_witness('A', 'the black cat')
-#         collation.add_witness('B', 'the black cat')
+#         collation.add_plain_witness('A', 'the black cat')
+#         collation.add_plain_witness('B', 'the black cat')
 #         graph = collation.collate()
 #         the_vertex = vertexWith(graph, 'the')
 #         black_vertex = vertexWith(graph, 'black')

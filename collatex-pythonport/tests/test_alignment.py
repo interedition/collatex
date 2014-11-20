@@ -15,16 +15,16 @@ class Test(unittest.TestCase):
     # TODO This aligns 'the cat' instead of 'is'!
     def testDoubleTransposition1(self):
         collation = Collation()
-        collation.add_witness("A", "the cat is black")
-        collation.add_witness("B", "black is the cat")
+        collation.add_plain_witness("A", "the cat is black")
+        collation.add_plain_witness("B", "black is the cat")
         alignment_table = collate(collation)
         self.assertEquals(["the cat", "is", "black"], alignment_table.rows[0].to_list())
         self.assertEquals(["black", "is", "the cat"], alignment_table.rows[1].to_list())
 
     def testDoubleTransposition2(self):
         collation = Collation()
-        collation.add_witness("A", "a b")
-        collation.add_witness("B", "b a")
+        collation.add_plain_witness("A", "a b")
+        collation.add_plain_witness("B", "b a")
         alignment_table = collate(collation)
         self.assertEquals(["-", "a", "b"], alignment_table.rows[0].to_list())
         self.assertEquals(["b", "a", "-"], alignment_table.rows[1].to_list())
@@ -35,8 +35,8 @@ class Test(unittest.TestCase):
         # Let's test that each row has four values, and that two of the
         # columns have identical values, and that c is one of those columns.
         collation = Collation()
-        collation.add_witness("A", "a b c")
-        collation.add_witness("B", "b a c")
+        collation.add_plain_witness("A", "a b c")
+        collation.add_plain_witness("B", "b a c")
         alignment_table = collate(collation)
         witness_a_list = alignment_table.rows[0].to_list()
         self.assertEquals(len(witness_a_list), 4)

@@ -5,6 +5,7 @@ Created on Nov 20, 2014
 '''
 
 import unittest
+from tests import unit_disabled
 from collatex import Collation
 from collatex.core_functions import collate_pretokenized_json
 
@@ -13,10 +14,24 @@ class Test(unittest.TestCase):
     def testPlainWitness(self):
         plain_witness = {'id': 'A', 'content': 'The quick brown fox jumped over the lazy dogs.'}
         c = Collation()
-        c.add_witness(plain_witness['id'], plain_witness['content'])
+        c.add_witness(plain_witness)
         self.assertEqual(len(c.witnesses[0].tokens()), 10)
 
+    def testPretokenizedWitnessAdd(self):
+        pt_witness = {
+                    "id": "A",
+                    "tokens": [
+                        {"t": "A", "ref": 123},
+                        {"t": "black and blue", "adj": True},
+                        {"t": "cat", "id": "xyz"},
+                        {"t": "bird", "id": "abc"}
+                    ]
+                }
+        c = Collation()
+        c.add_witness(pt_witness)
+        self.assertEqual(len(c.witnesses[0].tokens()), 4)
 
+    @unit_disabled
     def testPretokenizedWitness(self):
         pretokenized_witness = {
             "witnesses": [

@@ -42,8 +42,8 @@ class Test(unittest.TestCase):
     # we need to introduce a gap here
     def testOmission(self):
         collation = Collation()
-        collation.add_witness("A", "a b c")
-        collation.add_witness("B", "b c")
+        collation.add_plain_witness("A", "a b c")
+        collation.add_plain_witness("B", "b c")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)
@@ -67,8 +67,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def testOmission2GlobalScore(self):
         collation = Collation()
-        collation.add_witness("A", "a a b c")
-        collation.add_witness("B", "a b c")
+        collation.add_plain_witness("A", "a a b c")
+        collation.add_plain_witness("B", "a b c")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)
@@ -82,8 +82,8 @@ class Test(unittest.TestCase):
 
     def test_superbase(self):
         collation = Collation()
-        collation.add_witness("A", "X a b c d e f X g h i Y Z j k")
-        collation.add_witness("B", "a b c Y d e f Y Z g h i X j k")
+        collation.add_plain_witness("A", "X a b c d e f X g h i Y Z j k")
+        collation.add_plain_witness("B", "a b c Y d e f Y Z g h i X j k")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)

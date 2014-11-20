@@ -13,6 +13,7 @@ from networkx.algorithms.dag import topological_sort
 import re
 from prettytable import PrettyTable
 from textwrap import fill
+from collatex.exceptions import *
 
 class Row(object):
     
@@ -141,24 +142,40 @@ class WordPunctuationTokenizer(object):
         return re.findall(r'\w+|[^\w\s]+', contents)
 
 class Token(object):
-    
-    def __init__(self, tokenstring):
-        self.token_string = tokenstring
+    # tokendata comes in the dictionary that we use for JSON input.
+    def __init__(self, tokendata=None):
+        if tokendata is None:
+            # We can have empty tokens.
+            self.token_string = ""
+            self.token_data = {}
+        elif 'n' in tokendata:
+            self.token_string = tokendata['n']
+        elif 't' in tokendata:
+            self.token_string = tokendata['t']
+        else:
+            raise TokenError('No defined token string in tokendata')
+        self.token_data = tokendata
 
     def __repr__(self):
         return self.token_string
 
 class Witness(object):
     
-    def __init__(self, sigil, content):
-        self.sigil = sigil
-        self.content = content
-        # print("Witness "+sigil+" TOKENIZER IS CALLED!")
-        tokenizer = WordPunctuationTokenizer()
+    def __init__(self, witnessdata):
+        self.sigil = witnessdata['id']
         self._tokens = []
-        tokens_as_strings = tokenizer.tokenize(self.content)
-        for token_string in tokens_as_strings:
-            self._tokens.append(Token(token_string))
+        if 'content' in witnessdata:
+            self.content = witnessdata['content']
+            # print("Witness "+sigil+" TOKENIZER IS CALLED!")
+            tokenizer = WordPunctuationTokenizer()
+            tokens_as_strings = tokenizer.tokenize(self.content)
+            for token_string in tokens_as_strings:
+                self._tokens.append(Token({'t':token_string}))
+        elif 'tokens' in witnessdata:
+            for tk in witnessdata['tokens']:
+                self._tokens.append(Token(tk))
+            # TODO no idea what this content string is needed for.
+            self.content = ' '.join([x.token_string for x in self._tokens])
             
     def tokens(self):
         return self._tokens
@@ -167,8 +184,8 @@ class VariantGraph(object):
     
     def __init__(self):
         self.graph = nx.DiGraph()
-        self.start = self.add_vertex(Token(""))
-        self.end = self.add_vertex(Token(""))
+        self.start = self.add_vertex(Token())
+        self.end = self.add_vertex(Token())
     
 #     def is_directed(self):
 #         return self.graph.is_directed()

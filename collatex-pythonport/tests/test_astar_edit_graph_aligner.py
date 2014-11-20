@@ -13,15 +13,15 @@ class Test(unittest.TestCase):
 
     def test_longer_example(self):
         collation = Collation()
-        collation.add_witness("A", "The quick brown fox jumps over the dog.")
-        collation.add_witness("B", "The brown fox jumps over the lazy dog.")
+        collation.add_plain_witness("A", "The quick brown fox jumps over the dog.")
+        collation.add_plain_witness("B", "The brown fox jumps over the lazy dog.")
         collate(collation)
 
 #     # we need to introduce a gap here
     def testOmission(self):
         collation = Collation()
-        collation.add_witness("A", "a b c")
-        collation.add_witness("B", "b c")
+        collation.add_plain_witness("A", "a b c")
+        collation.add_plain_witness("B", "b c")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph, collation)

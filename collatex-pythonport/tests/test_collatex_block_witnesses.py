@@ -26,8 +26,8 @@ class Test(unittest.TestCase):
     
     def test_combined_string_hermans_case(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         # $ is meant to separate witnesses here
         self.assertEquals("a b c d F g h i ! K ! q r s t $1 a b c d F g h i ! q r s t", collation.get_combined_string())
     
@@ -35,8 +35,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_witness_ranges_hermans_case(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         self.assertEquals(RangeSet("0-14"), collation.get_range_for_witness("W1"))
         self.assertEquals(RangeSet("16-28"), collation.get_range_for_witness("W2"))
 
@@ -45,8 +45,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_lcp_intervals_failing_use_case_old_algorithm(self):
         collation = Collation()
-        collation.add_witness("W1", "the cat and the dog")
-        collation.add_witness("W2", "the dog and the cat")
+        collation.add_plain_witness("W1", "the cat and the dog")
+        collation.add_plain_witness("W2", "the dog and the cat")
         parent_lcp_intervals, child_lcp_intervals = collation.get_lcp_intervals()
         self.assertIn((1,2), parent_lcp_intervals)
         self.assertIn((3,4), parent_lcp_intervals)
@@ -68,17 +68,17 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_lcp_child_intervals_hermans_case(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        collation.add_witness("W3", "a b c d E g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
         _, child_lcp_intervals = collation.get_lcp_intervals()
         self.assertFalse(child_lcp_intervals)
 
     @unit_disabled
     def test_non_overlapping_blocks_black_cat(self):
         collation = Collation()
-        collation.add_witness("W1", "the black cat")
-        collation.add_witness("W2", "the black cat")
+        collation.add_plain_witness("W1", "the black cat")
+        collation.add_plain_witness("W2", "the black cat")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         block1 = Block(RangeSet("0-2, 4-6"))
@@ -88,8 +88,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_blocks_failing_transposition_use_case_old_algorithm(self):
         collation = Collation()
-        collation.add_witness("W1", "the cat and the dog")
-        collation.add_witness("W2", "the dog and the cat")
+        collation.add_plain_witness("W1", "the cat and the dog")
+        collation.add_plain_witness("W2", "the dog and the cat")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         block1 = Block(RangeSet("0-1, 9-10"))
@@ -100,8 +100,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_non_overlapping_blocks_Hermans(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-8, 16-24")), blocks) # a b c d F g h i !
@@ -110,9 +110,9 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_blocks_Hermans_case_three_witnesses(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        collation.add_witness("W3", "a b c d E g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-3, 16-19, 30-33")), blocks) # a b c d
@@ -125,8 +125,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_blocks_splitting_token_case(self):
         collation = Collation()
-        collation.add_witness("W1", "a c b c")
-        collation.add_witness("W2", "a c b")
+        collation.add_plain_witness("W1", "a c b c")
+        collation.add_plain_witness("W2", "a c b")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         block1 = Block(RangeSet("0-2, 5-7")) # a c b
@@ -135,8 +135,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_block_witnesses_Hermans_case_two_witnesses(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         algorithm = Scorer(collation)
         block_witness = algorithm._get_block_witness(collation.witnesses[0])
         self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
@@ -146,9 +146,9 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_block_witnesses_Hermans_case(self):
         collation = Collation()
-        collation.add_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_witness("W2", "a b c d F g h i ! q r s t")
-        collation.add_witness("W3", "a b c d E g h i ! q r s t")
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
+        collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
         algorithm = Scorer(collation)
         block_witness1 = algorithm._get_block_witness(collation.witnesses[0])
         self.assertEquals(["a b c d", "F", "g h i", "! q r s t"], block_witness1.debug())
@@ -159,8 +159,8 @@ class Test(unittest.TestCase):
         
     def test_filter_potential_blocks(self):
         collation = Collation()
-        collation.add_witness("W1", "a a")
-        collation.add_witness("w2", "a")
+        collation.add_plain_witness("W1", "a a")
+        collation.add_plain_witness("w2", "a")
         extsufarr = collation.to_extended_suffix_array()
         potential_blocks = extsufarr.split_lcp_array_into_intervals()
         algorithm = Scorer(collation)
@@ -171,9 +171,9 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_split_lcp_intervals_into_smaller_intervals(self):
         collation = Collation()
-        collation.add_witness("W1", "the cat")
-        collation.add_witness("W2", "the cat")
-        collation.add_witness("W3", "the cat")
+        collation.add_plain_witness("W1", "the cat")
+        collation.add_plain_witness("W2", "the cat")
+        collation.add_plain_witness("W3", "the cat")
         extsufarr = collation.to_extended_suffix_array()
         split_intervals = extsufarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 2, 3, split_intervals) # the cat
@@ -184,9 +184,9 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_split_lcp_intervals_into_smaller_intervals_2(self):
         collation = Collation()
-        collation.add_witness("W1", "the")
-        collation.add_witness("W2", "the cat")
-        collation.add_witness("W3", "the cat sits")
+        collation.add_plain_witness("W1", "the")
+        collation.add_plain_witness("W2", "the cat")
+        collation.add_plain_witness("W3", "the cat sits")
         extsufarr = collation.to_extended_suffix_array()
         split_intervals = extsufarr.split_lcp_array_into_intervals()
         self.assertIntervalIn(0, 1, 3, split_intervals) # the
@@ -233,8 +233,8 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_filter_potential_blocks(self):
         collation = Collation()
-        collation.add_witness("W1", "the fox jumps over the fox")
-        collation.add_witness("w2", "the fox jumps over the dog")
+        collation.add_plain_witness("W1", "the fox jumps over the fox")
+        collation.add_plain_witness("w2", "the fox jumps over the dog")
         potential_blocks = collation.calculate_potential_blocks()
         collation.filter_potential_blocks(potential_blocks)
         self.fail("TESTING!")

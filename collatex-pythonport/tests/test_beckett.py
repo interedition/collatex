@@ -13,8 +13,8 @@ class Test(unittest.TestCase):
     #TODO: last one only works when transposition detection is added.
     def testBeckett(self):
         collation = Collation()
-        collation.add_witness("1", "The same clock as when for example Magee once died.")
-        collation.add_witness("2", "The same as when for example Magee once died.")
+        collation.add_plain_witness("1", "The same clock as when for example Magee once died.")
+        collation.add_plain_witness("2", "The same as when for example Magee once died.")
         table = collate(collation)
         self.assertEquals(["The same", "clock", "as when for example Magee once died."], table.rows[0].to_list())
         self.assertEquals(["The same", "-", "as when for example Magee once died."], table.rows[1].to_list())

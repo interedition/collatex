@@ -57,7 +57,7 @@ def collate_pretokenized_json(json, output="table", layout="horizontal", segment
         tokenized_witnesses.append(tokenized_witness)
     collation = Collation()
     for normalized_witness in normalized_witnesses:
-        collation.add_witness(normalized_witness.sigil, normalized_witness.content)
+        collation.add_witness({'id':normalized_witness.sigil, 'content':normalized_witness.content})
     at = collate(collation, output="table", segmentation=segmentation)
     tokenized_at = AlignmentTable(collation, layout=layout)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
@@ -105,7 +105,7 @@ class Collation(object):
         collation = Collation()
         for witness in witnesses[:limit]:
             # generate collation object from json_data
-            collation.add_witness(witness["id"], witness["content"])
+            collation.add_witness(witness)
         return collation
 
     @classmethod
@@ -124,19 +124,22 @@ class Collation(object):
 
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
-    def add_witness(self, sigil, content):
+    def add_witness(self, witnessdata):
         # clear the suffix array and LCP array cache
         self.cached_suffix_array = None
-        witness = Witness(sigil, content)
+        witness = Witness(witnessdata)
         self.witnesses.append(witness)
         witness_range = RangeSet()
         witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
         # the extra one is for the marker token
         self.counter += len(witness.tokens()) +2 # $ + number 
-        self.witness_ranges[sigil] = witness_range
+        self.witness_ranges[witness.sigil] = witness_range
         if not self.combined_string == "":
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
-        self.combined_string += content
+        self.combined_string += witness.content
+
+    def add_plain_witness(self, sigil, content):
+        return self.add_witness({'id':sigil, 'content':content})
 
     def get_range_for_witness(self, witness_sigil):
         if not witness_sigil in self.witness_ranges:

@@ -11,12 +11,12 @@ class Test(unittest.TestCase):
 
     def testCachingOfSuffixArrayAndLCPArray(self):
         collation = Collation()
-        collation.add_witness("A", "content")
-        collation.add_witness("B", "content")
+        collation.add_plain_witness("A", "content")
+        collation.add_plain_witness("B", "content")
         sa1 = collation.get_sa()
         sa2 = collation.get_sa()
         self.assertEquals(sa1,sa2)
-        collation.add_witness("C", "content")
+        collation.add_plain_witness("C", "content")
         sa3 = collation.get_sa()
         self.assertNotEquals(sa2, sa3)
 
