@@ -121,3 +121,6 @@ class Test(unittest.TestCase):
 +-------+---------+"""
         plain_text_output = str(collate_pretokenized_json(json_in, layout="vertical"))
         self.assertEquals(expected_output, plain_text_output)
+
+if __name__ == '__main__':
+    unittest.main()
