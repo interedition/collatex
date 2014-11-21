@@ -8,3 +8,6 @@ This module contains the exception classes used elsewhere in CollateX.
 
 class TokenError(Exception):
     pass
+
+class UnsupportedError(Exception):
+    pass

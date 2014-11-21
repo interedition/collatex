@@ -5,6 +5,7 @@ Created on May 3, 2014
 '''
 from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
 from collatex.collatex_suffix import ExtendedSuffixArray
+from collatex.exceptions import *
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 import json
@@ -38,17 +39,23 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json, output="table", layout="horizontal", segmentation=False):
-    witnesses = json["witnesses"]
+def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
+    # Takes more or less the same arguments as collate() above, but with some restrictions.
+    # Only output types 'json' and 'table' are supported.
+    if output not in ['json', 'table']:
+        raise UnsupportedError("Output type" + kwargs['output'] + "not supported for pretokenized collation")
+    if 'segmentation' in kwargs and kwargs['segmentation']:
+        raise UnsupportedError("Segmented output not supported for pretokenized collation")
+    kwargs['segmentation'] = False
+
     # For each witness given, make a 'shadow' witness based on the normalization tokens
     # that will actually be collated.
-    normalized_witnesses = []
     tokenized_witnesses = []
     collation = Collation()
-    for witness in witnesses:
+    for witness in json["witnesses"]:
         collation.add_witness(witness)
         tokenized_witnesses.append(witness["tokens"])
-    at = collate(collation, output="table", segmentation=segmentation)
+    at = collate(collation, output="table", **kwargs)
     tokenized_at = AlignmentTable(collation, layout=layout)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
