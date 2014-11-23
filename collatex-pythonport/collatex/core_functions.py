@@ -5,6 +5,7 @@ Created on May 3, 2014
 '''
 from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
 from collatex.collatex_suffix import ExtendedSuffixArray
+from collatex.exceptions import *
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 import json
@@ -38,27 +39,23 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
 #TODO: this only works with a table output at the moment
 #TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json, output="table", layout="horizontal", segmentation=False):
-    witnesses = json["witnesses"]
-    normalized_witnesses = []
+def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
+    # Takes more or less the same arguments as collate() above, but with some restrictions.
+    # Only output types 'json' and 'table' are supported.
+    if output not in ['json', 'table']:
+        raise UnsupportedError("Output type" + kwargs['output'] + "not supported for pretokenized collation")
+    if 'segmentation' in kwargs and kwargs['segmentation']:
+        raise UnsupportedError("Segmented output not supported for pretokenized collation")
+    kwargs['segmentation'] = False
+
+    # For each witness given, make a 'shadow' witness based on the normalization tokens
+    # that will actually be collated.
     tokenized_witnesses = []
-    for witness in witnesses:
-        normalized_tokens = []
-        tokenized_witness = []
-        sigil = witness["id"]
-        for token in witness["tokens"]:
-            tokenized_witness.append(token)
-            if "n" in token:
-                normalized_tokens.append(token["n"])
-            else:
-                normalized_tokens.append(token["t"])
-            pass
-        normalized_witnesses.append(Witness(sigil, " ".join(normalized_tokens)))
-        tokenized_witnesses.append(tokenized_witness)
     collation = Collation()
-    for normalized_witness in normalized_witnesses:
-        collation.add_witness(normalized_witness.sigil, normalized_witness.content)
-    at = collate(collation, output="table", segmentation=segmentation)
+    for witness in json["witnesses"]:
+        collation.add_witness(witness)
+        tokenized_witnesses.append(witness["tokens"])
+    at = collate(collation, output="table", **kwargs)
     tokenized_at = AlignmentTable(collation, layout=layout)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
@@ -105,7 +102,7 @@ class Collation(object):
         collation = Collation()
         for witness in witnesses[:limit]:
             # generate collation object from json_data
-            collation.add_witness(witness["id"], witness["content"])
+            collation.add_witness(witness)
         return collation
 
     @classmethod
@@ -124,19 +121,22 @@ class Collation(object):
 
     # the tokenization process happens multiple times
     # and by different tokenizers. This should be fixed
-    def add_witness(self, sigil, content):
+    def add_witness(self, witnessdata):
         # clear the suffix array and LCP array cache
         self.cached_suffix_array = None
-        witness = Witness(sigil, content)
+        witness = Witness(witnessdata)
         self.witnesses.append(witness)
         witness_range = RangeSet()
         witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
         # the extra one is for the marker token
         self.counter += len(witness.tokens()) +2 # $ + number 
-        self.witness_ranges[sigil] = witness_range
+        self.witness_ranges[witness.sigil] = witness_range
         if not self.combined_string == "":
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
-        self.combined_string += content
+        self.combined_string += witness.content
+
+    def add_plain_witness(self, sigil, content):
+        return self.add_witness({'id':sigil, 'content':content})
 
     def get_range_for_witness(self, witness_sigil):
         if not witness_sigil in self.witness_ranges:

@@ -5,6 +5,7 @@ Created on Jun 11, 2014
 '''
 import unittest
 from collatex.core_functions import collate_pretokenized_json
+from collatex.exceptions import *
     
 
 class Test(unittest.TestCase):
@@ -121,3 +122,31 @@ class Test(unittest.TestCase):
 +-------+---------+"""
         plain_text_output = str(collate_pretokenized_json(json_in, layout="vertical"))
         self.assertEquals(expected_output, plain_text_output)
+
+    def testSegmentationPretokenizedJSON(self):
+        json_in = {
+      "witnesses" : [
+        {
+          "id" : "A",
+          "tokens" : [
+              { "t" : "A", "ref" : 123 },
+              { "t" : "black" , "adj" : True },
+              { "t" : "cat", "id" : "xyz" }
+          ]
+        },
+        {
+          "id" : "B",
+          "tokens" : [
+              { "t" : "A" },
+              { "t" : "white" , "adj" : True },
+              { "t" : "stripy", "adj" : True },
+              { "t" : "kitten.", "n" : "cat" }
+          ]
+        }
+      ]
+    }
+        bad_func = lambda x: collate_pretokenized_json(x, segmentation=True)
+        self.assertRaises(UnsupportedError, bad_func, json_in )
+
+if __name__ == '__main__':
+    unittest.main()

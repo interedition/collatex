@@ -23,7 +23,7 @@ except:
 '''
 
 class Scorer(object):
-    def __init__(self, collation, near_match):
+    def __init__(self, collation, near_match=False):
         self.collation = collation
         self.blocks = []
         self.global_tokens_to_occurrences = {}
