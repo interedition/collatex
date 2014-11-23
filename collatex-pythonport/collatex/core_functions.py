@@ -5,7 +5,7 @@ Created on May 3, 2014
 '''
 from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
 from collatex.collatex_suffix import ExtendedSuffixArray
-from collatex.exceptions import *
+from collatex.exceptions import UnsupportedError
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 import json
