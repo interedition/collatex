@@ -10,6 +10,7 @@ from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
+from collatex.display_module import display_alignment_table_as_HTML
 
 # Valid options for output are:
 # "table" for the alignment table (default)
@@ -30,6 +31,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     table = AlignmentTable(collation, graph, layout)
     if output == "json":
         return export_alignment_table_as_json(table)
+    if output == "html":
+        return display_alignment_table_as_HTML(table)
     if output == "table":
         return table
     else:

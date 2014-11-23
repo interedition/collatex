@@ -90,11 +90,10 @@ class AlignmentTable(object):
                     row.append("-")
     
     def __str__(self, *args, **kwargs):
-        return create_html_for_table(self)
+        return str(create_table_visualization(self))
                     
-#TODO: move layout parameter to alignment table object
 # DISPLAY PART OF THE VARIANT GRAPH IN PLAIN/HTML AND VERTICAL OR HORIZONTAL!
-def create_html_for_table(table):
+def create_table_visualization(table):
     # create visualization of alignment table
     if table.layout == "vertical":    
         prettytable = visualizeTableVertically(table)
@@ -102,7 +101,7 @@ def create_html_for_table(table):
         prettytable = visualizeTableHorizontal(table)
     else:
         raise Exception("Unknown table layout: "+table.layout)
-    return str(prettytable)
+    return prettytable
 
 def visualizeTableHorizontal(table):
     # print the table horizontal

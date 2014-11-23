@@ -3,14 +3,22 @@ Created on Nov 13, 2014
 
 @author: ronald
 '''
+from collatex.core_classes import create_table_visualization
 
 # optionally load the IPython dependencies
-# try:
-#     from IPython.display import HTML
+try:
+    from IPython.display import HTML
 #     from IPython.display import SVG
-#     from IPython.core.display import display
-# except:
-#     pass
+    from IPython.core.display import display
+except:
+    pass
+
+
+# create visualization of alignment table
+def display_alignment_table_as_HTML(at):
+    prettytable = create_table_visualization(at)
+    html = prettytable.get_html_string(formatting=True)
+    return display(HTML(html))
 
 # def in_ipython():
 #     try:
@@ -20,10 +28,6 @@ Created on Nov 13, 2014
 #     except:
 #         return False
 
-# TODO: move HTML display to  display function!
-#     if in_ipython():
-#         html = prettytable.get_html_string(formatting=True)
-#         return display(HTML(html))
 
 
 
@@ -35,15 +39,6 @@ Created on Nov 13, 2014
 #         print(json)
 #         return
 
-# create visualization of alignment table
-#         if layout == "vertical":    
-#             prettytable = visualizeTableVertically(tokenized_at)
-#         else:
-#             prettytable = visualizeTableHorizontal(tokenized_at)
-#         if in_ipython():
-#             html = prettytable.get_html_string(formatting=True)
-#             return display(HTML(html))
-#         return prettytable
 
 # DISPLAY PART OF THE VARIANT_GRAPH IN SVG!
 #     and in_ipython:
