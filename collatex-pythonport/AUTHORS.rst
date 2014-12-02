@@ -11,4 +11,5 @@ Development Lead
 Contributors
 ------------
 
-None yet. Why not be the first?
+David J. Birnbaum (for Windows support and installation documentation)
+Tara L. Andrews (for bugfixes and patches)

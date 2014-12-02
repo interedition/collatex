@@ -3,6 +3,14 @@
 History
 -------
 
+2.0.0pre11 (2014-12-02)
++++++++++++++++++++++++
+
+* Bug-fix: collate_pretokenize_json function should not re-tokenized the content. Thanks to Tara L. Andrews.
+* Allow near-matching for plain as well as for pre-tokenized content. Thanks to Tara L. Andrews.
+* Added HTML option to collate function for the output as an alignment table represented as HTML.
+
+
 2.0.0pre10 (2014-11-13)
 +++++++++++++++++++++++
 

@@ -56,8 +56,8 @@ Simple example:
   from collatex import *
 
   collation = Collation()
-  collation.add_witness("A", "The quick brown fox jumps over the dog.")
-  collation.add_witness("B", "The brown fox jumps over the lazy dog.")
+  collation.add_plain_witness("A", "The quick brown fox jumps over the dog.")
+  collation.add_plain_witness("B", "The brown fox jumps over the lazy dog.")
 
   alignment_table = collate(collation)
 
@@ -71,7 +71,7 @@ to show the results.
 When running from the command shell run the example script with:
 ::
 
-	python ./nameofscript.py
+	python3 ./nameofscript.py
 
 
 
