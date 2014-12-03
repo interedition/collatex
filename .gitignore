@@ -4,6 +4,7 @@ target
 *.ipr
 *.iws
 *.ipynb
+*.egg-info
 
 .classpath
 .project
