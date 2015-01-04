@@ -1,5 +1,8 @@
 @charset "UTF-8";
 
+@import "google-code-prettify/prettify";
+@import "google-code-prettify/prettify-sunburst-theme";
+
 body {
     width: 960px;
     margin: 1em auto;
@@ -55,42 +58,45 @@ a:hover {
     color: white;
     background: #060;
     border-radius: 0.5em;
+
+    h1, p {
+        margin: 0;
+    }
+
+    p {
+        padding-top: .5em;
+    }
+
+    a, a:visited, a:link, a:active, a:hover {
+        color: inherit;
+        text-decoration: none;
+    }
 }
 
-#header h1, #header p {
-    margin: 0;
-}
 
-#header p {
-    padding-top: .5em;
-}
+#menu {
+    ol {
+        list-style-type: none;
+        margin: 0;
+        padding: .5em 0;
+        width: 100%;
+        text-align: center;
+    }
 
-#header a, #header a:visited, #header a:link, #header a:active, #header a:hover {
-    color: inherit;
-    text-decoration: none;
-}
+    ol li {
+        display: inline-block;
+        margin: 0 2em 0 0;
+        font-size: 116%;
+        font-weight: bold;
+    }
 
-#menu ol {
-    list-style-type: none;
-    margin: 0;
-    padding: .5em 0;
-    width: 100%;
-    text-align: center;
-}
+    ol li:before {
+        content: "» "
+    }
 
-#menu ol li {
-    display: inline-block;
-    margin: 0 2em 0 0;
-    font-size: 116%;
-    font-weight: bold;
-}
-
-#menu ol li:before {
-    content: "» "
-}
-
-#menu a, #menu a:visited, #menu a:link, #menu a:active, #menu a:hover {
-    color: #333;
+    a, #menu a:visited, #menu a:link, #menu a:active, #menu a:hover {
+        color: #333;
+    }
 }
 
 #content {
@@ -112,16 +118,19 @@ a:hover {
     margin: 1em auto;
 }
 
-#project-team li {
-    margin: 0
-}
-#project-team a {
-    color: inherit;
-    font-weight: normal;
-}
+#project-team {
+    li {
+        margin: 0
+    }
 
-#project-team .institution {
-    font-size: 80%;
+    a {
+        color: inherit;
+        font-weight: normal;
+    }
+
+    .institution {
+        font-size: 80%;
+    }
 }
 
 #license pre {
@@ -137,16 +146,18 @@ a:hover {
     margin: .5em;
 }
 
-.figure img {
-    display: block;
-    padding: .25em;
-    margin: 0 auto;
-}
+.figure {
+    img {
+        display: block;
+        padding: .25em;
+        margin: 0 auto;
+    }
 
-.figure .caption {
-    font-size: 80%;
-    text-align: center;
-    font-style: italic;
+    .caption {
+        font-size: 80%;
+        text-align: center;
+        font-style: italic;
+    }
 }
 
 .float-left {
@@ -185,24 +196,27 @@ a:hover {
     width: 33%;
 }
 
-.toc li {
-    margin: .5em 1em;
+.toc {
+    li {
+        margin: .5em 1em;
+    }
+    a {
+        color: inherit;
+        font-weight: normal;
+    }
 }
 
-.toc a {
-    color: inherit;
-    font-weight: normal;
-}
+.bibliography {
+    dt {
+        float: left;
+        margin-right: .5em;
+    }
 
-.bibliography dt {
-    float: left;
-    margin-right: .5em;
-}
+    dt:before {
+        content: "[";
+    }
 
-.bibliography dt:before {
-    content: "[";
-}
-
-.bibliography dt:after {
-    content: "]";
+    dt:after {
+        content: "]";
+    }
 }

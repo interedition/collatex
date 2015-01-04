@@ -1,102 +1,43 @@
-{% extends "page.twig" %}
-
-{% block content %}
-
-<p>CollateX is open source software and made available for download in source as well as binary form.</p>
-
-<div id="download-binary">
-    <h2>Binary Distributions</h2>
-
-    <p>For usage instructions, please refer to the <a href="/doc/" title="Documentation">documentation</a>. Please also
-        note the <a href="#license" title="License">license terms</a> under which CollateX is made available.</p>
-
-    <div class="yui3-g">
-        <div class="yui3-u-1-2"><div class="content download-option">
-            <h3>1. Tools</h3>
-            <p class="download-link">» <a href="/dist/collatex-tools-{{ version }}.zip">collatex-tools-{{ version }}.zip</a></p>
-            <p class="download-link">» <a href="/dist/collatex-tools-{{ version }}.tar.bz2">collatex-tools-{{ version }}.tar.bz2</a></p>
-        </div></div>
-        <div class="yui3-u-1-2"><div class="content">
-            <h3>Requirements</h3>
-
-            <p>CollateX is written for the <a href="http://www.java.com/" title="Homepage">Java platform</a> which is available
-                for all major operating systems. You need the Java Runtime Environment (JRE) version&nbsp;6 or higher.</p>
-            </div></div>
-        <div class="yui3-u-1-2"><div class="content download-option">
-                <h3>2. Core</h3>
-
-                <p>For embedding CollateX into your JVM-based application, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a>:</p>
-
-                <pre class="prettyprint">&lt;dependency>
-    &lt;groupId>eu.interedition&lt;/groupId>
-    &lt;artifactId>collatex-core&lt;/artifactId>
-    &lt;version>{{ version }}&lt;/version>
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="content-type" content="text/html;charset=utf-8"><title>CollateX &ndash; Download</title><link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.8.1/build/cssfonts/cssfonts-min.css&amp;3.8.1/build/cssgrids/cssgrids-min.css&amp;3.8.1/build/cssreset/cssreset-min.css&amp;3.8.1/build/cssbase/cssbase-min.css"><link rel="stylesheet" type="text/css" href="/collatex.css"></head><body class="yui3-skin-sam"><div id="header"><h1><a href="/" title="Homepage">CollateX &ndash; Software for Collating Textual Sources</a></h1><p class="subtitle"><span class="quote">&ldquo;In a language, in the system of language, there are only differences.&rdquo;</span> &ndash; Jacques Derrida</p></div><div id="menu"><ol><li><a href="/">Home</a></li><li><a href="/download/">Download</a></li><li><a href="/doc/">Documentation</a></li><li><a href="/demo/">Demo</a></li><li><a href="/about/">About</a></li></ol></div><div id="content"><p>CollateX is open source software and made available for download in source as well as binary form.</p><div id="download-binary"><h2>Binary Distributions</h2><p>For usage instructions, please refer to the <a href="/doc/" title="Documentation">documentation</a>. Please also
+note the <a href="#license" title="License">license terms</a> under which CollateX is made available.
+</p><div class="yui3-g"><div class="yui3-u-1-2"><div class="content download-option"><h3>1. Tools</h3><p class="download-link">» <a href="/dist/collatex-tools-1.5.zip">collatex-tools-1.5.zip</a></p><p class="download-link">» <a href="/dist/collatex-tools-1.5.tar.bz2">collatex-tools-1.5.tar.bz2</a></p></div></div><div class="yui3-u-1-2"><div class="content"><h3>Requirements</h3><p>CollateX is written for the <a href="http://www.java.com/" title="Homepage">Java platform</a> which is available
+for all major operating systems. You need the Java Runtime Environment (JRE) version&nbsp;6 or higher.
+</p></div></div><div class="yui3-u-1-2"><div class="content download-option"><h3>2. Core</h3><p>For embedding CollateX into your JVM-based application, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a>:</p><pre class="prettyprint">&lt;dependency>
+  &lt;groupId>eu.interedition&lt;/groupId>
+  &lt;artifactId>collatex-core&lt;/artifactId>
+  &lt;version>1.5&lt;/version>
 &lt;/dependency>
 &lt;dependency>
-    &lt;groupId>net.sf.jung&lt;/groupId>
-    &lt;artifactId>jung-graph-impl&lt;/artifactId>
-    &lt;version>2.0.1&lt;/version>
-&lt;/dependency></pre>
-        </div></div>
-        <div class="yui3-u-1-2"><div class="content download-option">
-                <h3>3. Cocoon</h3>
-
-                <p>For adding CollateX' block to your Cocoon install, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a> as well:</p>
-
-<pre class="prettyprint">&lt;dependency>
-    &lt;groupId>eu.interedition&lt;/groupId>
-    &lt;artifactId>collatex-cocoon&lt;/artifactId>
-    &lt;version>{{ version }}&lt;/version>
+  &lt;groupId>net.sf.jung&lt;/groupId>
+  &lt;artifactId>jung-graph-impl&lt;/artifactId>
+  &lt;version>2.0.1&lt;/version>
+&lt;/dependency>
+</pre></div></div><div class="yui3-u-1-2"><div class="content download-option"><h3>3. Cocoon</h3><p>For adding CollateX' block to your Cocoon install, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a> as well:</p><pre class="prettyprint">&lt;dependency>
+  &lt;groupId>eu.interedition&lt;/groupId>
+  &lt;artifactId>collatex-cocoon&lt;/artifactId>
+  &lt;version>1.5&lt;/version>
 &lt;/dependency>
 &lt;dependency>
-    &lt;groupId>net.sf.jung&lt;/groupId>
-    &lt;artifactId>jung-graph-impl&lt;/artifactId>
-    &lt;version>2.0.1&lt;/version>
-&lt;/dependency></pre>
-        </div></div>
-    </div>
-
-    <p>Depending on how you would like to use CollateX, you can opt for three different ways to download it:</p>
-
-    <ol>
-        <li>Should you be in need for a collation component that integrates with your software system independent of its
-            runtime and development environment, we offer a <strong>tool suite</strong> comprised of a
-            <em>command-line tool</em> and a <em>self-contained RESTful web service</em>. So whether your project is web-based or
-            runs in your local environment, whether you write in Ruby, Python, PHP, JavaScript or some other language: This is
-            probably the option to get started on.</li>
-        <li>Should you target the <em>Java Virtual Machine</em> as your runtime environment and would like to <strong>embed CollateX</strong>
-            in your application, we provide <a href="http://maven.apache.org/" title="Homepage">Apache-Maven</a>-compatible artifacts of
-            CollateX' core for download.</li>
-        <li>Should you use <a href="http://cocoon.apache.org/" title="Homepage">Apache Cocoon</a> as the framework for your
-            <em>XML-oriented application</em>, we offer a <strong>Cocoon block</strong> making collation functionality available
-            as a transformer for your XML processing pipelines.</li>
-    </ol>
-</div>
-
-<div id="download-source">
-    <h2>Source Code</h2>
-
-    <div class="yui3-g">
-        <div class="yui3-u-1-2"><div class="content">
-            <p>We do not prepare source code bundles for download. Development of CollateX takes place on
-                <a href="https://github.com/interedition/collatex" title="CollateX on GitHub">GitHub</a> where you can find
-                the latest version of CollateX' source as well as earlier versions.</p>
-        </div></div>
-        <div class="yui3-u-1-2"><div class="content download-option">
-            <p class="download-link">» <a href="https://github.com/interedition/collatex/">github.com/interedition/collatex/</a></p>
-        </div></div>
-    </div>
-</div>
-
-<div id="license">
-    <h2>License</h2>
-
-    <p>CollateX may be used under the terms of the <a href="http://www.gnu.org/licenses/gpl.html" title="GPLv3 Homepage">GNU General Public License Version 3</a>.</p>
-
-    <pre class="content">                    GNU GENERAL PUBLIC LICENSE
+  &lt;groupId>net.sf.jung&lt;/groupId>
+  &lt;artifactId>jung-graph-impl&lt;/artifactId>
+  &lt;version>2.0.1&lt;/version>
+&lt;/dependency>
+</pre></div></div></div><p>Depending on how you would like to use CollateX, you can opt for three different ways to download it:</p><ol><li>Should you be in need for a collation component that integrates with your software system independent of its
+runtime and development environment, we offer a <strong>tool suite</strong> comprised of a
+<em>command-line tool</em> and a <em>self-contained RESTful web service</em>. So whether your project is web-based or
+runs in your local environment, whether you write in Ruby, Python, PHP, JavaScript or some other language: This is
+probably the option to get started on.</li><li>Should you target the <em>Java Virtual Machine</em> as your runtime environment and would like to <strong>embed CollateX</strong>
+in your application, we provide <a href="http://maven.apache.org/" title="Homepage">Apache-Maven</a>-compatible artifacts of
+CollateX' core for download.</li><li>Should you use <a href="http://cocoon.apache.org/" title="Homepage">Apache Cocoon</a> as the framework for your
+<em>XML-oriented application</em>, we offer a <strong>Cocoon block</strong> making collation functionality available
+as a transformer for your XML processing pipelines.
+</li></ol></div><div id="download-source"><h2>Source Code</h2><div class="yui3-g"><div class="yui3-u-1-2"><div class="content"><p>We do not prepare source code bundles for download. Development of CollateX takes place on
+<a href="https://github.com/interedition/collatex" title="CollateX on GitHub">GitHub</a> where you can find
+the latest version of CollateX' source as well as earlier versions.
+</p></div></div><div class="yui3-u-1-2"><div class="content download-option"><p class="download-link">» <a href="https://github.com/interedition/collatex/">github.com/interedition/collatex/</a></p></div></div></div></div><div id="license"><h2>License</h2><p>CollateX may be used under the terms of the <a href="http://www.gnu.org/licenses/gpl.html" title="GPLv3 Homepage">GNU General Public License Version 3</a>.</p><pre class="content">                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -726,8 +667,8 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    &lt;one line to give the program's name and a brief idea of what it does.&gt;
-    Copyright (C) &lt;year&gt;  &lt;name of author&gt;
+    <one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) <year>  <name of author>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -740,14 +681,14 @@ the "copyright" line and a pointer to where the full notice is found.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Also add information on how to contact you by electronic and paper mail.
 
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-    &lt;program&gt;  Copyright (C) &lt;year&gt;  &lt;name of author&gt;
+    <program>  Copyright (C) <year>  <name of author>
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
@@ -759,13 +700,12 @@ might be different; for a GUI interface, you would use an "about box".
   You should also get your employer (if you work as a programmer) or school,
 if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU GPL, see
-&lt;http://www.gnu.org/licenses/&gt;.
+<http://www.gnu.org/licenses/>.
 
   The GNU General Public License does not permit incorporating your program
 into proprietary programs.  If your program is a subroutine library, you
 may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
-&lt;http://www.gnu.org/philosophy/why-not-lgpl.html&gt;.</pre>
-</div>
-{% endblock %}
+<http://www.gnu.org/philosophy/why-not-lgpl.html>.
+</pre></div></div><div id="footer">Copyright &copy; 2010-2013 <a href="/about/">The Interedition Development Group</a>. All rights reserved.</div><a href="https://github.com/interedition/collatex"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><script type="text/javascript" src="http://yui.yahooapis.com/combo?3.8.1/build/yui-base/yui-base-min.js&amp;3.8.1/build/oop/oop-min.js&amp;3.8.1/build/event-custom-base/event-custom-base-min.js&amp;3.8.1/build/features/features-min.js&amp;3.8.1/build/dom-core/dom-core-min.js&amp;3.8.1/build/dom-base/dom-base-min.js&amp;3.8.1/build/selector-native/selector-native-min.js&amp;3.8.1/build/selector/selector-min.js&amp;3.8.1/build/node-core/node-core-min.js&amp;3.8.1/build/node-base/node-base-min.js&amp;3.8.1/build/event-base/event-base-min.js&amp;3.8.1/build/event-delegate/event-delegate-min.js&amp;3.8.1/build/node-event-delegate/node-event-delegate-min.js&amp;3.8.1/build/pluginhost-base/pluginhost-base-min.js&amp;3.8.1/build/pluginhost-config/pluginhost-config-min.js&amp;3.8.1/build/node-pluginhost/node-pluginhost-min.js&amp;3.8.1/build/dom-style/dom-style-min.js&amp;3.8.1/build/dom-screen/dom-screen-min.js&amp;3.8.1/build/node-screen/node-screen-min.js&amp;3.8.1/build/node-style/node-style-min.js&amp;3.8.1/build/event-custom-complex/event-custom-complex-min.js&amp;3.8.1/build/event-synthetic/event-synthetic-min.js"></script><script type="text/javascript" src="http://yui.yahooapis.com/combo?3.8.1/build/event-mousewheel/event-mousewheel-min.js&amp;3.8.1/build/event-mouseenter/event-mouseenter-min.js&amp;3.8.1/build/event-key/event-key-min.js&amp;3.8.1/build/event-focus/event-focus-min.js&amp;3.8.1/build/event-resize/event-resize-min.js&amp;3.8.1/build/event-hover/event-hover-min.js&amp;3.8.1/build/event-outside/event-outside-min.js&amp;3.8.1/build/event-touch/event-touch-min.js&amp;3.8.1/build/event-move/event-move-min.js&amp;3.8.1/build/event-flick/event-flick-min.js&amp;3.8.1/build/event-valuechange/event-valuechange-min.js&amp;3.8.1/build/event-tap/event-tap-min.js"></script><script type="text/javascript" src="/collatex.js"></script></body></html>

@@ -10,3 +10,4 @@ target
 .settings/
 bin/
 site/vendor
+node_modules
