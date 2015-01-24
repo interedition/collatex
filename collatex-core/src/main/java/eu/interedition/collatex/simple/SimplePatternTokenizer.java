@@ -19,47 +19,36 @@
 
 package eu.interedition.collatex.simple;
 
-import com.google.common.base.Function;
-
-import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  * @author Ronald Haentjens Dekker
  */
-public class SimplePatternTokenizer implements Function<String, Iterable<String>> {
-
-  private final Pattern pattern;
-
-  public SimplePatternTokenizer(Pattern pattern) {
-    this.pattern = pattern;
-  }
-
-  @Override
-  public Iterable<String> apply(@Nullable String input) {
-    final Matcher matcher = pattern.matcher(input);
-    final List<String> tokens = new LinkedList<>();
-    while (matcher.find()) {
-      tokens.add(input.substring(matcher.start(), matcher.end()));
-    }
-    return tokens;
-  }
-
-  public static final SimplePatternTokenizer BY_WHITESPACE = new SimplePatternTokenizer(
-          Pattern.compile("\\s*?\\S+\\s*]")
-  );
+public class SimplePatternTokenizer {
 
   static final String PUNCT = Pattern.quote(".?!,;:");
 
-  public static final SimplePatternTokenizer BY_WS_AND_PUNCT = new SimplePatternTokenizer(
-          Pattern.compile("[\\s" + PUNCT + "]*?[^\\s" + PUNCT + "]+[\\s" + PUNCT + "]*")
-  );
+  static Function<String, Stream<String>> tokenizer(Pattern pattern) {
+    return input -> {
+      final Matcher matcher = pattern.matcher(input);
+      final List<String> tokens = new LinkedList<>();
+      while (matcher.find()) {
+        tokens.add(input.substring(matcher.start(), matcher.end()));
+      }
+      return tokens.stream();
+    };
+  }
+
+  public static final Function<String, Stream<String>> BY_WHITESPACE = tokenizer(Pattern.compile("\\s*?\\S+\\s*]"));
+
+  public static final Function<String, Stream<String>> BY_WS_AND_PUNCT = tokenizer(Pattern.compile("[\\s" + PUNCT + "]*?[^\\s" + PUNCT + "]+[\\s" + PUNCT + "]*"));
   
-  public static final SimplePatternTokenizer BY_WS_OR_PUNCT = new SimplePatternTokenizer(
-          Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*")
-  );
+  public static final Function<String, Stream<String>> BY_WS_OR_PUNCT = tokenizer(Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*"));
+
 }

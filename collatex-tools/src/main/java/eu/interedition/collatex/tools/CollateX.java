@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
@@ -71,8 +70,11 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -85,7 +87,7 @@ public class CollateX implements Closeable {
   List<SimpleWitness> witnesses;
   XPathExpression tokenXPath;
 
-  Function<String, Iterable<String>> tokenizer;
+  Function<String, Stream<String>> tokenizer;
   Function<String, String> normalizer;
   Comparator<Token> comparator;
   CollationAlgorithm collationAlgorithm;
@@ -110,9 +112,9 @@ public class CollateX implements Closeable {
               ? PluginScript.read("<internal>", new StringReader(""))
               : PluginScript.read(argumentToResource(script)));
 
-      this.tokenizer = Objects.firstNonNull(pluginScript.tokenizer(), SimplePatternTokenizer.BY_WS_OR_PUNCT);
-      this.normalizer = Objects.firstNonNull(pluginScript.normalizer(), SimpleTokenNormalizers.LC_TRIM_WS);
-      this.comparator = Objects.firstNonNull(pluginScript.comparator(), new EqualityTokenComparator());
+      this.tokenizer = Optional.ofNullable(pluginScript.tokenizer()).orElse(SimplePatternTokenizer.BY_WS_OR_PUNCT);
+      this.normalizer = Optional.ofNullable(pluginScript.normalizer()).orElse(SimpleTokenNormalizers.LC_TRIM_WS);
+      this.comparator = Optional.ofNullable(pluginScript.comparator()).orElse(new EqualityTokenComparator());
     } catch (IOException e) {
       throw new ParseException("Failed to read script '" + script + "' - " + e.getMessage());
     }

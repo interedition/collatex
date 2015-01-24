@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
@@ -43,6 +42,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -57,7 +59,7 @@ public class URLWitness extends SimpleWitness {
   }
 
   public URLWitness read(
-          Function<String, Iterable<String>> tokenizer,
+          Function<String, Stream<String>> tokenizer,
           Function<String, String> normalizer,
           Charset charset,
           XPathExpression tokenXPath)
@@ -79,11 +81,10 @@ public class URLWitness extends SimpleWitness {
         }
         setTokens(tokens);
       } else {
-        final List<Token> tokens = Lists.newLinkedList();
-        for (String tokenText : tokenizer.apply(CharStreams.toString(new InputStreamReader(stream, charset)))) {
-          tokens.add(new SimpleToken(this, tokenText, normalizer.apply(tokenText)));
-        }
-        setTokens(tokens);
+        setTokens(tokenizer.apply(CharStreams.toString(new InputStreamReader(stream, charset)))
+                .map(tokenText -> new SimpleToken(this, tokenText, normalizer.apply(tokenText)))
+                .collect(Collectors.<Token>toList())
+        );
       }
     } catch (ParserConfigurationException e) {
       throw new SAXException(e);

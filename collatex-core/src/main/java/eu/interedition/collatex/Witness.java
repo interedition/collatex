@@ -19,11 +19,9 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Ordering;
-
 import java.util.Comparator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * IWitness
@@ -35,17 +33,7 @@ public interface Witness {
 
   String getSigil();
 
-  final Comparator<Witness> SIGIL_COMPARATOR = new Comparator<Witness>() {
-    @Override
-    public int compare(Witness o1, Witness o2) {
-      return o1.getSigil().compareTo(o2.getSigil());
-    }
-  };
+  final Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
 
-  final Function<VariantGraph.Edge, String> TO_SIGILS = new Function<VariantGraph.Edge, String>() {
-    @Override
-    public String apply(VariantGraph.Edge input) {
-      return Joiner.on(", ").join(Ordering.from(SIGIL_COMPARATOR).sortedCopy(input.witnesses()));
-    }
-  };
+  final Function<VariantGraph.Edge, String> TO_SIGILS = input -> input.witnesses().stream().sorted(SIGIL_COMPARATOR).map(Object::toString).collect(Collectors.joining(", "));
 }

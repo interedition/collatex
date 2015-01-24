@@ -3,7 +3,6 @@ package eu.interedition.collatex.suffixtree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,9 +49,9 @@ public class Utils {
 	 *         tree.
 	 */
 	static <T,S extends Iterable<T>> String printTreeForGraphViz(SuffixTree<T,S> tree, boolean printSuffixLinks) {
-		LinkedList<Node<T,S>> stack = new LinkedList<Node<T,S>>();
+		LinkedList<Node<T,S>> stack = new LinkedList<>();
 		stack.add(tree.getRoot());
-		Map<Node<T,S>, Integer> nodeMap = new HashMap<Node<T,S>, Integer>();
+		Map<Node<T,S>, Integer> nodeMap = new HashMap<>();
 		nodeMap.put(tree.getRoot(), 0);
 		int nodeId = 1;
 
@@ -60,7 +59,7 @@ public class Utils {
 				"\ndigraph suffixTree{\n node [shape=circle, label=\"\", fixedsize=true, width=0.1, height=0.1]\n");
 
 		while (stack.size() > 0) {
-			LinkedList<Node<T,S>> childNodes = new LinkedList<Node<T,S>>();
+			LinkedList<Node<T,S>> childNodes = new LinkedList<>();
 			for (Node<T,S> node : stack) {
 
 				// List<Edge> edges = node.getEdges();

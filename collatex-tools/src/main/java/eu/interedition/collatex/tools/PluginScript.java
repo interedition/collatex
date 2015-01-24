@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
@@ -41,6 +40,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -84,10 +85,10 @@ public class PluginScript {
     comparator = hasFunction(COMPARATOR_FUNCTION, "", "");
   }
 
-  Function<String, Iterable<String>> tokenizer() {
-    return (tokenizer ? new Function<String, Iterable<String>>() {
+  Function<String, Stream<String>> tokenizer() {
+    return (tokenizer ? new Function<String, Stream<String>>() {
       @Override
-      public Iterable<String> apply(@Nullable String input) {
+      public Stream<String> apply(@Nullable String input) {
         final Object result = invoke(TOKENIZER_FUNCTION, input);
         if (!(result instanceof Iterable)) {
           throw new PluginScriptExecutionException("Wrong result type of " +
@@ -107,7 +108,7 @@ public class PluginScript {
           tokens.add((String) token);
         }
 
-        return tokens;
+        return tokens.stream();
       }
     } : null);
   }

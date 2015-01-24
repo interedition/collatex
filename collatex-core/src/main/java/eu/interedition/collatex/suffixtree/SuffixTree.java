@@ -28,9 +28,9 @@ public class SuffixTree<I,S extends Iterable<I>> {
 	 * Constructs an empty suffix tree.
 	 */
 	public SuffixTree(){
-		sequence = new Sequence<I, S>();
-		root = new Node<I,S>(null, this.sequence, this);
-		activePoint = new ActivePoint<I,S>(root);
+		sequence = new Sequence<>();
+		root = new Node<>(null, this.sequence, this);
+		activePoint = new ActivePoint<>(root);
 	}
 	
 	/**
@@ -40,13 +40,12 @@ public class SuffixTree<I,S extends Iterable<I>> {
 	 * @param sequenceArray
 	 *            the array of items for which we are going to generate a suffix
 	 *            tree.
-	 * @throws Exception
 	 */
 	public SuffixTree(S sequenceArray) {
-		sequence = new Sequence<I, S>(sequenceArray);
-		root = new Node<I,S>(null, this.sequence, this);
-		activePoint = new ActivePoint<I,S>(root);
-		suffix = new Suffix<I, S>(0, 0, this.sequence);
+		sequence = new Sequence<>(sequenceArray);
+		root = new Node<>(null, this.sequence, this);
+		activePoint = new ActivePoint<>(root);
+		suffix = new Suffix<>(0, 0, this.sequence);
 		extendTree(0,sequence.getLength());
 	}
 	
@@ -58,7 +57,7 @@ public class SuffixTree<I,S extends Iterable<I>> {
 	public void add(S sequence){
 		int start = currentEnd;
 		this.sequence.add(sequence);
-		suffix = new Suffix<I,S>(currentEnd,currentEnd,this.sequence);
+		suffix = new Suffix<>(currentEnd,currentEnd,this.sequence);
 		activePoint.setPosition(root, null, 0);
 		extendTree(start, this.sequence.getLength());
 	}

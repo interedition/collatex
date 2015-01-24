@@ -22,6 +22,7 @@ package eu.interedition.collatex.simple;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -58,7 +59,7 @@ public class SimpleWitnessTeiBuilder {
         reader.next();
       }
     }
-    witness.setTokenContents(tokenContents, SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
+    witness.setTokenContents(tokenContents.stream(), SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
     return witness;
   }
 
