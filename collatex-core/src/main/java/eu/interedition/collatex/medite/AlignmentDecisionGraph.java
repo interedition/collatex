@@ -19,17 +19,17 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.util.VertexMatch;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 /**
@@ -45,14 +45,14 @@ public class AlignmentDecisionGraph {
   AlignmentDecisionGraph(List<SortedSet<VertexMatch.WithTokenIndex>> matches, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
     this.matches = matches;
     this.matchEvaluator = matchEvaluator;
-    this.bestPaths = new PriorityQueue<>(matches.size(), PATH_COST_COMPARATOR);
-    this.minCosts = Maps.newHashMap();
+    this.bestPaths = new PriorityQueue<>(matches.size(), Comparator.comparingInt(n -> n.cost));
+    this.minCosts = new HashMap<>();
   }
 
   static SortedSet<SortedSet<VertexMatch.WithTokenIndex>> filter(SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
-    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> alignments = Sets.newTreeSet(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> alignments = new TreeSet<>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
 
-    final List<SortedSet<VertexMatch.WithTokenIndex>> matchList = Lists.newArrayList(matches);
+    final List<SortedSet<VertexMatch.WithTokenIndex>> matchList = new ArrayList<>(matches);
     Node optimal = new AlignmentDecisionGraph(matchList, matchEvaluator).findBestPath();
     while (optimal.matchIndex >= 0) {
       if (optimal.aligned) {
@@ -145,14 +145,8 @@ public class AlignmentDecisionGraph {
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(matchIndex, aligned);
+      return Objects.hash(matchIndex, aligned);
     }
   }
 
-  static final Comparator<Node> PATH_COST_COMPARATOR = new Comparator<Node>() {
-    @Override
-    public int compare(Node o1, Node o2) {
-      return (o1.cost - o2.cost);
-    }
-  };
 }

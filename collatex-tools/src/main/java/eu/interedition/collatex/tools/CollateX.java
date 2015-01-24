@@ -19,8 +19,6 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import com.google.common.io.Closer;
 import com.google.common.io.Files;
@@ -68,6 +66,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -156,7 +155,7 @@ public class CollateX implements Closeable {
 
 
     final String[] witnessSpecs = commandLine.getArgs();
-    this.inputResources = Lists.newArrayListWithExpectedSize(witnessSpecs.length);
+    this.inputResources = new ArrayList<>(witnessSpecs.length);
     for (String witnessSpec : witnessSpecs) {
       inputResources.add(argumentToResource(witnessSpec));
     }
@@ -174,7 +173,7 @@ public class CollateX implements Closeable {
         this.witnesses = JsonProcessor.read(inputStream).getWitnesses();
       }
     } else {
-      this.witnesses = Lists.newArrayListWithExpectedSize(inputResources.size());
+      this.witnesses = new ArrayList<>(inputResources.size());
       //noinspection Convert2streamapi
       for (URL witnessURL : inputResources) {
         this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL)
