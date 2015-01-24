@@ -19,8 +19,6 @@
 
 package eu.interedition.collatex.util;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -35,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -58,7 +57,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
     public boolean isEqual(VariantGraph.Vertex[] a, Token b) {
       for (VariantGraph.Vertex vertex : a) {
         final Set<Token> tokens = vertex.tokens();
-        if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), b) == 0) {
+        if (!tokens.isEmpty() && comparator.compare(tokens.stream().findFirst().get(), b) == 0) {
           return true;
         }
       }
@@ -74,11 +73,11 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
   @Override
   public void collate(VariantGraph graph, Iterable<Token> witness) {
     final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
-    final Token[] tokens = Iterables.toArray(witness, Token.class);
+    final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
 
-    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<SortedSet<VertexMatch.WithTokenIndex>>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
     for (Match match : match(vertices, tokens, equality, minimumTileLength)) {
-      final SortedSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<VertexMatch.WithTokenIndex>();
+      final SortedSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<>();
       for (int mc = 0, ml = match.length; mc < ml; mc++) {
         final int rank = match.left + mc;
         phrase.add(new VertexMatch.WithTokenIndex(vertices[rank][0], rank, match.right + mc));
@@ -96,8 +95,8 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
     Arrays.fill(markedLeft, false);
     Arrays.fill(markedRight, false);
 
-    final SortedSet<Match> matches = new TreeSet<Match>();
-    final Map<Integer, List<Match>> matchesByLength = new HashMap<Integer, List<Match>>();
+    final SortedSet<Match> matches = new TreeSet<>();
+    final Map<Integer, List<Match>> matchesByLength = new HashMap<>();
 
     int maxMatchLength;
     do {
@@ -116,7 +115,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
           if (matchLength >= maxMatchLength) {
             List<Match> theMatches = matchesByLength.get(matchLength);
             if (theMatches == null) {
-              matchesByLength.put(matchLength, theMatches = new ArrayList<Match>());
+              matchesByLength.put(matchLength, theMatches = new ArrayList<>());
             }
             theMatches.add(new Match(lc, rc));
           }
@@ -127,7 +126,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
         }
       }
 
-      for (Match match : Objects.firstNonNull(matchesByLength.get(maxMatchLength), Collections.<Match>emptyList())) {
+      for (Match match : matchesByLength.getOrDefault(maxMatchLength, Collections.<Match>emptyList())) {
         boolean occluded = false;
 
         for (int tc = 0; tc < maxMatchLength; tc++) {
