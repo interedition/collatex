@@ -20,19 +20,19 @@
 package eu.interedition.collatex.medite;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.util.IntegerRangeSet;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VertexMatch;
 
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -64,16 +64,16 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
         break;
       }
 
-      final IntegerRangeSet rankFilter = new IntegerRangeSet();
-      final IntegerRangeSet tokenFilter = new IntegerRangeSet();
+      final BitSet rankFilter = new BitSet();
+      final BitSet tokenFilter = new BitSet();
 
       for (SortedSet<VertexMatch.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches, matchEvaluator)) {
         final VertexMatch.WithTokenIndex firstMatch = phrase.first();
         final VertexMatch.WithTokenIndex lastMatch = phrase.last();
 
         matches.add(phrase);
-        rankFilter.add(Range.closed(firstMatch.vertexRank, lastMatch.vertexRank));
-        tokenFilter.add(Range.closed(firstMatch.token, lastMatch.token));
+        IntStream.range(firstMatch.vertexRank, lastMatch.vertexRank + 1).forEach(rankFilter::set);
+        IntStream.range(firstMatch.token, lastMatch.token + 1).forEach(tokenFilter::set);
       }
 
       matchCandidates.removeIf(VertexMatch.filter(rankFilter, tokenFilter));

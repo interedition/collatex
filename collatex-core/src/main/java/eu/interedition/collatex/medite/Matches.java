@@ -25,14 +25,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.util.IntegerRangeSet;
 import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -158,10 +157,13 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
       }
       Preconditions.checkState(maximalUniqueMatches.add(nextMum), "Duplicate MUM");
 
-      allMatches.removeIf(VertexMatch.filter(
-              new IntegerRangeSet(Range.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
-              new IntegerRangeSet(Range.closed(nextMum.first().token, nextMum.last().token))
-      ));
+      final BitSet rankFilter = new BitSet();
+      final BitSet tokenFilter = new BitSet();
+
+      rankFilter.set(nextMum.first().vertexRank, nextMum.last().vertexRank + 1);
+      tokenFilter.set(nextMum.first().token, nextMum.last().token + 1);
+
+      allMatches.removeIf(VertexMatch.filter(rankFilter, tokenFilter));
     }
     return maximalUniqueMatches;
   }

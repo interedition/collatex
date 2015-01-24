@@ -22,6 +22,7 @@ package eu.interedition.collatex.util;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.function.Function;
@@ -101,14 +102,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
     return input -> new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
   }
 
-  public static Predicate<SortedSet<WithTokenIndex>> filter(final IntegerRangeSet rankFilter, final IntegerRangeSet tokenFilter) {
-    return input -> {
-      for (WithTokenIndex match : input) {
-        if (tokenFilter.apply(match.token) || rankFilter.apply(match.vertexRank)) {
-          return true;
-        }
-      }
-      return false;
-    };
+  public static Predicate<SortedSet<WithTokenIndex>> filter(final BitSet rankFilter, final BitSet tokenFilter) {
+    return input -> input.stream().anyMatch(match -> tokenFilter.get(match.token) || rankFilter.get(match.vertexRank));
   }
 }
