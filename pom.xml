@@ -23,9 +23,7 @@
 
     <modules>
         <module>collatex-core</module>
-        <module>collatex-cocoon</module>
         <module>collatex-tools</module>
-	      <module>collatex-nodeps</module>
     </modules>
 
     <licenses>
