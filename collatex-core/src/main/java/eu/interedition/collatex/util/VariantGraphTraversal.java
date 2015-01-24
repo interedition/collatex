@@ -19,20 +19,16 @@
 
 package eu.interedition.collatex.util;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-
-import static java.util.Collections.singleton;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -56,21 +52,25 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
 
   @Override
   public Iterator<VariantGraph.Vertex> iterator() {
-    return new AbstractIterator<VariantGraph.Vertex>() {
-      private final Map<VariantGraph.Vertex, Integer> encountered = Maps.newHashMap();
-      private final Queue<VariantGraph.Vertex> queue = new ArrayDeque<VariantGraph.Vertex>(singleton(graph.getStart()));
+    return new Iterator<VariantGraph.Vertex>() {
+
+      private final Map<VariantGraph.Vertex, Integer> encountered = new HashMap<>();
+      private final Queue<VariantGraph.Vertex> queue = new ArrayDeque<>();
+      private Optional<VariantGraph.Vertex> next = Optional.of(graph.getStart());
 
       @Override
-      protected VariantGraph.Vertex computeNext() {
-        if (queue.isEmpty()) {
-          return endOfData();
-        }
-        final VariantGraph.Vertex next = queue.remove();
+      public boolean hasNext() {
+        return next.isPresent();
+      }
+
+      @Override
+      public VariantGraph.Vertex next() {
+        final VariantGraph.Vertex next = this.next.get();
         for (VariantGraph.Edge edge : next.outgoing(witnesses)) {
           final VariantGraph.Vertex end = edge.to();
 
-          final int endEncountered = Objects.firstNonNull(encountered.get(end), 0);
-          final int endIncoming = Iterables.size(end.incoming(witnesses));
+          final int endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0);
+          final int endIncoming = end.incoming(witnesses).size();
 
           if (endIncoming == endEncountered) {
             throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
@@ -80,30 +80,31 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
 
           encountered.put(end, endEncountered + 1);
         }
+        this.next = Optional.ofNullable(queue.poll());
         return next;
       }
     };
   }
 
   public Iterable<VariantGraph.Edge> edges() {
-    return new Iterable<VariantGraph.Edge>() {
+    return () -> new Iterator<VariantGraph.Edge>() {
+
+      private final Iterator<VariantGraph.Vertex> vertexIt = VariantGraphTraversal.this.iterator();
+      private final Queue<VariantGraph.Edge> queue = new ArrayDeque<>();
 
       @Override
-      public Iterator<VariantGraph.Edge> iterator() {
-        return new AbstractIterator<VariantGraph.Edge>() {
-          private final Iterator<VariantGraph.Vertex> vertexIt = VariantGraphTraversal.this.iterator();
-          private final Queue<VariantGraph.Edge> queue = new ArrayDeque<VariantGraph.Edge>();
-
-          @Override
-          protected VariantGraph.Edge computeNext() {
-            if (queue.isEmpty()) {
-              if (vertexIt.hasNext()) {
-                Iterables.addAll(queue, vertexIt.next().outgoing(witnesses));
-              }
-            }
-            return (queue.isEmpty() ? endOfData() : queue.remove());
+      public boolean hasNext() {
+        if (queue.isEmpty()) {
+          if (vertexIt.hasNext()) {
+            vertexIt.next().outgoing(witnesses).forEach(queue::add);
           }
-        };
+        }
+        return !queue.isEmpty();
+      }
+
+      @Override
+      public VariantGraph.Edge next() {
+        return queue.remove();
       }
     };
   }
