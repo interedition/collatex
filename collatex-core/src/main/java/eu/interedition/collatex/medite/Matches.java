@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -28,11 +27,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
-import com.google.common.collect.SortedSetMultimap;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.IntegerRangeSet;
-import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.ArrayList;
@@ -43,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -82,7 +80,7 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
         for (int mc = 0; mc < equivalenceClass.length; mc++) {
           final int tokenCandidate = equivalenceClass.members[mc];
           if (firstElement) {
-            final SortedSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<VertexMatch.WithTokenIndex>();
+            final SortedSet<VertexMatch.WithTokenIndex> phrase = new TreeSet<>();
             phrase.add(new VertexMatch.WithTokenIndex(threadElement.vertex, threadElement.vertexRank, tokenCandidate));
             threadPhrases.add(phrase);
           } else {
@@ -160,7 +158,7 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
       }
       Preconditions.checkState(maximalUniqueMatches.add(nextMum), "Duplicate MUM");
 
-      Iterables.removeIf(allMatches, VertexMatch.filter(
+      allMatches.removeIf(VertexMatch.filter(
               new IntegerRangeSet(Range.closed(nextMum.first().vertexRank, nextMum.last().vertexRank)),
               new IntegerRangeSet(Range.closed(nextMum.first().token, nextMum.last().token))
       ));

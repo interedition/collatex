@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.simple;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
@@ -27,6 +26,7 @@ import eu.interedition.collatex.util.VertexMatch;
 
 import javax.annotation.Nullable;
 import java.util.SortedSet;
+import java.util.function.Function;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
   private final SimpleWitness witness;

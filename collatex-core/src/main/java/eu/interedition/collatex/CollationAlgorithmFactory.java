@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Function;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
 import eu.interedition.collatex.util.GreedyStringTilingAlgorithm;
@@ -29,6 +28,7 @@ import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 
 import java.util.Comparator;
 import java.util.SortedSet;
+import java.util.function.Function;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

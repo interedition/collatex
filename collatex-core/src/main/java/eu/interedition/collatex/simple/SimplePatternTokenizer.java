@@ -20,9 +20,9 @@
 package eu.interedition.collatex.simple;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +42,7 @@ public class SimplePatternTokenizer implements Function<String, Iterable<String>
   @Override
   public Iterable<String> apply(@Nullable String input) {
     final Matcher matcher = pattern.matcher(input);
-    final List<String> tokens = Lists.newLinkedList();
+    final List<String> tokens = new LinkedList<>();
     while (matcher.find()) {
       tokens.add(input.substring(matcher.start(), matcher.end()));
     }

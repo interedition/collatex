@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
@@ -33,6 +32,7 @@ import eu.interedition.collatex.util.VertexMatch;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -76,7 +76,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
         tokenFilter.add(Range.closed(firstMatch.token, lastMatch.token));
       }
 
-      Iterables.removeIf(matchCandidates, VertexMatch.filter(rankFilter, tokenFilter));
+      matchCandidates.removeIf(VertexMatch.filter(rankFilter, tokenFilter));
     }
 
     merge(graph, vertices, tokens, matches);
@@ -94,7 +94,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
 
     @Override
     public Integer apply(SortedSet<VertexMatch.WithTokenIndex> input) {
-      final SortedSet<VertexMatch.WithToken> tokenPhrase = new TreeSet<VertexMatch.WithToken>();
+      final SortedSet<VertexMatch.WithToken> tokenPhrase = new TreeSet<>();
       for (VertexMatch.WithTokenIndex match : input) {
         tokenPhrase.add(tokenResolver.apply(match));
       }

@@ -20,6 +20,7 @@
 package eu.interedition.collatex.simple;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -27,8 +28,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-
-import com.google.common.collect.Lists;
 
 // we are going to use stax
 // previous version was build on DOM, which is not particularly well suited to parsing
@@ -41,7 +40,7 @@ public class SimpleWitnessTeiBuilder {
 
   public SimpleWitness read(InputStream input) throws XMLStreamException {
     SimpleWitness witness = new SimpleWitness("id");
-    List<String> tokenContents = Lists.newArrayList();
+    List<String> tokenContents = new ArrayList<>();
     XMLInputFactory factory = XMLInputFactory.newInstance();
     XMLEventReader reader = factory.createXMLEventReader(input);
     XMLEvent event = null;

@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.SortedSet;
+import java.util.function.Function;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -45,7 +45,7 @@ public class AlignmentDecisionGraph {
   AlignmentDecisionGraph(List<SortedSet<VertexMatch.WithTokenIndex>> matches, Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
     this.matches = matches;
     this.matchEvaluator = matchEvaluator;
-    this.bestPaths = new PriorityQueue<Node>(matches.size(), PATH_COST_COMPARATOR);
+    this.bestPaths = new PriorityQueue<>(matches.size(), PATH_COST_COMPARATOR);
     this.minCosts = Maps.newHashMap();
   }
 

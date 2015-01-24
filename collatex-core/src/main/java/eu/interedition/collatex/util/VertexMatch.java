@@ -19,14 +19,13 @@
 
 package eu.interedition.collatex.util;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.SortedSet;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -59,12 +58,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
   }
 
   public static <T extends VertexMatch> Comparator<SortedSet<T>> setComparator() {
-    return new Comparator<SortedSet<T>>() {
-      @Override
-      public int compare(SortedSet<T> o1, SortedSet<T> o2) {
-        return o1.first().compareTo(o2.first());
-      }
-    };
+    return (o1, o2) -> o1.first().compareTo(o2.first());
   }
 
   /**
@@ -104,25 +98,17 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
   }
 
   public static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
-    return new Function<WithTokenIndex, WithToken>() {
-      @Override
-      public WithToken apply(@Nullable WithTokenIndex input) {
-        return new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
-      }
-    };
+    return input -> new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
   }
 
-  public static final Predicate<SortedSet<WithTokenIndex>> filter(final IntegerRangeSet rankFilter, final IntegerRangeSet tokenFilter) {
-    return new Predicate<SortedSet<WithTokenIndex>>() {
-      @Override
-      public boolean apply(@Nullable SortedSet<WithTokenIndex> input) {
-        for (WithTokenIndex match : input) {
-          if (tokenFilter.apply(match.token) || rankFilter.apply(match.vertexRank)) {
-            return true;
-          }
+  public static Predicate<SortedSet<WithTokenIndex>> filter(final IntegerRangeSet rankFilter, final IntegerRangeSet tokenFilter) {
+    return input -> {
+      for (WithTokenIndex match : input) {
+        if (tokenFilter.apply(match.token) || rankFilter.apply(match.vertexRank)) {
+          return true;
         }
-        return false;
       }
+      return false;
     };
   }
 }
