@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.cli;
+package eu.interedition.collatex.tools;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -29,7 +29,6 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.http.JsonProcessor;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleCollation;
@@ -43,6 +42,14 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glassfish.grizzly.http.CompressionConfig;
+import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.Response;
+import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.xml.sax.SAXException;
 
 import javax.script.ScriptException;
@@ -65,11 +72,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Engine implements Closeable {
+public class CollateX implements Closeable {
 
   Charset inputCharset;
   boolean xmlMode;
@@ -91,7 +100,7 @@ public class Engine implements Closeable {
   PrintWriter log = new PrintWriter(System.err);
   boolean errorOccurred = false;
 
-  Engine configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException, IOException {
+  CollateX configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException, IOException {
     this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
     this.xmlMode = commandLine.hasOption("xml");
     this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//text()"));
@@ -158,7 +167,7 @@ public class Engine implements Closeable {
     return this;
   }
 
-  Engine read() throws IOException, XPathExpressionException, SAXException {
+  CollateX read() throws IOException, XPathExpressionException, SAXException {
     if (inputResources.size() < 2) {
       try (InputStream inputStream = inputResources.get(0).openStream()) {
         this.witnesses = JsonProcessor.read(inputStream).getWitnesses();
@@ -174,7 +183,7 @@ public class Engine implements Closeable {
     return this;
   }
 
-  Engine collate() {
+  CollateX collate() {
     new SimpleCollation(witnesses, collationAlgorithm, joined).collate(variantGraph);
     return this;
   }
@@ -212,7 +221,53 @@ public class Engine implements Closeable {
     }
   }
 
-  Engine log(String str) {
+  CollateX serve(CommandLine commandLine) {
+    final CollatorService collator = new CollatorService(
+            Integer.parseInt(commandLine.getOptionValue("mpc", "2")),
+            Integer.parseInt(commandLine.getOptionValue("mcs", "0")),
+            commandLine.getOptionValue("dot", null)
+    );
+    final String staticPath = System.getProperty("collatex.static.path", "");
+    final HttpHandler httpHandler = staticPath.isEmpty() ? new CLStaticHttpHandler(CollateX.class.getClassLoader(), "/static/") {
+      @Override
+      protected void onMissingResource(Request request, Response response) throws Exception {
+        collator.service(request, response);
+      }
+    } : new StaticHttpHandler(staticPath.replaceAll("/+$", "") + "/") {
+      @Override
+      protected void onMissingResource(Request request, Response response) throws Exception {
+        collator.service(request, response);
+      }
+    };
+
+    final NetworkListener httpListener = new NetworkListener("http", "0.0.0.0", Integer.parseInt(commandLine.getOptionValue("p", "7369")));
+
+    final CompressionConfig compressionConfig = httpListener.getCompressionConfig();
+    compressionConfig.setCompressionMode(CompressionConfig.CompressionMode.ON);
+    compressionConfig.setCompressionMinSize(860); // http://webmasters.stackexchange.com/questions/31750/what-is-recommended-minimum-object-size-for-gzip-performance-benefits
+    compressionConfig.setCompressableMimeTypes("application/javascript", "application/json", "application/xml", "text/css", "text/html", "text/javascript", "text/plain", "text/xml");
+
+    final HttpServer httpServer = new HttpServer();
+    httpServer.addListener(httpListener);
+    httpServer.getServerConfiguration().addHttpHandler(httpHandler, commandLine.getOptionValue("cp", "").replaceAll("/+$", "") + "/*");
+
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      if (LOG.isLoggable(Level.INFO)) {
+        LOG.info("Stopping HTTP server");
+      }
+      httpServer.shutdown();
+    }));
+
+    try {
+      httpServer.start();
+      Thread.sleep(Long.MAX_VALUE);
+    } catch (IOException | InterruptedException e) {
+      error(e.getMessage(), e);
+    }
+    return this;
+  }
+
+  CollateX log(String str) {
     log.write(str);
     return this;
   }
@@ -240,14 +295,18 @@ public class Engine implements Closeable {
   }
 
   public static void main(String... args) {
-    final Engine engine = new Engine();
+    final CollateX engine = new CollateX();
     try {
       final CommandLine commandLine = new GnuParser().parse(OPTIONS, args);
       if (commandLine.hasOption("h")) {
         engine.help();
         return;
       }
-      engine.configure(commandLine).read().collate().write();
+      if (commandLine.hasOption("srv")) {
+        engine.serve(commandLine);
+      } else {
+        engine.configure(commandLine).read().collate().write();
+      }
     } catch (ParseException e) {
       engine.error("Error while parsing command line arguments", e);
       engine.log("\n").help();
@@ -264,15 +323,17 @@ public class Engine implements Closeable {
     } finally {
         try {
             Closeables.close(engine, false);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
   }
 
+  static final Logger LOG = Logger.getLogger(CollateX.class.getName());
   static final Options OPTIONS = new Options();
 
   static {
-    OPTIONS.addOption("h", "help", false, "print usage instructions (which your are looking at right now)");
+    OPTIONS.addOption("h", "help", false, "print usage instructions");
+
     OPTIONS.addOption("o", "output", true, "output file; '-' for standard output (default)");
     OPTIONS.addOption("ie", "input-encoding", true, "charset to use for decoding non-XML witnesses; default: UTF-8");
     OPTIONS.addOption("oe", "output-encoding", true, "charset to use for encoding the output; default: UTF-8");
@@ -282,6 +343,14 @@ public class Engine implements Closeable {
     OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
     OPTIONS.addOption("f", "format", true, "result/output format: 'json', 'csv', 'dot', 'graphml', 'tei'");
     OPTIONS.addOption("s", "script", true, "ECMA/JavaScript resource with functions to be plugged into the alignment algorithm");
+
+    OPTIONS.addOption("srv", "server", false, "start RESTful HTTP server");
+    OPTIONS.addOption("cp", "context-path", true, "URL base/context path of the service, default: '/'");
+    OPTIONS.addOption("dot", "dot-path", true, "path to Graphviz 'dot', auto-detected by default");
+    OPTIONS.addOption("p", "port", true, "HTTP port to bind server to, default: 7369");
+    OPTIONS.addOption("mpc", "max-parallel-collations", true, "maximum number of collations to perform in parallel, default: 2");
+    OPTIONS.addOption("mcs", "max-collation-size", true, "maximum number of characters (counted over all witnesses) to perform collations on, default: unlimited");
+
   }
 
   @Override

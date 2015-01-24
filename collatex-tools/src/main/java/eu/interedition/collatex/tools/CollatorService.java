@@ -1,4 +1,4 @@
-package eu.interedition.collatex.http;
+package eu.interedition.collatex.tools;
 
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleCollation;
@@ -37,14 +37,14 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Collator {
+public class CollatorService {
 
   private final int maxCollationSize;
   private final String dotPath;
   private final ExecutorService collationThreads;
   private final ExecutorService processThreads = Executors.newCachedThreadPool();
 
-  public Collator(int maxParallelCollations, int maxCollationSize, String dotPath) {
+  public CollatorService(int maxParallelCollations, int maxCollationSize, String dotPath) {
     this.collationThreads = Executors.newFixedThreadPool(maxParallelCollations, new ThreadFactory() {
       private final AtomicLong counter = new AtomicLong();
 

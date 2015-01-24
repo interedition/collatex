@@ -1,4 +1,4 @@
-package eu.interedition.collatex.http;
+package eu.interedition.collatex.tools;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;

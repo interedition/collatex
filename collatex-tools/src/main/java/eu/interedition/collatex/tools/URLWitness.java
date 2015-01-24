@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.cli;
+package eu.interedition.collatex.tools;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;

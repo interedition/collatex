@@ -17,30 +17,20 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.cli;
+package eu.interedition.collatex.tools;
 
-import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.w3c.dom.Node;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextWitness implements Witness {
+public class NodeToken extends SimpleToken {
+  final Node node;
 
-  public final String sigil;
-  public final String content;
-
-  public TextWitness(String sigil, String content) {
-    this.sigil = sigil;
-    this.content = content;
-  }
-
-  @Override
-  public String getSigil() {
-    return sigil;
-  }
-
-  @Override
-  public String toString() {
-    return sigil;
+  public NodeToken(SimpleWitness witness, String content, String normalized, Node node) {
+    super(witness, content, normalized);
+    this.node = node;
   }
 }
