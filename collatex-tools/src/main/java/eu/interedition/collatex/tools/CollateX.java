@@ -29,7 +29,6 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
@@ -134,7 +133,7 @@ public class CollateX implements Closeable {
         break;
     }
 
-    this.variantGraph = new JungVariantGraph();
+    this.variantGraph = new VariantGraph();
 
     this.joined = !commandLine.hasOption("t");
 

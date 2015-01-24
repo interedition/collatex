@@ -24,7 +24,6 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -81,7 +80,7 @@ public class CollateXLaboratory extends JFrame {
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
 
     this.tabbedPane = new JTabbedPane();
-    this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(new JungVariantGraph()));
+    this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(new VariantGraph()));
     this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     matchMatrixTable.setShowGrid(true);
@@ -164,7 +163,7 @@ public class CollateXLaboratory extends JFrame {
 
 
       final EqualityTokenComparator comparator = new EqualityTokenComparator();
-      final JungVariantGraph variantGraph = new JungVariantGraph();
+      final VariantGraph variantGraph = new VariantGraph();
 
       final CollationAlgorithm collator;
       if ("Dekker".equals(algorithm.getSelectedItem())) {
@@ -205,7 +204,7 @@ public class CollateXLaboratory extends JFrame {
       }
 
       final StrictEqualityTokenComparator comparator = new StrictEqualityTokenComparator();
-      final VariantGraph vg = new JungVariantGraph();
+      final VariantGraph vg = new VariantGraph();
 
       int outlierTranspositionsSizeLimit = 3;
       for (int i = 0; i <= w.size() - 2; i++) {

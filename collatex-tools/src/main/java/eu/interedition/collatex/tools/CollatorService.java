@@ -1,6 +1,6 @@
 package eu.interedition.collatex.tools;
 
-import eu.interedition.collatex.jung.JungVariantGraph;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
@@ -84,7 +84,7 @@ public class CollatorService {
     response.suspend(60, TimeUnit.SECONDS, new EmptyCompletionHandler<>());
     collationThreads.submit(() -> {
       try {
-        final JungVariantGraph graph = new JungVariantGraph();
+        final VariantGraph graph = new VariantGraph();
         collation.collate(graph);
 
         // CORS support

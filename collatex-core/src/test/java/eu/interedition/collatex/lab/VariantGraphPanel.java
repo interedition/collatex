@@ -29,9 +29,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraphEdge;
-import eu.interedition.collatex.jung.JungVariantGraphVertex;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -54,22 +51,22 @@ import eu.interedition.collatex.simple.SimpleToken;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraphPanel extends VisualizationViewer<JungVariantGraphVertex, JungVariantGraphEdge> {
+public class VariantGraphPanel extends VisualizationViewer<VariantGraph.Vertex, VariantGraph.Edge> {
 
   private VariantGraph variantGraph;
   private VariantGraphRanking ranking;
   private Map<VariantGraph.Transposition, Color> transpositionColors;
 
-  public VariantGraphPanel(JungVariantGraph vg) {
-    super(new StaticLayout<JungVariantGraphVertex, JungVariantGraphEdge>(new JungVariantGraph()));
+  public VariantGraphPanel(VariantGraph vg) {
+    super(new StaticLayout<>(new VariantGraph()));
 
     setBackground(Color.WHITE);
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
 
-    final RenderContext<JungVariantGraphVertex, JungVariantGraphEdge> rc = getRenderContext();
-    rc.setVertexLabelTransformer(new Transformer<JungVariantGraphVertex, String>() {
+    final RenderContext<VariantGraph.Vertex, VariantGraph.Edge> rc = getRenderContext();
+    rc.setVertexLabelTransformer(new Transformer<VariantGraph.Vertex, String>() {
       @Override
-      public String transform(JungVariantGraphVertex variantGraphVertexModel) {
+      public String transform(VariantGraph.Vertex variantGraphVertexModel) {
         final Multimap<Witness, Token> tokens = Multimaps.index(variantGraphVertexModel.tokens(), Token.TO_WITNESS);
         final StringBuilder label = new StringBuilder();
         for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
@@ -88,9 +85,9 @@ public class VariantGraphPanel extends VisualizationViewer<JungVariantGraphVerte
         return "<html>" + htmllabel + "</html>";
       }
     });
-    rc.setEdgeLabelTransformer(new Transformer<JungVariantGraphEdge, String>() {
+    rc.setEdgeLabelTransformer(new Transformer<VariantGraph.Edge, String>() {
       @Override
-      public String transform(JungVariantGraphEdge variantGraphEdgeModel) {
+      public String transform(VariantGraph.Edge variantGraphEdgeModel) {
         return Joiner.on(", ").join(Iterables.transform(variantGraphEdgeModel.witnesses(), new Function<Witness, String>() {
 
           @Override
@@ -100,9 +97,9 @@ public class VariantGraphPanel extends VisualizationViewer<JungVariantGraphVerte
         }));
       }
     });
-    rc.setVertexFillPaintTransformer(new Transformer<JungVariantGraphVertex, Paint>() {
+    rc.setVertexFillPaintTransformer(new Transformer<VariantGraph.Vertex, Paint>() {
       @Override
-      public Paint transform(JungVariantGraphVertex v) {
+      public Paint transform(VariantGraph.Vertex v) {
         final VariantGraph.Transposition transposition = Iterables.getFirst(v.transpositions(), null);
 
         return (v.tokens().isEmpty() ? Color.BLACK : (transposition == null
@@ -111,15 +108,15 @@ public class VariantGraphPanel extends VisualizationViewer<JungVariantGraphVerte
         ));
       }
     });
-    rc.setEdgeStrokeTransformer(new Transformer<JungVariantGraphEdge, Stroke>() {
+    rc.setEdgeStrokeTransformer(new Transformer<VariantGraph.Edge, Stroke>() {
       @Override
-      public Stroke transform(JungVariantGraphEdge variantGraphEdgeModel) {
+      public Stroke transform(VariantGraph.Edge variantGraphEdgeModel) {
         return variantGraphEdgeModel.witnesses().isEmpty() ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE;
       }
     });
-    rc.setEdgeDrawPaintTransformer(new Transformer<JungVariantGraphEdge, Paint>() {
+    rc.setEdgeDrawPaintTransformer(new Transformer<VariantGraph.Edge, Paint>() {
       @Override
-      public Paint transform(JungVariantGraphEdge jungVariantGraphEdge) {
+      public Paint transform(VariantGraph.Edge jungVariantGraphEdge) {
         return Color.GRAY;
       }
     });
@@ -127,7 +124,7 @@ public class VariantGraphPanel extends VisualizationViewer<JungVariantGraphVerte
     setVariantGraph(vg);
   }
 
-  public void setVariantGraph(JungVariantGraph variantGraph) {
+  public void setVariantGraph(VariantGraph variantGraph) {
     this.variantGraph = variantGraph;
     this.ranking = VariantGraphRanking.of(variantGraph);
 

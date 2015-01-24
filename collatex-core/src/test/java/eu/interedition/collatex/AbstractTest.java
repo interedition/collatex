@@ -30,7 +30,6 @@ import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -74,7 +73,7 @@ public abstract class AbstractTest {
   }
 
   protected VariantGraph collate(SimpleWitness... witnesses) {
-    final VariantGraph graph = new JungVariantGraph();
+    final VariantGraph graph = new VariantGraph();
     collate(graph, witnesses);
     return graph;
   }

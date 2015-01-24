@@ -38,7 +38,6 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -151,7 +150,7 @@ public class AlignmentTest extends AbstractTest {
     witnesses.add(new SimpleWitness("w3", "Y A X "));
 
     setCollationAlgorithm(CollationAlgorithmFactory.dekker(new EqualityTokenComparator()));
-    VariantGraph graph = new JungVariantGraph();
+    VariantGraph graph = new VariantGraph();
     collationAlgorithm.collate(graph, witnesses.toArray(new SimpleWitness[0]));
 
     StringWriter writer = new StringWriter();

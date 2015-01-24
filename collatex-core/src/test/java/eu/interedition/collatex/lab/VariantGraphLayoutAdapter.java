@@ -20,9 +20,7 @@
 package eu.interedition.collatex.lab;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
-import eu.interedition.collatex.jung.JungVariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraphEdge;
-import eu.interedition.collatex.jung.JungVariantGraphVertex;
+import eu.interedition.collatex.VariantGraph;
 
 import java.util.List;
 
@@ -40,7 +38,7 @@ import java.util.List;
  *
  * @author C. Schanck (chris at schanck dot net)
  */
-public class VariantGraphLayoutAdapter extends AbstractLayout<JungVariantGraphVertex, JungVariantGraphEdge> {
+public class VariantGraphLayoutAdapter extends AbstractLayout<VariantGraph.Vertex, VariantGraph.Edge> {
 
   public static enum Orientation {
     TOP, LEFT
@@ -52,7 +50,7 @@ public class VariantGraphLayoutAdapter extends AbstractLayout<JungVariantGraphVe
 
   private boolean executed = false;
 
-  public VariantGraphLayoutAdapter(JungVariantGraph g, Orientation orientation, int horzSpacing, int vertSpacing) {
+  public VariantGraphLayoutAdapter(VariantGraph g, Orientation orientation, int horzSpacing, int vertSpacing) {
     super(g);
     this.orientation = orientation;
     this.horzSpacing = horzSpacing;
@@ -61,17 +59,17 @@ public class VariantGraphLayoutAdapter extends AbstractLayout<JungVariantGraphVe
 
   public void initialize() {
     if (!executed) {
-      for (List<VariantGraphLayout.Cell> level : VariantGraphLayout.of((JungVariantGraph) getGraph())) {
+      for (List<VariantGraphLayout.Cell> level : VariantGraphLayout.of((VariantGraph) getGraph())) {
         for (VariantGraphLayout.Cell cell : level) {
 
           if (orientation.equals(Orientation.TOP)) {
             double xCoordinate = 10.0 + (cell.x * horzSpacing);
             double yCoordinate = 10.0 + (cell.y * vertSpacing);
-            setLocation((JungVariantGraphVertex) cell.vertex, xCoordinate, yCoordinate);
+            setLocation(cell.vertex, xCoordinate, yCoordinate);
           } else {
             double yCoordinate = 10.0 + (cell.x * vertSpacing);
             double xCoordinate = 10.0 + (cell.y * horzSpacing);
-            setLocation((JungVariantGraphVertex) cell.vertex, xCoordinate, yCoordinate);
+            setLocation(cell.vertex, xCoordinate, yCoordinate);
           }
         }
       }

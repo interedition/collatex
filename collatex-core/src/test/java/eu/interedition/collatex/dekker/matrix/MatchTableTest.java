@@ -33,7 +33,6 @@ import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -62,7 +61,7 @@ public class MatchTableTest extends AbstractTest {
 
   @Test
   public void testTableCreationEmptyGraph() {
-    final VariantGraph graph = new JungVariantGraph();
+    final VariantGraph graph = new VariantGraph();
     SimpleWitness[] witnesses = createWitnesses("a b");
     MatchTable table = MatchTable.create(graph, witnesses[0]);
     assertEquals(1, table.columnList().size());

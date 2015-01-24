@@ -25,7 +25,6 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Assert;
@@ -53,7 +52,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void reconnectingVerticesYieldsSameEdge() {
     final SimpleWitness witness = createWitnesses("hello world")[0];
-    final VariantGraph graph = new JungVariantGraph();
+    final VariantGraph graph = new VariantGraph();
     final VariantGraph.Vertex helloVertex = graph.add(witness.getTokens().get(0));
     final VariantGraph.Vertex worldVertex = graph.add(witness.getTokens().get(1));
     final VariantGraph.Edge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
