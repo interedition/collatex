@@ -25,7 +25,6 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;

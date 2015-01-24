@@ -12,14 +12,8 @@
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
     <dependencies>
         <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>net.sf.jung</groupId>

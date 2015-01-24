@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
 import org.junit.Assert;
 import org.junit.Test;
 

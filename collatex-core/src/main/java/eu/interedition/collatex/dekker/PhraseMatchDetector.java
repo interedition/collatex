@@ -23,11 +23,6 @@ import java.util.Map;
 
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jGraphRelationships;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

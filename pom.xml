@@ -104,37 +104,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j</artifactId>
-                <version>1.8</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-cypher</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-graph-matching</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-graph-algo</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-jmx</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-lucene-index</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-udc</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>net.sf.jung</groupId>
                 <artifactId>jung-graph-impl</artifactId>
                 <version>${jung.version}</version>
