@@ -19,12 +19,6 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +28,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -45,10 +42,12 @@ class SuffixTree<T> {
   final T[] source;
   final Node root;
 
+  @SafeVarargs
   static <T> SuffixTree<T> build(Comparator<T> comparator, T... source) {
-    return new SuffixTree<T>(comparator, source).build();
+    return new SuffixTree<>(comparator, source).build();
   }
 
+  @SafeVarargs
   private SuffixTree(Comparator<T> comparator, T... source) {
     this.comparator = comparator;
     this.sourceComparator = new SentinelAwareComparator(comparator);
@@ -61,24 +60,23 @@ class SuffixTree<T> {
   }
 
   public Iterable<EquivalenceClass> match(final Iterable<T> str) {
-    return new Iterable<EquivalenceClass>() {
+    return () -> new Iterator<EquivalenceClass>() {
+
+      final Iterator<T> it = str.iterator();
+      Optional<Cursor> cursor = Optional.ofNullable(it.hasNext() ? cursor().move(it.next()) : null);
+
       @Override
-      public Iterator<EquivalenceClass> iterator() {
-        return new AbstractIterator<EquivalenceClass>() {
-
-          Cursor cursor = cursor();
-          final Iterator<T> it = str.iterator();
-
-          @Override
-          protected EquivalenceClass computeNext() {
-            if (it.hasNext()) {
-              cursor = cursor.move(it.next());
-              return (cursor == null ? endOfData() : cursor.matchedClass());
-            }
-            return endOfData();
-          }
-        };
+      public boolean hasNext() {
+        return cursor.isPresent();
       }
+
+      @Override
+      public EquivalenceClass next() {
+        final EquivalenceClass next = cursor.get().matchedClass();
+        cursor = Optional.ofNullable(it.hasNext() ? cursor.get().move(it.next()) : null);
+        return next;
+      }
+
     };
   }
 
@@ -108,13 +106,11 @@ class SuffixTree<T> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final Deque<Node> nodes = new ArrayDeque<Node>(Collections.singleton(root));
+    final Deque<Node> nodes = new ArrayDeque<>(Collections.singleton(root));
     while (!nodes.isEmpty()) {
       final Node node = nodes.remove();
-      sb.append(Strings.repeat("\t", node.depth())).append(node).append("\n");
-      for (Node child : node.children) {
-        nodes.addFirst(child);
-      }
+      sb.append(IntStream.range(0, node.depth()).mapToObj(i -> "\t").collect(Collectors.joining())).append(node).append("\n");
+      node.children.forEach(nodes::addFirst);
     }
     return sb.toString();
   }
@@ -127,11 +123,11 @@ class SuffixTree<T> {
     final LinkedList<EquivalenceClass> incomingLabel;
 
     Node parent;
-    List<Node> children = new ArrayList<Node>();
+    List<Node> children = new ArrayList<>();
 
     public Node(Node parent, int firstIndex) {
       this.parent = parent;
-      this.incomingLabel = Lists.newLinkedList(Collections.singleton(new EquivalenceClass(firstIndex)));
+      this.incomingLabel = new LinkedList<>(Collections.singleton(new EquivalenceClass(firstIndex)));
     }
 
     public Node() {
@@ -175,7 +171,7 @@ class SuffixTree<T> {
 
     @Override
     public String toString() {
-      return Iterables.toString(incomingLabel == null ? Collections.emptySet() : incomingLabel);
+      return Optional.ofNullable(incomingLabel).map(label -> label.stream().map(Object::toString).collect(Collectors.joining(", "))).orElse("");
     }
   }
 
@@ -200,7 +196,7 @@ class SuffixTree<T> {
     }
 
     public boolean isMember(T symbol) {
-      return (members[0] == source.length ? false : comparator.compare(symbol, source[members[0]]) == 0);
+      return (members[0] != source.length && comparator.compare(symbol, source[members[0]]) == 0);
     }
 
     @Override
@@ -223,18 +219,9 @@ class SuffixTree<T> {
 
     @Override
     public String toString() {
-      return "{" + Joiner.on(", ").join(new AbstractIterator<String>() {
-        private int mc = 0;
-        @Override
-        protected String computeNext() {
-          if (mc == length) {
-            return endOfData();
-          }
-
-          final int member = members[mc++];
-          return "<[" + member + "] " + (member == source.length ? "$" : source[member].toString()) + ">";
-        }
-      }) + "}";
+      return String.format("{%s}", Arrays.stream(members, 0, length)
+              .mapToObj(member -> "<[" + member + "] " + (member == source.length ? "$" : source[member].toString()) + ">")
+              .collect(Collectors.joining(", ")));
     }
 
   }

@@ -19,8 +19,6 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -33,6 +31,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -50,13 +49,13 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
   @Override
   public void collate(VariantGraph graph, Iterable<Token> witness) {
     final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
-    final Token[] tokens = Iterables.toArray(witness, Token.class);
+    final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
 
     final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
     final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, tokens);
 
     final Matches matchCandidates = Matches.between(vertices, suffixTree, matchEvaluator);
-    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = Sets.newTreeSet(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
 
     while (true) {
       final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatches = matchCandidates.findMaximalUniqueMatches();
