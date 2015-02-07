@@ -19,16 +19,14 @@
 
 package eu.interedition.collatex.simple;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.StreamSupport;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 // we are going to use stax
 // previous version was build on DOM, which is not particularly well suited to parsing
