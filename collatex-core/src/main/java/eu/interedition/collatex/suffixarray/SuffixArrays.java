@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 /*
  * TODO: ultimately, this class should be "intelligent" enough to pick the best
  * algorithm, depending on the distribution and properties of the input (alphabet size,
@@ -177,7 +175,7 @@ public final class SuffixArrays
     public static List<CharSequence> toString(CharSequence input, int [] suffixes)
     {
         final String full = input.toString();
-        final ArrayList<CharSequence> result = Lists.newArrayList();
+        final ArrayList<CharSequence> result = new ArrayList<>();
         for (int i = 0; i < input.length(); i++)
         {
             result.add(full.subSequence(suffixes[i], full.length()));
