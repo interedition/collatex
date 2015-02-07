@@ -21,10 +21,10 @@ package eu.interedition.collatex.matching;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
-import com.google.common.collect.ListMultimap;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
@@ -68,21 +68,21 @@ public class MatchesTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     final Matches matches = Matches.between(vg.vertices(), sw[1].getTokens(), new EqualityTokenComparator());
     assertMatches(matches, 0, 3, 2);
-    assertEquals(7, matches.getAll().size());
+    assertEquals(7, matches.allMatches.values().stream().flatMap(List::stream).count());
   }
 
 
   private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
-    Set<Token> unmatched = matches.getUnmatched();
+    Set<Token> unmatched = matches.unmatchedInWitness;
     LOG.log(Level.FINE, "unmatched: {0}", unmatched);
 
-    Set<Token> unique = matches.getUnique();
+    Set<Token> unique = matches.uniqueInWitness;
     LOG.log(Level.FINE, "unique: {0}", unique);
 
-    Set<Token> ambiguous = matches.getAmbiguous();
+    Set<Token> ambiguous = matches.ambiguousInWitness;
     LOG.log(Level.FINE, "ambiguous: {0}", ambiguous);
 
-    ListMultimap<Token,VariantGraph.Vertex> all = matches.getAll();
+    Map<Token, List<VariantGraph.Vertex>> all = matches.allMatches;
     LOG.log(Level.FINE, "all: {0}", all);
 
     assertEquals(expected_unmatched, unmatched.size());

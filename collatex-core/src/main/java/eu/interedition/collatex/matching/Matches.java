@@ -19,105 +19,76 @@
 
 package eu.interedition.collatex.matching;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 public class Matches {
 
-  private final ListMultimap<Token, VariantGraph.Vertex> all;
-  private final Set<Token> unmatched;
-  private final Set<Token> ambiguous;
-  private final Set<Token> unique;
+  public final Map<Token, List<VariantGraph.Vertex>> allMatches;
+  public final Set<Token> unmatchedInWitness;
+  public final Set<Token> ambiguousInWitness;
+  public final Set<Token> uniqueInWitness;
 
   public static Matches between(final Iterable<VariantGraph.Vertex> vertices, final Iterable<Token> witnessTokens, Comparator<Token> comparator) {
 
-    final ListMultimap<Token, VariantGraph.Vertex> all = ArrayListMultimap.create();
-    for (VariantGraph.Vertex vertex : vertices) {
-      final Set<Token> tokens = vertex.tokens();
-      if (tokens.isEmpty()) {
-        continue;
-      }
-      for (Token witnessToken : witnessTokens) {
-        if (comparator.compare(Iterables.getFirst(tokens, null), witnessToken) == 0) {
-          all.put(witnessToken, vertex);
-        }
-      }
-    }
+    final Map<Token, List<VariantGraph.Vertex>> allMatches = new HashMap<>();
 
-    // unmatched tokens
-    Set<Token> unmatched = Sets.newLinkedHashSet();
-    for (Token witnessToken : witnessTokens) {
-      if (!all.containsKey(witnessToken)) {
-        unmatched.add(witnessToken);
-      }
-    }
-    // unsure tokens (have to check: base -> witness, and witness -> base)
-    Set<Token> ambiguous = Sets.newLinkedHashSet();
-    for (Token witnessToken : witnessTokens) {
-      int count = all.keys().count(witnessToken);
-      if (count > 1) {
-        ambiguous.add(witnessToken);
-      }
-    }
-    Multiset<VariantGraph.Vertex> bag = ImmutableMultiset.copyOf(all.values());
-    Set<VariantGraph.Vertex> unsureBaseTokens = Sets.newLinkedHashSet();
-    for (VariantGraph.Vertex baseToken : vertices) {
-      int count = bag.count(baseToken);
-      if (count > 1) {
-        unsureBaseTokens.add(baseToken);
-      }
-    }
-    Collection<Map.Entry<Token, VariantGraph.Vertex>> entries = all.entries();
-    for (Map.Entry<Token, VariantGraph.Vertex> entry : entries) {
-      if (unsureBaseTokens.contains(entry.getValue())) {
-        ambiguous.add(entry.getKey());
-      }
-    }
+    StreamSupport.stream(vertices.spliterator(), false).forEach(vertex ->
+            vertex.tokens().stream().findFirst().ifPresent(baseToken ->
+                            StreamSupport.stream(witnessTokens.spliterator(), false)
+                                    .filter(witnessToken -> comparator.compare(baseToken, witnessToken) == 0)
+                                    .forEach(matchingToken -> allMatches.computeIfAbsent(matchingToken, t -> new ArrayList<>()).add(vertex))));
+
+    final Set<Token> unmatchedInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
+            .filter(t -> !allMatches.containsKey(t))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+
+    final Set<VariantGraph.Vertex> ambiguousInBase = allMatches.values().stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toMap(Function.identity(), v -> 1, (a, b) -> a + b))
+            .entrySet()
+            .stream()
+            .filter(v -> v.getValue() > 1)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+
+    // (have to check: base -> witness, and witness -> base)
+    final Set<Token> ambiguousInWitness = Stream.concat(
+            StreamSupport.stream(witnessTokens.spliterator(), false)
+                    .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() > 1),
+
+            allMatches.entrySet().stream()
+                    .filter(match -> match.getValue().stream().anyMatch(ambiguousInBase::contains))
+                    .map(Map.Entry::getKey)
+    ).collect(Collectors.toCollection(LinkedHashSet::new));
+
     // sure tokens
     // have to check unsure tokens because of (base -> witness && witness -> base)
-    Set<Token> unique = Sets.newLinkedHashSet();
-    for (Token witnessToken : witnessTokens) {
-      if (all.keys().count(witnessToken) == 1 && !ambiguous.contains(witnessToken)) {
-        unique.add(witnessToken);
-      }
-    }
+    final Set<Token> uniqueInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
+            .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() == 1 && !ambiguousInWitness.contains(t))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
 
-    return new Matches(all, unmatched, ambiguous, unique);
+    return new Matches(allMatches, unmatchedInWitness, ambiguousInWitness, uniqueInWitness);
   }
 
-  private Matches(ListMultimap<Token, VariantGraph.Vertex> all, Set<Token> unmatched, Set<Token> ambiguous, Set<Token> unique) {
-    this.all = all;
-    this.unmatched = unmatched;
-    this.ambiguous = ambiguous;
-    this.unique = unique;
-  }
-
-  public ListMultimap<Token, VariantGraph.Vertex> getAll() {
-    return all;
-  }
-
-  public Set<Token> getUnmatched() {
-    return unmatched;
-  }
-
-  public Set<Token> getAmbiguous() {
-    return ambiguous;
-  }
-
-  public Set<Token> getUnique() {
-    return unique;
+  private Matches(Map<Token, List<VariantGraph.Vertex>> allMatches, Set<Token> unmatchedInWitness, Set<Token> ambiguousInWitness, Set<Token> uniqueInWitness) {
+    this.allMatches = Collections.unmodifiableMap(allMatches);
+    this.unmatchedInWitness = Collections.unmodifiableSet(unmatchedInWitness);
+    this.ambiguousInWitness = Collections.unmodifiableSet(ambiguousInWitness);
+    this.uniqueInWitness = Collections.unmodifiableSet(uniqueInWitness);
   }
 
 }

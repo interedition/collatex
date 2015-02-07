@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -33,7 +34,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.AbstractTest;
@@ -73,7 +73,7 @@ public class BeckettTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = collate(w[0]);
-    final ListMultimap<Token, VariantGraph.Vertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
+    final Map<Token, List<VariantGraph.Vertex>> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).allMatches;
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -86,7 +86,7 @@ public class BeckettTest extends AbstractTest {
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
         "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
     final VariantGraph graph = collate(w[0]);
-    final ListMultimap<Token, VariantGraph.Vertex> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).getAll();
+    final Map<Token, List<VariantGraph.Vertex>> matches = Matches.between(graph.vertices(), w[1], new EqualityTokenComparator()).allMatches;
 
     assertVertexHasContent(matches.get(w[1].getTokens().get(0)).get(0), "its", w[0]);
     assertEquals(2, matches.get(w[1].getTokens().get(3)).size()); // 2 matches for 'light'
@@ -140,8 +140,8 @@ public class BeckettTest extends AbstractTest {
     final VariantGraph graph = collate(w[0], w[1]);
     final Matches matches = Matches.between(graph.vertices(), w[2].getTokens(), new EqualityTokenComparator());
 
-    final Set<Token> unmatchedTokens = matches.getUnmatched();
-    final Set<Token> unsureTokens = matches.getAmbiguous();
+    final Set<Token> unmatchedTokens = matches.unmatchedInWitness;
+    final Set<Token> unsureTokens = matches.ambiguousInWitness;
     final List<Token> w2Tokens = w[2].getTokens();
 
     assertTrue(unmatchedTokens.contains(w2Tokens.get(1)));

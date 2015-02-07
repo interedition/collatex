@@ -19,6 +19,7 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -128,12 +129,12 @@ public class MatchTable {
   // move parameters into fields?
   private void fillTableWithMatches(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness, Comparator<Token> comparator) {
     Matches matches = Matches.between(graph.vertices(), witness, comparator);
-    Set<Token> unique = matches.getUnique();
-    Set<Token> ambiguous = matches.getAmbiguous();
+    Set<Token> unique = matches.uniqueInWitness;
+    Set<Token> ambiguous = matches.ambiguousInWitness;
     int rowIndex=0;
     for (Token t : witness) {
       if (unique.contains(t) || ambiguous.contains(t)) {
-        List<VariantGraph.Vertex> matchingVertices = matches.getAll().get(t);
+        List<VariantGraph.Vertex> matchingVertices = matches.allMatches.getOrDefault(t, Collections.<VariantGraph.Vertex>emptyList());
         for (VariantGraph.Vertex vgv : matchingVertices) {
           set(rowIndex, ranking.apply(vgv) - 1, t, vgv);
         }
