@@ -67,7 +67,7 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraph.Vertex, 
     rc.setVertexLabelTransformer(new Transformer<VariantGraph.Vertex, String>() {
       @Override
       public String transform(VariantGraph.Vertex variantGraphVertexModel) {
-        final Multimap<Witness, Token> tokens = Multimaps.index(variantGraphVertexModel.tokens(), Token.TO_WITNESS);
+        final Multimap<Witness, Token> tokens = Multimaps.index(variantGraphVertexModel.tokens(), Token::getWitness);
         final StringBuilder label = new StringBuilder();
         for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
           label.append("[").append(witness.getSigil()).append(": '");

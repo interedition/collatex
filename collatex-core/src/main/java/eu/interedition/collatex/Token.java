@@ -19,18 +19,10 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Function;
 
 /**
  * The normalized version of the token. 
  */
 public interface Token {
   Witness getWitness();
-  
-  final Function<Token, Witness> TO_WITNESS = new Function<Token, Witness>() {
-    @Override
-    public Witness apply(Token input) {
-      return input.getWitness();
-    }
-  };
 }

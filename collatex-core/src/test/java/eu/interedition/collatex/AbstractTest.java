@@ -103,7 +103,7 @@ public abstract class AbstractTest {
   }
 
   protected static String toString(VariantGraph.Vertex vertex, Witness... witnesses) {
-    final Multimap<Witness, Token> tokens = Multimaps.index(vertex.tokens(Sets.newHashSet(Arrays.asList(witnesses))), Token.TO_WITNESS);
+    final Multimap<Witness, Token> tokens = Multimaps.index(vertex.tokens(Sets.newHashSet(Arrays.asList(witnesses))), Token::getWitness);
     List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
     for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
       for (Token token : Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class))) {

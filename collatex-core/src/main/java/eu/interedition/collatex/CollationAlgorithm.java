@@ -19,11 +19,6 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschScorer;
@@ -33,6 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +38,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -75,13 +74,15 @@ public interface CollationAlgorithm {
     }
 
     protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
-      Preconditions.checkArgument(!Iterables.isEmpty(witnessTokens), "Empty witness");
-      final Witness witness = Iterables.getFirst(witnessTokens, null).getWitness();
+      final Witness witness = StreamSupport.stream(witnessTokens.spliterator(), false)
+              .findFirst()
+              .map(Token::getWitness)
+              .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
       if (LOG.isLoggable(Level.FINE)) {
         LOG.log(Level.FINE, "{0} + {1}: Merge comparand into graph", new Object[] { into, witness });
       }
-      witnessTokenVertices = Maps.newHashMap();
+      witnessTokenVertices = new HashMap<>();
       VariantGraph.Vertex last = into.getStart();
       final Set<Witness> witnessSet = Collections.singleton(witness);
       for (Token token : witnessTokens) {
@@ -107,7 +108,7 @@ public interface CollationAlgorithm {
         if (LOG.isLoggable(Level.FINE)) {
           LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
         }
-        final Set<VariantGraph.Vertex> transposed = Sets.newHashSet();
+        final Set<VariantGraph.Vertex> transposed = new HashSet<>();
         for (VertexMatch.WithToken match : transposedPhrase) {
           transposed.add(witnessTokenVertices.get(match.token));
           transposed.add(match.vertex);
@@ -121,7 +122,7 @@ public interface CollationAlgorithm {
         if (LOG.isLoggable(Level.FINE)) {
           LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
         }
-        final Set<VariantGraph.Vertex> transposed = Sets.newHashSet();
+        final Set<VariantGraph.Vertex> transposed = new HashSet<>();
         for (Match match : transposedPhrase) {
           transposed.add(witnessTokenVertices.get(match.token));
           transposed.add(match.vertex);
@@ -159,7 +160,7 @@ public interface CollationAlgorithm {
               }
       ).keySet();
 
-      final List<SortedSet<VertexMatch.WithTokenIndex>> transpositions = new ArrayList<SortedSet<VertexMatch.WithTokenIndex>>();
+      final List<SortedSet<VertexMatch.WithTokenIndex>> transpositions = new ArrayList<>();
       for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : matches) {
         if (!inOrderMatches.contains(phraseMatch)) {
           transpositions.add(phraseMatch);
@@ -167,16 +168,16 @@ public interface CollationAlgorithm {
       }
 
 
-      final Map<Token, VariantGraph.Vertex> matchedTokens = Maps.newHashMap();
+      final Map<Token, VariantGraph.Vertex> matchedTokens = new HashMap<>();
       for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : matches) {
         for (VertexMatch.WithTokenIndex tokenMatch : phraseMatch) {
           matchedTokens.put(tokens[tokenMatch.token], tokenMatch.vertex);
         }
       }
 
-      final List<SortedSet<VertexMatch.WithToken>> transposedTokens = Lists.newLinkedList();
+      final List<SortedSet<VertexMatch.WithToken>> transposedTokens = new LinkedList<>();
       for (SortedSet<VertexMatch.WithTokenIndex> transposition : transpositions) {
-        final SortedSet<VertexMatch.WithToken> transpositionMatch = new TreeSet<VertexMatch.WithToken>();
+        final SortedSet<VertexMatch.WithToken> transpositionMatch = new TreeSet<>();
         for (VertexMatch.WithTokenIndex match : transposition) {
           matchedTokens.remove(tokens[match.token]);
           transpositionMatch.add(new VertexMatch.WithToken(match.vertex, match.vertexRank, tokens[match.token]));
