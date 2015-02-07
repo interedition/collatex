@@ -19,9 +19,7 @@
 
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.Sets;
-
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -31,24 +29,22 @@ public class Tuple<T> {
   public final T left;
   public final T right;
 
-  private final Set<Object> set;
-
   public Tuple(T left, T right) {
     this.left = left;
     this.right = right;
-    this.set = Sets.<Object>newHashSet(left, right);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj != null && obj instanceof Tuple) {
-      return set.equals(((Tuple) obj).set);
+      final Tuple other = (Tuple) obj;
+      return (left.equals(other.left) || left.equals(other.right)) && (right.equals(other.right) || right.equals(other.left));
     }
     return super.equals(obj);
   }
 
   @Override
   public int hashCode() {
-    return set.hashCode();
+    return Objects.hash(left, right);
   }
 }

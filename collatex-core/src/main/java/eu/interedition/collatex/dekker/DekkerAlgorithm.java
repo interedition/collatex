@@ -18,16 +18,15 @@
  */
 package eu.interedition.collatex.dekker;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
@@ -61,8 +60,10 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
   @Override
   public void collate(VariantGraph graph, Iterable<Token> tokens) {
-    Preconditions.checkArgument(!Iterables.isEmpty(tokens), "Empty witness");
-    final Witness witness = Iterables.getFirst(tokens, null).getWitness();
+    final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
+            .findFirst()
+            .map(Token::getWitness)
+            .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
     if (LOG.isLoggable(Level.FINER)) {
       LOG.log(Level.FINER, "{0} + {1}: {2} vs. {3}", new Object[] { graph, witness, graph.vertices(), tokens });
@@ -85,7 +86,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, tokens);
     if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> phraseMatch : phraseMatches) {
-        LOG.log(Level.FINER, "{0} + {1}: Phrase match: {2}", new Object[] { graph, witness, Iterables.toString(phraseMatch) });
+        LOG.log(Level.FINER, "{0} + {1}: Phrase match: {2}", new Object[] { graph, witness, phraseMatch });
       }
     }
 
@@ -99,14 +100,14 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
 
     if (LOG.isLoggable(Level.FINER)) {
       for (List<Match> transposition : transpositions) {
-        LOG.log(Level.FINER, "{0} + {1}: Transposition: {2}", new Object[] { graph, witness, Iterables.toString(transposition) });
+        LOG.log(Level.FINER, "{0} + {1}: Transposition: {2}", new Object[] { graph, witness, transposition });
       }
     }
 
     if (LOG.isLoggable(Level.FINE)) {
       LOG.log(Level.FINE, "{0} + {1}: Determine aligned tokens by filtering transpositions", new Object[] { graph, witness });
     }
-    alignments = Maps.newHashMap();
+    alignments = new HashMap<>();
     for (List<Match> phrase : phraseMatches) {
       for (Match match : phrase) {
         alignments.put(match.token, match.vertex);
@@ -127,7 +128,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     merge(graph, tokens, alignments);
 
     // we filter out small transposed phrases over large distances
-    List<List<Match>> falseTranspositions = Lists.newArrayList();
+    List<List<Match>> falseTranspositions = new ArrayList<>();
     
     VariantGraphRanking ranking = VariantGraphRanking.of(graph);
     
@@ -150,7 +151,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
     }
     
     if (LOG.isLoggable(Level.FINER)) {
-      LOG.log(Level.FINER, "!{0}: {1}", new Object[] {graph, Iterables.toString(graph.vertices())});
+      LOG.log(Level.FINER, "!{0}: {1}", new Object[] {graph, StreamSupport.stream(graph.vertices().spliterator(), false).map(Object::toString).collect(Collectors.joining(", ")) });
     }
   }
 

@@ -19,15 +19,16 @@
 
 package eu.interedition.collatex.dekker;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -43,7 +44,7 @@ public class Match {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(vertex, token);
+    return Objects.hash(vertex, token);
   }
 
   @Override
@@ -57,11 +58,11 @@ public class Match {
 
   @Override
   public String toString() {    
-    return new StringBuilder("{").append(vertex).append("; ").append(token).append("}").toString();
+    return "{" + vertex + "; " + token + "}";
   }
 
   public static List<Match> createPhraseMatch(List<VariantGraph.Vertex> vertices, List<Token> tokens) {
-    final List<Match> phraseMatch = Lists.newArrayListWithExpectedSize(vertices.size());
+    final List<Match> phraseMatch = new ArrayList<>(vertices.size());
     final Iterator<VariantGraph.Vertex> vertexIt = vertices.iterator();
     final Iterator<Token> tokenIt = tokens.iterator();
     while (vertexIt.hasNext() && tokenIt.hasNext()) {
@@ -72,25 +73,8 @@ public class Match {
 
 
   public static Predicate<Match> createNoBoundaryMatchPredicate(final VariantGraph graph) {
-    return new Predicate<Match>() {
-      @Override
-      public boolean apply(Match input) {
-        return !input.vertex.equals(graph.getStart()) && !input.vertex.equals(graph.getEnd());
-      }
-    };
+    return input -> !input.vertex.equals(graph.getStart()) && !input.vertex.equals(graph.getEnd());
   }
 
-  public static final Function<Match,Token> MATCH_TO_TOKENS = new Function<Match, Token>() {
-    @Override
-    public Token apply(Match input) {
-      return input.token;
-    }
-  };
-
-  public static final Function<List<Match>, List<Token>> PHRASE_MATCH_TO_TOKENS = new Function<List<Match>, List<Token>>() {
-    @Override
-    public List<Token> apply(List<Match> input) {
-      return Lists.transform(input, MATCH_TO_TOKENS);
-    }
-  };
+  public static final Function<List<Match>, List<Token>> PHRASE_MATCH_TO_TOKENS = input -> input.stream().map(m -> m.token).collect(Collectors.toList());
 }

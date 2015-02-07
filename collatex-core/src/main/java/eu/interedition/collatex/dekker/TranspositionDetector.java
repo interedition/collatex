@@ -18,19 +18,19 @@
  */
 package eu.interedition.collatex.dekker;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -43,7 +43,7 @@ public class TranspositionDetector {
     // if there are no phrase matches it is not possible
     // to detect transpositions, return an empty list
     if (phraseMatches.isEmpty()) {
-      return Lists.newArrayList();
+      return new ArrayList<>();
     }
 
     /*
@@ -54,26 +54,23 @@ public class TranspositionDetector {
      */
     final VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
 
-    Comparator<List<Match>> comp = new Comparator<List<Match>>() {
-      @Override
-      public int compare(List<Match> pm1, List<Match> pm2) {
-        int rank1 = ranking.apply(pm1.get(0).vertex);
-        int rank2 = ranking.apply(pm2.get(0).vertex);
-        int difference = rank1 - rank2;
-        if (difference != 0) {
-          return difference;
-        }
-        int index1 = phraseMatches.indexOf(pm1);
-        int index2 = phraseMatches.indexOf(pm2);
-        return index1 - index2;
+    Comparator<List<Match>> comp = (pm1, pm2) -> {
+      int rank1 = ranking.apply(pm1.get(0).vertex);
+      int rank2 = ranking.apply(pm2.get(0).vertex);
+      int difference = rank1 - rank2;
+      if (difference != 0) {
+        return difference;
       }
+      int index1 = phraseMatches.indexOf(pm1);
+      int index2 = phraseMatches.indexOf(pm2);
+      return index1 - index2;
     };
 
-    List<List<Match>> phraseMatchesGraphOrder = Lists.newArrayList(phraseMatches);
+    List<List<Match>> phraseMatchesGraphOrder = new ArrayList<>(phraseMatches);
     Collections.sort(phraseMatchesGraphOrder, comp);
     
     // Map 1
-    phraseMatchToIndex = Maps.newHashMap();
+    phraseMatchToIndex = new HashMap<>();
     for (int i = 0; i < phraseMatchesGraphOrder.size(); i++) {
       phraseMatchToIndex.put(phraseMatchesGraphOrder.get(i), i);
     }
@@ -82,8 +79,8 @@ public class TranspositionDetector {
      * We calculate the index for all the phrase matches 
      * First in witness order, then in graph order 
      */
-    List<Integer> phraseMatchesGraphIndex = Lists.newArrayList();
-    List<Integer> phraseMatchesWitnessIndex = Lists.newArrayList();
+    List<Integer> phraseMatchesGraphIndex = new ArrayList<>();
+    List<Integer> phraseMatchesWitnessIndex = new ArrayList<>();
 
     for (int i=0; i < phraseMatches.size(); i++) {
       phraseMatchesGraphIndex.add(i);
@@ -96,15 +93,15 @@ public class TranspositionDetector {
     /*
      * Initialize result variables
      */
-    List<List<Match>> nonTransposedPhraseMatches = Lists.newArrayList(phraseMatches);
-    List<List<Match>> transpositions = Lists.newArrayList();
+    List<List<Match>> nonTransposedPhraseMatches = new ArrayList<>(phraseMatches);
+    List<List<Match>> transpositions = new ArrayList<>();
 
     /*
      * loop here until the maximum distance == 0
      */
     while (true) {
       // Map 2
-      final Map<List<Match>, Integer> phraseMatchToDistanceMap = Maps.newLinkedHashMap();
+      final Map<List<Match>, Integer> phraseMatchToDistanceMap = new LinkedHashMap<>();
       for (int i=0; i < nonTransposedPhraseMatches.size(); i++) {
         Integer graphIndex = phraseMatchesGraphIndex.get(i);
         Integer witnessIndex = phraseMatchesWitnessIndex.get(i);
@@ -113,7 +110,7 @@ public class TranspositionDetector {
         phraseMatchToDistanceMap.put(phraseMatch, distance);
       }
 
-      List<Integer> distanceList = Lists.newArrayList(phraseMatchToDistanceMap.values());
+      List<Integer> distanceList = new ArrayList<>(phraseMatchToDistanceMap.values());
 
       if (distanceList.isEmpty()||Collections.max(distanceList) == 0) {
         break;
@@ -123,23 +120,20 @@ public class TranspositionDetector {
       // TODO: order by 3) graph rank?
       // TODO: I have not yet found evidence/a use case that
       // TODO: indicates that it is needed.
-      Comparator<List<Match>> comp2 = new Comparator<List<Match>>() {
-        @Override
-        public int compare(List<Match> pm1, List<Match> pm2) {
-          // first order by distance
-          int distance1 = phraseMatchToDistanceMap.get(pm1);
-          int distance2 = phraseMatchToDistanceMap.get(pm2);
-          int difference = distance2 - distance1;
-          if (difference != 0) {
-            return difference;
-          }
-          // second order by size
-          // return pm1.size() - pm2.size();
-          return determineSize(pm1) - determineSize(pm2);
+      Comparator<List<Match>> comp2 = (pm1, pm2) -> {
+        // first order by distance
+        int distance1 = phraseMatchToDistanceMap.get(pm1);
+        int distance2 = phraseMatchToDistanceMap.get(pm2);
+        int difference = distance2 - distance1;
+        if (difference != 0) {
+          return difference;
         }
+        // second order by size
+        // return pm1.size() - pm2.size();
+        return determineSize(pm1) - determineSize(pm2);
       };
 
-      List<List<Match>> sortedPhraseMatches = Lists.newArrayList(nonTransposedPhraseMatches);
+      List<List<Match>> sortedPhraseMatches = new ArrayList<>(nonTransposedPhraseMatches);
       Collections.sort(sortedPhraseMatches, comp2);
 
       List<Match> transposedPhrase = sortedPhraseMatches.remove(0);
@@ -169,7 +163,7 @@ public class TranspositionDetector {
 
   private VariantGraphRanking rankTheGraph(List<List<Match>> phraseMatches, VariantGraph base) {
     // rank the variant graph
-    Set<VariantGraph.Vertex> matchedVertices = Sets.newHashSet();
+    Set<VariantGraph.Vertex> matchedVertices = new HashSet<>();
     for (List<Match> phraseMatch : phraseMatches) {
       matchedVertices.add(phraseMatch.get(0).vertex);
     }
