@@ -64,7 +64,7 @@ public class MatchTableTest extends AbstractTest {
     final VariantGraph graph = new VariantGraph();
     SimpleWitness[] witnesses = createWitnesses("a b");
     MatchTable table = MatchTable.create(graph, witnesses[0]);
-    assertEquals(1, table.columnList().size());
+    assertEquals(0, table.columnList().size());
   }
 
   @Test

@@ -19,26 +19,25 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.collect.ContiguousSet;
-import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Range;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 /* @author: Ronald Haentjens Dekker
 *
@@ -52,9 +51,9 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 * MatchTableSelection class.
 */
 public class MatchTable {
-  private final HashBasedTable<Integer, Integer, MatchTableCell> table;
-  private final Iterable<Token> witness;
-  private final List<Integer> ranks;
+  private final MatchTableCell[][] table;
+  private final Token[] witness;
+  private final int[] ranks;
   
   // assumes default token comparator
   public static MatchTable create(VariantGraph graph, Iterable<Token> witness) {
@@ -71,59 +70,62 @@ public class MatchTable {
     return table;
   }
 
+  private Optional<MatchTableCell> cell(int rowIndex, int columnIndex) {
+    return Optional.ofNullable(table[rowIndex][columnIndex]);
+  }
+  
   public VariantGraph.Vertex vertexAt(int rowIndex, int columnIndex) {
-    MatchTableCell cell = table.get(rowIndex, columnIndex);
-    return cell==null ? null : cell.vertex;
+    return cell(rowIndex, columnIndex).map(c -> c.vertex).orElse(null);
   }
   
   public Token tokenAt(int rowIndex, int columnIndex) {
-    MatchTableCell cell = table.get(rowIndex, columnIndex);
-    return cell==null ? null : cell.token;
+    return cell(rowIndex, columnIndex).map(c -> c.token).orElse(null);
   }
 
   // Warning: this method reiterates the witness!
   // This method is only meant for the user interface and serialization classes!
   // Use the tokenAt method in all other cases.
   public List<Token> rowList() {
-    return Lists.newArrayList(witness);
+    return Collections.unmodifiableList(Arrays.asList(witness));
   }
 
   public List<Integer> columnList() {
-    return ranks;
+    return Arrays.stream(ranks).boxed().collect(Collectors.toList());
   }
 
   // Since the coordinates in allMatches are ordered from upper left to lower right, 
   // we don't need to check the lower right neighbor.
   public Set<Island> getIslands() {
-    Map<Coordinate, Island> coordinateMapper = Maps.newHashMap();
+    Map<Coordinate, Island> coordinateMapper = new HashMap<>();
     List<Coordinate> allMatches = allMatches();
     for (Coordinate c : allMatches) {
       //      LOG.debug("coordinate {}", c);
       addToIslands(coordinateMapper, c);
     }
-    Set<Coordinate> smallestIslandsCoordinates = Sets.newHashSet(allMatches);
+    Set<Coordinate> smallestIslandsCoordinates = new HashSet<>(allMatches);
     smallestIslandsCoordinates.removeAll(coordinateMapper.keySet());
     for (Coordinate coordinate : smallestIslandsCoordinates) {
       Island island = new Island();
       island.add(coordinate);
       coordinateMapper.put(coordinate, island);
     }
-    return Sets.newHashSet(coordinateMapper.values());
+    return new HashSet<>(coordinateMapper.values());
   }
 
 
 	
-	private MatchTable(Iterable<Token> tokens, List<Integer> ranks) {
-    this.table = HashBasedTable.create();
+	private MatchTable(Token[] tokens, int[] ranks) {
+    this.table = new MatchTableCell[tokens.length][ranks.length];
     this.witness = tokens;
     this.ranks = ranks;
   }
 
   private static MatchTable createEmptyTable(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness) {
     // -2 === ignore the start and the end vertex
-    Range<Integer> ranksRange = Range.closed(0, Math.max(0, ranking.apply(graph.getEnd()) - 2));
-    ImmutableList<Integer> ranksSet = ContiguousSet.create(ranksRange, DiscreteDomain.integers()).asList();
-    return new MatchTable(witness, ranksSet);
+    return new MatchTable(
+            StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new), 
+            IntStream.range(0, Math.max(0, ranking.apply(graph.getEnd()) - 1)).toArray()
+    );
   }
 
   // move parameters into fields?
@@ -145,8 +147,7 @@ public class MatchTable {
 
   private void set(int rowIndex, int columnIndex, Token token, VariantGraph.Vertex vertex) {
     //    LOG.debug("putting: {}<->{}<->{}", new Object[] { token, columnIndex, variantGraphVertex });
-    MatchTableCell cell = new MatchTableCell(token, vertex);
-    table.put(rowIndex, columnIndex, cell);
+    table[rowIndex][columnIndex] = new MatchTableCell(token, vertex);
   }
 
   private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c) {
@@ -155,7 +156,9 @@ public class MatchTable {
     VariantGraph.Vertex neighbor = null;
     try {
       neighbor = vertexAt(c.row + diff, c.column + diff);
-    } catch (IndexOutOfBoundsException e) {}
+    } catch (IndexOutOfBoundsException e) {
+      // ignored
+    }
     if (neighbor != null) {
       Island island = coordinateMapper.get(neighborCoordinate);
       if (island == null) {
@@ -177,7 +180,7 @@ public class MatchTable {
   // TODO: might be simpler to work from the valueSet
   // TODO: try remove the call to rowList / columnList
   List<Coordinate> allMatches() {
-    List<Coordinate> pairs = Lists.newArrayList();
+    List<Coordinate> pairs = new ArrayList<>();
     int rows = rowList().size();
     int cols = columnList().size();
     for (int i = 0; i < rows; i++) {
