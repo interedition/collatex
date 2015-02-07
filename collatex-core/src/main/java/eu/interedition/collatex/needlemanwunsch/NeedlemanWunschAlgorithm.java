@@ -19,16 +19,17 @@
 
 package eu.interedition.collatex.needlemanwunsch;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -40,13 +41,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
 
     @Override
     public float score(VariantGraph.Vertex[] a, Token b) {
-      for (VariantGraph.Vertex vertex : a) {
-        final Set<Token> tokens = vertex.tokens();
-        if (!tokens.isEmpty() && comparator.compare(Iterables.getFirst(tokens, null), b) == 0) {
-          return 1;
-        }
-      }
-      return -1;
+      return Arrays.stream(a).map(VariantGraph.Vertex::tokens).flatMap(Set::stream).anyMatch(t -> comparator.compare(t, b) == 0) ? 1 : -1;
     }
 
     @Override
@@ -62,9 +57,9 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
   @Override
   public void collate(VariantGraph against, Iterable<Token> witness) {
     final VariantGraph.Vertex[][] ranks = VariantGraphRanking.of(against).asArray();
-    final Token[] tokens = Iterables.toArray(witness, Token.class);
+    final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
 
-    final Map<Token, VariantGraph.Vertex> alignments = Maps.newHashMap();
+    final Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
     for (Map.Entry<VariantGraph.Vertex[], Token> alignment : align(ranks, tokens, scorer).entrySet()) {
       boolean aligned = false;
       final Token token = alignment.getValue();
@@ -87,7 +82,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
 
   public static <A,B> Map<A,B> align(A[] a, B[] b, NeedlemanWunschScorer<A, B> scorer) {
 
-    final Map<A, B> alignments = Maps.newHashMap();
+    final Map<A, B> alignments = new HashMap<>();
     final float[][] matrix = new float[a.length + 1][b.length + 1];
 
     int ac = 0;
