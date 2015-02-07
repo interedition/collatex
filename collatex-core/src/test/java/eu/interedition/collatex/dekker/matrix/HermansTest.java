@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -80,7 +79,7 @@ public class HermansTest extends AbstractTest {
     VariantGraph vg = collate(sw[0]);
     MatchTable matchTable = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
     // System.out.println(buildMatrix.toHtml());
-    IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
+    IslandConflictResolver archipelago = new IslandConflictResolver(matchTable);
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
 //    assertEquals(42, archipelago.size());
@@ -126,7 +125,7 @@ public class HermansTest extends AbstractTest {
     // e.printStackTrace();
     // }
     // System.out.println(buildMatrix.toHtml());
-    IslandConflictResolver archipelago = new IslandConflictResolver(matchTable, 1);
+    IslandConflictResolver archipelago = new IslandConflictResolver(matchTable);
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
     MatchTableSelection firstVersion = archipelago.createNonConflictingVersion();
@@ -192,7 +191,7 @@ public class HermansTest extends AbstractTest {
 
     VariantGraph base = collate(witnesses[0]);
     MatchTable matchTable = MatchTable.create(base, witnesses[1], new EqualityTokenComparator());
-    IslandConflictResolver creator = new IslandConflictResolver(matchTable, 1);
+    IslandConflictResolver creator = new IslandConflictResolver(matchTable);
 
     //Mock Archipelago
     Archipelago result = mock(Archipelago.class);

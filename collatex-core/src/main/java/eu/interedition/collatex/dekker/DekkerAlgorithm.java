@@ -48,7 +48,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
   private boolean mergeTranspositions = false;
   
   public DekkerAlgorithm(Comparator<Token> comparator) {
-    this(comparator, new MatchTableLinker(3));
+    this(comparator, new MatchTableLinker());
   }
 
   public DekkerAlgorithm(Comparator<Token> comparator, TokenLinker tokenLinker) {

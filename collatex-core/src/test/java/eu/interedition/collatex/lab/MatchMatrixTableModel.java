@@ -25,7 +25,6 @@ import javax.swing.table.AbstractTableModel;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.Archipelago;
 import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
@@ -90,7 +89,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
 
   private MatchTableSelection preferred(MatchTable matchTable) {
     // prepare
-    IslandConflictResolver resolver = new IslandConflictResolver(matchTable, outlierTranspositionsSizeLimit);
+    IslandConflictResolver resolver = new IslandConflictResolver(matchTable);
     // find preferred islands
     MatchTableSelection preferred = resolver.createNonConflictingVersion();
     return preferred;

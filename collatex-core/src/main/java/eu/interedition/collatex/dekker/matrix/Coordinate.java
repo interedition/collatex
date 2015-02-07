@@ -19,7 +19,7 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class Coordinate implements Comparable<Coordinate> {
   int row;
@@ -65,7 +65,7 @@ public class Coordinate implements Comparable<Coordinate> {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(row, column);
+    return Objects.hash(row, column);
   }
 
   @Override

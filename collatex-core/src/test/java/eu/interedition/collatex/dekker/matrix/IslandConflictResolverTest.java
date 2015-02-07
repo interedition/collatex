@@ -1,17 +1,15 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
-import org.junit.Test;
-
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class IslandConflictResolverTest extends AbstractTest {
   
@@ -32,8 +30,8 @@ public class IslandConflictResolverTest extends AbstractTest {
         possibleIslands.add(island);
       }
     }
-    IslandConflictResolver resolver = new IslandConflictResolver(table, 3);
-    Multimap<IslandCompetition, Island> competition = resolver.analyzeConflictsBetweenPossibleIslands(possibleIslands);
+    IslandConflictResolver resolver = new IslandConflictResolver(table);
+    Map<IslandCompetition, List<Island>> competition = resolver.analyzeConflictsBetweenPossibleIslands(possibleIslands);
     assertEquals(3, competition.get(IslandCompetition.CompetingIsland).size());
   }
 }

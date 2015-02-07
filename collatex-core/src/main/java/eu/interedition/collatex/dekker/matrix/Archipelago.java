@@ -20,15 +20,13 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /*
  * @author Meindert Kroese
@@ -42,14 +40,14 @@ public class Archipelago {
   private final Set<Integer> islandvectors; 
 
   public Archipelago() {
-    islands = new ArrayList<Island>();
-    this.islandvectors = Sets.newHashSet(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
+    islands = new ArrayList<>();
+    this.islandvectors = new HashSet<>(); // row - column, all islands should have direction 1, so this diff should be the same for all coordinates on the island.
   }
 
   //copy constructor
   public Archipelago(Archipelago orig) {
-    this.islands = Lists.newArrayList(orig.islands);
-    this.islandvectors = Sets.newHashSet(orig.islandvectors);
+    this.islands = new ArrayList<>(orig.islands);
+    this.islandvectors = new HashSet<>(orig.islandvectors);
   }
   
   public Archipelago(Island isl) {
@@ -72,7 +70,7 @@ public class Archipelago {
   }
 
   public boolean containsCoordinate(int row, int column) {
-    return Objects.equal(getCoordinatesMap().get(row), column);
+    return Objects.equals(getCoordinatesMap().get(row), column);
   }
 
   public List<Island> getIslands() {
@@ -113,7 +111,7 @@ public class Archipelago {
   }
 
   private Map<Integer, Integer> getCoordinatesMap() {
-    final Map<Integer, Integer> map = Maps.newHashMap();
+    final Map<Integer, Integer> map = new HashMap<>();
     for (final Island isl : islands) {
       for (final Coordinate c : isl) {
         map.put(c.getRow(), c.getColumn());

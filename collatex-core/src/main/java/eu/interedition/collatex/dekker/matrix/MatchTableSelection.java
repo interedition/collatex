@@ -1,16 +1,16 @@
 package eu.interedition.collatex.dekker.matrix;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import java.util.stream.Collectors;
 
 import eu.interedition.collatex.VariantGraph;
 
@@ -21,7 +21,7 @@ import eu.interedition.collatex.VariantGraph;
 // islands may change after commit islands
 public class MatchTableSelection {
   Logger LOG = Logger.getLogger(MatchTableSelection.class.getName());
-  private final Multimap<Integer, Island> islandMultimap;
+  private final Map<Integer, List<Island>> islandMultimap;
   private final Archipelago fixedIslands;
   //this fields are needed for the locking of table cells
   private final Set<Integer> fixedRows;
@@ -29,23 +29,23 @@ public class MatchTableSelection {
   private final MatchTable table;
 
   public MatchTableSelection(MatchTable table) {
-    fixedRows = Sets.newHashSet();
-    fixedVertices = Sets.newHashSet();
+    fixedRows = new HashSet<>();
+    fixedVertices = new HashSet<>();
     this.table = table;
     this.fixedIslands = new Archipelago();
-    islandMultimap = ArrayListMultimap.create();
+    islandMultimap = new HashMap<>();
     for (Island isl : table.getIslands()) {
-      islandMultimap.put(isl.size(), isl);
+      islandMultimap.computeIfAbsent(isl.size(), s -> new ArrayList<>()).add(isl);
     }
   }
   
   // copy constructor
   public MatchTableSelection(MatchTableSelection orig) {
     // table structure is read only, does not have to be copied
-    this.islandMultimap = ArrayListMultimap.create(orig.islandMultimap);
+    this.islandMultimap = orig.islandMultimap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
     this.fixedIslands = new Archipelago(orig.fixedIslands);
-    this.fixedRows = Sets.newHashSet(orig.fixedRows);
-    this.fixedVertices = Sets.newHashSet(orig.fixedVertices);
+    this.fixedRows = new HashSet<>(orig.fixedRows);
+    this.fixedVertices = new HashSet<>(orig.fixedVertices);
     this.table = orig.table;
   }
 
@@ -80,7 +80,7 @@ public class MatchTableSelection {
       fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
     }
     fixedIslands.add(isl);
-    islandMultimap.remove(isl.size(), isl);
+    islandMultimap.computeIfPresent(isl.size(), (s, i) -> { i.remove(isl); return (i.isEmpty() ? null : i); });
   }
   
   public boolean doesCandidateLayOnVectorOfCommittedIsland(Island island) {
@@ -109,14 +109,14 @@ public class MatchTableSelection {
    */
   //TODO: the original Island object is modified here
   //TODO: That should not happen, if we want to build a decision tree.
-  public void removeOrSplitImpossibleIslands(Integer islandSize, Multimap<Integer, Island> islandMultimap) {
-    Collection<Island> islandsToCheck = Lists.newArrayList(islandMultimap.get(islandSize));
+  public void removeOrSplitImpossibleIslands(Integer islandSize, Map<Integer, List<Island>> islandMultimap) {
+    Collection<Island> islandsToCheck = new ArrayList<>(islandMultimap.getOrDefault(islandSize, Collections.emptyList()));
     for (Island island : islandsToCheck) {
       if (!isIslandPossibleCandidate(island)) {
-        islandMultimap.remove(islandSize, island);
+        islandMultimap.computeIfPresent(islandSize, (s, i) -> { i.remove(island); return (i.isEmpty() ? null : i); });
         removeConflictingEndCoordinates(island);
         if (island.size() > 0) {
-          islandMultimap.put(island.size(), island);
+          islandMultimap.computeIfAbsent(island.size(), s -> new ArrayList<>()).add(island);
         }
       }
     }
@@ -150,7 +150,7 @@ public class MatchTableSelection {
   }
 
   public List<Island> getPossibleIslands() {
-    List<Island> possibleIslands = Lists.newArrayList();
+    List<Island> possibleIslands = new ArrayList<>();
     while(possibleIslands.isEmpty()&&!islandMultimap.isEmpty()) {
       // find the maximum island size and traverse groups in descending order
       Integer max = Collections.max(islandMultimap.keySet());
@@ -158,7 +158,7 @@ public class MatchTableSelection {
       // check the possible islands of a certain size against 
       // the already committed islands.
       removeOrSplitImpossibleIslands(max, islandMultimap);
-      possibleIslands = Lists.newArrayList(islandMultimap.get(max));
+      possibleIslands = new ArrayList<>(islandMultimap.getOrDefault(max, Collections.emptyList()));
     }
     return possibleIslands;
   }

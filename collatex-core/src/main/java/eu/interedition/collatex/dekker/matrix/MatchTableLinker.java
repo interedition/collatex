@@ -20,11 +20,10 @@
 package eu.interedition.collatex.dekker.matrix;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -32,11 +31,9 @@ import eu.interedition.collatex.dekker.TokenLinker;
 
 public class MatchTableLinker implements TokenLinker {
 	static Logger LOG = Logger.getLogger(MatchTableLinker.class.getName());
-  private final int outlierTranspositionsSizeLimit;
 
-  public MatchTableLinker(int outlierTranspositionsSizeLimit) {
+  public MatchTableLinker() {
     super();
-    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
   }
 
   @Override
@@ -47,7 +44,7 @@ public class MatchTableLinker implements TokenLinker {
 
     // create IslandConflictResolver
     LOG.fine("create island conflict resolver");
-	  IslandConflictResolver resolver = new IslandConflictResolver(table, outlierTranspositionsSizeLimit);
+	  IslandConflictResolver resolver = new IslandConflictResolver(table);
 	
 	  // The IslandConflictResolver createNonConflictingVersion() method
 	  // selects the optimal islands
@@ -58,7 +55,7 @@ public class MatchTableLinker implements TokenLinker {
 	  }
 	
 	  // Here the result is put in a map
-	  Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
+	  Map<Token, VariantGraph.Vertex> map = new HashMap<>();
 	  for (Island island : preferredIslands.getIslands()) {
 	    for (Coordinate c : island) {
 	      map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));

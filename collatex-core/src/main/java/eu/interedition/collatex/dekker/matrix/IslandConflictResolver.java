@@ -19,16 +19,17 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 /**
  * 
@@ -42,7 +43,7 @@ public class IslandConflictResolver {
   private final MatchTableSelection selection;
   
   //NOTE: outlierTranspositionLimit is ignored for now
-  public IslandConflictResolver(MatchTable table, int outlierTranspositionsSizeLimit) {
+  public IslandConflictResolver(MatchTable table) {
     selection = new MatchTableSelection(table);
   }
 
@@ -58,7 +59,7 @@ public class IslandConflictResolver {
       if (possibleIslands.size() == 1) {
         selection.addIsland(possibleIslands.get(0));
       } else if (possibleIslands.size() > 1) {
-        Multimap<IslandCompetition, Island> analysis = analyzeConflictsBetweenPossibleIslands(possibleIslands);
+        Map<IslandCompetition, List<Island>> analysis = analyzeConflictsBetweenPossibleIslands(possibleIslands);
         resolveConflictsBySelectingPreferredIslands(selection, analysis);
       }
     }
@@ -73,18 +74,18 @@ public class IslandConflictResolver {
    *
    * Parameters: the size of the islands that you want to analyze
    */
-  public Multimap<IslandCompetition, Island> analyzeConflictsBetweenPossibleIslands(List<Island> possibleIslands) {
-    Multimap<IslandCompetition, Island> conflictMap = ArrayListMultimap.create();
+  public Map<IslandCompetition, List<Island>> analyzeConflictsBetweenPossibleIslands(List<Island> possibleIslands) {
+    Map<IslandCompetition, List<Island>> conflictMap = new HashMap<>();
     Set<Island> competingIslands = getCompetingIslands(possibleIslands);
     for (Island island : competingIslands) {
       if (selection.doesCandidateLayOnVectorOfCommittedIsland(island)) {
-        conflictMap.put(IslandCompetition.CompetingIslandAndOnIdealIine, island);
+        conflictMap.computeIfAbsent(IslandCompetition.CompetingIslandAndOnIdealIine, c -> new ArrayList<>()).add(island);
       } else {
-        conflictMap.put(IslandCompetition.CompetingIsland, island);
+        conflictMap.computeIfAbsent(IslandCompetition.CompetingIsland, c -> new ArrayList<>()).add(island);
       }
     }
     for (Island island : getNonCompetingIslands(possibleIslands, competingIslands)) {
-      conflictMap.put(IslandCompetition.NonCompetingIsland, island);
+      conflictMap.computeIfAbsent(IslandCompetition.NonCompetingIsland, c -> new ArrayList<>()).add(island);
     }
     return conflictMap;
   }
@@ -96,63 +97,50 @@ public class IslandConflictResolver {
    * we have to move this code out of this method and move it to the caller
    * class
    */
-  private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Multimap<IslandCompetition, Island> islandConflictMap) {
+  private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Map<IslandCompetition, List<Island>> islandConflictMap) {
     // First select competing islands that are on the ideal line
-    Multimap<Double, Island> distanceMap1 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIslandAndOnIdealIine));
     LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-    addBestOfCompeting(selection, distanceMap1);
-    
+    makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIslandAndOnIdealIine, Collections.emptyList()))
+            .values().stream()
+            .flatMap(List::stream).filter(ci1 -> selection.isIslandPossibleCandidate(ci1))
+            .forEach(selection::addIsland);
+
     // Second select other competing islands
-    Multimap<Double, Island> distanceMap2 = makeDistanceMap(islandConflictMap.get(IslandCompetition.CompetingIsland));
     LOG.fine("addBestOfCompeting with otherCompetingIslands");
-    addBestOfCompeting(selection, distanceMap2);
+    makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIsland, Collections.emptyList()))
+            .values().stream()
+            .flatMap(List::stream).filter(ci -> selection.isIslandPossibleCandidate(ci))
+            .forEach(selection::addIsland);
 
     // Third select non competing islands
     LOG.fine("add non competing islands");
-    for (Island i : islandConflictMap.get(IslandCompetition.NonCompetingIsland)) {
-      selection.addIsland(i);
-    }
-  }
-
-  private void addBestOfCompeting(MatchTableSelection selection, Multimap<Double, Island> distanceMap1) {
-    for (Double d : shortestToLongestDistances(distanceMap1)) {
-      for (Island ci : distanceMap1.get(d)) {
-        if (selection.isIslandPossibleCandidate(ci)) {
-          selection.addIsland(ci);
-        }
-      }
-    }
+    islandConflictMap.getOrDefault(IslandCompetition.NonCompetingIsland, Collections.emptyList())
+            .forEach(selection::addIsland);
   }
 
   // TODO: This method calculates the distance from the ideal line
   // TODO: by calculating the ratio x/y.
   // TODO: but the ideal line may have moved (due to additions/deletions).
-  private Multimap<Double, Island> makeDistanceMap(Collection<Island> competingIslands) {
-    Multimap<Double, Island> distanceMap = ArrayListMultimap.create();
+  private SortedMap<Double, List<Island>> makeDistanceMap(Collection<Island> competingIslands) {
+    SortedMap<Double, List<Island>> distanceMap = new TreeMap<>();
     for (Island isl : competingIslands) {
       Coordinate leftEnd = isl.getLeftEnd();
       double ratio = ((leftEnd.column+1) / (double) (leftEnd.row+1));
       double b2 = Math.log(ratio)/Math.log(2);
       double distanceToIdealLine = Math.abs(b2);
-      distanceMap.put(distanceToIdealLine, isl);
+      distanceMap.computeIfAbsent(distanceToIdealLine, d -> new ArrayList<>()).add(isl);
     }
     return distanceMap;
   }
 
-  private List<Double> shortestToLongestDistances(Multimap<Double, Island> distanceMap) {
-    List<Double> distances = Lists.newArrayList(distanceMap.keySet());
-    Collections.sort(distances);
-    return distances;
-  }
-
   private Set<Island> getNonCompetingIslands(List<Island> islands, Set<Island> competingIslands) {
-    Set<Island> nonCompetingIslands = Sets.newHashSet(islands);
+    Set<Island> nonCompetingIslands = new HashSet<>(islands);
     nonCompetingIslands.removeAll(competingIslands);
     return nonCompetingIslands;
   }
 
   private Set<Island> getCompetingIslands(List<Island> islands) {
-    Set<Island> competingIslands = Sets.newHashSet();
+    Set<Island> competingIslands = new HashSet<>();
     for (int i = 0; i < islands.size(); i++) {
       Island i1 = islands.get(i);
       for (int j = 1; j < islands.size() - i; j++) {

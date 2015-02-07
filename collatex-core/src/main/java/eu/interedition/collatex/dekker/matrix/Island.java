@@ -25,9 +25,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-
 /**
  * A DirectedIsland is a collections of Coordinates all on the same
  * diagonal. The direction of this diagonal can be -1, 0, or 1.
@@ -41,7 +38,7 @@ import com.google.common.collect.Lists;
 public class Island implements Iterable<Coordinate>, Comparable<Island> {
 
   private int direction = 0;
-  private final List<Coordinate> islandCoordinates = Lists.newArrayList();
+  private final List<Coordinate> islandCoordinates = new ArrayList<>();
 
   public Island() {}
 
@@ -181,7 +178,7 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
   }
 
   protected boolean removeSameColOrRow(Coordinate c) {
-    ArrayList<Coordinate> remove = new ArrayList<Coordinate>();
+    ArrayList<Coordinate> remove = new ArrayList<>();
     for (Coordinate coor : islandCoordinates) {
       if (coor.sameColumn(c) || coor.sameRow(c)) {
         remove.add(coor);
@@ -201,7 +198,7 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(islandCoordinates);
+    return islandCoordinates.hashCode();
   }
 
   @Override

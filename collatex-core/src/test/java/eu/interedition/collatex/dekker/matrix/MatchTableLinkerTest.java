@@ -57,7 +57,7 @@ public class MatchTableLinkerTest extends AbstractTest {
         "black is the cat",//
         "black and white is the cat");
     final VariantGraph graph = collate(w[0], w[1]);
-    MatchTableLinker linker = new MatchTableLinker(3);
+    MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> link = linker.link(graph, w[2], new EqualityTokenComparator());
     Set<Token> tokens = link.keySet();
     Map<String, String> tokensAsString = Maps.newHashMap();
@@ -71,7 +71,7 @@ public class MatchTableLinkerTest extends AbstractTest {
   public void testUsecase1() {
     final SimpleWitness[] w = createWitnesses("The black cat", "The black and white cat");
     final VariantGraph graph = collate(w[0]);
-    MatchTableLinker linker = new MatchTableLinker(3);
+    MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     assertEquals(3, link.size());
   }
@@ -83,7 +83,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     // Optimal alignment has no gaps
     final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "The red cat and the black cat");
     final VariantGraph graph = collate(w[0]);
-    MatchTableLinker linker = new MatchTableLinker(3);
+    MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     PhraseMatchDetector detector = new PhraseMatchDetector();
     List<List<Match>> phraseMatches = detector.detect(link, graph, w[1]);
@@ -97,7 +97,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     // Note: there are two paths here that contain 1 gap
     final SimpleWitness[] w = createWitnesses("The red cat and the black cat", "the black cat");
     final VariantGraph graph = collate(w[0]);
-    MatchTableLinker linker = new MatchTableLinker(3);
+    MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> link = linker.link(graph, w[1], new EqualityTokenComparator());
     PhraseMatchDetector detector = new PhraseMatchDetector();
     List<List<Match>> phraseMatches = detector.detect(link, graph, w[1]);
@@ -114,7 +114,7 @@ public class MatchTableLinkerTest extends AbstractTest {
 
     VariantGraph graph = collate(witnesses[0], witnesses[1]);
 
-    MatchTableLinker linker = new MatchTableLinker(1);
+    MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> linkedTokens = linker.link(graph, witnesses[2], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
@@ -139,7 +139,7 @@ public class MatchTableLinkerTest extends AbstractTest {
   public void test1() {
     SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
     VariantGraph vg = collate(sw[0]);
-    MatchTableLinker linker = new MatchTableLinker(1);
+    MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> linkedTokens = linker.link(vg, sw[1], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
@@ -162,7 +162,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     String textDMD1 = "Over de Atlantische Oceaan voer een grote stomer. De lucht was helder blauw, het water rimpelend satijn.<p/>\nOp sommige dekken van de stomer lagen mensen in de zon, op andere dekken werd getennist, op nog andere liepen de passagiers heen en weer en praatten. Wie over de reling hing en recht naar beneden keek, kon vaststellen dat het schip vorderde; of draaide alleen de aarde er onderdoor?<p/>\nOp de Atlantische Oceaan voer een ontzaggelijk zeekasteel. Onder de vele passagiers aan boord, bevond zich een bruine, korte dikke man. Hij werd nooit zonder sigaar gezien. Zijn pantalon had lijnrechte vouwen in de pijpen, maar zat toch altijd vol rimpels. De pantalon werd naar boven toe breed, ongelofelijk breed: hij omsloot de buik van de kleine man als een soort balkon.<p/>";
     SimpleWitness[] sw = createWitnesses(textD9, textDMD1);
     VariantGraph vg = collate(sw[0]);
-    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
+    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[1], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -188,7 +188,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     String textDmd1 = "Natuurlijk, alles is betrekkelijk";
     SimpleWitness[] sw = createWitnesses(textD1, textD9, textDmd1);
     VariantGraph vg = collate(sw[0], sw[1]);
-    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
+    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[2], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -214,7 +214,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     String c = "Et sortem mortis tribus diebus sompno suscepto et tunc ab inferis regressus ad lucem veniet.";
     SimpleWitness[] sw = createWitnesses(a, b, c);
     VariantGraph vg = collate(sw[0], sw[1]);
-    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[2], new StrictEqualityTokenComparator());
+    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[2], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
     Set<String> tokensAsString = Sets.newLinkedHashSet();
@@ -243,7 +243,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     assertEquals(4, tokensA.size());
     
     VariantGraph vg = collate(sw[0]);
-    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker(outlierTranspositionsSizeLimit).link(vg, sw[1], new StrictEqualityTokenComparator());
+    Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[1], new StrictEqualityTokenComparator());
     
     // assert linked tokens; helper method
     Set<Token> tokens = linkedTokens.keySet();
