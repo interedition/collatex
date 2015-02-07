@@ -57,7 +57,7 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
           matchThreads.computeIfAbsent(rank, r -> new LinkedList<>()).add(matchThreadElement);
         }
       }
-      for (MatchThreadElement matchThreadElement : matchThreads.get(rank - 1)) {
+      for (MatchThreadElement matchThreadElement : matchThreads.getOrDefault(rank - 1, Collections.emptyList())) {
         for (VariantGraph.Vertex vertex : vertices[rank]) {
           final MatchThreadElement advanced = matchThreadElement.advance(vertex, rank);
           if (advanced != null) {
