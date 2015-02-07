@@ -19,25 +19,20 @@
 
 package eu.interedition.collatex.util;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 
-import javax.xml.stream.XMLStreamWriter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -61,41 +56,42 @@ public class ParallelSegmentationApparatus {
     for (Iterator<Map.Entry<Integer, Collection<VariantGraph.Vertex>>> rowIt = ranking.getByRank().asMap().entrySet().iterator(); rowIt.hasNext(); ) {
       final Map.Entry<Integer, Collection<VariantGraph.Vertex>> row = rowIt.next();
       final int rank = row.getKey();
-      final Collection<VariantGraph.Vertex> vertices = row.getValue();
+      final Collection<VariantGraph.Vertex> verticesOfRank = row.getValue();
 
-      if (vertices.size() == 1 && Iterables.getOnlyElement(vertices).tokens().isEmpty()) {
+
+      if (verticesOfRank.size() == 1 && verticesOfRank.stream().findFirst().map(VariantGraph.Vertex::tokens).map(Set::isEmpty).orElse(false)) {
         // skip start and end vertex
         continue;
       }
 
       // spreading vertices with same rank according to their registered transpositions
-      final Multimap<Integer, VariantGraph.Vertex> verticesByTranspositionRank = HashMultimap.create();
-      for (VariantGraph.Vertex v : vertices) {
+      final SortedMap<Integer, List<VariantGraph.Vertex>> verticesByTranspositionRank = new TreeMap<>();
+      for (VariantGraph.Vertex v : verticesOfRank) {
         int transpositionRank = 0;
         for (VariantGraph.Transposition transposition : v.transpositions()) {
           for (VariantGraph.Vertex tv : transposition) {
             transpositionRank += (ranking.apply(tv).intValue() - rank);
           }
         }
-        verticesByTranspositionRank.put(transpositionRank, v);
+        verticesByTranspositionRank.computeIfAbsent(transpositionRank, r -> new LinkedList<>()).add(v);
       }
 
       // render segments
-      for (Iterator<Integer> transpositionRankIt = Ordering.natural().immutableSortedCopy(verticesByTranspositionRank.keySet()).iterator(); transpositionRankIt.hasNext() ;) {
-        final Multimap<Witness, Token> tokensByWitness = HashMultimap.create();
-        for (VariantGraph.Vertex v : verticesByTranspositionRank.get(transpositionRankIt.next())) {
+      verticesByTranspositionRank.values().forEach(vertices -> {
+        final Map<Witness, List<Token>> tokensByWitness = new HashMap<>();
+        for (VariantGraph.Vertex v : vertices) {
           for (Token token : v.tokens()) {
-            tokensByWitness.put(token.getWitness(), token);
+            tokensByWitness.computeIfAbsent(token.getWitness(), w -> new LinkedList<>()).add(token);
           }
         }
 
-        final SortedMap<Witness, Iterable<Token>> cellContents = Maps.newTreeMap(Witness.SIGIL_COMPARATOR);
+        final SortedMap<Witness, Iterable<Token>> cellContents = new TreeMap<>(Witness.SIGIL_COMPARATOR);
         for (Witness witness : allWitnesses) {
-          cellContents.put(witness, tokensByWitness.containsKey(witness) ? Iterables.unmodifiableIterable(tokensByWitness.get(witness)) : Collections.<Token>emptySet());
+          cellContents.put(witness, Collections.unmodifiableCollection(tokensByWitness.getOrDefault(witness, Collections.emptyList())));
         }
 
         callback.segment(cellContents);
-      }
+      });
     }
 
     callback.end();

@@ -19,15 +19,6 @@
 
 package eu.interedition.collatex.util;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-
-import javax.annotation.Nullable;
-
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -40,11 +31,17 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeBasedTable;
 import com.google.common.collect.TreeMultimap;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.Witness;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -153,7 +150,7 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
   }
 
   @Override
-  public Integer apply(@Nullable VariantGraph.Vertex vertex) {
+  public Integer apply(VariantGraph.Vertex vertex) {
     return byVertex.get(vertex);
   }
 
