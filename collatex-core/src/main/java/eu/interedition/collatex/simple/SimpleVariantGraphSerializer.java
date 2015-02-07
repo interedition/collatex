@@ -280,7 +280,7 @@ public class SimpleVariantGraphSerializer {
 
   Set<Tuple<VariantGraph.Vertex>> transposedTuples() {
     final Set<Tuple<VariantGraph.Vertex>> tuples = Sets.newHashSet();
-    final Ordering<VariantGraph.Vertex> vertexOrdering = Ordering.from(ranking()).compound((o1, o2) -> Ordering.arbitrary().compare(o1, o2));
+    final Ordering<VariantGraph.Vertex> vertexOrdering = Ordering.from(ranking().comparator()).compound((o1, o2) -> Ordering.arbitrary().compare(o1, o2));
 
     for (VariantGraph.Transposition transposition : graph.transpositions()) {
       final SortedSetMultimap<Witness, VariantGraph.Vertex> verticesByWitness = TreeMultimap.create(Witness.SIGIL_COMPARATOR, vertexOrdering);

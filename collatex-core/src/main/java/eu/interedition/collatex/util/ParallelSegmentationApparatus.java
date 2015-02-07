@@ -53,8 +53,8 @@ public class ParallelSegmentationApparatus {
     callback.start();
 
     final Set<Witness> allWitnesses = ranking.witnesses();
-    for (Iterator<Map.Entry<Integer, Collection<VariantGraph.Vertex>>> rowIt = ranking.getByRank().asMap().entrySet().iterator(); rowIt.hasNext(); ) {
-      final Map.Entry<Integer, Collection<VariantGraph.Vertex>> row = rowIt.next();
+    for (Iterator<Map.Entry<Integer, Set<VariantGraph.Vertex>>> rowIt = ranking.getByRank().entrySet().iterator(); rowIt.hasNext(); ) {
+      final Map.Entry<Integer, Set<VariantGraph.Vertex>> row = rowIt.next();
       final int rank = row.getKey();
       final Collection<VariantGraph.Vertex> verticesOfRank = row.getValue();
 

@@ -29,7 +29,9 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,9 +50,9 @@ public class SpencerHoweTest extends AbstractTest {
   @Test
   public void alignmentTable() {
     final SimpleWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final RowSortedTable<Integer, Witness, Set<Token>> table = VariantGraphRanking.of(collate(w)).asTable();
+    final List<SortedMap<Witness, Set<Token>>> table = VariantGraphRanking.of(collate(w)).asTable();
 
-    assertEquals(3, table.columnKeySet().size());
+    assertEquals(3, table.stream().flatMap(r -> r.keySet().stream()).distinct().count());
     //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
     assertEquals("|a|b|c| | |d|e|f|", toString(table, w[0]));
     assertEquals("| | |x|y|z|d|e| |", toString(table, w[1]));

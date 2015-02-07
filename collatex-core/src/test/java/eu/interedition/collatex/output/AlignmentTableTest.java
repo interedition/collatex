@@ -21,7 +21,9 @@ package eu.interedition.collatex.output;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import eu.interedition.collatex.VariantGraph;
 import org.junit.Ignore;
@@ -44,16 +46,16 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void firstWitness() {
     final SimpleWitness[] w = createWitnesses("the black cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
-    assertEquals(1, table.columnKeySet().size());
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+    assertEquals(1, witnesses(table).count());
     assertEquals("|the|black|cat|", toString(table, w[0]));
   }
   
   @Test
   public void everythingMatches() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat", "the black cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
-    assertEquals(3, table.columnKeySet().size());
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+    assertEquals(3, witnesses(table).count());
     assertEquals("|the|black|cat|", toString(table, w[0]));
     assertEquals("|the|black|cat|", toString(table, w[1]));
     assertEquals("|the|black|cat|", toString(table, w[2]));
@@ -62,8 +64,8 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void variant() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
-    assertEquals(5, table.columnKeySet().size());
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+    assertEquals(5, witnesses(table).count());
     assertEquals("|the|black|cat|", toString(table, w[0]));
     assertEquals("|the|white|cat|", toString(table, w[1]));
     assertEquals("|the|green|cat|", toString(table, w[2]));
@@ -73,38 +75,39 @@ public class AlignmentTableTest extends AbstractTest {
 
   @Test
   public void omission() {
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate("the black cat", "the cat", "the black cat"));
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate("the black cat", "the cat", "the black cat"));
     assertEquals("A: |the|black|cat|\nB: |the| |cat|\nC: |the|black|cat|\n", toString(table));
   }
 
   @Test
   public void addition1() {
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate("the black cat", "the white and black cat"));
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate("the black cat", "the white and black cat"));
     assertEquals("A: |the| | |black|cat|\nB: |the|white|and|black|cat|\n", toString(table));
   }
 
   @Test
   public void addition2() {
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate("the cat", "before the cat", "the black cat", "the cat walks"));
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate("the cat", "before the cat", "the black cat", "the cat walks"));
     assertEquals("A: | |the| |cat| |\nB: |before|the| |cat| |\nC: | |the|black|cat| |\nD: | |the| |cat|walks|\n", toString(table));
   }
 
   @Test
   public void addition3() {
-    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate("the cat", "before the cat", "the black cat", "just before midnight the cat walks"));
+    final List<SortedMap<Witness, Set<Token>>> t = table(collate("the cat", "before the cat", "the black cat", "just before midnight the cat walks"));
     assertEquals("A: | | | |the| |cat| |\nB: | |before| |the| |cat| |\nC: | | | |the|black|cat| |\nD: |just|before|midnight|the| |cat|walks|\n", toString(t));
   }
 
   @Test
   public void transpositionAndReplacement() {
-    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate("the black dog chases a red cat", "a red cat chases the black dog", "a red cat chases the yellow dog"));
+    final
+    List<SortedMap<Witness, Set<Token>>> t = table(collate("the black dog chases a red cat", "a red cat chases the black dog", "a red cat chases the yellow dog"));
     assertEquals("A: |the|black|dog|chases|a|red|cat|\nB: |a|red|cat|chases|the|black|dog|\nC: |a|red|cat|chases|the|yellow|dog|\n", toString(t));
   }
   
   @Test
   @Ignore("By default we align to the left; right alignment would be nicer in this specific case")
   public void variation() {
-    final RowSortedTable<Integer, Witness, Set<Token>> t = table(collate("the black cat", "the black and white cat", "the black very special cat", "the black not very special cat"));
+    final List<SortedMap<Witness, Set<Token>>> t = table(collate("the black cat", "the black and white cat", "the black very special cat", "the black not very special cat"));
     assertEquals("A: |the|black| | | |cat|\nB: |the|black| |and|white|cat|\nC: |the|black| |very|special|cat|\nD: |the|black|not|very|special|cat|\n", toString(t));
   }
 
@@ -112,7 +115,7 @@ public class AlignmentTableTest extends AbstractTest {
   public void witnessReorder() {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black and white cat", "the black not very special cat", "the black very special cat");
     VariantGraph variantgraph = collate(w);
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(variantgraph);
+    final List<SortedMap<Witness, Set<Token>>> table = table(variantgraph);
     assertEquals("|the|black| | | |cat|", toString(table, w[0]));
     assertEquals("|the|black|and|white| |cat|", toString(table, w[1]));
     assertEquals("|the|black|not|very|special|cat|", toString(table, w[2]));
@@ -122,8 +125,8 @@ public class AlignmentTableTest extends AbstractTest {
   @Test
   public void testSimpleSpencerHowe() {
     final SimpleWitness[] w = createWitnesses("a", "b", "a b");
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate(w));
-    assertEquals(3, table.columnKeySet().size());
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+    assertEquals(3, witnesses(table).count());
     assertEquals("|a| |", toString(table, w[0]));
     assertEquals("| |b|", toString(table, w[1]));
     assertEquals("|a|b|", toString(table, w[2]));
@@ -136,7 +139,7 @@ public class AlignmentTableTest extends AbstractTest {
 
   @Test
   public void stringOutputTwoWitnesses() {
-    final RowSortedTable<Integer, Witness, Set<Token>> table = table(collate("the black cat", "the black cat"));
+    final List<SortedMap<Witness, Set<Token>>> table = table(collate("the black cat", "the black cat"));
     assertEquals("A: |the|black|cat|\nB: |the|black|cat|\n", toString(table));
   }
 

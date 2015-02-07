@@ -27,7 +27,6 @@ import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschScorer;
-import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.ArrayList;

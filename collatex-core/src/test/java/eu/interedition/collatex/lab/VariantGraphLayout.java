@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -73,15 +75,11 @@ public class VariantGraphLayout {
   }
 
   private void fillLevels() {
-    final SortedSetMultimap<Integer,VariantGraph.Vertex> ranks = VariantGraphRanking.of(graph).getByRank();
-    for (Integer rank : ranks.keySet()) {
-      final List<Cell> cells = Lists.<Cell>newLinkedList();
-      for (VariantGraph.Vertex vertex : ranks.get(rank)) {
-        cells.add(new Cell(rank, cells.size(), vertex));
-      }
-      grid.add(cells);
+    VariantGraphRanking.of(graph).getByRank().forEach((rank, vertices) -> {
+      final AtomicInteger cellNum = new AtomicInteger();
+      grid.add(vertices.stream().map(vertex -> new Cell(rank, cellNum.getAndIncrement(), vertex)).collect(Collectors.toList()));
       maxX = Math.max(maxX, rank);
-    }
+    });
   }
 
   private void solveEdgeCrosses() {

@@ -19,14 +19,12 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.RowSortedTable;
 import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.Match;
@@ -41,8 +39,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
@@ -86,7 +87,7 @@ public abstract class AbstractTest {
     return collate(createWitnesses(witnesses));
   }
 
-  protected static RowSortedTable<Integer, Witness, Set<Token>> table(VariantGraph graph) {
+  protected static List<SortedMap<Witness, Set<Token>>> table(VariantGraph graph) {
     return VariantGraphRanking.of(graph).asTable();
   }
 
@@ -144,31 +145,32 @@ public abstract class AbstractTest {
     return null;
   }
 
-  protected static String toString(RowSortedTable<Integer, Witness, Set<Token>> table) {
-    final StringBuilder tableStr = new StringBuilder();
-    for (Witness witness : table.columnKeySet()) {
-      tableStr.append(witness.getSigil()).append(": ").append(toString(table, witness)).append("\n");
-    }
-    return tableStr.toString();
+  protected static Stream<Witness> witnesses(List<SortedMap<Witness, Set<Token>>> table) {
+    return table.stream()
+            .map(SortedMap::keySet)
+            .flatMap(Set::stream)
+            .distinct();
+  }
+  
+  protected static String toString(List<SortedMap<Witness, Set<Token>>> table) {
+    return witnesses(table)
+            .sorted(Witness.SIGIL_COMPARATOR)
+            .map(witness -> String.format("%s: %s\n", witness.getSigil(), toString(table, witness)))
+            .collect(Collectors.joining());
   }
 
-  protected static String toString(RowSortedTable<Integer, Witness, Set<Token>> table, Witness witness) {
-    final StringBuilder tableRowStr = new StringBuilder("|");
-    for (Integer row : table.rowKeySet()) {
-      final Set<Token> tokens = table.get(row, witness);
-      if (tokens == null) {
-        tableRowStr.append(" |");
-      } else {
-        final List<SimpleToken> simpleTokens = Ordering.natural().sortedCopy(Iterables.filter(tokens, SimpleToken.class));
-        tableRowStr.append(Joiner.on(" ").join(Iterables.transform(simpleTokens, new Function<Token, String>() {
-          @Override
-          public String apply(Token input) {
-            return ((SimpleToken) input).getNormalized();
-          }
-        }))).append("|");
-      }
-    }
-    return tableRowStr.toString();
+  protected static String toString(List<SortedMap<Witness, Set<Token>>> table, Witness witness) {
+    return String.format("|%s|", table.stream()
+            .map(r -> r.getOrDefault(witness, Collections.emptySet()))
+            .map(tokens -> tokens.stream()
+                            .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
+                            .map(t -> (SimpleToken) t)
+                            .sorted()
+                            .map(SimpleToken::getNormalized)
+                            .collect(Collectors.joining(" "))
+            )
+            .map(cell -> cell.isEmpty() ? " " : cell)
+            .collect(Collectors.joining("|")));
   }
 
   protected void assertPhraseMatches(String... expectedPhrases) {
