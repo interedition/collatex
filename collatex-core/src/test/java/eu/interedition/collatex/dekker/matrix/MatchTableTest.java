@@ -19,22 +19,20 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Test;
-
-import com.google.common.collect.Lists;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MatchTableTest extends AbstractTest {
 
@@ -173,7 +171,7 @@ public class MatchTableTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses("a b c a b", "c a b");
     VariantGraph graph = collate(witnesses[0]);
     MatchTable table = MatchTable.create(graph, witnesses[1]);
-    List<Island> islands = Lists.newArrayList(table.getIslands());
+    List<Island> islands = new ArrayList<>(table.getIslands());
     assertEquals(2, islands.size());
     Collections.sort(islands);
     Island island = islands.get(1);
@@ -185,7 +183,7 @@ public class MatchTableTest extends AbstractTest {
     SimpleWitness[] witnesses = createWitnesses("x a b c a b", "x c a b");
     VariantGraph graph = collate(witnesses[0]);
     MatchTable table = MatchTable.create(graph, witnesses[1]);
-    List<Island> islands = Lists.newArrayList(table.getIslands());
+    List<Island> islands = new ArrayList<>(table.getIslands());
     assertEquals(3, islands.size());
     Collections.sort(islands);
     Island island = islands.get(0);
@@ -197,7 +195,7 @@ public class MatchTableTest extends AbstractTest {
     SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
     VariantGraph graph = collate(w[0]);
     MatchTable table = MatchTable.create(graph, w[1], new EqualityTokenComparator());
-    List<Island> islands = Lists.newArrayList(table.getIslands());
+    List<Island> islands = new ArrayList<>(table.getIslands());
     Collections.sort(islands);
     assertEquals(4, islands.size());
     assertVectorEquals(0, 0, 1, islands.get(0));

@@ -40,6 +40,7 @@ import java.util.SortedSet;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
@@ -108,6 +109,18 @@ public abstract class AbstractTest {
             .collect(Collectors.joining(" "));
   }
 
+  protected static void assertGraphVertices(VariantGraph graph, int vertices) {
+    assertEquals(vertices, StreamSupport.stream(graph.vertices().spliterator(), false).count());
+  }
+
+  protected static void assertGraphEdges(VariantGraph graph, int edges) {
+    assertEquals(edges, StreamSupport.stream(graph.edges().spliterator(), false).count());
+  }
+  protected static void assetGraphSize(VariantGraph graph, int vertices, int edges) {
+    assertGraphVertices(graph, vertices);
+    assertGraphEdges(graph, edges);
+  }
+  
   protected static void assertHasWitnesses(VariantGraph.Edge edge, Witness... witnesses) {
     assertEquals(new HashSet<>(Arrays.asList(witnesses)), edge.witnesses());
   }

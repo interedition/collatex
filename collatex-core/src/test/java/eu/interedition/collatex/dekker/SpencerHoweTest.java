@@ -19,12 +19,10 @@
 
 package eu.interedition.collatex.dekker;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.RowSortedTable;
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
@@ -63,8 +61,8 @@ public class SpencerHoweTest extends AbstractTest {
   public void graph() {
     final SimpleWitness[] w = createWitnesses("a", "b", "a b");
     final VariantGraph graph = collate(w);
-    assertEquals(4, Iterables.size(graph.vertices()));
-    assertEquals(5, Iterables.size(graph.edges()));
+    
+    assetGraphSize(graph, 4, 5);
 
     final VariantGraph.Vertex startVertex = graph.getStart();
     final VariantGraph.Vertex aVertex = vertexWith(graph, "a", w[0]);

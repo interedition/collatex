@@ -1,11 +1,11 @@
 package eu.interedition.collatex.dekker.matrix;
 
-import com.google.common.collect.Lists;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public class IslandConflictResolverTest extends AbstractTest {
     VariantGraph graph = collate(w[0]);
     // create table from the graph and the second witness
     MatchTable table = MatchTable.create(graph, w[1]);
-    List<Island> possibleIslands = Lists.newArrayList();
+    List<Island> possibleIslands = new ArrayList<>();
     for (Island island : table.getIslands()) {
       if (island.size()==2) {
         possibleIslands.add(island);

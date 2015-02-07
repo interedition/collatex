@@ -19,25 +19,6 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.junit.Test;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -47,6 +28,21 @@ import eu.interedition.collatex.dekker.PhraseMatchDetector;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Test;
+
+import javax.xml.stream.XMLStreamException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MatchTableLinkerTest extends AbstractTest {
 
@@ -60,7 +56,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     MatchTableLinker linker = new MatchTableLinker();
     Map<Token, VariantGraph.Vertex> link = linker.link(graph, w[2], new EqualityTokenComparator());
     Set<Token> tokens = link.keySet();
-    Map<String, String> tokensAsString = Maps.newHashMap();
+    Map<String, String> tokensAsString = new HashMap<>();
     for (Token token : tokens) {
       tokensAsString.put(token.toString(), link.get(token).toString());
     }
@@ -118,11 +114,11 @@ public class MatchTableLinkerTest extends AbstractTest {
     Map<Token, VariantGraph.Vertex> linkedTokens = linker.link(graph, witnesses[2], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
-    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    Set<String> tokensAsString = new LinkedHashSet<>();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
-    LOG.fine(Iterables.toString(tokensAsString));
+    LOG.fine(tokensAsString::toString);
     assertTrue(tokensAsString.contains("C:0:'over'"));
     assertTrue(tokensAsString.contains("C:1:'de'"));
     assertTrue(tokensAsString.contains("C:2:'atlantische'"));
@@ -143,7 +139,7 @@ public class MatchTableLinkerTest extends AbstractTest {
     Map<Token, VariantGraph.Vertex> linkedTokens = linker.link(vg, sw[1], new EqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
-    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    Set<String> tokensAsString = new LinkedHashSet<>();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
@@ -165,13 +161,13 @@ public class MatchTableLinkerTest extends AbstractTest {
     Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[1], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
-    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    Set<String> tokensAsString = new LinkedHashSet<>();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
-    List<String> l = Lists.newArrayList(tokensAsString);
+    List<String> l = new ArrayList<>(tokensAsString);
     Collections.sort(l);
-    LOG.log(Level.FINE, Joiner.on('\n').join(l));
+    LOG.log(Level.FINE, () -> l.stream().collect(Collectors.joining("\n")));
     assertTrue(tokensAsString.contains("B:87:'onder'"));
     assertTrue(tokensAsString.contains("B:0:'over'"));
     assertTrue(tokensAsString.contains("B:1:'de'"));
@@ -182,7 +178,6 @@ public class MatchTableLinkerTest extends AbstractTest {
 
   @Test
   public void testHermansAllesIsBetrekkelijk1() throws XMLStreamException {
-    int outlierTranspositionsSizeLimit = 1;
     String textD1 = "natuurlijk is alles betrekkelijk";
     String textD9 = "Natuurlijk, alles mag relatief zijn";
     String textDmd1 = "Natuurlijk, alles is betrekkelijk";
@@ -191,11 +186,11 @@ public class MatchTableLinkerTest extends AbstractTest {
     Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[2], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
-    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    Set<String> tokensAsString = new LinkedHashSet<>();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
-    List<String> l = Lists.newArrayList(tokensAsString);
+    List<String> l = new ArrayList<>(tokensAsString);
     Collections.sort(l);
     LOG.log(Level.FINE, "tokensAsString={0}", l);
     //    assertTrue(tokensAsString.contains("B:75:'onder'"));
@@ -208,7 +203,6 @@ public class MatchTableLinkerTest extends AbstractTest {
 
   @Test
   public void testSuscepto() throws XMLStreamException {
-    int outlierTranspositionsSizeLimit = 1;
     String a = "Et sumpno suscepto tribus diebus morte morietur et deinde ab inferis regressus ad lucem veniet.";
     String b = "Et mortem sortis finiet post tridui somnum et morte morietur tribus diebus somno suscepto et tunc ab inferis regressus ad lucem veniet.";
     String c = "Et sortem mortis tribus diebus sompno suscepto et tunc ab inferis regressus ad lucem veniet.";
@@ -217,11 +211,11 @@ public class MatchTableLinkerTest extends AbstractTest {
     Map<Token, VariantGraph.Vertex> linkedTokens = new MatchTableLinker().link(vg, sw[2], new StrictEqualityTokenComparator());
 
     Set<Token> tokens = linkedTokens.keySet();
-    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    Set<String> tokensAsString = new LinkedHashSet<>();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
-    List<String> l = Lists.newArrayList(tokensAsString);
+    List<String> l = new ArrayList<>(tokensAsString);
     Collections.sort(l);
     LOG.log(Level.FINE, "tokensAsString={0}", l);
     assertTrue(tokensAsString.contains("C:6:'suscepto'"));
@@ -229,7 +223,6 @@ public class MatchTableLinkerTest extends AbstractTest {
 
   @Test
   public void testOutlierTranspositionLimitAndPunctuation() {
-    int outlierTranspositionsSizeLimit = 200;
     String w1 = "a b c .";
     String w2 = "a b c Natuurlijk, alles mag relatief zijn.";
     SimpleWitness[] sw = createWitnesses(w1, w2);
@@ -247,11 +240,11 @@ public class MatchTableLinkerTest extends AbstractTest {
     
     // assert linked tokens; helper method
     Set<Token> tokens = linkedTokens.keySet();
-    Set<String> tokensAsString = Sets.newLinkedHashSet();
+    Set<String> tokensAsString = new LinkedHashSet<>();
     for (Token token : tokens) {
       tokensAsString.add(token.toString());
     }
-    List<String> l = Lists.newArrayList(tokensAsString);
+    List<String> l = new ArrayList<>(tokensAsString);
     Collections.sort(l);
     
     assertTrue(l.contains("B:0:'a'"));

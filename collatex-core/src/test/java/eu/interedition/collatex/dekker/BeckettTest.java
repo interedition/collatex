@@ -19,23 +19,6 @@
 
 package eu.interedition.collatex.dekker;
 
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -45,6 +28,19 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BeckettTest extends AbstractTest {
 
@@ -126,9 +122,9 @@ public class BeckettTest extends AbstractTest {
   public void testDirkVincent7() {
     final SimpleWitness[] w = createWitnesses(//
         "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
-    VariantGraph graph = collate(w);
+    collate(w);
     assertPhraseMatches("Its soft","light", "any light he could remember from the days", "nights when day followed", "night", "vice versa.");
-    assertTrue(Iterables.isEmpty(((DekkerAlgorithm) collationAlgorithm).getTranspositions()));
+    assertTrue(((DekkerAlgorithm) collationAlgorithm).getTranspositions().isEmpty());
   }
 
   @Test
@@ -228,7 +224,7 @@ public class BeckettTest extends AbstractTest {
   }
 
   private static void assertGraphContains(VariantGraph graph, String... expected) {
-    SortedSet<String> contents = Sets.newTreeSet();
+    SortedSet<String> contents = new TreeSet<>();
     for (Witness witness : graph.witnesses()) {
       extractPhrases(contents, graph, witness);
     }

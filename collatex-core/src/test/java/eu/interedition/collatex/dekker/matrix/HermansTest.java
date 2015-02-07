@@ -19,30 +19,6 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.logging.Level;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -53,6 +29,26 @@ import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Level;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class HermansTest extends AbstractTest {
 
@@ -245,22 +241,22 @@ public class HermansTest extends AbstractTest {
     VariantGraph vg = collate(sw);
     Set<VariantGraph.Transposition> transpositions0 = vg.transpositions();
     for (VariantGraph.Transposition t : transpositions0) {
-      LOG.log(Level.FINE, "transposition {0}", showTransposition(t));
+      LOG.log(Level.FINE, "transposition {0}", t.toString());
     }
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
-      LOG.log(Level.FINE, "vertex:{0}, transpositions:{1}", new Object[] { v, Iterables.toString(v.transpositions()) });
+      LOG.log(Level.FINE, "vertex:{0}, transpositions:{1}", new Object[] { v, v.transpositions().toString() });
     }
     vg = VariantGraph.JOIN.apply(vg);
     LOG.fine(toString(table(vg)));
     Set<VariantGraph.Transposition> transpositions = vg.transpositions();
     LOG.log(Level.FINE, "{0} transpositions", transpositions.size());
     for (VariantGraph.Transposition t : transpositions) {
-      LOG.log(Level.FINE, "transposition {0}", showTransposition(t));
+      LOG.log(Level.FINE, "transposition {0}", t.toString());
       // all joined vertices should be size 3
       for (VariantGraph.Vertex vertex : t) {
-        assertEquals(showTransposition(t), 3, vertex.tokens().size());
+        assertEquals(t.toString(), 3, vertex.tokens().size());
       }
     }
     assertEquals(3, transpositions.size());
@@ -278,7 +274,7 @@ public class HermansTest extends AbstractTest {
 
     Iterable<VariantGraph.Vertex> vertices = vg.vertices();
     for (VariantGraph.Vertex v : vertices) {
-      LOG.log(Level.FINE, "vertex:{0}, transpositions:{1}", new Object[]{v, Iterables.toString(v.transpositions())});
+      LOG.log(Level.FINE, "vertex:{0}, transpositions:{1}", new Object[]{v, v.transpositions()});
     }
 
     final StringWriter writer = new StringWriter();
@@ -370,17 +366,17 @@ public class HermansTest extends AbstractTest {
     assertEquals(1, transpositions.size());
     VariantGraph.Transposition t = transpositions.iterator().next();
     for (VariantGraph.Vertex vertex : t) {
-      for (SimpleToken token : Iterables.filter(vertex.tokens(), SimpleToken.class)) {
+      for (SimpleToken token : vertex.tokens().stream().map(tk -> (SimpleToken)tk).toArray(SimpleToken[]::new)) {
         assertEquals(token.toString(), token.getNormalized(), "c");
       }
     }
-    final Set<Witness> witnessesInTransposition = Sets.newHashSet();
+    final Set<Witness> witnessesInTransposition = new HashSet<>();
     for (VariantGraph.Vertex vertex : t) {
       for (Token token : vertex.tokens()) {
         witnessesInTransposition.add(token.getWitness());
       }
     }
-    assertEquals(Sets.newHashSet(Arrays.asList(sw)), witnessesInTransposition);
+    assertEquals(new HashSet<>(Arrays.asList(sw)), witnessesInTransposition);
   }
 
   //  @Test
@@ -403,7 +399,4 @@ public class HermansTest extends AbstractTest {
     return writer.toString();
   }
 
-  private String showTransposition(VariantGraph.Transposition t) {
-    return Iterables.toString(t);
-  }
 }

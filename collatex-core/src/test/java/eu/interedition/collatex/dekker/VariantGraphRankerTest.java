@@ -19,18 +19,16 @@
 
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-import java.util.Map;
-
+import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-import eu.interedition.collatex.AbstractTest;
+import static org.junit.Assert.assertEquals;
 
 public class VariantGraphRankerTest extends AbstractTest {
 
@@ -38,7 +36,7 @@ public class VariantGraphRankerTest extends AbstractTest {
   public void ranking() {
     final VariantGraph graph = collate("The black cat", "The black and white cat", "The black and green cat");
     final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
-    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
+    final List<VariantGraph.Vertex> vertices = StreamSupport.stream(graph.vertices().spliterator(), false).collect(Collectors.toList());
 
     assertVertexEquals("the", vertices.get(1));
     assertEquals(1, (long) ranking.apply(vertices.get(1)));
@@ -60,7 +58,7 @@ public class VariantGraphRankerTest extends AbstractTest {
   public void agastTranspositionHandling() {
     final VariantGraph graph = collate("He was agast, so", "He was agast", "So he was agast");
     final VariantGraphRanking ranking = VariantGraphRanking.of(graph);
-    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
+    final List<VariantGraph.Vertex> vertices = StreamSupport.stream(graph.vertices().spliterator(), false).collect(Collectors.toList());
 
     assertVertexEquals("so", vertices.get(1));
     assertEquals(1,(long) ranking.apply(vertices.get(1)));

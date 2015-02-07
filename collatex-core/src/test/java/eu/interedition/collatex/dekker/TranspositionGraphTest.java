@@ -1,22 +1,19 @@
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.google.common.collect.Sets;
-
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Transposition;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TranspositionGraphTest extends AbstractTest {
 
@@ -79,7 +76,7 @@ public class TranspositionGraphTest extends AbstractTest {
     Set<Transposition> transpositions = graph.transpositions();
     assertEquals(1, transpositions.size());
     Transposition transposition = transpositions.iterator().next();
-    Set<String> transposedVertices = Sets.newHashSet();
+    Set<String> transposedVertices = new HashSet<>();
     for (Vertex transposedVertex : transposition) {
       transposedVertices.add(transposedVertex.toString());
     }

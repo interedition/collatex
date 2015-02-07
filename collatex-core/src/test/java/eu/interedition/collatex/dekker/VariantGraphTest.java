@@ -19,22 +19,13 @@
 
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
+import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
-import org.junit.Assert;
+import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.simple.SimpleWitness;
-
 /**
- * @todo Add test with an addition or omission in between!
+ * todo Add test with an addition or omission in between!
  */
 public class VariantGraphTest extends AbstractTest {
 
@@ -43,8 +34,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
     final VariantGraph graph = collate(w);
 
-    assertEquals(5, Iterables.size(graph.vertices()));
-    assertEquals(4, Iterables.size(graph.edges()));
+    assetGraphSize(graph, 5, 4);
 
     final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
     final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
@@ -61,8 +51,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white and black cat");
     final VariantGraph graph = collate(w);
 
-    assertEquals(7, Lists.newArrayList(graph.vertices()).size());
-    assertEquals(7, Iterables.size(graph.edges()));
+    assetGraphSize(graph, 7, 7);
 
     final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
     final VariantGraph.Vertex whiteVertex = vertexWith(graph, "white", w[1]);
@@ -84,9 +73,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black cat", "the white cat", "the green cat", "the red cat", "the yellow cat");
     final VariantGraph graph = collate(w);
 
-    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices());
-    assertEquals(9, vertices.size());
-    assertEquals(12, Iterables.size(graph.edges()));
+    assetGraphSize(graph, 9, 12);
 
     final VariantGraph.Vertex theVertex = vertexWith(graph, "the", w[0]);
     final VariantGraph.Vertex blackVertex = vertexWith(graph, "black", w[0]);
@@ -115,7 +102,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("a b", "b a");
     final VariantGraph graph = collate(w);
 
-    assertEquals(5, Iterables.size(graph.vertices()));
+    assertGraphVertices(graph, 5);
 
     assertHasWitnesses(edgeBetween(vertexWith(graph, "b", w[1]), vertexWith(graph, "a", w[1])), w[1]);
     assertHasWitnesses(edgeBetween(vertexWith(graph, "a", w[0]), vertexWith(graph, "b", w[0])), w[0]);
@@ -126,7 +113,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black and white cat", "the white and black cat");
     final VariantGraph graph = collate(w);
 
-    Assert.assertEquals(9, Iterables.size(graph.vertices()));
+    assertGraphVertices(graph, 9);
 
     // FIXME: find out, how to test this without stable topological order
     /*

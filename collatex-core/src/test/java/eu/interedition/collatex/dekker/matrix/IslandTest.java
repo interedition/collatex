@@ -19,16 +19,15 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import eu.interedition.collatex.VariantGraph;
-import org.junit.Test;
-
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.matching.EqualityTokenComparator;
-import eu.interedition.collatex.simple.SimpleWitness;
 
 public class IslandTest extends AbstractTest {
 
