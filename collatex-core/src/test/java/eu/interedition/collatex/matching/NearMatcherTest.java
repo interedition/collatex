@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.matching;
 
-import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -40,7 +39,7 @@ public class NearMatcherTest extends AbstractTest {
     final Map<Token, List<VariantGraph.Vertex>> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EditDistanceTokenComparator()).allMatches;
 
     assertEquals(2, matches.values().stream().flatMap(List::stream).count());
-    assertEquals(w[0].getTokens().get(0), Iterables.getFirst(Iterables.get(matches.get(w[1].getTokens().get(0)), 0).tokens(), null));
-    assertEquals(w[0].getTokens().get(1), Iterables.getFirst(Iterables.get(matches.get(w[1].getTokens().get(1)), 0).tokens(), null));
+    assertEquals(w[0].getTokens().get(0), matches.get(w[1].getTokens().get(0)).get(0).tokens().stream().findFirst().get());
+    assertEquals(w[0].getTokens().get(1), matches.get(w[1].getTokens().get(1)).get(0).tokens().stream().findFirst().get());
   }
 }

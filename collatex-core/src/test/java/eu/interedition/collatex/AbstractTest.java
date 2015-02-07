@@ -19,13 +19,6 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -37,7 +30,10 @@ import org.junit.Before;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -91,10 +87,6 @@ public abstract class AbstractTest {
     return VariantGraphRanking.of(graph).asTable();
   }
 
-  protected static SortedSet<String> extractPhrases(VariantGraph graph, Witness witness) {
-    return extractPhrases(Sets.<String> newTreeSet(), graph, witness);
-  }
-
   protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
     for (VariantGraph.Vertex v : graph.vertices(Collections.singleton(witness))) {
       phrases.add(toString(v, witness));
@@ -103,18 +95,21 @@ public abstract class AbstractTest {
   }
 
   protected static String toString(VariantGraph.Vertex vertex, Witness... witnesses) {
-    final Multimap<Witness, Token> tokens = Multimaps.index(vertex.tokens(Sets.newHashSet(Arrays.asList(witnesses))), Token::getWitness);
-    List<String> tokenContents = Lists.newArrayListWithExpectedSize(tokens.size());
-    for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
-      for (Token token : Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class))) {
-        tokenContents.add(((SimpleToken) token).getNormalized());
-      }
-    }
-    return Joiner.on(' ').join(tokenContents);
+    return vertex.tokens(new HashSet<>(Arrays.asList(witnesses))).stream()
+            .collect(Collectors.groupingBy(Token::getWitness)).entrySet().stream()
+            .sorted(Comparator.comparing(e -> e.getKey().getSigil()))
+            .map(Map.Entry::getValue)
+            .flatMap(tokens -> tokens.stream()
+                            .filter(t -> t instanceof SimpleToken)
+                            .map(t -> (SimpleToken) t)
+                            .sorted()
+                            .map(SimpleToken::getNormalized)
+            )
+            .collect(Collectors.joining(" "));
   }
 
   protected static void assertHasWitnesses(VariantGraph.Edge edge, Witness... witnesses) {
-    assertEquals(Sets.newHashSet(Arrays.asList(witnesses)), edge.witnesses());
+    assertEquals(new HashSet<>(Arrays.asList(witnesses)), edge.witnesses());
   }
 
   protected static VariantGraph.Edge edgeBetween(VariantGraph.Vertex start, VariantGraph.Vertex end) {
@@ -124,7 +119,7 @@ public abstract class AbstractTest {
   }
 
   protected static void assertVertexEquals(String expected, VariantGraph.Vertex vertex) {
-    assertEquals(expected, ((SimpleToken) Iterables.getFirst(vertex.tokens(), null)).getNormalized());
+    assertEquals(expected, vertex.tokens().stream().findFirst().map(t -> (SimpleToken) t).map(SimpleToken::getNormalized).get());
   }
 
   protected static void assertTokenEquals(String expected, Token token) {

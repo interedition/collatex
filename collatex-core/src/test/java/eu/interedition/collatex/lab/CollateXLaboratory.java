@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex.lab;
 
-import com.google.common.collect.Iterables;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
@@ -74,7 +73,7 @@ public class CollateXLaboratory extends JFrame {
   public CollateXLaboratory() {
     super("CollateX Laboratory");
 
-    this.algorithm = new JComboBox<String>(new String[] { "Dekker", "Needleman-Wunsch", "Greedy String Tiling", "MEDITE" });
+    this.algorithm = new JComboBox<>(new String[] { "Dekker", "Needleman-Wunsch", "Greedy String Tiling", "MEDITE" });
     this.algorithm.setEditable(false);
     this.algorithm.setFocusable(false);
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
@@ -158,7 +157,7 @@ public class CollateXLaboratory extends JFrame {
       final List<SimpleWitness> w = witnessPanel.getWitnesses();
 
       if (LOG.isLoggable(Level.FINE)) {
-        LOG.log(Level.FINE, "Collating {0}", Iterables.toString(w));
+        LOG.log(Level.FINE, "Collating {0}", w.toString());
       }
 
 
@@ -182,7 +181,7 @@ public class CollateXLaboratory extends JFrame {
 
       variantGraphPanel.setVariantGraph(variantGraph);
       if (LOG.isLoggable(Level.FINE)) {
-        LOG.log(Level.FINE, "Collated {0}", Iterables.toString(w));
+        LOG.log(Level.FINE, "Collated {0}", w.toString());
       }
 
       tabbedPane.setSelectedIndex(0);
@@ -219,7 +218,7 @@ public class CollateXLaboratory extends JFrame {
       if (LOG.isLoggable(Level.FINE)) {
         LOG.log(Level.FINE, "Creating MatchTable for: {0}", lastWitness.getSigil());
       }
-      matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator), vg, lastWitness, outlierTranspositionsSizeLimit));
+      matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator)));
 
       final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
       columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());

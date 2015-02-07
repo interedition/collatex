@@ -19,19 +19,18 @@
 
 package eu.interedition.collatex.matching;
 
-import static org.junit.Assert.*;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
-
-import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class MatchesTest extends AbstractTest {
 

@@ -17,14 +17,8 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.neo4j;
+package eu.interedition.collatex;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Assert;
@@ -33,9 +27,12 @@ import org.junit.Test;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,8 +42,8 @@ public class VariantGraphTest extends AbstractTest {
   public void emptyGraph() {
     final VariantGraph graph = collate(createWitnesses());
     assertEquals(0, graph.witnesses().size());
-    assertEquals(2, Iterables.size(graph.vertices()));
-    assertEquals(1, Iterables.size(graph.edges()));
+    assertEquals(2, StreamSupport.stream(graph.vertices().spliterator(), false).count());
+    assertEquals(1, StreamSupport.stream(graph.edges().spliterator(), false).count());
   }
 
   @Test
@@ -67,7 +64,7 @@ public class VariantGraphTest extends AbstractTest {
   public void getTokens() {
     final SimpleWitness[] w = createWitnesses("a b c d");
     final VariantGraph graph = collate(w);
-    final List<VariantGraph.Vertex> vertices = Lists.newArrayList(graph.vertices(Sets.newHashSet(Arrays.<Witness> asList(w))));
+    final List<VariantGraph.Vertex> vertices = StreamSupport.stream(graph.vertices(new HashSet<>(Arrays.<Witness>asList(w))).spliterator(), false).collect(Collectors.toList());
     assertEquals(6, vertices.size());
     assertEquals(graph.getStart(), vertices.get(0));
     assertVertexEquals("a", vertices.get(1));
@@ -82,8 +79,8 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("only one witness");
     final VariantGraph graph = collate(w);
 
-    assertEquals(5, Iterables.size(graph.vertices()));
-    assertEquals(4, Iterables.size(graph.edges()));
+    assertEquals(5, StreamSupport.stream(graph.vertices().spliterator(), false).count());
+    assertEquals(4, StreamSupport.stream(graph.edges().spliterator(), false).count());
 
     final VariantGraph.Vertex firstVertex = vertexWith(graph, "only", w[0]);
     final VariantGraph.Vertex secondVertex = vertexWith(graph, "one", w[0]);
@@ -100,7 +97,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
     final VariantGraph graph = collate(w);
     final Set<Witness> witnessSet = Collections.<Witness> singleton(w[0]);
-    final List<VariantGraph.Vertex> path = Lists.newArrayList(graph.vertices(witnessSet));
+    final List<VariantGraph.Vertex> path = StreamSupport.stream(graph.vertices(witnessSet).spliterator(), false).collect(Collectors.toList());
 
     assertEquals(8, path.size());
     assertEquals(graph.getStart(), path.get(0));
@@ -116,8 +113,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void transpositions1() {
     final VariantGraph graph = collate("the nice black and white cat", "the friendly white and black cat");
-    assertEquals(12, Iterables.size(graph.edges()));
-    assertEquals(12, Iterables.size(graph.edges()));
+    assertEquals(12, StreamSupport.stream(graph.edges().spliterator(), false).count());
   }
 
   @Test
@@ -131,8 +127,8 @@ public class VariantGraphTest extends AbstractTest {
     edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
     assertHasWitnesses(edge, w[1], w[2]);
 
-    assertEquals(17, Iterables.size(graph.vertices())); // start and end vertices included
-    assertEquals(20, Iterables.size(graph.edges()));
+    assertEquals(17, StreamSupport.stream(graph.vertices().spliterator(), false).count()); // start and end vertices included
+    assertEquals(20, StreamSupport.stream(graph.edges().spliterator(), false).count());
   }
 
   @Test
@@ -140,8 +136,8 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
     final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
 
-    assertEquals(3, Iterables.size(graph.vertices()));
-    assertEquals(2, Iterables.size(graph.edges()));
+    assertEquals(3, StreamSupport.stream(graph.vertices().spliterator(), false).count());
+    assertEquals(2, StreamSupport.stream(graph.edges().spliterator(), false).count());
 
     final VariantGraph.Vertex joinedVertex = vertexWith(graph, "the black cat", w[0]);
 

@@ -19,34 +19,22 @@
 
 package eu.interedition.collatex.lab;
 
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.util.Iterator;
-import java.util.Map;
-
-import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.util.VariantGraphRanking;
-import org.apache.commons.collections15.Transformer;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.WordUtils;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.util.VariantGraphRanking;
+
+import java.awt.Color;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -64,62 +52,22 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraph.Vertex, 
     setGraphMouse(new DefaultModalGraphMouse<String, Integer>());
 
     final RenderContext<VariantGraph.Vertex, VariantGraph.Edge> rc = getRenderContext();
-    rc.setVertexLabelTransformer(new Transformer<VariantGraph.Vertex, String>() {
-      @Override
-      public String transform(VariantGraph.Vertex variantGraphVertexModel) {
-        final Multimap<Witness, Token> tokens = Multimaps.index(variantGraphVertexModel.tokens(), Token::getWitness);
-        final StringBuilder label = new StringBuilder();
-        for (Witness witness : Ordering.from(Witness.SIGIL_COMPARATOR).sortedCopy(tokens.keySet())) {
-          label.append("[").append(witness.getSigil()).append(": '");
-          for (Iterator<SimpleToken> tokenIt = Ordering.natural().sortedCopy(Iterables.filter(tokens.get(witness), SimpleToken.class)).iterator(); tokenIt.hasNext(); ) {
-            label.append(tokenIt.next().getContent());
-            if (tokenIt.hasNext()) {
-              label.append(" ");
-            }
-          }
-          label.append("']\n");
-        }
-        String trim = label.append("(").append(Objects.firstNonNull(ranking.apply(variantGraphVertexModel), 0)).append(")").toString().trim();
-        String wrappedLabel = WordUtils.wrap(trim, 30, "\n", false);
-        String htmllabel = StringEscapeUtils.escapeHtml(wrappedLabel).replaceAll("\n", "<br/>");
-        return "<html>" + htmllabel + "</html>";
-      }
-    });
-    rc.setEdgeLabelTransformer(new Transformer<VariantGraph.Edge, String>() {
-      @Override
-      public String transform(VariantGraph.Edge variantGraphEdgeModel) {
-        return Joiner.on(", ").join(Iterables.transform(variantGraphEdgeModel.witnesses(), new Function<Witness, String>() {
-
-          @Override
-          public String apply(Witness input) {
-            return input.getSigil();
-          }
-        }));
-      }
-    });
-    rc.setVertexFillPaintTransformer(new Transformer<VariantGraph.Vertex, Paint>() {
-      @Override
-      public Paint transform(VariantGraph.Vertex v) {
-        final VariantGraph.Transposition transposition = Iterables.getFirst(v.transpositions(), null);
-
-        return (v.tokens().isEmpty() ? Color.BLACK : (transposition == null
-                ? Color.WHITE
-                : transpositionColors.get(transposition)
-        ));
-      }
-    });
-    rc.setEdgeStrokeTransformer(new Transformer<VariantGraph.Edge, Stroke>() {
-      @Override
-      public Stroke transform(VariantGraph.Edge variantGraphEdgeModel) {
-        return variantGraphEdgeModel.witnesses().isEmpty() ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE;
-      }
-    });
-    rc.setEdgeDrawPaintTransformer(new Transformer<VariantGraph.Edge, Paint>() {
-      @Override
-      public Paint transform(VariantGraph.Edge jungVariantGraphEdge) {
-        return Color.GRAY;
-      }
-    });
+    rc.setVertexLabelTransformer(variantGraphVertexModel -> String.format("%s (%d)",
+                    variantGraphVertexModel.tokens().stream()
+                            .collect(Collectors.groupingBy(Token::getWitness)).entrySet().stream()
+                            .sorted(Comparator.comparing(e -> e.getKey().getSigil()))
+                            .map(e -> String.format("[%s: %s]", e.getKey().getSigil(), e.getValue().stream()
+                                    .map(t -> (SimpleToken) t)
+                                    .sorted()
+                                    .map(SimpleToken::getContent)
+                                    .collect(Collectors.joining(" "))))
+                            .collect(Collectors.joining("\n")),
+                    Optional.ofNullable(ranking.apply(variantGraphVertexModel)).orElse(0))
+    );
+    rc.setEdgeLabelTransformer(variantGraphEdgeModel -> variantGraphEdgeModel.witnesses().stream().map(Witness::getSigil).collect(Collectors.joining(", ")));
+    rc.setVertexFillPaintTransformer(v -> v.tokens().isEmpty() ? Color.BLACK : v.transpositions().stream().findFirst().map(transpositionColors::get).orElse(Color.WHITE));
+    rc.setEdgeStrokeTransformer(variantGraphEdgeModel -> variantGraphEdgeModel.witnesses().isEmpty() ? CollateXLaboratory.DASHED_STROKE : CollateXLaboratory.SOLID_STROKE);
+    rc.setEdgeDrawPaintTransformer(jungVariantGraphEdge -> Color.GRAY);
 
     setVariantGraph(vg);
   }
@@ -128,7 +76,7 @@ public class VariantGraphPanel extends VisualizationViewer<VariantGraph.Vertex, 
     this.variantGraph = variantGraph;
     this.ranking = VariantGraphRanking.of(variantGraph);
 
-    this.transpositionColors = Maps.newHashMap();
+    this.transpositionColors = new HashMap<>();
     int tc = 0;
     for (VariantGraph.Transposition transposition : variantGraph.transpositions()) {
       this.transpositionColors.put(transposition, KELLY_MAX_CONTRAST_COLORS[tc++ % KELLY_MAX_CONTRAST_COLORS.length]);

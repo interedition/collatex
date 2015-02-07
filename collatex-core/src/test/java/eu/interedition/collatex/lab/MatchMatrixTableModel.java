@@ -19,16 +19,15 @@
 
 package eu.interedition.collatex.lab;
 
-import java.util.List;
-
-import javax.swing.table.AbstractTableModel;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
 import eu.interedition.collatex.simple.SimpleToken;
+
+import javax.swing.table.AbstractTableModel;
+import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -41,10 +40,8 @@ public class MatchMatrixTableModel extends AbstractTableModel {
   private final String[] rowNames;
   private final String[] columnNames;
   private final MatchTableCell[][] data;
-  private final int outlierTranspositionsSizeLimit;
 
-  public MatchMatrixTableModel(MatchTable matchTable, VariantGraph vg, Iterable<Token> witness, int outlierTranspositionsSizeLimit) {
-    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
+  public MatchMatrixTableModel(MatchTable matchTable) {
     List<Token> rowList = matchTable.rowList();
     List<Integer> columnList = matchTable.columnList();
 
@@ -91,8 +88,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
     // prepare
     IslandConflictResolver resolver = new IslandConflictResolver(matchTable);
     // find preferred islands
-    MatchTableSelection preferred = resolver.createNonConflictingVersion();
-    return preferred;
+    return resolver.createNonConflictingVersion();
   }
 
   @Override

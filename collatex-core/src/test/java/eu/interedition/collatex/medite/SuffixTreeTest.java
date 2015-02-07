@@ -19,12 +19,13 @@
 
 package eu.interedition.collatex.medite;
 
-import com.google.common.collect.Iterables;
 import eu.interedition.collatex.AbstractTest;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -40,9 +41,8 @@ public class SuffixTreeTest extends AbstractTest {
       }
     }, "S", "P", "O", "a", "s", "p", "o");
 
-    LOG.fine(st.toString());
-    LOG.fine(Iterables.toString(st.match(Arrays.asList("s", "p", "o", "a"))));
-
+    LOG.fine(() -> st.toString());
+    LOG.fine(() -> StreamSupport.stream(st.match(Arrays.asList("s", "p", "o", "a")).spliterator(), false).map(Object::toString).collect(Collectors.joining(", ")));
   }
 
 }

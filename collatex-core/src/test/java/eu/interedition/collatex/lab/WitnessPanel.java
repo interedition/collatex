@@ -19,8 +19,6 @@
 
 package eu.interedition.collatex.lab;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import eu.interedition.collatex.simple.SimpleWitness;
 
 import javax.swing.BorderFactory;
@@ -39,7 +37,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +46,7 @@ import java.util.List;
 public class WitnessPanel extends JPanel {
   private static final char[] SIGLA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
-  private List<WitnessTextArea> witnesses = Lists.newArrayListWithCapacity(SIGLA.length);
+  private List<WitnessTextArea> witnesses = new ArrayList<>(SIGLA.length);
 
   public WitnessPanel() {
     super();
@@ -61,7 +59,7 @@ public class WitnessPanel extends JPanel {
   public void newWitness() {
     WitnessTextArea newWitness = null;
     for (WitnessTextArea witness : witnesses) {
-      if (Strings.isNullOrEmpty(witness.getTextContent())) {
+      if (witness.getTextContent().isEmpty()) {
         newWitness = witness;
         break;
       }
@@ -75,10 +73,10 @@ public class WitnessPanel extends JPanel {
   }
 
   public List<SimpleWitness> getWitnesses() {
-    List<SimpleWitness> witnesses = Lists.newArrayListWithCapacity(this.witnesses.size());
+    List<SimpleWitness> witnesses = new ArrayList<>(this.witnesses.size());
     for (WitnessTextArea textArea : this.witnesses) {
       final String textContent = textArea.getTextContent();
-      if (!Strings.isNullOrEmpty(textContent)) {
+      if (!textContent.isEmpty()) {
         witnesses.add(new SimpleWitness(textArea.getSigil(), textContent));
       }
     }
@@ -86,11 +84,11 @@ public class WitnessPanel extends JPanel {
   }
 
   public void removeEmptyWitnesses() {
-    for (Iterator<WitnessTextArea> textAreaIt = Lists.reverse(witnesses).iterator(); textAreaIt.hasNext() && witnesses.size() > 2; ) {
-      final WitnessTextArea textArea = textAreaIt.next();
-      if (Strings.isNullOrEmpty(textArea.getTextContent())) {
+    for (int wc = witnesses.size() - 1; wc >= 0 && witnesses.size() > 2; wc--) {
+      final WitnessTextArea textArea = witnesses.get(wc);
+      if (textArea.getTextContent().isEmpty()) {
         remove(SwingUtilities.getAncestorOfClass(JScrollPane.class, textArea));
-        textAreaIt.remove();
+        witnesses.remove(wc);
       }
     }
     revalidate();

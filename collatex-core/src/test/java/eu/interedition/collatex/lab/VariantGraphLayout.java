@@ -19,18 +19,15 @@
 
 package eu.interedition.collatex.lab;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.SortedSetMultimap;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -40,7 +37,7 @@ import java.util.stream.Collectors;
 public class VariantGraphLayout {
 
   private final VariantGraph graph;
-  private final List<List<Cell>> grid = Lists.newLinkedList();
+  private final List<List<Cell>> grid = new LinkedList<>();
 
   /**
    * represents the size of the grid in horizontal grid elements
@@ -108,7 +105,7 @@ public class VariantGraphLayout {
     // Get the current level
     final List<Cell> cells = grid.get(level);
     // remember the old sort
-    final List<Cell> levelSortBefore = Lists.newArrayList(cells);
+    final List<Cell> levelSortBefore = new ArrayList<>(cells);
     // new sort
     Collections.sort(cells);
 
@@ -121,7 +118,8 @@ public class VariantGraphLayout {
     }
 
     // Collections Sort sorts the highest value to the first value
-    for (Cell cell : Lists.reverse(cells)) {
+    for (int cc = cells.size() - 1; cc >= 0 ; cc--) {
+      final Cell cell = cells.get(cc);
       final VariantGraph.Vertex vertex = cell.vertex;
 
       for (VariantGraph.Edge edge : (down ? vertex.outgoing() : vertex.incoming())) {
@@ -251,7 +249,7 @@ public class VariantGraphLayout {
   }
 
   private List<VariantGraph.Vertex> neighborsOf(VariantGraph.Vertex vertex) {
-    final List<VariantGraph.Vertex> neighbors = Lists.newLinkedList();
+    final List<VariantGraph.Vertex> neighbors = new LinkedList<>();
     for (VariantGraph.Edge outgoing : vertex.outgoing()) {
       neighbors.add(outgoing.to());
     }
@@ -261,7 +259,7 @@ public class VariantGraphLayout {
     return neighbors;
   }
 
-  private final Map<VariantGraph.Vertex, Cell> vertexToCell = Maps.newHashMap();
+  private final Map<VariantGraph.Vertex, Cell> vertexToCell = new HashMap<>();
 
   class Cell implements Comparable<Cell> {
     /**

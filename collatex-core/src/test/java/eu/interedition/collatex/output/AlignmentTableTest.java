@@ -19,22 +19,19 @@
 
 package eu.interedition.collatex.output;
 
-import static org.junit.Assert.assertEquals;
+import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-import eu.interedition.collatex.VariantGraph;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.google.common.collect.RowSortedTable;
-
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleWitness;
+import static org.junit.Assert.assertEquals;
 
 public class AlignmentTableTest extends AbstractTest {
 
