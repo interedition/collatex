@@ -42,8 +42,7 @@ public class VariantGraphTest extends AbstractTest {
   public void emptyGraph() {
     final VariantGraph graph = collate(createWitnesses());
     assertEquals(0, graph.witnesses().size());
-    assertEquals(2, StreamSupport.stream(graph.vertices().spliterator(), false).count());
-    assertEquals(1, StreamSupport.stream(graph.edges().spliterator(), false).count());
+    assetGraphSize(graph, 2, 1);
   }
 
   @Test
@@ -79,8 +78,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("only one witness");
     final VariantGraph graph = collate(w);
 
-    assertEquals(5, StreamSupport.stream(graph.vertices().spliterator(), false).count());
-    assertEquals(4, StreamSupport.stream(graph.edges().spliterator(), false).count());
+    assetGraphSize(graph, 5, 4);
 
     final VariantGraph.Vertex firstVertex = vertexWith(graph, "only", w[0]);
     final VariantGraph.Vertex secondVertex = vertexWith(graph, "one", w[0]);
@@ -113,7 +111,7 @@ public class VariantGraphTest extends AbstractTest {
   @Test
   public void transpositions1() {
     final VariantGraph graph = collate("the nice black and white cat", "the friendly white and black cat");
-    assertEquals(12, StreamSupport.stream(graph.edges().spliterator(), false).count());
+    assertGraphEdges(graph, 12);
   }
 
   @Test
@@ -127,8 +125,7 @@ public class VariantGraphTest extends AbstractTest {
     edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
     assertHasWitnesses(edge, w[1], w[2]);
 
-    assertEquals(17, StreamSupport.stream(graph.vertices().spliterator(), false).count()); // start and end vertices included
-    assertEquals(20, StreamSupport.stream(graph.edges().spliterator(), false).count());
+    assetGraphSize(graph, 17, 20);
   }
 
   @Test
@@ -136,8 +133,7 @@ public class VariantGraphTest extends AbstractTest {
     final SimpleWitness[] w = createWitnesses("the black cat", "the black cat");
     final VariantGraph graph = VariantGraph.JOIN.apply(collate(w));
 
-    assertEquals(3, StreamSupport.stream(graph.vertices().spliterator(), false).count());
-    assertEquals(2, StreamSupport.stream(graph.edges().spliterator(), false).count());
+    assetGraphSize(graph, 3, 2);
 
     final VariantGraph.Vertex joinedVertex = vertexWith(graph, "the black cat", w[0]);
 

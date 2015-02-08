@@ -50,11 +50,7 @@ public class SimpleCollation {
 
   public VariantGraph collate(VariantGraph graph) {
     for (SimpleWitness witness : witnesses) {
-      if (witness.getTokens().isEmpty()) {
-        graph.register(witness);
-      } else {
-        algorithm.collate(graph, witness);
-      }
+      algorithm.collate(graph, witness);
     }
     if (joined) {
       VariantGraph.JOIN.apply(graph);

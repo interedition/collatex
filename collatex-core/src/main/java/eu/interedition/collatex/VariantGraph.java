@@ -113,10 +113,6 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     return edge;
   }
 
-  public Edge register(Witness witness) {
-    return connect(start, end, Collections.singleton(witness));
-  }
-
   public Transposition transpose(Set<Vertex> vertices) {
     if (vertices.isEmpty()) {
       throw new IllegalArgumentException();
@@ -198,6 +194,8 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
   public static class Vertex {
     private final VariantGraph graph;
     private final Set<Token> tokens;
+    private final Map<Vertex, Set<Witness>> outgoing = new HashMap<>();
+    private final Map<Vertex, Set<Witness>> incoming = new HashMap<>();
 
     public Vertex(VariantGraph graph, Set<Token> tokens) {
       this.graph = graph;
