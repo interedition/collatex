@@ -54,7 +54,7 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
   public Iterator<VariantGraph.Vertex> iterator() {
     return new Iterator<VariantGraph.Vertex>() {
 
-      private final Map<VariantGraph.Vertex, Integer> encountered = new HashMap<>();
+      private final Map<VariantGraph.Vertex, Long> encountered = new HashMap<>();
       private final Queue<VariantGraph.Vertex> queue = new ArrayDeque<>();
       private Optional<VariantGraph.Vertex> next = Optional.of(graph.getStart());
 
@@ -66,11 +66,14 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
       @Override
       public VariantGraph.Vertex next() {
         final VariantGraph.Vertex next = this.next.get();
-        for (VariantGraph.Edge edge : next.outgoing(witnesses)) {
+        for (VariantGraph.Edge edge : next.outgoing()) {
+          if (witnesses != null && !edge.witnesses().stream().anyMatch(witnesses::contains)) {
+            continue;
+          }
           final VariantGraph.Vertex end = edge.to();
 
-          final int endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0);
-          final int endIncoming = end.incoming(witnesses).size();
+          final long endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0L);
+          final long endIncoming = end.incoming().stream().filter(e -> witnesses == null || e.witnesses().stream().anyMatch(witnesses::contains)).count();
 
           if (endIncoming == endEncountered) {
             throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
@@ -82,29 +85,6 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
         }
         this.next = Optional.ofNullable(queue.poll());
         return next;
-      }
-    };
-  }
-
-  public Iterable<VariantGraph.Edge> edges() {
-    return () -> new Iterator<VariantGraph.Edge>() {
-
-      private final Iterator<VariantGraph.Vertex> vertexIt = VariantGraphTraversal.this.iterator();
-      private final Queue<VariantGraph.Edge> queue = new ArrayDeque<>();
-
-      @Override
-      public boolean hasNext() {
-        if (queue.isEmpty()) {
-          if (vertexIt.hasNext()) {
-            vertexIt.next().outgoing(witnesses).forEach(queue::add);
-          }
-        }
-        return !queue.isEmpty();
-      }
-
-      @Override
-      public VariantGraph.Edge next() {
-        return queue.remove();
       }
     };
   }

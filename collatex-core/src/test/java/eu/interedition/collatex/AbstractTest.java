@@ -25,15 +25,18 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
+import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.junit.Assert;
 import org.junit.Before;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -89,14 +92,16 @@ public abstract class AbstractTest {
   }
 
   protected static SortedSet<String> extractPhrases(SortedSet<String> phrases, VariantGraph graph, Witness witness) {
-    for (VariantGraph.Vertex v : graph.vertices(Collections.singleton(witness))) {
+    for (VariantGraph.Vertex v : VariantGraphTraversal.of(graph, Collections.singleton(witness))) {
       phrases.add(toString(v, witness));
     }
     return phrases;
   }
 
   protected static String toString(VariantGraph.Vertex vertex, Witness... witnesses) {
-    return vertex.tokens(new HashSet<>(Arrays.asList(witnesses))).stream()
+    final Set<Witness> witnessSet = new HashSet<>(Arrays.asList(witnesses));
+    return vertex.tokens().stream()
+            .filter(t -> witnessSet.contains(t.getWitness()))
             .collect(Collectors.groupingBy(Token::getWitness)).entrySet().stream()
             .sorted(Comparator.comparing(e -> e.getKey().getSigil()))
             .map(Map.Entry::getValue)
@@ -114,7 +119,7 @@ public abstract class AbstractTest {
   }
 
   protected static void assertGraphEdges(VariantGraph graph, int edges) {
-    assertEquals(edges, StreamSupport.stream(graph.edges().spliterator(), false).count());
+    assertEquals(edges, StreamSupport.stream(graph.vertices().spliterator(), false).map(VariantGraph.Vertex::outgoing).flatMap(Collection::stream).count());
   }
   protected static void assetGraphSize(VariantGraph graph, int vertices, int edges) {
     assertGraphVertices(graph, vertices);
@@ -126,9 +131,9 @@ public abstract class AbstractTest {
   }
 
   protected static VariantGraph.Edge edgeBetween(VariantGraph.Vertex start, VariantGraph.Vertex end) {
-    final VariantGraph.Edge edge = start.graph().edgeBetween(start, end);
-    Assert.assertNotNull(String.format("No edge between %s and %s", start, end), edge);
-    return edge;
+    final Optional<VariantGraph.Edge> edge = start.outgoing().stream().filter(e -> end.equals(e.to())).findFirst();
+    Assert.assertTrue(String.format("No edge between %s and %s", start, end), edge.isPresent());
+    return edge.get();
   }
 
   protected static void assertVertexEquals(String expected, VariantGraph.Vertex vertex) {
@@ -144,7 +149,7 @@ public abstract class AbstractTest {
   }
 
   protected static VariantGraph.Vertex vertexWith(VariantGraph graph, String content, Witness in) {
-    for (VariantGraph.Vertex v : graph.vertices(Collections.singleton(in))) {
+    for (VariantGraph.Vertex v : VariantGraphTraversal.of(graph, Collections.singleton(in))) {
       if (content.equals(toString(v, in))) {
         return v;
       }

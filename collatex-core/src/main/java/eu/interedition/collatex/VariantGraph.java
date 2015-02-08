@@ -24,7 +24,6 @@ import eu.interedition.collatex.util.VariantGraphTraversal;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -65,19 +64,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
   }
 
   public Iterable<Vertex> vertices() {
-    return vertices(null);
-  }
-
-  public Iterable<Vertex> vertices(Set<Witness> witnesses) {
-    return VariantGraphTraversal.of(this, witnesses);
-  }
-
-  public Iterable<Edge> edges() {
-    return edges(null);
-  }
-
-  public Iterable<Edge> edges(Set<Witness> witnesses) {
-    return VariantGraphTraversal.of(this, witnesses).edges();
+    return VariantGraphTraversal.of(this);
   }
 
   public Vertex add(Token token) {
@@ -92,7 +79,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     }
 
     if (from.equals(start)) {
-      final Edge startEndEdge = edgeBetween(start, end);
+      final Edge startEndEdge = findEdge(start, end);
       if (startEndEdge != null) {
         if (to.equals(end)) {
           witnesses = new HashSet<>(witnesses);
@@ -123,10 +110,6 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
       }
     }
     return new VariantGraph.Transposition(this, vertices);
-  }
-
-  public Edge edgeBetween(Vertex a, Vertex b) {
-    return findEdge(a, b);
   }
 
   public Set<Witness> witnesses() {
@@ -203,19 +186,11 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     }
 
     public Collection<VariantGraph.Edge> incoming() {
-      return incoming(null);
-    }
-
-    public Collection<VariantGraph.Edge> incoming(final Set<Witness> witnesses) {
-      return paths(graph.getInEdges(this), witnesses);
+      return graph.getInEdges(this);
     }
 
     public Collection<VariantGraph.Edge> outgoing() {
-      return outgoing(null);
-    }
-
-    public Collection<VariantGraph.Edge> outgoing(Set<Witness> witnesses) {
-      return paths(graph.getOutEdges(this), witnesses);
+      return graph.getOutEdges(this);
     }
 
     public Collection<Transposition> transpositions() {
@@ -223,19 +198,11 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     }
 
     public Set<Token> tokens() {
-      return tokens(null);
-    }
-
-    public Set<Token> tokens(final Set<Witness> witnesses) {
-      return Collections.unmodifiableSet(witnesses == null ? tokens :tokens.stream().filter(t -> witnesses.contains(t.getWitness())).collect(Collectors.toSet()));
+      return tokens;
     }
 
     public Set<Witness> witnesses() {
-      final Set<Witness> witnesses = new HashSet<>();
-      for (VariantGraph.Edge edge : incoming()) {
-        witnesses.addAll(edge.witnesses());
-      }
-      return witnesses;
+      return incoming().stream().map(Edge::witnesses).flatMap(Set::stream).collect(Collectors.toSet());
     }
 
     public void add(Iterable<Token> tokens) {
@@ -252,13 +219,6 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
 
     public String toString() {
       return tokens.toString();
-    }
-
-    protected static Collection<Edge> paths(final Collection<Edge> edges, final Set<Witness> witnesses) {
-      if (witnesses == null) {
-        return edges;
-      }
-      return Arrays.asList(edges.stream().filter(edge -> edge.witnesses().stream().anyMatch(witnesses::contains)).toArray(Edge[]::new));
     }
   }
 

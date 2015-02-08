@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -65,7 +66,6 @@ public class SimpleVariantGraphSerializer {
   private final VariantGraph graph;
   private final Function<Iterable<Token>, String> tokensToString;
   private final Map<VariantGraph.Vertex, Integer> vertexIds = new HashMap<>();
-  private final Map<VariantGraph.Transposition, Integer> transpositionIds = new HashMap<>();
   private VariantGraphRanking ranking;
 
   public SimpleVariantGraphSerializer(VariantGraph graph) {
@@ -217,10 +217,12 @@ public class SimpleVariantGraphSerializer {
         out.println(";");
       }
 
-      for (VariantGraph.Edge e : graph.edges()) {
-        out.print(indent + id(e.from()) + connector + id(e.to()));
-        out.print(" [label = \"" + toDotLabel(e) + "\"]");
-        out.println(";");
+      for (VariantGraph.Vertex v : graph.vertices()) {
+        for (VariantGraph.Edge e : v.outgoing()) {
+          out.print(indent + id(e.from()) + connector + id(e.to()));
+          out.print(" [label = \"" + toDotLabel(e) + "\"]");
+          out.println(";");  
+        }
       }
 
       for (Tuple<VariantGraph.Vertex> transposedTuple : transposedTuples()) {
@@ -333,15 +335,17 @@ public class SimpleVariantGraphSerializer {
     }
 
     int edgeNumber = 0;
-    for (VariantGraph.Edge edge : graph.edges()) {
-      xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
-      xml.writeAttribute(ID_ATT, "e" + edgeNumber);
-      xml.writeAttribute(SOURCE_ATT, "n" + numericId(edge.from()));
-      xml.writeAttribute(TARGET_ATT, "n" + numericId(edge.to()));
-      GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
-      GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
-      GraphMLProperty.EDGE_WITNESSES.write(Witness.TO_SIGILS.apply(edge), xml);
-      xml.writeEndElement();
+    for (VariantGraph.Vertex v : graph.vertices()) {
+      for (VariantGraph.Edge edge : v.outgoing()) {
+        xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
+        xml.writeAttribute(ID_ATT, "e" + edgeNumber);
+        xml.writeAttribute(SOURCE_ATT, "n" + numericId(edge.from()));
+        xml.writeAttribute(TARGET_ATT, "n" + numericId(edge.to()));
+        GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
+        GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
+        GraphMLProperty.EDGE_WITNESSES.write(Witness.TO_SIGILS.apply(edge), xml);
+        xml.writeEndElement();
+      }
     }
 
     for (Tuple<VariantGraph.Vertex> transposedTuple : transposedTuples()) {
@@ -427,7 +431,7 @@ public class SimpleVariantGraphSerializer {
     @Override
     public String apply(VariantGraph.Vertex input) {
       return input.witnesses().stream().findFirst()
-              .map(witness -> tokensToString.apply(input.tokens(Collections.singleton(witness))))
+              .map(witness -> tokensToString.apply(Arrays.asList(input.tokens().stream().filter(t -> witness.equals(t.getWitness())).toArray(Token[]::new))))
               .orElse("");
     }
   };

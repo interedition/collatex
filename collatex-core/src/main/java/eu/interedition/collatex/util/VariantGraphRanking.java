@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -47,22 +46,16 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
   private final Map<VariantGraph.Vertex, Integer> byVertex = new HashMap<>();
   private final SortedMap<Integer, Set<Vertex>> byRank = new TreeMap<>();
   private final VariantGraph graph;
-  private final Set<Witness> witnesses;
 
-  VariantGraphRanking(VariantGraph graph, Set<Witness> witnesses) {
+  VariantGraphRanking(VariantGraph graph) {
     this.graph = graph;
-    this.witnesses = witnesses;
   }
 
   public static VariantGraphRanking of(VariantGraph graph) {
-    return of(graph, null);
-  }
-
-  public static VariantGraphRanking of(VariantGraph graph, Set<Witness> witnesses) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
-    for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
+    final VariantGraphRanking ranking = new VariantGraphRanking(graph);
+    for (VariantGraph.Vertex v : graph.vertices()) {
       int rank = -1;
-      for (VariantGraph.Edge e : v.incoming(witnesses)) {
+      for (VariantGraph.Edge e : v.incoming()) {
         rank = Math.max(rank, ranking.byVertex.get(e.from()));
       }
       rank++;
@@ -72,11 +65,11 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
     return ranking;
   }
 
-  public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<Witness> witnesses, Set<VariantGraph.Vertex> vertices) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
-    for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
+  public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<VariantGraph.Vertex> vertices) {
+    final VariantGraphRanking ranking = new VariantGraphRanking(graph);
+    for (VariantGraph.Vertex v : graph.vertices()) {
       int rank = -1;
-      for (VariantGraph.Edge e : v.incoming(witnesses)) {
+      for (VariantGraph.Edge e : v.incoming()) {
         rank = Math.max(rank, ranking.byVertex.get(e.from()));
       }
       if (vertices.contains(v)) {
@@ -89,7 +82,7 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
   }
 
   public Set<Witness> witnesses() {
-    return Optional.ofNullable(witnesses).orElse(graph.witnesses());
+    return graph.witnesses();
   }
 
   public Map<VariantGraph.Vertex, Integer> getByVertex() {
@@ -111,10 +104,10 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
 
   public List<SortedMap<Witness, Set<Token>>> asTable() {
     return byRank.values().stream()
-            .filter(rank -> rank.stream().flatMap(v -> v.tokens(witnesses).stream()).findFirst().isPresent())
+            .filter(rank -> rank.stream().anyMatch(v -> !v.tokens().isEmpty()))
             .map(vertices -> {
               final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
-              vertices.stream().flatMap(v -> v.tokens(witnesses).stream()).forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
+              vertices.stream().flatMap(v -> v.tokens().stream()).forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
               return row;
             })
             .collect(Collectors.toList());
