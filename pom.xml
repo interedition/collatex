@@ -87,12 +87,6 @@
             </dependency>
 
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
-            </dependency>
-
-            <dependency>
                 <groupId>net.sf.jung</groupId>
                 <artifactId>jung-graph-impl</artifactId>
                 <version>${jung.version}</version>
@@ -101,13 +95,6 @@
                 <groupId>net.sf.jung</groupId>
                 <artifactId>jung-visualization</artifactId>
                 <version>${jung.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>1.9.0-rc1</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -296,62 +296,59 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     }
   }
 
-  public static final Function<VariantGraph, VariantGraph> JOIN = new Function<VariantGraph, VariantGraph>() {
-    @Override
-    public VariantGraph apply(VariantGraph graph) {
-      final Set<Vertex> processed = new HashSet<>();
+  public static final Function<VariantGraph, VariantGraph> JOIN = graph -> {
+    final Set<Vertex> processed = new HashSet<>();
 
-      final Vertex end = graph.getEnd();
-      final Deque<Vertex> queue = new ArrayDeque<>();
-      for (VariantGraph.Edge startingEdges : graph.getStart().outgoing()) {
-        queue.push(startingEdges.to());
-      }
-
-      while (!queue.isEmpty()) {
-        final Vertex vertex = queue.pop();
-        final Set<Transposition> transpositions = new HashSet<>(vertex.transpositions());
-        final List<Edge> outgoingEdges = new ArrayList<>(vertex.outgoing());
-        if (outgoingEdges.size() == 1) {
-          final Edge joinCandidateEdge = outgoingEdges.get(0);
-          final Vertex joinCandidateVertex = joinCandidateEdge.to();
-          final Set<Transposition> joinCandidateTranspositions = new HashSet<>(joinCandidateVertex.transpositions());
-
-          boolean canJoin = !end.equals(joinCandidateVertex) && //
-                  joinCandidateVertex.incoming().size() == 1 && //
-                  transpositions.equals(joinCandidateTranspositions);
-          if (canJoin) {
-            vertex.add(joinCandidateVertex.tokens());
-            for (Transposition t : new HashSet<>(joinCandidateVertex.transpositions())) {
-              final Set<Vertex> transposed = new HashSet<>(t.vertices);
-              transposed.remove(joinCandidateVertex);
-              transposed.add(vertex);
-              t.delete();
-              graph.transpose(transposed);
-            }
-            for (Edge e : new ArrayList<>(joinCandidateVertex.outgoing())) {
-              final Vertex to = e.to();
-              final Set<Witness> witnesses = e.witnesses();
-              e.delete();
-              graph.connect(vertex, to, witnesses);
-            }
-            joinCandidateEdge.delete();
-            joinCandidateVertex.delete();
-            queue.push(vertex);
-            continue;
-          }
-        }
-
-        processed.add(vertex);
-        for (Edge e : outgoingEdges) {
-          final Vertex next = e.to();
-          // FIXME: Why do we run out of memory in some cases here, if this is not checked?
-          if (!processed.contains(next)) {
-            queue.push(next);
-          }
-        }
-      }
-
-      return graph;
+    final Vertex end1 = graph.getEnd();
+    final Deque<Vertex> queue = new ArrayDeque<>();
+    for (Edge startingEdges : graph.getStart().outgoing()) {
+      queue.push(startingEdges.to());
     }
+
+    while (!queue.isEmpty()) {
+      final Vertex vertex = queue.pop();
+      final Set<Transposition> transpositions = new HashSet<>(vertex.transpositions());
+      final List<Edge> outgoingEdges = new ArrayList<>(vertex.outgoing());
+      if (outgoingEdges.size() == 1) {
+        final Edge joinCandidateEdge = outgoingEdges.get(0);
+        final Vertex joinCandidateVertex = joinCandidateEdge.to();
+        final Set<Transposition> joinCandidateTranspositions = new HashSet<>(joinCandidateVertex.transpositions());
+
+        boolean canJoin = !end1.equals(joinCandidateVertex) && //
+                joinCandidateVertex.incoming().size() == 1 && //
+                transpositions.equals(joinCandidateTranspositions);
+        if (canJoin) {
+          vertex.add(joinCandidateVertex.tokens());
+          for (Transposition t : new HashSet<>(joinCandidateVertex.transpositions())) {
+            final Set<Vertex> transposed = new HashSet<>(t.vertices);
+            transposed.remove(joinCandidateVertex);
+            transposed.add(vertex);
+            t.delete();
+            graph.transpose(transposed);
+          }
+          for (Edge e : new ArrayList<>(joinCandidateVertex.outgoing())) {
+            final Vertex to = e.to();
+            final Set<Witness> witnesses = e.witnesses();
+            e.delete();
+            graph.connect(vertex, to, witnesses);
+          }
+          joinCandidateEdge.delete();
+          joinCandidateVertex.delete();
+          queue.push(vertex);
+          continue;
+        }
+      }
+
+      processed.add(vertex);
+      for (Edge e : outgoingEdges) {
+        final Vertex next = e.to();
+        // FIXME: Why do we run out of memory in some cases here, if this is not checked?
+        if (!processed.contains(next)) {
+          queue.push(next);
+        }
+      }
+    }
+
+    return graph;
   };
 }

@@ -15,11 +15,6 @@
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
         </dependency>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-visualization</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>

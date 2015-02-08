@@ -63,8 +63,6 @@ public class CollateXLaboratory extends JFrame {
 
   private final WitnessPanel witnessPanel = new WitnessPanel();
 
-  private final VariantGraphPanel variantGraphPanel;
-
   private final JTable matchMatrixTable = new JTable();
 
   private final JComboBox algorithm;
@@ -79,7 +77,6 @@ public class CollateXLaboratory extends JFrame {
     this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
 
     this.tabbedPane = new JTabbedPane();
-    this.tabbedPane.addTab("Variant Graph", variantGraphPanel = new VariantGraphPanel(new VariantGraph()));
     this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
     matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     matchMatrixTable.setShowGrid(true);
@@ -179,12 +176,9 @@ public class CollateXLaboratory extends JFrame {
 
       VariantGraph.JOIN.apply(variantGraph);
 
-      variantGraphPanel.setVariantGraph(variantGraph);
       if (LOG.isLoggable(Level.FINE)) {
         LOG.log(Level.FINE, "Collated {0}", w.toString());
       }
-
-      tabbedPane.setSelectedIndex(0);
     }
   }
 
@@ -226,7 +220,7 @@ public class CollateXLaboratory extends JFrame {
         columnModel.getColumn(col).setCellRenderer(MATCH_MATRIX_CELL_RENDERER);
       }
 
-      tabbedPane.setSelectedIndex(1);
+      tabbedPane.setSelectedIndex(0);
     }
   }
 
