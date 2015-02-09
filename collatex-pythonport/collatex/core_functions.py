@@ -108,10 +108,17 @@ class Collation(object):
             collation.add_witness(witness)
         return collation
 
+    # json input can be a string or a file
     @classmethod
-    # json_data can be a string or a file
-    def create_from_json(cls, json_data):
-        data = json.load(json_data)
+    def create_from_json_string(cls, json_string):
+        data = json.loads(json_string)
+        collation = cls.create_from_dict(data)
+        return collation
+    
+    @classmethod
+    def create_from_json_file(cls, json_path):
+        with open(json_path, 'r') as json_file:
+            data = json.load(json_file)
         collation = cls.create_from_dict(data)
         return collation
 
