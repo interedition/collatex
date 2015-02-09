@@ -1,6 +1,6 @@
 {"witnesses" :
     [
-        {"id" : "E","tokens" :
+        {"id" : "C","tokens" :
             [
             {"t" : "The"},
             {"t" : "quick"},
@@ -14,7 +14,7 @@
             ]
         },
         
-        {"id" : "F", "tokens" :
+        {"id" : "D", "tokens" :
             [
             {"t" : "The"},
             {"t" : "brown"},
