@@ -19,9 +19,6 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -36,11 +33,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -64,16 +64,14 @@ public class URLWitness extends SimpleWitness {
           Charset charset,
           XPathExpression tokenXPath)
           throws IOException, XPathExpressionException, SAXException {
-    InputStream stream = null;
-    try {
-      stream = url.openStream();
+    try (InputStream stream = url.openStream()) {
       if (tokenXPath != null) {
         final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         final Document document = documentBuilder.parse(stream);
         document.normalizeDocument();
 
         final NodeList tokenNodes = (NodeList) tokenXPath.evaluate(document, XPathConstants.NODESET);
-        final List<Token> tokens = Lists.newArrayListWithExpectedSize(tokenNodes.getLength());
+        final List<Token> tokens = new ArrayList<>(tokenNodes.getLength());
         for (int nc = 0; nc < tokenNodes.getLength(); nc++) {
           final Node tokenNode = tokenNodes.item(nc);
           final String tokenText = tokenNode.getTextContent();
@@ -81,15 +79,20 @@ public class URLWitness extends SimpleWitness {
         }
         setTokens(tokens);
       } else {
-        setTokens(tokenizer.apply(CharStreams.toString(new InputStreamReader(stream, charset)))
-                .map(tokenText -> new SimpleToken(this, tokenText, normalizer.apply(tokenText)))
-                .collect(Collectors.<Token>toList())
+
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
+        final StringWriter writer = new StringWriter();
+        final char[] buf = new char[1024];
+        while (reader.read(buf) != -1) {
+          writer.write(buf);
+        }
+        setTokens(tokenizer.apply(writer.toString())
+                        .map(tokenText -> new SimpleToken(this, tokenText, normalizer.apply(tokenText)))
+                        .collect(Collectors.<Token>toList())
         );
       }
     } catch (ParserConfigurationException e) {
       throw new SAXException(e);
-    } finally {
-      Closeables.close(stream, false);
     }
     return this;
   }

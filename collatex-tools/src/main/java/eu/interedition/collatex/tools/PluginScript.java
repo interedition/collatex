@@ -19,27 +19,25 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
 
-import javax.annotation.Nullable;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -60,16 +58,13 @@ public class PluginScript {
   final boolean comparator;
 
   public static PluginScript read(URL source) throws ScriptException, IOException {
-    InputStream sourceStream = null;
-    try {
-      return read(source.toString(), new InputStreamReader(sourceStream = source.openStream(), SCRIPT_CHARSET));
-    } finally {
-      Closeables.close(sourceStream, false);
+    try (Reader sourceReader = new BufferedReader(new InputStreamReader(source.openStream(), SCRIPT_CHARSET))) {
+      return read(source.toString(), sourceReader);
     }
   }
 
   public static PluginScript read(String filename, Reader source) throws ScriptException, IOException {
-    final ScriptEngine scriptEngine = Preconditions.checkNotNull(new ScriptEngineManager().getEngineByExtension("js"));
+    final ScriptEngine scriptEngine = Objects.requireNonNull(new ScriptEngineManager().getEngineByExtension("js"));
     scriptEngine.put(ScriptEngine.FILENAME, filename);
 
     final CompiledScript script = ((Compilable) scriptEngine).compile(source);
@@ -88,14 +83,14 @@ public class PluginScript {
   Function<String, Stream<String>> tokenizer() {
     return (tokenizer ? new Function<String, Stream<String>>() {
       @Override
-      public Stream<String> apply(@Nullable String input) {
+      public Stream<String> apply(String input) {
         final Object result = invoke(TOKENIZER_FUNCTION, input);
         if (!(result instanceof Iterable)) {
           throw new PluginScriptExecutionException("Wrong result type of " +
                   TOKENIZER_FUNCTION + "(); expected an iterable type, found " +
                   result.getClass());
         }
-        final List<String> tokens = Lists.newLinkedList();
+        final List<String> tokens = new LinkedList<>();
         for (Object token : (Iterable<?>) result) {
           if (token == null) {
             throw new PluginScriptExecutionException(TOKENIZER_FUNCTION + "() returned null token");
@@ -116,7 +111,7 @@ public class PluginScript {
   Function<String, String> normalizer() {
     return (normalizer ? new Function<String, String>() {
       @Override
-      public String apply(@Nullable String input) {
+      public String apply(String input) {
         final Object result = invoke(NORMALIZER_FUNCTION, input);
         if (!(result instanceof String)) {
           throw new PluginScriptExecutionException("Wrong result type of " +

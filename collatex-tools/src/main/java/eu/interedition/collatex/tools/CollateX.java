@@ -19,9 +19,6 @@
 
 package eu.interedition.collatex.tools;
 
-import com.google.common.io.Closeables;
-import com.google.common.io.Closer;
-import com.google.common.io.Files;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
@@ -55,7 +52,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -66,6 +62,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -78,7 +75,7 @@ import java.util.stream.Stream;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class CollateX implements Closeable {
+public class CollateX implements AutoCloseable {
 
   Charset inputCharset;
   boolean xmlMode;
@@ -145,7 +142,7 @@ public class CollateX implements Closeable {
     if (!"-".equals(output)) {
       try {
         this.outFile = new File(output);
-        this.out = new PrintWriter(Files.newWriter(this.outFile, outputCharset));
+        this.out = new PrintWriter(Files.newBufferedWriter(this.outFile.toPath(), outputCharset));
       } catch (FileNotFoundException e) {
         throw new ParseException("Output file '" + outFile + "' not found");
       }
@@ -212,7 +209,7 @@ public class CollateX implements Closeable {
           try {
             xml.close();
           } catch (XMLStreamException e) {
-            throw new IOException(e);
+            // ignored
           }
         }
       }
@@ -322,8 +319,9 @@ public class CollateX implements Closeable {
       engine.error("Script error", e);
     } finally {
         try {
-            Closeables.close(engine, false);
+            engine.close();
         } catch (IOException ignored) {
+          // ignored
         }
     }
   }
@@ -355,20 +353,15 @@ public class CollateX implements Closeable {
 
   @Override
   public void close() throws IOException {
-    final Closer closer = Closer.create();
     try {
-      if (out != null) {
-        closer.register(out).flush();
-      }
-      if (log != null) {
-        closer.register(log).flush();
+      for (PrintWriter writer : new PrintWriter[] { out, log }) {
+        writer.close();
       }
     } finally {
-      closer.close();
-    }
-    if (errorOccurred && (outFile != null) && outFile.isFile()) {
-      //noinspection ResultOfMethodCallIgnored
-      outFile.delete();
+      if (errorOccurred && (outFile != null) && outFile.isFile()) {
+        //noinspection ResultOfMethodCallIgnored
+        outFile.delete();
+      }
     }
   }
 }
