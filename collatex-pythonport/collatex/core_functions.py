@@ -126,11 +126,8 @@ class Collation(object):
         self.witnesses = []
         self.counter = 0
         self.witness_ranges = {}
-        self.combined_string = ""
         self.cached_suffix_array = None
 
-    # the tokenization process happens multiple times
-    # and by different tokenizers. This should be fixed
     def add_witness(self, witnessdata):
         # clear the suffix array and LCP array cache
         self.cached_suffix_array = None
@@ -141,9 +138,6 @@ class Collation(object):
         # the extra one is for the marker token
         self.counter += len(witness.tokens()) +2 # $ + number 
         self.witness_ranges[witness.sigil] = witness_range
-        if not self.combined_string == "":
-            self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
-        self.combined_string += witness.content
 
     def add_plain_witness(self, sigil, content):
         return self.add_witness({'id':sigil, 'content':content})
@@ -152,9 +146,6 @@ class Collation(object):
         if not witness_sigil in self.witness_ranges:
             raise Exception("Witness "+witness_sigil+" is not added to the collation!")
         return self.witness_ranges[witness_sigil]
-
-    def get_combined_string(self):
-        return self.combined_string
 
     def get_sa(self):
         #NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
@@ -171,24 +162,17 @@ class Collation(object):
         sa = self.get_sa()
         return sa._LCP_values
 
-
     def to_extended_suffix_array(self):
         return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
 
     @property
     def tokens(self):
-        #print("COLLATION TOKENIZE IS CALLED!")
-        #TODO: complete set of witnesses is retokenized here!
-        #tokenizer = WordPunctuationTokenizer()
-        #tokens = tokenizer.tokenize(self.get_combined_string())
-        
-        #tokens = [token.token_string for witness in self.witnesses for token in witness._tokens]
         tokens = []
         for i, witness in enumerate(self.witnesses):
             if i > 0 :
                 tokens.append('$')
                 tokens.append(str(i))
-            for tk in witness._tokens:
+            for tk in witness.tokens():
                 tokens.append(tk.token_string)
         return tokens
 
