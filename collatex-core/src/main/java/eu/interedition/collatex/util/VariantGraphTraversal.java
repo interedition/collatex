@@ -66,14 +66,14 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
       @Override
       public VariantGraph.Vertex next() {
         final VariantGraph.Vertex next = this.next.get();
-        for (VariantGraph.Edge edge : next.outgoing()) {
-          if (witnesses != null && !edge.witnesses().stream().anyMatch(witnesses::contains)) {
+        for (Map.Entry<VariantGraph.Vertex, Set<Witness>> edge : next.outgoing().entrySet()) {
+          if (witnesses != null && !edge.getValue().stream().anyMatch(witnesses::contains)) {
             continue;
           }
-          final VariantGraph.Vertex end = edge.to();
+          final VariantGraph.Vertex end = edge.getKey();
 
           final long endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0L);
-          final long endIncoming = end.incoming().stream().filter(e -> witnesses == null || e.witnesses().stream().anyMatch(witnesses::contains)).count();
+          final long endIncoming = end.incoming().entrySet().stream().filter(e -> witnesses == null || e.getValue().stream().anyMatch(witnesses::contains)).count();
 
           if (endIncoming == endEncountered) {
             throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));

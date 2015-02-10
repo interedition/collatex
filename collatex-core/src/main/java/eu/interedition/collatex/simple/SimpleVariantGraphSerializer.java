@@ -218,9 +218,9 @@ public class SimpleVariantGraphSerializer {
       }
 
       for (VariantGraph.Vertex v : graph.vertices()) {
-        for (VariantGraph.Edge e : v.outgoing()) {
-          out.print(indent + id(e.from()) + connector + id(e.to()));
-          out.print(" [label = \"" + toDotLabel(e) + "\"]");
+        for (Map.Entry<VariantGraph.Vertex, Set<Witness>> e : v.outgoing().entrySet()) {
+          out.print(indent + id(v) + connector + id(e.getKey()));
+          out.print(" [label = \"" + toDotLabel(e.getValue()) + "\"]");
           out.println(";");  
         }
       }
@@ -255,8 +255,8 @@ public class SimpleVariantGraphSerializer {
     return id;
   }
 
-  String toDotLabel(VariantGraph.Edge e) {
-    return escapeDotLabel(Witness.TO_SIGILS.apply(e));
+  String toDotLabel(Set<Witness> e) {
+    return escapeDotLabel(e.stream().map(Witness::getSigil).distinct().sorted().collect(Collectors.joining(", ")));
   }
 
   String toDotLabel(VariantGraph.Vertex v) {
@@ -278,7 +278,7 @@ public class SimpleVariantGraphSerializer {
     final Set<Tuple<VariantGraph.Vertex>> tuples = new HashSet<>();
     final Comparator<VariantGraph.Vertex> vertexOrdering = ranking().comparator();
 
-    for (VariantGraph.Transposition transposition : graph.transpositions()) {
+    for (Set<VariantGraph.Vertex> transposition : graph.transpositions()) {
       final SortedMap<Witness, SortedSet<VariantGraph.Vertex>> verticesByWitness = new TreeMap<>(Witness.SIGIL_COMPARATOR);
       for (VariantGraph.Vertex vertex : transposition) {
         for (Witness witness : vertex.witnesses()) {
@@ -336,14 +336,14 @@ public class SimpleVariantGraphSerializer {
 
     int edgeNumber = 0;
     for (VariantGraph.Vertex v : graph.vertices()) {
-      for (VariantGraph.Edge edge : v.outgoing()) {
+      for (Map.Entry<VariantGraph.Vertex, Set<Witness>> edge : v.outgoing().entrySet()) {
         xml.writeStartElement(GRAPHML_NS, EDGE_TAG);
         xml.writeAttribute(ID_ATT, "e" + edgeNumber);
-        xml.writeAttribute(SOURCE_ATT, "n" + numericId(edge.from()));
-        xml.writeAttribute(TARGET_ATT, "n" + numericId(edge.to()));
+        xml.writeAttribute(SOURCE_ATT, "n" + numericId(v));
+        xml.writeAttribute(TARGET_ATT, "n" + numericId(edge.getKey()));
         GraphMLProperty.EDGE_NUMBER.write(Integer.toString(edgeNumber++), xml);
         GraphMLProperty.EDGE_TYPE.write(EDGE_TYPE_PATH, xml);
-        GraphMLProperty.EDGE_WITNESSES.write(Witness.TO_SIGILS.apply(edge), xml);
+        GraphMLProperty.EDGE_WITNESSES.write(edge.getValue().stream().map(Witness::getSigil).distinct().sorted().collect(Collectors.joining(", ")), xml);
         xml.writeEndElement();
       }
     }

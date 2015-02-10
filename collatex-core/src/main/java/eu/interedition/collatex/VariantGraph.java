@@ -19,19 +19,16 @@
 
 package eu.interedition.collatex;
 
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import eu.interedition.collatex.util.VariantGraphTraversal;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,16 +36,18 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, VariantGraph.Edge> {
+public class VariantGraph {
   final VariantGraph.Vertex start;
   final VariantGraph.Vertex end;
-  final Map<Vertex, Set<Transposition>> transpositionIndex = new HashMap<>();
+  final Map<Vertex, Set<Set<Vertex>>> transpositionIndex = new HashMap<>();
 
   public VariantGraph() {
     super();
-    addVertex(this.start = new VariantGraph.Vertex(this, Collections.<Token>emptySet()));
-    addVertex(this.end = new VariantGraph.Vertex(this, Collections.<Token>emptySet()));
-    connect(this.start, this.end, Collections.<Witness>emptySet());
+    this.start = new VariantGraph.Vertex(this);
+    this.end = new VariantGraph.Vertex(this);
+    
+    this.start.outgoing.put(this.end, Collections.emptySet());
+    this.end.incoming.put(this.start, Collections.emptySet());
   }
 
   public Vertex getStart() {
@@ -59,7 +58,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     return end;
   }
 
-  public Set<Transposition> transpositions() {
+  public Set<Set<Vertex>> transpositions() {
     return transpositionIndex.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
   }
 
@@ -68,56 +67,44 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
   }
 
   public Vertex add(Token token) {
-    final VariantGraph.Vertex vertex = new VariantGraph.Vertex(this, Collections.singleton(token));
-    addVertex(vertex);
+    final VariantGraph.Vertex vertex = new VariantGraph.Vertex(this);
+    vertex.tokens.add(token);
     return vertex;
   }
 
-  public Edge connect(Vertex from, Vertex to, Set<Witness> witnesses) {
+  public void connect(Vertex from, Vertex to, Set<Witness> witnesses) {
     if (from.equals(to)) {
       throw new IllegalArgumentException();
     }
 
-    if (from.equals(start)) {
-      final Edge startEndEdge = findEdge(start, end);
-      if (startEndEdge != null) {
-        if (to.equals(end)) {
-          witnesses = new HashSet<>(witnesses);
-          witnesses.addAll(startEndEdge.witnesses());
-        }
-        startEndEdge.delete();
-      }
-    }
+    witnesses = new HashSet<>(witnesses);
+    Optional.ofNullable(from.outgoing.remove(to)).ifPresent(witnesses::addAll);
+    
+    from.outgoing.put(to, witnesses);
+    to.incoming.put(from, witnesses);
 
-    for (Edge e : from.outgoing()) {
-      if (to.equals(e.to())) {
-        return e.add(witnesses);
-      }
-    }
-
-    final VariantGraph.Edge edge = new VariantGraph.Edge(this, witnesses);
-    addEdge(edge, from, to);
-    return edge;
+    start.outgoing.remove(end);
+    end.incoming.remove(start);
   }
 
-  public Transposition transpose(Set<Vertex> vertices) {
+  public Set<Vertex> transpose(Set<Vertex> vertices) {
     if (vertices.isEmpty()) {
       throw new IllegalArgumentException();
     }
-    for (Transposition transposition : vertices.iterator().next().transpositions()) {
-      if (transposition.vertices.equals(vertices)) {
+    for (Set<Vertex> transposition : vertices.iterator().next().transpositions()) {
+      if (transposition.equals(vertices)) {
         return transposition;
       }
     }
-    return new VariantGraph.Transposition(this, vertices);
+    final Set<Vertex> t = new HashSet<>(vertices);
+    for (VariantGraph.Vertex vertex : t) {
+      transpositionIndex.computeIfAbsent(vertex, v -> new HashSet<>()).add(t);
+    }
+    return t;
   }
 
   public Set<Witness> witnesses() {
-    Set<Witness> witnesses = new HashSet<>();
-    for (Edge edge : start.outgoing()) {
-      witnesses.addAll(edge.witnesses());
-    }
-    return witnesses;
+    return start.outgoing().values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
   }
 
   @Override
@@ -129,71 +116,25 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
   /**
    * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
    */
-  public static class Edge {
-
-    final VariantGraph graph;
-    final Set<Witness> witnesses;
-
-    public Edge(VariantGraph graph, Set<Witness> witnesses) {
-      this.graph = graph;
-      this.witnesses = new HashSet<>(witnesses);
-    }
-
-    public VariantGraph.Edge add(Set<Witness> witnesses) {
-      this.witnesses.addAll(witnesses);
-      return this;
-    }
-
-    public Set<Witness> witnesses() {
-      return Collections.unmodifiableSet(witnesses);
-    }
-
-    public VariantGraph graph() {
-      return graph;
-    }
-
-    public VariantGraph.Vertex from() {
-      return graph.getEndpoints(this).getFirst();
-    }
-
-    public VariantGraph.Vertex to() {
-      return graph.getEndpoints(this).getSecond();
-    }
-
-    public void delete() {
-      graph.removeEdge(this);
-    }
-
-    @Override
-    public String toString() {
-      return witnesses.toString();
-    }
-
-  }
-
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
   public static class Vertex {
     private final VariantGraph graph;
-    private final Set<Token> tokens;
+    private final Set<Token> tokens = new HashSet<>();
     private final Map<Vertex, Set<Witness>> outgoing = new HashMap<>();
     private final Map<Vertex, Set<Witness>> incoming = new HashMap<>();
 
-    public Vertex(VariantGraph graph, Set<Token> tokens) {
+    public Vertex(VariantGraph graph) {
       this.graph = graph;
-      this.tokens = new HashSet<>(tokens);
     }
 
-    public Collection<VariantGraph.Edge> incoming() {
-      return graph.getInEdges(this);
+    public Map<Vertex, Set<Witness>> incoming() {
+      return incoming;
     }
 
-    public Collection<VariantGraph.Edge> outgoing() {
-      return graph.getOutEdges(this);
+    public Map<Vertex, Set<Witness>> outgoing() {
+      return outgoing;
     }
 
-    public Collection<Transposition> transpositions() {
+    public Set<Set<Vertex>> transpositions() {
       return graph.transpositionIndex.getOrDefault(this, Collections.emptySet());
     }
 
@@ -202,7 +143,7 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
     }
 
     public Set<Witness> witnesses() {
-      return incoming().stream().map(Edge::witnesses).flatMap(Set::stream).collect(Collectors.toSet());
+      return incoming().values().stream().flatMap(Set::stream).collect(Collectors.toSet());
     }
 
     public void add(Iterable<Token> tokens) {
@@ -213,98 +154,50 @@ public class VariantGraph extends DirectedSparseGraph<VariantGraph.Vertex, Varia
       return graph;
     }
 
-    public void delete() {
-      graph.removeVertex(this);
-    }
-
     public String toString() {
       return tokens.toString();
     }
   }
 
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
-  public static class Transposition implements Iterable<Vertex> {
-    private final VariantGraph graph;
-    private final Set<VariantGraph.Vertex> vertices;
-
-    public Transposition(VariantGraph graph, Set<VariantGraph.Vertex> vertices) {
-      this.graph = graph;
-      this.vertices = new HashSet<>(vertices);
-      for (VariantGraph.Vertex vertex : this.vertices) {
-        graph.transpositionIndex.computeIfAbsent(vertex, v -> new HashSet<>()).add(this);
-      }
-    }
-
-    public void delete() {
-      for (VariantGraph.Vertex vertex : this.vertices) {
-        graph.transpositionIndex.getOrDefault(vertex, Collections.emptySet()).remove(this);
-      }
-    }
-
-    @Override
-    public Iterator<Vertex> iterator() {
-      return vertices.iterator();
-    }
-
-    @Override
-    public String toString() {
-      return vertices.toString();
-    }
-  }
-
   public static final Function<VariantGraph, VariantGraph> JOIN = graph -> {
     final Set<Vertex> processed = new HashSet<>();
-
-    final Vertex end1 = graph.getEnd();
-    final Deque<Vertex> queue = new ArrayDeque<>();
-    for (Edge startingEdges : graph.getStart().outgoing()) {
-      queue.push(startingEdges.to());
-    }
+    final Deque<Vertex> queue = new ArrayDeque<>(graph.start.outgoing.keySet());
 
     while (!queue.isEmpty()) {
       final Vertex vertex = queue.pop();
-      final Set<Transposition> transpositions = new HashSet<>(vertex.transpositions());
-      final List<Edge> outgoingEdges = new ArrayList<>(vertex.outgoing());
-      if (outgoingEdges.size() == 1) {
-        final Edge joinCandidateEdge = outgoingEdges.get(0);
-        final Vertex joinCandidateVertex = joinCandidateEdge.to();
-        final Set<Transposition> joinCandidateTranspositions = new HashSet<>(joinCandidateVertex.transpositions());
+      final Set<Set<Vertex>> transpositions = new HashSet<>(vertex.transpositions());
+      if (vertex.outgoing.size() == 1) {
+        final Vertex joinCandidateVertex = vertex.outgoing.keySet().iterator().next();
+        final Set<Set<Vertex>> joinCandidateTranspositions = new HashSet<>(joinCandidateVertex.transpositions());
 
-        boolean canJoin = !end1.equals(joinCandidateVertex) && //
-                joinCandidateVertex.incoming().size() == 1 && //
+        boolean canJoin = !graph.end.equals(joinCandidateVertex) && //
+                joinCandidateVertex.incoming.size() == 1 && //
                 transpositions.equals(joinCandidateTranspositions);
         if (canJoin) {
           vertex.add(joinCandidateVertex.tokens());
-          for (Transposition t : new HashSet<>(joinCandidateVertex.transpositions())) {
-            final Set<Vertex> transposed = new HashSet<>(t.vertices);
+          for (Set<Vertex> t : new HashSet<>(joinCandidateVertex.transpositions())) {
+            final Set<Vertex> transposed = new HashSet<>(t);
             transposed.remove(joinCandidateVertex);
             transposed.add(vertex);
-            t.delete();
+            for (Vertex tv : t) {
+              graph.transpositionIndex.getOrDefault(tv, Collections.emptySet()).remove(t);
+            }
             graph.transpose(transposed);
           }
-          for (Edge e : new ArrayList<>(joinCandidateVertex.outgoing())) {
-            final Vertex to = e.to();
-            final Set<Witness> witnesses = e.witnesses();
-            e.delete();
-            graph.connect(vertex, to, witnesses);
-          }
-          joinCandidateEdge.delete();
-          joinCandidateVertex.delete();
+          
+          vertex.outgoing.clear();
+          vertex.outgoing.putAll(joinCandidateVertex.outgoing);
+
+          vertex.outgoing.keySet().forEach(v -> v.incoming.put(vertex, v.incoming.remove(joinCandidateVertex)));
+          
           queue.push(vertex);
           continue;
         }
       }
 
+      // FIXME: Why do we run out of memory in some cases here, if this is not checked?
       processed.add(vertex);
-      for (Edge e : outgoingEdges) {
-        final Vertex next = e.to();
-        // FIXME: Why do we run out of memory in some cases here, if this is not checked?
-        if (!processed.contains(next)) {
-          queue.push(next);
-        }
-      }
+      vertex.outgoing.keySet().stream().filter(v -> !processed.contains(v)).forEach(queue::push);
     }
 
     return graph;

@@ -68,7 +68,7 @@ public class ParallelSegmentationApparatus {
       final SortedMap<Integer, List<VariantGraph.Vertex>> verticesByTranspositionRank = new TreeMap<>();
       for (VariantGraph.Vertex v : verticesOfRank) {
         int transpositionRank = 0;
-        for (VariantGraph.Transposition transposition : v.transpositions()) {
+        for (Set<VariantGraph.Vertex> transposition : v.transpositions()) {
           for (VariantGraph.Vertex tv : transposition) {
             transpositionRank += (ranking.apply(tv).intValue() - rank);
           }

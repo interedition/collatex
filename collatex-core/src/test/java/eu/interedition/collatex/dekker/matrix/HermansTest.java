@@ -199,8 +199,8 @@ public class HermansTest extends AbstractTest {
     SimpleWitness[] sw = createWitnesses(a, b);
     //    testWitnessCollation(sw);
     VariantGraph vg = collate(sw);
-    Set<VariantGraph.Transposition> transpositions0 = vg.transpositions();
-    for (VariantGraph.Transposition t : transpositions0) {
+    Set<Set<VariantGraph.Vertex>> transpositions0 = vg.transpositions();
+    for (Set<VariantGraph.Vertex> t : transpositions0) {
       LOG.log(Level.FINE, "transposition {0}", t.toString());
     }
 
@@ -210,9 +210,9 @@ public class HermansTest extends AbstractTest {
     }
     vg = VariantGraph.JOIN.apply(vg);
     LOG.fine(toString(table(vg)));
-    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
+    Set<Set<VariantGraph.Vertex>> transpositions = vg.transpositions();
     LOG.log(Level.FINE, "{0} transpositions", transpositions.size());
-    for (VariantGraph.Transposition t : transpositions) {
+    for (Set<VariantGraph.Vertex> t : transpositions) {
       LOG.log(Level.FINE, "transposition {0}", t.toString());
       // all joined vertices should be size 3
       for (VariantGraph.Vertex vertex : t) {
@@ -242,9 +242,9 @@ public class HermansTest extends AbstractTest {
     LOG.fine(writer.toString());
 
     vg = VariantGraph.JOIN.apply(vg);
-    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
+    Set<Set<VariantGraph.Vertex>> transpositions = vg.transpositions();
     LOG.log(Level.FINE, "{0} transpositions", transpositions.size());
-    for (VariantGraph.Transposition t : transpositions) {
+    for (Set<VariantGraph.Vertex> t : transpositions) {
       String showTransposition = t.toString();
       LOG.log(Level.FINE, "transposition {0}", showTransposition);
       boolean transpositionOfA = showTransposition.contains("a");
@@ -278,9 +278,9 @@ public class HermansTest extends AbstractTest {
     testWitnessCollation(sw);
 
     VariantGraph vg = VariantGraph.JOIN.apply(collate(sw));
-    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
+    Set<Set<VariantGraph.Vertex>> transpositions = vg.transpositions();
     assertEquals(5, transpositions.size());
-    VariantGraph.Transposition transposition = transpositions.iterator().next();
+    Set<VariantGraph.Vertex> transposition = transpositions.iterator().next();
     //    assertEquals("genaamd de", transposition.from().toString());
   }
 
@@ -322,9 +322,9 @@ public class HermansTest extends AbstractTest {
     String w3 = "e c b d";
     SimpleWitness[] sw = createWitnesses(w1, w2, w3);
     VariantGraph vg = collate(sw);
-    Set<VariantGraph.Transposition> transpositions = vg.transpositions();
+    Set<Set<VariantGraph.Vertex>> transpositions = vg.transpositions();
     assertEquals(1, transpositions.size());
-    VariantGraph.Transposition t = transpositions.iterator().next();
+    Set<VariantGraph.Vertex> t = transpositions.iterator().next();
     for (VariantGraph.Vertex vertex : t) {
       for (SimpleToken token : vertex.tokens().stream().map(tk -> (SimpleToken)tk).toArray(SimpleToken[]::new)) {
         assertEquals(token.toString(), token.getNormalized(), "c");

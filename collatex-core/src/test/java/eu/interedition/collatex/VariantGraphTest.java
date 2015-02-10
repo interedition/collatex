@@ -22,15 +22,11 @@ package eu.interedition.collatex;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphTraversal;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -44,20 +40,6 @@ public class VariantGraphTest extends AbstractTest {
     final VariantGraph graph = collate(createWitnesses());
     assertEquals(0, graph.witnesses().size());
     assetGraphSize(graph, 2, 1);
-  }
-
-  @Test
-  public void reconnectingVerticesYieldsSameEdge() {
-    final SimpleWitness witness = createWitnesses("hello world")[0];
-    final VariantGraph graph = new VariantGraph();
-    final VariantGraph.Vertex helloVertex = graph.add(witness.getTokens().get(0));
-    final VariantGraph.Vertex worldVertex = graph.add(witness.getTokens().get(1));
-    final VariantGraph.Edge edge = graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness));
-
-    Assert.assertEquals(1, edge.witnesses().size());
-
-    Assert.assertEquals(edge, graph.connect(helloVertex, worldVertex, Collections.<Witness> singleton(witness)));
-    Assert.assertEquals(1, edge.witnesses().size());
   }
 
   @Test
@@ -120,10 +102,8 @@ public class VariantGraphTest extends AbstractTest {
     final VariantGraph graph = collate(w);
 
     // There should be two vertices for cat in the graph
-    VariantGraph.Edge edge = edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0]));
-    assertHasWitnesses(edge, w[0]);
-    edge = edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1]));
-    assertHasWitnesses(edge, w[1], w[2]);
+    assertHasWitnesses(edgeBetween(vertexWith(graph, "red", w[0]), vertexWith(graph, "cat", w[0])), w[0]);
+    assertHasWitnesses(edgeBetween(vertexWith(graph, "red", w[1]), vertexWith(graph, "cat", w[1])), w[1], w[2]);
 
     assetGraphSize(graph, 17, 20);
   }

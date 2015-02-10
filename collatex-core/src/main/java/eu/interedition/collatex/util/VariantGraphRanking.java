@@ -55,8 +55,8 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
     final VariantGraphRanking ranking = new VariantGraphRanking(graph);
     for (VariantGraph.Vertex v : graph.vertices()) {
       int rank = -1;
-      for (VariantGraph.Edge e : v.incoming()) {
-        rank = Math.max(rank, ranking.byVertex.get(e.from()));
+      for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
+        rank = Math.max(rank, ranking.byVertex.get(incoming));
       }
       rank++;
       ranking.byVertex.put(v, rank);
@@ -69,8 +69,8 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
     final VariantGraphRanking ranking = new VariantGraphRanking(graph);
     for (VariantGraph.Vertex v : graph.vertices()) {
       int rank = -1;
-      for (VariantGraph.Edge e : v.incoming()) {
-        rank = Math.max(rank, ranking.byVertex.get(e.from()));
+      for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
+        rank = Math.max(rank, ranking.byVertex.get(incoming));
       }
       if (vertices.contains(v)) {
         rank++;

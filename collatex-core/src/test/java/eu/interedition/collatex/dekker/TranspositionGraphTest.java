@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraph.Transposition;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -29,7 +28,7 @@ public class TranspositionGraphTest extends AbstractTest {
     final VariantGraph graph = collate(w[0], w[1]);
     assertEquals(2, graph.transpositions().size());
     collate(graph, w[2]);
-    final Set<VariantGraph.Transposition> transposed = graph.transpositions();
+    final Set<Set<VariantGraph.Vertex>> transposed = graph.transpositions();
     assertEquals(2, transposed.size());
   }
 
@@ -64,7 +63,7 @@ public class TranspositionGraphTest extends AbstractTest {
         "και αποκριθεισ ειπεν αυτω ου βλεπεισ ταυτασ μεγαλασ οικοδομασ αμην λεγω σοι ο(υ μη α)φεθη ωδε λιθοσ επι λιθω (οσ ου) μη καταλυθη", //
         "και αποκριθεισ ο ι̅σ̅ ειπεν αυτω βλεπεισ Ταυτασ τασ μεγαλασ οικοδομασ λεγω υμιν ου μη αφεθη λιθοσ επι λιθου οσ ου μη καταλυθη");
     VariantGraph graph = collate(w[0], w[1]);
-    Set<Transposition> transpositions = graph.transpositions();
+    Set<Set<Vertex>> transpositions = graph.transpositions();
     assertTrue(transpositions.isEmpty());
   }
   
@@ -73,9 +72,9 @@ public class TranspositionGraphTest extends AbstractTest {
   public void testGreekThreeWitnesses() {
     SimpleWitness[] w = createWitnesses("και αποκριθεισ ειπεν αυτω ου βλεπεισ ταυτασ μεγαλασ οικοδομασ αμην λεγω σοι ο(υ μη α)φεθη ωδε λιθοσ επι λιθω (οσ ου) μη καταλυθη", "και αποκριθεισ ο ι̅σ̅ ειπεν αυτω βλεπεισ Ταυτασ τασ μεγαλασ οικοδομασ λεγω υμιν ου μη αφεθη λιθοσ επι λιθου οσ ου μη καταλυθη", "και ο ι̅σ̅ αποκριθεισ ειπεν αυτω βλεπεισ ταυτασ τασ μεγαλασ οικοδομασ ου μη αφεθη λιθοσ επι λιθον οσ ου μη καταλυθη");
     VariantGraph graph = collate(w[0], w[1], w[2]);
-    Set<Transposition> transpositions = graph.transpositions();
+    Set<Set<Vertex>> transpositions = graph.transpositions();
     assertEquals(1, transpositions.size());
-    Transposition transposition = transpositions.iterator().next();
+    Set<Vertex> transposition = transpositions.iterator().next();
     Set<String> transposedVertices = new HashSet<>();
     for (Vertex transposedVertex : transposition) {
       transposedVertices.add(transposedVertex.toString());

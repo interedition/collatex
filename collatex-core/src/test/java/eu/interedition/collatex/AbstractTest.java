@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -119,19 +118,19 @@ public abstract class AbstractTest {
   }
 
   protected static void assertGraphEdges(VariantGraph graph, int edges) {
-    assertEquals(edges, StreamSupport.stream(graph.vertices().spliterator(), false).map(VariantGraph.Vertex::outgoing).flatMap(Collection::stream).count());
+    assertEquals(edges, StreamSupport.stream(graph.vertices().spliterator(), false).map(VariantGraph.Vertex::outgoing).map(Map::keySet).flatMap(Set::stream).count());
   }
   protected static void assetGraphSize(VariantGraph graph, int vertices, int edges) {
     assertGraphVertices(graph, vertices);
     assertGraphEdges(graph, edges);
   }
   
-  protected static void assertHasWitnesses(VariantGraph.Edge edge, Witness... witnesses) {
-    assertEquals(new HashSet<>(Arrays.asList(witnesses)), edge.witnesses());
+  protected static void assertHasWitnesses(Set<Witness> edge, Witness... witnesses) {
+    assertEquals(new HashSet<>(Arrays.asList(witnesses)), edge);
   }
 
-  protected static VariantGraph.Edge edgeBetween(VariantGraph.Vertex start, VariantGraph.Vertex end) {
-    final Optional<VariantGraph.Edge> edge = start.outgoing().stream().filter(e -> end.equals(e.to())).findFirst();
+  protected static Set<Witness> edgeBetween(VariantGraph.Vertex start, VariantGraph.Vertex end) {
+    final Optional<Set<Witness>> edge = Optional.ofNullable(start.outgoing().get(end));
     Assert.assertTrue(String.format("No edge between %s and %s", start, end), edge.isPresent());
     return edge.get();
   }

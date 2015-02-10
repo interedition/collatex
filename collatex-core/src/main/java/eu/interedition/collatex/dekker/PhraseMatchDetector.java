@@ -52,7 +52,7 @@ public class PhraseMatchDetector {
       // - there may not be a longer path between previous and base vertex
       boolean sameTranspositions = new HashSet<>(previous.transpositions()).equals(new HashSet<>(baseVertex.transpositions()));
       boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
-      boolean directedEdge = previous.outgoing().stream().filter(e -> baseVertex.equals(e.to())).findFirst().isPresent();
+      boolean directedEdge = previous.outgoing().containsKey(baseVertex);
       boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (previous.outgoing().size() == 1 || baseVertex.incoming().size() == 1);
       if (!isNear) {
         addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);

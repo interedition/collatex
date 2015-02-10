@@ -34,6 +34,4 @@ public interface Witness {
   String getSigil();
 
   final Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
-
-  final Function<VariantGraph.Edge, String> TO_SIGILS = input -> input.witnesses().stream().sorted(SIGIL_COMPARATOR).map(Object::toString).collect(Collectors.joining(", "));
 }
