@@ -10,36 +10,4 @@
     <version>1.6-SNAPSHOT</version>
     <name>CollateX Core</name>
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
-    <dependencies>
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-graph-impl</artifactId>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <groups>
-                        <group>
-                            <title>API</title>
-                            <packages>eu.interedition.collatex</packages>
-                        </group>
-                        <group>
-                            <title>Collation Algorithms</title>
-                            <packages>
-                                eu.interedition.collatex.dekker*:eu.interedition.collatex.medite:eu.interedition.collatex.needlemanwunsch
-                            </packages>
-                        </group>
-                        <group>
-                            <title>Variant Graph Implementations</title>
-                            <packages>eu.interedition.collatex.jung*:eu.interedition.collatex.neo4j*</packages>
-                        </group>
-                    </groups>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

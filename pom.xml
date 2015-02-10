@@ -59,56 +59,28 @@
         </developer>
     </developers>
 
-    <properties>
-        <jung.version>2.0.1</jung.version>
-    </properties>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+  <dependencies>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.10</version>
+          <scope>test</scope>
+      </dependency>
+  </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>eu.interedition</groupId>
-                <artifactId>collatex-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
-                <artifactId>grizzly-http-server</artifactId>
-                <version>2.3.17</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.sf.jung</groupId>
-                <artifactId>jung-graph-impl</artifactId>
-                <version>${jung.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sf.jung</groupId>
-                <artifactId>jung-visualization</artifactId>
-                <version>${jung.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <dependencyManagement>
+      <dependencies>
+          <dependency>
+              <groupId>eu.interedition</groupId>
+              <artifactId>collatex-core</artifactId>
+              <version>${project.version}</version>
+          </dependency>
+      </dependencies>
+  </dependencyManagement>
+  
 </project>
