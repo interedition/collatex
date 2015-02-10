@@ -185,13 +185,11 @@ class Collation(object):
         #tokens = [token.token_string for witness in self.witnesses for token in witness._tokens]
         tokens = []
         for i, witness in enumerate(self.witnesses):
+            if i > 0 :
+                tokens.append('$')
+                tokens.append(str(i))
             for tk in witness._tokens:
                 tokens.append(tk.token_string)
-            # if last witness, do not append $ or i to the list of tokens
-            if i == len(self.witnesses)-1:
-                break
-            tokens.append('$')
-            tokens.append(str(i+1))
         return tokens
 
 
