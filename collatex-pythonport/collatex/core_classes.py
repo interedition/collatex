@@ -164,17 +164,15 @@ class Witness(object):
         self.sigil = witnessdata['id']
         self._tokens = []
         if 'content' in witnessdata:
-            self.content = witnessdata['content']
-            # print("Witness "+sigil+" TOKENIZER IS CALLED!")
             tokenizer = WordPunctuationTokenizer()
-            tokens_as_strings = tokenizer.tokenize(self.content)
+            tokens_as_strings = tokenizer.tokenize(witnessdata['content'])
             for token_string in tokens_as_strings:
                 self._tokens.append(Token({'t':token_string}))
         elif 'tokens' in witnessdata:
             for tk in witnessdata['tokens']:
                 self._tokens.append(Token(tk))
-            # TODO no idea what this content string is needed for.
-            self.content = ' '.join([x.token_string for x in self._tokens])
+        #else raise an exception, if neither 'content' or 'tokens' in witnessdata? 
+        #also if no 'id' in witnessdata?
             
     def tokens(self):
         return self._tokens
