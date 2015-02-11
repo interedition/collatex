@@ -64,14 +64,7 @@ def get_tokenized_at(table, token_list, segmentation=False):
                 new_row.cells.append(witness_tokens[counter])
                 counter+=1
             # else if segmentation=True
-                #string = witness_tokens[counter].token_string
-                #token_counter = 1
-                #while string != cell:
-                    ##add token_string of the next token until it is equivalent to the string in the cell
-                    #string += next token string
-                    #token_counter += 1
-                #new_row.cells.append([tk for tk in witness_tokens[counter:counter+token_counter]])
-                #update counter (counter += token_counter)
+                # do something else...
     return tokenized_at
 
 def export_alignment_table_as_json(table, indent=None, status=False, layout="horizontal"):
