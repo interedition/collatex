@@ -32,8 +32,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     table = AlignmentTable(collation, graph, layout)
     if pretokenized and not segmentation:
         token_list = [[tk.token_data for tk in witness.tokens()] for witness in collation.witnesses]
-        #for the moment only with segmentation=False
-        #there could be a different comportment of get_tokenized_table if semgentation=True
+        # only with segmentation=False
+        # there could be a different comportment of get_tokenized_table if semgentation=True
         table = get_tokenized_at(table, token_list, segmentation=segmentation)
         # for display purpose, table and html output will return only token 't' (string) and not the full token_data (dict)
         if output=="table" or output=="html":
@@ -125,6 +125,7 @@ class Collation(object):
         self.counter = 0
         self.witness_ranges = {}
         self.cached_suffix_array = None
+        self.combined_tokens =[]
 
     def add_witness(self, witnessdata):
         # clear the suffix array and LCP array cache
@@ -136,6 +137,11 @@ class Collation(object):
         # the extra one is for the marker token
         self.counter += len(witness.tokens()) +2 # $ + number 
         self.witness_ranges[witness.sigil] = witness_range
+        if len(self.witnesses) > 1:
+            self.combined_tokens.append('$')
+            self.combined_tokens.append(str(len(self.witnesses)-1))
+        for tk in witness.tokens():
+            self.combined_tokens.append(tk.token_string)
 
     def add_plain_witness(self, sigil, content):
         return self.add_witness({'id':sigil, 'content':content})
@@ -149,7 +155,7 @@ class Collation(object):
         #NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
         if not self.cached_suffix_array:
             # Unit byte is done to skip tokenization in third party library
-            self.cached_suffix_array = SuffixArray(self.tokens, unit=UNIT_BYTE)
+            self.cached_suffix_array = SuffixArray(self.combined_tokens, unit=UNIT_BYTE)
         return self.cached_suffix_array
 
     def get_suffix_array(self):
@@ -161,18 +167,6 @@ class Collation(object):
         return sa._LCP_values
 
     def to_extended_suffix_array(self):
-        return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
-
-    @property
-    def tokens(self):
-        tokens = []
-        for i, witness in enumerate(self.witnesses):
-            if i > 0 :
-                tokens.append('$')
-                tokens.append(str(i))
-            for tk in witness.tokens():
-                tokens.append(tk.token_string)
-        return tokens
-
+        return ExtendedSuffixArray(self.combined_tokens, self.get_suffix_array(), self.get_lcp_array())
 
 
