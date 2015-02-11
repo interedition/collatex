@@ -161,6 +161,8 @@ class Token(object):
 class Witness(object):
     
     def __init__(self, witnessdata):
+        if 'id' not in witnessdata:
+            raise UnsupportedError("No defined id in witnessdata")
         self.sigil = witnessdata['id']
         self._tokens = []
         if 'content' in witnessdata:
@@ -171,8 +173,8 @@ class Witness(object):
         elif 'tokens' in witnessdata:
             for tk in witnessdata['tokens']:
                 self._tokens.append(Token(tk))
-        #else raise an exception, if neither 'content' or 'tokens' in witnessdata? 
-        #also if no 'id' in witnessdata?
+        else:
+            raise UnsupportedError("No defined content/tokens in witness "+self.sigil)
             
     def tokens(self):
         return self._tokens
