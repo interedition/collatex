@@ -24,13 +24,11 @@ import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschScorer;
 import eu.interedition.collatex.util.VertexMatch;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +36,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -132,61 +131,50 @@ public interface CollationAlgorithm {
     }
 
     protected void merge(VariantGraph graph, VariantGraph.Vertex[][] vertices, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
-      final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = (SortedSet<VertexMatch.WithTokenIndex>[]) matches.toArray(new SortedSet[matches.size()]);
+      @SuppressWarnings("unchecked")
+      final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = matches.toArray(new SortedSet[matches.size()]);
       final SortedSet<VertexMatch.WithTokenIndex>[] matchesTokenOrder = Arrays.copyOf(matchesVertexOrder, matchesVertexOrder.length);
 
-      Arrays.sort(matchesTokenOrder, new Comparator<SortedSet<VertexMatch.WithTokenIndex>>() {
-        @Override
-        public int compare(SortedSet<VertexMatch.WithTokenIndex> o1, SortedSet<VertexMatch.WithTokenIndex> o2) {
-          return (o1.first().token - o2.first().token);
-        }
-      });
+      Arrays.sort(matchesTokenOrder, Comparator.comparing(m -> m.first().token));
 
-      final int mergedLength = Math.max(tokens.length, vertices.length);
-      final Set<SortedSet<VertexMatch.WithTokenIndex>> inOrderMatches = NeedlemanWunschAlgorithm.align(
+      final Set<SortedSet<VertexMatch.WithTokenIndex>> alignedMatches = NeedlemanWunschAlgorithm.align(
               matchesVertexOrder,
               matchesTokenOrder,
-              new NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>>() {
-
-                @Override
-                public float score(SortedSet<VertexMatch.WithTokenIndex> a, SortedSet<VertexMatch.WithTokenIndex> b) {
-                  return (a.equals(b) ? 1 : -mergedLength);
-                }
-
-                @Override
-                public float gap() {
-                  return -(1 / (mergedLength * 1.0f));
-                }
-              }
+              new MatchPhraseAlignmentScorer(Math.max(tokens.length, vertices.length))
       ).keySet();
 
-      final List<SortedSet<VertexMatch.WithTokenIndex>> transpositions = new ArrayList<>();
-      for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : matches) {
-        if (!inOrderMatches.contains(phraseMatch)) {
-          transpositions.add(phraseMatch);
-        }
-      }
+      final Map<Token, VariantGraph.Vertex> alignments = matches.stream()
+              .filter(alignedMatches::contains)
+              .flatMap(Set::stream)
+              .collect(Collectors.toMap(m -> tokens[m.token], m -> m.vertex));
 
+      final List<SortedSet<VertexMatch.WithToken>> transpositions = matches.stream()
+              .filter(m -> !alignedMatches.contains(m))
+              .map(t -> t.stream().map(m -> new VertexMatch.WithToken(m.vertex, m.vertexRank, tokens[m.token])).collect(Collectors.toCollection(TreeSet::new)))
+              .collect(Collectors.toList());
 
-      final Map<Token, VariantGraph.Vertex> matchedTokens = new HashMap<>();
-      for (SortedSet<VertexMatch.WithTokenIndex> phraseMatch : matches) {
-        for (VertexMatch.WithTokenIndex tokenMatch : phraseMatch) {
-          matchedTokens.put(tokens[tokenMatch.token], tokenMatch.vertex);
-        }
-      }
-
-      final List<SortedSet<VertexMatch.WithToken>> transposedTokens = new LinkedList<>();
-      for (SortedSet<VertexMatch.WithTokenIndex> transposition : transpositions) {
-        final SortedSet<VertexMatch.WithToken> transpositionMatch = new TreeSet<>();
-        for (VertexMatch.WithTokenIndex match : transposition) {
-          matchedTokens.remove(tokens[match.token]);
-          transpositionMatch.add(new VertexMatch.WithToken(match.vertex, match.vertexRank, tokens[match.token]));
-        }
-        transposedTokens.add(transpositionMatch);
-      }
-
-      merge(graph, Arrays.asList(tokens), matchedTokens);
-      mergeTranspositions(graph, transposedTokens);
+      merge(graph, Arrays.asList(tokens), alignments);
+      mergeTranspositions(graph, transpositions);
     }
+  }
+  
+  static class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
+
+    private final int maxWitnessLength;
+
+    public MatchPhraseAlignmentScorer(int maxWitnessLength) {
+      this.maxWitnessLength = maxWitnessLength;
+    }
+
+    @Override
+    public float score(SortedSet<VertexMatch.WithTokenIndex> a, SortedSet<VertexMatch.WithTokenIndex> b) {
+      return (a.equals(b) ? 1 : -maxWitnessLength);
+    }
+
+    @Override
+    public float gap() {
+      return -(1 / (maxWitnessLength * 1.0f));
+    }
+    
   }
 }
