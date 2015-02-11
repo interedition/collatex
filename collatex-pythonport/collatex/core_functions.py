@@ -16,7 +16,7 @@ from collatex.display_module import display_alignment_table_as_HTML
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False, pretokenized=False):
     algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
     # build graph
     graph = VariantGraph()
@@ -27,10 +27,17 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     # check which output format is requested: graph or table
     if output=="graph": 
         return graph
+    
     # create alignment table
     table = AlignmentTable(collation, graph, layout)
+    if pretokenized and not segmentation:
+        token_list = [[tk.token_data for tk in witness.tokens()] for witness in collation.witnesses]
+        #for the moment only with segmentation=False
+        #there could be a different comportment of get_tokenized_table if semgentation=True
+        table = get_tokenized_at(table, token_list, segmentation=segmentation)
+    
     if output == "json":
-        return export_alignment_table_as_json(table)
+        return export_alignment_table_as_json(table, layout=layout)
     if output == "html":
         return display_alignment_table_as_HTML(table)
     if output == "table":
@@ -38,48 +45,21 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     else:
         raise Exception("Unknown output type: "+output)
     
-
-
-#TODO: this only works with a table output at the moment
-#TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
-    # Takes more or less the same arguments as collate() above, but with some restrictions.
-    # Only output types 'json' and 'table' are supported.
-    if output not in ['json', 'table']:
-        raise UnsupportedError("Output type" + kwargs['output'] + "not supported for pretokenized collation")
-    if 'segmentation' in kwargs and kwargs['segmentation']:
-        raise UnsupportedError("Segmented output not supported for pretokenized collation")
-    kwargs['segmentation'] = False
-
-    # For each witness given, make a 'shadow' witness based on the normalization tokens
-    # that will actually be collated.
-    tokenized_witnesses = []
-    collation = Collation()
-    for witness in json["witnesses"]:
-        collation.add_witness(witness)
-        tokenized_witnesses.append(witness["tokens"])
-    at = collate(collation, output="table", **kwargs)
-    tokenized_at = AlignmentTable(collation, layout=layout)
-    for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
-        new_row = Row(row.header)
+def get_tokenized_at(table, token_list, segmentation=False):
+    tokenized_at = AlignmentTable(Collation())
+    for witness_row, witness_tokens in zip(table.rows, token_list):
+        new_row = Row(witness_row.header)
         tokenized_at.rows.append(new_row)
-        token_counter = 0
-        for cell in row.cells:
+        counter = 0
+        for cell in witness_row.cells:
             if cell != "-":
-                new_row.cells.append(tokenized_witness[token_counter])
-                token_counter+=1
-            else:
-                #TODO: should probably be null or None instead, but that would break the rendering at the moment 
-                new_row.cells.append({"t":"-"})
-    if output=="json":
-        return export_alignment_table_as_json(tokenized_at)
-    if output=="table":
-        # transform JSON objects to "t" form.
-        for row in tokenized_at.rows:
-            row.cells = [cell["t"]  for cell in row.cells]
-        return tokenized_at
+                new_row.cells.append(witness_tokens[counter])
+                counter+=1
+            else: 
+                new_row.cells.append({})
+    return tokenized_at
 
-def export_alignment_table_as_json(table, indent=None, status=False):
+def export_alignment_table_as_json(table, indent=None, status=False, layout="horizontal"):
     json_output = {}
     json_output["table"]=[]
     sigli = []
@@ -92,6 +72,9 @@ def export_alignment_table_as_json(table, indent=None, status=False):
         for column in table.columns:
             variant_status.append(column.variant)
         json_output["status"]=variant_status
+    if layout=="vertical":
+        new_table = [[row[i] for row in json_output["table"]] for i in range(len(row.cells))]
+        json_output["table"] = new_table
     return json.dumps(json_output, sort_keys=True, indent=indent)
 
 '''
