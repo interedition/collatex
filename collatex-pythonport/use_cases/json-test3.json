@@ -1,0 +1,29 @@
+{"witnesses" :
+    [
+        {"id" : "E","tokens" :
+            [
+            {"t" : "The", "id": 1, "n": "the"},
+            {"t" : "quick", "id": 2},
+            {"t" : "brown", "id": 3},
+            {"t" : "fox", "id": 4},
+            {"t" : "jumps", "id": 5},
+            {"t" : "over", "id": 6},
+            {"t" : "the", "id": 7},
+            {"t" : "dog.", "id": 8, "n": "dog"}
+            ]
+        },
+        
+        {"id" : "F", "tokens" :
+            [
+            {"t" : "The"},
+            {"t" : "brown"},
+            {"t" : "fox"},
+            {"t" : "jumps"},
+            {"t" : "over"},
+            {"t" : "the"},
+            {"t" : "lazy"},
+            {"t" : "dog."}
+            ]
+        }
+    ]
+}
