@@ -35,6 +35,10 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         #for the moment only with segmentation=False
         #there could be a different comportment of get_tokenized_table if semgentation=True
         table = get_tokenized_at(table, token_list, segmentation=segmentation)
+        # for display purpose, table and html output will return only token 't' (string) and not the full token_data (dict)
+        if output=="table" or output=="html":
+            for row in table.rows:
+                row.cells = [cell["t"] for cell in row.cells]
     
     if output == "json":
         return export_alignment_table_as_json(table, layout=layout)
@@ -52,11 +56,22 @@ def get_tokenized_at(table, token_list, segmentation=False):
         tokenized_at.rows.append(new_row)
         counter = 0
         for cell in witness_row.cells:
-            if cell != "-":
+            if cell == "-":
+                # TODO: should probably be null or None instead, but that would break the rendering at the moment (line 41)
+                new_row.cells.append({"t" : "-"})
+            # if segmentation=False    
+            else: 
                 new_row.cells.append(witness_tokens[counter])
                 counter+=1
-            else: 
-                new_row.cells.append({})
+            # else if segmentation=True
+                #string = witness_tokens[counter].token_string
+                #token_counter = 1
+                #while string != cell:
+                    ##add token_string of the next token until it is equivalent to the string in the cell
+                    #string += next token string
+                    #token_counter += 1
+                #new_row.cells.append([tk for tk in witness_tokens[counter:counter+token_counter]])
+                #update counter (counter += token_counter)
     return tokenized_at
 
 def export_alignment_table_as_json(table, indent=None, status=False, layout="horizontal"):
