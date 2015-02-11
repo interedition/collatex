@@ -16,7 +16,7 @@ from collatex.display_module import display_alignment_table_as_HTML
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False, pretokenized=False):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False):
     algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
     # build graph
     graph = VariantGraph()
@@ -30,7 +30,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     
     # create alignment table
     table = AlignmentTable(collation, graph, layout)
-    if pretokenized and not segmentation:
+    if collation.pretokenized and not segmentation:
         token_list = [[tk.token_data for tk in witness.tokens()] for witness in collation.witnesses]
         # only with segmentation=False
         # there could be a different comportment of get_tokenized_table if semgentation=True
@@ -99,8 +99,13 @@ class Collation(object):
 
     @classmethod
     def create_from_dict(cls, data, limit=None):
+        if "witnesses" not in data:
+            raise UnsupportedError("Json input not valid")
         witnesses = data["witnesses"]
         collation = Collation()
+        # determine if data is pretokenized (check for the first witness)
+        if 'tokens' in witnesses[0]:
+            collation.pretokenized = True
         for witness in witnesses[:limit]:
             # generate collation object from json_data
             collation.add_witness(witness)
@@ -122,6 +127,7 @@ class Collation(object):
 
     def __init__(self):
         self.witnesses = []
+        self.pretokenized = False
         self.counter = 0
         self.witness_ranges = {}
         self.cached_suffix_array = None
