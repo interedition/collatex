@@ -34,7 +34,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         token_list = [[tk.token_data for tk in witness.tokens()] for witness in collation.witnesses]
         # only with segmentation=False
         # there could be a different comportment of get_tokenized_table if semgentation=True
-        table = get_tokenized_at(table, token_list, segmentation=segmentation)
+        table = get_tokenized_at(table, token_list, segmentation=segmentation, layout=layout)
         # for display purpose, table and html output will return only token 't' (string) and not the full token_data (dict)
         if output=="table" or output=="html":
             for row in table.rows:
@@ -49,8 +49,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     else:
         raise Exception("Unknown output type: "+output)
     
-def get_tokenized_at(table, token_list, segmentation=False):
-    tokenized_at = AlignmentTable(Collation())
+def get_tokenized_at(table, token_list, segmentation=False, layout="horizontal"):
+    tokenized_at = AlignmentTable(Collation(), layout=layout)
     for witness_row, witness_tokens in zip(table.rows, token_list):
         new_row = Row(witness_row.header)
         tokenized_at.rows.append(new_row)
@@ -64,7 +64,19 @@ def get_tokenized_at(table, token_list, segmentation=False):
                 new_row.cells.append(witness_tokens[counter])
                 counter+=1
             # else if segmentation=True
-                # do something else...
+                ##token_list must be a list of Token instead of list of dict (update lines 34, 64)
+                ##line 41 will not be happy in case of table/html output
+                #string = witness_tokens[counter].token_string
+                #token_counter = 1
+                #while string != cell :
+                #    if counter+token_counter-1 < len(witness_tokens)-1:
+                #        #add token_string of the next token until it is equivalent to the string in the cell
+                #        #if we are not at the last token
+                #        string += ' '+witness_tokens[counter+token_counter].token_string
+                #        token_counter += 1
+                ##there is one list level too many in the output
+                #new_row.cells.append([tk.token_data for tk in witness_tokens[counter:counter+token_counter]])
+                #counter += token_counter.
     return tokenized_at
 
 def export_alignment_table_as_json(table, indent=None, status=False, layout="horizontal"):
