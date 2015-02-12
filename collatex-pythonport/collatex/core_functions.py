@@ -96,12 +96,12 @@ class Collation(object):
             raise UnsupportedError("Json input not valid")
         witnesses = data["witnesses"]
         collation = Collation()
-        # determine if data is pretokenized (check for the first witness)
-        if 'tokens' in witnesses[0]:
-            collation.pretokenized = True
         for witness in witnesses[:limit]:
             # generate collation object from json_data
             collation.add_witness(witness)
+            # determine if data is pretokenized
+            if 'tokens' in witness:
+                collation.pretokenized = True
         return collation
 
     # json input can be a string or a file
