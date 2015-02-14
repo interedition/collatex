@@ -11,7 +11,6 @@ import java.util.List;
  * terminating item to the end of the instance which is included in all
  * operations.
  *
- * @param <I,S>
  * @author <a href="https://github.com/maxgarfinkel/suffixTree">Max Garfinkel</a>
  */
 public class Sequence<I, S extends Iterable<I>> implements Iterable<Object> {

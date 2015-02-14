@@ -155,7 +155,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
      * <ul>
      * <li>non-negative (&ge;0) symbols in the input</li>
      * <li>symbols limited by alphabet size passed in the constructor.</li>
-     * <li>length >= 2</li>
+     * <li>length &gt;= 2</li>
      * </ul>
      * <p>
      */

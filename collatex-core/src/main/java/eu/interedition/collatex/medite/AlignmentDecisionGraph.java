@@ -33,7 +33,7 @@ import java.util.TreeSet;
 import java.util.function.Function;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class AlignmentDecisionGraph {
 

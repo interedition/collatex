@@ -19,7 +19,7 @@
 
 /**
  * Dekker's implementation of a collation algorithm.
- * <p/>
+ *
  * Supports progressive alignment of multiple witnesses including heuristic detection of transpositions.
  *
  * @see eu.interedition.collatex.dekker.DekkerAlgorithm

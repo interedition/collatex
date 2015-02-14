@@ -174,10 +174,10 @@ public final class Skew implements ISuffixArrayBuilder {
      * <p>
      * Additional constraints enforced by Karkkainen-Sanders algorithm:
      * <ul>
-     * <li>non-negative (>0) symbols in the input (because of radix sort)</li>,
+     * <li>non-negative (&gt;0) symbols in the input (because of radix sort)</li>
      * <li><code>input.length</code> &gt;= <code>start + length + 3</code> (to simplify
      * border cases)</li>
-     * <li>length >= 2</li>
+     * <li>length &gt;= 2</li>
      * </ul>
      * <p>
      * If the input contains zero or negative values, or has no extra trailing cells,

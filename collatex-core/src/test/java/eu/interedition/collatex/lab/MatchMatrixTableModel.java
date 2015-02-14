@@ -30,7 +30,7 @@ import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  * @author Bram Buitendijk
  * @author Ronald Haentjens Dekker
  */

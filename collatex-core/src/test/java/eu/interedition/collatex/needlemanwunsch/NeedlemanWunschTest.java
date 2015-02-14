@@ -25,7 +25,7 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.junit.Test;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class NeedlemanWunschTest extends AbstractTest {
 

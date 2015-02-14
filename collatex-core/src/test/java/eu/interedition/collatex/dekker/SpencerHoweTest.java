@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Testing the dependence of the algorithm on the order of witnesses.
- * <p/>
+ *
  * <p>
  * See Matthew Spencer and Christopher J. Howe
  * "Collating Texts Using Progressive Multiple Alignment".

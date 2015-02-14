@@ -29,7 +29,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public abstract class VertexMatch implements Comparable<VertexMatch> {
     public final VariantGraph.Vertex vertex;
@@ -63,7 +63,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
     }
 
     /**
-     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
      */
     public static class WithToken extends VertexMatch {
 
@@ -81,7 +81,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
     }
 
     /**
-     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
      */
     public static class WithTokenIndex extends VertexMatch {
 

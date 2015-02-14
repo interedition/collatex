@@ -35,7 +35,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class ParallelSegmentationApparatus {
 

@@ -33,7 +33,7 @@ import java.util.SortedMap;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class TranspositionRenderingTest extends AbstractTest {
     @Test

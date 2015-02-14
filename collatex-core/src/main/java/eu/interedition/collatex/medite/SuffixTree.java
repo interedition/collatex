@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 class SuffixTree<T> {
 
@@ -116,7 +116,7 @@ class SuffixTree<T> {
     }
 
     /**
-     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
      */
     class Node {
 

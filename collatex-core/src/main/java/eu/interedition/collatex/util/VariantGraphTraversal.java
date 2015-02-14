@@ -31,7 +31,7 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
     private final VariantGraph graph;

@@ -92,7 +92,7 @@ public class BPR implements ISuffixArrayBuilder {
      * <li>non-negative (&ge;0) symbols in the input</li>
      * <li>symbols limited by {@link #KBS_MAX_ALPHABET_SIZE} (&lt;
      * <code>KBS_MAX_ALPHABET_SIZE</code>)</li>
-     * <li>length >= 2</li>
+     * <li>length &ge; 2</li>
      * </ul>
      * <p>
      */

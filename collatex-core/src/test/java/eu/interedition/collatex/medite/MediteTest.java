@@ -27,7 +27,7 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 import org.junit.Test;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class MediteTest extends AbstractTest {
 

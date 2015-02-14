@@ -39,7 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
 
@@ -168,7 +168,7 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
     }
 
     /**
-     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
      */
     static class MatchThreadElement {
 

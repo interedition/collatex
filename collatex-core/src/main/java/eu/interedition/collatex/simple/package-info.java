@@ -19,12 +19,12 @@
 
 /**
  * Default implementations for core interfaces like witnesses and tokens.
- * <p/>
- * Classes in this package make fundamental assumptions about the nature of text version to be collated, e.g. that they
+ *
+ * <p>Classes in this package make fundamental assumptions about the nature of text version to be collated, e.g. that they
  * can be tokenized by whitespace, that tokens might be case insensitive, that punctuation might not matter or that
- * XML input adheres to a particular schema.
- * <p/>
- * Users are advised to implement {@link eu.interedition.collatex.Token} and {@link eu.interedition.collatex.Witness}
- * themselves and adjust their implementations to the use case at hand where those assumptions do not hold.
+ * XML input adheres to a particular schema.</p>
+ *
+ * <p>Users are advised to implement {@link eu.interedition.collatex.Token} and {@link eu.interedition.collatex.Witness}
+ * themselves and adjust their implementations to the use case at hand where those assumptions do not hold.</p>
  */
 package eu.interedition.collatex.simple;

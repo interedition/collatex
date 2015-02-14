@@ -7,7 +7,7 @@ import java.util.TreeMap;
 /**
  * An adapter for constructing suffix arrays on generic arrays.
  *
- * @author Anton Olsson <abc2386@gmail.com> for friprogramvarusyndikatet.se
+ * @author <a href="mailto:abc2386@gmail.com">Anton Olsson</a> for friprogramvarusyndikatet.se
  */
 class GenericArrayAdapter<T> {
 

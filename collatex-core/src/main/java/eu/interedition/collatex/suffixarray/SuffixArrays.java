@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Michał Nowak (Carrot Search)
  * @author Dawid Weiss (Carrot Search)
- * @author Anton Olsson <abc2386@gmail.com> for friprogramvarusyndikatet.se
+ * @author <a href="mailto:abc2386@gmail.com">Anton Olsson</a> for friprogramvarusyndikatet.se
  */
 public final class SuffixArrays {
     /**
@@ -113,7 +113,7 @@ public final class SuffixArrays {
     /**
      * Calculate longest prefix (LCP) array for an existing suffix array and input. Index
      * <code>i</code> of the returned array indicates the length of the common prefix
-     * between suffix <code>i</code> and <code>i-1<code>. The 0-th
+     * between suffix <code>i</code> and <code>i-1</code>. The 0-th
      * index has a constant value of <code>-1</code>.
      * <p>
      * The algorithm used to compute the LCP comes from

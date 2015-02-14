@@ -34,7 +34,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class VariantGraph {
     final VariantGraph.Vertex start;
@@ -114,7 +114,7 @@ public class VariantGraph {
 
 
     /**
-     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
      */
     public static class Vertex {
         private final VariantGraph graph;

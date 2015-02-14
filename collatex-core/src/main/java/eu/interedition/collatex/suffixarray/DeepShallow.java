@@ -124,7 +124,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
      * <li>maximal symbol value &lt; <code>256</code></li>
      * <li><code>input.length</code> &ge; <code>start + length</code> if {@link #preserveInput} is <tt>true</tt></li>
      * <li><code>input.length</code> &ge; <code>start + length + {@link #OVERSHOOT}</code> if {@link #preserveInput} is <tt>false</tt></li>
-     * <li>length >= 2</li>
+     * <li>length &ge; 2</li>
      * </ul>
      */
     @Override

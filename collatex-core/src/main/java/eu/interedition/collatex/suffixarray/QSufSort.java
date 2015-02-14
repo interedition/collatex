@@ -73,7 +73,7 @@ public class QSufSort implements ISuffixArrayBuilder {
      * Additional constraints enforced by qsufsort algorithm:
      * <ul>
      * <li>non-negative (&ge;0) symbols in the input</li>
-     * <li>length >= 2</li>
+     * <li>length &gt;= 2</li>
      * </ul>
      * <p>
      */
