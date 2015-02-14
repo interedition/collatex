@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
