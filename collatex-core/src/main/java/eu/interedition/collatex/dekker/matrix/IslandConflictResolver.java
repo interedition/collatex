@@ -32,125 +32,124 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 /**
- * 
  * @author Ronald Haentjens Dekker
  * @author Bram Buitendijk
  * @author Meindert Kroese
  */
 public class IslandConflictResolver {
-  Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
-  // fixed islands contains all the islands that are selected for the final alignment
-  private final MatchTableSelection selection;
-  
-  //NOTE: outlierTranspositionLimit is ignored for now
-  public IslandConflictResolver(MatchTable table) {
-    selection = new MatchTableSelection(table);
-  }
+    Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
+    // fixed islands contains all the islands that are selected for the final alignment
+    private final MatchTableSelection selection;
 
-  /*
-   * Create a non-conflicting version by simply taken all the islands that do
-   * not conflict with each other, largest first. 
-   */
-  public MatchTableSelection createNonConflictingVersion() {
-    List<Island> possibleIslands;
-    do { 
-      possibleIslands = selection.getPossibleIslands();
-      // check the possible islands of a certain size against each other.
-      if (possibleIslands.size() == 1) {
-        selection.addIsland(possibleIslands.get(0));
-      } else if (possibleIslands.size() > 1) {
-        Map<IslandCompetition, List<Island>> analysis = analyzeConflictsBetweenPossibleIslands(possibleIslands);
-        resolveConflictsBySelectingPreferredIslands(selection, analysis);
-      }
+    //NOTE: outlierTranspositionLimit is ignored for now
+    public IslandConflictResolver(MatchTable table) {
+        selection = new MatchTableSelection(table);
     }
-    while (!possibleIslands.isEmpty());
-    return selection;
-  }
-  
-  /*
-   * This method analyzes the relationship between all the islands of the same
-   * size that have yet to be selected. They can compete with one another
-   * (choosing one locks out the other), some of them can be on the ideal line.
-   *
-   * Parameters: the size of the islands that you want to analyze
-   */
-  public Map<IslandCompetition, List<Island>> analyzeConflictsBetweenPossibleIslands(List<Island> possibleIslands) {
-    Map<IslandCompetition, List<Island>> conflictMap = new HashMap<>();
-    Set<Island> competingIslands = getCompetingIslands(possibleIslands);
-    for (Island island : competingIslands) {
-      if (selection.doesCandidateLayOnVectorOfCommittedIsland(island)) {
-        conflictMap.computeIfAbsent(IslandCompetition.CompetingIslandAndOnIdealIine, c -> new ArrayList<>()).add(island);
-      } else {
-        conflictMap.computeIfAbsent(IslandCompetition.CompetingIsland, c -> new ArrayList<>()).add(island);
-      }
-    }
-    for (Island island : getNonCompetingIslands(possibleIslands, competingIslands)) {
-      conflictMap.computeIfAbsent(IslandCompetition.NonCompetingIsland, c -> new ArrayList<>()).add(island);
-    }
-    return conflictMap;
-  }
 
-  /*
-   * The preferred Islands are directly added to the result Archipelago 
-   * If we want to
-   * re-factor this into a pull construction rather then a push construction
-   * we have to move this code out of this method and move it to the caller
-   * class
-   */
-  private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Map<IslandCompetition, List<Island>> islandConflictMap) {
-    // First select competing islands that are on the ideal line
-    LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
-    makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIslandAndOnIdealIine, Collections.emptyList()))
+    /*
+     * Create a non-conflicting version by simply taken all the islands that do
+     * not conflict with each other, largest first.
+     */
+    public MatchTableSelection createNonConflictingVersion() {
+        List<Island> possibleIslands;
+        do {
+            possibleIslands = selection.getPossibleIslands();
+            // check the possible islands of a certain size against each other.
+            if (possibleIslands.size() == 1) {
+                selection.addIsland(possibleIslands.get(0));
+            } else if (possibleIslands.size() > 1) {
+                Map<IslandCompetition, List<Island>> analysis = analyzeConflictsBetweenPossibleIslands(possibleIslands);
+                resolveConflictsBySelectingPreferredIslands(selection, analysis);
+            }
+        }
+        while (!possibleIslands.isEmpty());
+        return selection;
+    }
+
+    /*
+     * This method analyzes the relationship between all the islands of the same
+     * size that have yet to be selected. They can compete with one another
+     * (choosing one locks out the other), some of them can be on the ideal line.
+     *
+     * Parameters: the size of the islands that you want to analyze
+     */
+    public Map<IslandCompetition, List<Island>> analyzeConflictsBetweenPossibleIslands(List<Island> possibleIslands) {
+        Map<IslandCompetition, List<Island>> conflictMap = new HashMap<>();
+        Set<Island> competingIslands = getCompetingIslands(possibleIslands);
+        for (Island island : competingIslands) {
+            if (selection.doesCandidateLayOnVectorOfCommittedIsland(island)) {
+                conflictMap.computeIfAbsent(IslandCompetition.CompetingIslandAndOnIdealIine, c -> new ArrayList<>()).add(island);
+            } else {
+                conflictMap.computeIfAbsent(IslandCompetition.CompetingIsland, c -> new ArrayList<>()).add(island);
+            }
+        }
+        for (Island island : getNonCompetingIslands(possibleIslands, competingIslands)) {
+            conflictMap.computeIfAbsent(IslandCompetition.NonCompetingIsland, c -> new ArrayList<>()).add(island);
+        }
+        return conflictMap;
+    }
+
+    /*
+     * The preferred Islands are directly added to the result Archipelago
+     * If we want to
+     * re-factor this into a pull construction rather then a push construction
+     * we have to move this code out of this method and move it to the caller
+     * class
+     */
+    private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Map<IslandCompetition, List<Island>> islandConflictMap) {
+        // First select competing islands that are on the ideal line
+        LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
+        makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIslandAndOnIdealIine, Collections.emptyList()))
             .values().stream()
             .flatMap(List::stream).filter(ci1 -> selection.isIslandPossibleCandidate(ci1))
             .forEach(selection::addIsland);
 
-    // Second select other competing islands
-    LOG.fine("addBestOfCompeting with otherCompetingIslands");
-    makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIsland, Collections.emptyList()))
+        // Second select other competing islands
+        LOG.fine("addBestOfCompeting with otherCompetingIslands");
+        makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIsland, Collections.emptyList()))
             .values().stream()
             .flatMap(List::stream).filter(ci -> selection.isIslandPossibleCandidate(ci))
             .forEach(selection::addIsland);
 
-    // Third select non competing islands
-    LOG.fine("add non competing islands");
-    islandConflictMap.getOrDefault(IslandCompetition.NonCompetingIsland, Collections.emptyList())
+        // Third select non competing islands
+        LOG.fine("add non competing islands");
+        islandConflictMap.getOrDefault(IslandCompetition.NonCompetingIsland, Collections.emptyList())
             .forEach(selection::addIsland);
-  }
-
-  // TODO: This method calculates the distance from the ideal line
-  // TODO: by calculating the ratio x/y.
-  // TODO: but the ideal line may have moved (due to additions/deletions).
-  private SortedMap<Double, List<Island>> makeDistanceMap(Collection<Island> competingIslands) {
-    SortedMap<Double, List<Island>> distanceMap = new TreeMap<>();
-    for (Island isl : competingIslands) {
-      Coordinate leftEnd = isl.getLeftEnd();
-      double ratio = ((leftEnd.column+1) / (double) (leftEnd.row+1));
-      double b2 = Math.log(ratio)/Math.log(2);
-      double distanceToIdealLine = Math.abs(b2);
-      distanceMap.computeIfAbsent(distanceToIdealLine, d -> new ArrayList<>()).add(isl);
     }
-    return distanceMap;
-  }
 
-  private Set<Island> getNonCompetingIslands(List<Island> islands, Set<Island> competingIslands) {
-    Set<Island> nonCompetingIslands = new HashSet<>(islands);
-    nonCompetingIslands.removeAll(competingIslands);
-    return nonCompetingIslands;
-  }
-
-  private Set<Island> getCompetingIslands(List<Island> islands) {
-    Set<Island> competingIslands = new HashSet<>();
-    for (int i = 0; i < islands.size(); i++) {
-      Island i1 = islands.get(i);
-      for (int j = 1; j < islands.size() - i; j++) {
-        Island i2 = islands.get(i + j);
-        if (i1.isCompetitor(i2)) {
-          competingIslands.add(i1);
-          competingIslands.add(i2);
+    // TODO: This method calculates the distance from the ideal line
+    // TODO: by calculating the ratio x/y.
+    // TODO: but the ideal line may have moved (due to additions/deletions).
+    private SortedMap<Double, List<Island>> makeDistanceMap(Collection<Island> competingIslands) {
+        SortedMap<Double, List<Island>> distanceMap = new TreeMap<>();
+        for (Island isl : competingIslands) {
+            Coordinate leftEnd = isl.getLeftEnd();
+            double ratio = ((leftEnd.column + 1) / (double) (leftEnd.row + 1));
+            double b2 = Math.log(ratio) / Math.log(2);
+            double distanceToIdealLine = Math.abs(b2);
+            distanceMap.computeIfAbsent(distanceToIdealLine, d -> new ArrayList<>()).add(isl);
         }
-      }
+        return distanceMap;
     }
-    return competingIslands;
-  }
+
+    private Set<Island> getNonCompetingIslands(List<Island> islands, Set<Island> competingIslands) {
+        Set<Island> nonCompetingIslands = new HashSet<>(islands);
+        nonCompetingIslands.removeAll(competingIslands);
+        return nonCompetingIslands;
+    }
+
+    private Set<Island> getCompetingIslands(List<Island> islands) {
+        Set<Island> competingIslands = new HashSet<>();
+        for (int i = 0; i < islands.size(); i++) {
+            Island i1 = islands.get(i);
+            for (int j = 1; j < islands.size() - i; j++) {
+                Island i2 = islands.get(i + j);
+                if (i1.isCompetitor(i2)) {
+                    competingIslands.add(i1);
+                    competingIslands.add(i2);
+                }
+            }
+        }
+        return competingIslands;
+    }
 }

@@ -27,10 +27,10 @@ import org.w3c.dom.Node;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class NodeToken extends SimpleToken {
-  final Node node;
+    final Node node;
 
-  public NodeToken(SimpleWitness witness, String content, String normalized, Node node) {
-    super(witness, content, normalized);
-    this.node = node;
-  }
+    public NodeToken(SimpleWitness witness, String content, String normalized, Node node) {
+        super(witness, content, normalized);
+        this.node = node;
+    }
 }

@@ -29,53 +29,53 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
-  private final SimpleWitness witness;
-  private final String content;
-  private final String normalized;
+    private final SimpleWitness witness;
+    private final String content;
+    private final String normalized;
 
-  public SimpleToken(SimpleWitness witness, String content, String normalized) {
-    this.witness = witness;
-    this.content = content;
-    this.normalized = normalized;
-  }
+    public SimpleToken(SimpleWitness witness, String content, String normalized) {
+        this.witness = witness;
+        this.content = content;
+        this.normalized = normalized;
+    }
 
-  public String getContent() {
-    return content;
-  }
+    public String getContent() {
+        return content;
+    }
 
-  @Override
-  public Witness getWitness() {
-    return witness;
-  }
+    @Override
+    public Witness getWitness() {
+        return witness;
+    }
 
-  public String getNormalized() {
-    return normalized;
-  }
+    public String getNormalized() {
+        return normalized;
+    }
 
-  @Override
-  public String toString() {
-    return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
-  }
+    @Override
+    public String toString() {
+        return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
+    }
 
-  public static String toString(Iterable<? extends Token> tokens) {
-    return StreamSupport.stream(tokens.spliterator(), false)
+    public static String toString(Iterable<? extends Token> tokens) {
+        return StreamSupport.stream(tokens.spliterator(), false)
             .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
             .map(t -> (SimpleToken) t)
             .map(SimpleToken::getContent)
             .collect(Collectors.joining())
             .trim();
-  }
-
-  @Override
-  public int compareTo(SimpleToken o) {
-    return witness.compare(this, o);
-  }
-
-  public static final Function<SortedSet<VertexMatch.WithToken>, Integer> TOKEN_MATCH_EVALUATOR = input -> {
-    int value = 0;
-    for (VertexMatch.WithToken match : input) {
-      value += ((SimpleToken) match.token).getContent().length();
     }
-    return value;
-  };
+
+    @Override
+    public int compareTo(SimpleToken o) {
+        return witness.compare(this, o);
+    }
+
+    public static final Function<SortedSet<VertexMatch.WithToken>, Integer> TOKEN_MATCH_EVALUATOR = input -> {
+        int value = 0;
+        for (VertexMatch.WithToken match : input) {
+            value += ((SimpleToken) match.token).getContent().length();
+        }
+        return value;
+    };
 }

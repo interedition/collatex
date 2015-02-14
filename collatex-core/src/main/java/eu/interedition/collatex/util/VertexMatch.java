@@ -29,80 +29,80 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
-* @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-*/
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
 public abstract class VertexMatch implements Comparable<VertexMatch> {
-  public final VariantGraph.Vertex vertex;
-  public final int vertexRank;
+    public final VariantGraph.Vertex vertex;
+    public final int vertexRank;
 
-  VertexMatch(VariantGraph.Vertex vertex, int vertexRank) {
-    this.vertex = vertex;
-    this.vertexRank = vertexRank;
-  }
-
-  @Override
-  public int compareTo(VertexMatch o) {
-    return (vertexRank - o.vertexRank);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VertexMatch) {
-      return vertexRank == ((VertexMatch)obj).vertexRank;
-    }
-    return super.equals(obj);
-  }
-
-  @Override
-  public int hashCode() {
-    return vertexRank;
-  }
-
-  public static <T extends VertexMatch> Comparator<SortedSet<T>> setComparator() {
-    return (o1, o2) -> o1.first().compareTo(o2.first());
-  }
-
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
-  public static class WithToken extends VertexMatch {
-
-    public final Token token;
-
-    public WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
-      super(vertex, vertexRank);
-      this.token = token;
+    VertexMatch(VariantGraph.Vertex vertex, int vertexRank) {
+        this.vertex = vertex;
+        this.vertexRank = vertexRank;
     }
 
     @Override
-    public String toString() {
-      return "{" + vertex + " -> " + token + "}";
-    }
-  }
-
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
-  public static class WithTokenIndex extends VertexMatch {
-
-    public final int token;
-
-    public WithTokenIndex(VariantGraph.Vertex vertex, int vertexRank, int token) {
-      super(vertex, vertexRank);
-      this.token = token;
+    public int compareTo(VertexMatch o) {
+        return (vertexRank - o.vertexRank);
     }
 
     @Override
-    public String toString() {
-      return "{" + vertex + " -> " + token + "}";
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof VertexMatch) {
+            return vertexRank == ((VertexMatch) obj).vertexRank;
+        }
+        return super.equals(obj);
     }
-  }
 
-  public static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
-    return input -> new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
-  }
+    @Override
+    public int hashCode() {
+        return vertexRank;
+    }
 
-  public static Predicate<SortedSet<WithTokenIndex>> filter(final BitSet rankFilter, final BitSet tokenFilter) {
-    return input -> input.stream().anyMatch(match -> tokenFilter.get(match.token) || rankFilter.get(match.vertexRank));
-  }
+    public static <T extends VertexMatch> Comparator<SortedSet<T>> setComparator() {
+        return (o1, o2) -> o1.first().compareTo(o2.first());
+    }
+
+    /**
+     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     */
+    public static class WithToken extends VertexMatch {
+
+        public final Token token;
+
+        public WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
+            super(vertex, vertexRank);
+            this.token = token;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + vertex + " -> " + token + "}";
+        }
+    }
+
+    /**
+     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     */
+    public static class WithTokenIndex extends VertexMatch {
+
+        public final int token;
+
+        public WithTokenIndex(VariantGraph.Vertex vertex, int vertexRank, int token) {
+            super(vertex, vertexRank);
+            this.token = token;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + vertex + " -> " + token + "}";
+        }
+    }
+
+    public static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
+        return input -> new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
+    }
+
+    public static Predicate<SortedSet<WithTokenIndex>> filter(final BitSet rankFilter, final BitSet tokenFilter) {
+        return input -> input.stream().anyMatch(match -> tokenFilter.get(match.token) || rankFilter.get(match.vertexRank));
+    }
 }

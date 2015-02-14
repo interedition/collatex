@@ -31,14 +31,14 @@ import org.junit.Test;
  */
 public class MediteTest extends AbstractTest {
 
-  @Override
-  public void initAlgorithm() {
-    collationAlgorithm = CollationAlgorithmFactory.medite(new EqualityTokenComparator(), SimpleToken.TOKEN_MATCH_EVALUATOR);
-  }
+    @Override
+    public void initAlgorithm() {
+        collationAlgorithm = CollationAlgorithmFactory.medite(new EqualityTokenComparator(), SimpleToken.TOKEN_MATCH_EVALUATOR);
+    }
 
-  @Test
-  public void medite() {
-    LOG.fine(toString(VariantGraphRanking.of(collate(
+    @Test
+    public void medite() {
+        LOG.fine(toString(VariantGraphRanking.of(collate(
             "This Carpenter hadde wedded newe a wyf",
             "This Carpenter hadde wedded a newe wyf",
             "This Carpenter hadde newe wedded a wyf",
@@ -46,6 +46,6 @@ public class MediteTest extends AbstractTest {
             "This Carpenter hadde E wedded newe a wyf",
             "This Carpenter hadde newli wedded a wyf",
             "This Carpenter hadde wedded a wyf"
-    )).asTable()));
-  }
+        )).asTable()));
+    }
 }

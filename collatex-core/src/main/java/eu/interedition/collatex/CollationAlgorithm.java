@@ -44,137 +44,137 @@ import java.util.stream.StreamSupport;
  */
 public interface CollationAlgorithm {
 
-  void collate(VariantGraph against, Iterable<Token> witness);
+    void collate(VariantGraph against, Iterable<Token> witness);
 
-  void collate(VariantGraph against, Iterable<Token>... witnesses);
+    void collate(VariantGraph against, Iterable<Token>... witnesses);
 
-  void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses);
+    void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses);
 
-  abstract class Base implements CollationAlgorithm {
-    protected final Logger LOG = Logger.getLogger(getClass().getName());
-    protected Map<Token, VariantGraph.Vertex> witnessTokenVertices;
+    abstract class Base implements CollationAlgorithm {
+        protected final Logger LOG = Logger.getLogger(getClass().getName());
+        protected Map<Token, VariantGraph.Vertex> witnessTokenVertices;
 
-    @Override
-    public void collate(VariantGraph against, Iterable<Token>... witnesses) {
-      collate(against, Arrays.asList(witnesses));
-    }
-
-    @Override
-    public void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses) {
-      for (Iterable<Token> witness : witnesses) {
-        if (LOG.isLoggable(Level.FINE)) {
-          LOG.log(Level.FINE, "heap space: {0}/{1}", new Object[] {
-                  Runtime.getRuntime().totalMemory(),
-                  Runtime.getRuntime().maxMemory()
-          });
+        @Override
+        public void collate(VariantGraph against, Iterable<Token>... witnesses) {
+            collate(against, Arrays.asList(witnesses));
         }
-        collate(against, witness);
-      }
-    }
 
-    protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
-      final Witness witness = StreamSupport.stream(witnessTokens.spliterator(), false)
-              .findFirst()
-              .map(Token::getWitness)
-              .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
-
-      if (LOG.isLoggable(Level.FINE)) {
-        LOG.log(Level.FINE, "{0} + {1}: Merge comparand into graph", new Object[] { into, witness });
-      }
-      witnessTokenVertices = new HashMap<>();
-      VariantGraph.Vertex last = into.getStart();
-      final Set<Witness> witnessSet = Collections.singleton(witness);
-      for (Token token : witnessTokens) {
-        VariantGraph.Vertex matchingVertex = alignments.get(token);
-        if (matchingVertex == null) {
-          matchingVertex = into.add(token);
-        } else {
-          if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Match: {0} to {1}", new Object[] { matchingVertex, token });
-          }
-          matchingVertex.add(Collections.singleton(token));
+        @Override
+        public void collate(VariantGraph against, List<? extends Iterable<Token>> witnesses) {
+            for (Iterable<Token> witness : witnesses) {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "heap space: {0}/{1}", new Object[]{
+                        Runtime.getRuntime().totalMemory(),
+                        Runtime.getRuntime().maxMemory()
+                    });
+                }
+                collate(against, witness);
+            }
         }
-        witnessTokenVertices.put(token, matchingVertex);
 
-        into.connect(last, matchingVertex, witnessSet);
-        last = matchingVertex;
-      }
-      into.connect(last, into.getEnd(), witnessSet);
-    }
+        protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
+            final Witness witness = StreamSupport.stream(witnessTokens.spliterator(), false)
+                .findFirst()
+                .map(Token::getWitness)
+                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
-    protected void mergeTranspositions(VariantGraph into, Iterable<SortedSet<VertexMatch.WithToken>> transpositions) {
-      for (SortedSet<VertexMatch.WithToken> transposedPhrase : transpositions) {
-        if (LOG.isLoggable(Level.FINE)) {
-          LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "{0} + {1}: Merge comparand into graph", new Object[]{into, witness});
+            }
+            witnessTokenVertices = new HashMap<>();
+            VariantGraph.Vertex last = into.getStart();
+            final Set<Witness> witnessSet = Collections.singleton(witness);
+            for (Token token : witnessTokens) {
+                VariantGraph.Vertex matchingVertex = alignments.get(token);
+                if (matchingVertex == null) {
+                    matchingVertex = into.add(token);
+                } else {
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.log(Level.FINE, "Match: {0} to {1}", new Object[]{matchingVertex, token});
+                    }
+                    matchingVertex.add(Collections.singleton(token));
+                }
+                witnessTokenVertices.put(token, matchingVertex);
+
+                into.connect(last, matchingVertex, witnessSet);
+                last = matchingVertex;
+            }
+            into.connect(last, into.getEnd(), witnessSet);
         }
-        final Set<VariantGraph.Vertex> transposed = new HashSet<>();
-        for (VertexMatch.WithToken match : transposedPhrase) {
-          transposed.add(witnessTokenVertices.get(match.token));
-          transposed.add(match.vertex);
+
+        protected void mergeTranspositions(VariantGraph into, Iterable<SortedSet<VertexMatch.WithToken>> transpositions) {
+            for (SortedSet<VertexMatch.WithToken> transposedPhrase : transpositions) {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
+                }
+                final Set<VariantGraph.Vertex> transposed = new HashSet<>();
+                for (VertexMatch.WithToken match : transposedPhrase) {
+                    transposed.add(witnessTokenVertices.get(match.token));
+                    transposed.add(match.vertex);
+                }
+                into.transpose(transposed);
+            }
         }
-        into.transpose(transposed);
-      }
-    }
 
-    protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
-      for (List<Match> transposedPhrase : transpositions) {
-        if (LOG.isLoggable(Level.FINE)) {
-          LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
+        protected void mergeTranspositions(VariantGraph into, List<List<Match>> transpositions) {
+            for (List<Match> transposedPhrase : transpositions) {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Transposition: {0}", transposedPhrase);
+                }
+                final Set<VariantGraph.Vertex> transposed = new HashSet<>();
+                for (Match match : transposedPhrase) {
+                    transposed.add(witnessTokenVertices.get(match.token));
+                    transposed.add(match.vertex);
+                }
+                into.transpose(transposed);
+            }
         }
-        final Set<VariantGraph.Vertex> transposed = new HashSet<>();
-        for (Match match : transposedPhrase) {
-          transposed.add(witnessTokenVertices.get(match.token));
-          transposed.add(match.vertex);
+
+        protected void merge(VariantGraph graph, VariantGraph.Vertex[][] vertices, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
+            @SuppressWarnings("unchecked")
+            final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = matches.toArray(new SortedSet[matches.size()]);
+            final SortedSet<VertexMatch.WithTokenIndex>[] matchesTokenOrder = Arrays.copyOf(matchesVertexOrder, matchesVertexOrder.length);
+
+            Arrays.sort(matchesTokenOrder, Comparator.comparing(m -> m.first().token));
+
+            final Set<SortedSet<VertexMatch.WithTokenIndex>> alignedMatches = NeedlemanWunschAlgorithm.align(
+                matchesVertexOrder,
+                matchesTokenOrder,
+                new MatchPhraseAlignmentScorer(Math.max(tokens.length, vertices.length))
+            ).keySet();
+
+            final Map<Token, VariantGraph.Vertex> alignments = matches.stream()
+                .filter(alignedMatches::contains)
+                .flatMap(Set::stream)
+                .collect(Collectors.toMap(m -> tokens[m.token], m -> m.vertex));
+
+            final List<SortedSet<VertexMatch.WithToken>> transpositions = matches.stream()
+                .filter(m -> !alignedMatches.contains(m))
+                .map(t -> t.stream().map(m -> new VertexMatch.WithToken(m.vertex, m.vertexRank, tokens[m.token])).collect(Collectors.toCollection(TreeSet::new)))
+                .collect(Collectors.toList());
+
+            merge(graph, Arrays.asList(tokens), alignments);
+            mergeTranspositions(graph, transpositions);
         }
-        into.transpose(transposed);
-      }
     }
 
-    protected void merge(VariantGraph graph, VariantGraph.Vertex[][] vertices, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
-      @SuppressWarnings("unchecked")
-      final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = matches.toArray(new SortedSet[matches.size()]);
-      final SortedSet<VertexMatch.WithTokenIndex>[] matchesTokenOrder = Arrays.copyOf(matchesVertexOrder, matchesVertexOrder.length);
+    static class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
 
-      Arrays.sort(matchesTokenOrder, Comparator.comparing(m -> m.first().token));
+        private final int maxWitnessLength;
 
-      final Set<SortedSet<VertexMatch.WithTokenIndex>> alignedMatches = NeedlemanWunschAlgorithm.align(
-              matchesVertexOrder,
-              matchesTokenOrder,
-              new MatchPhraseAlignmentScorer(Math.max(tokens.length, vertices.length))
-      ).keySet();
+        public MatchPhraseAlignmentScorer(int maxWitnessLength) {
+            this.maxWitnessLength = maxWitnessLength;
+        }
 
-      final Map<Token, VariantGraph.Vertex> alignments = matches.stream()
-              .filter(alignedMatches::contains)
-              .flatMap(Set::stream)
-              .collect(Collectors.toMap(m -> tokens[m.token], m -> m.vertex));
+        @Override
+        public float score(SortedSet<VertexMatch.WithTokenIndex> a, SortedSet<VertexMatch.WithTokenIndex> b) {
+            return (a.equals(b) ? 1 : -maxWitnessLength);
+        }
 
-      final List<SortedSet<VertexMatch.WithToken>> transpositions = matches.stream()
-              .filter(m -> !alignedMatches.contains(m))
-              .map(t -> t.stream().map(m -> new VertexMatch.WithToken(m.vertex, m.vertexRank, tokens[m.token])).collect(Collectors.toCollection(TreeSet::new)))
-              .collect(Collectors.toList());
+        @Override
+        public float gap() {
+            return -(1 / (maxWitnessLength * 1.0f));
+        }
 
-      merge(graph, Arrays.asList(tokens), alignments);
-      mergeTranspositions(graph, transpositions);
     }
-  }
-  
-  static class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
-
-    private final int maxWitnessLength;
-
-    public MatchPhraseAlignmentScorer(int maxWitnessLength) {
-      this.maxWitnessLength = maxWitnessLength;
-    }
-
-    @Override
-    public float score(SortedSet<VertexMatch.WithTokenIndex> a, SortedSet<VertexMatch.WithTokenIndex> b) {
-      return (a.equals(b) ? 1 : -maxWitnessLength);
-    }
-
-    @Override
-    public float gap() {
-      return -(1 / (maxWitnessLength * 1.0f));
-    }
-    
-  }
 }

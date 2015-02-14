@@ -34,59 +34,59 @@ import static org.junit.Assert.assertEquals;
 
 public class MatchesTest extends AbstractTest {
 
-  @Test
-  public void test1() {
-    final SimpleWitness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
-    final VariantGraph graph = collate(w[0]);
-    final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
+    @Test
+    public void test1() {
+        final SimpleWitness[] w = createWitnesses("john and paul and george and ringo", "john and paul and george and ringo");
+        final VariantGraph graph = collate(w[0]);
+        final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
-    int expected_unmatched = 0;
-    int expected_unique = 4; // john paul george ringo
-    int expected_ambiguous = 3; // 3 ands in 2nd witness
-    assertMatches(matches, expected_unmatched, expected_unique, expected_ambiguous);
-  }
+        int expected_unmatched = 0;
+        int expected_unique = 4; // john paul george ringo
+        int expected_ambiguous = 3; // 3 ands in 2nd witness
+        assertMatches(matches, expected_unmatched, expected_unique, expected_ambiguous);
+    }
 
-  @Test
-  public void test2() {
-    final SimpleWitness[] w = createWitnesses("the white cat", "the black cat");
-    final VariantGraph graph = collate(w[0]);
-    final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
+    @Test
+    public void test2() {
+        final SimpleWitness[] w = createWitnesses("the white cat", "the black cat");
+        final VariantGraph graph = collate(w[0]);
+        final Matches matches = Matches.between(graph.vertices(), w[1].getTokens(), new EqualityTokenComparator());
 
-    int expected_unmatched = 1; // black
-    int expected_unique = 2; // the & cat
-    int expected_ambiguous = 0;
-    assertMatches(matches, expected_unmatched, expected_unique, expected_ambiguous);
-  }
-  
-  // This test tests overlapping islands
-  @Test
-  public void test3OverlappingIslands() {
-    String witnessA = "the cat and the dog";
-    String witnessB = "the dog and the cat";
-    SimpleWitness[] sw = createWitnesses(witnessA, witnessB);
-    VariantGraph vg = collate(sw[0]);
-    final Matches matches = Matches.between(vg.vertices(), sw[1].getTokens(), new EqualityTokenComparator());
-    assertMatches(matches, 0, 3, 2);
-    assertEquals(7, matches.allMatches.values().stream().flatMap(List::stream).count());
-  }
+        int expected_unmatched = 1; // black
+        int expected_unique = 2; // the & cat
+        int expected_ambiguous = 0;
+        assertMatches(matches, expected_unmatched, expected_unique, expected_ambiguous);
+    }
+
+    // This test tests overlapping islands
+    @Test
+    public void test3OverlappingIslands() {
+        String witnessA = "the cat and the dog";
+        String witnessB = "the dog and the cat";
+        SimpleWitness[] sw = createWitnesses(witnessA, witnessB);
+        VariantGraph vg = collate(sw[0]);
+        final Matches matches = Matches.between(vg.vertices(), sw[1].getTokens(), new EqualityTokenComparator());
+        assertMatches(matches, 0, 3, 2);
+        assertEquals(7, matches.allMatches.values().stream().flatMap(List::stream).count());
+    }
 
 
-  private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
-    Set<Token> unmatched = matches.unmatchedInWitness;
-    LOG.log(Level.FINE, "unmatched: {0}", unmatched);
+    private void assertMatches(final Matches matches, int expected_unmatched, int expected_unique, int expected_ambiguous) {
+        Set<Token> unmatched = matches.unmatchedInWitness;
+        LOG.log(Level.FINE, "unmatched: {0}", unmatched);
 
-    Set<Token> unique = matches.uniqueInWitness;
-    LOG.log(Level.FINE, "unique: {0}", unique);
+        Set<Token> unique = matches.uniqueInWitness;
+        LOG.log(Level.FINE, "unique: {0}", unique);
 
-    Set<Token> ambiguous = matches.ambiguousInWitness;
-    LOG.log(Level.FINE, "ambiguous: {0}", ambiguous);
+        Set<Token> ambiguous = matches.ambiguousInWitness;
+        LOG.log(Level.FINE, "ambiguous: {0}", ambiguous);
 
-    Map<Token, List<VariantGraph.Vertex>> all = matches.allMatches;
-    LOG.log(Level.FINE, "all: {0}", all);
+        Map<Token, List<VariantGraph.Vertex>> all = matches.allMatches;
+        LOG.log(Level.FINE, "all: {0}", all);
 
-    assertEquals(expected_unmatched, unmatched.size());
-    assertEquals(expected_unique, unique.size());
-    assertEquals(expected_ambiguous, ambiguous.size());
-    //    assertEquals(expected_unique + expected_ambiguous, all.size());
-  }
+        assertEquals(expected_unmatched, unmatched.size());
+        assertEquals(expected_unique, unique.size());
+        assertEquals(expected_ambiguous, ambiguous.size());
+        //    assertEquals(expected_unique + expected_ambiguous, all.size());
+    }
 }

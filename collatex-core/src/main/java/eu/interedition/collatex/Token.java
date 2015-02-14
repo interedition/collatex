@@ -21,8 +21,8 @@ package eu.interedition.collatex;
 
 
 /**
- * The normalized version of the token. 
+ * The normalized version of the token.
  */
 public interface Token {
-  Witness getWitness();
+    Witness getWitness();
 }

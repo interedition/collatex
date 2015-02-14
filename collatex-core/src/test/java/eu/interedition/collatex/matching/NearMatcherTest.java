@@ -31,15 +31,15 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class NearMatcherTest extends AbstractTest {
-  
-  @Test
-  public void nearTokenMatching() {
-    final SimpleWitness[] w = createWitnesses("near matching yeah", "nar matching");
-    final VariantGraph graph = collate(w[0]);
-    final Map<Token, List<VariantGraph.Vertex>> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EditDistanceTokenComparator()).allMatches;
 
-    assertEquals(2, matches.values().stream().flatMap(List::stream).count());
-    assertEquals(w[0].getTokens().get(0), matches.get(w[1].getTokens().get(0)).get(0).tokens().stream().findFirst().get());
-    assertEquals(w[0].getTokens().get(1), matches.get(w[1].getTokens().get(1)).get(0).tokens().stream().findFirst().get());
-  }
+    @Test
+    public void nearTokenMatching() {
+        final SimpleWitness[] w = createWitnesses("near matching yeah", "nar matching");
+        final VariantGraph graph = collate(w[0]);
+        final Map<Token, List<VariantGraph.Vertex>> matches = Matches.between(graph.vertices(), w[1].getTokens(), new EditDistanceTokenComparator()).allMatches;
+
+        assertEquals(2, matches.values().stream().flatMap(List::stream).count());
+        assertEquals(w[0].getTokens().get(0), matches.get(w[1].getTokens().get(0)).get(0).tokens().stream().findFirst().get());
+        assertEquals(w[0].getTokens().get(1), matches.get(w[1].getTokens().get(1)).get(0).tokens().stream().findFirst().get());
+    }
 }

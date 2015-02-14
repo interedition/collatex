@@ -32,23 +32,23 @@ import java.util.stream.Stream;
  */
 public class SimplePatternTokenizer {
 
-  static final String PUNCT = Pattern.quote(".?!,;:");
+    static final String PUNCT = Pattern.quote(".?!,;:");
 
-  static Function<String, Stream<String>> tokenizer(Pattern pattern) {
-    return input -> {
-      final Matcher matcher = pattern.matcher(input);
-      final List<String> tokens = new LinkedList<>();
-      while (matcher.find()) {
-        tokens.add(input.substring(matcher.start(), matcher.end()));
-      }
-      return tokens.stream();
-    };
-  }
+    static Function<String, Stream<String>> tokenizer(Pattern pattern) {
+        return input -> {
+            final Matcher matcher = pattern.matcher(input);
+            final List<String> tokens = new LinkedList<>();
+            while (matcher.find()) {
+                tokens.add(input.substring(matcher.start(), matcher.end()));
+            }
+            return tokens.stream();
+        };
+    }
 
-  public static final Function<String, Stream<String>> BY_WHITESPACE = tokenizer(Pattern.compile("\\s*?\\S+\\s*]"));
+    public static final Function<String, Stream<String>> BY_WHITESPACE = tokenizer(Pattern.compile("\\s*?\\S+\\s*]"));
 
-  public static final Function<String, Stream<String>> BY_WS_AND_PUNCT = tokenizer(Pattern.compile("[\\s" + PUNCT + "]*?[^\\s" + PUNCT + "]+[\\s" + PUNCT + "]*"));
-  
-  public static final Function<String, Stream<String>> BY_WS_OR_PUNCT = tokenizer(Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*"));
+    public static final Function<String, Stream<String>> BY_WS_AND_PUNCT = tokenizer(Pattern.compile("[\\s" + PUNCT + "]*?[^\\s" + PUNCT + "]+[\\s" + PUNCT + "]*"));
+
+    public static final Function<String, Stream<String>> BY_WS_OR_PUNCT = tokenizer(Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*"));
 
 }

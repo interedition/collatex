@@ -51,49 +51,49 @@ import java.util.stream.Stream;
  */
 public class URLWitness extends SimpleWitness {
 
-  public final URL url;
+    public final URL url;
 
-  public URLWitness(String sigil, URL url) {
-    super(sigil);
-    this.url = url;
-  }
+    public URLWitness(String sigil, URL url) {
+        super(sigil);
+        this.url = url;
+    }
 
-  public URLWitness read(
-          Function<String, Stream<String>> tokenizer,
-          Function<String, String> normalizer,
-          Charset charset,
-          XPathExpression tokenXPath)
-          throws IOException, XPathExpressionException, SAXException {
-    try (InputStream stream = url.openStream()) {
-      if (tokenXPath != null) {
-        final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        final Document document = documentBuilder.parse(stream);
-        document.normalizeDocument();
+    public URLWitness read(
+        Function<String, Stream<String>> tokenizer,
+        Function<String, String> normalizer,
+        Charset charset,
+        XPathExpression tokenXPath)
+        throws IOException, XPathExpressionException, SAXException {
+        try (InputStream stream = url.openStream()) {
+            if (tokenXPath != null) {
+                final DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                final Document document = documentBuilder.parse(stream);
+                document.normalizeDocument();
 
-        final NodeList tokenNodes = (NodeList) tokenXPath.evaluate(document, XPathConstants.NODESET);
-        final List<Token> tokens = new ArrayList<>(tokenNodes.getLength());
-        for (int nc = 0; nc < tokenNodes.getLength(); nc++) {
-          final Node tokenNode = tokenNodes.item(nc);
-          final String tokenText = tokenNode.getTextContent();
-          tokens.add(new NodeToken(this, tokenText, normalizer.apply(tokenText), tokenNode));
-        }
-        setTokens(tokens);
-      } else {
+                final NodeList tokenNodes = (NodeList) tokenXPath.evaluate(document, XPathConstants.NODESET);
+                final List<Token> tokens = new ArrayList<>(tokenNodes.getLength());
+                for (int nc = 0; nc < tokenNodes.getLength(); nc++) {
+                    final Node tokenNode = tokenNodes.item(nc);
+                    final String tokenText = tokenNode.getTextContent();
+                    tokens.add(new NodeToken(this, tokenText, normalizer.apply(tokenText), tokenNode));
+                }
+                setTokens(tokens);
+            } else {
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
-        final StringWriter writer = new StringWriter();
-        final char[] buf = new char[1024];
-        while (reader.read(buf) != -1) {
-          writer.write(buf);
-        }
-        setTokens(tokenizer.apply(writer.toString())
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
+                final StringWriter writer = new StringWriter();
+                final char[] buf = new char[1024];
+                while (reader.read(buf) != -1) {
+                    writer.write(buf);
+                }
+                setTokens(tokenizer.apply(writer.toString())
                         .map(tokenText -> new SimpleToken(this, tokenText, normalizer.apply(tokenText)))
                         .collect(Collectors.<Token>toList())
-        );
-      }
-    } catch (ParserConfigurationException e) {
-      throw new SAXException(e);
+                );
+            }
+        } catch (ParserConfigurationException e) {
+            throw new SAXException(e);
+        }
+        return this;
     }
-    return this;
-  }
 }

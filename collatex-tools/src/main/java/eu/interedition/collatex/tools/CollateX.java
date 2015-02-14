@@ -77,291 +77,291 @@ import java.util.stream.Stream;
  */
 public class CollateX implements AutoCloseable {
 
-  Charset inputCharset;
-  boolean xmlMode;
-  List<URL> inputResources;
-  List<SimpleWitness> witnesses;
-  XPathExpression tokenXPath;
+    Charset inputCharset;
+    boolean xmlMode;
+    List<URL> inputResources;
+    List<SimpleWitness> witnesses;
+    XPathExpression tokenXPath;
 
-  Function<String, Stream<String>> tokenizer;
-  Function<String, String> normalizer;
-  Comparator<Token> comparator;
-  CollationAlgorithm collationAlgorithm;
-  VariantGraph variantGraph;
-  boolean joined = false;
+    Function<String, Stream<String>> tokenizer;
+    Function<String, String> normalizer;
+    Comparator<Token> comparator;
+    CollationAlgorithm collationAlgorithm;
+    VariantGraph variantGraph;
+    boolean joined = false;
 
-  String outputFormat;
-  Charset outputCharset;
-  PrintWriter out;
-  File outFile = null;
-  PrintWriter log = new PrintWriter(System.err);
-  boolean errorOccurred = false;
+    String outputFormat;
+    Charset outputCharset;
+    PrintWriter out;
+    File outFile = null;
+    PrintWriter log = new PrintWriter(System.err);
+    boolean errorOccurred = false;
 
-  CollateX configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException, IOException {
-    this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
-    this.xmlMode = commandLine.hasOption("xml");
-    this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//text()"));
+    CollateX configure(CommandLine commandLine) throws XPathExpressionException, ParseException, ScriptException, IOException {
+        this.inputCharset = Charset.forName(commandLine.getOptionValue("ie", "UTF-8"));
+        this.xmlMode = commandLine.hasOption("xml");
+        this.tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//text()"));
 
-    final String script = commandLine.getOptionValue("s");
-    try {
-      final PluginScript pluginScript = (script == null
-              ? PluginScript.read("<internal>", new StringReader(""))
-              : PluginScript.read(argumentToResource(script)));
+        final String script = commandLine.getOptionValue("s");
+        try {
+            final PluginScript pluginScript = (script == null
+                ? PluginScript.read("<internal>", new StringReader(""))
+                : PluginScript.read(argumentToResource(script)));
 
-      this.tokenizer = Optional.ofNullable(pluginScript.tokenizer()).orElse(SimplePatternTokenizer.BY_WS_OR_PUNCT);
-      this.normalizer = Optional.ofNullable(pluginScript.normalizer()).orElse(SimpleTokenNormalizers.LC_TRIM_WS);
-      this.comparator = Optional.ofNullable(pluginScript.comparator()).orElse(new EqualityTokenComparator());
-    } catch (IOException e) {
-      throw new ParseException("Failed to read script '" + script + "' - " + e.getMessage());
-    }
+            this.tokenizer = Optional.ofNullable(pluginScript.tokenizer()).orElse(SimplePatternTokenizer.BY_WS_OR_PUNCT);
+            this.normalizer = Optional.ofNullable(pluginScript.normalizer()).orElse(SimpleTokenNormalizers.LC_TRIM_WS);
+            this.comparator = Optional.ofNullable(pluginScript.comparator()).orElse(new EqualityTokenComparator());
+        } catch (IOException e) {
+            throw new ParseException("Failed to read script '" + script + "' - " + e.getMessage());
+        }
 
-    final String algorithm = commandLine.getOptionValue("a", "dekker").toLowerCase();
-    switch (algorithm) {
-      case "needleman-wunsch":
-        this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
-        break;
-      case "medite":
-        this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
-        break;
-      case "gst":
-        this.collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
-        break;
-      default:
-        this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
-        break;
-    }
+        final String algorithm = commandLine.getOptionValue("a", "dekker").toLowerCase();
+        switch (algorithm) {
+            case "needleman-wunsch":
+                this.collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(this.comparator);
+                break;
+            case "medite":
+                this.collationAlgorithm = CollationAlgorithmFactory.medite(this.comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
+                break;
+            case "gst":
+                this.collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
+                break;
+            default:
+                this.collationAlgorithm = CollationAlgorithmFactory.dekker(this.comparator);
+                break;
+        }
 
-    this.variantGraph = new VariantGraph();
+        this.variantGraph = new VariantGraph();
 
-    this.joined = !commandLine.hasOption("t");
+        this.joined = !commandLine.hasOption("t");
 
-    this.outputFormat = commandLine.getOptionValue("f", "json").toLowerCase();
+        this.outputFormat = commandLine.getOptionValue("f", "json").toLowerCase();
 
-    outputCharset = Charset.forName(commandLine.getOptionValue("oe", "UTF-8"));
-    final String output = commandLine.getOptionValue("o", "-");
-    if (!"-".equals(output)) {
-      try {
-        this.outFile = new File(output);
-        this.out = new PrintWriter(Files.newBufferedWriter(this.outFile.toPath(), outputCharset));
-      } catch (FileNotFoundException e) {
-        throw new ParseException("Output file '" + outFile + "' not found");
-      }
-    } else {
-      this.out = new PrintWriter(new OutputStreamWriter(System.out, outputCharset));
-    }
-
-
-    final String[] witnessSpecs = commandLine.getArgs();
-    this.inputResources = new ArrayList<>(witnessSpecs.length);
-    for (String witnessSpec : witnessSpecs) {
-      inputResources.add(argumentToResource(witnessSpec));
-    }
-    if (inputResources.size() < 1) {
-      throw new ParseException("No input resource(s) given");
-    }
-
-
-    return this;
-  }
-
-  CollateX read() throws IOException, XPathExpressionException, SAXException {
-    if (inputResources.size() < 2) {
-      try (InputStream inputStream = inputResources.get(0).openStream()) {
-        this.witnesses = JsonProcessor.read(inputStream).getWitnesses();
-      }
-    } else {
-      this.witnesses = new ArrayList<>(inputResources.size());
-      //noinspection Convert2streamapi
-      for (URL witnessURL : inputResources) {
-        this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL)
-                .read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null)));
-      }
-    }
-    return this;
-  }
-
-  CollateX collate() {
-    new SimpleCollation(witnesses, collationAlgorithm, joined).collate(variantGraph);
-    return this;
-  }
-
-  void write() throws IOException {
-    final SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraph);
-    if ("csv".equals(outputFormat)) {
-      serializer.toCsv(out);
-    } else if ("dot".equals(outputFormat)) {
-      serializer.toDot(out);
-    } else if ("graphml".equals(outputFormat) || "tei".equals(outputFormat)) {
-      XMLStreamWriter xml = null;
-      try {
-        xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
-        xml.writeStartDocument(outputCharset.name(), "1.0");
-        if ("graphml".equals(outputFormat)) {
-          serializer.toGraphML(xml);
+        outputCharset = Charset.forName(commandLine.getOptionValue("oe", "UTF-8"));
+        final String output = commandLine.getOptionValue("o", "-");
+        if (!"-".equals(output)) {
+            try {
+                this.outFile = new File(output);
+                this.out = new PrintWriter(Files.newBufferedWriter(this.outFile.toPath(), outputCharset));
+            } catch (FileNotFoundException e) {
+                throw new ParseException("Output file '" + outFile + "' not found");
+            }
         } else {
-          serializer.toTEI(xml);
+            this.out = new PrintWriter(new OutputStreamWriter(System.out, outputCharset));
         }
-        xml.writeEndDocument();
-      } catch (XMLStreamException e) {
-        throw new IOException(e);
-      } finally {
-        if (xml != null) {
-          try {
-            xml.close();
-          } catch (XMLStreamException e) {
-            // ignored
-          }
-        }
-      }
-    } else {
-      JsonProcessor.write(variantGraph, out);
-    }
-  }
 
-  CollateX serve(CommandLine commandLine) {
-    final CollatorService collator = new CollatorService(
+
+        final String[] witnessSpecs = commandLine.getArgs();
+        this.inputResources = new ArrayList<>(witnessSpecs.length);
+        for (String witnessSpec : witnessSpecs) {
+            inputResources.add(argumentToResource(witnessSpec));
+        }
+        if (inputResources.size() < 1) {
+            throw new ParseException("No input resource(s) given");
+        }
+
+
+        return this;
+    }
+
+    CollateX read() throws IOException, XPathExpressionException, SAXException {
+        if (inputResources.size() < 2) {
+            try (InputStream inputStream = inputResources.get(0).openStream()) {
+                this.witnesses = JsonProcessor.read(inputStream).getWitnesses();
+            }
+        } else {
+            this.witnesses = new ArrayList<>(inputResources.size());
+            //noinspection Convert2streamapi
+            for (URL witnessURL : inputResources) {
+                this.witnesses.add(new URLWitness("w" + (witnesses.size() + 1), witnessURL)
+                    .read(tokenizer, normalizer, inputCharset, (xmlMode ? tokenXPath : null)));
+            }
+        }
+        return this;
+    }
+
+    CollateX collate() {
+        new SimpleCollation(witnesses, collationAlgorithm, joined).collate(variantGraph);
+        return this;
+    }
+
+    void write() throws IOException {
+        final SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraph);
+        if ("csv".equals(outputFormat)) {
+            serializer.toCsv(out);
+        } else if ("dot".equals(outputFormat)) {
+            serializer.toDot(out);
+        } else if ("graphml".equals(outputFormat) || "tei".equals(outputFormat)) {
+            XMLStreamWriter xml = null;
+            try {
+                xml = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
+                xml.writeStartDocument(outputCharset.name(), "1.0");
+                if ("graphml".equals(outputFormat)) {
+                    serializer.toGraphML(xml);
+                } else {
+                    serializer.toTEI(xml);
+                }
+                xml.writeEndDocument();
+            } catch (XMLStreamException e) {
+                throw new IOException(e);
+            } finally {
+                if (xml != null) {
+                    try {
+                        xml.close();
+                    } catch (XMLStreamException e) {
+                        // ignored
+                    }
+                }
+            }
+        } else {
+            JsonProcessor.write(variantGraph, out);
+        }
+    }
+
+    CollateX serve(CommandLine commandLine) {
+        final CollatorService collator = new CollatorService(
             Integer.parseInt(commandLine.getOptionValue("mpc", "2")),
             Integer.parseInt(commandLine.getOptionValue("mcs", "0")),
             commandLine.getOptionValue("dot", null)
-    );
-    final String staticPath = System.getProperty("collatex.static.path", "");
-    final HttpHandler httpHandler = staticPath.isEmpty() ? new CLStaticHttpHandler(CollateX.class.getClassLoader(), "/static/") {
-      @Override
-      protected void onMissingResource(Request request, Response response) throws Exception {
-        collator.service(request, response);
-      }
-    } : new StaticHttpHandler(staticPath.replaceAll("/+$", "") + "/") {
-      @Override
-      protected void onMissingResource(Request request, Response response) throws Exception {
-        collator.service(request, response);
-      }
-    };
+        );
+        final String staticPath = System.getProperty("collatex.static.path", "");
+        final HttpHandler httpHandler = staticPath.isEmpty() ? new CLStaticHttpHandler(CollateX.class.getClassLoader(), "/static/") {
+            @Override
+            protected void onMissingResource(Request request, Response response) throws Exception {
+                collator.service(request, response);
+            }
+        } : new StaticHttpHandler(staticPath.replaceAll("/+$", "") + "/") {
+            @Override
+            protected void onMissingResource(Request request, Response response) throws Exception {
+                collator.service(request, response);
+            }
+        };
 
-    final NetworkListener httpListener = new NetworkListener("http", "0.0.0.0", Integer.parseInt(commandLine.getOptionValue("p", "7369")));
+        final NetworkListener httpListener = new NetworkListener("http", "0.0.0.0", Integer.parseInt(commandLine.getOptionValue("p", "7369")));
 
-    final CompressionConfig compressionConfig = httpListener.getCompressionConfig();
-    compressionConfig.setCompressionMode(CompressionConfig.CompressionMode.ON);
-    compressionConfig.setCompressionMinSize(860); // http://webmasters.stackexchange.com/questions/31750/what-is-recommended-minimum-object-size-for-gzip-performance-benefits
-    compressionConfig.setCompressableMimeTypes("application/javascript", "application/json", "application/xml", "text/css", "text/html", "text/javascript", "text/plain", "text/xml");
+        final CompressionConfig compressionConfig = httpListener.getCompressionConfig();
+        compressionConfig.setCompressionMode(CompressionConfig.CompressionMode.ON);
+        compressionConfig.setCompressionMinSize(860); // http://webmasters.stackexchange.com/questions/31750/what-is-recommended-minimum-object-size-for-gzip-performance-benefits
+        compressionConfig.setCompressableMimeTypes("application/javascript", "application/json", "application/xml", "text/css", "text/html", "text/javascript", "text/plain", "text/xml");
 
-    final HttpServer httpServer = new HttpServer();
-    httpServer.addListener(httpListener);
-    httpServer.getServerConfiguration().addHttpHandler(httpHandler, commandLine.getOptionValue("cp", "").replaceAll("/+$", "") + "/*");
+        final HttpServer httpServer = new HttpServer();
+        httpServer.addListener(httpListener);
+        httpServer.getServerConfiguration().addHttpHandler(httpHandler, commandLine.getOptionValue("cp", "").replaceAll("/+$", "") + "/*");
 
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      if (LOG.isLoggable(Level.INFO)) {
-        LOG.info("Stopping HTTP server");
-      }
-      httpServer.shutdown();
-    }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.info("Stopping HTTP server");
+            }
+            httpServer.shutdown();
+        }));
 
-    try {
-      httpServer.start();
-      Thread.sleep(Long.MAX_VALUE);
-    } catch (IOException | InterruptedException e) {
-      error(e.getMessage(), e);
-    }
-    return this;
-  }
-
-  CollateX log(String str) {
-    log.write(str);
-    return this;
-  }
-
-  void error(String str, Throwable t) {
-    errorOccurred = true;
-    log(str).log("\n").log(t.getMessage()).log("\n");
-  }
-
-  void help() {
-    new HelpFormatter().printHelp(log, 78, "collatex [<options>]\n (<json_input> | <witness_1> <witness_2> [[<witness_3>] ...])", "", OPTIONS, 2, 4, "");
-  }
-
-  URL argumentToResource(String arg) throws ParseException {
-    try {
-      final File witnessFile = new File(arg);
-      if (witnessFile.exists()) {
-        return witnessFile.toURI().normalize().toURL();
-      } else {
-         return new URL(arg);
-      }
-    } catch (MalformedURLException urlEx) {
-      throw new ParseException("Invalid resource: " + arg);
-    }
-  }
-
-  public static void main(String... args) {
-    final CollateX engine = new CollateX();
-    try {
-      final CommandLine commandLine = new GnuParser().parse(OPTIONS, args);
-      if (commandLine.hasOption("h")) {
-        engine.help();
-        return;
-      }
-      if (commandLine.hasOption("srv")) {
-        engine.serve(commandLine);
-      } else {
-        engine.configure(commandLine).read().collate().write();
-      }
-    } catch (ParseException e) {
-      engine.error("Error while parsing command line arguments", e);
-      engine.log("\n").help();
-    } catch (IllegalArgumentException e) {
-      engine.error("Illegal argument", e);
-    } catch (IOException e) {
-      engine.error("I/O error", e);
-    } catch (SAXException e) {
-      engine.error("XML error", e);
-    } catch (XPathExpressionException e) {
-      engine.error("XPath error", e);
-    } catch (ScriptException | PluginScript.PluginScriptExecutionException e) {
-      engine.error("Script error", e);
-    } finally {
         try {
-            engine.close();
-        } catch (IOException ignored) {
-          // ignored
+            httpServer.start();
+            Thread.sleep(Long.MAX_VALUE);
+        } catch (IOException | InterruptedException e) {
+            error(e.getMessage(), e);
+        }
+        return this;
+    }
+
+    CollateX log(String str) {
+        log.write(str);
+        return this;
+    }
+
+    void error(String str, Throwable t) {
+        errorOccurred = true;
+        log(str).log("\n").log(t.getMessage()).log("\n");
+    }
+
+    void help() {
+        new HelpFormatter().printHelp(log, 78, "collatex [<options>]\n (<json_input> | <witness_1> <witness_2> [[<witness_3>] ...])", "", OPTIONS, 2, 4, "");
+    }
+
+    URL argumentToResource(String arg) throws ParseException {
+        try {
+            final File witnessFile = new File(arg);
+            if (witnessFile.exists()) {
+                return witnessFile.toURI().normalize().toURL();
+            } else {
+                return new URL(arg);
+            }
+        } catch (MalformedURLException urlEx) {
+            throw new ParseException("Invalid resource: " + arg);
         }
     }
-  }
 
-  static final Logger LOG = Logger.getLogger(CollateX.class.getName());
-  static final Options OPTIONS = new Options();
-
-  static {
-    OPTIONS.addOption("h", "help", false, "print usage instructions");
-
-    OPTIONS.addOption("o", "output", true, "output file; '-' for standard output (default)");
-    OPTIONS.addOption("ie", "input-encoding", true, "charset to use for decoding non-XML witnesses; default: UTF-8");
-    OPTIONS.addOption("oe", "output-encoding", true, "charset to use for encoding the output; default: UTF-8");
-    OPTIONS.addOption("xml", "xml-mode", false, "witnesses are treated as XML documents");
-    OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//text()'");
-    OPTIONS.addOption("a", "algorithm", true, "progressive alignment algorithm to use 'dekker' (default), 'medite', 'needleman-wunsch'");
-    OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
-    OPTIONS.addOption("f", "format", true, "result/output format: 'json', 'csv', 'dot', 'graphml', 'tei'");
-    OPTIONS.addOption("s", "script", true, "ECMA/JavaScript resource with functions to be plugged into the alignment algorithm");
-
-    OPTIONS.addOption("srv", "server", false, "start RESTful HTTP server");
-    OPTIONS.addOption("cp", "context-path", true, "URL base/context path of the service, default: '/'");
-    OPTIONS.addOption("dot", "dot-path", true, "path to Graphviz 'dot', auto-detected by default");
-    OPTIONS.addOption("p", "port", true, "HTTP port to bind server to, default: 7369");
-    OPTIONS.addOption("mpc", "max-parallel-collations", true, "maximum number of collations to perform in parallel, default: 2");
-    OPTIONS.addOption("mcs", "max-collation-size", true, "maximum number of characters (counted over all witnesses) to perform collations on, default: unlimited");
-
-  }
-
-  @Override
-  public void close() throws IOException {
-    try {
-      for (PrintWriter writer : new PrintWriter[] { out, log }) {
-        writer.close();
-      }
-    } finally {
-      if (errorOccurred && (outFile != null) && outFile.isFile()) {
-        //noinspection ResultOfMethodCallIgnored
-        outFile.delete();
-      }
+    public static void main(String... args) {
+        final CollateX engine = new CollateX();
+        try {
+            final CommandLine commandLine = new GnuParser().parse(OPTIONS, args);
+            if (commandLine.hasOption("h")) {
+                engine.help();
+                return;
+            }
+            if (commandLine.hasOption("srv")) {
+                engine.serve(commandLine);
+            } else {
+                engine.configure(commandLine).read().collate().write();
+            }
+        } catch (ParseException e) {
+            engine.error("Error while parsing command line arguments", e);
+            engine.log("\n").help();
+        } catch (IllegalArgumentException e) {
+            engine.error("Illegal argument", e);
+        } catch (IOException e) {
+            engine.error("I/O error", e);
+        } catch (SAXException e) {
+            engine.error("XML error", e);
+        } catch (XPathExpressionException e) {
+            engine.error("XPath error", e);
+        } catch (ScriptException | PluginScript.PluginScriptExecutionException e) {
+            engine.error("Script error", e);
+        } finally {
+            try {
+                engine.close();
+            } catch (IOException ignored) {
+                // ignored
+            }
+        }
     }
-  }
+
+    static final Logger LOG = Logger.getLogger(CollateX.class.getName());
+    static final Options OPTIONS = new Options();
+
+    static {
+        OPTIONS.addOption("h", "help", false, "print usage instructions");
+
+        OPTIONS.addOption("o", "output", true, "output file; '-' for standard output (default)");
+        OPTIONS.addOption("ie", "input-encoding", true, "charset to use for decoding non-XML witnesses; default: UTF-8");
+        OPTIONS.addOption("oe", "output-encoding", true, "charset to use for encoding the output; default: UTF-8");
+        OPTIONS.addOption("xml", "xml-mode", false, "witnesses are treated as XML documents");
+        OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//text()'");
+        OPTIONS.addOption("a", "algorithm", true, "progressive alignment algorithm to use 'dekker' (default), 'medite', 'needleman-wunsch'");
+        OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
+        OPTIONS.addOption("f", "format", true, "result/output format: 'json', 'csv', 'dot', 'graphml', 'tei'");
+        OPTIONS.addOption("s", "script", true, "ECMA/JavaScript resource with functions to be plugged into the alignment algorithm");
+
+        OPTIONS.addOption("srv", "server", false, "start RESTful HTTP server");
+        OPTIONS.addOption("cp", "context-path", true, "URL base/context path of the service, default: '/'");
+        OPTIONS.addOption("dot", "dot-path", true, "path to Graphviz 'dot', auto-detected by default");
+        OPTIONS.addOption("p", "port", true, "HTTP port to bind server to, default: 7369");
+        OPTIONS.addOption("mpc", "max-parallel-collations", true, "maximum number of collations to perform in parallel, default: 2");
+        OPTIONS.addOption("mcs", "max-collation-size", true, "maximum number of characters (counted over all witnesses) to perform collations on, default: unlimited");
+
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            for (PrintWriter writer : new PrintWriter[]{out, log}) {
+                writer.close();
+            }
+        } finally {
+            if (errorOccurred && (outFile != null) && outFile.isFile()) {
+                //noinspection ResultOfMethodCallIgnored
+                outFile.delete();
+            }
+        }
+    }
 }

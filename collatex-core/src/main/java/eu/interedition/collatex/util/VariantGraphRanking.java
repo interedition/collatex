@@ -41,90 +41,90 @@ import java.util.stream.Collectors;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  * @author Ronald Haentjens Dekker
  */
-public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<Vertex,Integer> {
+public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<Vertex, Integer> {
 
-  private final Map<VariantGraph.Vertex, Integer> byVertex = new HashMap<>();
-  private final SortedMap<Integer, Set<Vertex>> byRank = new TreeMap<>();
-  private final VariantGraph graph;
+    private final Map<VariantGraph.Vertex, Integer> byVertex = new HashMap<>();
+    private final SortedMap<Integer, Set<Vertex>> byRank = new TreeMap<>();
+    private final VariantGraph graph;
 
-  VariantGraphRanking(VariantGraph graph) {
-    this.graph = graph;
-  }
-
-  public static VariantGraphRanking of(VariantGraph graph) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph);
-    for (VariantGraph.Vertex v : graph.vertices()) {
-      int rank = -1;
-      for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
-        rank = Math.max(rank, ranking.byVertex.get(incoming));
-      }
-      rank++;
-      ranking.byVertex.put(v, rank);
-      ranking.byRank.computeIfAbsent(rank, r -> new HashSet<>()).add(v);
+    VariantGraphRanking(VariantGraph graph) {
+        this.graph = graph;
     }
-    return ranking;
-  }
 
-  public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<VariantGraph.Vertex> vertices) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph);
-    for (VariantGraph.Vertex v : graph.vertices()) {
-      int rank = -1;
-      for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
-        rank = Math.max(rank, ranking.byVertex.get(incoming));
-      }
-      if (vertices.contains(v)) {
-        rank++;
-      }
-      ranking.byVertex.put(v, rank);
-      ranking.byRank.computeIfAbsent(rank, r -> new HashSet<>()).add(v);
+    public static VariantGraphRanking of(VariantGraph graph) {
+        final VariantGraphRanking ranking = new VariantGraphRanking(graph);
+        for (VariantGraph.Vertex v : graph.vertices()) {
+            int rank = -1;
+            for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
+                rank = Math.max(rank, ranking.byVertex.get(incoming));
+            }
+            rank++;
+            ranking.byVertex.put(v, rank);
+            ranking.byRank.computeIfAbsent(rank, r -> new HashSet<>()).add(v);
+        }
+        return ranking;
     }
-    return ranking;
-  }
 
-  public Set<Witness> witnesses() {
-    return graph.witnesses();
-  }
+    public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<VariantGraph.Vertex> vertices) {
+        final VariantGraphRanking ranking = new VariantGraphRanking(graph);
+        for (VariantGraph.Vertex v : graph.vertices()) {
+            int rank = -1;
+            for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
+                rank = Math.max(rank, ranking.byVertex.get(incoming));
+            }
+            if (vertices.contains(v)) {
+                rank++;
+            }
+            ranking.byVertex.put(v, rank);
+            ranking.byRank.computeIfAbsent(rank, r -> new HashSet<>()).add(v);
+        }
+        return ranking;
+    }
 
-  public Map<VariantGraph.Vertex, Integer> getByVertex() {
-    return Collections.unmodifiableMap(byVertex);
-  }
+    public Set<Witness> witnesses() {
+        return graph.witnesses();
+    }
 
-  public Map<Integer, Set<VariantGraph.Vertex>> getByRank() {
-    return Collections.unmodifiableMap(byRank);
-  }
+    public Map<VariantGraph.Vertex, Integer> getByVertex() {
+        return Collections.unmodifiableMap(byVertex);
+    }
 
-  public int size() {
-    return byRank.keySet().size();
-  }
+    public Map<Integer, Set<VariantGraph.Vertex>> getByRank() {
+        return Collections.unmodifiableMap(byRank);
+    }
 
-  @Override
-  public Iterator<Set<VariantGraph.Vertex>> iterator() {
-    return byRank.values().iterator();
-  }
+    public int size() {
+        return byRank.keySet().size();
+    }
 
-  public List<SortedMap<Witness, Set<Token>>> asTable() {
-    return byRank.values().stream()
+    @Override
+    public Iterator<Set<VariantGraph.Vertex>> iterator() {
+        return byRank.values().iterator();
+    }
+
+    public List<SortedMap<Witness, Set<Token>>> asTable() {
+        return byRank.values().stream()
             .filter(rank -> rank.stream().anyMatch(v -> !v.tokens().isEmpty()))
             .map(vertices -> {
-              final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
-              vertices.stream().flatMap(v -> v.tokens().stream()).forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
-              return row;
+                final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
+                vertices.stream().flatMap(v -> v.tokens().stream()).forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
+                return row;
             })
             .collect(Collectors.toList());
-  }
+    }
 
-  public VariantGraph.Vertex[][] asArray() {
-    final VariantGraph.Vertex[][] arr = new VariantGraph.Vertex[byRank.size()][];
-    byRank.forEach((rank, vertices) -> arr[rank] = vertices.toArray(new Vertex[vertices.size()]));
-    return arr;
-  }
+    public VariantGraph.Vertex[][] asArray() {
+        final VariantGraph.Vertex[][] arr = new VariantGraph.Vertex[byRank.size()][];
+        byRank.forEach((rank, vertices) -> arr[rank] = vertices.toArray(new Vertex[vertices.size()]));
+        return arr;
+    }
 
-  @Override
-  public Integer apply(VariantGraph.Vertex vertex) {
-    return byVertex.get(vertex);
-  }
+    @Override
+    public Integer apply(VariantGraph.Vertex vertex) {
+        return byVertex.get(vertex);
+    }
 
-  public Comparator<VariantGraph.Vertex> comparator() {
-    return Comparator.comparingInt(byVertex::get);
-  }
+    public Comparator<VariantGraph.Vertex> comparator() {
+        return Comparator.comparingInt(byVertex::get);
+    }
 }

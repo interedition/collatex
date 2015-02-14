@@ -26,25 +26,25 @@ import java.util.Objects;
  */
 public class Tuple<T> {
 
-  public final T left;
-  public final T right;
+    public final T left;
+    public final T right;
 
-  public Tuple(T left, T right) {
-    this.left = left;
-    this.right = right;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Tuple) {
-      final Tuple other = (Tuple) obj;
-      return (left.equals(other.left) || left.equals(other.right)) && (right.equals(other.right) || right.equals(other.left));
+    public Tuple(T left, T right) {
+        this.left = left;
+        this.right = right;
     }
-    return super.equals(obj);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(left, right);
-  }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Tuple) {
+            final Tuple other = (Tuple) obj;
+            return (left.equals(other.left) || left.equals(other.right)) && (right.equals(other.right) || right.equals(other.left));
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
+    }
 }

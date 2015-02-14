@@ -37,80 +37,80 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class MatchMatrixTableModel extends AbstractTableModel {
 
-  private final String[] rowNames;
-  private final String[] columnNames;
-  private final MatchTableCell[][] data;
+    private final String[] rowNames;
+    private final String[] columnNames;
+    private final MatchTableCell[][] data;
 
-  public MatchMatrixTableModel(MatchTable matchTable) {
-    List<Token> rowList = matchTable.rowList();
-    List<Integer> columnList = matchTable.columnList();
+    public MatchMatrixTableModel(MatchTable matchTable) {
+        List<Token> rowList = matchTable.rowList();
+        List<Integer> columnList = matchTable.columnList();
 
-    final int rowNum = rowList.size();
-    final int colNum = columnList.size();
+        final int rowNum = rowList.size();
+        final int colNum = columnList.size();
 
-    // set the row labels
-    rowNames = new String[rowNum];
-    for (int row = 0; row < rowNum; row++) {
-      rowNames[row] = ((SimpleToken) rowList.get(row)).getContent();
-    }
-
-    // set the column labels
-    columnNames = new String[colNum];
-    for (int col = 0; col < colNum; col++) {
-      columnNames[col] = Integer.toString(columnList.get(col) + 1);
-    }
-
-    // fill the cells with colors
-    MatchTableSelection preferred = preferred(matchTable);
-    //LOG.debug(matchMatrix.toHtml(preferred));
-    data = new MatchTableCell[rowNum][colNum];
-    for (int row = 0; row < rowNum; row++) {
-      for (int col = 0; col < colNum; col++) {
-        VariantGraph.Vertex at = matchTable.vertexAt(row, col);
-        MatchMatrixCellStatus status;
-        if (at != null) {
-          status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
-        } else {
-          status = MatchMatrixCellStatus.EMPTY;
+        // set the row labels
+        rowNames = new String[rowNum];
+        for (int row = 0; row < rowNum; row++) {
+            rowNames[row] = ((SimpleToken) rowList.get(row)).getContent();
         }
-        String text;
-        if (at != null) {
-          text = ((SimpleToken) at.tokens().iterator().next()).getContent();
-        } else {
-          text = null;
+
+        // set the column labels
+        columnNames = new String[colNum];
+        for (int col = 0; col < colNum; col++) {
+            columnNames[col] = Integer.toString(columnList.get(col) + 1);
         }
-        data[row][col] = new MatchTableCell(status, text);
-      }
+
+        // fill the cells with colors
+        MatchTableSelection preferred = preferred(matchTable);
+        //LOG.debug(matchMatrix.toHtml(preferred));
+        data = new MatchTableCell[rowNum][colNum];
+        for (int row = 0; row < rowNum; row++) {
+            for (int col = 0; col < colNum; col++) {
+                VariantGraph.Vertex at = matchTable.vertexAt(row, col);
+                MatchMatrixCellStatus status;
+                if (at != null) {
+                    status = preferred.containsCoordinate(row, col) ? MatchMatrixCellStatus.PREFERRED_MATCH : MatchMatrixCellStatus.OPTIONAL_MATCH;
+                } else {
+                    status = MatchMatrixCellStatus.EMPTY;
+                }
+                String text;
+                if (at != null) {
+                    text = ((SimpleToken) at.tokens().iterator().next()).getContent();
+                } else {
+                    text = null;
+                }
+                data[row][col] = new MatchTableCell(status, text);
+            }
+        }
     }
-  }
 
-  private MatchTableSelection preferred(MatchTable matchTable) {
-    // prepare
-    IslandConflictResolver resolver = new IslandConflictResolver(matchTable);
-    // find preferred islands
-    return resolver.createNonConflictingVersion();
-  }
-
-  @Override
-  public String getColumnName(int column) {
-    return (column == 0 ? "" : columnNames[column - 1]);
-  }
-
-  @Override
-  public int getRowCount() {
-    return data.length;
-  }
-
-  @Override
-  public int getColumnCount() {
-    return (data.length == 0 ? 0 : data[0].length + 1);
-  }
-
-  @Override
-  public Object getValueAt(int rowIndex, int columnIndex) {
-    if (columnIndex == 0) {
-      return rowNames[rowIndex];
+    private MatchTableSelection preferred(MatchTable matchTable) {
+        // prepare
+        IslandConflictResolver resolver = new IslandConflictResolver(matchTable);
+        // find preferred islands
+        return resolver.createNonConflictingVersion();
     }
-    return data[rowIndex][columnIndex - 1];
-  }
+
+    @Override
+    public String getColumnName(int column) {
+        return (column == 0 ? "" : columnNames[column - 1]);
+    }
+
+    @Override
+    public int getRowCount() {
+        return data.length;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return (data.length == 0 ? 0 : data[0].length + 1);
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        if (columnIndex == 0) {
+            return rowNames[rowIndex];
+        }
+        return data[rowIndex][columnIndex - 1];
+    }
 }

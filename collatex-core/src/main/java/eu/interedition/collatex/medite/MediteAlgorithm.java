@@ -38,66 +38,66 @@ import java.util.stream.StreamSupport;
  */
 public class MediteAlgorithm extends CollationAlgorithm.Base {
 
-  private final Comparator<Token> comparator;
-  private final Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator;
+    private final Comparator<Token> comparator;
+    private final Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator;
 
-  public MediteAlgorithm(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {
-    this.comparator = comparator;
-    this.matchEvaluator = matchEvaluator;
-  }
-
-  @Override
-  public void collate(VariantGraph graph, Iterable<Token> witness) {
-    final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
-    final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
-
-    final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
-    final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, tokens);
-
-    final Matches matchCandidates = Matches.between(vertices, suffixTree, matchEvaluator);
-    final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
-
-    while (true) {
-      final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatches = matchCandidates.findMaximalUniqueMatches();
-      if (maximalUniqueMatches.isEmpty()) {
-        break;
-      }
-
-      final BitSet rankFilter = new BitSet();
-      final BitSet tokenFilter = new BitSet();
-
-      for (SortedSet<VertexMatch.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches, matchEvaluator)) {
-        final VertexMatch.WithTokenIndex firstMatch = phrase.first();
-        final VertexMatch.WithTokenIndex lastMatch = phrase.last();
-
-        matches.add(phrase);
-        IntStream.range(firstMatch.vertexRank, lastMatch.vertexRank + 1).forEach(rankFilter::set);
-        IntStream.range(firstMatch.token, lastMatch.token + 1).forEach(tokenFilter::set);
-      }
-
-      matchCandidates.removeIf(VertexMatch.filter(rankFilter, tokenFilter));
-    }
-
-    merge(graph, vertices, tokens, matches);
-  }
-
-  static class MatchEvaluatorWrapper implements Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> {
-
-    private final Function<SortedSet<VertexMatch.WithToken>, Integer> wrapped;
-    private final Function<VertexMatch.WithTokenIndex,VertexMatch.WithToken> tokenResolver;
-
-    MatchEvaluatorWrapper(final Function<SortedSet<VertexMatch.WithToken>, Integer> wrapped, final Token[] tokens) {
-      this.wrapped = wrapped;
-      this.tokenResolver = VertexMatch.tokenResolver(tokens);
+    public MediteAlgorithm(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {
+        this.comparator = comparator;
+        this.matchEvaluator = matchEvaluator;
     }
 
     @Override
-    public Integer apply(SortedSet<VertexMatch.WithTokenIndex> input) {
-      final SortedSet<VertexMatch.WithToken> tokenPhrase = new TreeSet<>();
-      for (VertexMatch.WithTokenIndex match : input) {
-        tokenPhrase.add(tokenResolver.apply(match));
-      }
-      return wrapped.apply(tokenPhrase);
+    public void collate(VariantGraph graph, Iterable<Token> witness) {
+        final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
+        final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
+
+        final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
+        final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, tokens);
+
+        final Matches matchCandidates = Matches.between(vertices, suffixTree, matchEvaluator);
+        final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
+
+        while (true) {
+            final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatches = matchCandidates.findMaximalUniqueMatches();
+            if (maximalUniqueMatches.isEmpty()) {
+                break;
+            }
+
+            final BitSet rankFilter = new BitSet();
+            final BitSet tokenFilter = new BitSet();
+
+            for (SortedSet<VertexMatch.WithTokenIndex> phrase : AlignmentDecisionGraph.filter(maximalUniqueMatches, matchEvaluator)) {
+                final VertexMatch.WithTokenIndex firstMatch = phrase.first();
+                final VertexMatch.WithTokenIndex lastMatch = phrase.last();
+
+                matches.add(phrase);
+                IntStream.range(firstMatch.vertexRank, lastMatch.vertexRank + 1).forEach(rankFilter::set);
+                IntStream.range(firstMatch.token, lastMatch.token + 1).forEach(tokenFilter::set);
+            }
+
+            matchCandidates.removeIf(VertexMatch.filter(rankFilter, tokenFilter));
+        }
+
+        merge(graph, vertices, tokens, matches);
     }
-  }
+
+    static class MatchEvaluatorWrapper implements Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> {
+
+        private final Function<SortedSet<VertexMatch.WithToken>, Integer> wrapped;
+        private final Function<VertexMatch.WithTokenIndex, VertexMatch.WithToken> tokenResolver;
+
+        MatchEvaluatorWrapper(final Function<SortedSet<VertexMatch.WithToken>, Integer> wrapped, final Token[] tokens) {
+            this.wrapped = wrapped;
+            this.tokenResolver = VertexMatch.tokenResolver(tokens);
+        }
+
+        @Override
+        public Integer apply(SortedSet<VertexMatch.WithTokenIndex> input) {
+            final SortedSet<VertexMatch.WithToken> tokenPhrase = new TreeSet<>();
+            for (VertexMatch.WithTokenIndex match : input) {
+                tokenPhrase.add(tokenResolver.apply(match));
+            }
+            return wrapped.apply(tokenPhrase);
+        }
+    }
 }

@@ -40,7 +40,7 @@ public final class EditDistance {
         }
 
         int[][][] cache = new int[30][][];
-        int matrix[][]; 
+        int matrix[][];
         if (str2Length >= cache.length) {
             matrix = form(str1Length, str2Length);
         } else if (cache[str2Length] != null) {
@@ -48,7 +48,7 @@ public final class EditDistance {
         } else {
             matrix = cache[str2Length] = form(str1Length, str2Length);
         }
-        
+
         for (int i = 1; i <= str1Length; i++) {
             final char str1Char = str1Chars[i - 1];
             for (int j = 1; j <= str2Length; j++) {

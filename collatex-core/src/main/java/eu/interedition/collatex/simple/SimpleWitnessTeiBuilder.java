@@ -33,78 +33,78 @@ import java.util.List;
 // large TEI files, with segments and expansions
 public class SimpleWitnessTeiBuilder {
 
-  private static QName w = new QName("http://www.tei-c.org/ns/1.0", "w");
-  private static QName seg = new QName("http://www.tei-c.org/ns/1.0", "seg");
-  private static QName p = new QName("http://www.tei-c.org/ns/1.0", "p");
+    private static QName w = new QName("http://www.tei-c.org/ns/1.0", "w");
+    private static QName seg = new QName("http://www.tei-c.org/ns/1.0", "seg");
+    private static QName p = new QName("http://www.tei-c.org/ns/1.0", "p");
 
-  public SimpleWitness read(InputStream input) throws XMLStreamException {
-    SimpleWitness witness = new SimpleWitness("id");
-    List<String> tokenContents = new ArrayList<>();
-    XMLInputFactory factory = XMLInputFactory.newInstance();
-    XMLEventReader reader = factory.createXMLEventReader(input);
-    XMLEvent event = null;
-    int numberOfParagraphs = 0;
-    while ((event = reader.peek()) != null && numberOfParagraphs < 10) {
-      // System.out.println(event.toString());
-      if (event.isStartElement() && event.asStartElement().getName().equals(w)) {
-        tokenContents.add(handleWElement(reader));
-      } else if (event.isStartElement() && event.asStartElement().getName().equals(seg)) {
-        tokenContents.add(handleSegElement(reader));
-      } else if (event.isStartElement() && event.asStartElement().getName().equals(p)) {
-        reader.next();
-        numberOfParagraphs++;
-      } else {
-        reader.next();
-      }
-    }
-    witness.setTokenContents(tokenContents.stream(), SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
-    return witness;
-  }
-
-  private static String handleWElement(XMLEventReader reader) throws XMLStreamException {
-    XMLEvent event = reader.nextEvent();
-    // Do what you need to do with the start element, e.g. initialize
-    // data structures
-    // System.out.println("W tag is triggered here!");
-    StringBuffer textBuffer = new StringBuffer();
-    while ((event = reader.peek()) != null) {
-      if (event.isEndElement() && event.asEndElement().getName().equals(w)) {
-        // Do what you need to do at the end, e.g. add data
-        // collected from sub elements, etc.
-        event = reader.nextEvent();
-        break;
-      } else {
-        // Do what you need to do for start or child elements, e.g.
-        // dispatch to another handler function
-        event = reader.nextEvent();
-        textBuffer.append(event.toString());
-        // System.out.println("Text :"+event.toString());
-      }
-    }
-    return textBuffer.toString();
-  }
-
-  private static String handleSegElement(XMLEventReader reader) throws XMLStreamException {
-    XMLEvent event = reader.nextEvent();
-    // Do what you need to do with the start element, e.g. initialize
-    // data structures
-    // System.out.println("Seg tag is triggered here!");
-    StringBuffer textBuffer = new StringBuffer();
-    while ((event = reader.peek()) != null) {
-      if (event.isEndElement() && event.asEndElement().getName().equals(seg)) {
-        // Do what you need to do at the end, e.g. add data
-        // collected from sub elements, etc.
-        event = reader.nextEvent();
-        break;
-      } else {
-        // Do what you need to do for start or child elements, e.g.
-        // dispatch to another handler function
-        event = reader.nextEvent();
-        if (event.getEventType() == XMLEvent.CHARACTERS) {
-          textBuffer.append(event.toString().trim());
+    public SimpleWitness read(InputStream input) throws XMLStreamException {
+        SimpleWitness witness = new SimpleWitness("id");
+        List<String> tokenContents = new ArrayList<>();
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        XMLEventReader reader = factory.createXMLEventReader(input);
+        XMLEvent event = null;
+        int numberOfParagraphs = 0;
+        while ((event = reader.peek()) != null && numberOfParagraphs < 10) {
+            // System.out.println(event.toString());
+            if (event.isStartElement() && event.asStartElement().getName().equals(w)) {
+                tokenContents.add(handleWElement(reader));
+            } else if (event.isStartElement() && event.asStartElement().getName().equals(seg)) {
+                tokenContents.add(handleSegElement(reader));
+            } else if (event.isStartElement() && event.asStartElement().getName().equals(p)) {
+                reader.next();
+                numberOfParagraphs++;
+            } else {
+                reader.next();
+            }
         }
-      }
+        witness.setTokenContents(tokenContents.stream(), SimpleTokenNormalizers.LC_TRIM_WS_PUNCT);
+        return witness;
     }
-    return textBuffer.toString();
-  }
+
+    private static String handleWElement(XMLEventReader reader) throws XMLStreamException {
+        XMLEvent event = reader.nextEvent();
+        // Do what you need to do with the start element, e.g. initialize
+        // data structures
+        // System.out.println("W tag is triggered here!");
+        StringBuffer textBuffer = new StringBuffer();
+        while ((event = reader.peek()) != null) {
+            if (event.isEndElement() && event.asEndElement().getName().equals(w)) {
+                // Do what you need to do at the end, e.g. add data
+                // collected from sub elements, etc.
+                event = reader.nextEvent();
+                break;
+            } else {
+                // Do what you need to do for start or child elements, e.g.
+                // dispatch to another handler function
+                event = reader.nextEvent();
+                textBuffer.append(event.toString());
+                // System.out.println("Text :"+event.toString());
+            }
+        }
+        return textBuffer.toString();
+    }
+
+    private static String handleSegElement(XMLEventReader reader) throws XMLStreamException {
+        XMLEvent event = reader.nextEvent();
+        // Do what you need to do with the start element, e.g. initialize
+        // data structures
+        // System.out.println("Seg tag is triggered here!");
+        StringBuffer textBuffer = new StringBuffer();
+        while ((event = reader.peek()) != null) {
+            if (event.isEndElement() && event.asEndElement().getName().equals(seg)) {
+                // Do what you need to do at the end, e.g. add data
+                // collected from sub elements, etc.
+                event = reader.nextEvent();
+                break;
+            } else {
+                // Do what you need to do for start or child elements, e.g.
+                // dispatch to another handler function
+                event = reader.nextEvent();
+                if (event.getEventType() == XMLEvent.CHARACTERS) {
+                    textBuffer.append(event.toString().trim());
+                }
+            }
+        }
+        return textBuffer.toString();
+    }
 }

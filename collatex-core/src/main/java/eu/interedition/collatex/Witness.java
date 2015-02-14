@@ -20,18 +20,15 @@
 package eu.interedition.collatex;
 
 import java.util.Comparator;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * IWitness
- * 
+ * <p>
  * Representation of a single textual witness
- *
  */
 public interface Witness {
 
-  String getSigil();
+    String getSigil();
 
-  final Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
+    final Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
 }

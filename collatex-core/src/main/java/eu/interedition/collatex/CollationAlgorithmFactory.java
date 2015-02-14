@@ -21,10 +21,10 @@ package eu.interedition.collatex;
 
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
-import eu.interedition.collatex.util.GreedyStringTilingAlgorithm;
-import eu.interedition.collatex.util.VertexMatch;
 import eu.interedition.collatex.medite.MediteAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
+import eu.interedition.collatex.util.GreedyStringTilingAlgorithm;
+import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -36,23 +36,23 @@ import java.util.function.Function;
  */
 public class CollationAlgorithmFactory {
 
-  public static CollationAlgorithm dekker(Comparator<Token> comparator) {
-    return dekkerMatchMatrix(comparator, 3);
-  }
+    public static CollationAlgorithm dekker(Comparator<Token> comparator) {
+        return dekkerMatchMatrix(comparator, 3);
+    }
 
-  public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
-    return new DekkerAlgorithm(comparator, new MatchTableLinker());
-  }
+    public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
+        return new DekkerAlgorithm(comparator, new MatchTableLinker());
+    }
 
-  public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
-    return new NeedlemanWunschAlgorithm(comparator);
-  }
+    public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
+        return new NeedlemanWunschAlgorithm(comparator);
+    }
 
-  public static CollationAlgorithm greedyStringTiling(Comparator<Token> comparator, int minimumTileLength) {
-    return new GreedyStringTilingAlgorithm(comparator, minimumTileLength);
-  }
+    public static CollationAlgorithm greedyStringTiling(Comparator<Token> comparator, int minimumTileLength) {
+        return new GreedyStringTilingAlgorithm(comparator, minimumTileLength);
+    }
 
-  public static CollationAlgorithm medite(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {
-    return new MediteAlgorithm(comparator, matchEvaluator);
-  }
+    public static CollationAlgorithm medite(Comparator<Token> comparator, Function<SortedSet<VertexMatch.WithToken>, Integer> matchEvaluator) {
+        return new MediteAlgorithm(comparator, matchEvaluator);
+    }
 }

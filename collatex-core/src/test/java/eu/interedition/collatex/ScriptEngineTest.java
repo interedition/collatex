@@ -36,24 +36,24 @@ import java.util.stream.Stream;
  */
 public class ScriptEngineTest extends AbstractTest {
 
-  @Test
-  public void functions() throws ScriptException, NoSuchMethodException {
-    final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-    for (ScriptEngineFactory scriptEngineFactory : scriptEngineManager.getEngineFactories()) {
-      LOG.fine(() -> Stream.of(
-              scriptEngineFactory.getEngineName(),
-              scriptEngineFactory.getEngineVersion(),
-              scriptEngineFactory.getLanguageName(),
-              scriptEngineFactory.getLanguageVersion(),
-              scriptEngineFactory.getExtensions().toString()
-      ).collect(Collectors.joining("; ")));
+    @Test
+    public void functions() throws ScriptException, NoSuchMethodException {
+        final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+        for (ScriptEngineFactory scriptEngineFactory : scriptEngineManager.getEngineFactories()) {
+            LOG.fine(() -> Stream.of(
+                scriptEngineFactory.getEngineName(),
+                scriptEngineFactory.getEngineVersion(),
+                scriptEngineFactory.getLanguageName(),
+                scriptEngineFactory.getLanguageVersion(),
+                scriptEngineFactory.getExtensions().toString()
+            ).collect(Collectors.joining("; ")));
+        }
+
+        final Compilable compiler = (Compilable) Objects.requireNonNull(scriptEngineManager.getEngineByExtension("js"));
+        final CompiledScript script = compiler.compile("function compare(a, b) { return a == b }\nfunction cost(a) { return 1; }");
+
+        script.eval();
+
+        System.out.println(((Invocable) script.getEngine()).invokeFunction("compare", "1", "0"));
     }
-
-    final Compilable compiler = (Compilable) Objects.requireNonNull(scriptEngineManager.getEngineByExtension("js"));
-    final CompiledScript script = compiler.compile("function compare(a, b) { return a == b }\nfunction cost(a) { return 1; }");
-
-    script.eval();
-
-    System.out.println(((Invocable) script.getEngine()).invokeFunction("compare", "1", "0"));
-  }
 }

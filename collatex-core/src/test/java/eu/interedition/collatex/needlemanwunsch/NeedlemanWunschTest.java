@@ -29,9 +29,9 @@ import org.junit.Test;
  */
 public class NeedlemanWunschTest extends AbstractTest {
 
-  @Test
-  public void simple() {
-    setCollationAlgorithm(CollationAlgorithmFactory.needlemanWunsch(new EqualityTokenComparator()));
-    LOG.fine(toString(table(collate("a b a b a", "a b a"))));
-  }
+    @Test
+    public void simple() {
+        setCollationAlgorithm(CollationAlgorithmFactory.needlemanWunsch(new EqualityTokenComparator()));
+        LOG.fine(toString(table(collate("a b a b a", "a b a"))));
+    }
 }

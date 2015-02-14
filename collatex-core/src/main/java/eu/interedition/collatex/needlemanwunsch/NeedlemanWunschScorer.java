@@ -24,7 +24,7 @@ package eu.interedition.collatex.needlemanwunsch;
  */
 public interface NeedlemanWunschScorer<A, B> {
 
-  float score(A a, B b);
+    float score(A a, B b);
 
-  float gap();
+    float gap();
 }

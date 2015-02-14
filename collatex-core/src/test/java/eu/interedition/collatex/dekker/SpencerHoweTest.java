@@ -45,35 +45,35 @@ import static org.junit.Assert.assertEquals;
  */
 public class SpencerHoweTest extends AbstractTest {
 
-  @Test
-  public void alignmentTable() {
-    final SimpleWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
-    final List<SortedMap<Witness, Set<Token>>> table = VariantGraphRanking.of(collate(w)).asTable();
+    @Test
+    public void alignmentTable() {
+        final SimpleWitness[] w = createWitnesses("a b c d e f", "x y z d e", "a b x y z");
+        final List<SortedMap<Witness, Set<Token>>> table = VariantGraphRanking.of(collate(w)).asTable();
 
-    assertEquals(3, table.stream().flatMap(r -> r.keySet().stream()).distinct().count());
-    //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
-    assertEquals("|a|b|c| | |d|e|f|", toString(table, w[0]));
-    assertEquals("| | |x|y|z|d|e| |", toString(table, w[1]));
-    assertEquals("|a|b|x|y|z| | | |", toString(table, w[2]));
-  }
+        assertEquals(3, table.stream().flatMap(r -> r.keySet().stream()).distinct().count());
+        //NOTE: Currently the AT visualization aligns variation to the left of the table: see the 'C' element
+        assertEquals("|a|b|c| | |d|e|f|", toString(table, w[0]));
+        assertEquals("| | |x|y|z|d|e| |", toString(table, w[1]));
+        assertEquals("|a|b|x|y|z| | | |", toString(table, w[2]));
+    }
 
-  @Test
-  public void graph() {
-    final SimpleWitness[] w = createWitnesses("a", "b", "a b");
-    final VariantGraph graph = collate(w);
-    
-    assetGraphSize(graph, 4, 5);
+    @Test
+    public void graph() {
+        final SimpleWitness[] w = createWitnesses("a", "b", "a b");
+        final VariantGraph graph = collate(w);
 
-    final VariantGraph.Vertex startVertex = graph.getStart();
-    final VariantGraph.Vertex aVertex = vertexWith(graph, "a", w[0]);
-    final VariantGraph.Vertex bVertex = vertexWith(graph, "b", w[1]);
-    final VariantGraph.Vertex endVertex = graph.getEnd();
+        assetGraphSize(graph, 4, 5);
 
-    assertHasWitnesses(edgeBetween(startVertex, aVertex), w[0], w[2]);
-    assertHasWitnesses(edgeBetween(aVertex, endVertex), w[0]);
-    assertHasWitnesses(edgeBetween(startVertex, bVertex), w[1]);
-    assertHasWitnesses(edgeBetween(bVertex, endVertex), w[1], w[2]);
-    assertHasWitnesses(edgeBetween(aVertex, bVertex), w[2]);
-  }
+        final VariantGraph.Vertex startVertex = graph.getStart();
+        final VariantGraph.Vertex aVertex = vertexWith(graph, "a", w[0]);
+        final VariantGraph.Vertex bVertex = vertexWith(graph, "b", w[1]);
+        final VariantGraph.Vertex endVertex = graph.getEnd();
+
+        assertHasWitnesses(edgeBetween(startVertex, aVertex), w[0], w[2]);
+        assertHasWitnesses(edgeBetween(aVertex, endVertex), w[0]);
+        assertHasWitnesses(edgeBetween(startVertex, bVertex), w[1]);
+        assertHasWitnesses(edgeBetween(bVertex, endVertex), w[1], w[2]);
+        assertHasWitnesses(edgeBetween(aVertex, bVertex), w[2]);
+    }
 
 }

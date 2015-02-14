@@ -34,71 +34,71 @@ import java.util.stream.Stream;
 
 public class SimpleWitness implements Iterable<Token>, Witness, Comparator<SimpleToken> {
 
-  private final String sigil;
-  private final List<Token> tokens = new ArrayList<>();
+    private final String sigil;
+    private final List<Token> tokens = new ArrayList<>();
 
-  public SimpleWitness(String sigil) {
-    this.sigil = sigil;
-  }
-
-  public SimpleWitness(String sigil, String content) {
-    this(sigil, content, SimplePatternTokenizer.BY_WS_OR_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS);
-  }
-
-  public SimpleWitness(String sigil,
-                       String content,
-                       Function<String, Stream<String>> tokenizer,
-                       Function<String, String> normalizer) {
-    this(sigil);
-    setTokenContents(tokenizer.apply(content), normalizer);
-  }
-
-  public List<Token> getTokens() {
-    return tokens;
-  }
-
-  public void setTokenContents(Stream<String> tokenContents, Function<String, String> normalizer) {
-    setTokens(tokenContents.map(content -> new SimpleToken(SimpleWitness.this, content, normalizer.apply(content))).collect(Collectors.toList()));
-  }
-
-  public void setTokens(List<Token> tokens) {
-    this.tokens.clear();
-    this.tokens.addAll(tokens);
-  }
-
-  @Override
-  public String getSigil() {
-    return sigil;
-  }
-
-  @Override
-  public Iterator<Token> iterator() {
-    return Collections.unmodifiableList(tokens).iterator();
-  }
-
-  @Override
-  public String toString() {
-    return getSigil();
-  }
-
-  @Override
-  public int compare(SimpleToken o1, SimpleToken o2) {
-    final int o1Index = tokens.indexOf(o1);
-    final int o2Index = tokens.indexOf(o2);
-    if (o1Index < 0) {
-      throw new IllegalArgumentException(o1.toString());
+    public SimpleWitness(String sigil) {
+        this.sigil = sigil;
     }
-    if (o2Index < 0) {
-      throw new IllegalArgumentException();
+
+    public SimpleWitness(String sigil, String content) {
+        this(sigil, content, SimplePatternTokenizer.BY_WS_OR_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS);
     }
-    return (o1Index - o2Index);
-  }
 
-  public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
+    public SimpleWitness(String sigil,
+                         String content,
+                         Function<String, Stream<String>> tokenizer,
+                         Function<String, String> normalizer) {
+        this(sigil);
+        setTokenContents(tokenizer.apply(content), normalizer);
+    }
 
-  public static final Function<String, String> TOKEN_NORMALIZER = input -> {
-    final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
-    return (normalized == null || normalized.length() == 0 ? input : normalized);
-  };
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+    public void setTokenContents(Stream<String> tokenContents, Function<String, String> normalizer) {
+        setTokens(tokenContents.map(content -> new SimpleToken(SimpleWitness.this, content, normalizer.apply(content))).collect(Collectors.toList()));
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens.clear();
+        this.tokens.addAll(tokens);
+    }
+
+    @Override
+    public String getSigil() {
+        return sigil;
+    }
+
+    @Override
+    public Iterator<Token> iterator() {
+        return Collections.unmodifiableList(tokens).iterator();
+    }
+
+    @Override
+    public String toString() {
+        return getSigil();
+    }
+
+    @Override
+    public int compare(SimpleToken o1, SimpleToken o2) {
+        final int o1Index = tokens.indexOf(o1);
+        final int o2Index = tokens.indexOf(o2);
+        if (o1Index < 0) {
+            throw new IllegalArgumentException(o1.toString());
+        }
+        if (o2Index < 0) {
+            throw new IllegalArgumentException();
+        }
+        return (o1Index - o2Index);
+    }
+
+    public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
+
+    public static final Function<String, String> TOKEN_NORMALIZER = input -> {
+        final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
+        return (normalized == null || normalized.length() == 0 ? input : normalized);
+    };
 
 }

@@ -36,91 +36,91 @@ import static org.junit.Assert.assertEquals;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class TranspositionRenderingTest extends AbstractTest {
-  @Test
-  public void transposition1() {
-    final SimpleWitness[] w = createWitnesses(//
+    @Test
+    public void transposition1() {
+        final SimpleWitness[] w = createWitnesses(//
             "the white and black cat", "The black cat",//
             "the black and white cat", "the black and green cat");
-    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+        final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
 
-    assertEquals("|the|white|and|black|cat|", toString(table, w[0]));
-    assertEquals("|the| | |black|cat|", toString(table, w[1]));
-    assertEquals("|the|black|and|white|cat|", toString(table, w[2]));
-    assertEquals("|the|black|and|green|cat|", toString(table, w[3]));
-  }
+        assertEquals("|the|white|and|black|cat|", toString(table, w[0]));
+        assertEquals("|the| | |black|cat|", toString(table, w[1]));
+        assertEquals("|the|black|and|white|cat|", toString(table, w[2]));
+        assertEquals("|the|black|and|green|cat|", toString(table, w[3]));
+    }
 
-  @Test
-  public void transposition2() {
-    final SimpleWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
-    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+    @Test
+    public void transposition2() {
+        final SimpleWitness[] w = createWitnesses("He was agast, so", "He was agast", "So he was agast");
+        final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
 
-    assertEquals("| |he|was|agast|,|so|", toString(table, w[0]));
-    assertEquals("| |he|was|agast| | |", toString(table, w[1]));
-    assertEquals("|so|he|was|agast| | |", toString(table, w[2]));
-  }
+        assertEquals("| |he|was|agast|,|so|", toString(table, w[0]));
+        assertEquals("| |he|was|agast| | |", toString(table, w[1]));
+        assertEquals("|so|he|was|agast| | |", toString(table, w[2]));
+    }
 
-  @Test
-  public void transposition2Reordered() {
-    final SimpleWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
-    final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
+    @Test
+    public void transposition2Reordered() {
+        final SimpleWitness[] w = createWitnesses("So he was agast", "He was agast", "He was agast, so");
+        final List<SortedMap<Witness, Set<Token>>> table = table(collate(w));
 
-    assertEquals("|so|he|was|agast| | |", toString(table, w[0]));
-    assertEquals("| |he|was|agast| | |", toString(table, w[1]));
-    assertEquals("| |he|was|agast|,|so|", toString(table, w[2]));
-  }
-  
-  @Test
-  public void testTranspositionLimiter1() {
-    final SimpleWitness a = new SimpleWitness("A","X a b");
-    final SimpleWitness b = new SimpleWitness("B","a b X");
-    VariantGraph graph = collate(a,b);
-    final List<SortedMap<Witness, Set<Token>>> table = table(graph);
-    assertEquals("|x|a|b| |", toString(table, a));
-    assertEquals("| |a|b|x|", toString(table, b));
-  }
-  
-  @Test
-  public void testTranspositionLimiter2() {
-    final SimpleWitness a = new SimpleWitness("A","a b c .");
-    final SimpleWitness b = new SimpleWitness("B","a b c d e f g h i j k l m n o p q r s t u v w .");
-    final List<SortedMap<Witness, Set<Token>>> table = table(collate(a, b));
-    assertEquals("|a|b|c| | | | | | | | | | | | | | | | | | | | |.|", toString(table, a));
-    assertEquals("|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|.|", toString(table, b));
-  }
+        assertEquals("|so|he|was|agast| | |", toString(table, w[0]));
+        assertEquals("| |he|was|agast| | |", toString(table, w[1]));
+        assertEquals("| |he|was|agast|,|so|", toString(table, w[2]));
+    }
 
-  @Test
-  public void testTranspositionLimiter3() {
-    final SimpleWitness a = new SimpleWitness("A","X a b c d e f g h i j k l m n o p");
-    final SimpleWitness b = new SimpleWitness("B","a b c d e f g h i j k l m n o p X");
-    VariantGraph graph = collate(a,b);
-    assertEquals(0, graph.transpositions().size());
-    final List<SortedMap<Witness, Set<Token>>> table = table(graph);
-    assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, a));
-    assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, b));
-  }
-  
-  @Test
-  public void testTranspositionLimiter4() {
-    final SimpleWitness a = new SimpleWitness("A","a b c d e f g h i j k l m n o p X");
-    final SimpleWitness b = new SimpleWitness("B","X a b c d e f g h i j k l m n o p");
-    VariantGraph graph = collate(a,b);
-    assertEquals(0, graph.transpositions().size());
-    final List<SortedMap<Witness, Set<Token>>> table = table(graph);
-    assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, a));
-    assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, b));
-  }
+    @Test
+    public void testTranspositionLimiter1() {
+        final SimpleWitness a = new SimpleWitness("A", "X a b");
+        final SimpleWitness b = new SimpleWitness("B", "a b X");
+        VariantGraph graph = collate(a, b);
+        final List<SortedMap<Witness, Set<Token>>> table = table(graph);
+        assertEquals("|x|a|b| |", toString(table, a));
+        assertEquals("| |a|b|x|", toString(table, b));
+    }
 
-  @Test
-  public void additionInCombinationWithTransposition2() {
-    final SimpleWitness[] w = createWitnesses(//
-        "the cat is black",//
-        "black is the cat",//
-        "black and white is the cat");
-    final List<SortedMap<Witness, Set<Token>>> t = table(collate(w[0], w[1], w[2]));
-    assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
-    assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
-    assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
-  }
+    @Test
+    public void testTranspositionLimiter2() {
+        final SimpleWitness a = new SimpleWitness("A", "a b c .");
+        final SimpleWitness b = new SimpleWitness("B", "a b c d e f g h i j k l m n o p q r s t u v w .");
+        final List<SortedMap<Witness, Set<Token>>> table = table(collate(a, b));
+        assertEquals("|a|b|c| | | | | | | | | | | | | | | | | | | | |.|", toString(table, a));
+        assertEquals("|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|.|", toString(table, b));
+    }
+
+    @Test
+    public void testTranspositionLimiter3() {
+        final SimpleWitness a = new SimpleWitness("A", "X a b c d e f g h i j k l m n o p");
+        final SimpleWitness b = new SimpleWitness("B", "a b c d e f g h i j k l m n o p X");
+        VariantGraph graph = collate(a, b);
+        assertEquals(0, graph.transpositions().size());
+        final List<SortedMap<Witness, Set<Token>>> table = table(graph);
+        assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, a));
+        assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, b));
+    }
+
+    @Test
+    public void testTranspositionLimiter4() {
+        final SimpleWitness a = new SimpleWitness("A", "a b c d e f g h i j k l m n o p X");
+        final SimpleWitness b = new SimpleWitness("B", "X a b c d e f g h i j k l m n o p");
+        VariantGraph graph = collate(a, b);
+        assertEquals(0, graph.transpositions().size());
+        final List<SortedMap<Witness, Set<Token>>> table = table(graph);
+        assertEquals("| |a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|x|", toString(table, a));
+        assertEquals("|x|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p| |", toString(table, b));
+    }
+
+    @Test
+    public void additionInCombinationWithTransposition2() {
+        final SimpleWitness[] w = createWitnesses(//
+            "the cat is black",//
+            "black is the cat",//
+            "black and white is the cat");
+        final List<SortedMap<Witness, Set<Token>>> t = table(collate(w[0], w[1], w[2]));
+        assertEquals("|the|cat| |is|black| |", toString(t, w[0]));
+        assertEquals("|black| | |is|the|cat|", toString(t, w[1]));
+        assertEquals("|black|and|white|is|the|cat|", toString(t, w[2]));
+    }
 
 
 }

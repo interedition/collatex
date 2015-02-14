@@ -32,17 +32,17 @@ import java.util.stream.StreamSupport;
  */
 public class SuffixTreeTest extends AbstractTest {
 
-  @Test
-  public void suffixTree() {
-    final SuffixTree<String> st = SuffixTree.build(new Comparator<String>() {
-      @Override
-      public int compare(String o1, String o2) {
-        return o1.toLowerCase().compareTo(o2.toLowerCase());
-      }
-    }, "S", "P", "O", "a", "s", "p", "o");
+    @Test
+    public void suffixTree() {
+        final SuffixTree<String> st = SuffixTree.build(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.toLowerCase().compareTo(o2.toLowerCase());
+            }
+        }, "S", "P", "O", "a", "s", "p", "o");
 
-    LOG.fine(() -> st.toString());
-    LOG.fine(() -> StreamSupport.stream(st.match(Arrays.asList("s", "p", "o", "a")).spliterator(), false).map(Object::toString).collect(Collectors.joining(", ")));
-  }
+        LOG.fine(() -> st.toString());
+        LOG.fine(() -> StreamSupport.stream(st.match(Arrays.asList("s", "p", "o", "a")).spliterator(), false).map(Object::toString).collect(Collectors.joining(", ")));
+    }
 
 }

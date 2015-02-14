@@ -37,26 +37,26 @@ import java.util.stream.StreamSupport;
 
 public class Matches {
 
-  public final Map<Token, List<VariantGraph.Vertex>> allMatches;
-  public final Set<Token> unmatchedInWitness;
-  public final Set<Token> ambiguousInWitness;
-  public final Set<Token> uniqueInWitness;
+    public final Map<Token, List<VariantGraph.Vertex>> allMatches;
+    public final Set<Token> unmatchedInWitness;
+    public final Set<Token> ambiguousInWitness;
+    public final Set<Token> uniqueInWitness;
 
-  public static Matches between(final Iterable<VariantGraph.Vertex> vertices, final Iterable<Token> witnessTokens, Comparator<Token> comparator) {
+    public static Matches between(final Iterable<VariantGraph.Vertex> vertices, final Iterable<Token> witnessTokens, Comparator<Token> comparator) {
 
-    final Map<Token, List<VariantGraph.Vertex>> allMatches = new HashMap<>();
+        final Map<Token, List<VariantGraph.Vertex>> allMatches = new HashMap<>();
 
-    StreamSupport.stream(vertices.spliterator(), false).forEach(vertex ->
+        StreamSupport.stream(vertices.spliterator(), false).forEach(vertex ->
             vertex.tokens().stream().findFirst().ifPresent(baseToken ->
-                            StreamSupport.stream(witnessTokens.spliterator(), false)
-                                    .filter(witnessToken -> comparator.compare(baseToken, witnessToken) == 0)
-                                    .forEach(matchingToken -> allMatches.computeIfAbsent(matchingToken, t -> new ArrayList<>()).add(vertex))));
+                StreamSupport.stream(witnessTokens.spliterator(), false)
+                    .filter(witnessToken -> comparator.compare(baseToken, witnessToken) == 0)
+                    .forEach(matchingToken -> allMatches.computeIfAbsent(matchingToken, t -> new ArrayList<>()).add(vertex))));
 
-    final Set<Token> unmatchedInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
+        final Set<Token> unmatchedInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
             .filter(t -> !allMatches.containsKey(t))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
-    final Set<VariantGraph.Vertex> ambiguousInBase = allMatches.values().stream()
+        final Set<VariantGraph.Vertex> ambiguousInBase = allMatches.values().stream()
             .flatMap(List::stream)
             .collect(Collectors.toMap(Function.identity(), v -> 1, (a, b) -> a + b))
             .entrySet()
@@ -65,30 +65,30 @@ public class Matches {
             .map(Map.Entry::getKey)
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
-    // (have to check: base -> witness, and witness -> base)
-    final Set<Token> ambiguousInWitness = Stream.concat(
+        // (have to check: base -> witness, and witness -> base)
+        final Set<Token> ambiguousInWitness = Stream.concat(
             StreamSupport.stream(witnessTokens.spliterator(), false)
-                    .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() > 1),
+                .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() > 1),
 
             allMatches.entrySet().stream()
-                    .filter(match -> match.getValue().stream().anyMatch(ambiguousInBase::contains))
-                    .map(Map.Entry::getKey)
-    ).collect(Collectors.toCollection(LinkedHashSet::new));
+                .filter(match -> match.getValue().stream().anyMatch(ambiguousInBase::contains))
+                .map(Map.Entry::getKey)
+        ).collect(Collectors.toCollection(LinkedHashSet::new));
 
-    // sure tokens
-    // have to check unsure tokens because of (base -> witness && witness -> base)
-    final Set<Token> uniqueInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
+        // sure tokens
+        // have to check unsure tokens because of (base -> witness && witness -> base)
+        final Set<Token> uniqueInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
             .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() == 1 && !ambiguousInWitness.contains(t))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
-    return new Matches(allMatches, unmatchedInWitness, ambiguousInWitness, uniqueInWitness);
-  }
+        return new Matches(allMatches, unmatchedInWitness, ambiguousInWitness, uniqueInWitness);
+    }
 
-  private Matches(Map<Token, List<VariantGraph.Vertex>> allMatches, Set<Token> unmatchedInWitness, Set<Token> ambiguousInWitness, Set<Token> uniqueInWitness) {
-    this.allMatches = Collections.unmodifiableMap(allMatches);
-    this.unmatchedInWitness = Collections.unmodifiableSet(unmatchedInWitness);
-    this.ambiguousInWitness = Collections.unmodifiableSet(ambiguousInWitness);
-    this.uniqueInWitness = Collections.unmodifiableSet(uniqueInWitness);
-  }
+    private Matches(Map<Token, List<VariantGraph.Vertex>> allMatches, Set<Token> unmatchedInWitness, Set<Token> ambiguousInWitness, Set<Token> uniqueInWitness) {
+        this.allMatches = Collections.unmodifiableMap(allMatches);
+        this.unmatchedInWitness = Collections.unmodifiableSet(unmatchedInWitness);
+        this.ambiguousInWitness = Collections.unmodifiableSet(ambiguousInWitness);
+        this.uniqueInWitness = Collections.unmodifiableSet(uniqueInWitness);
+    }
 
 }
