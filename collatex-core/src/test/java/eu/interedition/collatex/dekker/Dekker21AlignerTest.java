@@ -11,6 +11,7 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.Dekker21Aligner.DecisionGraph;
 import eu.interedition.collatex.dekker.Dekker21Aligner.DecisionGraphNode;
+import eu.interedition.collatex.dekker.Dekker21Aligner.HeuristicCostFunction;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleWitness;
 
@@ -76,5 +77,22 @@ public class Dekker21AlignerTest extends AbstractTest {
     
   }
 
+  @Test
+  public void testCaseDanielStoeklheuristicCostFunction() {
+    // 1: a, b, c, d, e
+    // 2: a, e, c, d
+    // 3: a, d, b
+    final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+    Dekker21Aligner aligner = new Dekker21Aligner(w);
+    VariantGraph against = new JungVariantGraph();
+    aligner.collate(against, w);
+    
+    DecisionGraph gr = aligner.getDecisionGraph();
+    List<DecisionGraphNode> neighbours = gr.neighbours(gr.getRoot());
+    HeuristicCostFunction heuristic = aligner.getHeuristic();
+    assertEquals(4, heuristic.heuristic(neighbours.get(0)));
+    assertEquals(3, heuristic.heuristic(neighbours.get(1)));
+    assertEquals(3, heuristic.heuristic(neighbours.get(2)));
+  }
 
 }

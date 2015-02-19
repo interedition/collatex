@@ -24,7 +24,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
   private int[] suffix_array;
   protected int[] LCP_array;
   private DecisionGraph g;
-	
+  private HeuristicCostFunction heuristic;
 
 	public Dekker21Aligner(SimpleWitness[] w) {
 		// 1. prepare token array
@@ -90,6 +90,14 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     return g;
   }
 
+  protected HeuristicCostFunction getHeuristic() {
+    if (heuristic==null) {
+      throw new IllegalStateException("Collate something first!");
+    }
+    return heuristic;
+  }
+
+
 	@Override
 	public void collate(VariantGraph against, Iterable<Token> witness) {
 		List<LCP_Interval> LCP_intervals = splitLCP_ArrayIntoIntervals();
@@ -117,8 +125,11 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 		// try to find a match
 		// are they the same interval?
     g = new DecisionGraph();
-
+    heuristic = new HeuristicCostFunction(rm, beginWitness1, endWitness1, beginWitness2, endWitness2);
 	}
+	
+  
+
 	
 	class DecisionGraph {
 	  private DecisionGraphNode root;
@@ -127,6 +138,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 	    root = new DecisionGraphNode();
 	  }
 	  
+    //setEditOperation
+    // in het geval child3 moet ik eerst matchen om te kunnen
+    // scoren van de node
 	  public List<DecisionGraphNode> neighbours(DecisionGraphNode current) {
 	    // 3 possibilities
 	    DecisionGraphNode child1 = current.copy();
@@ -144,10 +158,6 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 	    children.add(child3);
 	    
 	    return children;
-	    // in het geval child3 moet ik eerst matchen om te kunnen
-	    // scoren van de node
-	    
-	    //setEditOperation
 	  }
 
     public DecisionGraphNode getRoot() {
@@ -184,6 +194,37 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 	    return sa.getNormalized().equals(sb.getNormalized());
 	  }
 	}
+	
+	class HeuristicCostFunction {
+	  private RangeMap<Integer, LCP_Interval> rm;
+    private int startRangeWitness1;
+    private int endRangeWitness1;
+    private int startRangeWitness2;
+    private int endRangeWitness2;
 
-
+    public HeuristicCostFunction(RangeMap<Integer, LCP_Interval> rm, int startRangeWitness1, int endRangeWitness1, int startRangeWitness2, int endRangeWitness2) {
+      this.rm = rm;
+      this.startRangeWitness1 = startRangeWitness1;
+      this.endRangeWitness1 = endRangeWitness1;
+      this.startRangeWitness2 = startRangeWitness2;
+      this.endRangeWitness2 = endRangeWitness2;
+	  }
+	  
+	  protected int heuristic(DecisionGraphNode node) {
+	    int minimum_wit1 = 0;
+	    for (int i = startRangeWitness1 + node.startPosWitness1; i <= endRangeWitness1; i++) {
+	      if (rm.get(i)!=null) {
+	        minimum_wit1 ++;
+	      }
+	    }
+	    int minimum_wit2 = 0;
+	    for (int i = startRangeWitness2 + node.startPosWitness2; i <= endRangeWitness2; i++) {
+	      if (rm.get(i)!=null) {
+	        minimum_wit2 ++;
+	      }
+	    }
+	    int potential = Math.min(minimum_wit1, minimum_wit2);
+	    return potential;
+	  }
+	}
 }
