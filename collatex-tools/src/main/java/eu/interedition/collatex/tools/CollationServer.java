@@ -24,9 +24,13 @@ import eu.interedition.collatex.simple.SimpleCollation;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.apache.commons.cli.CommandLine;
 import org.glassfish.grizzly.EmptyCompletionHandler;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
+import org.glassfish.grizzly.http.CompressionConfig;
+import org.glassfish.grizzly.http.server.*;
+import org.glassfish.grizzly.http.server.accesslog.AccessLogAppender;
+import org.glassfish.grizzly.http.server.accesslog.AccessLogProbe;
+import org.glassfish.grizzly.http.server.accesslog.ApacheLogFormat;
 import org.glassfish.grizzly.http.util.Header;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -50,20 +54,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
-public class CollatorService {
+public class CollationServer {
+    private static final Logger LOG = Logger.getLogger(CollationServer.class.getName());
 
     private final int maxCollationSize;
     private final String dotPath;
     private final ExecutorService collationThreads;
     private final ExecutorService processThreads = Executors.newCachedThreadPool();
 
-    public CollatorService(int maxParallelCollations, int maxCollationSize, String dotPath) {
+    public CollationServer(int maxParallelCollations, int maxCollationSize, String dotPath) {
         this.collationThreads = Executors.newFixedThreadPool(maxParallelCollations, new ThreadFactory() {
             private final AtomicLong counter = new AtomicLong();
 
@@ -78,6 +85,52 @@ public class CollatorService {
 
         this.maxCollationSize = maxCollationSize;
         this.dotPath = dotPath;
+    }
+
+    public static void start(CommandLine commandLine) {
+        final CollationServer collator = new CollationServer(
+            Integer.parseInt(commandLine.getOptionValue("mpc", "2")),
+            Integer.parseInt(commandLine.getOptionValue("mcs", "0")),
+            commandLine.getOptionValue("dot", null)
+        );
+        final String staticPath = System.getProperty("collatex.static.path", "");
+        final HttpHandler httpHandler = staticPath.isEmpty() ? new CLStaticHttpHandler(CollationPipe.class.getClassLoader(), "/static/") {
+            @Override
+            protected void onMissingResource(Request request, Response response) throws Exception {
+                collator.service(request, response);
+            }
+        } : new StaticHttpHandler(staticPath.replaceAll("/+$", "") + "/") {
+            @Override
+            protected void onMissingResource(Request request, Response response) throws Exception {
+                collator.service(request, response);
+            }
+        };
+
+        final NetworkListener httpListener = new NetworkListener("http", "0.0.0.0", Integer.parseInt(commandLine.getOptionValue("p", "7369")));
+
+        final CompressionConfig compressionConfig = httpListener.getCompressionConfig();
+        compressionConfig.setCompressionMode(CompressionConfig.CompressionMode.ON);
+        compressionConfig.setCompressionMinSize(860); // http://webmasters.stackexchange.com/questions/31750/what-is-recommended-minimum-object-size-for-gzip-performance-benefits
+        compressionConfig.setCompressableMimeTypes("application/javascript", "application/json", "application/xml", "text/css", "text/html", "text/javascript", "text/plain", "text/xml");
+
+        final HttpServer httpServer = new HttpServer();
+        final ServerConfiguration httpServerConfig = httpServer.getServerConfiguration();
+
+        httpServer.addListener(httpListener);
+        httpServerConfig.addHttpHandler(httpHandler, commandLine.getOptionValue("cp", "").replaceAll("/+$", "") + "/*");
+        httpServerConfig.getMonitoringConfig().getWebServerConfig().addProbes(new AccessLogProbe(new StandardOutAccessLogAppender(), ApacheLogFormat.COMBINED));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOG.info("Stopping HTTP server");
+            httpServer.shutdown();
+        }));
+
+        try {
+            httpServer.start();
+            Thread.sleep(Long.MAX_VALUE);
+        } catch (IOException | InterruptedException e) {
+            LOG.log(Level.SEVERE, e, e::getMessage);
+        }
     }
 
     public void service(Request request, Response response) throws Exception {
@@ -233,4 +286,16 @@ public class CollatorService {
             .collect(Collectors.toCollection(ArrayDeque::new));
     }
 
+    private static class StandardOutAccessLogAppender implements AccessLogAppender {
+
+
+        @Override
+        public void append(String accessLogEntry) throws IOException {
+            System.out.println(accessLogEntry);
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+    }
 }
