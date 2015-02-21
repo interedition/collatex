@@ -36,23 +36,12 @@ import org.glassfish.grizzly.http.util.Header;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,7 +80,7 @@ public class CollationServer {
         final CollationServer collator = new CollationServer(
             Integer.parseInt(commandLine.getOptionValue("mpc", "2")),
             Integer.parseInt(commandLine.getOptionValue("mcs", "0")),
-            commandLine.getOptionValue("dot", null)
+            Optional.ofNullable(commandLine.getOptionValue("dot")).orElse(detectDotPath())
         );
         final String staticPath = System.getProperty("collatex.static.path", "");
         final HttpHandler httpHandler = staticPath.isEmpty() ? new CLStaticHttpHandler(CollationPipe.class.getClassLoader(), "/static/") {
@@ -285,6 +274,29 @@ public class CollationServer {
             .filter(s -> !s.isEmpty())
             .collect(Collectors.toCollection(ArrayDeque::new));
     }
+
+    private static String detectDotPath() {
+        for (String detectionCommand : new String[] { "which dot", "where dot.exe" }) {
+            try {
+
+                final Process process = Runtime.getRuntime().exec(detectionCommand);
+                try (BufferedReader processReader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()))) {
+                    final CompletableFuture<Optional<String>> path = CompletableFuture.supplyAsync(() -> processReader.lines()
+                        .map(String::trim)
+                        .filter(l -> l.toLowerCase().contains("dot"))
+                        .findFirst());
+                    process.waitFor();
+                    final String dotPath = path.get().get();
+                    LOG.info(() -> "Detected GraphViz' dot at '" + dotPath + "'");
+                    return dotPath;
+                }
+            } catch (IOException | InterruptedException | ExecutionException e) {
+                LOG.log(Level.FINE, detectionCommand, e);
+            }
+        }
+        return null;
+    }
+
 
     private static class StandardOutAccessLogAppender implements AccessLogAppender {
 
