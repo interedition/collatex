@@ -352,33 +352,33 @@ For an example GraphML document, take a look at sample output from the
   v306 -> v305 [label = "B"];
   v305 -> v302 [label = "A, B"];
 }
-</pre><h2 id="cli">The Command Line Interface</h2><pre class="prettyprint lang-xml">usage: collatex [<options>]
-        (<json_input> | <witness_1> <witness_2> [[<witness_3>] ...])
--a,--algorithm <arg>                    progressive alignment algorithm to
+</pre><h2 id="cli">The Command Line Interface</h2><pre class="prettyprint lang-xml">usage: collatex [&lt;options>]
+                (&lt;json_input> | &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...])
+  -a,--algorithm &lt;arg>                    progressive alignment algorithm to
                                           use 'dekker' (default), 'medite',
                                           'needleman-wunsch'
--cp,--context-path <arg>                URL base/context path of the
+  -cp,--context-path &lt;arg>                URL base/context path of the
                                           service, default: '/'
--dot,--dot-path <arg>                   path to Graphviz 'dot',
+  -dot,--dot-path &lt;arg>                   path to Graphviz 'dot',
                                           auto-detected by default
--f,--format <arg>                       result/output format: 'json', 'csv',
+  -f,--format &lt;arg>                       result/output format: 'json', 'csv',
                                           'dot', 'graphml', 'tei'
--h,--help                               print usage instructions
-  -ie,--input-encoding <arg>              charset to use for decoding non-XML
+  -h,--help                               print usage instructions
+  -ie,--input-encoding &lt;arg>              charset to use for decoding non-XML
                                           witnesses; default: UTF-8
-  -mcs,--max-collation-size <arg>         maximum number of characters
+  -mcs,--max-collation-size &lt;arg>         maximum number of characters
                                           (counted over all witnesses) to
                                           perform collations on, default:
                                           unlimited
-  -mpc,--max-parallel-collations <arg>    maximum number of collations to
+  -mpc,--max-parallel-collations &lt;arg>    maximum number of collations to
                                           perform in parallel, default: 2
-  -o,--output <arg>                       output file; '-' for standard output
+  -o,--output &lt;arg>                       output file; '-' for standard output
                                           (default)
-  -oe,--output-encoding <arg>             charset to use for encoding the
+  -oe,--output-encoding &lt;arg>             charset to use for encoding the
                                           output; default: UTF-8
-  -p,--port <arg>                         HTTP port to bind server to,
+  -p,--port &lt;arg>                         HTTP port to bind server to,
                                           default: 7369
-  -s,--script <arg>                       ECMA/JavaScript resource with
+  -s,--script &lt;arg>                       ECMA/JavaScript resource with
                                           functions to be plugged into the
                                           alignment algorithm
   -S,--http                               start RESTful HTTP server
@@ -386,10 +386,9 @@ For an example GraphML document, take a look at sample output from the
                                           *not* be joined to segments
   -xml,--xml-mode                         witnesses are treated as XML
                                           documents
-  -xp,--xpath <arg>                       XPath 1.0 expression evaluating to
+  -xp,--xpath &lt;arg>                       XPath 1.0 expression evaluating to
                                           tokens of XML witnesses; default:
-                                          '//text()'
-                                          </pre><h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3><h2 id="rest-service">The RESTful Web Service</h2><pre class="prettyprint lang-xml">java -jar collatex-tools-1.6.jar --http</pre><p>The CollateX service is callable via
+                                          '//text()'</pre><h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3><h2 id="rest-service">The RESTful Web Service</h2><pre class="prettyprint lang-xml">java -jar collatex-tools-1.6.jar --http</pre><p>The CollateX service is callable via
 <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" title="RFC">HTTP POST requests</a> to
 <a href="${cp}/collate" title="REST-API Endpoint">/collate</a>.
 </p><p>It expects <strong>input</strong> formatted in <a href="http://json.org/" title="Website">JavaScript Object Notation (JSON)</a> as the request body;

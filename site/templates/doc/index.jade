@@ -612,44 +612,8 @@ block content
 
     h2#cli The Command Line Interface
 
-    pre.prettyprint.lang-xml.
-        usage: collatex [<options>]
-                (<json_input> | <witness_1> <witness_2> [[<witness_3>] ...])
-          -a,--algorithm <arg>                    progressive alignment algorithm to
-                                                  use 'dekker' (default), 'medite',
-                                                  'needleman-wunsch'
-          -cp,--context-path <arg>                URL base/context path of the
-                                                  service, default: '/'
-          -dot,--dot-path <arg>                   path to Graphviz 'dot',
-                                                  auto-detected by default
-          -f,--format <arg>                       result/output format: 'json', 'csv',
-                                                  'dot', 'graphml', 'tei'
-          -h,--help                               print usage instructions
-          -ie,--input-encoding <arg>              charset to use for decoding non-XML
-                                                  witnesses; default: UTF-8
-          -mcs,--max-collation-size <arg>         maximum number of characters
-                                                  (counted over all witnesses) to
-                                                  perform collations on, default:
-                                                  unlimited
-          -mpc,--max-parallel-collations <arg>    maximum number of collations to
-                                                  perform in parallel, default: 2
-          -o,--output <arg>                       output file; '-' for standard output
-                                                  (default)
-          -oe,--output-encoding <arg>             charset to use for encoding the
-                                                  output; default: UTF-8
-          -p,--port <arg>                         HTTP port to bind server to,
-                                                  default: 7369
-          -s,--script <arg>                       ECMA/JavaScript resource with
-                                                  functions to be plugged into the
-                                                  alignment algorithm
-          -S,--http                               start RESTful HTTP server
-          -t,--tokenized                          consecutive matches of tokens will
-                                                  *not* be joined to segments
-          -xml,--xml-mode                         witnesses are treated as XML
-                                                  documents
-          -xp,--xpath <arg>                       XPath 1.0 expression evaluating to
-                                                  tokens of XML witnesses; default:
-                                                  '//text()'
+    pre.prettyprint.lang-xml
+        include ./usage-instructions.txt
 
     h3#cli-js-callbacks ECMA/JavaScript Callbacks
 
