@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class CollateX {
 
