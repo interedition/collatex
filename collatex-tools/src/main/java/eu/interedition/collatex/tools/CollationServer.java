@@ -40,6 +40,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -290,8 +291,8 @@ public class CollationServer {
                     LOG.info(() -> "Detected GraphViz' dot at '" + dotPath + "'");
                     return dotPath;
                 }
-            } catch (IOException | InterruptedException | ExecutionException e) {
-                LOG.log(Level.FINE, detectionCommand, e);
+            } catch (Throwable t) {
+                LOG.log(Level.FINE, detectionCommand, t);
             }
         }
         return null;
