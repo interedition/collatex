@@ -3,7 +3,8 @@ compile:
   - browserify
   - less
 
-compile:min:
+deploy:
+  - clean
   - compile
   - uglify
   - cssmin

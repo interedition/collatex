@@ -102,8 +102,7 @@ another run delivering enhanced results. The declaration of pre-determined align
 parametrization of optimizing algorithms along the requirements of a specific use case would be such feedback information which
 influences results substantially.
 </p><p>CollateX offers rudimentary support for tailoring alignment results to a user's specific requirements, mainly through
-its <a href="#javadoc" title="Section">Java API</a>. It is an area in need for improvement, particularly with regard to its
-ease of use.
+its Java API. It is an area in need for improvement, particularly with regard to its ease of use.
 </p><h3 id="visualization">Visualization</h3><p>The final concern of any collation workflow relates to the visualization of its results. As the broad variety
 of building principles, layouts and notational conventions found in printed apparatuses already suggests, representing
 textual variance is a complex problem on its own. Software like <a href="http://juxtasoftware.org/" title="Homepage">Juxta</a>
@@ -266,22 +265,12 @@ a <a href="http://en.wikipedia.org/wiki/Levenshtein_distance" title="Wikipedia">
 The optional property <em>distance</em> defines the maximum edit distance between two normalized tokens strings which is still considered to be a match.
 An edit distance of&nbsp;1 is the default.
 </p><h3 id="xml-input">XML</h3><p>XML-encoded text versions are also supported by CollateX, though the ability to preserve the markup context during the collation process is
-fairly limited at the moment when not using the <a href="#javadoc">Java API</a>. Out of the box, you can compare XML documents either via
-the <a href="#cli" title="Section">command line interface</a> or collate them as part of a processing pipeline in <a href="#cocoon">Apache Cocoon</a>.
-</p><p>On the command line, CollateX accepts XML documents with arbitrary tag sets. All it needs is an <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath&nbsp;1.0
+fairly limited at the moment when not using the Java API.
+</p><p>Out of the box, you can compare XML documents via the <a href="#cli" title="Section">command line interface</a>.
+On the command line, CollateX accepts XML documents with arbitrary tag sets. All it needs is an <a href="http://www.w3.org/TR/xpath/" title="XPath 1.0 W3C Spec">XPath&nbsp;1.0
 expression</a> that evaluates to a <a href="http://www.w3.org/TR/xpath/#node-sets" title="Node Sets">node set</a> for each document. The
-tex content of each node in such a set equals a token. For example, the XPath expression "//w" would result in a text version for each XML document with the sequence
+text content of each node in such a set equals a token. For example, the XPath expression "//w" would result in a text version for each XML document with the sequence
 of text segments enclosed in &lt;w/> elements as tokens.
-</p><p>When using CollateX' Apache Cocoon component, the collation will be performed on one or more XML fragments in an input document which adhere to the following schema:</p><pre class="prettyprint">&lt;collation xmlns="http://interedition.eu/collatex/ns/1.0" joined="true" editDistance="1" algorithm="medite" format="tei">
-    &lt;witness>Almost every aspect of what scholarly editors do may be changed&lt;/witness>
-    &lt;witness>Hardly any aspect of what stupid editors do in the privacy of their own home may be changed again and again&lt;/witness>
-    &lt;witness>very many aspects of what scholarly editors do in the livingrooms of their own home may not be changed&lt;/witness>
-&lt;/collation>
-</pre><p>CollateX will process any XML fragment enclosed in a &lt;collation/> element from its namespace. In order to configure the collation, this element can have a number of
-optional attributes:
-</p><table><tr><th>algorithm</th><td>the collation algorithm to use: "dekker" (default), "needleman-wunsch" or "medite"</td></tr><tr><th>format</th><td>the desired output format: "table" for an alignment table in <a href="#xml-output">CollateX' custom schema</a> (default), or "tei" for output in <a href="#tei-p5-output">TEI&nbsp;P5's parallel segmentation format</a></td></tr><tr><th>editDistance</th><td>the edit distance threshold for optional fuzzy matching of tokens; the default is exact matching</td></tr><tr><th>joined</th><td>Whether consecutive alignments of tokens should be joined/merged in the output, or whether each alignment of tokens should occupy a separate cell/segment; the latter being the default.</td></tr></table><p>Each text version to be collated is given as an XML fragment enclosed in a &lt;witness/> element. CollateX will compare all versions contained in a
-&lt;collation/> element against each other. Markup within &lt;witness/> elements is ignored; only the text content is considered and tokenized/normalized
-before collation as if it were originating from a plain text source.
 </p><h2 id="output">Output</h2><p>CollateX supports several formats to represent collation results.</p><h3 id="json-output">JSON</h3><p>In conjunction with JSON being supported as an input format, collation results can be output in JSON as well.
 The schema of such output resembles matrices commonly encountered in <a href="http://en.wikipedia.org/wiki/Sequence_alignment" title="Wikipedia">sequence alignment</a> representations,
 and looks as follows for the second example given in the <a href="#json-input">section on JSON input</a> (indentation/whitespace added for easier readability):
@@ -363,54 +352,46 @@ For an example GraphML document, take a look at sample output from the
   v306 -> v305 [label = "B"];
   v305 -> v302 [label = "A, B"];
 }
-</pre><h2 id="cli">The Command Line Interface</h2><pre class="prettyprint lang-xml">usage: collatex [&lt;options>]
-                (&lt;json_input> | &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...])
--a,--algorithm &lt;arg>           progressive alignment algorithm to use
-                                 'dekker' (default), 'medite',
-                                 'needleman-wunsch'
--f,--format &lt;arg>              result/output format: 'json', 'csv', 'dot',
-                                 'graphml', 'tei'
--h,--help                      print usage instructions (which your are
-                                 looking at right now)
--ie,--input-encoding &lt;arg>     charset to use for decoding non-XML
-                                 witnesses; default: UTF-8
--o,--output &lt;arg>              output file; '-' for standard output
-                                 (default)
--oe,--output-encoding &lt;arg>    charset to use for encoding the output;
-                                 default: UTF-8
--s,--script &lt;arg>              ECMA/JavaScript resource with functions to be
-                                 plugged into the alignment algorithm
--t,--tokenized                 consecutive matches of tokens will *not* be
-                                 joined to segments
--xml,--xml-mode                witnesses are treated as XML documents
-  -xp,--xpath &lt;arg>              XPath 1.0 expression evaluating to tokens of
-                                 XML witnesses; default: '//text()'
-                                 </pre><h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3><h2 id="cocoon">Apache Cocoon Integration</h2><pre class="prettyprint">&lt;map:components>
-...
-&lt;map:transformers>
-    ...
-    &lt;map:transformer name="collatex" src="eu.interedition.collatex.cocoon.CollateXTransformer" />
-    ...
-&lt;/map:transformers>
-...
-&lt;/map:components>
-</pre><pre class="prettyprint">&lt;map:pipelines>
-...
-&lt;map:pipeline>
-  &lt;map:match pattern="collatex-test">
-    &lt;map:generate src="resource/internal/collation.xml" />
-    &lt;map:transform type="collatex"/>
-    &lt;map:serialize type="xml"/>
-  &lt;/map:match>
-&lt;/map:pipeline>
-...
-&lt;/map:pipelines>
-</pre><h2 id="rest-service">The RESTful Web Service</h2><p>This page documents the
-<a href="http://en.wikipedia.org/wiki/Application_programming_interface" title="Wikipedia Page">Application Programming Interface (API)</a>
-of CollateX via which you can provide textual versions (&ldquo;witnesses&rdquo;) to be compared and get the collation result back in a number of formats.
-</p><p>The CollateX service is callable via
+</pre><h2 id="cli">The Command Line Interface</h2><pre class="prettyprint lang-xml">usage: collatex [<options>]
+        (<json_input> | <witness_1> <witness_2> [[<witness_3>] ...])
+-a,--algorithm <arg>                    progressive alignment algorithm to
+                                          use 'dekker' (default), 'medite',
+                                          'needleman-wunsch'
+-cp,--context-path <arg>                URL base/context path of the
+                                          service, default: '/'
+-dot,--dot-path <arg>                   path to Graphviz 'dot',
+                                          auto-detected by default
+-f,--format <arg>                       result/output format: 'json', 'csv',
+                                          'dot', 'graphml', 'tei'
+-h,--help                               print usage instructions
+  -ie,--input-encoding <arg>              charset to use for decoding non-XML
+                                          witnesses; default: UTF-8
+  -mcs,--max-collation-size <arg>         maximum number of characters
+                                          (counted over all witnesses) to
+                                          perform collations on, default:
+                                          unlimited
+  -mpc,--max-parallel-collations <arg>    maximum number of collations to
+                                          perform in parallel, default: 2
+  -o,--output <arg>                       output file; '-' for standard output
+                                          (default)
+  -oe,--output-encoding <arg>             charset to use for encoding the
+                                          output; default: UTF-8
+  -p,--port <arg>                         HTTP port to bind server to,
+                                          default: 7369
+  -s,--script <arg>                       ECMA/JavaScript resource with
+                                          functions to be plugged into the
+                                          alignment algorithm
+  -S,--http                               start RESTful HTTP server
+  -t,--tokenized                          consecutive matches of tokens will
+                                          *not* be joined to segments
+  -xml,--xml-mode                         witnesses are treated as XML
+                                          documents
+  -xp,--xpath <arg>                       XPath 1.0 expression evaluating to
+                                          tokens of XML witnesses; default:
+                                          '//text()'
+                                          </pre><h3 id="cli-js-callbacks">ECMA/JavaScript Callbacks</h3><h2 id="rest-service">The RESTful Web Service</h2><pre class="prettyprint lang-xml">java -jar collatex-tools-1.6.jar --http</pre><p>The CollateX service is callable via
 <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html" title="RFC">HTTP POST requests</a> to
-<a href="${cp}/collate" title="REST-API Endpoint">${cp}/collate</a>.
+<a href="${cp}/collate" title="REST-API Endpoint">/collate</a>.
 </p><p>It expects <strong>input</strong> formatted in <a href="http://json.org/" title="Website">JavaScript Object Notation (JSON)</a> as the request body;
 accordingly the content type of the HTTP request must be set to <code>application/json</code> by the client.
 </p><p>The output format of the collator, contained in the response to an HTTP POST request, can be chosen via
@@ -438,7 +419,7 @@ the resulting HTML alignment table …
 </p><p>… generic <code>collate(witnesses, callback)</code> as well as methods for other formats available:
 <code>toSVG()</code>, <code>toTEI()</code>, <code>toGraphViz()</code> …
 </p><p>… configuration of a collator instance via methods like <code>withDekker()</code>, <code>withFuzzyMatching(maxDistance)</code> …
-</p></div><h2 id="javadoc">API Documentation (Javadoc)</h2><p><a href="/apidocs/" title="CollateX API (Javadoc)">here</a></p><h2 id="bibliography">Resources/ Bibliography</h2><dl class="bibliography"><dt id="bib-bourdaillet-2007"><a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project?action=AttachFile&do=view&target=LATA+2007" title="Electronic Resource">Bourdaillet 2007</a></dt><dd>Bourdaillet J. and Ganascia J.-G., 2007. Practical block sequence alignment with moves. LATA 2007 - International Conference on Language and Automata Theory and Applications, 3/2007.</dd><dt id="bib-collate-2000"><a href="http://www.sd-editions.com/about/index.html" title="Homepage">Collate</a></dt><dd>Robinson, P., 2000. Collate.</dd><dt id="bib-dekker-2011"><a href="http://crdo.up.univ-aix.fr/SLDRdata/doc/show/copenhagen/SDH-2011/proceedings.html" title="Conference Proceedings">Dekker 2011</a></dt><dd>Dekker, R. H. and Middell, G., 2011. Computer-Supported Collation with CollateX: Managing Textual Variance in an Environment with Varying Requirements. Supporting Digital Humanities 2011. University of Copenhagen, Denmark. 17-18 November 2011.</dd><dt id="bib-juxta-2013"><a href="https://github.com/performant-software" title="GitHub">Juxta 2013</a></dt><dd>Performant Software Solutions LLC, 2013. Juxta.</dd><dt id="bib-needleman-1970"><a href="http://dx.doi.org/10.1016%2F0022-2836%2870%2990057-4" title="Electronic Resource">Needleman 1970</a></dt><dd>Needleman, Saul B. and Wunsch, Christian D., 1970. A general method applicable to the search for similarities in the amino acid sequence of two proteins. Journal of Molecular Biology 48 (3), 443–53.</dd><dt id="bib-nmerge-2012"><a href="https://github.com/HRIT-Infrastructure/NMergeNew" title="GitHub">NMerge 2012</a></dt><dd>Schmidt, D., 2012. NMerge. The nmerge Java library/commandline tool for making multi-version documents.</dd><dt id="bib-schmidt-2008"><a href="http://multiversiondocs.blogspot.com/2008/03/whats-multi-version-document.html">Schmidt 2008</a></dt><dd>Schmidt, D., 2008. What's a Multi-Version Document. <a href="http://multiversiondocs.blogspot.com/"title="Web Resource">Multi-Version Documents Blog</a>.</dd><dt id="bib-schmidt-2009"><a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" title="Electronic Article">Schmidt 2009</a></dt><dd>Schmidt, D. and Colomb, R., 2009. A data structure for representing multi-version texts online. International Journal of Human-Computer Studies, 67.6, 497-514.</dd></dd><dt id="bib-schmidt-2009a"><a href="http://www.balisage.net/Proceedings/vol3/html/Schmidt01/BalisageVol3-Schmidt01.html">Schmidt 2009a</a></dt><dd>Schmidt, D., 2009. Merging Multi-Version Texts: a Generic Solution to the Overlap Problem.” Presented at Balisage:
+</p></div><h2 id="bibliography">Resources/ Bibliography</h2><dl class="bibliography"><dt id="bib-bourdaillet-2007"><a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project?action=AttachFile&do=view&target=LATA+2007" title="Electronic Resource">Bourdaillet 2007</a></dt><dd>Bourdaillet J. and Ganascia J.-G., 2007. Practical block sequence alignment with moves. LATA 2007 - International Conference on Language and Automata Theory and Applications, 3/2007.</dd><dt id="bib-collate-2000"><a href="http://www.sd-editions.com/about/index.html" title="Homepage">Collate</a></dt><dd>Robinson, P., 2000. Collate.</dd><dt id="bib-dekker-2011"><a href="http://crdo.up.univ-aix.fr/SLDRdata/doc/show/copenhagen/SDH-2011/proceedings.html" title="Conference Proceedings">Dekker 2011</a></dt><dd>Dekker, R. H. and Middell, G., 2011. Computer-Supported Collation with CollateX: Managing Textual Variance in an Environment with Varying Requirements. Supporting Digital Humanities 2011. University of Copenhagen, Denmark. 17-18 November 2011.</dd><dt id="bib-juxta-2013"><a href="https://github.com/performant-software" title="GitHub">Juxta 2013</a></dt><dd>Performant Software Solutions LLC, 2013. Juxta.</dd><dt id="bib-needleman-1970"><a href="http://dx.doi.org/10.1016%2F0022-2836%2870%2990057-4" title="Electronic Resource">Needleman 1970</a></dt><dd>Needleman, Saul B. and Wunsch, Christian D., 1970. A general method applicable to the search for similarities in the amino acid sequence of two proteins. Journal of Molecular Biology 48 (3), 443–53.</dd><dt id="bib-nmerge-2012"><a href="https://github.com/HRIT-Infrastructure/NMergeNew" title="GitHub">NMerge 2012</a></dt><dd>Schmidt, D., 2012. NMerge. The nmerge Java library/commandline tool for making multi-version documents.</dd><dt id="bib-schmidt-2008"><a href="http://multiversiondocs.blogspot.com/2008/03/whats-multi-version-document.html">Schmidt 2008</a></dt><dd>Schmidt, D., 2008. What's a Multi-Version Document. <a href="http://multiversiondocs.blogspot.com/"title="Web Resource">Multi-Version Documents Blog</a>.</dd><dt id="bib-schmidt-2009"><a href="http://dx.doi.org/10.1016/j.ijhcs.2009.02.001" title="Electronic Article">Schmidt 2009</a></dt><dd>Schmidt, D. and Colomb, R., 2009. A data structure for representing multi-version texts online. International Journal of Human-Computer Studies, 67.6, 497-514.</dd></dd><dt id="bib-schmidt-2009a"><a href="http://www.balisage.net/Proceedings/vol3/html/Schmidt01/BalisageVol3-Schmidt01.html">Schmidt 2009a</a></dt><dd>Schmidt, D., 2009. Merging Multi-Version Texts: a Generic Solution to the Overlap Problem.” Presented at Balisage:
 The Markup Conference 2009, Montréal, Canada, August 11 - 14, 2009. In Proceedings of Balisage: The Markup Conference 2009.
 Balisage Series on Markup Technologies, vol. 3 (2009). doi:10.4242/BalisageVol3.Schmidt01.
 </dd><dt id="bib-spencer-2004"><a href="http://dx.doi.org/10.1007/s10579-004-8682-1">Spencer 2004</a></dt><dd>Spencer M., Howe and Christopher J., 2004. Collating Texts Using Progressive Multiple Alignment. Computers and the Humanities. 38/2004, 253–270.</dd><dt id="bib-stolz-2006"><a href="http://edoc.bbaw.de/volltexte/2007/516/">Stolz 2006</a></dt><dd>Stolz, M. and Dimpel F. M., 2006. Computergestützte Kollationierung und ihre Integration in den editorischen Arbeitsfluss. 2006.</dd></dl></div><div id="footer">Copyright &copy; 2010-2013 <a href="/about/">The Interedition Development Group</a>. All rights reserved.</div><a href="https://github.com/interedition/collatex"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a><script type="text/javascript" src="http://yui.yahooapis.com/combo?3.8.1/build/yui-base/yui-base-min.js&amp;3.8.1/build/oop/oop-min.js&amp;3.8.1/build/event-custom-base/event-custom-base-min.js&amp;3.8.1/build/features/features-min.js&amp;3.8.1/build/dom-core/dom-core-min.js&amp;3.8.1/build/dom-base/dom-base-min.js&amp;3.8.1/build/selector-native/selector-native-min.js&amp;3.8.1/build/selector/selector-min.js&amp;3.8.1/build/node-core/node-core-min.js&amp;3.8.1/build/node-base/node-base-min.js&amp;3.8.1/build/event-base/event-base-min.js&amp;3.8.1/build/event-delegate/event-delegate-min.js&amp;3.8.1/build/node-event-delegate/node-event-delegate-min.js&amp;3.8.1/build/pluginhost-base/pluginhost-base-min.js&amp;3.8.1/build/pluginhost-config/pluginhost-config-min.js&amp;3.8.1/build/node-pluginhost/node-pluginhost-min.js&amp;3.8.1/build/dom-style/dom-style-min.js&amp;3.8.1/build/dom-screen/dom-screen-min.js&amp;3.8.1/build/node-screen/node-screen-min.js&amp;3.8.1/build/node-style/node-style-min.js&amp;3.8.1/build/event-custom-complex/event-custom-complex-min.js&amp;3.8.1/build/event-synthetic/event-synthetic-min.js"></script><script type="text/javascript" src="http://yui.yahooapis.com/combo?3.8.1/build/event-mousewheel/event-mousewheel-min.js&amp;3.8.1/build/event-mouseenter/event-mouseenter-min.js&amp;3.8.1/build/event-key/event-key-min.js&amp;3.8.1/build/event-focus/event-focus-min.js&amp;3.8.1/build/event-resize/event-resize-min.js&amp;3.8.1/build/event-hover/event-hover-min.js&amp;3.8.1/build/event-outside/event-outside-min.js&amp;3.8.1/build/event-touch/event-touch-min.js&amp;3.8.1/build/event-move/event-move-min.js&amp;3.8.1/build/event-flick/event-flick-min.js&amp;3.8.1/build/event-valuechange/event-valuechange-min.js&amp;3.8.1/build/event-tap/event-tap-min.js"></script><script type="text/javascript" src="/collatex.js"></script></body></html>

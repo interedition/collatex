@@ -1,36 +1,18 @@
 <!DOCTYPE html><html lang="en"><head><meta http-equiv="content-type" content="text/html;charset=utf-8"><title>CollateX &ndash; Download</title><link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.8.1/build/cssfonts/cssfonts-min.css&amp;3.8.1/build/cssgrids/cssgrids-min.css&amp;3.8.1/build/cssreset/cssreset-min.css&amp;3.8.1/build/cssbase/cssbase-min.css"><link rel="stylesheet" type="text/css" href="/collatex.css"></head><body class="yui3-skin-sam"><div id="header"><h1><a href="/" title="Homepage">CollateX &ndash; Software for Collating Textual Sources</a></h1><p class="subtitle"><span class="quote">&ldquo;In a language, in the system of language, there are only differences.&rdquo;</span> &ndash; Jacques Derrida</p></div><div id="menu"><ol><li><a href="/">Home</a></li><li><a href="/download/">Download</a></li><li><a href="/doc/">Documentation</a></li><li><a href="/demo/">Demo</a></li><li><a href="/about/">About</a></li></ol></div><div id="content"><p>CollateX is open source software and made available for download in source as well as binary form.</p><div id="download-binary"><h2>Binary Distributions</h2><p>For usage instructions, please refer to the <a href="/doc/" title="Documentation">documentation</a>. Please also
 note the <a href="#license" title="License">license terms</a> under which CollateX is made available.
-</p><div class="yui3-g"><div class="yui3-u-1-2"><div class="content download-option"><h3>1. Tools</h3><p class="download-link">» <a href="/dist/collatex-tools-1.5.zip">collatex-tools-1.5.zip</a></p><p class="download-link">» <a href="/dist/collatex-tools-1.5.tar.bz2">collatex-tools-1.5.tar.bz2</a></p></div></div><div class="yui3-u-1-2"><div class="content"><h3>Requirements</h3><p>CollateX is written for the <a href="http://www.java.com/" title="Homepage">Java platform</a> which is available
-for all major operating systems. You need the Java Runtime Environment (JRE) version&nbsp;6 or higher.
-</p></div></div><div class="yui3-u-1-2"><div class="content download-option"><h3>2. Core</h3><p>For embedding CollateX into your JVM-based application, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a>:</p><pre class="prettyprint">&lt;dependency>
+</p><h3>Requirements</h3><p>CollateX is written for the <a href="http://www.java.com/" title="Homepage">Java platform</a> which is available
+for all major operating systems. You need the <strong>Java Runtime Environment (JRE) version&nbsp;8</strong> or higher.
+</p><div class="yui3-g"><div class="yui3-u-1-2"><div class="content download-option"><h3>1. Core</h3><p>For embedding CollateX into your JVM-based application, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a>:</p><pre class="prettyprint">&lt;dependency>
   &lt;groupId>eu.interedition&lt;/groupId>
   &lt;artifactId>collatex-core&lt;/artifactId>
-  &lt;version>1.5&lt;/version>
-&lt;/dependency>
-&lt;dependency>
-  &lt;groupId>net.sf.jung&lt;/groupId>
-  &lt;artifactId>jung-graph-impl&lt;/artifactId>
-  &lt;version>2.0.1&lt;/version>
-&lt;/dependency>
-</pre></div></div><div class="yui3-u-1-2"><div class="content download-option"><h3>3. Cocoon</h3><p>For adding CollateX' block to your Cocoon install, please use <a href="http://search.maven.org/" title="Maven Central">Maven Central</a> as well:</p><pre class="prettyprint">&lt;dependency>
-  &lt;groupId>eu.interedition&lt;/groupId>
-  &lt;artifactId>collatex-cocoon&lt;/artifactId>
-  &lt;version>1.5&lt;/version>
-&lt;/dependency>
-&lt;dependency>
-  &lt;groupId>net.sf.jung&lt;/groupId>
-  &lt;artifactId>jung-graph-impl&lt;/artifactId>
-  &lt;version>2.0.1&lt;/version>
-&lt;/dependency>
-</pre></div></div></div><p>Depending on how you would like to use CollateX, you can opt for three different ways to download it:</p><ol><li>Should you be in need for a collation component that integrates with your software system independent of its
+  &lt;version>1.6&lt;/version>
+&lt;/dependency></pre></div></div><div class="yui3-u-1-2"><div class="content download-option"><h3>2. Tools</h3><p>For using CollateX as a standalone tool, please download the following <a href="http://en.wikipedia.org/wiki/JAR_%28file_format%29" title="Java Archive - Wikipedia">Java Archive</a> and execute it on the command line:</p><p class="download-link">» <a href="https://oss.sonatype.org/service/local/repositories/releases/content/eu/interedition/collatex-tools/1.6/collatex-tools-1.6.jar">collatex-tools-1.6.jar</a></p><pre class="prettyprint lang-xml">java -jar collatex-tools-1.6.jar -h</pre></div></div><div class="yui3-u-1-2"><div class="content"></div></div></div><p>Depending on how you would like to use CollateX, you can opt for two ways to download it:</p><ol><li>Should you target the <em>Java Virtual Machine</em> as your runtime environment and would like to <strong>embed CollateX</strong>
+in your application, we provide <a href="http://maven.apache.org/" title="Homepage">Apache-Maven</a>-compatible artifacts of
+CollateX' core for download.</li><li>Should you be in need for a collation component that integrates with your software system independent of its
 runtime and development environment, we offer a <strong>tool suite</strong> comprised of a
 <em>command-line tool</em> and a <em>self-contained RESTful web service</em>. So whether your project is web-based or
 runs in your local environment, whether you write in Ruby, Python, PHP, JavaScript or some other language: This is
-probably the option to get started on.</li><li>Should you target the <em>Java Virtual Machine</em> as your runtime environment and would like to <strong>embed CollateX</strong>
-in your application, we provide <a href="http://maven.apache.org/" title="Homepage">Apache-Maven</a>-compatible artifacts of
-CollateX' core for download.</li><li>Should you use <a href="http://cocoon.apache.org/" title="Homepage">Apache Cocoon</a> as the framework for your
-<em>XML-oriented application</em>, we offer a <strong>Cocoon block</strong> making collation functionality available
-as a transformer for your XML processing pipelines.
+probably the option to get started on.
 </li></ol></div><div id="download-source"><h2>Source Code</h2><div class="yui3-g"><div class="yui3-u-1-2"><div class="content"><p>We do not prepare source code bundles for download. Development of CollateX takes place on
 <a href="https://github.com/interedition/collatex" title="CollateX on GitHub">GitHub</a> where you can find
 the latest version of CollateX' source as well as earlier versions.

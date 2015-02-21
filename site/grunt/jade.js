@@ -7,7 +7,7 @@ module.exports = {
         ext: '.html',
         options: {
             data: {
-                version: "1.5"
+                version: "1.6"
             }
         }
     }
