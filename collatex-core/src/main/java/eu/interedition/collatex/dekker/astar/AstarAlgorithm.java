@@ -2,14 +2,12 @@ package eu.interedition.collatex.dekker.astar;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import eu.interedition.collatex.CollationAlgorithm;
 
@@ -26,15 +24,15 @@ public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgo
 
   public List<N> aStar(N startNode, C startCost) {
     // The set of nodes already evaluated.
-    Set<N> closed = Sets.newHashSet();
-    cameFrom = Maps.newHashMap();
+    Set<N> closed = new HashSet<>();
+    cameFrom = new HashMap<>();
     
     // Cost from start along best known path.
-    Map<N, C> gScore = Maps.newHashMap();
+    Map<N, C> gScore = new HashMap<>();
     gScore.put(startNode, startCost);
   
     // Estimated total cost from start to goal through y.
-    final Map<N, C> fScore = Maps.newHashMap();
+    final Map<N, C> fScore = new HashMap<>();
     fScore.put(startNode, gScore.get(startNode).plus(heuristicCostEstimate(startNode)));
     
     // The set of tentative nodes to be evaluated, initially containing the start node
@@ -72,7 +70,7 @@ public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgo
   }
 
   protected List<N> reconstructPath(Map<N, N> cameFrom, N current) {
-    ArrayList<N> path = Lists.newArrayList();
+    ArrayList<N> path = new ArrayList<>();
     do {
       path.add(0, current);
       current = cameFrom.get(current);
