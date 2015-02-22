@@ -1,13 +1,9 @@
 package eu.interedition.collatex.dekker;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
 
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
@@ -24,14 +20,14 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
   private int[] suffix_array;
   protected int[] LCP_array;
   private DecisionGraph g;
-  private HeuristicCostFunction heuristic;
+//  private HeuristicCostFunction heuristic;
 
 	public Dekker21Aligner(SimpleWitness[] w) {
 		// 1. prepare token array
 		// 2. derive the suffix array 
 		// 3. derive LCP array
 		// 4. derive LCP intervals
-		token_array = Lists.newArrayList();
+		token_array = new ArrayList<>();
 		for (SimpleWitness witness : w) {
 			for (Token t : witness) {
 				token_array.add(t);
@@ -45,7 +41,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 	}
 
 	protected List<LCP_Interval> splitLCP_ArrayIntoIntervals() {
-	  List<LCP_Interval> closedIntervals = Lists.newArrayList();
+	  List<LCP_Interval> closedIntervals = new ArrayList<>();
 	  int previousLCP_value = 0;
 	  Stack<LCP_Interval> openIntervals = new Stack<LCP_Interval>();
 	  for (int idx = 0; idx < LCP_array.length; idx++) {
@@ -90,12 +86,12 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     return g;
   }
 
-  protected HeuristicCostFunction getHeuristic() {
-    if (heuristic==null) {
-      throw new IllegalStateException("Collate something first!");
-    }
-    return heuristic;
-  }
+//  protected HeuristicCostFunction getHeuristic() {
+//    if (heuristic==null) {
+//      throw new IllegalStateException("Collate something first!");
+//    }
+//    return heuristic;
+//  }
 
 
 	@Override
@@ -103,11 +99,11 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 		List<LCP_Interval> LCP_intervals = splitLCP_ArrayIntoIntervals();
 		// map LCP intervals to range, so that for each position in
 		// the token array the LCP interval can be found
-		RangeMap<Integer, LCP_Interval> rm = TreeRangeMap.create();
-		for (LCP_Interval interval : LCP_intervals) {
-		  Range<Integer> ri = Range.closed(interval.start, interval.end);
-		  rm.put(ri, interval);
-		}
+//		RangeMap<Integer, LCP_Interval> rm = TreeRangeMap.create();
+//		for (LCP_Interval interval : LCP_intervals) {
+//		  Range<Integer> ri = Range.closed(interval.start, interval.end);
+//		  rm.put(ri, interval);
+//		}
 		// now we are going to prepare a* mechanism
 		// 1) We need to know the neighbors in the decision graph
 		// There are three possibilities 
@@ -125,7 +121,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 		// try to find a match
 		// are they the same interval?
     g = new DecisionGraph();
-    heuristic = new HeuristicCostFunction(rm, beginWitness1, endWitness1, beginWitness2, endWitness2);
+//    heuristic = new HeuristicCostFunction(rm, beginWitness1, endWitness1, beginWitness2, endWitness2);
 	}
 	
   
@@ -152,7 +148,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
       child3.startPosWitness1++;
       child3.startPosWitness2++;
 
-	    List<DecisionGraphNode> children = Lists.newArrayList();
+	    List<DecisionGraphNode> children = new ArrayList<>();
 	    children.add(child1);
 	    children.add(child2);
 	    children.add(child3);
@@ -195,36 +191,36 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 	  }
 	}
 	
-	class HeuristicCostFunction {
-	  private RangeMap<Integer, LCP_Interval> rm;
-    private int startRangeWitness1;
-    private int endRangeWitness1;
-    private int startRangeWitness2;
-    private int endRangeWitness2;
-
-    public HeuristicCostFunction(RangeMap<Integer, LCP_Interval> rm, int startRangeWitness1, int endRangeWitness1, int startRangeWitness2, int endRangeWitness2) {
-      this.rm = rm;
-      this.startRangeWitness1 = startRangeWitness1;
-      this.endRangeWitness1 = endRangeWitness1;
-      this.startRangeWitness2 = startRangeWitness2;
-      this.endRangeWitness2 = endRangeWitness2;
-	  }
-	  
-	  protected int heuristic(DecisionGraphNode node) {
-	    int minimum_wit1 = 0;
-	    for (int i = startRangeWitness1 + node.startPosWitness1; i <= endRangeWitness1; i++) {
-	      if (rm.get(i)!=null) {
-	        minimum_wit1 ++;
-	      }
-	    }
-	    int minimum_wit2 = 0;
-	    for (int i = startRangeWitness2 + node.startPosWitness2; i <= endRangeWitness2; i++) {
-	      if (rm.get(i)!=null) {
-	        minimum_wit2 ++;
-	      }
-	    }
-	    int potential = Math.min(minimum_wit1, minimum_wit2);
-	    return potential;
-	  }
-	}
+//	class HeuristicCostFunction {
+//	  private RangeMap<Integer, LCP_Interval> rm;
+//    private int startRangeWitness1;
+//    private int endRangeWitness1;
+//    private int startRangeWitness2;
+//    private int endRangeWitness2;
+//
+//    public HeuristicCostFunction(RangeMap<Integer, LCP_Interval> rm, int startRangeWitness1, int endRangeWitness1, int startRangeWitness2, int endRangeWitness2) {
+//      this.rm = rm;
+//      this.startRangeWitness1 = startRangeWitness1;
+//      this.endRangeWitness1 = endRangeWitness1;
+//      this.startRangeWitness2 = startRangeWitness2;
+//      this.endRangeWitness2 = endRangeWitness2;
+//	  }
+//	  
+//	  protected int heuristic(DecisionGraphNode node) {
+//	    int minimum_wit1 = 0;
+//	    for (int i = startRangeWitness1 + node.startPosWitness1; i <= endRangeWitness1; i++) {
+//	      if (rm.get(i)!=null) {
+//	        minimum_wit1 ++;
+//	      }
+//	    }
+//	    int minimum_wit2 = 0;
+//	    for (int i = startRangeWitness2 + node.startPosWitness2; i <= endRangeWitness2; i++) {
+//	      if (rm.get(i)!=null) {
+//	        minimum_wit2 ++;
+//	      }
+//	    }
+//	    int potential = Math.min(minimum_wit1, minimum_wit2);
+//	    return potential;
+//	  }
+//	}
 }
