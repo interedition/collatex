@@ -15,10 +15,10 @@ import eu.interedition.collatex.CollationAlgorithm;
 /*
  * Implementation of the a* algorithm to find the optimal
  * solution in a decision tree.
- * 
+ *
  * @author: Ronald Haentjens Dekker
  */
-public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgorithm.Base {
+public abstract class AstarAlgorithm<N, C extends Cost<C>> {
   // The map of navigated nodes.
   protected Map<N, N> cameFrom;
 
@@ -26,15 +26,15 @@ public abstract class AstarAlgorithm<N, C extends Cost<C>> extends CollationAlgo
     // The set of nodes already evaluated.
     Set<N> closed = new HashSet<>();
     cameFrom = new HashMap<>();
-    
+
     // Cost from start along best known path.
     Map<N, C> gScore = new HashMap<>();
     gScore.put(startNode, startCost);
-  
+
     // Estimated total cost from start to goal through y.
     final Map<N, C> fScore = new HashMap<>();
     fScore.put(startNode, gScore.get(startNode).plus(heuristicCostEstimate(startNode)));
-    
+
     // The set of tentative nodes to be evaluated, initially containing the start node
     Comparator<N> comp = new Comparator<N>() {
       @Override
