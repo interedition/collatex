@@ -1,6 +1,7 @@
 package eu.interedition.collatex.dekker;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -56,7 +57,27 @@ public class Dekker21AlignerTest extends AbstractTest {
     }
 
     @Test
-    public void testCaseDanielStoeklheuristicCostFunction() {
+    public void testCaseDecisionGraphNeighbours() {
+        // 1: a, b, c, d, e
+        // 2: a, e, c, d
+        // 3: a, d, b
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph against = new VariantGraph();
+        aligner.collate(against, w);
+
+        DecisionGraphNode root = aligner.new DecisionGraphNode();
+        Dekker21Aligner.TwoDimensionalDecisionGraph gr = aligner.getDecisionGraph();
+
+        Iterator<DecisionGraphNode> neighbours = gr.neighborNodes(root).iterator();
+        assertNode(1,0, neighbours.next());
+        assertNode(0,1, neighbours.next());
+        assertNode(1,1, neighbours.next());
+        assertFalse(neighbours.hasNext());
+    }
+
+    @Test
+    public void testCaseDecisionGraphHeuristicCostFunction() {
         // 1: a, b, c, d, e
         // 2: a, e, c, d
         // 3: a, d, b
@@ -73,25 +94,6 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(3, decisionGraph.heuristicCostEstimate(neighbours.next()).alignedTokens);
     }
 
-//  @Test
-//  public void testCaseDanielStoeklDecisionGraph() {
-//    // 1: a, b, c, d, e
-//    // 2: a, e, c, d
-//    // 3: a, d, b
-//    final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
-//    Dekker21Aligner aligner = new Dekker21Aligner(w);
-//    VariantGraph against = new VariantGraph();
-//    aligner.collate(against, w);
-//
-//    DecisionGraph gr = aligner.getDecisionGraph();
-//    // NOTE: active form: expand tree
-//    List<DecisionGraphNode> neighbours = gr.neighbours(gr.getRoot());
-//    assertEquals(3, neighbours.size());
-//    assertNode(1,0, neighbours.get(0));
-//    assertNode(0,1, neighbours.get(1));
-//    assertNode(1,1, neighbours.get(2));
-//
-//  }
 
 
 }
