@@ -130,10 +130,14 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         int beginWitness2 = 5;
         int endWitness2 = 8;
 
-        // prepare vertices, tokens
+        // prepare vertices
         List<VariantGraph.Vertex> vert = copyIterable(against.vertices());
+        // remove start / end vertices
+        vert.remove(0);
+        vert.remove(vert.size()-1);
         VariantGraph.Vertex[] vertices = vert.toArray(new VariantGraph.Vertex[vert.size()]);
 
+        // prepare tokens
         List<Token> tok = copyIterable(witness);
         Token[] tokens = tok.toArray(new Token[tok.size()]);
 
@@ -152,9 +156,16 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     }
 
+    enum EditOperationEnum {
+        SKIP_TOKEN_GRAPH,
+        SKIP_TOKEN_WITNESS,
+        MATCH_TOKENS_OR_REPLACE
+    }
+
     class DecisionGraphNode {
         int startPosWitness1 = 0;
         int startPosWitness2 = 0;
+        EditOperationEnum editOperation;
 
         public DecisionGraphNode copy() {
             DecisionGraphNode copy = new DecisionGraphNode();
@@ -191,11 +202,13 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         private final VariantGraph.Vertex[] vertices;
         private final Token[] tokens;
         private int startRangeWitness2;
+        private Matcher matcher;
 
         public TwoDimensionalDecisionGraph(VariantGraph.Vertex[] vertices, Token[] tokens, int startRangeWitness2) {
             this.vertices = vertices;
             this.tokens = tokens;
             this.startRangeWitness2 = startRangeWitness2;
+            this.matcher = new SimpleMatcher();
         }
 
         @Override
@@ -216,6 +229,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             child2.startPosWitness2++;
             child3.startPosWitness1++;
             child3.startPosWitness2++;
+
+            child1.editOperation = EditOperationEnum.SKIP_TOKEN_GRAPH;
+            child2.editOperation = EditOperationEnum.SKIP_TOKEN_WITNESS;
+            child3.editOperation = EditOperationEnum.MATCH_TOKENS_OR_REPLACE;
 
             List<DecisionGraphNode> children = new ArrayList<>();
             children.add(child1);
@@ -245,15 +262,27 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             return new DecisionGraphNodeCost(potentialMatches);
         }
 
+        //NOTE: this scorer assigns positive costs
         @Override
         protected DecisionGraphNodeCost distBetween(DecisionGraphNode current, DecisionGraphNode neighbor) {
-            return null;
+            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
+                VariantGraph.Vertex v = vertices[current.startPosWitness1];
+                Token t = tokens[current.startPosWitness2];
+                Boolean match = matcher.match(v, t);
+                if (match) {
+                    return new DecisionGraphNodeCost(1);
+                }
+            }
+
+            return new DecisionGraphNodeCost(0);
         }
     }
 
 
+
+
     class Matcher {
-        Boolean match(Token a, Token b) {
+        Boolean match(VariantGraph.Vertex a, Token b) {
             return false;
         }
 
@@ -261,8 +290,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     class SimpleMatcher extends Matcher {
         @Override
-        Boolean match(Token a, Token b) {
-            SimpleToken sa = (SimpleToken) a;
+        Boolean match(VariantGraph.Vertex a, Token b) {
+            SimpleToken sa = (SimpleToken) a.tokens().iterator().next();
             SimpleToken sb = (SimpleToken) b;
             return sa.getNormalized().equals(sb.getNormalized());
         }

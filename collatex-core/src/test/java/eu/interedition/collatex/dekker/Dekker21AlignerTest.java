@@ -22,9 +22,10 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(depth, lcp_interval.depth());
     }
 
-    private void assertNode(int i, int j, DecisionGraphNode decisionGraphNode) {
+    private void assertNode(int i, int j, Dekker21Aligner.EditOperationEnum editOperation, DecisionGraphNode decisionGraphNode) {
         assertEquals(i, decisionGraphNode.startPosWitness1);
         assertEquals(j, decisionGraphNode.startPosWitness2);
+        assertEquals(editOperation, decisionGraphNode.editOperation);
     }
 
     @Test
@@ -70,9 +71,9 @@ public class Dekker21AlignerTest extends AbstractTest {
         Dekker21Aligner.TwoDimensionalDecisionGraph gr = aligner.getDecisionGraph();
 
         Iterator<DecisionGraphNode> neighbours = gr.neighborNodes(root).iterator();
-        assertNode(1,0, neighbours.next());
-        assertNode(0,1, neighbours.next());
-        assertNode(1,1, neighbours.next());
+        assertNode(1,0, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH, neighbours.next());
+        assertNode(0,1, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_WITNESS, neighbours.next());
+        assertNode(1,1, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, neighbours.next());
         assertFalse(neighbours.hasNext());
     }
 
@@ -94,6 +95,23 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(3, decisionGraph.heuristicCostEstimate(neighbours.next()).alignedTokens);
     }
 
+    @Test
+    public void testCaseDecisionGraphdistanceFunction() {
+        // 1: a, b, c, d, e
+        // 2: a, e, c, d
+        // 3: a, d, b
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph against = new VariantGraph();
+        aligner.collate(against, w);
+        DecisionGraphNode root = aligner.new DecisionGraphNode();
+        Dekker21Aligner.TwoDimensionalDecisionGraph decisionGraph = aligner.getDecisionGraph();
+
+        Iterator<DecisionGraphNode> neighbours = decisionGraph.neighborNodes(root).iterator();
+        assertEquals(0, decisionGraph.distBetween(root, neighbours.next()).alignedTokens);
+        assertEquals(0, decisionGraph.distBetween(root, neighbours.next()).alignedTokens);
+        assertEquals(1, decisionGraph.distBetween(root, neighbours.next()).alignedTokens);
+    }
 
 
 }
