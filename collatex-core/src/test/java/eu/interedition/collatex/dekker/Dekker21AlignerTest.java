@@ -1,19 +1,20 @@
 package eu.interedition.collatex.dekker;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.junit.Test;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.Dekker21Aligner.DecisionGraphNode;
 import eu.interedition.collatex.simple.SimpleWitness;
+
+import static eu.interedition.collatex.dekker.VariantGraphTraversalMatcher.non;
+import static org.junit.Assert.*;
 
 public class Dekker21AlignerTest extends AbstractTest {
 
@@ -161,6 +162,16 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertFalse(nodes.hasNext());
     }
 
+    @Test
+    public void testCaseVariantGraphOneWitness() {
+        // 1: a, b, c, d, e
+        final SimpleWitness[] w = createWitnesses("a b c d e");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph g = new VariantGraph();
+        aligner.collate(g, w);
+
+        assertThat(VariantGraphTraversal.of(g, Collections.singleton(w[0])), non("a ", "b ", "c ", "d ", "e"));
+    }
 
 
 }
