@@ -149,11 +149,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         // TODO: second dimension: all vertices of a certain rank
         // TODO: third dimension: witness tokens
 
-
         astar = new TwoDimensionalDecisionGraph(vertices, tokens, beginWitness2);
         //TODO: do the actual alignment
-
-
     }
 
     enum EditOperationEnum {
@@ -166,6 +163,15 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         int startPosWitness1 = 0;
         int startPosWitness2 = 0;
         EditOperationEnum editOperation;
+
+        public DecisionGraphNode() {
+            this(0,0);
+        }
+
+        public DecisionGraphNode(int x, int y) {
+            this.startPosWitness1 = x;
+            this.startPosWitness2 = y;
+        }
 
         public DecisionGraphNode copy() {
             DecisionGraphNode copy = new DecisionGraphNode();
@@ -189,7 +195,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         @Override
         public int compareTo(DecisionGraphNodeCost o) {
-            return alignedTokens - o.alignedTokens;
+            return o.alignedTokens - alignedTokens;
         }
      }
 
@@ -213,32 +219,34 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         @Override
         protected boolean isGoal(DecisionGraphNode node) {
-            boolean isGoal = node.startPosWitness1 == vertices.length && node.startPosWitness2 == tokens.length;
-            return isGoal;
+            return node.startPosWitness1 == vertices.length-1 && node.startPosWitness2 == tokens.length-1;
         }
 
         @Override
         protected Iterable<DecisionGraphNode> neighborNodes(DecisionGraphNode current) {
             // In a 2D approach there are 3 possibilities
-            //TODO: check not always all children can be created (check end graph or end witness)
-            DecisionGraphNode child1 = current.copy();
-            DecisionGraphNode child2 = current.copy();
-            DecisionGraphNode child3 = current.copy();
-
-            child1.startPosWitness1++;
-            child2.startPosWitness2++;
-            child3.startPosWitness1++;
-            child3.startPosWitness2++;
-
-            child1.editOperation = EditOperationEnum.SKIP_TOKEN_GRAPH;
-            child2.editOperation = EditOperationEnum.SKIP_TOKEN_WITNESS;
-            child3.editOperation = EditOperationEnum.MATCH_TOKENS_OR_REPLACE;
-
             List<DecisionGraphNode> children = new ArrayList<>();
-            children.add(child1);
-            children.add(child2);
-            children.add(child3);
-
+            boolean xEnd = current.startPosWitness1 == vertices.length-1;
+            boolean yEnd = current.startPosWitness2 == tokens.length-1;
+            if (!xEnd) {
+                DecisionGraphNode child1 = current.copy();
+                child1.startPosWitness1++;
+                child1.editOperation = EditOperationEnum.SKIP_TOKEN_GRAPH;
+                children.add(child1);
+            }
+            if (!yEnd) {
+                DecisionGraphNode child2 = current.copy();
+                child2.startPosWitness2++;
+                child2.editOperation = EditOperationEnum.SKIP_TOKEN_WITNESS;
+                children.add(child2);
+            }
+            if (!xEnd && !yEnd) {
+                DecisionGraphNode child3 = current.copy();
+                child3.startPosWitness1++;
+                child3.startPosWitness2++;
+                child3.editOperation = EditOperationEnum.MATCH_TOKENS_OR_REPLACE;
+                children.add(child3);
+            }
             return children;
         }
 
@@ -247,13 +255,13 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             int potentialMatchesGraph = 0;
             for (int i = node.startPosWitness1; i < vertices.length; i++) {
                 VariantGraph.Vertex v = vertices[i];
-                if (vertexToLCP.containsKey(v)) {
+                if (vertexToLCP.get(v)!=null) {
                     potentialMatchesGraph++;
                 }
             }
 
             int potentialMatchesWitness = 0;
-            for (int i = startRangeWitness2 + node.startPosWitness2; i <= startRangeWitness2+tokens.length; i++) {
+            for (int i = startRangeWitness2 + node.startPosWitness2; i < startRangeWitness2+tokens.length; i++) {
                 if (lcp_interval_array[i] != null) {
                     potentialMatchesWitness++;
                 }

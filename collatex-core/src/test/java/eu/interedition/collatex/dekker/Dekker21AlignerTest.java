@@ -2,6 +2,7 @@ package eu.interedition.collatex.dekker;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -26,6 +27,17 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(i, decisionGraphNode.startPosWitness1);
         assertEquals(j, decisionGraphNode.startPosWitness2);
         assertEquals(editOperation, decisionGraphNode.editOperation);
+    }
+
+    private void debugPath(Dekker21Aligner.TwoDimensionalDecisionGraph decisionGraph, List<DecisionGraphNode> decisionGraphNodes) {
+        for (DecisionGraphNode node : decisionGraphNodes) {
+            System.out.println(node.startPosWitness1 + ":" + node.startPosWitness2);
+            for (DecisionGraphNode neighbor : decisionGraph.neighborNodes(node)) {
+                Dekker21Aligner.DecisionGraphNodeCost decisionGraphNodeCost = decisionGraph.distBetween(node, neighbor);
+                Dekker21Aligner.DecisionGraphNodeCost heuristic = decisionGraph.heuristicCostEstimate(neighbor);
+                System.out.println(">> neighbor: "+neighbor.startPosWitness1+","+neighbor.startPosWitness2+":"+decisionGraphNodeCost.alignedTokens+":"+heuristic.alignedTokens);
+            }
+        }
     }
 
     @Test
@@ -58,11 +70,28 @@ public class Dekker21AlignerTest extends AbstractTest {
     }
 
     @Test
+    public void testCaseDecisionGraphIsGoalNode() {
+        // 1: a, b, c, d, e
+        // 2: a, e, c, d
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph against = new VariantGraph();
+        aligner.collate(against, w);
+        Dekker21Aligner.TwoDimensionalDecisionGraph gr = aligner.getDecisionGraph();
+
+        DecisionGraphNode root = aligner.new DecisionGraphNode();
+        DecisionGraphNode neighbor = aligner.new DecisionGraphNode(1, 1);
+        DecisionGraphNode goal = aligner.new DecisionGraphNode(4, 3);
+        assertFalse(gr.isGoal(root));
+        assertFalse(gr.isGoal(neighbor));
+        assertTrue(gr.isGoal(goal));
+    }
+
+    @Test
     public void testCaseDecisionGraphNeighbours() {
         // 1: a, b, c, d, e
         // 2: a, e, c, d
-        // 3: a, d, b
-        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
         Dekker21Aligner aligner = new Dekker21Aligner(w);
         VariantGraph against = new VariantGraph();
         aligner.collate(against, w);
@@ -81,8 +110,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     public void testCaseDecisionGraphHeuristicCostFunction() {
         // 1: a, b, c, d, e
         // 2: a, e, c, d
-        // 3: a, d, b
-        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
         Dekker21Aligner aligner = new Dekker21Aligner(w);
         VariantGraph against = new VariantGraph();
         aligner.collate(against, w);
@@ -90,7 +118,7 @@ public class Dekker21AlignerTest extends AbstractTest {
         Dekker21Aligner.TwoDimensionalDecisionGraph decisionGraph = aligner.getDecisionGraph();
 
         Iterator<DecisionGraphNode> neighbours = decisionGraph.neighborNodes(root).iterator();
-        assertEquals(4, decisionGraph.heuristicCostEstimate(neighbours.next()).alignedTokens);
+        assertEquals(3, decisionGraph.heuristicCostEstimate(neighbours.next()).alignedTokens);
         assertEquals(3, decisionGraph.heuristicCostEstimate(neighbours.next()).alignedTokens);
         assertEquals(3, decisionGraph.heuristicCostEstimate(neighbours.next()).alignedTokens);
     }
@@ -99,8 +127,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     public void testCaseDecisionGraphdistanceFunction() {
         // 1: a, b, c, d, e
         // 2: a, e, c, d
-        // 3: a, d, b
-        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
         Dekker21Aligner aligner = new Dekker21Aligner(w);
         VariantGraph against = new VariantGraph();
         aligner.collate(against, w);
@@ -112,6 +139,28 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(0, decisionGraph.distBetween(root, neighbours.next()).alignedTokens);
         assertEquals(1, decisionGraph.distBetween(root, neighbours.next()).alignedTokens);
     }
+
+    @Test
+    public void testCaseDecisionGraphPath() {
+        // 1: a, b, c, d, e
+        // 2: a, e, c, d
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph against = new VariantGraph();
+        aligner.collate(against, w);
+        DecisionGraphNode root = aligner.new DecisionGraphNode();
+        Dekker21Aligner.TwoDimensionalDecisionGraph decisionGraph = aligner.getDecisionGraph();
+
+        List<DecisionGraphNode> decisionGraphNodes = decisionGraph.aStar(aligner.new DecisionGraphNode(), aligner.new DecisionGraphNodeCost(0));
+        Iterator<DecisionGraphNode> nodes = decisionGraphNodes.iterator();
+        assertNode(0,0, null, nodes.next());
+        assertNode(1,1, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
+        assertNode(2,2, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
+        assertNode(3,3, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
+        assertNode(4,3, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH, nodes.next());
+        assertFalse(nodes.hasNext());
+    }
+
 
 
 }
