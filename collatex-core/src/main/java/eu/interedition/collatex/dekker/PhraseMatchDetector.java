@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -18,68 +18,59 @@
  */
 package eu.interedition.collatex.dekker;
 
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Sets;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.neo4j.Neo4jGraphRelationships;
-import eu.interedition.collatex.neo4j.Neo4jVariantGraphVertex;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
-import eu.interedition.collatex.Token;
-
 /**
- *
  * @author Ronald Haentjens Dekker
  * @author Bram Buitendijk
  */
 public class PhraseMatchDetector {
 
-  public List<List<Match>> detect(Map<Token, VariantGraph.Vertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
-    List<List<Match>> phraseMatches = Lists.newArrayList();
-    List<VariantGraph.Vertex> basePhrase = Lists.newArrayList();
-    List<Token> witnessPhrase = Lists.newArrayList();
-    VariantGraph.Vertex previous = base.getStart();
+    public List<List<Match>> detect(Map<Token, VariantGraph.Vertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
+        List<List<Match>> phraseMatches = new ArrayList<>();
+        List<VariantGraph.Vertex> basePhrase = new ArrayList<>();
+        List<Token> witnessPhrase = new ArrayList<>();
+        VariantGraph.Vertex previous = base.getStart();
 
-    for (Token token : tokens) {
-      if (!linkedTokens.containsKey(token)) {
-	addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
-        continue;
-      }
-      VariantGraph.Vertex baseVertex = linkedTokens.get(token);
-      // requirements:
-      // - previous and base vertex should have the same witnesses
-      // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions 
-      // - there should be a directed edge between previous and base vertex
-      // - there may not be a longer path between previous and base vertex
-      boolean sameTranspositions = Sets.newHashSet(previous.transpositions()).equals(Sets.newHashSet(baseVertex.transpositions()));
-      boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
-      boolean directedEdge = (base.edgeBetween(previous, baseVertex) != null);
-      boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (Iterables.size(previous.outgoing()) == 1 || Iterables.size(baseVertex.incoming()) == 1);
-      if (!isNear) {
-        addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
-      }
-      basePhrase.add(baseVertex);
-      witnessPhrase.add(token);
-      previous = baseVertex;
+        for (Token token : tokens) {
+            if (!linkedTokens.containsKey(token)) {
+                addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
+                continue;
+            }
+            VariantGraph.Vertex baseVertex = linkedTokens.get(token);
+            // requirements:
+            // - previous and base vertex should have the same witnesses
+            // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions
+            // - there should be a directed edge between previous and base vertex
+            // - there may not be a longer path between previous and base vertex
+            boolean sameTranspositions = new HashSet<>(previous.transpositions()).equals(new HashSet<>(baseVertex.transpositions()));
+            boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
+            boolean directedEdge = previous.outgoing().containsKey(baseVertex);
+            boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (previous.outgoing().size() == 1 || baseVertex.incoming().size() == 1);
+            if (!isNear) {
+                addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
+            }
+            basePhrase.add(baseVertex);
+            witnessPhrase.add(token);
+            previous = baseVertex;
+        }
+        if (!basePhrase.isEmpty()) {
+            phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
+        }
+        return phraseMatches;
     }
-    if (!basePhrase.isEmpty()) {
-      phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
-    }
-    return phraseMatches;
-  }
 
-  private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraph.Vertex> basePhrase, List<Token> witnessPhrase) {
-    if (!basePhrase.isEmpty()) {
-      phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
-      basePhrase.clear();
-      witnessPhrase.clear();
+    private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraph.Vertex> basePhrase, List<Token> witnessPhrase) {
+        if (!basePhrase.isEmpty()) {
+            phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
+            basePhrase.clear();
+            witnessPhrase.clear();
+        }
     }
-  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -25,13 +25,13 @@ import eu.interedition.collatex.matching.EqualityTokenComparator;
 import org.junit.Test;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class NeedlemanWunschTest extends AbstractTest {
 
-  @Test
-  public void simple() {
-    setCollationAlgorithm(CollationAlgorithmFactory.needlemanWunsch(new EqualityTokenComparator()));
-    LOG.fine(toString(table(collate("a b a b a", "a b a"))));
-  }
+    @Test
+    public void simple() {
+        setCollationAlgorithm(CollationAlgorithmFactory.needlemanWunsch(new EqualityTokenComparator()));
+        LOG.fine(toString(table(collate("a b a b a", "a b a"))));
+    }
 }

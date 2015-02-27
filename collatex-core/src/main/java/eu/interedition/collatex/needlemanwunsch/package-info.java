@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -18,10 +18,9 @@
  */
 
 /**
- * A version of the <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm" title="Wikipedia Article">Needleman-Wunsch</a>
- * algorithm.
- * <p/>
- * This algorithm strives for global alignment of witnesses and bases the alignment on a configurable scoring of matches vs. differences/gaps.
+ * A version of the Needleman-Wunsch algorithm.
+ *
+ * This <a href="http://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm">algorithm</a> strives for global alignment of witnesses and bases the alignment on a configurable scoring of matches vs. differences/gaps.
  * It does not try to detect transpositions.
  *
  * @see eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm

@@ -1,3 +1,11 @@
+Release 1.6
+- new aligorithm based on Greedy String Tiling
+- Java 8 now required
+- provide our own implementation of variant graphs
+- remove optional and seldomly used integrations with Neo4j and Apache Cocoon
+- turn collatex-core into a self-contained library, independent of other components
+- package collatex-tools as a self-contained, shaded JAR
+
 Release 1.5.1
 - Extended the normalization in the javascript alignment table rendering to not only trim
  whitespace but also lowercase the tokens.
@@ -8,7 +16,7 @@ Release 1.5
 - Feature: Punctuation is now treated as separate tokens by default in the web-service and command-line tool.
 - Transposition limiter is moved from the Transposition Detector class to the DekkerAlgorithm class.
 - The transposition detector is rewritten. It no longer works from left to right, but from largest
- moved distance to smallest moved distance. This improves the alignment result in case of longer witnesses. 
+ moved distance to smallest moved distance. This improves the alignment result in case of longer witnesses.
 - Improved handling of competing blocks of text in the IslandConflictResolver.
 - Fix: When splitting island in the IslandConflictResolver resulting islands were only
 kept if there were of size two and up. Now they are kept if they are of size one and up.

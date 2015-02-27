@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,15 +19,15 @@
 
 package eu.interedition.collatex.dekker;
 
-import java.util.Comparator;
-import java.util.Map;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+
+import java.util.Comparator;
+import java.util.Map;
 
 
 public interface TokenLinker {
 
-  Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator);
+    Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator);
 
 }

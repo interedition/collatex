@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -26,17 +26,17 @@ import static org.junit.Assert.assertEquals;
 
 public class SimpleWitnessTest extends AbstractTest {
 
-  @Test
-  public void normalize() {
-    assertNormalized("Hello", "hello");
-    assertNormalized("Now!", "now");
-    assertNormalized("later?", "later");
-    assertNormalized("#$@!?", "#$@!?");
-    assertNormalized("&", "&");
-  }
+    @Test
+    public void normalize() {
+        assertNormalized("Hello", "hello");
+        assertNormalized("Now!", "now");
+        assertNormalized("later?", "later");
+        assertNormalized("#$@!?", "#$@!?");
+        assertNormalized("&", "&");
+    }
 
-  private static void assertNormalized(String content, String expected) {
-    assertEquals(expected, SimpleWitness.TOKEN_NORMALIZER.apply(content));
-  }
+    private static void assertNormalized(String content, String expected) {
+        assertEquals(expected, SimpleWitness.TOKEN_NORMALIZER.apply(content));
+    }
 
 }

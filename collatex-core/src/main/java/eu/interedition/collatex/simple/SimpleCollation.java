@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -26,39 +26,35 @@ import java.util.List;
 
 public class SimpleCollation {
 
-  private final List<SimpleWitness> witnesses;
-  private final CollationAlgorithm algorithm;
-  private final boolean joined;
+    private final List<SimpleWitness> witnesses;
+    private final CollationAlgorithm algorithm;
+    private final boolean joined;
 
-  public SimpleCollation(List<SimpleWitness> witnesses, CollationAlgorithm algorithm, boolean joined) {
-    this.witnesses = witnesses;
-    this.algorithm = algorithm;
-    this.joined = joined;
-  }
-
-  public List<SimpleWitness> getWitnesses() {
-    return witnesses;
-  }
-
-  public CollationAlgorithm getAlgorithm() {
-    return algorithm;
-  }
-
-  public boolean isJoined() {
-    return joined;
-  }
-
-  public VariantGraph collate(VariantGraph graph) {
-    for (SimpleWitness witness : witnesses) {
-      if (witness.getTokens().isEmpty()) {
-        graph.register(witness);
-      } else {
-        algorithm.collate(graph, witness);
-      }
+    public SimpleCollation(List<SimpleWitness> witnesses, CollationAlgorithm algorithm, boolean joined) {
+        this.witnesses = witnesses;
+        this.algorithm = algorithm;
+        this.joined = joined;
     }
-    if (joined) {
-      VariantGraph.JOIN.apply(graph);
+
+    public List<SimpleWitness> getWitnesses() {
+        return witnesses;
     }
-    return graph;
-  }
+
+    public CollationAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public boolean isJoined() {
+        return joined;
+    }
+
+    public VariantGraph collate(VariantGraph graph) {
+        for (SimpleWitness witness : witnesses) {
+            algorithm.collate(graph, witness);
+        }
+        if (joined) {
+            VariantGraph.JOIN.apply(graph);
+        }
+        return graph;
+    }
 }

@@ -9,43 +9,34 @@ package eu.interedition.collatex.suffixarray;
  * @author Michał Nowak (Carrot Search)
  * @author Dawid Weiss (Carrot Search)
  */
-public final class DensePositiveDecorator implements ISuffixArrayBuilder
-{
+public final class DensePositiveDecorator implements ISuffixArrayBuilder {
     private final ISuffixArrayBuilder delegate;
 
     /*
-     * 
+     *
      */
-    public DensePositiveDecorator(ISuffixArrayBuilder delegate)
-    {
+    public DensePositiveDecorator(ISuffixArrayBuilder delegate) {
         this.delegate = delegate;
     }
 
     /*
-     * 
+     *
      */
     @Override
-    public int [] buildSuffixArray(int [] input, final int start, final int length)
-    {
+    public int[] buildSuffixArray(int[] input, final int start, final int length) {
         final MinMax minmax = Tools.minmax(input, start, length);
 
         final ISymbolMapper mapper;
-        if (minmax.range() > 0x10000)
-        {
+        if (minmax.range() > 0x10000) {
             throw new RuntimeException("Large symbol space not implemented yet.");
-        }
-        else
-        {
+        } else {
             mapper = new DensePositiveMapper(input, start, length);
         }
 
         mapper.map(input, start, length);
-        try
-        {
+        try {
             return delegate.buildSuffixArray(input, start, length);
-        }
-        finally
-        {
+        } finally {
             mapper.undo(input, start, length);
         }
     }

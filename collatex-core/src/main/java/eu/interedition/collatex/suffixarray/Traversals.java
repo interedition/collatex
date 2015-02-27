@@ -10,20 +10,18 @@ import java.util.Deque;
  * @author Michał Nowak (Carrot Search)
  * @author Dawid Weiss (Carrot Search)
  */
-public final class Traversals
-{
+public final class Traversals {
     /**
      * Visitor interface for post-order traversal methods in {@link Traversals}.
      */
-    public interface IPostOrderVisitor
-    {
+    public interface IPostOrderVisitor {
         /**
          * Visits a node in the (virtual) suffix tree, labeled with <code>length</code>
          * objects starting at <code>start</code> in the input sequence.
-         * 
-         * @param start The node label's starting offset in the input sequence.
+         *
+         * @param start  The node label's starting offset in the input sequence.
          * @param length The node label's length (number of symbols).
-         * @param leaf <code>true</code> if this node is a leaf.
+         * @param leaf   <code>true</code> if this node is a leaf.
          */
         public void visitNode(int start, int length, boolean leaf);
     }
@@ -32,8 +30,7 @@ public final class Traversals
      * Visitor interface for post-order traversal methods that compute an aggregated value
      * during the traversal.
      */
-    public interface IPostOrderComputingVisitor<E>
-    {
+    public interface IPostOrderComputingVisitor<E> {
         /**
          * Aggregate two values into the result. The aggregation function should be
          * symmetric, that is: <code>value1 + value2 = value2 + value1</code>.
@@ -42,10 +39,10 @@ public final class Traversals
 
         /**
          * Compute the initial value for a leaf node.
-         * 
-         * @param saIndex Index of the leaf node in the suffix array.
+         *
+         * @param saIndex     Index of the leaf node in the suffix array.
          * @param symbolIndex The node label's starting offset in the input sequence.
-         * @param length The node label's length (number of symbols).
+         * @param length      The node label's length (number of symbols).
          * @return Returns the initial function value for the leaf node.
          */
         public E leafValue(int saIndex, int symbolIndex, int length);
@@ -53,11 +50,11 @@ public final class Traversals
         /**
          * Visits a node in the (virtual) suffix tree, labeled with <code>length</code>
          * objects starting at <code>start</code> in the input sequence.
-         * 
-         * @param start The node label's starting offset in the input sequence.
+         *
+         * @param start  The node label's starting offset in the input sequence.
          * @param length The node label's length (number of symbols).
-         * @param leaf <code>true</code> if this node is a leaf.
-         * @param value Aggregated value for all sub-nodes of the given node.
+         * @param leaf   <code>true</code> if this node is a leaf.
+         * @param value  Aggregated value for all sub-nodes of the given node.
          */
         public void visitNode(int start, int length, boolean leaf, E value);
     }
@@ -72,15 +69,14 @@ public final class Traversals
      * The algorithm implemented here is from <i>Efficient Substring Traversal with Suffix
      * Arrays</i> by Toru Kasai, Hiroki Arimura and Setsuo Arikawa, Dept of Informatics,
      * Kyushu University, Japan.
-     * 
+     *
      * @param sequenceLength Input sequence length for the suffix array and LCP array.
-     * @param sa Suffix array.
-     * @param lcp Corresponding LCP array for a given suffix array.
-     * @param visitor Callback visitor.
+     * @param sa             Suffix array.
+     * @param lcp            Corresponding LCP array for a given suffix array.
+     * @param visitor        Callback visitor.
      */
-    public static void postorder(final int sequenceLength, int [] sa, int [] lcp,
-        IPostOrderVisitor visitor)
-    {
+    public static void postorder(final int sequenceLength, int[] sa, int[] lcp,
+                                 IPostOrderVisitor visitor) {
         assert sequenceLength <= sa.length && sequenceLength <= lcp.length : "Input sequence length larger than suffix array or the LCP.";
 
         final Deque<Integer> stack = new ArrayDeque<Integer>();
@@ -91,12 +87,10 @@ public final class Traversals
 
         // Process every leaf.
         int top_h;
-        for (int i = 0; i <= sequenceLength; i++)
-        {
+        for (int i = 0; i <= sequenceLength; i++) {
             final int h = (sequenceLength == i ? -1 : lcp[i]);
 
-            while (true)
-            {
+            while (true) {
                 top_h = stack.peek();
                 if (top_h <= h) break;
                 stack.pop();
@@ -108,14 +102,12 @@ public final class Traversals
                 visitor.visitNode(sa[leaf ? -(top_i + 1) : top_i], top_h, leaf);
             }
 
-            if (top_h < h)
-            {
+            if (top_h < h) {
                 stack.push(i);
                 stack.push(h);
             }
 
-            if (i < sequenceLength)
-            {
+            if (i < sequenceLength) {
                 // Mark leaf nodes in the stack.
                 stack.push(-(i + 1));
                 stack.push(sequenceLength - sa[i]);
@@ -133,17 +125,16 @@ public final class Traversals
      * The algorithm implemented here is from <i>Efficient Substring Traversal with Suffix
      * Arrays</i> by Toru Kasai, Hiroki Arimura and Setsuo Arikawa, Dept of Informatics,
      * Kyushu University, Japan.
-     * 
+     *
      * @param sequenceLength Input sequence length for the suffix array and LCP array.
-     * @param sa Suffix array.
-     * @param lcp Corresponding LCP array for a given suffix array.
-     * @param visitor Callback visitor computing aggregate values when traversing the
-     *            tree.
-     * @param epsilon "Zero" value (epsilon) for computations.
+     * @param sa             Suffix array.
+     * @param lcp            Corresponding LCP array for a given suffix array.
+     * @param visitor        Callback visitor computing aggregate values when traversing the
+     *                       tree.
+     * @param epsilon        "Zero" value (epsilon) for computations.
      */
-    public static <E> void postorder(final int sequenceLength, int [] sa, int [] lcp,
-        E epsilon, IPostOrderComputingVisitor<E> visitor)
-    {
+    public static <E> void postorder(final int sequenceLength, int[] sa, int[] lcp,
+                                     E epsilon, IPostOrderComputingVisitor<E> visitor) {
         assert sequenceLength <= sa.length && sequenceLength <= lcp.length : "Input sequence length larger than suffix array or the LCP.";
 
         final Deque<Integer> stack = new ArrayDeque<Integer>();
@@ -157,13 +148,11 @@ public final class Traversals
         // Process every leaf.
         int top_h;
         E top_c;
-        for (int i = 0; i <= sequenceLength; i++)
-        {
+        for (int i = 0; i <= sequenceLength; i++) {
             final int h = (sequenceLength == i ? -1 : lcp[i]);
             E ci = epsilon;
 
-            while (true)
-            {
+            while (true) {
                 top_h = stack.peek();
                 if (top_h <= h) break;
                 stack.pop();
@@ -179,21 +168,17 @@ public final class Traversals
                 top_c = values.get(values.size() - 1);
             }
 
-            if (top_h < h)
-            {
+            if (top_h < h) {
                 stack.push(i);
                 stack.push(h);
                 values.add(ci);
-            }
-            else
-            {
+            } else {
                 assert top_h == h;
                 final int index = values.size() - 1;
                 values.set(index, visitor.aggregate(ci, values.get(index)));
             }
 
-            if (i < sequenceLength)
-            {
+            if (i < sequenceLength) {
                 // Mark leaf nodes in the stack.
                 stack.push(-(i + 1));
                 stack.push(sequenceLength - sa[i]);

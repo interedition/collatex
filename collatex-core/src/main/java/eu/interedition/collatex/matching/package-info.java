@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,7 +19,7 @@
 
 /**
  * {@link java.util.Comparator Comparators} for matching tokens.
- * <p/>
+ *
  * Implementation base the equality of tokens on strict or on approximate equality of their respective textual contents.
  *
  * @see eu.interedition.collatex.matching.StrictEqualityTokenComparator

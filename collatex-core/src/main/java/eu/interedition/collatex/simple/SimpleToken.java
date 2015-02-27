@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,65 +19,63 @@
 
 package eu.interedition.collatex.simple;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.util.VertexMatch;
 
-import javax.annotation.Nullable;
 import java.util.SortedSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
-  private final SimpleWitness witness;
-  private final String content;
-  private final String normalized;
+    private final SimpleWitness witness;
+    private final String content;
+    private final String normalized;
 
-  public SimpleToken(SimpleWitness witness, String content, String normalized) {
-    this.witness = witness;
-    this.content = content;
-    this.normalized = normalized;
-  }
-
-  public String getContent() {
-    return content;
-  }
-
-  @Override
-  public Witness getWitness() {
-    return witness;
-  }
-
-  public String getNormalized() {
-    return normalized;
-  }
-
-  @Override
-  public String toString() {
-    return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
-  }
-
-  public static String toString(Iterable<? extends Token> tokens) {
-    final StringBuilder normalized = new StringBuilder();
-    for (SimpleToken token : Iterables.filter(tokens, SimpleToken.class)) {
-      normalized.append(token.getContent());
+    public SimpleToken(SimpleWitness witness, String content, String normalized) {
+        this.witness = witness;
+        this.content = content;
+        this.normalized = normalized;
     }
-    return normalized.toString().trim();
-  }
 
-  @Override
-  public int compareTo(SimpleToken o) {
-    return witness.compare(this, o);
-  }
+    public String getContent() {
+        return content;
+    }
 
-  public static final Function<SortedSet<VertexMatch.WithToken>, Integer> TOKEN_MATCH_EVALUATOR = new Function<SortedSet<VertexMatch.WithToken>, Integer>() {
     @Override
-    public Integer apply(@Nullable SortedSet<VertexMatch.WithToken> input) {
-      int value = 0;
-      for (VertexMatch.WithToken match : input) {
-        value += ((SimpleToken) match.token).getContent().length();
-      }
-      return value;
+    public Witness getWitness() {
+        return witness;
     }
-  };
+
+    public String getNormalized() {
+        return normalized;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
+    }
+
+    public static String toString(Iterable<? extends Token> tokens) {
+        return StreamSupport.stream(tokens.spliterator(), false)
+            .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
+            .map(t -> (SimpleToken) t)
+            .map(SimpleToken::getContent)
+            .collect(Collectors.joining())
+            .trim();
+    }
+
+    @Override
+    public int compareTo(SimpleToken o) {
+        return witness.compare(this, o);
+    }
+
+    public static final Function<SortedSet<VertexMatch.WithToken>, Integer> TOKEN_MATCH_EVALUATOR = input -> {
+        int value = 0;
+        for (VertexMatch.WithToken match : input) {
+            value += ((SimpleToken) match.token).getContent().length();
+        }
+        return value;
+    };
 }

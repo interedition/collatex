@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -26,20 +26,20 @@ import java.util.Comparator;
 
 public class EditDistanceTokenComparator implements Comparator<Token> {
 
-  private final int threshold;
+    private final int threshold;
 
-  public EditDistanceTokenComparator() {
-    this(1);
-  }
+    public EditDistanceTokenComparator() {
+        this(1);
+    }
 
-  public EditDistanceTokenComparator(int threshold) {
-    this.threshold = threshold;
-  }
+    public EditDistanceTokenComparator(int threshold) {
+        this.threshold = threshold;
+    }
 
-  @Override
-  public int compare(Token base, Token witness) {
-    final String baseContent = ((SimpleToken) base).getNormalized();
-    final String witnessContent = ((SimpleToken) witness).getNormalized();
-    return (EditDistance.compute(baseContent, witnessContent) <= threshold) ? 0 : -1;
-  }
+    @Override
+    public int compare(Token base, Token witness) {
+        final String baseContent = ((SimpleToken) base).getNormalized();
+        final String witnessContent = ((SimpleToken) witness).getNormalized();
+        return (EditDistance.compute(baseContent, witnessContent) <= threshold) ? 0 : -1;
+    }
 }

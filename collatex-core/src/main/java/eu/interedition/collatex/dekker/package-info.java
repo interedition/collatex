@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,7 +19,7 @@
 
 /**
  * Dekker's implementation of a collation algorithm.
- * <p/>
+ *
  * Supports progressive alignment of multiple witnesses including heuristic detection of transpositions.
  *
  * @see eu.interedition.collatex.dekker.DekkerAlgorithm

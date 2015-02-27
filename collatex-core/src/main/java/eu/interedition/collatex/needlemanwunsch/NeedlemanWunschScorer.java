@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -20,11 +20,11 @@
 package eu.interedition.collatex.needlemanwunsch;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public interface NeedlemanWunschScorer<A, B> {
 
-  float score(A a, B b);
+    float score(A a, B b);
 
-  float gap();
+    float gap();
 }

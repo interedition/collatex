@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -24,19 +24,19 @@ package eu.interedition.collatex.lab;
  */
 public class MatchTableCell {
 
-  private final MatchMatrixCellStatus status;
-  private final String text;
-  
-  public MatchTableCell(MatchMatrixCellStatus status, String text) {
-    this.status = status;
-    this.text = text;
-  }
+    private final MatchMatrixCellStatus status;
+    private final String text;
 
-  public MatchMatrixCellStatus getStatus() {
-    return status;
-  }
+    public MatchTableCell(MatchMatrixCellStatus status, String text) {
+        this.status = status;
+        this.text = text;
+    }
 
-  public String getText() {
-    return text;
-  }
+    public MatchMatrixCellStatus getStatus() {
+        return status;
+    }
+
+    public String getText() {
+        return text;
+    }
 }

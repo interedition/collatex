@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,7 +19,7 @@
 
 /**
  * Implementation of a collation algorithm inspired by the work of Jean-Gabriel Ganascia and Julien Bourdaillet
- * on <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project" title="MEDITE project">MEDITE</a>.
+ * on <a href="http://www-poleia.lip6.fr/~ganascia/Medite_Project">MEDITE</a>.
  *
  * @see eu.interedition.collatex.medite.MediteAlgorithm
  *

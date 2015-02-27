@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,110 +19,90 @@
 
 package eu.interedition.collatex.util;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
-import javax.annotation.Nullable;
+import java.util.BitSet;
 import java.util.Comparator;
 import java.util.SortedSet;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
-* @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-*/
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+ */
 public abstract class VertexMatch implements Comparable<VertexMatch> {
-  public final VariantGraph.Vertex vertex;
-  public final int vertexRank;
+    public final VariantGraph.Vertex vertex;
+    public final int vertexRank;
 
-  VertexMatch(VariantGraph.Vertex vertex, int vertexRank) {
-    this.vertex = vertex;
-    this.vertexRank = vertexRank;
-  }
-
-  @Override
-  public int compareTo(VertexMatch o) {
-    return (vertexRank - o.vertexRank);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof VertexMatch) {
-      return vertexRank == ((VertexMatch)obj).vertexRank;
-    }
-    return super.equals(obj);
-  }
-
-  @Override
-  public int hashCode() {
-    return vertexRank;
-  }
-
-  public static <T extends VertexMatch> Comparator<SortedSet<T>> setComparator() {
-    return new Comparator<SortedSet<T>>() {
-      @Override
-      public int compare(SortedSet<T> o1, SortedSet<T> o2) {
-        return o1.first().compareTo(o2.first());
-      }
-    };
-  }
-
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
-  public static class WithToken extends VertexMatch {
-
-    public final Token token;
-
-    public WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
-      super(vertex, vertexRank);
-      this.token = token;
+    VertexMatch(VariantGraph.Vertex vertex, int vertexRank) {
+        this.vertex = vertex;
+        this.vertexRank = vertexRank;
     }
 
     @Override
-    public String toString() {
-      return "{" + vertex + " -> " + token + "}";
-    }
-  }
-
-  /**
-   * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-   */
-  public static class WithTokenIndex extends VertexMatch {
-
-    public final int token;
-
-    public WithTokenIndex(VariantGraph.Vertex vertex, int vertexRank, int token) {
-      super(vertex, vertexRank);
-      this.token = token;
+    public int compareTo(VertexMatch o) {
+        return (vertexRank - o.vertexRank);
     }
 
     @Override
-    public String toString() {
-      return "{" + vertex + " -> " + token + "}";
-    }
-  }
-
-  public static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
-    return new Function<WithTokenIndex, WithToken>() {
-      @Override
-      public WithToken apply(@Nullable WithTokenIndex input) {
-        return new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
-      }
-    };
-  }
-
-  public static final Predicate<SortedSet<WithTokenIndex>> filter(final IntegerRangeSet rankFilter, final IntegerRangeSet tokenFilter) {
-    return new Predicate<SortedSet<WithTokenIndex>>() {
-      @Override
-      public boolean apply(@Nullable SortedSet<WithTokenIndex> input) {
-        for (WithTokenIndex match : input) {
-          if (tokenFilter.apply(match.token) || rankFilter.apply(match.vertexRank)) {
-            return true;
-          }
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof VertexMatch) {
+            return vertexRank == ((VertexMatch) obj).vertexRank;
         }
-        return false;
-      }
-    };
-  }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return vertexRank;
+    }
+
+    public static <T extends VertexMatch> Comparator<SortedSet<T>> setComparator() {
+        return (o1, o2) -> o1.first().compareTo(o2.first());
+    }
+
+    /**
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+     */
+    public static class WithToken extends VertexMatch {
+
+        public final Token token;
+
+        public WithToken(VariantGraph.Vertex vertex, int vertexRank, Token token) {
+            super(vertex, vertexRank);
+            this.token = token;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + vertex + " -> " + token + "}";
+        }
+    }
+
+    /**
+     * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+     */
+    public static class WithTokenIndex extends VertexMatch {
+
+        public final int token;
+
+        public WithTokenIndex(VariantGraph.Vertex vertex, int vertexRank, int token) {
+            super(vertex, vertexRank);
+            this.token = token;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + vertex + " -> " + token + "}";
+        }
+    }
+
+    public static Function<WithTokenIndex, WithToken> tokenResolver(final Token[] tokens) {
+        return input -> new WithToken(input.vertex, input.vertexRank, tokens[input.token]);
+    }
+
+    public static Predicate<SortedSet<WithTokenIndex>> filter(final BitSet rankFilter, final BitSet tokenFilter) {
+        return input -> input.stream().anyMatch(match -> tokenFilter.get(match.token) || rankFilter.get(match.vertexRank));
+    }
 }

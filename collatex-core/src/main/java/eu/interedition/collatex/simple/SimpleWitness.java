@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,90 +19,86 @@
 
 package eu.interedition.collatex.simple;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SimpleWitness implements Iterable<Token>, Witness, Comparator<SimpleToken> {
 
-  private final String sigil;
-  private final List<Token> tokens = new ArrayList<Token>();
+    private final String sigil;
+    private final List<Token> tokens = new ArrayList<>();
 
-  public SimpleWitness(String sigil) {
-    this.sigil = sigil;
-  }
-
-  public SimpleWitness(String sigil, String content) {
-    this(sigil, content, SimplePatternTokenizer.BY_WS_OR_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS);
-  }
-
-  public SimpleWitness(String sigil,
-                       String content,
-                       Function<String, Iterable<String>> tokenizer,
-                       Function<String, String> normalizer) {
-    this(sigil);
-    setTokenContents(tokenizer.apply(content), normalizer);
-  }
-
-  public List<Token> getTokens() {
-    return tokens;
-  }
-
-  public void setTokenContents(Iterable<String> tokenContents, Function<String, String> normalizer) {
-    final List<Token> tokens = Lists.newArrayListWithExpectedSize(Iterables.size(tokenContents));
-    for (String content : tokenContents) {
-      tokens.add(new SimpleToken(this, content, normalizer.apply(content)));
+    public SimpleWitness(String sigil) {
+        this.sigil = sigil;
     }
-    setTokens(tokens);
-  }
 
-  public void setTokens(List<Token> tokens) {
-    this.tokens.clear();
-    this.tokens.addAll(tokens);
-  }
+    public SimpleWitness(String sigil, String content) {
+        this(sigil, content, SimplePatternTokenizer.BY_WS_OR_PUNCT, SimpleTokenNormalizers.LC_TRIM_WS);
+    }
 
-  @Override
-  public String getSigil() {
-    return sigil;
-  }
+    public SimpleWitness(String sigil,
+                         String content,
+                         Function<String, Stream<String>> tokenizer,
+                         Function<String, String> normalizer) {
+        this(sigil);
+        setTokenContents(tokenizer.apply(content), normalizer);
+    }
 
-  @Override
-  public Iterator<Token> iterator() {
-    return Iterators.unmodifiableIterator(tokens.iterator());
-  }
+    public List<Token> getTokens() {
+        return tokens;
+    }
 
-  @Override
-  public String toString() {
-    return getSigil();
-  }
+    public void setTokenContents(Stream<String> tokenContents, Function<String, String> normalizer) {
+        setTokens(tokenContents.map(content -> new SimpleToken(SimpleWitness.this, content, normalizer.apply(content))).collect(Collectors.toList()));
+    }
 
-  @Override
-  public int compare(SimpleToken o1, SimpleToken o2) {
-    final int o1Index = tokens.indexOf(o1);
-    final int o2Index = tokens.indexOf(o2);
-    Preconditions.checkArgument(o1Index >= 0, o1);
-    Preconditions.checkArgument(o2Index >= 0, o2);
-    return (o1Index - o2Index);
-  }
+    public void setTokens(List<Token> tokens) {
+        this.tokens.clear();
+        this.tokens.addAll(tokens);
+    }
 
-  public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
-
-  public static final Function<String, String> TOKEN_NORMALIZER = new Function<String, String>() {
     @Override
-    public String apply(String input) {
-      final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
-      return (normalized == null || normalized.length() == 0 ? input : normalized);
+    public String getSigil() {
+        return sigil;
     }
-  };
+
+    @Override
+    public Iterator<Token> iterator() {
+        return Collections.unmodifiableList(tokens).iterator();
+    }
+
+    @Override
+    public String toString() {
+        return getSigil();
+    }
+
+    @Override
+    public int compare(SimpleToken o1, SimpleToken o2) {
+        final int o1Index = tokens.indexOf(o1);
+        final int o2Index = tokens.indexOf(o2);
+        if (o1Index < 0) {
+            throw new IllegalArgumentException(o1.toString());
+        }
+        if (o2Index < 0) {
+            throw new IllegalArgumentException();
+        }
+        return (o1Index - o2Index);
+    }
+
+    public static final Pattern PUNCT = Pattern.compile("\\p{Punct}");
+
+    public static final Function<String, String> TOKEN_NORMALIZER = input -> {
+        final String normalized = PUNCT.matcher(input.trim().toLowerCase()).replaceAll("");
+        return (normalized == null || normalized.length() == 0 ? input : normalized);
+    };
 
 }

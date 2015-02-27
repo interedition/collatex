@@ -1,0 +1,16 @@
+compile:
+  - jade
+  - browserify
+  - less
+
+deploy:
+  - clean
+  - compile
+  - uglify
+  - cssmin
+
+default:
+  - clean
+  - compile
+  - connect
+  - watch

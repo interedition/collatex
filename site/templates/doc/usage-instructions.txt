@@ -1,0 +1,37 @@
+usage: collatex [&lt;options>]
+                (&lt;json_input> | &lt;witness_1> &lt;witness_2> [[&lt;witness_3>] ...])
+  -a,--algorithm &lt;arg>                    progressive alignment algorithm to
+                                          use 'dekker' (default), 'medite',
+                                          'needleman-wunsch'
+  -cp,--context-path &lt;arg>                URL base/context path of the
+                                          service, default: '/'
+  -dot,--dot-path &lt;arg>                   path to Graphviz 'dot',
+                                          auto-detected by default
+  -f,--format &lt;arg>                       result/output format: 'json', 'csv',
+                                          'dot', 'graphml', 'tei'
+  -h,--help                               print usage instructions
+  -ie,--input-encoding &lt;arg>              charset to use for decoding non-XML
+                                          witnesses; default: UTF-8
+  -mcs,--max-collation-size &lt;arg>         maximum number of characters
+                                          (counted over all witnesses) to
+                                          perform collations on, default:
+                                          unlimited
+  -mpc,--max-parallel-collations &lt;arg>    maximum number of collations to
+                                          perform in parallel, default: 2
+  -o,--output &lt;arg>                       output file; '-' for standard output
+                                          (default)
+  -oe,--output-encoding &lt;arg>             charset to use for encoding the
+                                          output; default: UTF-8
+  -p,--port &lt;arg>                         HTTP port to bind server to,
+                                          default: 7369
+  -s,--script &lt;arg>                       ECMA/JavaScript resource with
+                                          functions to be plugged into the
+                                          alignment algorithm
+  -S,--http                               start RESTful HTTP server
+  -t,--tokenized                          consecutive matches of tokens will
+                                          *not* be joined to segments
+  -xml,--xml-mode                         witnesses are treated as XML
+                                          documents
+  -xp,--xpath &lt;arg>                       XPath 1.0 expression evaluating to
+                                          tokens of XML witnesses; default:
+                                          '//text()'

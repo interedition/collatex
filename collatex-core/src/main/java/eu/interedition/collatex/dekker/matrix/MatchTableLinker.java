@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,51 +19,48 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.google.common.collect.Maps;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.TokenLinker;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class MatchTableLinker implements TokenLinker {
-	static Logger LOG = Logger.getLogger(MatchTableLinker.class.getName());
-  private final int outlierTranspositionsSizeLimit;
+    static Logger LOG = Logger.getLogger(MatchTableLinker.class.getName());
 
-  public MatchTableLinker(int outlierTranspositionsSizeLimit) {
-    super();
-    this.outlierTranspositionsSizeLimit = outlierTranspositionsSizeLimit;
-  }
+    public MatchTableLinker() {
+        super();
+    }
 
-  @Override
-  public Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
-    // create MatchTable and fill it with matches
-    LOG.fine("create MatchTable and fill it with matches");
-    MatchTable table = MatchTable.create(base, witness, comparator);
+    @Override
+    public Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
+        // create MatchTable and fill it with matches
+        LOG.fine("create MatchTable and fill it with matches");
+        MatchTable table = MatchTable.create(base, witness, comparator);
 
-    // create IslandConflictResolver
-    LOG.fine("create island conflict resolver");
-	  IslandConflictResolver resolver = new IslandConflictResolver(table, outlierTranspositionsSizeLimit);
-	
-	  // The IslandConflictResolver createNonConflictingVersion() method
-	  // selects the optimal islands
-	  LOG.fine("select the optimal islands");
-	  MatchTableSelection preferredIslands = resolver.createNonConflictingVersion();
-	  if (LOG.isLoggable(Level.FINE)) {
-	    LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
-	  }
-	
-	  // Here the result is put in a map
-	  Map<Token, VariantGraph.Vertex> map = Maps.newHashMap();
-	  for (Island island : preferredIslands.getIslands()) {
-	    for (Coordinate c : island) {
-	      map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
-	    }
-	  }
-	  return map;
-  }
+        // create IslandConflictResolver
+        LOG.fine("create island conflict resolver");
+        IslandConflictResolver resolver = new IslandConflictResolver(table);
+
+        // The IslandConflictResolver createNonConflictingVersion() method
+        // selects the optimal islands
+        LOG.fine("select the optimal islands");
+        MatchTableSelection preferredIslands = resolver.createNonConflictingVersion();
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
+        }
+
+        // Here the result is put in a map
+        Map<Token, VariantGraph.Vertex> map = new HashMap<>();
+        for (Island island : preferredIslands.getIslands()) {
+            for (Coordinate c : island) {
+                map.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
+            }
+        }
+        return map;
+    }
 }

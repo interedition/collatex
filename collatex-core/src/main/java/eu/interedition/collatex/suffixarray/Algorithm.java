@@ -7,49 +7,61 @@ package eu.interedition.collatex.suffixarray;
  * @author Michał Nowak (Carrot Search)
  * @author Dawid Weiss (Carrot Search)
  */
-public enum Algorithm
-{
-    /** Karkkainen-Sanders. */
+public enum Algorithm {
+    /**
+     * Karkkainen-Sanders.
+     */
     SKEW("Kärkkäinen-Sanders"),
 
-    /** Karkkainen-Sanders, with decorators allowing arbitrary input. */
+    /**
+     * Karkkainen-Sanders, with decorators allowing arbitrary input.
+     */
     SKEW_D("Kärkkäinen-Sanders (decorated for arbitrary input symbols)"),
 
-    /** Yuta Mori's divsufsort algorithm. */
+    /**
+     * Yuta Mori's divsufsort algorithm.
+     */
     DIVSUFSORT("Mori's algorithm"),
 
-    /** Yuta Mori's implementation of SA-IS. */
+    /**
+     * Yuta Mori's implementation of SA-IS.
+     */
     SAIS("SA-IS algorithm"),
 
-    /** Klaus-Bernd Schürmann's bucket pointer refinement algorithm */
+    /**
+     * Klaus-Bernd Schürmann's bucket pointer refinement algorithm
+     */
     BPR("Klaus-Bernd Schürmann's bpr algorithm"),
 
-    /** Deep-Shallow algorithm by Manzini and Ferragina. */
+    /**
+     * Deep-Shallow algorithm by Manzini and Ferragina.
+     */
     DEEP_SHALLOW("Manzini-Ferragina"),
 
-    /** "Larrson-Sadakane qsufsort algorithm */
+    /**
+     * "Larrson-Sadakane qsufsort algorithm
+     */
     QSUFSORT("Larrson-Sadakane qsufsort algorithm");
 
-    /** Full name of the algorithm. */
+    /**
+     * Full name of the algorithm.
+     */
     private final String name;
 
     /*
-     * 
+     *
      */
-    private Algorithm(String name)
-    {
+    private Algorithm(String name) {
         this.name = name;
     }
 
     /**
      * @return Same as {@link #getInstance()}, but returns the algorithm instance
-     *         decorated to work with any range or distribution of input symbols
-     *         (respecting each algorithm's constraints).
+     * decorated to work with any range or distribution of input symbols
+     * (respecting each algorithm's constraints).
      */
-    public ISuffixArrayBuilder getDecoratedInstance()
-    {
-        switch (this)
-        {
+    public ISuffixArrayBuilder getDecoratedInstance() {
+        switch (this) {
             case SKEW:
                 return new DensePositiveDecorator(new ExtraTrailingCellsDecorator(
                     getInstance(), SuffixArrays.MAX_EXTRA_TRAILING_SPACE));
@@ -62,10 +74,8 @@ public enum Algorithm
     /**
      * @return Create and return an algorithm instance.
      */
-    public ISuffixArrayBuilder getInstance()
-    {
-        switch (this)
-        {
+    public ISuffixArrayBuilder getInstance() {
+        switch (this) {
             case SKEW:
                 return new Skew();
 
@@ -94,13 +104,11 @@ public enum Algorithm
      * instance will overwrite input.</b>
      * <p>
      * If not, create default instance
-     * 
+     *
      * @return Create and return low memory consuming instance.
      */
-    public ISuffixArrayBuilder getMemoryConservingInstance()
-    {
-        switch (this)
-        {
+    public ISuffixArrayBuilder getMemoryConservingInstance() {
+        switch (this) {
             case QSUFSORT:
                 return new QSufSort(false);
             case BPR:
@@ -115,8 +123,7 @@ public enum Algorithm
     /**
      * Return the full name of the algorithm.
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,152 +19,112 @@
 
 package eu.interedition.collatex.util;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-
-import javax.annotation.Nullable;
-
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.RowSortedTable;
-import com.google.common.collect.Sets;
-import com.google.common.collect.SortedSetMultimap;
-import com.google.common.collect.TreeBasedTable;
-import com.google.common.collect.TreeMultimap;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.Witness;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  * @author Ronald Haentjens Dekker
  */
-public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<VariantGraph.Vertex,Integer>, Comparator<VariantGraph.Vertex> {
+public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, Function<Vertex, Integer> {
 
-  private final Map<VariantGraph.Vertex, Integer> byVertex = Maps.newHashMap();
-  private final SortedSetMultimap<Integer, VariantGraph.Vertex> byRank = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-  private final VariantGraph graph;
-  private final Set<Witness> witnesses;
+    private final Map<VariantGraph.Vertex, Integer> byVertex = new HashMap<>();
+    private final SortedMap<Integer, Set<Vertex>> byRank = new TreeMap<>();
+    private final VariantGraph graph;
 
-  VariantGraphRanking(VariantGraph graph, Set<Witness> witnesses) {
-    this.graph = graph;
-    this.witnesses = witnesses;
-  }
-
-  public static VariantGraphRanking of(VariantGraph graph) {
-    return of(graph, null);
-  }
-
-  public static VariantGraphRanking of(VariantGraph graph, Set<Witness> witnesses) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
-    for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
-      int rank = -1;
-      for (VariantGraph.Edge e : v.incoming(witnesses)) {
-        rank = Math.max(rank, ranking.byVertex.get(e.from()));
-      }
-      rank++;
-      ranking.byVertex.put(v, rank);
-      ranking.byRank.put(rank, v);
+    VariantGraphRanking(VariantGraph graph) {
+        this.graph = graph;
     }
-    return ranking;
-  }
 
-  public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<Witness> witnesses, Set<VariantGraph.Vertex> vertices) {
-    final VariantGraphRanking ranking = new VariantGraphRanking(graph, witnesses);
-    for (VariantGraph.Vertex v : graph.vertices(witnesses)) {
-      int rank = -1;
-      for (VariantGraph.Edge e : v.incoming(witnesses)) {
-        rank = Math.max(rank, ranking.byVertex.get(e.from()));
-      }
-      if (vertices.contains(v)) {
-        rank++;
-      }
-      ranking.byVertex.put(v, rank);
-      ranking.byRank.put(rank, v);
-    }
-    return ranking;
-  }
-
-  public Set<Witness> witnesses() {
-    return Objects.firstNonNull(witnesses, graph.witnesses());
-  }
-
-  public Map<VariantGraph.Vertex, Integer> getByVertex() {
-    return Collections.unmodifiableMap(byVertex);
-  }
-
-  public SortedSetMultimap<Integer, VariantGraph.Vertex> getByRank() {
-    return Multimaps.unmodifiableSortedSetMultimap(byRank);
-  }
-
-  public int size() {
-    return byRank.keySet().size();
-  }
-
-  @Override
-  public Iterator<Set<VariantGraph.Vertex>> iterator() {
-    return new AbstractIterator<Set<VariantGraph.Vertex>>() {
-      private final Iterator<Integer> it = byRank.keySet().iterator();
-
-      @Override
-      protected Set<VariantGraph.Vertex> computeNext() {
-        return (it.hasNext() ? byRank.get(it.next()) : endOfData());
-      }
-    };
-  }
-
-  public RowSortedTable<Integer, Witness, Set<Token>> asTable() {
-    final TreeBasedTable<Integer, Witness, Set<Token>> table = TreeBasedTable.create(Ordering.natural(), Witness.SIGIL_COMPARATOR);
-    for (Map.Entry<VariantGraph.Vertex, Integer> rank : byVertex.entrySet()) {
-      final int row = rank.getValue();
-      for (Token token : rank.getKey().tokens(witnesses)) {
-        final Witness column = token.getWitness();
-
-        Set<Token> cell = table.get(row, column);
-        if (cell == null) {
-          table.put(row, column, cell = Sets.newHashSet());
+    public static VariantGraphRanking of(VariantGraph graph) {
+        final VariantGraphRanking ranking = new VariantGraphRanking(graph);
+        for (VariantGraph.Vertex v : graph.vertices()) {
+            int rank = -1;
+            for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
+                rank = Math.max(rank, ranking.byVertex.get(incoming));
+            }
+            rank++;
+            ranking.byVertex.put(v, rank);
+            ranking.byRank.computeIfAbsent(rank, r -> new HashSet<>()).add(v);
         }
-        cell.add(token);
-      }
+        return ranking;
     }
-    return table;
-  }
 
-  public VariantGraph.Vertex[][] asArray() {
-    final Set<Integer> ranks = byRank.keySet();
-    final VariantGraph.Vertex[][] arr = new VariantGraph.Vertex[ranks.size()][];
-    for (final Iterator<Integer> it = ranks.iterator(); it.hasNext(); ) {
-      final Integer rank = it.next();
-      final SortedSet<Vertex> vertices = byRank.get(rank);
-      arr[rank] = vertices.toArray(new Vertex[vertices.size()]);
+    public static VariantGraphRanking ofOnlyCertainVertices(VariantGraph graph, Set<VariantGraph.Vertex> vertices) {
+        final VariantGraphRanking ranking = new VariantGraphRanking(graph);
+        for (VariantGraph.Vertex v : graph.vertices()) {
+            int rank = -1;
+            for (VariantGraph.Vertex incoming : v.incoming().keySet()) {
+                rank = Math.max(rank, ranking.byVertex.get(incoming));
+            }
+            if (vertices.contains(v)) {
+                rank++;
+            }
+            ranking.byVertex.put(v, rank);
+            ranking.byRank.computeIfAbsent(rank, r -> new HashSet<>()).add(v);
+        }
+        return ranking;
     }
-    return arr;
-  }
 
-  @Override
-  public Integer apply(@Nullable VariantGraph.Vertex vertex) {
-    return byVertex.get(vertex);
-  }
+    public Set<Witness> witnesses() {
+        return graph.witnesses();
+    }
 
-  @Override
-  public int compare(VariantGraph.Vertex o1, VariantGraph.Vertex o2) {
-    final Integer o1Rank = byVertex.get(o1);
-    final Integer o2Rank = byVertex.get(o2);
+    public Map<VariantGraph.Vertex, Integer> getByVertex() {
+        return Collections.unmodifiableMap(byVertex);
+    }
 
-    Preconditions.checkState(o1Rank != null, o1);
-    Preconditions.checkState(o2Rank != null, o2);
+    public Map<Integer, Set<VariantGraph.Vertex>> getByRank() {
+        return Collections.unmodifiableMap(byRank);
+    }
 
-    return (o1Rank.intValue() - o2Rank.intValue());
-  }
+    public int size() {
+        return byRank.keySet().size();
+    }
+
+    @Override
+    public Iterator<Set<VariantGraph.Vertex>> iterator() {
+        return byRank.values().iterator();
+    }
+
+    public List<SortedMap<Witness, Set<Token>>> asTable() {
+        return byRank.values().stream()
+            .filter(rank -> rank.stream().anyMatch(v -> !v.tokens().isEmpty()))
+            .map(vertices -> {
+                final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
+                vertices.stream().flatMap(v -> v.tokens().stream()).forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
+                return row;
+            })
+            .collect(Collectors.toList());
+    }
+
+    public VariantGraph.Vertex[][] asArray() {
+        final VariantGraph.Vertex[][] arr = new VariantGraph.Vertex[byRank.size()][];
+        byRank.forEach((rank, vertices) -> arr[rank] = vertices.toArray(new Vertex[vertices.size()]));
+        return arr;
+    }
+
+    @Override
+    public Integer apply(VariantGraph.Vertex vertex) {
+        return byVertex.get(vertex);
+    }
+
+    public Comparator<VariantGraph.Vertex> comparator() {
+        return Comparator.comparingInt(byVertex::get);
+    }
 }

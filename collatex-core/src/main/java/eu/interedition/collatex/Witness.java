@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 The Interedition Development Group.
+ * Copyright (c) 2015 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,33 +19,16 @@
 
 package eu.interedition.collatex;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Ordering;
-
 import java.util.Comparator;
 
 /**
  * IWitness
- * 
+ * <p>
  * Representation of a single textual witness
- *
  */
 public interface Witness {
 
-  String getSigil();
+    String getSigil();
 
-  final Comparator<Witness> SIGIL_COMPARATOR = new Comparator<Witness>() {
-    @Override
-    public int compare(Witness o1, Witness o2) {
-      return o1.getSigil().compareTo(o2.getSigil());
-    }
-  };
-
-  final Function<VariantGraph.Edge, String> TO_SIGILS = new Function<VariantGraph.Edge, String>() {
-    @Override
-    public String apply(VariantGraph.Edge input) {
-      return Joiner.on(", ").join(Ordering.from(SIGIL_COMPARATOR).sortedCopy(input.witnesses()));
-    }
-  };
+    final Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
 }
