@@ -13,7 +13,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.Dekker21Aligner.DecisionGraphNode;
 import eu.interedition.collatex.simple.SimpleWitness;
 
-import static eu.interedition.collatex.dekker.VariantGraphTraversalMatcher.non;
+import static eu.interedition.collatex.dekker.VariantGraphMatcher.graph;
 import static org.junit.Assert.*;
 
 public class Dekker21AlignerTest extends AbstractTest {
@@ -170,7 +170,7 @@ public class Dekker21AlignerTest extends AbstractTest {
         VariantGraph g = new VariantGraph();
         aligner.collate(g, w);
 
-        assertThat(VariantGraphTraversal.of(g, Collections.singleton(w[0])), non("a ", "b ", "c ", "d ", "e"));
+        assertThat(g, graph(w[0]).non_aligned("a", "b", "c", "d", "e"));
     }
 
 

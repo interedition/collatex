@@ -19,7 +19,7 @@ public class VariantGraphTraversalMatcher extends BaseMatcher<VariantGraphTraver
         return new VariantGraphTraversalMatcher(token_content);
     }
 
-    private VariantGraphTraversalMatcher(String[] token_content) {
+    VariantGraphTraversalMatcher(String[] token_content) {
         this.token_content = token_content;
     }
 
@@ -37,7 +37,7 @@ public class VariantGraphTraversalMatcher extends BaseMatcher<VariantGraphTraver
             }
             VariantGraph.Vertex v = iterator.next();
             SimpleToken to = (SimpleToken) v.tokens().iterator().next();
-            if (!(content.equals(to.getContent()))) {
+            if (!(content.equals(to.getNormalized()))) {
                 return false;
             }
         }
@@ -68,7 +68,7 @@ public class VariantGraphTraversalMatcher extends BaseMatcher<VariantGraphTraver
                 continue;
             }
             SimpleToken to = (SimpleToken) v.tokens().iterator().next();
-            description.appendText(to.getContent());
+            description.appendText(to.getNormalized());
             description.appendText(",");
         }
     }
