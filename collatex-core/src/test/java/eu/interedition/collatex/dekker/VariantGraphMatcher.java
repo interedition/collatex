@@ -7,10 +7,7 @@ import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by ronald on 2/27/15.
@@ -70,7 +67,11 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
                     failed = expectation;
                     return false;
                 }
-                //TODO: check whether token is aligned or not
+                // Check whether token is aligned or not
+                if (expectation.aligned != v.tokens().size() > 1) {
+                    failed = expectation;
+                    return false;
+                }
             }
         }
         // TODO: check more tokens than expected
@@ -80,18 +81,40 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("");
+        description.appendText("tokens ");
         for (ExpectationTuple expectation : expected) {
             for (String content : expectation.expected_content) {
                 description.appendText(content);
-                description.appendText(",");
+                description.appendText(", ");
             }
         }
     }
 
     @Override
     public void describeMismatch(Object item, Description description) {
-        description.appendText(""+failed.expected_content);
-        description.appendText(""+failed.aligned);
+        if (failed.aligned) {
+            description.appendText("aligned token(s): ");
+        } else {
+            description.appendText("non-aligned token(s): ");
+        }
+        description.appendText(Arrays.toString(failed.expected_content));
+        description.appendText(" is/are missing!");
+        // actual
+        description.appendText("\nActual: ");
+        VariantGraph g = (VariantGraph) item;
+        VariantGraphTraversal graphTraversal = VariantGraphTraversal.of(g, Collections.singleton(w));
+        Iterator<VariantGraph.Vertex> iterator = graphTraversal.iterator();
+        iterator.next(); // skip start token
+        while (iterator.hasNext()) {
+            VariantGraph.Vertex v = iterator.next();
+            if (v.tokens().size()>0) { // skip end token
+                SimpleToken t = (SimpleToken) v.tokens().iterator().next();
+                if (v.tokens().size()>1) {
+                    description.appendText("aligned: " + t.getNormalized().toString()+", ");
+                } else {
+                    description.appendText("non-aligned: "+ t.getNormalized().toString()+", ");
+                }
+            }
+        }
     }
 }

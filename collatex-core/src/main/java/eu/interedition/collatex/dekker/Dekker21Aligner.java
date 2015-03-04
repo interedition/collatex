@@ -134,7 +134,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         List<VariantGraph.Vertex> vert = copyIterable(against.vertices());
         // remove start / end vertices
         vert.remove(0);
-        vert.remove(vert.size()-1);
+        vert.remove(vert.size() - 1);
         VariantGraph.Vertex[] vertices = vert.toArray(new VariantGraph.Vertex[vert.size()]);
 
         // prepare tokens
@@ -150,7 +150,19 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         // TODO: third dimension: witness tokens
 
         astar = new TwoDimensionalDecisionGraph(vertices, tokens, beginWitness2);
-        //TODO: do the actual alignment
+        // Do the actual alignment
+        List<DecisionGraphNode> nodes = astar.aStar(new DecisionGraphNode(), new DecisionGraphNodeCost());
+        // from the list of nodes we need to extract the matches
+        // and construct a map (token -> vertex) containing the alignment.
+        Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
+        for (DecisionGraphNode node : nodes) {
+            if (node.isMatch()) {
+                alignments.put(tokens[node.startPosWitness1], vertices[node.startPosWitness2]);
+            }
+        }
+
+        merge(against, witness, alignments);
+
     }
 
     enum EditOperationEnum {
@@ -163,6 +175,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         int startPosWitness1 = 0;
         int startPosWitness2 = 0;
         EditOperationEnum editOperation;
+        private boolean match;
 
         public DecisionGraphNode() {
             this(0,0);
@@ -179,10 +192,19 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             copy.startPosWitness2 = this.startPosWitness2;
             return copy;
         }
+
+        public boolean isMatch() {
+            return match;
+        }
     }
 
     class DecisionGraphNodeCost extends Cost<DecisionGraphNodeCost> {
-        int alignedTokens = 0; // cost function TODO: this is far too simple!
+        // TODO: this is far too simple!
+        int alignedTokens; // cost function
+
+        public DecisionGraphNodeCost() {
+            this(0);
+        }
 
         public DecisionGraphNodeCost(int alignedTokens) {
             this.alignedTokens = alignedTokens;
@@ -273,11 +295,12 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         //NOTE: this scorer assigns positive costs
         @Override
         protected DecisionGraphNodeCost distBetween(DecisionGraphNode current, DecisionGraphNode neighbor) {
-            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
+            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE || isGoal(neighbor)) {
                 VariantGraph.Vertex v = vertices[current.startPosWitness1];
                 Token t = tokens[current.startPosWitness2];
                 Boolean match = matcher.match(v, t);
                 if (match) {
+                    current.match = true;
                     return new DecisionGraphNodeCost(1);
                 }
             }
