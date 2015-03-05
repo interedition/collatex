@@ -157,7 +157,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
         for (DecisionGraphNode node : nodes) {
             if (node.isMatch()) {
-                alignments.put(tokens[node.startPosWitness1], vertices[node.startPosWitness2]);
+                alignments.put(tokens[node.startPosWitness1-1], vertices[node.startPosWitness2-1]);
             }
         }
 
@@ -241,15 +241,23 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         @Override
         protected boolean isGoal(DecisionGraphNode node) {
-            return node.startPosWitness1 == vertices.length-1 && node.startPosWitness2 == tokens.length-1;
+            return isHorizontalEnd(node) && isVerticalEnd(node);
+        }
+
+        private boolean isHorizontalEnd(DecisionGraphNode node) {
+            return node.startPosWitness1 == vertices.length;
+        }
+
+        private boolean isVerticalEnd(DecisionGraphNode node) {
+            return node.startPosWitness2 == tokens.length;
         }
 
         @Override
         protected Iterable<DecisionGraphNode> neighborNodes(DecisionGraphNode current) {
             // In a 2D approach there are 3 possibilities
             List<DecisionGraphNode> children = new ArrayList<>();
-            boolean xEnd = current.startPosWitness1 == vertices.length-1;
-            boolean yEnd = current.startPosWitness2 == tokens.length-1;
+            boolean xEnd = isHorizontalEnd(current);
+            boolean yEnd = isVerticalEnd(current);
             if (!xEnd) {
                 DecisionGraphNode child1 = current.copy();
                 child1.startPosWitness1++;
@@ -295,12 +303,12 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         //NOTE: this scorer assigns positive costs
         @Override
         protected DecisionGraphNodeCost distBetween(DecisionGraphNode current, DecisionGraphNode neighbor) {
-            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE || isGoal(neighbor)) {
-                VariantGraph.Vertex v = vertices[current.startPosWitness1];
-                Token t = tokens[current.startPosWitness2];
+            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
+                VariantGraph.Vertex v = vertices[neighbor.startPosWitness1-1];
+                Token t = tokens[neighbor.startPosWitness2-1];
                 Boolean match = matcher.match(v, t);
                 if (match) {
-                    current.match = true;
+                    neighbor.match = true;
                     return new DecisionGraphNodeCost(1);
                 }
             }

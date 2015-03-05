@@ -88,7 +88,7 @@ public class Dekker21AlignerTest extends AbstractTest {
 
         DecisionGraphNode root = aligner.new DecisionGraphNode();
         DecisionGraphNode neighbor = aligner.new DecisionGraphNode(1, 1);
-        DecisionGraphNode goal = aligner.new DecisionGraphNode(4, 3);
+        DecisionGraphNode goal = aligner.new DecisionGraphNode(5, 4);
         assertFalse(gr.isGoal(root));
         assertFalse(gr.isGoal(neighbor));
         assertTrue(gr.isGoal(goal));
@@ -160,11 +160,12 @@ public class Dekker21AlignerTest extends AbstractTest {
 
         List<DecisionGraphNode> decisionGraphNodes = decisionGraph.aStar(aligner.new DecisionGraphNode(), aligner.new DecisionGraphNodeCost(0));
         Iterator<DecisionGraphNode> nodes = decisionGraphNodes.iterator();
-        assertNode(0,0, null, nodes.next());
-        assertNode(1,1, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
-        assertNode(2,2, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
+        assertNode(0, 0, null, nodes.next());
+        assertNode(1, 1, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
+        assertNode(2, 2, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
         assertNode(3, 3, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
-        assertNode(4, 3, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH, nodes.next());
+        assertNode(4, 4, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, nodes.next());
+        assertNode(5, 4, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH, nodes.next());
         assertFalse(nodes.hasNext());
     }
 
@@ -181,11 +182,12 @@ public class Dekker21AlignerTest extends AbstractTest {
 
         List<DecisionGraphNode> decisionGraphNodes = decisionGraph.aStar(aligner.new DecisionGraphNode(), aligner.new DecisionGraphNodeCost(0));
         Iterator<DecisionGraphNode> nodes = decisionGraphNodes.iterator();
-        assertMatch(0, 0, true, nodes.next());
-        assertMatch(1, 1, false, nodes.next());
-        assertMatch(2, 2, true, nodes.next());
+        assertMatch(0, 0, false, nodes.next());
+        assertMatch(1, 1, true, nodes.next());
+        assertMatch(2, 2, false, nodes.next());
         assertMatch(3, 3, true, nodes.next());
-        assertMatch(4, 3, false, nodes.next());
+        assertMatch(4, 4, true, nodes.next());
+        assertMatch(5, 4, false, nodes.next());
         assertFalse(nodes.hasNext());
     }
 
@@ -213,7 +215,28 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
     }
 
+//    @Test
+//    public void testCaseVariantGraphThreeWitnesses() {
+//        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
+//        Dekker21Aligner aligner = new Dekker21Aligner(w);
+//        VariantGraph g = new VariantGraph();
+//        aligner.collate(g, w);
+//
+//        assertThat(g, graph(w[0]).aligned("a").non_aligned("b").aligned("c", "d").non_aligned("e"));
+//        assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
+//    }
 
+
+//    @Test
+//    public void testCaseVariantGraphThreeWitnesses() {
+//        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
+//        Dekker21Aligner aligner = new Dekker21Aligner(w);
+//        VariantGraph g = new VariantGraph();
+//        aligner.collate(g, w);
+//
+//        assertThat(g, graph(w[0]).aligned("a").non_aligned("b").aligned("c", "d").non_aligned("e"));
+//        assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
+//    }
 
 
 }
