@@ -215,28 +215,56 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
     }
 
-//    @Test
-//    public void testCaseVariantGraphThreeWitnesses() {
-//        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
-//        Dekker21Aligner aligner = new Dekker21Aligner(w);
-//        VariantGraph g = new VariantGraph();
-//        aligner.collate(g, w);
-//
-//        assertThat(g, graph(w[0]).aligned("a").non_aligned("b").aligned("c", "d").non_aligned("e"));
-//        assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
-//    }
+    @Test
+    public void testCaseVariantGraphTwoDifferentWitnesses() {
+        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph g = new VariantGraph();
+        aligner.collate(g, w);
+
+        assertThat(g, graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
+        assertThat(g, graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
+    }
 
 
 //    @Test
-//    public void testCaseVariantGraphThreeWitnesses() {
+//    public void testCaseDecisionGraphThreeWitnessesMatches() {
 //        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
 //        Dekker21Aligner aligner = new Dekker21Aligner(w);
 //        VariantGraph g = new VariantGraph();
-//        aligner.collate(g, w);
-//
-//        assertThat(g, graph(w[0]).aligned("a").non_aligned("b").aligned("c", "d").non_aligned("e"));
-//        assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
+//        // we collate the first two witnesses
+//        aligner.collate(g, w[0]);
+//        aligner.collate(g, w[1]);
+//        // then we examine the decision graph for the third witness
+//        Dekker21Aligner.TwoDimensionalDecisionGraph decisionGraph = aligner.createDecisionGraph(g, w[2]);
+//        List<DecisionGraphNode> decisionGraphNodes = decisionGraph.aStar(aligner.new DecisionGraphNode(), aligner.new DecisionGraphNodeCost());
+//        Iterator<DecisionGraphNode> nodes = decisionGraphNodes.iterator();
+//        assertMatch(0, 0, false, nodes.next());
+//        assertMatch(1, 1, true, nodes.next());
+//        assertMatch(2, 2, false, nodes.next());
+//        assertMatch(3, 3, true, nodes.next());
+//        assertMatch(4, 4, true, nodes.next());
+//        assertMatch(5, 4, false, nodes.next());
+//        assertFalse(nodes.hasNext());
 //    }
+
+
+
+
+
+
+    @Test
+    public void testCaseVariantGraphThreeWitnesses() {
+        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph g = new VariantGraph();
+        aligner.collate(g, w);
+
+        assertThat(g, graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
+        assertThat(g, graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
+        assertThat(g, graph(w[2]).aligned("the").non_aligned("red").aligned("fox", "jumps", "over", "the").non_aligned("fence"));
+    }
+
 
 
 }

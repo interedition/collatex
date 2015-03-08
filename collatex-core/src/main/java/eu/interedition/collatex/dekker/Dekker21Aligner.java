@@ -5,6 +5,7 @@ import java.util.*;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.astar.AstarAlgorithm;
 import eu.interedition.collatex.dekker.astar.Cost;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -21,6 +22,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     private List<LCP_Interval> lcp_intervals;
     private LCP_Interval[] lcp_interval_array;
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
+    private Map<Witness, Integer> witnessToStartToken;
     private TwoDimensionalDecisionGraph astar;
 
     public Dekker21Aligner(SimpleWitness[] w) {
@@ -29,9 +31,13 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         // 3. derive LCP array
         // 4. derive LCP intervals
         token_array = new ArrayList<>();
+        int counter = 0;
+        witnessToStartToken = new HashMap<>();
         for (SimpleWitness witness : w) {
+            witnessToStartToken.put(witness, counter);
             for (Token t : witness) {
                 token_array.add(t);
+                counter++;
             }
             //TODO: add witness separation marker token
         }
@@ -121,14 +127,25 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             }
             return;
         }
+        //NOTE: the following method assigns the decision graph to the field astar
+        createDecisionGraph(against, witness);
 
-        // we need to know how long the witnesses are
-        int lengthWitness1 = 5; // [0, 4]
-        int lengthWitness2 = 4; // [5, 8]
-        int beginWitness1 = 0;
-        int endWitness1 = 4;
-        int beginWitness2 = 5;
-        int endWitness2 = 8;
+
+        // Do the actual alignment
+        List<DecisionGraphNode> nodes = astar.aStar(new DecisionGraphNode(), new DecisionGraphNodeCost());
+        // from the list of nodes we need to extract the matches
+        // and construct a map (token -> vertex) containing the alignment.
+        Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
+        for (DecisionGraphNode node : nodes) {
+            if (node.isMatch()) {
+                alignments.put(astar.token(node), astar.vertex(node));
+            }
+        }
+        merge(against, witness, alignments);
+    }
+
+    protected TwoDimensionalDecisionGraph createDecisionGraph(VariantGraph against, Iterable<Token> witness) {
+        int beginWitness2 = witnessToStartToken.get(witness.iterator().next().getWitness());
 
         // prepare vertices
         List<VariantGraph.Vertex> vert = copyIterable(against.vertices());
@@ -150,19 +167,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         // TODO: third dimension: witness tokens
 
         astar = new TwoDimensionalDecisionGraph(vertices, tokens, beginWitness2);
-        // Do the actual alignment
-        List<DecisionGraphNode> nodes = astar.aStar(new DecisionGraphNode(), new DecisionGraphNodeCost());
-        // from the list of nodes we need to extract the matches
-        // and construct a map (token -> vertex) containing the alignment.
-        Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
-        for (DecisionGraphNode node : nodes) {
-            if (node.isMatch()) {
-                alignments.put(tokens[node.startPosWitness1-1], vertices[node.startPosWitness2-1]);
-            }
-        }
-
-        merge(against, witness, alignments);
-
+        return astar;
     }
 
     enum EditOperationEnum {
@@ -304,18 +309,26 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         @Override
         protected DecisionGraphNodeCost distBetween(DecisionGraphNode current, DecisionGraphNode neighbor) {
             if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
-                VariantGraph.Vertex v = vertices[neighbor.startPosWitness1-1];
-                Token t = tokens[neighbor.startPosWitness2-1];
+                VariantGraph.Vertex v = vertex(neighbor);
+                Token t = token(neighbor);
                 Boolean match = matcher.match(v, t);
                 if (match) {
+                    // Log("match: "+(neighbor.startPosWitness1-1)+", "+(neighbor.startPosWitness2-1));
                     neighbor.match = true;
                     return new DecisionGraphNodeCost(1);
                 }
             }
-
             return new DecisionGraphNodeCost(0);
         }
-    }
+
+        public VariantGraph.Vertex vertex(DecisionGraphNode node) {
+            return vertices[node.startPosWitness1-1];
+        }
+
+        public Token token(DecisionGraphNode node) {
+            return tokens[node.startPosWitness2-1];
+        }
+   }
 
 
 
