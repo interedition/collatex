@@ -1,3 +1,6 @@
+Release 1.6.1
+- JSON processing: fix regression bug due to which "tokenComparator" and "algorithm" turned into mandatory fields
+
 Release 1.6
 - new aligorithm based on Greedy String Tiling
 - Java 8 now required
