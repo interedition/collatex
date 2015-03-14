@@ -157,7 +157,7 @@ public class JsonProcessor {
 
             Comparator<eu.interedition.collatex.Token> tokenComparator = null;
             final JsonValue tokenComparatorNode = collationObject.get("tokenComparator");
-            if (tokenComparatorNode.getValueType() == JsonValue.ValueType.OBJECT) {
+            if (tokenComparatorNode != null && tokenComparatorNode.getValueType() == JsonValue.ValueType.OBJECT) {
                 final JsonObject tokenComparatorObject = (JsonObject) tokenComparatorNode;
                 try {
                     if ("levenshtein".equals(tokenComparatorObject.getString("type"))) {
@@ -174,7 +174,7 @@ public class JsonProcessor {
 
             CollationAlgorithm collationAlgorithm = null;
             final JsonValue collationAlgorithmNode = collationObject.get("algorithm");
-            if (collationAlgorithmNode.getValueType() == JsonValue.ValueType.STRING) {
+            if (collationAlgorithmNode != null && collationAlgorithmNode.getValueType() == JsonValue.ValueType.STRING) {
                 final String collationAlgorithmValue = ((JsonString) collationAlgorithmNode).getString();
                 if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
                     collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
