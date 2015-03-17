@@ -277,8 +277,16 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         @Override
         protected boolean isGoal(ExtendedGraphNode node) {
-            //TODO: check token pointer is at end of witness also!
-            return node.getVertexRank() == ranking.size();
+            return isHorizontalEnd(node) && isVerticalEnd(node);
+        }
+
+        private boolean isHorizontalEnd(ExtendedGraphNode node) {
+            // check whether we have reached the end node of the variant graph
+            return node.getVertexRank() == ranking.size()-1;
+        }
+
+        private boolean isVerticalEnd(ExtendedGraphNode node) {
+            return node.startPosWitness2 == witnessTokens.length;
         }
 
         @Override
@@ -294,10 +302,21 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             // also a node is needed to skip all the vertices of a certain rank
             // also a node to skip the token of the witness
             List<ExtendedGraphNode> neighbors = new ArrayList<>();
-            Set<VariantGraph.Vertex> vertices = ranking.getByRank().get(current.getVertexRank());
-            for (VariantGraph.Vertex vertex : vertices) {
+            // siblings
+            Set<VariantGraph.Vertex> siblings = ranking.getByRank().get(current.getVertexRank());
+            for (VariantGraph.Vertex vertex : siblings) {
                 ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), vertex, current.startPosWitness2, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
                 neighbors.add(node);
+            }
+            // check whether we are at the end of the variant graph
+            // we might not be at the end of the tokens yet
+            if (!isHorizontalEnd(current)) {
+                // children
+                Set<VariantGraph.Vertex> children = ranking.getByRank().get(current.getVertexRank() + 1);
+                for (VariantGraph.Vertex vertex : children) {
+                    ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank() + 1, vertex, current.startPosWitness2, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
+                    neighbors.add(node);
+                }
             }
             return neighbors;
         }
