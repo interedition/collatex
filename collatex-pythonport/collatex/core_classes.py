@@ -13,7 +13,7 @@ from networkx.algorithms.dag import topological_sort
 import re
 from prettytable import PrettyTable
 from textwrap import fill
-from collatex.exceptions import TokenError
+from collatex.exceptions import TokenError, UnsupportedError
 
 class Row(object):
     
