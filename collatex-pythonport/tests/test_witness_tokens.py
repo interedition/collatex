@@ -6,7 +6,7 @@ Created on Nov 20, 2014
 
 import unittest
 from collatex import Collation
-from collatex.core_functions import collate_pretokenized_json
+from collatex.core_functions import collate
 
 
 class Test(unittest.TestCase):
@@ -52,7 +52,8 @@ class Test(unittest.TestCase):
                 }
             ]
         }
-        result = collate_pretokenized_json(pretokenized_witness)
+        c = Collation.create_from_dict(pretokenized_witness)
+        result = collate(c, segmentation=False)
         self.assertEqual(len(result.rows[0].to_list()), 4)
         self.assertEqual(len(result.rows[1].to_list()), 4)
         # The second witness should have a token that reads 'mousedog bird'.
