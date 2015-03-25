@@ -127,7 +127,6 @@ class Test(unittest.TestCase):
         block1 = Block(RangeSet("0-2, 6-8")) # a c b
         self.assertIn(block1, blocks)
 
-    @unit_disabled
     def test_block_witnesses_Hermans_case_two_witnesses(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -138,7 +137,6 @@ class Test(unittest.TestCase):
         block_witness = algorithm._get_block_witness(collation.witnesses[1])
         self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
 
-    @unit_disabled
     def test_block_witnesses_Hermans_case(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
