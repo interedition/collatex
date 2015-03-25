@@ -188,7 +188,7 @@ class BlockWitness(object):
     def debug(self):
         result = []
         for occurrence in self.occurrences:
-            result.append(' '.join(self.tokens[occurrence.token_range.slices().next()]))
+            result.append(' '.join(self.tokens[next(occurrence.token_range.slices())]))
         return result
 
 
