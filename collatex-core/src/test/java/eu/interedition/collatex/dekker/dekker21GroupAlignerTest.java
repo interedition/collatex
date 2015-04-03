@@ -8,8 +8,7 @@ import org.junit.Test;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * Created by ronald on 3/31/15.
@@ -55,5 +54,10 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertNode(3, 0, target1);
         assertNode(3, 3, target2);
         assertNode(0, 3, target3);
+
+        // check goal node
+        assertFalse(decisionGraph.isGoal(target1));
+        assertTrue(decisionGraph.isGoal(target2));
+        assertFalse(decisionGraph.isGoal(target3));
     }
 }

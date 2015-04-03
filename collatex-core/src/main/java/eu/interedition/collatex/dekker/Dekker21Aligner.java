@@ -307,7 +307,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         private boolean isHorizontalEnd(ExtendedGraphNode node) {
             // check whether we have reached the end node of the variant graph
-            return node.getVertexRank() == ranking.size()-1;
+            // -2 because ignore start / end vertices of variant graph
+            return node.getVertexRank() == ranking.size()-2;
         }
 
         private boolean isVerticalEnd(ExtendedGraphNode node) {
