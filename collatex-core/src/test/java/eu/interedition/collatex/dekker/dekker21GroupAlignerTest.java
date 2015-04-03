@@ -9,11 +9,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by ronald on 3/31/15.
  */
 public class dekker21GroupAlignerTest extends AbstractTest {
+
+    private void assertLCPInterval(String blabla, LCP_Interval lcp_interval, Dekker21Aligner aligner) {
+        assertEquals(blabla, aligner.getNormalizedForm(lcp_interval));
+    }
 
     private void assertNode(int i, int j, Dekker21Aligner.ExtendedGraphNode decisionGraphNode) {
         assertEquals(i, decisionGraphNode.getVertexRank());
@@ -42,8 +47,13 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         Dekker21Aligner.ExtendedGraphNode target2 = decisionGraph.getTarget(edge2);
         Dekker21Aligner.ExtendedGraphNode target3 = decisionGraph.getTarget(edge3);
 
-        assertNode(1, 0, target1);
-        assertNode(1, 1, target2);
-        assertNode(0, 1, target3);
+        // assert LCP interval on the edges
+        assertLCPInterval("the same stuff", edge1.lcp_interval, aligner);
+        assertLCPInterval("the same stuff", edge2.lcp_interval, aligner);
+        assertLCPInterval("the same stuff", edge3.lcp_interval, aligner);
+
+        assertNode(3, 0, target1);
+        assertNode(3, 3, target2);
+        assertNode(0, 3, target3);
     }
 }

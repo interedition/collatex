@@ -82,11 +82,26 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     }
 
     protected String debug(LCP_Interval interval) {
+        return interval.toString() + " -> " + getNormalizedForm(interval);
+    }
+
+    protected String getNormalizedForm(LCP_Interval interval) {
         int suffix_start = interval.start;
         int token_pos = this.suffix_array[suffix_start];
-        //TODO; add more tokens (look at length)
-        Token t = this.token_array.get(token_pos);
-        return interval.toString() + " -> " + t.toString();
+        List<Token> tokens = new ArrayList<>();
+        for (int i = 0; i < interval.length; i++) {
+            Token t = this.token_array.get(token_pos+i);
+            tokens.add(t);
+        }
+        String normalized = "";
+        for (Token t : tokens) {
+            SimpleToken st = (SimpleToken) t;
+            if (!normalized.isEmpty()) {
+                normalized += " ";
+            }
+            normalized += st.getNormalized();
+        }
+        return normalized;
     }
 
     //TODO: remove! Replace with createDecisionGraph
@@ -278,7 +293,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             this.matcher = matcher;
             this.startRangeWitness2 = startRangeWitness2;
             //TODO: get by the root node in a better way...
-            this.root = new ExtendedGraphNode(0, ranking.getByRank().get(0).iterator().next(), 0);
+            //TODO: we don need the root node here but the first actual node
+            //TODO: thus vertex rank +1
+            this.root = new ExtendedGraphNode(0, ranking.getByRank().get(1).iterator().next(), 0);
             edges = new HashMap<>();
             targets = new HashMap<>();
         }
@@ -323,7 +340,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 //            }
 
             // skip next graph LCP interval
-            int nextVertexRank = current.getVertexRank() + 1;
+            LCP_Interval graph_interval = vertexToLCP.get(current.vertex);
+            int nextVertexRank = current.getVertexRank() + graph_interval.length;
             if (!isHorizontalEnd(current)) {
                 //TODO: dit zouden in theorie meerdere vertices kunenn zijn..
                 //TODO: er moet in de constructor van de node moet of de rank of de vertex worden meegegeven..
@@ -332,7 +350,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 VariantGraph.Vertex vertex = ranking.getByRank().get(nextVertexRank).iterator().next();
                 ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2);
                 neighbors.add(node);
-                addEdge(current, node, EditOperationEnum.SKIP_TOKEN_GRAPH);
+                addEdge(current, node, EditOperationEnum.SKIP_TOKEN_GRAPH, graph_interval);
             }
 
             // check whether we are at the end of the variant graph
@@ -341,23 +359,30 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 // children
                 Set<VariantGraph.Vertex> children = ranking.getByRank().get(nextVertexRank);
                 for (VariantGraph.Vertex vertex : children) {
-                    ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2+1);
+                    ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2+graph_interval.length);
                     neighbors.add(node);
-                    addEdge(current, node, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
+                    addEdge(current, node, EditOperationEnum.MATCH_TOKENS_OR_REPLACE, graph_interval);
                 }
             }
 
             // skip next witness LCP interval
             if (!isVerticalEnd(current)) {
-                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), current.vertex, current.startPosWitness2+1);
+                // calc position start position witness + position in witness
+                int token_position = startRangeWitness2 + current.startPosWitness2;
+                LCP_Interval witness_interval = lcp_interval_array[token_position];
+                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), current.vertex, current.startPosWitness2+witness_interval.length);
                 neighbors.add(node);
-                addEdge(current, node, EditOperationEnum.SKIP_TOKEN_WITNESS);
+                addEdge(current, node, EditOperationEnum.SKIP_TOKEN_WITNESS, witness_interval);
             }
             return neighbors;
         }
 
-        private void addEdge(ExtendedGraphNode source, ExtendedGraphNode target, EditOperationEnum operation) {
-            ExtendedGraphEdge edge = new ExtendedGraphEdge(operation, null);
+        private void addEdge(ExtendedGraphNode source, ExtendedGraphNode target, EditOperationEnum operation, LCP_Interval interval) {
+            // Actually there are two intervals!
+            if (interval==null) {
+                throw new RuntimeException("Interval is null!");
+            }
+            ExtendedGraphEdge edge = new ExtendedGraphEdge(operation, interval);
             edges.put(new ExtendedGraphNodeTuple(source, operation), edge);
             targets.put(edge, target);
         }
