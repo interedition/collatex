@@ -199,7 +199,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         int startPosWitness1 = 0;
         int startPosWitness2 = 0;
         //TODO: move to edge!
-        private boolean match;
+        boolean match;
 
         public DecisionGraphNode() {
             this(0,0);
@@ -422,9 +422,36 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             return new DecisionGraphNodeCost(potentialMatches);
         }
 
+
+        //        //NOTE: this scorer assigns positive costs
+//        @Override
+//        protected DecisionGraphNodeCost distBetween(DecisionGraphNode current, DecisionGraphNode neighbor) {
+//            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
+//                VariantGraph.Vertex v = vertex(neighbor);
+//                Token t = token(neighbor);
+//                Boolean match = matcher.match(v, t);
+//                if (match) {
+//                    // Log("match: "+(neighbor.startPosWitness1-1)+", "+(neighbor.startPosWitness2-1));
+//                    neighbor.match = true;
+//                    return new DecisionGraphNodeCost(1);
+//                }
+//            }
+//            return new DecisionGraphNodeCost(0);
+//        }
+
+
+
         @Override
         protected DecisionGraphNodeCost distBetween(ExtendedGraphNode current, ExtendedGraphNode neighbor) {
-            //TODO: FIX
+            ExtendedGraphEdge edge = this.edgeBetween(current, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
+            if (this.getTarget(edge).equals(neighbor)) {
+                LCP_Interval graphInterval = edge.lcp_interval;
+                LCP_Interval witnessInterval = lcp_interval_array[startRangeWitness2+current.startPosWitness2];
+                if (graphInterval==witnessInterval) {
+                    neighbor.match = true;
+                    return new DecisionGraphNodeCost(graphInterval.length);
+                }
+            }
             return new DecisionGraphNodeCost(0);
         }
 

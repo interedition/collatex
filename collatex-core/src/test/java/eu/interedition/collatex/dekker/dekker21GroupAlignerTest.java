@@ -59,5 +59,10 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertFalse(decisionGraph.isGoal(target1));
         assertTrue(decisionGraph.isGoal(target2));
         assertFalse(decisionGraph.isGoal(target3));
+
+        // check costs of target nodes
+        assertEquals(0, decisionGraph.distBetween(root, target1).alignedTokens);
+        assertEquals(3, decisionGraph.distBetween(root, target2).alignedTokens);
+        assertEquals(0, decisionGraph.distBetween(root, target3).alignedTokens);
     }
 }
