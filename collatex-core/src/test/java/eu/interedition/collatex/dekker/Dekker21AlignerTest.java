@@ -24,10 +24,9 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(depth, lcp_interval.depth());
     }
 
-    private void assertNode(int i, int j, Dekker21Aligner.EditOperationEnum editOperation, ExtendedGraphNode decisionGraphNode) {
+    private void assertNode(int i, int j, ExtendedGraphNode decisionGraphNode) {
         assertEquals(i, decisionGraphNode.startPosWitness1);
         assertEquals(j, decisionGraphNode.startPosWitness2);
-        assertEquals(editOperation, decisionGraphNode.editOperation);
     }
 
     private void assertMatch(int i, int j, boolean match, ExtendedGraphNode decisionGraphNode) {
@@ -80,10 +79,10 @@ public class Dekker21AlignerTest extends AbstractTest {
     public void testExtendedGraphNodeIsAValueObject() {
         VariantGraph v = new VariantGraph();
 
-        ExtendedGraphNode n1 = new ExtendedGraphNode(0, v.getStart(), 0, null);
-        ExtendedGraphNode n2 = new ExtendedGraphNode(0, v.getStart(), 0, null);
-        ExtendedGraphNode n3 = new ExtendedGraphNode(1, v.getEnd(), 0, null);
-        ExtendedGraphNode n4 = new ExtendedGraphNode(0, v.getStart(), 1, null);
+        ExtendedGraphNode n1 = new ExtendedGraphNode(0, v.getStart(), 0);
+        ExtendedGraphNode n2 = new ExtendedGraphNode(0, v.getStart(), 0);
+        ExtendedGraphNode n3 = new ExtendedGraphNode(1, v.getEnd(), 0);
+        ExtendedGraphNode n4 = new ExtendedGraphNode(0, v.getStart(), 1);
         assertTrue(n1.equals(n2));
         assertFalse(n1.equals(n3));
         assertFalse(n1.equals(n4));
@@ -99,8 +98,8 @@ public class Dekker21AlignerTest extends AbstractTest {
         aligner.collate(against, w[0]);
         Dekker21Aligner.ThreeDimensionalDecisionGraph decisionGraph = aligner.createDecisionGraph(against, w[1]);
 
-        ExtendedGraphNode root = new ExtendedGraphNode(0, against.getStart(), 0, null);
-        ExtendedGraphNode goal = new ExtendedGraphNode(6, against.getEnd(), 4, null);
+        ExtendedGraphNode root = new ExtendedGraphNode(0, against.getStart(), 0);
+        ExtendedGraphNode goal = new ExtendedGraphNode(6, against.getEnd(), 4);
         //TODO: add neighbor node assertation
         //ExtendedGraphNode neighbor = new ExtendedGraphNode(1, 1);
         assertFalse(decisionGraph.isGoal(root));
@@ -109,26 +108,26 @@ public class Dekker21AlignerTest extends AbstractTest {
     }
 
 
-    @Test
-    public void testCaseDecisionGraphNeighbours() {
-        // 1: a, b, c, d, e
-        // 2: a, e, c, d
-        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
-        Dekker21Aligner aligner = new Dekker21Aligner(w);
-        VariantGraph against = new VariantGraph();
-        aligner.collate(against, w);
-
-        ExtendedGraphNode root = new ExtendedGraphNode(0, against.getStart(), 0, null);
-        Dekker21Aligner.ThreeDimensionalDecisionGraph gr = aligner.getDecisionGraph();
-
-        Iterator<ExtendedGraphNode> neighbors = gr.neighborNodes(root).iterator();
-        //TODO: this (0,0) is not needed! Filter out self
-        assertNode(0, 0, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, neighbors.next());
-        assertNode(1, 0, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH, neighbors.next());
-        assertNode(0, 1, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_WITNESS, neighbors.next());
-        assertNode(1, 1, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, neighbors.next());
-        assertFalse(neighbors.hasNext());
-    }
+//    @Test
+//    public void testCaseDecisionGraphNeighbours() {
+//        // 1: a, b, c, d, e
+//        // 2: a, e, c, d
+//        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d");
+//        Dekker21Aligner aligner = new Dekker21Aligner(w);
+//        VariantGraph against = new VariantGraph();
+//        aligner.collate(against, w);
+//
+//        ExtendedGraphNode root = new ExtendedGraphNode(0, against.getStart(), 0);
+//        Dekker21Aligner.ThreeDimensionalDecisionGraph gr = aligner.getDecisionGraph();
+//
+//        Iterator<ExtendedGraphNode> neighbors = gr.neighborNodes(root).iterator();
+//        //TODO: this (0,0) is not needed! Filter out self
+//        assertNode(0, 0, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, neighbors.next());
+//        assertNode(1, 0, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH, neighbors.next());
+//        assertNode(0, 1, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_WITNESS, neighbors.next());
+//        assertNode(1, 1, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, neighbors.next());
+//        assertFalse(neighbors.hasNext());
+//    }
 
 
 

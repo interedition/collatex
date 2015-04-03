@@ -89,6 +89,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         return interval.toString() + " -> " + t.toString();
     }
 
+    //TODO: remove! Replace with createDecisionGraph
     protected ThreeDimensionalDecisionGraph getDecisionGraph() {
         if (astar == null) {
             throw new IllegalStateException("Collate something first!");
@@ -133,7 +134,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
 
         // Do the actual alignment
-        List<ExtendedGraphNode> nodes = astar.aStar(new ExtendedGraphNode(0, against.getStart(), 0, null), new DecisionGraphNodeCost());
+        List<ExtendedGraphNode> nodes = astar.aStar(new ExtendedGraphNode(0, against.getStart(), 0), new DecisionGraphNodeCost());
         // from the list of nodes we need to extract the matches
         // and construct a map (token -> vertex) containing the alignment.
         Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
@@ -145,7 +146,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         merge(against, witness, alignments);
     }
 
-    protected ThreeDimensionalDecisionGraph createDecisionGraph(VariantGraph against, Iterable<Token> witness) {
+    public ThreeDimensionalDecisionGraph createDecisionGraph(VariantGraph against, Iterable<Token> witness) {
         int beginWitness2 = witnessToStartToken.get(witness.iterator().next().getWitness());
 
         // prepare vertices
@@ -179,10 +180,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         MATCH_TOKENS_OR_REPLACE // OLD, but kept for now
     }
 
-    static class DecisionGraphNode {
+    public static class DecisionGraphNode {
         int startPosWitness1 = 0;
         int startPosWitness2 = 0;
-        EditOperationEnum editOperation;
+        //TODO: move to edge!
         private boolean match;
 
         public DecisionGraphNode() {
@@ -206,7 +207,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
     }
 
-    class DecisionGraphNodeCost extends Cost<DecisionGraphNodeCost> {
+    public class DecisionGraphNodeCost extends Cost<DecisionGraphNodeCost> {
         // TODO: this is far too simple!
         int alignedTokens; // cost function
 
@@ -229,12 +230,12 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
      }
 
-    static class ExtendedGraphNode extends DecisionGraphNode {
+    public static class ExtendedGraphNode extends DecisionGraphNode {
 
         private int vertexRank;
         private final VariantGraph.Vertex vertex;
 
-        public ExtendedGraphNode(int vertexRank, VariantGraph.Vertex vertex, int startPosWitness2, EditOperationEnum matchTokensOrReplace) {
+        public ExtendedGraphNode(int vertexRank, VariantGraph.Vertex vertex, int startPosWitness2) {
             this.vertexRank = vertexRank;
             this.vertex = vertex;
             this.startPosWitness2 = startPosWitness2; // index in token array
@@ -261,18 +262,25 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
     }
 
-    class ThreeDimensionalDecisionGraph extends AstarAlgorithm<ExtendedGraphNode, DecisionGraphNodeCost> {
+    public class ThreeDimensionalDecisionGraph extends AstarAlgorithm<ExtendedGraphNode, DecisionGraphNodeCost> {
 
         private final VariantGraphRanking ranking;
         private final Token[] witnessTokens;
         private final Matcher matcher;
         private final int startRangeWitness2;
+        private final ExtendedGraphNode root;
+        private final Map<ExtendedGraphNodeTuple, ExtendedGraphEdge> edges;
+        private final Map<ExtendedGraphEdge, ExtendedGraphNode> targets;
 
         public ThreeDimensionalDecisionGraph(VariantGraphRanking ranking, Token[] witnessTokens, Matcher matcher, int startRangeWitness2) {
             this.ranking = ranking;
             this.witnessTokens = witnessTokens;
             this.matcher = matcher;
             this.startRangeWitness2 = startRangeWitness2;
+            //TODO: get by the root node in a better way...
+            this.root = new ExtendedGraphNode(0, ranking.getByRank().get(0).iterator().next(), 0);
+            edges = new HashMap<>();
+            targets = new HashMap<>();
         }
 
         @Override
@@ -302,23 +310,56 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             // also a node is needed to skip all the vertices of a certain rank
             // also a node to skip the token of the witness
             List<ExtendedGraphNode> neighbors = new ArrayList<>();
-            // siblings
-            Set<VariantGraph.Vertex> siblings = ranking.getByRank().get(current.getVertexRank());
-            for (VariantGraph.Vertex vertex : siblings) {
-                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), vertex, current.startPosWitness2, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
+
+//            The following code is only necessary when there are two or more witnesses
+                // TODO: in the siblings we need to skip the current vertex
+//            // siblings
+//            Set<VariantGraph.Vertex> siblings = ranking.getByRank().get(current.getVertexRank());
+//            for (VariantGraph.Vertex vertex : siblings) {
+//                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), vertex, current.startPosWitness2);
+//                neighbors.add(node);
+//                ExtendedGraphEdge edge = new ExtendedGraphEdge(EditOperationEnum.MATCH_TOKENS_OR_REPLACE, null);
+//                edges.put(current, edge);
+//            }
+
+            // skip next graph LCP interval
+            int nextVertexRank = current.getVertexRank() + 1;
+            if (!isHorizontalEnd(current)) {
+                //TODO: dit zouden in theorie meerdere vertices kunenn zijn..
+                //TODO: er moet in de constructor van de node moet of de rank of de vertex worden meegegeven..
+                //TODO: voor de derde dimensie is een vertex noodzakelijk
+                //TODO: we zouden de graaf af moeten lopen..
+                VariantGraph.Vertex vertex = ranking.getByRank().get(nextVertexRank).iterator().next();
+                ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2);
                 neighbors.add(node);
+                addEdge(current, node, EditOperationEnum.SKIP_TOKEN_GRAPH);
             }
+
             // check whether we are at the end of the variant graph
             // we might not be at the end of the tokens yet
-            if (!isHorizontalEnd(current)) {
+            if (!isHorizontalEnd(current)&&!isVerticalEnd(current)) {
                 // children
-                Set<VariantGraph.Vertex> children = ranking.getByRank().get(current.getVertexRank() + 1);
+                Set<VariantGraph.Vertex> children = ranking.getByRank().get(nextVertexRank);
                 for (VariantGraph.Vertex vertex : children) {
-                    ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank() + 1, vertex, current.startPosWitness2, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
+                    ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2+1);
                     neighbors.add(node);
+                    addEdge(current, node, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
                 }
             }
+
+            // skip next witness LCP interval
+            if (!isVerticalEnd(current)) {
+                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), current.vertex, current.startPosWitness2+1);
+                neighbors.add(node);
+                addEdge(current, node, EditOperationEnum.SKIP_TOKEN_WITNESS);
+            }
             return neighbors;
+        }
+
+        private void addEdge(ExtendedGraphNode source, ExtendedGraphNode target, EditOperationEnum operation) {
+            ExtendedGraphEdge edge = new ExtendedGraphEdge(operation, null);
+            edges.put(new ExtendedGraphNodeTuple(source, operation), edge);
+            targets.put(edge, target);
         }
 
         @Override
@@ -367,6 +408,65 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         public VariantGraph.Vertex vertex(DecisionGraphNode node) {
             return ((ExtendedGraphNode)node).vertex;
+        }
+
+        public ExtendedGraphNode getRoot() {
+            return root;
+        }
+
+        public ExtendedGraphEdge edgeBetween(ExtendedGraphNode source, EditOperationEnum operation) {
+            ExtendedGraphEdge edge = edges.get(new ExtendedGraphNodeTuple(source, operation));
+            if (edge == null) {
+                throw new RuntimeException("Edge not present!");
+            }
+            return edge;
+        }
+
+        public ExtendedGraphNode getTarget(ExtendedGraphEdge edge) {
+            ExtendedGraphNode target = targets.get(edge);
+            if (target == null) {
+                throw new RuntimeException("Target not set!");
+            }
+            return target;
+        }
+    }
+
+    public class ExtendedGraphNodeTuple {
+        private ExtendedGraphNode source;
+        private EditOperationEnum operation;
+        //private ExtendedGraphNode target;
+
+        public ExtendedGraphNodeTuple(ExtendedGraphNode source, EditOperationEnum operation) {
+            this.source = source;
+            this.operation = operation;
+        }
+
+        //TODO: with target hashcode added performance would be improved
+        @Override
+        public int hashCode() {
+            return source.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof ExtendedGraphNodeTuple)) {
+                return false;
+            }
+            ExtendedGraphNodeTuple other = (ExtendedGraphNodeTuple) obj;
+            return other.source.equals(source) && other.operation == operation;
+        }
+    }
+
+    public class ExtendedGraphEdge {
+        protected EditOperationEnum operation;
+        protected LCP_Interval lcp_interval;
+
+        public ExtendedGraphEdge(EditOperationEnum operation, LCP_Interval lcp_interval) {
+            this.operation = operation;
+            this.lcp_interval = lcp_interval;
         }
     }
 
