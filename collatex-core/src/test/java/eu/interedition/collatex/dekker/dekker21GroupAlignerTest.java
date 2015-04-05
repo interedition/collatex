@@ -64,5 +64,11 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertEquals(0, decisionGraph.distBetween(root, target1).alignedTokens);
         assertEquals(3, decisionGraph.distBetween(root, target2).alignedTokens);
         assertEquals(0, decisionGraph.distBetween(root, target3).alignedTokens);
+
+        // check alignment path
+        List<Dekker21Aligner.ExtendedGraphEdge> edges = decisionGraph.getOptimalPath();
+        Dekker21Aligner.ExtendedGraphEdge edge = edges.get(0);
+        assertEquals(Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, edge.operation);
+        assertLCPInterval("the same stuff", edge.lcp_interval, aligner);
     }
 }

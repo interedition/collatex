@@ -249,11 +249,13 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         private int vertexRank;
         private final VariantGraph.Vertex vertex;
+        public final Map<ExtendedGraphNode, ExtendedGraphEdge> outgoingEdges;
 
         public ExtendedGraphNode(int vertexRank, VariantGraph.Vertex vertex, int startPosWitness2) {
             this.vertexRank = vertexRank;
             this.vertex = vertex;
             this.startPosWitness2 = startPosWitness2; // index in token array
+            this.outgoingEdges = new HashMap<>();
         }
 
         public int getVertexRank() {
@@ -384,8 +386,11 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 throw new RuntimeException("Interval is null!");
             }
             ExtendedGraphEdge edge = new ExtendedGraphEdge(operation, interval);
+            // old style
             edges.put(new ExtendedGraphNodeTuple(source, operation), edge);
             targets.put(edge, target);
+            // new style
+            source.outgoingEdges.put(target, edge);
         }
 
         @Override
@@ -481,6 +486,33 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 throw new RuntimeException("Target not set!");
             }
             return target;
+        }
+
+        public List<ExtendedGraphEdge> getOptimalPath() {
+            List<ExtendedGraphNode> nodes = this.aStar(getRoot(), new DecisionGraphNodeCost(0));
+            if (nodes.isEmpty()) {
+                throw new RuntimeException("Nodes are unexpected empty!");
+            }
+            // transform the nodes into edges
+            Deque<ExtendedGraphNode> nodesTodo = new ArrayDeque<>();
+            nodesTodo.addAll(nodes);
+            List<ExtendedGraphEdge> edges = new ArrayList<>();
+            while(!nodesTodo.isEmpty()) {
+                ExtendedGraphNode node = nodesTodo.pop();
+                if (isGoal(node)) {
+                    break;
+                }
+                ExtendedGraphNode next = nodesTodo.peek();
+                ExtendedGraphEdge edge = this.getEdgeBetween(node, next);
+                edges.add(edge);
+            }
+            return edges;
+
+        }
+
+        private ExtendedGraphEdge getEdgeBetween(ExtendedGraphNode node, ExtendedGraphNode next) {
+            ExtendedGraphEdge edge = node.outgoingEdges.get(next);
+            return edge;
         }
     }
 
