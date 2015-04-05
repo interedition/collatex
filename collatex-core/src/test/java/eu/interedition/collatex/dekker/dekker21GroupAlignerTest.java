@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Iterator;
 import java.util.List;
 
+import static eu.interedition.collatex.dekker.VariantGraphMatcher.graph;
 import static org.junit.Assert.*;
 
 /**
@@ -70,5 +71,12 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         Dekker21Aligner.ExtendedGraphEdge edge = edges.get(0);
         assertEquals(Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE, edge.operation);
         assertLCPInterval("the same stuff", edge.lcp_interval, aligner);
+
+        // check the actual alignment
+        aligner.collate(g, w[1]);
+        //TODO: add the other tokens of the LCP interval
+        assertThat(g, graph(w[0]).aligned("the")); //, "same", "stuff"));
+        assertThat(g, graph(w[1]).aligned("the")); //, "same", "stuff"));
+
     }
 }

@@ -22,7 +22,7 @@ public abstract class AstarAlgorithm<N, C extends Cost<C>> {
   // The map of navigated nodes.
   protected Map<N, N> cameFrom;
 
-  public List<N> aStar(N startNode, C startCost) {
+  protected List<N> aStar(N startNode, C startCost) {
     // The set of nodes already evaluated.
     Set<N> closed = new HashSet<>();
     cameFrom = new HashMap<>();

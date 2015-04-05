@@ -24,7 +24,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     private LCP_Interval[] lcp_interval_array;
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
     private Map<Witness, Integer> witnessToStartToken;
-    private ThreeDimensionalDecisionGraph astar;
+    private ThreeDimensionalDecisionGraph decisionGraph;
 
     public Dekker21Aligner(SimpleWitness[] w) {
         // 1. prepare token array
@@ -104,15 +104,6 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         return normalized;
     }
 
-    //TODO: remove! Replace with createDecisionGraph
-    protected ThreeDimensionalDecisionGraph getDecisionGraph() {
-        if (astar == null) {
-            throw new IllegalStateException("Collate something first!");
-        }
-        return astar;
-    }
-
-
     private LCP_Interval[] construct_LCP_interval_array() {
         LCP_Interval[] lcp_interval_array = new LCP_Interval[token_array.size()];
         for (LCP_Interval interval : lcp_intervals) {
@@ -144,19 +135,28 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             }
             return;
         }
-        //NOTE: the following method assigns the decision graph to the field astar
+        //NOTE: the following method assigns the decision graph to the field decisionGraph
         createDecisionGraph(against, witness);
 
 
         // Do the actual alignment
-        List<ExtendedGraphNode> nodes = astar.aStar(new ExtendedGraphNode(0, against.getStart(), 0), new DecisionGraphNodeCost());
-        // from the list of nodes we need to extract the matches
+        List<ExtendedGraphEdge> edges = decisionGraph.getOptimalPath();
+        // from the list of edges we need to extract the matches
         // and construct a map (token -> vertex) containing the alignment.
         Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
-        for (DecisionGraphNode node : nodes) {
-            if (node.isMatch()) {
-                alignments.put(astar.token(node), astar.vertex(node));
+        ExtendedGraphNode previous = decisionGraph.getRoot();
+        for (ExtendedGraphEdge edge : edges) {
+            ExtendedGraphNode targetNode = decisionGraph.getTarget(edge);
+            //TODO: is match should be moved to the edge (instead of the target node)
+            if (targetNode.isMatch()) {
+                //TODO: this should be multiple vertices (length of LCP_interval
+//                for (int i=0; i < edge.lcp_interval.length; i++) {
+                    alignments.put(decisionGraph.token(previous), decisionGraph.vertex(previous));
+
+//                }
+
             }
+            previous = targetNode;
         }
         merge(against, witness, alignments);
     }
@@ -175,7 +175,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         List<Token> tok = copyIterable(witness);
         Token[] tokens = tok.toArray(new Token[tok.size()]);
 
-        // Align using astar algorithm in 2D
+        // Align using decisionGraph algorithm in 2D
         // first dimension: vertices in topological order
         // second dimension: witness tokens
         // TODO: This should be done in a 3D space. 2D causes artifacts, since there are multiple topological sorts of the graph.
@@ -184,8 +184,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         // TODO: third dimension: witness tokens
 
         VariantGraphRanking ranking = VariantGraphRanking.of(against);
-        astar = new ThreeDimensionalDecisionGraph(ranking, tokens, new SimpleMatcher(), beginWitness2);
-        return astar;
+        decisionGraph = new ThreeDimensionalDecisionGraph(ranking, tokens, new SimpleMatcher(), beginWitness2);
+        return decisionGraph;
     }
 
     enum EditOperationEnum {
@@ -428,24 +428,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
 
 
-        //        //NOTE: this scorer assigns positive costs
-//        @Override
-//        protected DecisionGraphNodeCost distBetween(DecisionGraphNode current, DecisionGraphNode neighbor) {
-//            if (neighbor.editOperation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
-//                VariantGraph.Vertex v = vertex(neighbor);
-//                Token t = token(neighbor);
-//                Boolean match = matcher.match(v, t);
-//                if (match) {
-//                    // Log("match: "+(neighbor.startPosWitness1-1)+", "+(neighbor.startPosWitness2-1));
-//                    neighbor.match = true;
-//                    return new DecisionGraphNodeCost(1);
-//                }
-//            }
-//            return new DecisionGraphNodeCost(0);
-//        }
 
 
 
+        //NOTE: this scorer assigns positive costs
         @Override
         protected DecisionGraphNodeCost distBetween(ExtendedGraphNode current, ExtendedGraphNode neighbor) {
             ExtendedGraphEdge edge = this.edgeBetween(current, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
@@ -461,7 +447,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
 
         public Token token(DecisionGraphNode node) {
-            return witnessTokens[node.startPosWitness2-1];
+            return witnessTokens[node.startPosWitness2];
         }
 
         public VariantGraph.Vertex vertex(DecisionGraphNode node) {
@@ -489,7 +475,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
 
         public List<ExtendedGraphEdge> getOptimalPath() {
-            List<ExtendedGraphNode> nodes = this.aStar(getRoot(), new DecisionGraphNodeCost(0));
+            List<ExtendedGraphNode> nodes = this.aStar(getRoot(), new DecisionGraphNodeCost());
             if (nodes.isEmpty()) {
                 throw new RuntimeException("Nodes are unexpected empty!");
             }
