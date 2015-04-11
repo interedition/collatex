@@ -152,16 +152,37 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             ExtendedGraphNode targetNode = decisionGraph.getTarget(edge);
             //TODO: is match should be moved to the edge (instead of the target node)
             if (targetNode.isMatch()) {
-                //TODO: this should be multiple vertices (length of LCP_interval
-//                for (int i=0; i < edge.lcp_interval.length; i++) {
-                    alignments.put(decisionGraph.token(previous), decisionGraph.vertex(previous));
-
-//                }
-
+                LCP_Interval lcpInterval = edge.lcp_interval;
+                //NOTE: this does not always have to be true
+                //intervals can occurr multiple times in one witness
+                int tokenPosition = getLowestTokenPosition(lcpInterval);
+                for (int i=0; i< lcpInterval.length; i++) {
+                    // we need:
+                    // 1. token in graph and associated vertex in graph (tokenPosition+i)
+                    // 2. token in witness (startRangeWitness+positionIndex+i)
+                    VariantGraph.Vertex v = vertex_array[tokenPosition+i];
+                    Token token = token_array.get(decisionGraph.startRangeWitness2+previous.startPosWitness2+i);
+                    alignments.put(token, v);
+                    //TODO: fill vertex array for current witness
+                }
             }
             previous = targetNode;
         }
         merge(against, witness, alignments);
+    }
+
+    private int getLowestTokenPosition(LCP_Interval lcpInterval) {
+        // search lowest token position in lcp interval
+        // that position will already be in the variant graph
+        int suffixStart = lcpInterval.start;
+        int suffixEnd = lcpInterval.end;
+        int lowestPosition = 0;
+        for (int i = suffixStart; i <= suffixEnd; i++) {
+            int tokenPosition = suffix_array[i];
+            if (tokenPosition < lowestPosition)
+                lowestPosition = tokenPosition;
+        }
+        return lowestPosition;
     }
 
     public ThreeDimensionalDecisionGraph createDecisionGraph(VariantGraph against, Iterable<Token> witness) {

@@ -39,10 +39,6 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertVertexEquals("stuff", vertices[2]);
     }
 
-
-
-
-
     @Test
     public void testCaseDecisionGraphThreeWitnessesMatches() {
         final SimpleWitness[] w = createWitnesses("The same stuff", "The same stuff");
@@ -92,9 +88,7 @@ public class dekker21GroupAlignerTest extends AbstractTest {
 
         // check the actual alignment
         aligner.collate(g, w[1]);
-        //TODO: add the other tokens of the LCP interval
-        assertThat(g, graph(w[0]).aligned("the")); //, "same", "stuff"));
-        assertThat(g, graph(w[1]).aligned("the")); //, "same", "stuff"));
-
+        assertThat(g, graph(w[0]).aligned("the", "same", "stuff"));
+        assertThat(g, graph(w[1]).aligned("the", "same", "stuff"));
     }
 }
