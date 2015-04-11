@@ -25,6 +25,24 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertEquals(j, decisionGraphNode.startPosWitness2);
     }
 
+
+    @Test
+    public void testCaseDecisionGraphFirstWitness() {
+        final SimpleWitness[] w = createWitnesses("The same stuff", "The same stuff");
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph g = new VariantGraph();
+        // we collate the first witness --> is a simple add
+        aligner.collate(g, w[0]);
+        VariantGraph.Vertex[] vertices = aligner.vertex_array;
+        assertVertexEquals("the", vertices[0]);
+        assertVertexEquals("same", vertices[1]);
+        assertVertexEquals("stuff", vertices[2]);
+    }
+
+
+
+
+
     @Test
     public void testCaseDecisionGraphThreeWitnessesMatches() {
         final SimpleWitness[] w = createWitnesses("The same stuff", "The same stuff");

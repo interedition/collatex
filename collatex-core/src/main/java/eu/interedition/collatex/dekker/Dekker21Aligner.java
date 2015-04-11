@@ -20,8 +20,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     private List<Token> token_array;
     private int[] suffix_array;
     protected int[] LCP_array;
-    private List<LCP_Interval> lcp_intervals;
     private LCP_Interval[] lcp_interval_array;
+    protected VariantGraph.Vertex[] vertex_array;
+    private List<LCP_Interval> lcp_intervals;
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
     private Map<Witness, Integer> witnessToStartToken;
     private ThreeDimensionalDecisionGraph decisionGraph;
@@ -49,6 +50,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         vertexToLCP = new HashMap<>();
         lcp_intervals = splitLCP_ArrayIntoIntervals();
         lcp_interval_array = construct_LCP_interval_array();
+        this.vertex_array = new VariantGraph.Vertex[token_array.size()];
     }
 
     protected List<LCP_Interval> splitLCP_ArrayIntoIntervals() {
@@ -131,6 +133,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
                 LCP_Interval interval = lcp_interval_array[tokenPosition];
                 vertexToLCP.put(vertex, interval);
+                vertex_array[tokenPosition] = vertex;
                 tokenPosition++;
             }
             return;
