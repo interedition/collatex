@@ -233,17 +233,6 @@ public class Dekker21AlignerTest extends AbstractTest {
 //        assertThat(g, graph(w[1]).aligned("a").non_aligned("e").aligned("c", "d"));
 //    }
 //
-//    @Test
-//    public void testCaseVariantGraphTwoDifferentWitnesses() {
-//        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog");
-//        Dekker21Aligner aligner = new Dekker21Aligner(w);
-//        VariantGraph g = new VariantGraph();
-//        aligner.collate(g, w);
-//
-//        assertThat(g, graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
-//        assertThat(g, graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
-//    }
-
 
 //    @Test
 //    public void testCaseDecisionGraphThreeWitnessesMatches() {

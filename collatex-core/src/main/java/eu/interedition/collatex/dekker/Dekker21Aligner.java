@@ -109,6 +109,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     private LCP_Interval[] construct_LCP_interval_array() {
         LCP_Interval[] lcp_interval_array = new LCP_Interval[token_array.size()];
         for (LCP_Interval interval : lcp_intervals) {
+            //TODO: why are there empty LCP intervals in the LCP_interval_array ?
+            if (interval.length==0) {
+                continue;
+            }
             for (int i = interval.start; i <= interval.end; i++) {
                 int tokenIndex = suffix_array[i];
                 //Log("Adding interval: " + interval.toString() + " to token number: " + tokenIndex);
@@ -371,15 +375,31 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 //            }
 
             // skip next graph LCP interval
-            LCP_Interval graph_interval = vertexToLCP.get(current.vertex);
-            int nextVertexRank = current.getVertexRank() + graph_interval.length;
+            VariantGraph.Vertex currentVertex = current.vertex;
+            LCP_Interval graph_interval = vertexToLCP.get(currentVertex);
+            //NOTE: not every vertex has to be associated with a LCP interval... non repeated unique blocks of text
+            //are not part of an interval, but do have vertices!
+            int nextVertexRank;
+            if (graph_interval!=null) {
+                nextVertexRank = current.getVertexRank() + graph_interval.length;
+            } else {
+                nextVertexRank = current.getVertexRank() + 1;
+                //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
+                graph_interval = new LCP_Interval(0, 0);
+            }
             if (!isHorizontalEnd(current)) {
                 //TODO: dit zouden in theorie meerdere vertices kunenn zijn..
-                //TODO: er moet in de constructor van de node moet of de rank of de vertex worden meegegeven..
-                //TODO: voor de derde dimensie is een vertex noodzakelijk
+                //TODO: er moet in de constructor van de node moet of de rank of de nextVertex worden meegegeven..
+                //TODO: voor de derde dimensie is een nextVertex noodzakelijk
                 //TODO: we zouden de graaf af moeten lopen..
-                VariantGraph.Vertex vertex = ranking.getByRank().get(nextVertexRank).iterator().next();
-                ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2);
+                //NOTE: +1 is because of skipping root vertex of variant graph
+                //TODO: remove duplication with the root node of decision graph
+                VariantGraph.Vertex nextVertex = ranking.getByRank().get(nextVertexRank+1).iterator().next();
+                //NOTE: Defensive programming!
+                if (currentVertex.equals(nextVertex)) {
+                    throw new RuntimeException("current, next Vertex: "+ currentVertex.toString()+" "+nextVertex);
+                }
+                ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, nextVertex, current.startPosWitness2);
                 neighbors.add(node);
                 addEdge(current, node, EditOperationEnum.SKIP_TOKEN_GRAPH, graph_interval);
             }
@@ -388,7 +408,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             // we might not be at the end of the tokens yet
             if (!isHorizontalEnd(current)&&!isVerticalEnd(current)) {
                 // children
-                Set<VariantGraph.Vertex> children = ranking.getByRank().get(nextVertexRank);
+                //TODO; remove duplication here!
+                //NOTE: +1 is because of skipping root vertex of variant graph
+                Set<VariantGraph.Vertex> children = ranking.getByRank().get(nextVertexRank+1);
                 for (VariantGraph.Vertex vertex : children) {
                     ExtendedGraphNode node = new ExtendedGraphNode(nextVertexRank, vertex, current.startPosWitness2+graph_interval.length);
                     neighbors.add(node);
@@ -401,7 +423,11 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 // calc position start position witness + position in witness
                 int token_position = startRangeWitness2 + current.startPosWitness2;
                 LCP_Interval witness_interval = lcp_interval_array[token_position];
-                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), current.vertex, current.startPosWitness2+witness_interval.length);
+                if (witness_interval==null) {
+                    //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
+                    witness_interval = new LCP_Interval(0, 0);
+                }
+                ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), currentVertex, current.startPosWitness2+witness_interval.length);
                 neighbors.add(node);
                 addEdge(current, node, EditOperationEnum.SKIP_TOKEN_WITNESS, witness_interval);
             }
@@ -463,7 +489,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         @Override
         protected DecisionGraphNodeCost distBetween(ExtendedGraphNode current, ExtendedGraphNode neighbor) {
             ExtendedGraphEdge edge = this.edgeBetween(current, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
-            if (this.getTarget(edge).equals(neighbor)) {
+            if (edge!=null&&this.getTarget(edge).equals(neighbor)) {
                 LCP_Interval graphInterval = edge.lcp_interval;
                 LCP_Interval witnessInterval = lcp_interval_array[startRangeWitness2+current.startPosWitness2];
                 if (graphInterval==witnessInterval) {
@@ -488,9 +514,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         public ExtendedGraphEdge edgeBetween(ExtendedGraphNode source, EditOperationEnum operation) {
             ExtendedGraphEdge edge = edges.get(new ExtendedGraphNodeTuple(source, operation));
-            if (edge == null) {
-                throw new RuntimeException("Edge not present!");
-            }
+//            if (edge == null) {
+//                throw new RuntimeException("Edge not present!");
+//            }
             return edge;
         }
 
