@@ -19,11 +19,13 @@
 
 package eu.interedition.collatex.laboratory;
 
+import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.Dekker21Aligner;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -47,7 +49,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +82,6 @@ public class CollateXLaboratory extends JFrame {
         this.algorithm.setMaximumSize(new Dimension(200, this.algorithm.getMaximumSize().height));
 
         this.tabbedPane = new JTabbedPane();
-        this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
         matchMatrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         matchMatrixTable.setShowGrid(true);
         matchMatrixTable.setGridColor(new Color(0, 0, 0, 32));
@@ -110,6 +113,83 @@ public class CollateXLaboratory extends JFrame {
 
         splitPane.setDividerLocation(0.3f);
 
+        // mxGraphComponent graphComponent = decisionGraphHelloWorldExample();
+        mxGraphComponent graphComponent = decisionGraphBlackCat();
+
+        //NOTE: wrap in JScrollPane?
+        this.tabbedPane.addTab("Decision graph", graphComponent);
+        this.tabbedPane.addTab("Match Table", new JScrollPane(matchMatrixTable));
+    }
+
+    private mxGraphComponent decisionGraphBlackCat() {
+        SimpleWitness w1 = new SimpleWitness("a", "The same stuff");
+        SimpleWitness w2 = new SimpleWitness("b", "The same stuff");
+//        SimpleWitness w1 = new SimpleWitness("a", "The black cat");
+//        SimpleWitness w2 = new SimpleWitness("b", "The red cat");
+        SimpleWitness[] w = new SimpleWitness[] { w1, w2 };
+
+        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w1);
+        Dekker21Aligner.ThreeDimensionalDecisionGraph decisionGraph = aligner.createDecisionGraph(graph, w2);
+        try {
+            decisionGraph.getOptimalPath();
+        } catch (Exception e) {
+            System.out.println("Can't find a path through the graph!");
+        }
+
+
+        Dekker21Aligner.ExtendedGraphNode startNode = decisionGraph.getRoot();
+
+        // prepare visual graph
+        mxGraph vizGraph = new mxGraph();
+        Object parent = vizGraph.getDefaultParent();
+
+        // convert root decision graph node to mxNode
+        vizGraph.getModel().beginUpdate();
+
+        Object root = vizGraph.insertVertex(parent, null, "root", 20, 30, 100, 100);
+
+        // fetch edges of root node
+        for (Dekker21Aligner.ExtendedGraphEdge edge : startNode.outgoingEdges.values()) {
+            Dekker21Aligner.ExtendedGraphNode target = decisionGraph.getTarget(edge);
+            Object newVertex = vizGraph.insertVertex(parent, null, target.represent(), 20, 50, 100, 100);
+            vizGraph.insertEdge(parent, null, edge.represent(aligner), root, newVertex);
+
+
+        }
+
+        // set layout of graph
+        mxCircleLayout circleLayout = new mxCircleLayout(vizGraph);
+        circleLayout.execute(parent);
+
+        vizGraph.getModel().endUpdate();
+
+
+//        // prepare map
+//        Map<Dekker21Aligner.ExtendedGraphNode, Object> t = new HashMap<>();
+//
+//        // build viz graph
+//        vizGraph.getModel().beginUpdate();
+//        try {
+//            // have to map the extended graph nodes to viz graph nodes
+//            Dekker21Aligner.ExtendedGraphNode previous = null;
+//            for (Dekker21Aligner.ExtendedGraphNode node : nodes) {
+//                Object v1 = vizGraph.insertVertex(parent, null, ""+node.getVertexRank(), 0, 0, 100, 100);
+//                t.put(node, v1);
+//                if (previous != null) {
+//                    vizGraph.insertEdge(parent, null, ""+node.editOperation, previous, v1);
+//                }
+//                previous = node;
+//            }
+//        } finally {
+//            vizGraph.getModel().endUpdate();
+//        }
+
+        return new mxGraphComponent(vizGraph);
+    }
+
+    private mxGraphComponent decisionGraphHelloWorldExample() {
         // hello world example for JGraphX
         mxGraph graph = new mxGraph();
         Object parent = graph.getDefaultParent();
@@ -126,9 +206,7 @@ public class CollateXLaboratory extends JFrame {
             graph.getModel().endUpdate();
         }
 
-        mxGraphComponent graphComponent = new mxGraphComponent(graph);
-        //NOTE: wrap in JScrollPane?
-        this.tabbedPane.addTab("Decision graph", graphComponent);
+        return new mxGraphComponent(graph);
     }
 
     public static void main(String[] args) {

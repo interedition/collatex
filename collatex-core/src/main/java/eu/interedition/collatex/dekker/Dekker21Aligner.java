@@ -301,6 +301,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         public int hashCode() {
             return vertex.hashCode() + 97 * startPosWitness2;
         }
+
+        public String represent() {
+            return String.format("(%d, %d)", this.getVertexRank(), this.startPosWitness2);
+        }
     }
 
     public class ThreeDimensionalDecisionGraph extends AstarAlgorithm<ExtendedGraphNode, DecisionGraphNodeCost> {
@@ -562,6 +566,21 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         public ExtendedGraphEdge(EditOperationEnum operation, LCP_Interval lcp_interval) {
             this.operation = operation;
             this.lcp_interval = lcp_interval;
+        }
+
+        public String represent(Dekker21Aligner aligner) {
+            String result = "";
+            if (operation == EditOperationEnum.SKIP_TOKEN_GRAPH) {
+                result += "remove";
+            } else if (operation == EditOperationEnum.MATCH_TOKENS_OR_REPLACE) {
+                result += "match/replace";
+            } else if (operation == EditOperationEnum.SKIP_TOKEN_WITNESS) {
+                result += "add";
+            }
+            result += " (";
+            result += aligner.getNormalizedForm(lcp_interval);
+            result += ")";
+            return result;
         }
     }
 
