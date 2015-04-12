@@ -19,7 +19,8 @@
 
 package eu.interedition.collatex.laboratory;
 
-import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxFastOrganicLayout;
+import com.mxgraph.layout.mxGraphLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 import eu.interedition.collatex.CollationAlgorithm;
@@ -34,24 +35,18 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -122,10 +117,10 @@ public class CollateXLaboratory extends JFrame {
     }
 
     private mxGraphComponent decisionGraphBlackCat() {
-        SimpleWitness w1 = new SimpleWitness("a", "The same stuff");
-        SimpleWitness w2 = new SimpleWitness("b", "The same stuff");
-//        SimpleWitness w1 = new SimpleWitness("a", "The black cat");
-//        SimpleWitness w2 = new SimpleWitness("b", "The red cat");
+//        SimpleWitness w1 = new SimpleWitness("a", "The same stuff");
+//        SimpleWitness w2 = new SimpleWitness("b", "The same stuff");
+        SimpleWitness w1 = new SimpleWitness("a", "The black cat");
+        SimpleWitness w2 = new SimpleWitness("b", "The red cat");
         SimpleWitness[] w = new SimpleWitness[] { w1, w2 };
 
         Dekker21Aligner aligner = new Dekker21Aligner(w);
@@ -145,46 +140,46 @@ public class CollateXLaboratory extends JFrame {
         mxGraph vizGraph = new mxGraph();
         Object parent = vizGraph.getDefaultParent();
 
+        // prepare map (decision graph --> viz graph)
+        Map<Dekker21Aligner.ExtendedGraphNode, Object> t = new HashMap<>();
+
+
         // convert root decision graph node to mxNode
         vizGraph.getModel().beginUpdate();
 
         Object root = vizGraph.insertVertex(parent, null, "root", 20, 30, 100, 100);
 
-        // fetch edges of root node
-        for (Dekker21Aligner.ExtendedGraphEdge edge : startNode.outgoingEdges.values()) {
-            Dekker21Aligner.ExtendedGraphNode target = decisionGraph.getTarget(edge);
-            Object newVertex = vizGraph.insertVertex(parent, null, target.represent(), 20, 50, 100, 100);
-            vizGraph.insertEdge(parent, null, edge.represent(aligner), root, newVertex);
+        t.put(startNode, root);
 
+        Deque<Dekker21Aligner.ExtendedGraphNode> stack = new ArrayDeque<>();
+        stack.add(startNode);
 
+        while (!stack.isEmpty()) {
+            Dekker21Aligner.ExtendedGraphNode current = stack.pop();
+            System.out.println("Working on "+current.represent());
+            Object vizNode = t.get(current);
+            // fetch edges of current node
+            for (Dekker21Aligner.ExtendedGraphEdge edge : current.outgoingEdges.values()) {
+                Dekker21Aligner.ExtendedGraphNode target = decisionGraph.getTarget(edge);
+                if (!t.containsKey(target)) {
+                    Object newVertex = vizGraph.insertVertex(parent, null, target.represent(), 20, 50, 100, 100);
+                    vizGraph.insertEdge(parent, null, edge.represent(aligner), vizNode, newVertex);
+                    t.put(target, newVertex);
+                    stack.add(target);
+                } else {
+                    Object targetVertex = t.get(target);
+                    vizGraph.insertEdge(parent, null, edge.represent(aligner), vizNode, targetVertex);
+                }
+            }
         }
 
+
+
         // set layout of graph
-        mxCircleLayout circleLayout = new mxCircleLayout(vizGraph);
-        circleLayout.execute(parent);
+        mxGraphLayout layout = new mxFastOrganicLayout(vizGraph);
+        layout.execute(parent);
 
         vizGraph.getModel().endUpdate();
-
-
-//        // prepare map
-//        Map<Dekker21Aligner.ExtendedGraphNode, Object> t = new HashMap<>();
-//
-//        // build viz graph
-//        vizGraph.getModel().beginUpdate();
-//        try {
-//            // have to map the extended graph nodes to viz graph nodes
-//            Dekker21Aligner.ExtendedGraphNode previous = null;
-//            for (Dekker21Aligner.ExtendedGraphNode node : nodes) {
-//                Object v1 = vizGraph.insertVertex(parent, null, ""+node.getVertexRank(), 0, 0, 100, 100);
-//                t.put(node, v1);
-//                if (previous != null) {
-//                    vizGraph.insertEdge(parent, null, ""+node.editOperation, previous, v1);
-//                }
-//                previous = node;
-//            }
-//        } finally {
-//            vizGraph.getModel().endUpdate();
-//        }
 
         return new mxGraphComponent(vizGraph);
     }
