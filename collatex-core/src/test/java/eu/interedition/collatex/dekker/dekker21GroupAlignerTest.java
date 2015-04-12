@@ -95,8 +95,7 @@ public class dekker21GroupAlignerTest extends AbstractTest {
 
     @Test
     public void testCaseDecisionGraphTwoWitnessesReplacement() {
-        //TODO; add cat after the witnesses... this will trigger a bug
-        final SimpleWitness[] w = createWitnesses("The black", "The red");
+        final SimpleWitness[] w = createWitnesses("The black cat", "The red cat");
         Dekker21Aligner aligner = new Dekker21Aligner(w);
         VariantGraph g = new VariantGraph();
         // we collate the first witness --> is a simple add
@@ -134,6 +133,11 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertEquals(0, decisionGraph.distBetween(root, target1).alignedTokens);
         assertEquals(1, decisionGraph.distBetween(root, target2).alignedTokens);
         assertEquals(0, decisionGraph.distBetween(root, target3).alignedTokens);
+
+        // check heuristic costs of target nodes
+        assertEquals(1, decisionGraph.heuristicCostEstimate(target1).alignedTokens);
+        assertEquals(1, decisionGraph.heuristicCostEstimate(target2).alignedTokens);
+        assertEquals(1, decisionGraph.heuristicCostEstimate(target3).alignedTokens);
 
         //TODO: check alignment path!
 

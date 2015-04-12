@@ -449,6 +449,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             source.outgoingEdges.put(target, edge);
         }
 
+        //NOTE: The heuristic cost estimate for the root node of the decision graph is wrong
+        //NOTE: this does not yet have consequences because the root node is always selected, after which the heuristic is overwritten
         @Override
         protected DecisionGraphNodeCost heuristicCostEstimate(ExtendedGraphNode node) {
             // traverse the vertices from the current rank to the last
@@ -456,8 +458,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             int potentialMatchesGraph = 0;
             int vertexRank = node.getVertexRank();
             int endRank = ranking.size();
-
-            for (int i = vertexRank; i < endRank; i++) {
+            // +1 to skip start vertex of variant graph
+            // without end rank to skip end vertex of variant graph
+            for (int i = vertexRank+1; i < endRank; i++) {
                 for (VariantGraph.Vertex vertex : ranking.getByRank().get(i)) {
                     if (vertex != node.vertex && vertexToLCP.get(vertex) != null) {
                         potentialMatchesGraph++;
