@@ -275,9 +275,11 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     public static class ExtendedGraphNode extends DecisionGraphNode {
 
-        private int vertexRank;
+        private final int vertexRank;
         private final VariantGraph.Vertex vertex;
         public final Map<ExtendedGraphNode, ExtendedGraphEdge> outgoingEdges;
+        protected int cost; // to be assigned by the cost function in the aligner
+        protected int heuristicCost; // to be assigned by the heuristic cost function in the aligner
 
         public ExtendedGraphNode(int vertexRank, VariantGraph.Vertex vertex, int startPosWitness2) {
             this.vertexRank = vertexRank;
@@ -307,7 +309,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         }
 
         public String represent() {
-            return String.format("(%d, %d)", this.getVertexRank(), this.startPosWitness2);
+            return String.format("(%d, %d) (%d, %d)", this.getVertexRank(), this.startPosWitness2, this.cost, this.heuristicCost);
         }
     }
 
@@ -478,6 +480,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 }
             }
             int potentialMatches = Math.min(potentialMatchesGraph, potentialMatchesWitness);
+
+            // put heuristic cost on the node
+            node.heuristicCost = potentialMatches;
+
             return new DecisionGraphNodeCost(potentialMatches);
         }
 
@@ -494,6 +500,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 LCP_Interval witnessInterval = lcp_interval_array[startRangeWitness2+current.startPosWitness2];
                 if (graphInterval==witnessInterval) {
                     neighbor.match = true;
+                    // set cost on neighbor if it is higher
+                    if (neighbor.cost < graphInterval.length) {
+                        neighbor.cost = graphInterval.length;
+                    }
                     return new DecisionGraphNodeCost(graphInterval.length);
                 }
             }
