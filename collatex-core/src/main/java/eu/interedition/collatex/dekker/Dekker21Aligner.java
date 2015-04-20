@@ -18,8 +18,7 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     protected TokenIndex tokenIndex;
-    private List<Token> token_array;
-    private int[] suffix_array;
+    protected List<Token> token_array;
     private LCP_Interval[] lcp_interval_array;
     protected VariantGraph.Vertex[] vertex_array;
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
@@ -43,12 +42,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             }
             //TODO: add witness separation marker token
         }
-        Comparator<Token> comparator = new SimpleTokenNormalizedFormComparator();
-        SuffixData suffixData = SuffixArrays.createWithLCP(token_array.toArray(new Token[0]), new SAIS(), comparator);
-        suffix_array = suffixData.getSuffixArray();
-        tokenIndex.LCP_array = suffixData.getLCP();
+        tokenIndex.prepare();
         vertexToLCP = new HashMap<>();
-        tokenIndex.lcp_intervals = tokenIndex.splitLCP_ArrayIntoIntervals();
         lcp_interval_array = construct_LCP_interval_array();
         this.vertex_array = new VariantGraph.Vertex[token_array.size()];
     }
@@ -60,7 +55,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     protected String getNormalizedForm(LCP_Interval interval) {
         int suffix_start = interval.start;
-        int token_pos = this.suffix_array[suffix_start];
+        int token_pos = tokenIndex.suffix_array[suffix_start];
         List<Token> tokens = new ArrayList<>();
         for (int i = 0; i < interval.length; i++) {
             Token t = this.token_array.get(token_pos+i);
@@ -85,9 +80,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 continue;
             }
             for (int i = interval.start; i <= interval.end; i++) {
-                int tokenIndex = suffix_array[i];
+                int tokenPosition = tokenIndex.suffix_array[i];
                 //Log("Adding interval: " + interval.toString() + " to token number: " + tokenIndex);
-                lcp_interval_array[tokenIndex] = interval;
+                lcp_interval_array[tokenPosition] = interval;
             }
         }
 //        //NOTE: For tokens that are not repeated we create new LCP intervals here
@@ -163,7 +158,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         int suffixEnd = lcpInterval.end;
         int lowestPosition = 0;
         for (int i = suffixStart; i <= suffixEnd; i++) {
-            int tokenPosition = suffix_array[i];
+            int tokenPosition = tokenIndex.suffix_array[i];
             if (tokenPosition < lowestPosition)
                 lowestPosition = tokenPosition;
         }

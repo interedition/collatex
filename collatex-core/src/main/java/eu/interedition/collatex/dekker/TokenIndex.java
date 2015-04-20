@@ -1,6 +1,12 @@
 package eu.interedition.collatex.dekker;
 
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.suffixarray.SAIS;
+import eu.interedition.collatex.suffixarray.SuffixArrays;
+import eu.interedition.collatex.suffixarray.SuffixData;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 
@@ -11,9 +17,18 @@ public class TokenIndex {
     private final Dekker21Aligner aligner;
     public List<LCP_Interval> lcp_intervals;
     public int[] LCP_array;
+    public int[] suffix_array;
 
     public TokenIndex(Dekker21Aligner aligner) {
         this.aligner = aligner;
+    }
+
+    public void prepare() {
+        Comparator<Token> comparator = new SimpleTokenNormalizedFormComparator();
+        SuffixData suffixData = SuffixArrays.createWithLCP(aligner.token_array.toArray(new Token[0]), new SAIS(), comparator);
+        this.suffix_array = suffixData.getSuffixArray();
+        this.LCP_array = suffixData.getLCP();
+        this.lcp_intervals = splitLCP_ArrayIntoIntervals();
     }
 
     protected List<LCP_Interval> splitLCP_ArrayIntoIntervals() {
