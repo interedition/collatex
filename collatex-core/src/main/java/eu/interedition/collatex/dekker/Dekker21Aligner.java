@@ -18,34 +18,21 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     protected TokenIndex tokenIndex;
-    protected List<Token> token_array;
     private LCP_Interval[] lcp_interval_array;
     protected VariantGraph.Vertex[] vertex_array;
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
-    private Map<Witness, Integer> witnessToStartToken;
     private ThreeDimensionalDecisionGraph decisionGraph;
 
     public Dekker21Aligner(SimpleWitness[] w) {
-        this.tokenIndex = new TokenIndex(this);
+        this.tokenIndex = new TokenIndex(this, w);
         // 1. prepare token array
         // 2. derive the suffix array
         // 3. derive LCP array
         // 4. derive LCP intervals
-        token_array = new ArrayList<>();
-        int counter = 0;
-        witnessToStartToken = new HashMap<>();
-        for (SimpleWitness witness : w) {
-            witnessToStartToken.put(witness, counter);
-            for (Token t : witness) {
-                token_array.add(t);
-                counter++;
-            }
-            //TODO: add witness separation marker token
-        }
         tokenIndex.prepare();
         vertexToLCP = new HashMap<>();
         lcp_interval_array = construct_LCP_interval_array();
-        this.vertex_array = new VariantGraph.Vertex[token_array.size()];
+        this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.size()];
     }
 
 
@@ -58,7 +45,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         int token_pos = tokenIndex.suffix_array[suffix_start];
         List<Token> tokens = new ArrayList<>();
         for (int i = 0; i < interval.length; i++) {
-            Token t = this.token_array.get(token_pos+i);
+            Token t = tokenIndex.token_array.get(token_pos+i);
             tokens.add(t);
         }
         String normalized = "";
@@ -73,7 +60,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     }
 
     private LCP_Interval[] construct_LCP_interval_array() {
-        LCP_Interval[] lcp_interval_array = new LCP_Interval[token_array.size()];
+        LCP_Interval[] lcp_interval_array = new LCP_Interval[tokenIndex.token_array.size()];
         for (LCP_Interval interval : tokenIndex.lcp_intervals) {
             //TODO: why are there empty LCP intervals in the LCP_interval_array ?
             if (interval.length==0) {
@@ -141,7 +128,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                     // 1. token in graph and associated vertex in graph (tokenPosition+i)
                     // 2. token in witness (startRangeWitness+positionIndex+i)
                     VariantGraph.Vertex v = vertex_array[tokenPosition+i];
-                    Token token = token_array.get(decisionGraph.startRangeWitness2+previous.startPosWitness2+i);
+                    Token token = tokenIndex.token_array.get(decisionGraph.startRangeWitness2+previous.startPosWitness2+i);
                     alignments.put(token, v);
                     //TODO: fill vertex array for current witness
                 }
@@ -166,7 +153,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     }
 
     public ThreeDimensionalDecisionGraph createDecisionGraph(VariantGraph against, Iterable<Token> witness) {
-        int beginWitness2 = witnessToStartToken.get(witness.iterator().next().getWitness());
+        int beginWitness2 = tokenIndex.getStartTokenPositionForWitness(witness.iterator().next().getWitness());
 
         // prepare vertices
         List<VariantGraph.Vertex> vert = copyIterable(against.vertices());
