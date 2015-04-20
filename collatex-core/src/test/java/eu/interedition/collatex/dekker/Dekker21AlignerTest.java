@@ -23,12 +23,12 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals(j, decisionGraphNode.startPosWitness2);
     }
 
-    private void assertMatch(int i, int j, boolean match, ExtendedGraphNode decisionGraphNode) {
-        assertEquals(i, decisionGraphNode.startPosWitness1);
-        assertEquals(j, decisionGraphNode.startPosWitness2);
-        assertEquals(match, decisionGraphNode.isMatch());
-    }
-
+//    private void assertMatch(int i, int j, boolean match, ExtendedGraphNode decisionGraphNode) {
+//        assertEquals(i, decisionGraphNode.startPosWitness1);
+//        assertEquals(j, decisionGraphNode.startPosWitness2);
+//        assertEquals(match, decisionGraphNode.isMatch());
+//    }
+//
     private void debugPath(Dekker21Aligner.ThreeDimensionalDecisionGraph decisionGraph, List<Dekker21Aligner.ExtendedGraphNode> decisionGraphNodes) {
         for (ExtendedGraphNode node : decisionGraphNodes) {
             System.out.println(node.startPosWitness1 + ":" + node.startPosWitness2);

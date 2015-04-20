@@ -89,11 +89,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         ExtendedGraphNode previous = decisionGraph.getRoot();
         for (ExtendedGraphEdge edge : edges) {
             ExtendedGraphNode targetNode = decisionGraph.getTarget(edge);
-            //TODO: is match should be moved to the edge (instead of the target node)
-            if (targetNode.isMatch()) {
+            if (edge.isMatch()) {
                 LCP_Interval lcpInterval = edge.lcp_interval;
                 //NOTE: this does not always have to be true
-                //intervals can occurr multiple times in one witness
+                //intervals can occur multiple times in one witness
                 int tokenPosition = getLowestTokenPosition(lcpInterval);
                 for (int i=0; i< lcpInterval.length; i++) {
                     // we need:
@@ -161,8 +160,6 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     public static class DecisionGraphNode {
         int startPosWitness1 = 0;
         int startPosWitness2 = 0;
-        //TODO: move to edge!
-        boolean match;
 
         public DecisionGraphNode() {
             this(0,0);
@@ -178,10 +175,6 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             copy.startPosWitness1 = this.startPosWitness1;
             copy.startPosWitness2 = this.startPosWitness2;
             return copy;
-        }
-
-        public boolean isMatch() {
-            return match;
         }
     }
 
@@ -437,7 +430,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 LCP_Interval graphInterval = edge.lcp_interval;
                 LCP_Interval witnessInterval = tokenIndex.getLCP_intervalFor(startRangeWitness2+current.startPosWitness2);
                 if (graphInterval==witnessInterval) {
-                    neighbor.match = true;
+                    edge.match = true;
                     // set cost on neighbor if it is higher
                     if (neighbor.cost < graphInterval.length) {
                         neighbor.cost = graphInterval.length;
@@ -536,6 +529,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     public class ExtendedGraphEdge {
         protected EditOperationEnum operation;
         protected LCP_Interval lcp_interval;
+        private boolean match;
 
         public ExtendedGraphEdge(EditOperationEnum operation, LCP_Interval lcp_interval) {
             this.operation = operation;
@@ -555,6 +549,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             result += aligner.getNormalizedForm(lcp_interval);
             result += ")";
             return result;
+        }
+
+        public boolean isMatch() {
+            return match;
         }
     }
 
