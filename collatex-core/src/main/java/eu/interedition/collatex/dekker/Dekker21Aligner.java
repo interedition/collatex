@@ -70,7 +70,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             int tokenPosition = 0;
             for (Token token : witness) {
                 VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
-                LCP_Interval interval = tokenIndex.lcp_interval_array[tokenPosition];
+                LCP_Interval interval = tokenIndex.getLCP_intervalFor(tokenPosition);
                 vertexToLCP.put(vertex, interval);
                 vertex_array[tokenPosition] = vertex;
                 tokenPosition++;
@@ -359,7 +359,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             if (!isVerticalEnd(current)) {
                 // calc position start position witness + position in witness
                 int token_position = startRangeWitness2 + current.startPosWitness2;
-                LCP_Interval witness_interval = tokenIndex.lcp_interval_array[token_position];
+                LCP_Interval witness_interval = tokenIndex.getLCP_intervalFor(token_position);
                 if (witness_interval==null) {
                     //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
                     witness_interval = new LCP_Interval(0, 0);
@@ -413,7 +413,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
             int potentialMatchesWitness = 0;
             for (int i = startRangeWitness2 + node.startPosWitness2; i < startRangeWitness2+witnessTokens.length; i++) {
-                if (tokenIndex.lcp_interval_array[i] != null) {
+                if (tokenIndex.hasLCP_intervalFor(i)) {
                     potentialMatchesWitness++;
                 }
             }
@@ -435,7 +435,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             ExtendedGraphEdge edge = this.edgeBetween(current, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
             if (edge!=null&&this.getTarget(edge).equals(neighbor)) {
                 LCP_Interval graphInterval = edge.lcp_interval;
-                LCP_Interval witnessInterval = tokenIndex.lcp_interval_array[startRangeWitness2+current.startPosWitness2];
+                LCP_Interval witnessInterval = tokenIndex.getLCP_intervalFor(startRangeWitness2+current.startPosWitness2);
                 if (graphInterval==witnessInterval) {
                     neighbor.match = true;
                     // set cost on neighbor if it is higher

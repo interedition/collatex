@@ -21,7 +21,7 @@ public class TokenIndex {
     public int[] suffix_array;
     public int[] LCP_array;
     public List<LCP_Interval> lcp_intervals;
-    protected LCP_Interval[] lcp_interval_array;
+    private LCP_Interval[] lcp_interval_array;
     private final Dekker21Aligner aligner;
 
     public TokenIndex(Dekker21Aligner aligner, SimpleWitness[] w) {
@@ -118,5 +118,11 @@ public class TokenIndex {
     }
 
 
+    public LCP_Interval getLCP_intervalFor(int tokenPosition) {
+        return lcp_interval_array[tokenPosition];
+    }
 
+    public boolean hasLCP_intervalFor(int i) {
+        return lcp_interval_array[i]!=null;
+    }
 }
