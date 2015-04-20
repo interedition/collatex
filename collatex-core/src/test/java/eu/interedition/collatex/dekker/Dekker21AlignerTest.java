@@ -66,7 +66,7 @@ public class Dekker21AlignerTest extends AbstractTest {
         // 3: a, d, b
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
         Dekker21Aligner aligner = new Dekker21Aligner(w);
-        List<LCP_Interval> lcp_intervals = aligner.splitLCP_ArrayIntoIntervals();
+        List<LCP_Interval> lcp_intervals = aligner.tokenIndex.splitLCP_ArrayIntoIntervals();
         assertLCP_Interval(0, 1, 3, lcp_intervals.get(0)); // a
         assertLCP_Interval(3, 1, 2, lcp_intervals.get(1)); // b
         assertLCP_Interval(5, 2, 2, lcp_intervals.get(2)); // c d

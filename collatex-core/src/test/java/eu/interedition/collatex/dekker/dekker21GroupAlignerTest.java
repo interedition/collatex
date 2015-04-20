@@ -139,6 +139,24 @@ public class dekker21GroupAlignerTest extends AbstractTest {
         assertEquals(1, decisionGraph.heuristicCostEstimate(target2).alignedTokens);
         assertEquals(1, decisionGraph.heuristicCostEstimate(target3).alignedTokens);
 
+//        // we take the next step
+//        decisionGraph.neighborNodes(target2);
+//
+//        edge1 = decisionGraph.edgeBetween(target2, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_GRAPH);
+//        edge2 = decisionGraph.edgeBetween(target2, Dekker21Aligner.EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
+//        edge3 = decisionGraph.edgeBetween(target2, Dekker21Aligner.EditOperationEnum.SKIP_TOKEN_WITNESS);
+//
+//        target1 = decisionGraph.getTarget(edge1);
+//        target2 = decisionGraph.getTarget(edge2);
+//        target3 = decisionGraph.getTarget(edge3);
+//
+//        // assert LCP interval on the edges
+//        assertLCPInterval("black", edge1.lcp_interval, aligner);
+//        assertLCPInterval("black", edge2.lcp_interval, aligner);
+//        assertLCPInterval("red", edge3.lcp_interval, aligner);
+
+
+
         //TODO: check alignment path!
 
 //        // check alignment path
