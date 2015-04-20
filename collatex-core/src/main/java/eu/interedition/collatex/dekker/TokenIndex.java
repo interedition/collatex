@@ -21,6 +21,7 @@ public class TokenIndex {
     public int[] suffix_array;
     public int[] LCP_array;
     public List<LCP_Interval> lcp_intervals;
+    protected LCP_Interval[] lcp_interval_array;
     private final Dekker21Aligner aligner;
 
     public TokenIndex(Dekker21Aligner aligner, SimpleWitness[] w) {
@@ -32,6 +33,10 @@ public class TokenIndex {
         return witnessToStartToken.get(witness);
     }
 
+    // 1. prepare token array
+    // 2. derive the suffix array
+    // 3. derive LCP array
+    // 4. derive LCP intervals
     public void prepare() {
         this.prepareTokenArray();
         Comparator<Token> comparator = new SimpleTokenNormalizedFormComparator();
@@ -39,6 +44,7 @@ public class TokenIndex {
         this.suffix_array = suffixData.getSuffixArray();
         this.LCP_array = suffixData.getLCP();
         this.lcp_intervals = splitLCP_ArrayIntoIntervals();
+        lcp_interval_array = construct_LCP_interval_array();
     }
 
     private void prepareTokenArray() {
@@ -84,5 +90,33 @@ public class TokenIndex {
         }
         return closedIntervals;
     }
+
+    private LCP_Interval[] construct_LCP_interval_array() {
+        LCP_Interval[] lcp_interval_array = new LCP_Interval[token_array.size()];
+        for (LCP_Interval interval : lcp_intervals) {
+            //TODO: why are there empty LCP intervals in the LCP_interval_array ?
+            if (interval.length==0) {
+                continue;
+            }
+            for (int i = interval.start; i <= interval.end; i++) {
+                int tokenPosition = suffix_array[i];
+                //Log("Adding interval: " + interval.toString() + " to token number: " + tokenIndex);
+                lcp_interval_array[tokenPosition] = interval;
+            }
+        }
+//        //NOTE: For tokens that are not repeated we create new LCP intervals here
+//        //This is not very space efficient, but it makes life much easier for the code that follows
+//        for (int i=0; i< this.token_array.size(); i++) {
+//            if (lcp_interval_array[i]==null) {
+//                // create new LCP interval for token
+//                LCP_Interval lcp_interval;
+//                //NOTE: I have to know the start and end position of token in the suffix array... not easy!
+//                lcp_interval = new LCP_Interval()
+//            }
+//        }
+        return lcp_interval_array;
+    }
+
+
 
 }

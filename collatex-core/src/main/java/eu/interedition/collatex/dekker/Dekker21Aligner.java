@@ -18,20 +18,18 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 public class Dekker21Aligner extends CollationAlgorithm.Base {
 
     protected TokenIndex tokenIndex;
-    private LCP_Interval[] lcp_interval_array;
+    // tokens are mapped to vertices by their position in the token array
     protected VariantGraph.Vertex[] vertex_array;
+    // map vertices to LCP
+    // NOTE: vertices contain tokens... tokens are already mapped to LCP intervals
+    // NOTE: It should be possible to remove this map
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
     private ThreeDimensionalDecisionGraph decisionGraph;
 
     public Dekker21Aligner(SimpleWitness[] w) {
         this.tokenIndex = new TokenIndex(this, w);
-        // 1. prepare token array
-        // 2. derive the suffix array
-        // 3. derive LCP array
-        // 4. derive LCP intervals
         tokenIndex.prepare();
         vertexToLCP = new HashMap<>();
-        lcp_interval_array = construct_LCP_interval_array();
         this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.size()];
     }
 
@@ -59,32 +57,6 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         return normalized;
     }
 
-    private LCP_Interval[] construct_LCP_interval_array() {
-        LCP_Interval[] lcp_interval_array = new LCP_Interval[tokenIndex.token_array.size()];
-        for (LCP_Interval interval : tokenIndex.lcp_intervals) {
-            //TODO: why are there empty LCP intervals in the LCP_interval_array ?
-            if (interval.length==0) {
-                continue;
-            }
-            for (int i = interval.start; i <= interval.end; i++) {
-                int tokenPosition = tokenIndex.suffix_array[i];
-                //Log("Adding interval: " + interval.toString() + " to token number: " + tokenIndex);
-                lcp_interval_array[tokenPosition] = interval;
-            }
-        }
-//        //NOTE: For tokens that are not repeated we create new LCP intervals here
-//        //This is not very space efficient, but it makes life much easier for the code that follows
-//        for (int i=0; i< this.token_array.size(); i++) {
-//            if (lcp_interval_array[i]==null) {
-//                // create new LCP interval for token
-//                LCP_Interval lcp_interval;
-//                //NOTE: I have to know the start and end position of token in the suffix array... not easy!
-//                lcp_interval = new LCP_Interval()
-//            }
-//        }
-        return lcp_interval_array;
-    }
-
     @Override
     public void collate(VariantGraph against, Iterable<Token> witness) {
         // first witness?
@@ -98,7 +70,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             int tokenPosition = 0;
             for (Token token : witness) {
                 VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
-                LCP_Interval interval = lcp_interval_array[tokenPosition];
+                LCP_Interval interval = tokenIndex.lcp_interval_array[tokenPosition];
                 vertexToLCP.put(vertex, interval);
                 vertex_array[tokenPosition] = vertex;
                 tokenPosition++;
@@ -387,7 +359,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             if (!isVerticalEnd(current)) {
                 // calc position start position witness + position in witness
                 int token_position = startRangeWitness2 + current.startPosWitness2;
-                LCP_Interval witness_interval = lcp_interval_array[token_position];
+                LCP_Interval witness_interval = tokenIndex.lcp_interval_array[token_position];
                 if (witness_interval==null) {
                     //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
                     witness_interval = new LCP_Interval(0, 0);
@@ -441,7 +413,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
             int potentialMatchesWitness = 0;
             for (int i = startRangeWitness2 + node.startPosWitness2; i < startRangeWitness2+witnessTokens.length; i++) {
-                if (lcp_interval_array[i] != null) {
+                if (tokenIndex.lcp_interval_array[i] != null) {
                     potentialMatchesWitness++;
                 }
             }
@@ -463,7 +435,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             ExtendedGraphEdge edge = this.edgeBetween(current, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
             if (edge!=null&&this.getTarget(edge).equals(neighbor)) {
                 LCP_Interval graphInterval = edge.lcp_interval;
-                LCP_Interval witnessInterval = lcp_interval_array[startRangeWitness2+current.startPosWitness2];
+                LCP_Interval witnessInterval = tokenIndex.lcp_interval_array[startRangeWitness2+current.startPosWitness2];
                 if (graphInterval==witnessInterval) {
                     neighbor.match = true;
                     // set cost on neighbor if it is higher
