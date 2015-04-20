@@ -20,7 +20,6 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     protected TokenIndex tokenIndex;
     private List<Token> token_array;
     private int[] suffix_array;
-    protected int[] LCP_array;
     private LCP_Interval[] lcp_interval_array;
     protected VariantGraph.Vertex[] vertex_array;
     private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
@@ -47,7 +46,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         Comparator<Token> comparator = new SimpleTokenNormalizedFormComparator();
         SuffixData suffixData = SuffixArrays.createWithLCP(token_array.toArray(new Token[0]), new SAIS(), comparator);
         suffix_array = suffixData.getSuffixArray();
-        LCP_array = suffixData.getLCP();
+        tokenIndex.LCP_array = suffixData.getLCP();
         vertexToLCP = new HashMap<>();
         tokenIndex.lcp_intervals = tokenIndex.splitLCP_ArrayIntoIntervals();
         lcp_interval_array = construct_LCP_interval_array();

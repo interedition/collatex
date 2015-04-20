@@ -10,6 +10,7 @@ import java.util.Stack;
 public class TokenIndex {
     private final Dekker21Aligner aligner;
     public List<LCP_Interval> lcp_intervals;
+    public int[] LCP_array;
 
     public TokenIndex(Dekker21Aligner aligner) {
         this.aligner = aligner;
@@ -19,8 +20,8 @@ public class TokenIndex {
         List<LCP_Interval> closedIntervals = new ArrayList<>();
         int previousLCP_value = 0;
         Stack<LCP_Interval> openIntervals = new Stack<LCP_Interval>();
-        for (int idx = 0; idx < aligner.LCP_array.length; idx++) {
-            int lcp_value = aligner.LCP_array[idx];
+        for (int idx = 0; idx < LCP_array.length; idx++) {
+            int lcp_value = LCP_array[idx];
             if (lcp_value > previousLCP_value) {
                 openIntervals.push(new LCP_Interval(idx - 1, lcp_value));
                 previousLCP_value = lcp_value;
@@ -40,7 +41,7 @@ public class TokenIndex {
         }
         // add all the open intervals to the result
         for (LCP_Interval interval : openIntervals) {
-            closedIntervals.add(new LCP_Interval(interval.start, aligner.LCP_array.length - 1, interval.length));
+            closedIntervals.add(new LCP_Interval(interval.start, LCP_array.length - 1, interval.length));
         }
         return closedIntervals;
     }
