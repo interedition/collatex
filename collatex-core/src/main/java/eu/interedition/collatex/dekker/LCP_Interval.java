@@ -1,8 +1,10 @@
 package eu.interedition.collatex.dekker;
 
+import java.util.stream.IntStream;
+
 public class LCP_Interval {
   // length = number of tokens in this block of text
-  int length; 
+  int length;
   // start = start position in suffix array
   int start;
   // end = end position in suffix array
@@ -26,10 +28,23 @@ public class LCP_Interval {
     }
     return this.end - this.start +1;
   }
-  
+
+  // transform lcp interval into int stream range
+  public IntStream getAllOccurrencesAsRanges(TokenIndex index) {
+      IntStream result = IntStream.empty();
+      // with/or without end
+      for (int i=start; i < end; i++) {
+          // every i is one occurrence
+          int token_position = index.suffix_array[i];
+          IntStream range = IntStream.range(token_position, token_position + length);
+          result = IntStream.concat(result, range);
+      }
+      return result;
+  }
+
   @Override
   public String toString() {
     return ("LCP interval start at: "+start+" , length: "+this.length+" depth:" + depth());
   }
-  
+
 }
