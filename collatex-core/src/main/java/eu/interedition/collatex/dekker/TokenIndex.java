@@ -8,6 +8,7 @@ import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Created by ronald on 4/20/15.
@@ -15,6 +16,7 @@ import java.util.*;
 public class TokenIndex {
     //TODO: not sure this functionality should be in this class or in a separate class
     private Map<Witness, Integer> witnessToStartToken;
+    private Map<Witness, Integer> witnessToEndToken;
     private final SimpleWitness[] w;
     protected List<Token> token_array;
     //END witness data
@@ -49,12 +51,14 @@ public class TokenIndex {
         token_array = new ArrayList<>();
         int counter = 0;
         witnessToStartToken = new HashMap<>();
+        witnessToEndToken = new HashMap<>();
         for (SimpleWitness witness : w) {
             witnessToStartToken.put(witness, counter);
             for (Token t : witness) {
                 token_array.add(t);
                 counter++;
             }
+            witnessToEndToken.put(witness, counter);
             //TODO: add witness separation marker token
         }
     }
@@ -122,5 +126,49 @@ public class TokenIndex {
 
     public boolean hasLCP_intervalFor(int i) {
         return block_array[i]!=null;
+    }
+
+    // lcp intervals can overlap horizontally
+    // we prioritize the intervals with the biggest length
+    // Note: with more than two witnesses we have to select the right instance of an interval
+    public List<Block> getNonOverlappingBlocks() {
+        // sort lcp intervals based on length in descending order
+        Collections.sort(blocks, (Block interval1, Block interval2) -> interval2.length - interval1.length);
+        //TODO: set size based on the length of the token array
+        BitSet occupied = new BitSet();
+        // set up predicate
+        // why is length check needed? empty lcp intervals should not be there
+        Predicate<Block> p = lcp_interval -> lcp_interval.length > 0 && !lcp_interval.getAllOccurrencesAsRanges().anyMatch(i -> occupied.get(i));
+
+        List<Block> result = new ArrayList<>();
+        for (Block interval : blocks) {
+            // test whether the interval is in occupied
+            //Note: filter
+            if (p.test(interval)) {
+                result.add(interval);
+                // mark all the occurrences of the lcp interval in the occupied bit set
+                interval.getAllOccurrencesAsRanges().forEach(occupied::set);
+            }
+        }
+        return result;
+    }
+
+    public List<Block.Instance> getBlockInstancesForWitness(Witness w) {
+        Integer witnessStart = witnessToStartToken.get(w);
+        Integer witnessEnd = witnessToEndToken.get(w);
+        //TODO: size: witnessEnd!
+        BitSet witnessRange = new BitSet();
+        witnessRange.set(witnessStart, witnessEnd);
+        //TODO: rewrite!
+        List<Block.Instance> result = new ArrayList<>();
+        for (Block block : getNonOverlappingBlocks()) {
+            for (Block.Instance instance : block.getAllInstances()) {
+                if (instance.asRange().anyMatch(witnessRange::get)) {
+                    result.add(instance);
+                }
+            }
+        }
+        //TODO: sort the instances
+        return result;
     }
 }

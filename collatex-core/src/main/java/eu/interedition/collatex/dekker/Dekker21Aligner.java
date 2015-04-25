@@ -48,28 +48,4 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
         //TODO: handle next witness
     }
 
-    // lcp intervals can overlap horizontally
-    // we prioritize the intervals with the biggest length
-    // Note: with more than two witnesses we have to select the right instance of an interval
-    public List<Block> getNonOverlappingBlocks() {
-        // sort lcp intervals based on length in descending order
-        Collections.sort(tokenIndex.blocks, (Block interval1, Block interval2) -> interval2.length - interval1.length);
-        //TODO: set size based on the length of the token array
-        BitSet occupied = new BitSet();
-        // set up predicate
-        // why is length check needed? empty lcp intervals should not be there
-        Predicate<Block> p = lcp_interval -> lcp_interval.length > 0 && !lcp_interval.getAllOccurrencesAsRanges().anyMatch(i -> occupied.get(i));
-
-        List<Block> result = new ArrayList<>();
-        for (Block interval : tokenIndex.blocks) {
-            // test whether the interval is in occupied
-            //Note: filter
-            if (p.test(interval)) {
-                result.add(interval);
-                // mark all the occurrences of the lcp interval in the occupied bit set
-                interval.getAllOccurrencesAsRanges().forEach(occupied::set);
-            }
-        }
-        return result;
-    }
 }

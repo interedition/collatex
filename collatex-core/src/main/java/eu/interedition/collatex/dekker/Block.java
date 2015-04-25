@@ -38,6 +38,17 @@ public class Block {
         return this.end - this.start + 1;
     }
 
+    public List<Block.Instance> getAllInstances() {
+        List<Block.Instance> instances = new ArrayList<>();
+        for (int i = start; i <= end; i++) {
+            // every i is one occurrence
+            int token_position = tokenIndex.suffix_array[i];
+            Block.Instance instance = new Instance(token_position, this);
+            instances.add(instance);
+        }
+        return instances;
+    }
+
     // transform lcp interval into int stream range
     public IntStream getAllOccurrencesAsRanges() {
         IntStream result = IntStream.empty();
@@ -75,4 +86,39 @@ public class Block {
         return ("LCP interval start at: " + start + " , length: " + this.length + " depth:" + depth());
     }
 
+    public static class Instance {
+        private final int token_start;
+        private final Block block;
+
+        public Instance(int token_start, Block block) {
+            this.token_start = token_start;
+            this.block = block;
+        }
+
+        public int length() {
+            return block.length;
+        }
+
+        public IntStream asRange() {
+            return IntStream.range(token_start, token_start + length());
+        }
+
+        @Override
+        public String toString() {
+            List<Token> tokens = new ArrayList<>();
+            for (int i = 0; i < this.length(); i++) {
+                Token t = block.tokenIndex.token_array.get(token_start + i);
+                tokens.add(t);
+            }
+            String normalized = "";
+            for (Token t : tokens) {
+                SimpleToken st = (SimpleToken) t;
+                if (!normalized.isEmpty()) {
+                    normalized += " ";
+                }
+                normalized += st.getNormalized();
+            }
+            return normalized;
+        }
+    }
 }
