@@ -20,12 +20,10 @@ public class TokenIndex {
     //END witness data
     public int[] suffix_array;
     public int[] LCP_array;
-    public List<LCP_Interval> lcp_intervals;
-    private LCP_Interval[] lcp_interval_array;
-    private final Dekker21Aligner aligner;
+    public List<Block> blocks;
+    private Block[] block_array;
 
-    public TokenIndex(Dekker21Aligner aligner, SimpleWitness[] w) {
-        this.aligner = aligner;
+    public TokenIndex(SimpleWitness[] w) {
         this.w = w;
     }
 
@@ -43,8 +41,8 @@ public class TokenIndex {
         SuffixData suffixData = SuffixArrays.createWithLCP(token_array.toArray(new Token[0]), new SAIS(), comparator);
         this.suffix_array = suffixData.getSuffixArray();
         this.LCP_array = suffixData.getLCP();
-        this.lcp_intervals = splitLCP_ArrayIntoIntervals();
-        lcp_interval_array = construct_LCP_interval_array();
+        this.blocks = splitLCP_ArrayIntoIntervals();
+        block_array = construct_LCP_interval_array();
     }
 
     private void prepareTokenArray() {
@@ -61,39 +59,39 @@ public class TokenIndex {
         }
     }
 
-    protected List<LCP_Interval> splitLCP_ArrayIntoIntervals() {
-        List<LCP_Interval> closedIntervals = new ArrayList<>();
+    protected List<Block> splitLCP_ArrayIntoIntervals() {
+        List<Block> closedIntervals = new ArrayList<>();
         int previousLCP_value = 0;
-        Stack<LCP_Interval> openIntervals = new Stack<LCP_Interval>();
+        Stack<Block> openIntervals = new Stack<Block>();
         for (int idx = 0; idx < LCP_array.length; idx++) {
             int lcp_value = LCP_array[idx];
             if (lcp_value > previousLCP_value) {
-                openIntervals.push(new LCP_Interval(idx - 1, lcp_value));
+                openIntervals.push(new Block(this, idx - 1, lcp_value));
                 previousLCP_value = lcp_value;
             } else if (lcp_value < previousLCP_value) {
                 // close open intervals that are larger than current LCP value
                 while (!openIntervals.isEmpty() && openIntervals.peek().length > lcp_value) {
-                    LCP_Interval a = openIntervals.pop();
-                    closedIntervals.add(new LCP_Interval(a.start, idx - 1, a.length));
+                    Block a = openIntervals.pop();
+                    closedIntervals.add(new Block(this, a.start, idx - 1, a.length));
                 }
                 // then: open a new interval starting with filtered intervals
                 if (lcp_value > 0) {
                     int start = closedIntervals.get(closedIntervals.size() - 1).start;
-                    openIntervals.add(new LCP_Interval(start, lcp_value));
+                    openIntervals.add(new Block(this, start, lcp_value));
                 }
                 previousLCP_value = lcp_value;
             }
         }
         // add all the open intervals to the result
-        for (LCP_Interval interval : openIntervals) {
-            closedIntervals.add(new LCP_Interval(interval.start, LCP_array.length - 1, interval.length));
+        for (Block interval : openIntervals) {
+            closedIntervals.add(new Block(this, interval.start, LCP_array.length - 1, interval.length));
         }
         return closedIntervals;
     }
 
-    private LCP_Interval[] construct_LCP_interval_array() {
-        LCP_Interval[] lcp_interval_array = new LCP_Interval[token_array.size()];
-        for (LCP_Interval interval : lcp_intervals) {
+    private Block[] construct_LCP_interval_array() {
+        Block[] block_array = new Block[token_array.size()];
+        for (Block interval : blocks) {
             //TODO: why are there empty LCP intervals in the LCP_interval_array ?
             if (interval.length==0) {
                 continue;
@@ -101,7 +99,7 @@ public class TokenIndex {
             for (int i = interval.start; i <= interval.end; i++) {
                 int tokenPosition = suffix_array[i];
                 //Log("Adding interval: " + interval.toString() + " to token number: " + tokenIndex);
-                lcp_interval_array[tokenPosition] = interval;
+                block_array[tokenPosition] = interval;
             }
         }
 //        //NOTE: For tokens that are not repeated we create new LCP intervals here
@@ -114,15 +112,15 @@ public class TokenIndex {
 //                lcp_interval = new LCP_Interval()
 //            }
 //        }
-        return lcp_interval_array;
+        return block_array;
     }
 
 
-    public LCP_Interval getLCP_intervalFor(int tokenPosition) {
-        return lcp_interval_array[tokenPosition];
+    public Block getLCP_intervalFor(int tokenPosition) {
+        return block_array[tokenPosition];
     }
 
     public boolean hasLCP_intervalFor(int i) {
-        return lcp_interval_array[i]!=null;
+        return block_array[i]!=null;
     }
 }

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TokenIndexTest extends AbstractTest {
 
-    private void assertLCP_Interval(int start, int length, int depth, LCP_Interval lcp_interval) {
+    private void assertLCP_Interval(int start, int length, int depth, Block lcp_interval) {
         assertEquals(start, lcp_interval.start);
         assertEquals(length, lcp_interval.length);
         assertEquals(depth, lcp_interval.depth());
@@ -41,13 +41,13 @@ public class TokenIndexTest extends AbstractTest {
         // 3: a, d, b
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
         Dekker21Aligner aligner = new Dekker21Aligner(w);
-        List<LCP_Interval> lcp_intervals = aligner.tokenIndex.splitLCP_ArrayIntoIntervals();
-        assertLCP_Interval(0, 1, 3, lcp_intervals.get(0)); // a
-        assertLCP_Interval(3, 1, 2, lcp_intervals.get(1)); // b
-        assertLCP_Interval(5, 2, 2, lcp_intervals.get(2)); // c d
-        assertLCP_Interval(7, 1, 3, lcp_intervals.get(3)); // d
-        assertLCP_Interval(10, 1, 2, lcp_intervals.get(4)); // e
-        assertEquals(5, lcp_intervals.size());
+        List<Block> blocks = aligner.tokenIndex.splitLCP_ArrayIntoIntervals();
+        assertLCP_Interval(0, 1, 3, blocks.get(0)); // a
+        assertLCP_Interval(3, 1, 2, blocks.get(1)); // b
+        assertLCP_Interval(5, 2, 2, blocks.get(2)); // c d
+        assertLCP_Interval(7, 1, 3, blocks.get(3)); // d
+        assertLCP_Interval(10, 1, 2, blocks.get(4)); // e
+        assertEquals(5, blocks.size());
     }
 
 

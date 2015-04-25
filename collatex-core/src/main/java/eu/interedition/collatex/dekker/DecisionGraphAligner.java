@@ -17,7 +17,7 @@ public class DecisionGraphAligner {
     protected TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
     protected VariantGraph.Vertex[] vertex_array;
-    private Map<VariantGraph.Vertex, LCP_Interval> vertexToLCP;
+    private Map<VariantGraph.Vertex, Block> vertexToLCP;
 
 
     public void align(VariantGraph against, Iterable<Token> witness) {
@@ -33,7 +33,7 @@ public class DecisionGraphAligner {
         for (ExtendedGraphEdge edge : edges) {
             ExtendedGraphNode targetNode = decisionGraph.getTarget(edge);
             if (edge.isMatch()) {
-                LCP_Interval lcpInterval = edge.lcp_interval;
+                Block lcpInterval = edge.block;
                 //NOTE: this does not always have to be true
                 //intervals can occur multiple times in one witness
                 int tokenPosition = getLowestTokenPosition(lcpInterval);
@@ -237,7 +237,7 @@ public class DecisionGraphAligner {
 
             // skip next graph LCP interval
             VariantGraph.Vertex currentVertex = current.vertex;
-            LCP_Interval graph_interval = vertexToLCP.get(currentVertex);
+            Block graph_interval = vertexToLCP.get(currentVertex);
             //NOTE: not every vertex has to be associated with a LCP interval... non repeated unique blocks of text
             //are not part of an interval, but do have vertices!
             int nextVertexRank;
@@ -246,7 +246,7 @@ public class DecisionGraphAligner {
             } else {
                 nextVertexRank = current.getVertexRank() + 1;
                 //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
-                graph_interval = new LCP_Interval(0, 0);
+                graph_interval = new Block(tokenIndex, 0, 0);
             }
             if (!isHorizontalEnd(current)) {
                 //TODO: dit zouden in theorie meerdere vertices kunenn zijn..
@@ -283,10 +283,10 @@ public class DecisionGraphAligner {
             if (!isVerticalEnd(current)) {
                 // calc position start position witness + position in witness
                 int token_position = startRangeWitness2 + current.startPosWitness2;
-                LCP_Interval witness_interval = tokenIndex.getLCP_intervalFor(token_position);
+                Block witness_interval = tokenIndex.getLCP_intervalFor(token_position);
                 if (witness_interval==null) {
                     //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
-                    witness_interval = new LCP_Interval(0, 0);
+                    witness_interval = new Block(tokenIndex, 0, 0);
                 }
                 ExtendedGraphNode node = new ExtendedGraphNode(current.getVertexRank(), currentVertex, current.startPosWitness2+witness_interval.length);
                 neighbors.add(node);
@@ -295,7 +295,7 @@ public class DecisionGraphAligner {
             return neighbors;
         }
 
-        private void addEdge(ExtendedGraphNode source, ExtendedGraphNode target, EditOperationEnum operation, LCP_Interval interval) {
+        private void addEdge(ExtendedGraphNode source, ExtendedGraphNode target, EditOperationEnum operation, Block interval) {
             // Actually there are two intervals!
             if (interval==null) {
                 throw new RuntimeException("Interval is null!");
@@ -358,8 +358,8 @@ public class DecisionGraphAligner {
         protected DecisionGraphNodeCost distBetween(ExtendedGraphNode current, ExtendedGraphNode neighbor) {
             ExtendedGraphEdge edge = this.edgeBetween(current, EditOperationEnum.MATCH_TOKENS_OR_REPLACE);
             if (edge!=null&&this.getTarget(edge).equals(neighbor)) {
-                LCP_Interval graphInterval = edge.lcp_interval;
-                LCP_Interval witnessInterval = tokenIndex.getLCP_intervalFor(startRangeWitness2+current.startPosWitness2);
+                Block graphInterval = edge.block;
+                Block witnessInterval = tokenIndex.getLCP_intervalFor(startRangeWitness2+current.startPosWitness2);
                 if (graphInterval==witnessInterval) {
                     edge.match = true;
                     // set cost on neighbor if it is higher
@@ -459,12 +459,12 @@ public class DecisionGraphAligner {
 
     public class ExtendedGraphEdge {
         protected EditOperationEnum operation;
-        protected LCP_Interval lcp_interval;
+        protected Block block;
         private boolean match;
 
-        public ExtendedGraphEdge(EditOperationEnum operation, LCP_Interval lcp_interval) {
+        public ExtendedGraphEdge(EditOperationEnum operation, Block block) {
             this.operation = operation;
-            this.lcp_interval = lcp_interval;
+            this.block = block;
         }
 
         public String represent(Dekker21Aligner aligner) {
@@ -477,7 +477,7 @@ public class DecisionGraphAligner {
                 result += "add";
             }
             result += " (";
-            result += aligner.getNormalizedForm(lcp_interval);
+            result += block.getNormalizedForm();
             result += ")";
             return result;
         }
@@ -487,7 +487,7 @@ public class DecisionGraphAligner {
         }
     }
 
-    private int getLowestTokenPosition(LCP_Interval lcpInterval) {
+    private int getLowestTokenPosition(Block lcpInterval) {
         // search lowest token position in lcp interval
         // that position will already be in the variant graph
         int suffixStart = lcpInterval.start;
