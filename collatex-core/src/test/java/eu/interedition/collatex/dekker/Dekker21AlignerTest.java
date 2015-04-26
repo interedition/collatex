@@ -2,17 +2,11 @@ package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.Island;
-import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.dekker.matrix.MatchTableImpl;
+import eu.interedition.collatex.dekker.matrix.*;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,7 +17,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     // note: x = x of start coordinate
     // note: y = y of start coordinate
     //TODO: replace Island by a real Vector class
-    private void assertIslandAsVectorEquals(int x, int y, int length, Set<Island> islands) {
+    private void assertIslandAsVectorEquals(int x, int y, int length, Collection<Island> islands) {
         Coordinate startCoordinate = new Coordinate(x, y);
         Coordinate endCoordinate = new Coordinate(x+length-1, y+length-1);
         Island expected = new Island(startCoordinate, endCoordinate);
@@ -54,7 +48,6 @@ public class Dekker21AlignerTest extends AbstractTest {
         // new
         MatchTable table = BlockBasedMatchTable.createMatchTable(aligner, against, w[1]);
         Set<Island> islands = table.getIslands();
-        //System.out.println(islands);
         assertIslandAsVectorEquals(0, 2, 2, islands); // the cat
         assertIslandAsVectorEquals(4, 6, 3, islands); // birds in the
         assertIslandAsVectorEquals(7, 5, 1, islands); // little
@@ -63,5 +56,17 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertIslandAsVectorEquals(13, 4, 1, islands); // observed
         assertIslandAsVectorEquals(18, 10, 1, islands); //
         assertEquals(7, islands.size());
+
+        IslandConflictResolver resolver = new IslandConflictResolver(table);
+        MatchTableSelection selection = resolver.createNonConflictingVersion();
+        List<Island> selectedIslands = selection.getIslands();
+        assertIslandAsVectorEquals(0, 2, 2, selectedIslands); // the cat
+        assertIslandAsVectorEquals(4, 6, 3, selectedIslands); // birds in the
+        assertIslandAsVectorEquals(7, 5, 1, selectedIslands); // little
+        assertIslandAsVectorEquals(8, 9, 1, selectedIslands); // trees
+        assertIslandAsVectorEquals(9, 0, 2, selectedIslands); // this morning
+        assertIslandAsVectorEquals(13, 4, 1, selectedIslands); // observed
+        assertIslandAsVectorEquals(18, 10, 1, selectedIslands); //
+        assertEquals(7, selectedIslands.size());
     }
 }
