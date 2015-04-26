@@ -22,8 +22,8 @@ package eu.interedition.collatex.dekker.matrix;
 import java.util.Objects;
 
 public class Coordinate implements Comparable<Coordinate> {
-    int row;
-    int column;
+    public int row;
+    public int column;
 
     public Coordinate(int row, int column) {
         this.column = column;

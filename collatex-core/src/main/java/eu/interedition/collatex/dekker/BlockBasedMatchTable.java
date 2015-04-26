@@ -33,24 +33,26 @@ public class BlockBasedMatchTable implements MatchTable {
         this.ranks = ranks;
     }
 
-    public static MatchTable create(Dekker21Aligner aligner, VariantGraph graph, SimpleWitness witness) {
+    public static MatchTable create(Dekker21Aligner aligner, VariantGraph graph, Iterable<Token> witness) {
         return createMatchTable(aligner, graph, witness);
     }
 
-    public static MatchTable createMatchTable(Dekker21Aligner aligner, VariantGraph g, Witness w) {
+    public static MatchTable createMatchTable(Dekker21Aligner aligner, VariantGraph g, Iterable<Token> w) {
         // we need the variant graph ranking for the projection in the vector space
         VariantGraphRanking ranking = VariantGraphRanking.of(g);
         // result
         List<Island> result = new ArrayList<>();
         // witness tokens
-        Token[] tokens = StreamSupport.stream(((Iterable<Token>)w).spliterator(), false).toArray(Token[]::new);
+        Token[] tokens = StreamSupport.stream(w.spliterator(), false).toArray(Token[]::new);
         // graph ranks
         int[] ranks = IntStream.range(0, Math.max(0, ranking.apply(g.getEnd()) - 1)).toArray();
         // create table
         BlockBasedMatchTable table = new BlockBasedMatchTable(result, tokens, ranks);
         // based on the TokenIndex we build up the islands...
         // an island is a graph instance and a witness instance of the same block combined
-        List<Block.Instance> instances = aligner.tokenIndex.getBlockInstancesForWitness(w);
+        Witness witness = w.iterator().next().getWitness();
+        int startTokenPositionForWitness = aligner.tokenIndex.getStartTokenPositionForWitness(witness);
+        List<Block.Instance> instances = aligner.tokenIndex.getBlockInstancesForWitness(witness);
         // we have to combine each instance in the witness with the other instances already present in the graph
         for (Block.Instance witnessInstance : instances) {
             // fetch block
@@ -61,27 +63,27 @@ public class BlockBasedMatchTable implements MatchTable {
             for (Block.Instance graphInstance : graphInstances) {
                 // combine witness and graph instance into an island
                 // project graph instance into vectorspace
-                int start_token = graphInstance.start_token;
-                VariantGraph.Vertex v = aligner.vertex_array[start_token];
+                int graph_start_token = graphInstance.start_token;
+                VariantGraph.Vertex v = aligner.vertex_array[graph_start_token];
                 if (v==null) {
                     throw new RuntimeException("Vertex is null!");
                 }
                 Integer column = ranking.apply(v)-1;
-                int row = witnessInstance.start_token - aligner.tokenIndex.getStartTokenPositionForWitness(w);
+                int row = witnessInstance.start_token - startTokenPositionForWitness;
                 Coordinate startCoordinate = new Coordinate(row, column);
                 Coordinate endCoordinate = new Coordinate(row+block.length-1, column+block.length-1);
                 Island island = new Island(startCoordinate, endCoordinate);
                 result.add(island);
                 // set the tokens and vertices on the table
                 for (int i = 0; i < block.length; i++) {
-                    v = aligner.vertex_array[start_token+i];
+                    v = aligner.vertex_array[graph_start_token+i];
                     if (v==null) {
                         throw new RuntimeException("Vertex is null!");
                     }
                     column = ranking.apply(v)-1;
-                    int startTokenPositionForWitness = aligner.tokenIndex.getStartTokenPositionForWitness(w);
-                    row = witnessInstance.start_token+i - startTokenPositionForWitness;
-                    table.set(row, column, aligner.tokenIndex.token_array.get(start_token+i), v);
+                    int witnessStartToken = witnessInstance.start_token + i;
+                    row = witnessStartToken - startTokenPositionForWitness;
+                    table.set(row, column, aligner.tokenIndex.token_array.get(witnessStartToken), v);
                 }
             }
         }

@@ -41,32 +41,30 @@ public class Dekker21AlignerTest extends AbstractTest {
         VariantGraph against = new VariantGraph();
         aligner.collate(against, w[0]);
 
-        // old
-//        MatchTable oldMatchTable = MatchTableImpl.create(against, w[1]);
-//        System.out.println(oldMatchTable.getIslands());
+        aligner.collate(against, w[1]);
 
-        // new
-        MatchTable table = BlockBasedMatchTable.createMatchTable(aligner, against, w[1]);
-        Set<Island> islands = table.getIslands();
+        Set<Island> islands = aligner.table.getIslands();
         assertIslandAsVectorEquals(0, 2, 2, islands); // the cat
         assertIslandAsVectorEquals(4, 6, 3, islands); // birds in the
         assertIslandAsVectorEquals(7, 5, 1, islands); // little
         assertIslandAsVectorEquals(8, 9, 1, islands); // trees
         assertIslandAsVectorEquals(9, 0, 2, islands); // this morning
         assertIslandAsVectorEquals(13, 4, 1, islands); // observed
-        assertIslandAsVectorEquals(18, 10, 1, islands); //
+        assertIslandAsVectorEquals(18, 10, 1, islands); // .
         assertEquals(7, islands.size());
 
-        IslandConflictResolver resolver = new IslandConflictResolver(table);
-        MatchTableSelection selection = resolver.createNonConflictingVersion();
-        List<Island> selectedIslands = selection.getIslands();
+        List<Island> selectedIslands = aligner.preferredIslands;
         assertIslandAsVectorEquals(0, 2, 2, selectedIslands); // the cat
         assertIslandAsVectorEquals(4, 6, 3, selectedIslands); // birds in the
         assertIslandAsVectorEquals(7, 5, 1, selectedIslands); // little
         assertIslandAsVectorEquals(8, 9, 1, selectedIslands); // trees
         assertIslandAsVectorEquals(9, 0, 2, selectedIslands); // this morning
         assertIslandAsVectorEquals(13, 4, 1, selectedIslands); // observed
-        assertIslandAsVectorEquals(18, 10, 1, selectedIslands); //
+        assertIslandAsVectorEquals(18, 10, 1, selectedIslands); // .
         assertEquals(7, selectedIslands.size());
+
+        //Todo: assert transpositions
+//        assertPhraseMatches("this morning", "observed", "little");
+//        System.out.println(aligner.transpositions);
     }
 }
