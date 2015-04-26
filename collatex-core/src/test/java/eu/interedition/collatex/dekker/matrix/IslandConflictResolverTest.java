@@ -42,7 +42,7 @@ public class IslandConflictResolverTest extends AbstractTest {
         // create graph from the first witness
         VariantGraph graph = collate(w[0]);
         // create table from the graph and the second witness
-        MatchTable table = MatchTable.create(graph, w[1]);
+        MatchTable table = MatchTableImpl.create(graph, w[1]);
         List<Island> possibleIslands = new ArrayList<>();
         for (Island island : table.getIslands()) {
             if (island.size() == 2) {

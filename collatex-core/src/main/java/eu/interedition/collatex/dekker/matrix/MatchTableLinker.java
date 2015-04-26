@@ -40,7 +40,7 @@ public class MatchTableLinker implements TokenLinker {
     public Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
         // create MatchTable and fill it with matches
         LOG.fine("create MatchTable and fill it with matches");
-        MatchTable table = MatchTable.create(base, witness, comparator);
+        MatchTable table = MatchTableImpl.create(base, witness, comparator);
 
         // create IslandConflictResolver
         LOG.fine("create island conflict resolver");

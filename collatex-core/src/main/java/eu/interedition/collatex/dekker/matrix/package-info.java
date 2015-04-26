@@ -20,7 +20,7 @@
 /**
  * Matching of tokens to variant graph vertices based on the analyis of a matrix containing all possible matches.
  *
- * @see eu.interedition.collatex.dekker.matrix.MatchTable
+ * @see eu.interedition.collatex.dekker.matrix.MatchTableImpl
  * @see eu.interedition.collatex.dekker.matrix.MatchTableLinker
  *
  */

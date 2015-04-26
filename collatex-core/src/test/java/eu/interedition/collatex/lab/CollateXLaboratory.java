@@ -22,7 +22,7 @@ package eu.interedition.collatex.lab;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.MatchTable;
+import eu.interedition.collatex.dekker.matrix.MatchTableImpl;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -212,7 +212,7 @@ public class CollateXLaboratory extends JFrame {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "Creating MatchTable for: {0}", lastWitness.getSigil());
             }
-            matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTable.create(vg, lastWitness, comparator)));
+            matchMatrixTable.setModel(new MatchMatrixTableModel(MatchTableImpl.create(vg, lastWitness, comparator)));
 
             final TableColumnModel columnModel = matchMatrixTable.getColumnModel();
             columnModel.getColumn(0).setCellRenderer(matchMatrixTable.getTableHeader().getDefaultRenderer());

@@ -61,7 +61,7 @@ public class MatchTableTest extends AbstractTest {
     public void testTableCreationEmptyGraph() {
         final VariantGraph graph = new VariantGraph();
         SimpleWitness[] witnesses = createWitnesses("a b");
-        MatchTable table = MatchTable.create(graph, witnesses[0]);
+        MatchTable table = MatchTableImpl.create(graph, witnesses[0]);
         assertEquals(0, table.columnList().size());
     }
 
@@ -69,7 +69,7 @@ public class MatchTableTest extends AbstractTest {
     public void testTableCreationVariationDoesNotCauseExtraColumns() {
         SimpleWitness[] witnesses = createWitnesses("a", "b", "c", "d");
         VariantGraph graph = collate(witnesses[0], witnesses[1], witnesses[2]);
-        MatchTable table = MatchTable.create(graph, witnesses[3]);
+        MatchTable table = MatchTableImpl.create(graph, witnesses[3]);
         assertEquals(1, table.columnList().size());
     }
 
@@ -77,7 +77,7 @@ public class MatchTableTest extends AbstractTest {
     public void testTableCreationAbAcAbc() {
         SimpleWitness[] witnesses = createWitnesses("a b", "a c", "a b c");
         VariantGraph graph = collate(witnesses[0], witnesses[1]);
-        MatchTable table = MatchTable.create(graph, witnesses[2]);
+        MatchTable table = MatchTableImpl.create(graph, witnesses[2]);
         assertVertexEquals("a", table.vertexAt(0, 0));
         assertVertexEquals("b", table.vertexAt(1, 1));
         assertVertexEquals("c", table.vertexAt(2, 1));
@@ -87,7 +87,7 @@ public class MatchTableTest extends AbstractTest {
     public void testTableCreationAbcabCab() {
         SimpleWitness[] witnesses = createWitnesses("a b c a b", "c a b");
         VariantGraph graph = collate(witnesses[0]);
-        MatchTable table = MatchTable.create(graph, witnesses[1]);
+        MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         assertVertexEquals("a", table.vertexAt(1, 0));
         assertVertexEquals("b", table.vertexAt(2, 1));
         assertVertexEquals("c", table.vertexAt(0, 2));
@@ -99,7 +99,7 @@ public class MatchTableTest extends AbstractTest {
     public void testTableCreationAbcabAbcab() {
         SimpleWitness[] sw = createWitnesses("A B C A B", "A B C A B");
         VariantGraph vg = collate(sw[0]);
-        MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+        MatchTable table = MatchTableImpl.create(vg, sw[1], new EqualityTokenComparator());
         assertEquals(5, table.columnList().size());
         assertEquals(5, table.rowList().size());
         assertVertexEquals("a", table.vertexAt(0, 0));
@@ -117,7 +117,7 @@ public class MatchTableTest extends AbstractTest {
     public void testTableCreationAsymmatricMatrix() {
         SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
         VariantGraph vg = collate(sw[0]);
-        MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+        MatchTable table = MatchTableImpl.create(vg, sw[1], new EqualityTokenComparator());
         assertVertexEquals("a", table.vertexAt(0, 0));
         assertVertexEquals("a", table.vertexAt(0, 2));
         assertVertexEquals("b", table.vertexAt(1, 1));
@@ -135,7 +135,7 @@ public class MatchTableTest extends AbstractTest {
         String textD9 = "het een de";
         SimpleWitness[] sw = createWitnesses(textD1, textD9);
         VariantGraph vg = collate(sw[0]);
-        MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+        MatchTable table = MatchTableImpl.create(vg, sw[1], new EqualityTokenComparator());
         List<Token> labels = table.rowList();
         assertTokenEquals("het ", labels.get(0));
         assertTokenEquals("een ", labels.get(1));
@@ -148,7 +148,7 @@ public class MatchTableTest extends AbstractTest {
         String textD9 = "het een de";
         SimpleWitness[] sw = createWitnesses(textD1, textD9);
         VariantGraph vg = collate(sw[0]);
-        MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+        MatchTable table = MatchTableImpl.create(vg, sw[1], new EqualityTokenComparator());
         List<Integer> labels = table.columnList();
         assertEquals((Integer) 0, labels.get(0));
         assertEquals((Integer) 1, labels.get(1));
@@ -159,7 +159,7 @@ public class MatchTableTest extends AbstractTest {
     public void testGetAllMatches() {
         SimpleWitness[] sw = createWitnesses("A B A B C", "A B C A B");
         VariantGraph vg = collate(sw[0]);
-        MatchTable table = MatchTable.create(vg, sw[1], new EqualityTokenComparator());
+        MatchTableImpl table = MatchTableImpl.create(vg, sw[1], new EqualityTokenComparator());
         List<Coordinate> allTrue = table.allMatches();
         assertEquals(9, allTrue.size());
         assertTrue(allTrue.contains(new Coordinate(0, 0)));
@@ -170,7 +170,7 @@ public class MatchTableTest extends AbstractTest {
     public void testIslandDetectionAbcabCab() {
         SimpleWitness[] witnesses = createWitnesses("a b c a b", "c a b");
         VariantGraph graph = collate(witnesses[0]);
-        MatchTable table = MatchTable.create(graph, witnesses[1]);
+        MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         List<Island> islands = new ArrayList<>(table.getIslands());
         assertEquals(2, islands.size());
         Collections.sort(islands);
@@ -182,7 +182,7 @@ public class MatchTableTest extends AbstractTest {
     public void testIslandDetectionXabcabXcab() {
         SimpleWitness[] witnesses = createWitnesses("x a b c a b", "x c a b");
         VariantGraph graph = collate(witnesses[0]);
-        MatchTable table = MatchTable.create(graph, witnesses[1]);
+        MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         List<Island> islands = new ArrayList<>(table.getIslands());
         assertEquals(3, islands.size());
         Collections.sort(islands);
@@ -194,7 +194,7 @@ public class MatchTableTest extends AbstractTest {
     public void testIslandDetectionPartlyOverlappingIslandsUsecase() {
         SimpleWitness[] w = createWitnesses("The cat and the dog", "the dog and the cat");
         VariantGraph graph = collate(w[0]);
-        MatchTable table = MatchTable.create(graph, w[1], new EqualityTokenComparator());
+        MatchTable table = MatchTableImpl.create(graph, w[1], new EqualityTokenComparator());
         List<Island> islands = new ArrayList<>(table.getIslands());
         Collections.sort(islands);
         assertEquals(4, islands.size());
