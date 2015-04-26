@@ -88,7 +88,7 @@ public class Block {
 
     public static class Instance {
         public final int start_token;
-        private final Block block;
+        public final Block block;
 
         public Instance(int start_token, Block block) {
             this.start_token = start_token;
