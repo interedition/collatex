@@ -72,9 +72,17 @@ public class BlockBasedMatchTable implements MatchTable {
                 Coordinate endCoordinate = new Coordinate(row+block.length-1, column+block.length-1);
                 Island island = new Island(startCoordinate, endCoordinate);
                 result.add(island);
-                // set first token, vertex
-                // TODO: add the other tokens..
-                table.set(row, column, aligner.tokenIndex.token_array.get(start_token), v);
+                // set the tokens and vertices on the table
+                for (int i = 0; i < block.length; i++) {
+                    v = aligner.vertex_array[start_token+i];
+                    if (v==null) {
+                        throw new RuntimeException("Vertex is null!");
+                    }
+                    column = ranking.apply(v)-1;
+                    int startTokenPositionForWitness = aligner.tokenIndex.getStartTokenPositionForWitness(w);
+                    row = witnessInstance.start_token+i - startTokenPositionForWitness;
+                    table.set(row, column, aligner.tokenIndex.token_array.get(start_token+i), v);
+                }
             }
         }
         return table;
@@ -82,12 +90,12 @@ public class BlockBasedMatchTable implements MatchTable {
 
     @Override
     public VariantGraph.Vertex vertexAt(int rowIndex, int columnIndex) {
-        return cell(rowIndex, columnIndex).map(c -> c.vertex).orElse(null);
+        return cell(rowIndex, columnIndex).map(c -> c.vertex).orElseThrow(RuntimeException::new);
     }
 
     @Override
     public Token tokenAt(int rowIndex, int columnIndex) {
-        return cell(rowIndex, columnIndex).map(c -> c.token).orElse(null);
+        return cell(rowIndex, columnIndex).map(c -> c.token).orElseThrow(RuntimeException::new);
     }
 
     private Optional<MatchTableCell> cell(int rowIndex, int columnIndex) {
