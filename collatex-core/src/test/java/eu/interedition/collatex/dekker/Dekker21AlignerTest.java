@@ -26,6 +26,8 @@ public class Dekker21AlignerTest extends AbstractTest {
         Set<String> expected = new HashSet<>(Arrays.asList("birds in the", "the cat", "this morning", ".", "little", "observed", "trees"));
         assertEquals(expected, blocksAsString);
         List<Block.Instance> instances = aligner.tokenIndex.getBlockInstancesForWitness(w[0]);
-        assertEquals("[birds in the, the cat, this morning, ., little, observed, trees]", instances.toString());
+        assertEquals("[this morning, the cat, observed, little, birds in the, trees, .]", instances.toString());
+        instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
+        assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
     }
 }

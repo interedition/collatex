@@ -153,6 +153,8 @@ public class TokenIndex {
         return result;
     }
 
+    //NOTE: Much of the work done here can be prepared before hand
+    //and stored in the lcp_array.. should be transformed in a block instance array
     public List<Block.Instance> getBlockInstancesForWitness(Witness w) {
         Integer witnessStart = witnessToStartToken.get(w);
         Integer witnessEnd = witnessToEndToken.get(w);
@@ -168,7 +170,7 @@ public class TokenIndex {
                 }
             }
         }
-        //TODO: sort the instances
+        result.sort((instance1, instance2) -> instance1.start_token - instance2.start_token);
         return result;
     }
 }

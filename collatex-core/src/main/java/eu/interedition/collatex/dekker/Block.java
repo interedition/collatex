@@ -87,11 +87,11 @@ public class Block {
     }
 
     public static class Instance {
-        private final int token_start;
+        public final int start_token;
         private final Block block;
 
-        public Instance(int token_start, Block block) {
-            this.token_start = token_start;
+        public Instance(int start_token, Block block) {
+            this.start_token = start_token;
             this.block = block;
         }
 
@@ -100,14 +100,14 @@ public class Block {
         }
 
         public IntStream asRange() {
-            return IntStream.range(token_start, token_start + length());
+            return IntStream.range(start_token, start_token + length());
         }
 
         @Override
         public String toString() {
             List<Token> tokens = new ArrayList<>();
             for (int i = 0; i < this.length(); i++) {
-                Token t = block.tokenIndex.token_array.get(token_start + i);
+                Token t = block.tokenIndex.token_array.get(start_token + i);
                 tokens.add(t);
             }
             String normalized = "";
