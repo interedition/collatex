@@ -8,7 +8,9 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static eu.interedition.collatex.dekker.VariantGraphMatcher.graph;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class Dekker21AlignerTest extends AbstractTest {
@@ -38,10 +40,10 @@ public class Dekker21AlignerTest extends AbstractTest {
         instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
         assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
 
-        VariantGraph against = new VariantGraph();
-        aligner.collate(against, w[0]);
+        VariantGraph g = new VariantGraph();
+        aligner.collate(g, w[0]);
 
-        aligner.collate(against, w[1]);
+        aligner.collate(g, w[1]);
 
         Set<Island> islands = aligner.table.getIslands();
         assertIslandAsVectorEquals(0, 2, 2, islands); // the cat
@@ -66,5 +68,8 @@ public class Dekker21AlignerTest extends AbstractTest {
         //Todo: assert transpositions
 //        assertPhraseMatches("this morning", "observed", "little");
 //        System.out.println(aligner.transpositions);
+
+        assertThat(g, graph(w[0]).non_aligned("this", "morning").aligned("the", "cat").non_aligned("observed").non_aligned("little").aligned("birds", "in", "the").aligned("trees", "."));
+        assertThat(g, graph(w[1]).aligned("the", "cat").non_aligned("was", "observing").aligned("birds", "in", "the").non_aligned("little").aligned("trees").non_aligned("this", "morning").non_aligned(",", "it").non_aligned("observed", "birds", "for", "two", "hours").aligned("."));
     }
 }
