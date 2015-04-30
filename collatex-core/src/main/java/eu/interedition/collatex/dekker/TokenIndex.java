@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
@@ -17,7 +16,7 @@ public class TokenIndex {
     //TODO: not sure this functionality should be in this class or in a separate class
     private Map<Witness, Integer> witnessToStartToken;
     private Map<Witness, Integer> witnessToEndToken;
-    private final SimpleWitness[] w;
+    private final List<? extends Iterable<Token>> w;
     protected List<Token> token_array;
     //END witness data
     public int[] suffix_array;
@@ -25,8 +24,14 @@ public class TokenIndex {
     public List<Block> blocks;
     private Block[] block_array;
 
-    public TokenIndex(SimpleWitness[] w) {
+
+    public TokenIndex(List<? extends Iterable<Token>> w) {
         this.w = w;
+    }
+
+    public TokenIndex(Iterable<Token>[] w) {
+        List<Iterable<Token>> witnesses = Arrays.asList(w);
+        this.w = witnesses;
     }
 
     public int getStartTokenPositionForWitness(Witness witness) {
@@ -52,9 +57,10 @@ public class TokenIndex {
         int counter = 0;
         witnessToStartToken = new HashMap<>();
         witnessToEndToken = new HashMap<>();
-        for (SimpleWitness witness : w) {
+        for (Iterable<Token> tokens : w) {
+            Witness witness = tokens.iterator().next().getWitness();
             witnessToStartToken.put(witness, counter);
-            for (Token t : witness) {
+            for (Token t : tokens) {
                 token_array.add(t);
                 counter++;
             }

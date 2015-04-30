@@ -27,7 +27,7 @@ public class TokenIndexTest extends AbstractTest {
         // 2: a, e, c, d
         // 3: a, d, b
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
-        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        Dekker21Aligner aligner = new Dekker21Aligner();
         //Note: the suffix array can have multiple forms
         //outcome of sorting is not guaranteed
         //however the LCP array is fixed we can assert that
@@ -40,7 +40,7 @@ public class TokenIndexTest extends AbstractTest {
         // 2: a, e, c, d
         // 3: a, d, b
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
-        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        Dekker21Aligner aligner = new Dekker21Aligner();
         List<Block> blocks = aligner.tokenIndex.splitLCP_ArrayIntoIntervals();
         assertLCP_Interval(0, 1, 3, blocks.get(0)); // a
         assertLCP_Interval(3, 1, 2, blocks.get(1)); // b

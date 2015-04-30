@@ -29,7 +29,11 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testExample1() {
         final SimpleWitness[] w = createWitnesses("This morning the cat observed little birds in the trees.", "The cat was observing birds in the little trees this morning, it observed birds for two hours.");
-        Dekker21Aligner aligner = new Dekker21Aligner(w);
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph graph = new VariantGraph();
+        List<SimpleWitness> witnesses = new ArrayList<>();
+        witnesses.addAll(Arrays.asList(w));
+        aligner.collate(graph, witnesses);
         List<Block> blocks = aligner.tokenIndex.getNonOverlappingBlocks();
         Set<String> blocksAsString = new HashSet<>();
         blocks.stream().map(interval -> interval.getNormalizedForm()).forEach(blocksAsString::add);
@@ -39,11 +43,6 @@ public class Dekker21AlignerTest extends AbstractTest {
         assertEquals("[this morning, the cat, observed, little, birds in the, trees, .]", instances.toString());
         instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
         assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
-
-        VariantGraph g = new VariantGraph();
-        aligner.collate(g, w[0]);
-
-        aligner.collate(g, w[1]);
 
         Set<Island> islands = aligner.table.getIslands();
         assertIslandAsVectorEquals(0, 2, 2, islands); // the cat
@@ -69,7 +68,7 @@ public class Dekker21AlignerTest extends AbstractTest {
 //        assertPhraseMatches("this morning", "observed", "little");
 //        System.out.println(aligner.transpositions);
 
-        assertThat(g, graph(w[0]).non_aligned("this", "morning").aligned("the", "cat").non_aligned("observed").non_aligned("little").aligned("birds", "in", "the").aligned("trees", "."));
-        assertThat(g, graph(w[1]).aligned("the", "cat").non_aligned("was", "observing").aligned("birds", "in", "the").non_aligned("little").aligned("trees").non_aligned("this", "morning").non_aligned(",", "it").non_aligned("observed", "birds", "for", "two", "hours").aligned("."));
+        assertThat(graph, graph(w[0]).non_aligned("this", "morning").aligned("the", "cat").non_aligned("observed").non_aligned("little").aligned("birds", "in", "the").aligned("trees", "."));
+        assertThat(graph, graph(w[1]).aligned("the", "cat").non_aligned("was", "observing").aligned("birds", "in", "the").non_aligned("little").aligned("trees").non_aligned("this", "morning").non_aligned(",", "it").non_aligned("observed", "birds", "for", "two", "hours").aligned("."));
     }
 }

@@ -49,9 +49,7 @@ public class SimpleCollation {
     }
 
     public VariantGraph collate(VariantGraph graph) {
-        for (SimpleWitness witness : witnesses) {
-            algorithm.collate(graph, witness);
-        }
+        algorithm.collate(graph, witnesses);
         if (joined) {
             VariantGraph.JOIN.apply(graph);
         }
