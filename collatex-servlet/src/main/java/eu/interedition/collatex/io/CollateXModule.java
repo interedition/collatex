@@ -32,6 +32,5 @@ public class CollateXModule extends SimpleModule {
   public CollateXModule() {
     super(CollateXModule.class.getPackage().getName(), Version.unknownVersion());
     addDeserializer(SimpleCollation.class, new SimpleCollationDeserializer());
-    addSerializer(VariantGraph.class, new VariantGraphSerializer());
   }
 }

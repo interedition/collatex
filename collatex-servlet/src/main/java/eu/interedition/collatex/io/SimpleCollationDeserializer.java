@@ -45,6 +45,7 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
+//TOODO: use the one without Jackson (Java 8)
 public class SimpleCollationDeserializer extends JsonDeserializer<SimpleCollation> {
 
   @Override
