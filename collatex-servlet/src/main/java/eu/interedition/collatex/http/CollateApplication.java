@@ -1,7 +1,8 @@
 package eu.interedition.collatex.http;
 
+import eu.interedition.collatex.io.IOExceptionMapper;
+import eu.interedition.collatex.io.SimpleCollationJSONMessageBodyReader;
 import eu.interedition.collatex.io.VariantGraphJSONMessageBodyWriter;
-import org.glassfish.jersey.jackson1.Jackson1Feature;
 
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -15,11 +16,9 @@ public class CollateApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> s = new HashSet<>();
+        s.add(SimpleCollationJSONMessageBodyReader.class);
         s.add(VariantGraphJSONMessageBodyWriter.class);
-        //TODO: remove depdendency on Jackson 1
-        //TODO: To remove this.. use JSON read code from JSONProcessor class.
-        s.add(ObjectMapperProvider.class);
-        s.add(Jackson1Feature.class);
+        s.add(IOExceptionMapper.class);
         return s;
     }
 

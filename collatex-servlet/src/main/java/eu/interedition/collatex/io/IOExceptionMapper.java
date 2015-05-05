@@ -19,18 +19,22 @@
 
 package eu.interedition.collatex.io;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.simple.SimpleCollation;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.module.SimpleModule;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 /**
-* @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-*/
-public class CollateXModule extends SimpleModule {
-
-  public CollateXModule() {
-    super(CollateXModule.class.getPackage().getName(), Version.unknownVersion());
-    addDeserializer(SimpleCollation.class, new SimpleCollationDeserializer());
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+@Provider
+public class IOExceptionMapper implements ExceptionMapper<IOException> {
+  @Override
+  public Response toResponse(IOException exception) {
+    return Response.status(Response.Status.BAD_REQUEST)
+            .entity(exception.getMessage())
+            .type(MediaType.TEXT_PLAIN_TYPE)
+            .build();
   }
 }
