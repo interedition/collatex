@@ -1,9 +1,6 @@
 package eu.interedition.collatex.http;
 
-import eu.interedition.collatex.io.IOExceptionMapper;
-import eu.interedition.collatex.io.SimpleCollationJSONMessageBodyReader;
-import eu.interedition.collatex.io.VariantGraphJSONMessageBodyWriter;
-import eu.interedition.collatex.io.VariantGraphSVGMessageBodyWriter;
+import eu.interedition.collatex.io.*;
 
 import javax.ws.rs.core.Application;
 import java.io.BufferedReader;
@@ -25,7 +22,6 @@ public class CollateApplication extends Application {
     private static String detectDotPath() {
         for (String detectionCommand : new String[] { "which dot", "where dot.exe" }) {
             try {
-
                 final Process process = Runtime.getRuntime().exec(detectionCommand);
                 try (BufferedReader processReader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()))) {
                     final CompletableFuture<Optional<String>> path = CompletableFuture.supplyAsync(() -> processReader.lines()
@@ -49,6 +45,9 @@ public class CollateApplication extends Application {
         Set<Class<?>> s = new HashSet<>();
         s.add(SimpleCollationJSONMessageBodyReader.class);
         s.add(VariantGraphJSONMessageBodyWriter.class);
+        s.add(VariantGraphTEIMessageBodyWriter.class);
+        s.add(VariantGraphGraphMLMessageBodyWriter.class);
+        s.add(VariantGraphDotMessageBodyWriter.class);
         s.add(IOExceptionMapper.class);
         return s;
     }
