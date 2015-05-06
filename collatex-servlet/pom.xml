@@ -3,15 +3,16 @@
   <parent>
     <groupId>eu.interedition</groupId>
     <artifactId>collatex</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.6.2-SNAPSHOT</version>
   </parent>
   <artifactId>collatex-servlet</artifactId>
-  <packaging>war</packaging>
+  <name>CollateX Servlet</name> 
+ <packaging>war</packaging>
 <dependencies>
- <dependency>
-            <groupId>eu.interedition</groupId>
-            <artifactId>collatex-core</artifactId>
-        </dependency>
+	<dependency>
+ 		<groupId>eu.interedition</groupId>
+        	<artifactId>collatex-core</artifactId>
+	</dependency>
 <dependency>
     <groupId>javax.ws.rs</groupId>
     <artifactId>javax.ws.rs-api</artifactId>

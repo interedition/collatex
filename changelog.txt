@@ -1,3 +1,6 @@
+Release 1.6.2
+- Added servlet module for easy deployment on servlet containers such as the Apache Tomcat webserver. Implementation is based on JAX-RS and Jersey 2.
+
 Release 1.6.1
 - JSON processing: fix regression bug due to which "tokenComparator" and "algorithm" turned into mandatory fields
 
