@@ -40,7 +40,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 
 @Path("/")

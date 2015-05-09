@@ -26,7 +26,7 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 @Provider
 public class IOExceptionMapper implements ExceptionMapper<IOException> {
