@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /*
  * @author Meindert Kroese
@@ -34,7 +33,6 @@ import java.util.logging.Logger;
  * @author Ronald Haentjens Dekker
  */
 public class Archipelago {
-    Logger LOG = Logger.getLogger(Archipelago.class.getName());
 
     private final List<Island> islands;
     private final Set<Integer> islandvectors;
@@ -48,11 +46,6 @@ public class Archipelago {
     public Archipelago(Archipelago orig) {
         this.islands = new ArrayList<>(orig.islands);
         this.islandvectors = new HashSet<>(orig.islandvectors);
-    }
-
-    public Archipelago(Island isl) {
-        this();
-        islands.add(isl);
     }
 
     public void add(Island island) {
@@ -120,61 +113,8 @@ public class Archipelago {
         return map;
     }
 
-    private double distance(Island isl1, Island isl2) {
-        double result = 0.0;
-        int isl1_L_x = isl1.getLeftEnd().column;
-        int isl1_L_y = isl1.getLeftEnd().row;
-        int isl1_R_x = isl1.getRightEnd().column;
-        int isl1_R_y = isl1.getRightEnd().row;
-        int isl2_L_x = isl2.getLeftEnd().column;
-        int isl2_L_y = isl2.getLeftEnd().row;
-        int isl2_R_x = isl2.getRightEnd().column;
-        int isl2_R_y = isl2.getRightEnd().row;
-        result = distance(isl1_L_x, isl1_L_y, isl2_L_x, isl2_L_y);
-        double d = distance(isl1_L_x, isl1_L_y, isl2_R_x, isl2_R_y);
-        if (d < result) result = d;
-        d = distance(isl1_R_x, isl1_R_y, isl2_L_x, isl2_L_y);
-        if (d < result) result = d;
-        d = distance(isl1_R_x, isl1_R_y, isl2_R_x, isl2_R_y);
-        if (d < result) result = d;
-        return result;
-    }
-
-    private double distance(int a_x, int a_y, int b_x, int b_y) {
-        double result = 0.0;
-        result = Math.sqrt((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
-        return result;
-    }
-
     public Set<Integer> getIslandVectors() {
         return islandvectors;
     }
 
-    public double smallestDistance(Island isl) {
-        double minimum = 10000;
-        for (Island fixedIsland : getIslands()) {
-            minimum = Math.min(minimum, distance(isl, fixedIsland));
-        }
-        return minimum;
-    }
-
-    public double smallestDistanceToIdealLine(Island isl) {
-        double minimum = 10000;
-        Island closestIsland = null;
-        for (Island fixedIsland : getIslands()) {
-            double prev = minimum;
-            minimum = Math.min(minimum, distance(isl, fixedIsland));
-            if (prev > minimum) {
-                closestIsland = fixedIsland;
-            }
-        }
-        if (closestIsland == null) {
-            return minimum;
-        }
-        Coordinate leftEnd = isl.getLeftEnd();
-        int islandVector = leftEnd.row - leftEnd.column;
-        Coordinate leftEnd0 = closestIsland.getLeftEnd();
-        int closestIslandVector = leftEnd0.row - leftEnd0.column;
-        return Math.abs(islandVector - closestIslandVector);
-    }
 }

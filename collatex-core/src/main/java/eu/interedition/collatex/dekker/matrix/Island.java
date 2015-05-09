@@ -25,28 +25,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * A DirectedIsland is a collections of Coordinates all on the same
- * diagonal. The direction of this diagonal can be -1, 0, or 1.
- * The zero is for a DirectedIsland of only one Coordinate.
- * Directions 1 and -1 examples
- * Coordinates (0,0) (1,1) have Direction 1
- * Coordinates (1,1) (2,1) have Direction -1
- * I.e. if the row-coordinate gets larger and the col-coordinate also, the
- * direction is 1 (positive) else it is -1 (negative)
- */
 public class Island implements Iterable<Coordinate>, Comparable<Island> {
 
-    private int direction = 0;
     private final List<Coordinate> islandCoordinates = new ArrayList<>();
 
     public Island() {
-    }
-
-    public Island(Island other) {
-        for (Coordinate c : other.islandCoordinates) {
-            add(new Coordinate(c));
-        }
     }
 
     public Island(Coordinate first, Coordinate last) {
@@ -59,60 +42,12 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
         }
     }
 
-    public boolean add(Coordinate coordinate) {
-        boolean result = false;
-        if (islandCoordinates.isEmpty()) {
-            result = islandCoordinates.add(coordinate);
-        } else if (!contains(coordinate) && neighbour(coordinate)) {
-            if (direction == 0) {
-                Coordinate existing = islandCoordinates.get(0);
-                direction = (existing.row - coordinate.row) / (existing.column - coordinate.column);
-                result = islandCoordinates.add(coordinate);
-            } else {
-                Coordinate existing = islandCoordinates.get(0);
-                if (existing.column != coordinate.column) {
-                    int new_direction = (existing.row - coordinate.row) / (existing.column - coordinate.column);
-                    if (new_direction == direction) result = islandCoordinates.add(coordinate);
-                }
-            }
-        }
-        return result;
-    }
-
-    public int direction() {
-        return direction;
-    }
-
-    public Island removePoints(Island di) {
-        Island result = new Island(this);
-        for (Coordinate c : di) {
-            result.removeSameColOrRow(c);
-        }
-        return result;
+    public void add(Coordinate coordinate) {
+        islandCoordinates.add(coordinate);
     }
 
     public void removeCoordinate(Coordinate c) {
         islandCoordinates.remove(c);
-    }
-
-    public Coordinate getCoorOnRow(int row) {
-        for (Coordinate coor : islandCoordinates) {
-            if (coor.getRow() == row) return coor;
-        }
-        return null;
-    }
-
-    public Coordinate getCoorOnCol(int col) {
-        for (Coordinate coor : islandCoordinates) {
-            if (coor.getColumn() == col) return coor;
-        }
-        return null;
-    }
-
-    public void merge(Island di) {
-        for (Coordinate c : di) {
-            add(c);
-        }
     }
 
     /**
@@ -132,16 +67,6 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
         return islandCoordinates.contains(c);
     }
 
-    public boolean neighbour(Coordinate c) {
-        if (contains(c)) return false;
-        for (Coordinate islC : islandCoordinates) {
-            if (c.bordersOn(islC)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Coordinate getLeftEnd() {
         Coordinate coor = islandCoordinates.get(0);
         for (Coordinate c : islandCoordinates) {
@@ -158,38 +83,8 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
         return coor;
     }
 
-    public boolean overlap(Island isl) {
-        for (Coordinate c : isl) {
-            if (contains(c) || neighbour(c)) return true;
-        }
-        return false;
-    }
-
     public int size() {
         return islandCoordinates.size();
-    }
-
-    public void clear() {
-        islandCoordinates.clear();
-    }
-
-    public int value() {
-        final int size = size();
-        return (size < 2 ? size : direction + size * size);
-    }
-
-    protected boolean removeSameColOrRow(Coordinate c) {
-        ArrayList<Coordinate> remove = new ArrayList<>();
-        for (Coordinate coor : islandCoordinates) {
-            if (coor.sameColumn(c) || coor.sameRow(c)) {
-                remove.add(coor);
-            }
-        }
-        if (remove.isEmpty()) return false;
-        for (Coordinate coor : remove) {
-            islandCoordinates.remove(coor);
-        }
-        return true;
     }
 
     @Override
@@ -223,7 +118,7 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
         if (islandCoordinates.isEmpty()) {
             throw new RuntimeException("Unexpected situation: island coordinates empty!");
         }
-        return MessageFormat.format("Island ({0}-{1}) size: {2} direction: {3}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size(), direction());
+        return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
     }
 
     @Override
