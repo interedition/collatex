@@ -5,10 +5,10 @@
     <parent>
         <groupId>eu.interedition</groupId>
         <artifactId>collatex</artifactId>
-        <version>1.6.2-SNAPSHOT</version>
+        <version>1.6.2</version>
     </parent>
     <artifactId>collatex-tools</artifactId>
-    <version>1.6.2-SNAPSHOT</version>
+    <version>1.6.2</version>
     <name>CollateX Tools</name>
     <description>CollateX Tool Suite including a command line interface and a HTTP service</description>
     <dependencies>
