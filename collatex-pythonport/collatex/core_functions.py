@@ -11,6 +11,7 @@ from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML
+from collatex.display_module import display_variant_graph_as_SVG
 
 # Valid options for output are:
 # "table" for the alignment table (default)
@@ -25,6 +26,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if segmentation:
         join(graph)
     # check which output format is requested: graph or table
+    if output == "svg":
+        return display_variant_graph_as_SVG(graph)
     if output=="graph": 
         return graph
     # create alignment table
