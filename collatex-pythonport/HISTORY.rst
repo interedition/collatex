@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.0pre12 (2015-05-12)
++++++++++++++++++++++++
+
+* Added SVG output option to the collate function. For this functionality to work the graphviz python library needs to be installed.
+
 2.0.0pre11 (2014-12-02)
 +++++++++++++++++++++++
 
