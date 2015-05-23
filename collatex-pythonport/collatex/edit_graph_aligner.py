@@ -3,75 +3,10 @@ Created on Aug 5, 2014
 
 @author: Ronald Haentjens Dekker
 '''
+from prettytable import PrettyTable
 
 from collatex.core_classes import CollationAlgorithm
 from collatex.suffix_based_scorer import Scorer
-from prettytable import PrettyTable
-from collatex.astar import AStarNode, AStar
-
-class AstarEditGraphNode(AStarNode):
-    def __init__(self, aligner, y, x):
-        self.aligner = aligner
-        self.y = y
-        self.x = x
-        self.match = False
-        self.segments = 0 #TODO: remove
-        super(AstarEditGraphNode, self).__init__()
-
-    def __repr__(self):
-        return repr(self.g)
-#         return str(self.y)+" "+str(self.x)+" "+
-    
-    def is_end_node(self):
-        is_end = self.y == self.aligner.length_witness_b and self.x == self.aligner.length_witness_a
-#         print("Node: "+str(self.y)+" "+str(self.x)+" "+str(self.edit_operation)+" is end: "+str(is_end))
-        return is_end 
-    
-    # TODO: not nice: scorer already updates global score of other..
-    def move_cost(self, other):
-        #NOTE: possible optimization: you don't always need to fetch the tokens!
-        token_a = self.aligner.tokens_witness_a[other.x-1]
-        token_b = self.aligner.tokens_witness_b[other.y-1]
-        edit_operation = 1
-        if other.x -1 == self.x and other.y - 1 == self.y:
-            edit_operation = 0
-        #     def score_cell(self, table_node, parent_node, token_a, token_b, y, x, edit_operation):
-        self.aligner.scorer.score_cell(other, self, token_a, token_b, other.y, other.x, edit_operation)
-        cost = other.g - self.g
-#         print("From Node: "+str(self.y)+" "+str(self.x)+" "+str(self.edit_operation)+" to other: "+str(other.y)+" "+str(other.x)+" "+str(other.edit_operation)+" cost: "+str(cost))
-        return -cost
-
-class AstarEditGraphAligner(AStar):
-    def __init__(self, tokens_witness_a, tokens_witness_b, scorer):
-        self.tokens_witness_a = tokens_witness_a
-        self.tokens_witness_b = tokens_witness_b
-        self.scorer = scorer
-        self.table = None #TODO: not nice!
-        self.length_witness_a = len(self.tokens_witness_a)
-        self.length_witness_b = len(self.tokens_witness_b)
-
-    def create_childnodes(self, node):
-        # we create 3 child nodes
-        # NOTE: In some cases it is possible to get away with only 2 nodes
-        # NOTE: possible performance enhancement
-        child_nodes = []
-        if node.y < self.length_witness_b:
-            child_node = self.table[node.y+1][node.x]
-            child_nodes.append(child_node)
-        if node.x < self.length_witness_a:
-            child_node = self.table[node.y][node.x+1]
-            child_nodes.append(child_node)
-        if node.y < self.length_witness_b and node.x < self.length_witness_a:
-            child_node = self.table[node.y+1][node.x+1]
-            child_nodes.append(child_node)
-        return child_nodes
-
-    def heuristic(self, node):
-        distance_to_end_node_horizontal = (self.length_witness_a-node.x)
-        distance_to_end_node_vertical = (self.length_witness_b-node.y)
-        gap_penalty = abs(distance_to_end_node_horizontal - distance_to_end_node_vertical)
-#         print("heuristic penalty: "+str(node.y)+" "+str(node.x)+" penalty: "+str(-gap_penalty))
-        return gap_penalty
 
 class EditGraphNode(object):
     def __init__(self):
@@ -93,12 +28,8 @@ class EditGraphAligner(CollationAlgorithm):
         self.collation = collation
         self.debug_scores = debug_scores
         self.scorer = Scorer(collation, near_match)
-        if not astar:
-            self.align_function = self._align_table
-        else:
-            print("INFO: Aligning using a* search algorithm. BETA quality.")
-            self.align_function = self._align_astar
-            
+        self.align_function = self._align_table
+
     def collate(self, graph, collation):
         '''
         :type graph: VariantGraph
@@ -144,56 +75,7 @@ class EditGraphAligner(CollationAlgorithm):
         if self.debug_scores:
             self._debug_edit_graph_table(self.table)
         
-    def _align_astar(self, superbase, witness, token_to_vertex, control_table=None):
-        self.tokens_witness_a = superbase
-        self.tokens_witness_b = witness.tokens()
-        self.length_witness_a = len(self.tokens_witness_a)
-        self.length_witness_b = len(self.tokens_witness_b)
-        self.control_table = control_table
-        aligner = AstarEditGraphAligner(self.tokens_witness_a, self.tokens_witness_b, self.scorer)
-        self.table = [[AstarEditGraphNode(aligner, y, x) for x in range(self.length_witness_a+1)] for y in range(self.length_witness_b+1)]
-        aligner.table = self.table
-        start = self.table[0][0]
-        path = aligner.search(start, self.control_table)
-        
-        # transform path into an alignment
-        alignment = {}
 
-        # segment stuff
-        # note we traverse from left to right!
-        self.last_x = 0
-        self.last_y = 0
-        self.new_superbase=[]
-        
-        for element in path:
-#             print(element.y, element.x)
-            
-            if element.match == True:
-                # process segments
-                self.newer_add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, element.x, element.y)
-                self.last_x = element.x
-                self.last_y = element.y
-                # process alignment
-                token = self.tokens_witness_a[element.x-1]
-                token2 = self.tokens_witness_b[element.y-1]
-                vertex = token_to_vertex[token]
-                alignment[token2] = vertex
-                # add match to superbase
-                self.new_superbase.append(token)
-
-        # process additions/omissions in the begin of the superbase/witness
-        self.newer_add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, self.length_witness_a, self.length_witness_b)
-        return alignment
-    
-    
-    def newer_add_to_superbase(self, witness_a, witness_b, x, y):
-        if x - self.last_x - 1 > 0 or y - self.last_y - 1 > 0:
-            # create new segment
-            omitted_base = witness_a[self.last_x:x - 1]
-            added_witness = witness_b[self.last_y:y - 1]
-            self.new_superbase += omitted_base
-            self.new_superbase += added_witness
-    
     def _align_table(self, superbase, witness, token_to_vertex):
         self.tokens_witness_a = superbase
         self.tokens_witness_b = witness.tokens()

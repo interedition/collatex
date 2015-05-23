@@ -6,6 +6,7 @@ Created on May 3, 2014
 from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
 from collatex.collatex_suffix import ExtendedSuffixArray
 from collatex.exceptions import UnsupportedError
+from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 import json
@@ -18,7 +19,11 @@ from collatex.display_module import display_variant_graph_as_SVG
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, debug_scores=False):
-    algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
+    if not astar:
+        algorithm = EditGraphAligner(collation, near_match=near_match, astar=astar, debug_scores=debug_scores)
+    else:
+        algorithm = ExperimentalAstarAligner(collation, near_match=near_match, debug_scores=debug_scores)
+
     # build graph
     graph = VariantGraph()
     algorithm.collate(graph, collation)
