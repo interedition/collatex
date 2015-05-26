@@ -32,6 +32,60 @@ class Scorer(object):
         else:
             self.match_function = self.match
         
+    # edit operation:
+    #    0 == match/replacement
+    #    1 == addition/omission
+    def score_cell(self, table_node, parent_node, token_a, token_b, y, x, edit_operation):
+        # no matching possible in this case (always treated as a gap)
+        # it is either an add or a delete
+        if x == 0 or y == 0:
+            table_node.g = parent_node.g - 1
+            return
+
+        # it is either an add/delete or replacement (so an add and a delete)
+        # it is a replacement
+        if edit_operation == 0:
+            match = self.match_function(token_a, token_b)
+#             print("testing "+token_a.token_string+" and "+token_b.token_string+" "+str(match))
+            # match = token_a.token_string == token_b.token_string
+            # based on match or not and parent_node calculate new score
+            if match==0:
+                # mark the fact that this node is match
+                table_node.match = True
+                # do not change score for now
+                table_node.g = parent_node.g
+                # count segments
+                if parent_node.match == False:
+                    table_node.segments = parent_node.segments + 1
+                return
+            if match==1:
+                table_node.g = parent_node.g - 0.5 #TODO: TEST TEST TEST
+                pass
+            else:
+                table_node.g = parent_node.g - 2
+                return
+        # it is an add/delete
+        else:
+            table_node.g = parent_node.g - 1
+            return
+
+    def heuristic_score(self, node, length_witness_a, length_witness_b):
+        heuristic_gap_penalty = 0
+
+        # step 1: check blocks for all the base tokens
+        #TODO: implement!
+        #TODO: isn't the correct heuristic to count all the tokens that do not have a block associated with them?
+        #TODO: for the base as the witness?
+
+
+        # step 2: add costs to get to the end to the heuristic gap penalty
+        distance_to_end_node_horizontal = (length_witness_a - node.x)
+        distance_to_end_node_vertical = (length_witness_b - node.y)
+        gap_penalty = abs(distance_to_end_node_horizontal - distance_to_end_node_vertical)
+        #         print("heuristic penalty: "+str(node.y)+" "+str(node.x)+" penalty: "+str(-gap_penalty))
+        return gap_penalty
+
+
     def prepare_witness(self, witness):
         # this code can probably done more efficient, for now the main goal is to make it work
         block_witness = self._get_block_witness(witness)
@@ -71,43 +125,6 @@ class Scorer(object):
             return -1
         pass
     
-    # edit operation: 
-    #    0 == match/replacement
-    #    1 == addition/omission
-    def score_cell(self, table_node, parent_node, token_a, token_b, y, x, edit_operation):
-        # no matching possible in this case (always treated as a gap)
-        # it is either an add or a delete
-        if x == 0 or y == 0:
-            table_node.g = parent_node.g - 1
-            return
-        
-        # it is either an add/delete or replacement (so an add and a delete)
-        # it is a replacement
-        if edit_operation == 0:
-            match = self.match_function(token_a, token_b)
-#             print("testing "+token_a.token_string+" and "+token_b.token_string+" "+str(match))   
-            # match = token_a.token_string == token_b.token_string
-            # based on match or not and parent_node calculate new score
-            if match==0:
-                # mark the fact that this node is match
-                table_node.match = True
-                # do not change score for now 
-                table_node.g = parent_node.g
-                # count segments
-                if parent_node.match == False:
-                    table_node.segments = parent_node.segments + 1
-                return
-            if match==1:
-                table_node.g = parent_node.g - 0.5 #TODO: TEST TEST TEST
-                pass
-            else:
-                table_node.g = parent_node.g - 2
-                return
-        # it is an add/delete
-        else:
-            table_node.g = parent_node.g - 1
-            return 
-
     #TODO: it should be possible to do this simpler, faster
     # An occurrence should know its tokens, since it knows its token range
     def _build_tokens_to_occurrences(self, collation, witness, block_witness):
