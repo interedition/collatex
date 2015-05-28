@@ -7,6 +7,8 @@ from prettytable import PrettyTable
 
 from collatex.core_classes import CollationAlgorithm
 from collatex.suffix_based_scorer import Scorer
+from collatex.transposition_handling import TranspositionDetection
+
 
 class EditGraphNode(object):
     def __init__(self):
@@ -24,9 +26,10 @@ class EditGraphNode(object):
     Default implementation is a* based.
     '''
 class EditGraphAligner(CollationAlgorithm):
-    def __init__(self, collation, near_match=False, astar=False, debug_scores=False):
+    def __init__(self, collation, near_match=False, debug_scores=False, detect_transpositions=False):
         self.collation = collation
         self.debug_scores = debug_scores
+        self.detect_transpositions = detect_transpositions
         self.scorer = Scorer(collation, near_match)
         self.align_function = self._align_table
 
@@ -71,7 +74,11 @@ class EditGraphAligner(CollationAlgorithm):
             
             # change superbase
             superbase = self.new_superbase
-        
+
+            if self.detect_transpositions:
+                detector = TranspositionDetection(self)
+                detector.detect()
+
         if self.debug_scores:
             self._debug_edit_graph_table(self.table)
         
@@ -87,6 +94,8 @@ class EditGraphAligner(CollationAlgorithm):
         self.traverse_diagonally()
 
         alignment = {}
+        self.additions = []
+        self.omissions = []
 
         # segment stuff
         # note we traverse from right to left!
@@ -126,26 +135,33 @@ class EditGraphAligner(CollationAlgorithm):
         
 
     def add_to_superbase(self, witness_a, witness_b, x, y):
+        # detect additions/omissions compared to the superbase
+
+
 #         print self.last_x - x - 1, self.last_y - y - 1
         if self.last_x - x - 1 > 0 or self.last_y - y - 1 > 0:
 #             print x, self.last_x, y, self.last_y 
             # create new segment
             omitted_base = witness_a[x:self.last_x - 1]
 #             print omitted_base
+            # add segment to the omissions
+            self.omissions.extend(omitted_base)
             added_witness = witness_b[y:self.last_y - 1]
 #             print added_witness
+            self.additions.extend(added_witness)
+            # update superbase with additions, omissions
             self.new_superbase = added_witness + self.new_superbase
             self.new_superbase = omitted_base + self.new_superbase
 
     def _process_cell(self, token_to_vertex, witness_a, witness_b, alignment, x, y):
         cell = self.table[y][x]
         # process segments
-        if cell.match == True:
+        if cell.match:
             self.add_to_superbase(witness_a, witness_b, x, y)
             self.last_x = x
             self.last_y = y
         # process alignment
-        if cell.match == True:
+        if cell.match:
             token = witness_a[x-1]
             token2 = witness_b[y-1]
             vertex = token_to_vertex[token]

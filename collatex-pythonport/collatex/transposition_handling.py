@@ -4,6 +4,71 @@
     @author: Ronald Haentjens Dekker
 '''
 from collatex.core_classes import VariantGraphRanking
+
+# New transposition detection implementation, still beta quality
+# This implementation works with the new collation algorithm (LCP intervals and edit graph)
+class TranspositionDetection(object):
+
+    def __init__(self, aligner):
+        self.aligner = aligner
+
+    def detect(self):
+        # analyse additions and omissions to detect transpositions
+        # We fetch all the occurrences of the added tokens
+        # Using the scorer (which has the blocks and occurrences of these blocks)
+        added_occurrences = set()
+        for token in self.aligner.additions:
+            # get occurrences from scorer
+            occurrence = self.aligner.scorer.global_tokens_to_occurrences[token]
+            # Note: not every token is an occurrence of a block
+            if occurrence:
+                added_occurrences.add(occurrence)
+        # for every occurrences we have to detect the associated block
+        added_blocks = set()
+        added_blocks_dict = {}
+        for occurrence in added_occurrences:
+            added_blocks.add(occurrence.block)
+            added_blocks_dict[occurrence.block]=occurrence
+        print("Added blocks: "+str(added_blocks))
+        # Fetch all omitted block
+        omitted_occurrences = set()
+        for token in self.aligner.omissions:
+            # get occurrences from scorer
+            occurrence = self.aligner.scorer.global_tokens_to_occurrences[token]
+            if occurrence:
+                omitted_occurrences.add(occurrence)
+        # for every occurrences we have to detect the associated block
+        omitted_blocks = set()
+        omitted_blocks_dict = {}
+        for occurrence in omitted_occurrences:
+            omitted_blocks.add(occurrence.block)
+            omitted_blocks_dict[occurrence.block]=occurrence
+        print("omitted blocks: "+str(omitted_blocks))
+
+        # calculate transpositions by taking the intersection of the two sets
+        transposed_blocks = omitted_blocks.intersection(added_blocks)
+        print ("transposed blocks: "+str(transposed_blocks))
+
+
+        # for now assume that there is only one occurrence for every block
+        # otherwise we skip
+        for block in transposed_blocks:
+            occurrence1 = added_blocks_dict[block]
+            occurrence2 = omitted_blocks_dict[block]
+            # we need to go from the occurrences to the tokens
+            token_positions = zip(occurrence1.token_range, occurrence2.token_range)
+            for (token_position_base, token_position_witness) in token_positions:
+                token_base = self.aligner.collation.tokens[token_position_base]
+                token_witness = self.aligner.collation.tokens[token_position_witness]
+                print(token_base, token_witness)
+
+
+
+
+
+
+
+
 #===========================================================================
 # Direct port from Java code
 #===========================================================================
