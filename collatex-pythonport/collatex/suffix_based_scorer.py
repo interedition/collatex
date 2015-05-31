@@ -164,7 +164,7 @@ class Scorer(object):
                 occurrences.append(occurrence) 
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=attrgetter('lower_end'))
-        block_witness = BlockWitness(sorted_o, self.collation.tokens)
+        block_witness = BlockWitness(sorted_o, self.collation.combined_tokens)
         return block_witness
 
     '''

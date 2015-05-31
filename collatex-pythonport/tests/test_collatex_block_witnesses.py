@@ -29,16 +29,15 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         # $ is meant to separate witnesses here
-        self.assertEquals("a b c d F g h i ! K ! q r s t $1 a b c d F g h i ! q r s t", collation.get_combined_string())
+        self.assertEquals("a b c d F g h i ! K ! q r s t $ 1 a b c d F g h i ! q r s t", " ".join(collation.combined_tokens))
     
     # test whether the witness->range mapping works
-    @unit_disabled
     def test_witness_ranges_hermans_case(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         self.assertEquals(RangeSet("0-14"), collation.get_range_for_witness("W1"))
-        self.assertEquals(RangeSet("16-28"), collation.get_range_for_witness("W2"))
+        self.assertEquals(RangeSet("17-29"), collation.get_range_for_witness("W2"))
 
 # TODO: re-enable test!    
     # Note: LCP intervals can overlap
@@ -74,14 +73,13 @@ class Test(unittest.TestCase):
         _, child_lcp_intervals = collation.get_lcp_intervals()
         self.assertFalse(child_lcp_intervals)
 
-    @unit_disabled
     def test_non_overlapping_blocks_black_cat(self):
         collation = Collation()
         collation.add_plain_witness("W1", "the black cat")
         collation.add_plain_witness("W2", "the black cat")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
-        block1 = Block(RangeSet("0-2, 4-6"))
+        block1 = Block(RangeSet("0-2, 5-7"))
         self.assertEqual([block1], blocks)
 
     #TODO: Fix number of siblings!
@@ -97,17 +95,15 @@ class Test(unittest.TestCase):
         block3 = Block(RangeSet("2, 8"))
         self.assertEqual([block1, block2, block3], blocks)
 
-    @unit_disabled
     def test_non_overlapping_blocks_Hermans(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
         collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
-        self.assertIn(Block(RangeSet("0-8, 16-24")), blocks) # a b c d F g h i !
-        self.assertIn(Block(RangeSet("11-14, 25-28")), blocks) # q r s t
+        self.assertIn(Block(RangeSet("0-8, 17-25")), blocks) # a b c d F g h i !
+        self.assertIn(Block(RangeSet("11-14, 26-29")), blocks) # q r s t
 
-    @unit_disabled
     def test_blocks_Hermans_case_three_witnesses(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -115,24 +111,22 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
-        self.assertIn(Block(RangeSet("0-3, 16-19, 30-33")), blocks) # a b c d
-        self.assertIn(Block(RangeSet("5-7, 21-23, 35-37")), blocks) # g h i
-        self.assertIn(Block(RangeSet("10-14, 24-28, 38-42")), blocks) # ! q r s t
-        self.assertIn(Block(RangeSet("4, 20")), blocks) # F
+        self.assertIn(Block(RangeSet("0-3, 17-20, 32-35")), blocks) # a b c d
+        self.assertIn(Block(RangeSet("5-7, 22-24, 37-39")), blocks) # g h i 
+        self.assertIn(Block(RangeSet("10-14, 25-29, 40-44")), blocks) # ! q r s t
+        self.assertIn(Block(RangeSet("4, 21")), blocks) # F
         
 
     # In the new approach nothing should be split
-    @unit_disabled
     def test_blocks_splitting_token_case(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a c b c")
         collation.add_plain_witness("W2", "a c b")
         algorithm = Scorer(collation)
         blocks = algorithm._get_non_overlapping_repeating_blocks()
-        block1 = Block(RangeSet("0-2, 5-7")) # a c b
+        block1 = Block(RangeSet("0-2, 6-8")) # a c b
         self.assertIn(block1, blocks)
 
-    @unit_disabled
     def test_block_witnesses_Hermans_case_two_witnesses(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -143,7 +137,6 @@ class Test(unittest.TestCase):
         block_witness = algorithm._get_block_witness(collation.witnesses[1])
         self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
 
-    @unit_disabled
     def test_block_witnesses_Hermans_case(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")

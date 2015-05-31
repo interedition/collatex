@@ -13,7 +13,7 @@ from networkx.algorithms.dag import topological_sort
 import re
 from prettytable import PrettyTable
 from textwrap import fill
-from collatex.exceptions import TokenError
+from collatex.exceptions import TokenError, UnsupportedError
 
 class Row(object):
     
@@ -161,20 +161,20 @@ class Token(object):
 class Witness(object):
     
     def __init__(self, witnessdata):
+        if 'id' not in witnessdata:
+            raise UnsupportedError("No defined id in witnessdata")
         self.sigil = witnessdata['id']
         self._tokens = []
         if 'content' in witnessdata:
-            self.content = witnessdata['content']
-            # print("Witness "+sigil+" TOKENIZER IS CALLED!")
             tokenizer = WordPunctuationTokenizer()
-            tokens_as_strings = tokenizer.tokenize(self.content)
+            tokens_as_strings = tokenizer.tokenize(witnessdata['content'])
             for token_string in tokens_as_strings:
                 self._tokens.append(Token({'t':token_string}))
         elif 'tokens' in witnessdata:
             for tk in witnessdata['tokens']:
                 self._tokens.append(Token(tk))
-            # TODO no idea what this content string is needed for.
-            self.content = ' '.join([x.token_string for x in self._tokens])
+        else:
+            raise UnsupportedError("No defined content/tokens in witness "+self.sigil)
             
     def tokens(self):
         return self._tokens
