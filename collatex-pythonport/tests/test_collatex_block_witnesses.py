@@ -97,30 +97,6 @@ class Test(unittest.TestCase):
         block3 = Block(RangeSet("2, 8"))
         self.assertEqual([block1, block2, block3], blocks)
 
-    @unit_disabled
-    def test_non_overlapping_blocks_Hermans(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        algorithm = Scorer(collation)
-        blocks = algorithm._get_non_overlapping_repeating_blocks()
-        self.assertIn(Block(RangeSet("0-8, 16-24")), blocks) # a b c d F g h i !
-        self.assertIn(Block(RangeSet("11-14, 25-28")), blocks) # q r s t
-
-    @unit_disabled
-    def test_blocks_Hermans_case_three_witnesses(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
-        algorithm = Scorer(collation)
-        blocks = algorithm._get_non_overlapping_repeating_blocks()
-        self.assertIn(Block(RangeSet("0-3, 16-19, 30-33")), blocks) # a b c d
-        self.assertIn(Block(RangeSet("5-7, 21-23, 35-37")), blocks) # g h i
-        self.assertIn(Block(RangeSet("10-14, 24-28, 38-42")), blocks) # ! q r s t
-        self.assertIn(Block(RangeSet("4, 20")), blocks) # F
-        
-
     # In the new approach nothing should be split
     @unit_disabled
     def test_blocks_splitting_token_case(self):
