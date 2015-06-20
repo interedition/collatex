@@ -147,7 +147,7 @@ class LCPInterval(object):
         
     def __str__(self):
         part1= "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])
-        return part1+"> with "+str(self.number_of_occurrences)+" occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
+        return part1+"> with "+str(self.number_of_witnesses)+":"+str(self.number_of_occurrences)+" witnesses/occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
  
     def __repr__(self):
         return "LCPivl: "+str(self.token_start_position)+","+str(self.minimum_block_length)+","+str(self.number_of_occurrences)

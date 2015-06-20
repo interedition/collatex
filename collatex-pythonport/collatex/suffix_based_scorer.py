@@ -172,25 +172,28 @@ class Scorer(object):
     '''
     def _get_non_overlapping_repeating_blocks(self):
         extended_suffix_array = self.collation.to_extended_suffix_array()
-        potential_blocks = extended_suffix_array.split_lcp_array_into_intervals() 
-        self.filter_potential_blocks(potential_blocks)
-        # step 3: sort the blocks based on depth (number of repetitions) first,
+
+        # The LCP intervals that are calculated from the extend suffix array are all potential blocks.
+        # However some potential blocks overlap. To decide the definitive blocks we sort the potential blocks on the
+        # amount of witnesses they occur in.
+        potential_blocks = extended_suffix_array.split_lcp_array_into_intervals()
+        # Sort the blocks based on number of witnesses first,
         # second length of LCP interval,
         # third sort on parent LCP interval occurrences.
-        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_occurrences", "minimum_block_length", "number_of_siblings"), reverse=True)
-        # step 4: select the definitive blocks
+        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_witnesses", "minimum_block_length", "number_of_siblings"), reverse=True)
+        # Select the definitive blocks
         occupied = RangeSet()
         real_blocks = []
         for potential_block in sorted_blocks_on_priority:
-#           print(potential_block.info())
+            # print(potential_block.info())
             try:
                 non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
                 if non_overlapping_range:
-#                     print("Selecting: "+str(potential_block))
+                    #                     print("Selecting: "+str(potential_block))
                     occupied.union_update(non_overlapping_range)
                     real_blocks.append(Block(non_overlapping_range))
             except PartialOverlapException:          
-#                 print("Skip due to conflict: "+str(potential_block))
+                #                 print("Skip due to conflict: "+str(potential_block))
                 while potential_block.minimum_block_length > 1:
                     # retry with a different length: one less
                     for idx in range(potential_block.start+1, potential_block.end+1):
@@ -199,25 +202,11 @@ class Scorer(object):
                     try:
                         non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
                         if non_overlapping_range:
-#                             print("Retried and selecting: "+str(potential_block))
+                            #                             print("Retried and selecting: "+str(potential_block))
                             occupied.union_update(non_overlapping_range)
                             real_blocks.append(Block(non_overlapping_range))
                             break
                     except PartialOverlapException:          
-#                         print("Retried and failed again")
+                        #                         print("Retried and failed again")
                         pass
         return real_blocks
-
-
-    # filter out all the blocks that have more than one occurrence within a witness
-    def filter_potential_blocks(self, potential_blocks):
-        for potential_block in potential_blocks[:]:
-            for witness in self.collation.witnesses:
-                witness_sigil = witness.sigil
-                witness_range = self.collation.get_range_for_witness(witness_sigil)
-                inter = witness_range.intersection(potential_block.block_occurrences())
-                if potential_block.number_of_occurrences > len(self.collation.witnesses) or len(inter)> potential_block.minimum_block_length:
-#                     print("Removing block: "+str(potential_block))
-                    potential_blocks.remove(potential_block)
-                    break
-
