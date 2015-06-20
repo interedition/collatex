@@ -96,12 +96,24 @@ class LCPInterval(object):
     @property            
     def token_start_position(self):
         return min(self.block_occurrences())
-    
-    def calculate_non_overlapping_range_with(self, occupied):
-        # convert block occurrences into ranges
-        potential_block_range = RangeSet()
+
+    def _as_range(self):
+        # convert interval into range
+        range = RangeSet()
         for occurrence in self.block_occurrences():
-            potential_block_range.add_range(occurrence, occurrence + self.minimum_block_length)
+            range.add_range(occurrence, occurrence + self.minimum_block_length)
+        return range
+
+    def number_of_witnesses(self, collation):
+        range = self._as_range()
+        number_of_witnesses = 0
+        for witness_range in collation.witness_ranges.values():
+            if witness_range.intersection(range):
+                number_of_witnesses += 1
+        return number_of_witnesses
+
+    def calculate_non_overlapping_range_with(self, occupied):
+        potential_block_range = self._as_range()
         #check the intersection with the already occupied ranges
         block_intersection = potential_block_range.intersection(occupied)
         if not block_intersection:

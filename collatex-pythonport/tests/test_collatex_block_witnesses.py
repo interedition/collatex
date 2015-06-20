@@ -64,16 +64,6 @@ class Test(unittest.TestCase):
         self.assertEqual([(5, 7), (8, 10)], child_lcp_intervals[5])
         self.assertEqual([(513, 515),(516, 518),(519, 521),(522, 524),(525,527)], child_lcp_intervals[513])
 
-# TODO: re-enable test!
-    @unit_disabled
-    def test_lcp_child_intervals_hermans_case(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
-        _, child_lcp_intervals = collation.get_lcp_intervals()
-        self.assertFalse(child_lcp_intervals)
-
     @unit_disabled
     def test_non_overlapping_blocks_black_cat(self):
         collation = Collation()
@@ -133,16 +123,6 @@ class Test(unittest.TestCase):
         block_witness3 = algorithm._get_block_witness(collation.witnesses[2])
         self.assertEquals(["a b c d", "g h i", "! q r s t"], block_witness3.debug())
         
-    def test_filter_potential_blocks(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a a")
-        collation.add_plain_witness("w2", "a")
-        extsufarr = collation.to_extended_suffix_array()
-        potential_blocks = extsufarr.split_lcp_array_into_intervals()
-        algorithm = Scorer(collation)
-        algorithm.filter_potential_blocks(potential_blocks)
-        self.assertFalse(potential_blocks)
-    
     # LCP interval is not ascending nor descending
     @unit_disabled
     def test_split_lcp_intervals_into_smaller_intervals(self):
