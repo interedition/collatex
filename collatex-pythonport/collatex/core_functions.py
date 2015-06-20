@@ -174,7 +174,7 @@ class Collation(object):
 
 
     def to_extended_suffix_array(self):
-        return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array())
+        return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array(), self)
 
     @property
     def tokens(self):

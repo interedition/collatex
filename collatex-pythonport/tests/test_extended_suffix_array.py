@@ -13,7 +13,7 @@ class Test(unittest.TestCase):
         extsufarr = collation.to_extended_suffix_array()
         intervals = extsufarr.split_lcp_array_into_intervals()
         potential_block = intervals[1] # ! q r s t
-        self.assertEqual(3, potential_block.number_of_witnesses(collation))
+        self.assertEqual(3, potential_block.number_of_witnesses)
 
     def test_filter_potential_blocks(self):
         collation = Collation()
@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
         # expectations
         # There is one interval with length 1, number of occurrences 3, number of witnesses: 2
         a_interval = intervals[0] # a
-        self.assertEqual(2, a_interval.number_of_witnesses(collation))
+        self.assertEqual(2, a_interval.number_of_witnesses)
         self.assertEqual(1, a_interval.length)
         self.assertEqual(3, a_interval.number_of_occurrences)
 

@@ -17,10 +17,11 @@ class PartialOverlapException(Exception):
 
 class ExtendedSuffixArray(object):
     
-    def __init__(self, tokens, sa_array, lcp_array):
+    def __init__(self, tokens, sa_array, lcp_array, collation):
         self.tokens = tokens
         self.SA = sa_array
         self.LCP = lcp_array
+        self.collation = collation
 
     # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend. 4) descend, ascend
     def split_lcp_array_into_intervals(self):
@@ -39,7 +40,7 @@ class ExtendedSuffixArray(object):
 #                     print("Peek: "+str(open_intervals.peek()))
                     (start, length) = open_intervals.pop()
                     #TODO: FIX NUMBER OF SIBLINGS!
-                    closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, idx-1, length, 0))
+                    closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, idx-1, length, 0, self.collation))
 #                     print("new: "+repr(closed_intervals[-1]))
                 # then: open a new interval starting with start filter open intervals.
                 if lcp_value > 0:
@@ -50,7 +51,7 @@ class ExtendedSuffixArray(object):
 #         print("Closing remaining:")
         for start, length in open_intervals:
             #TODO: FIX NUMBER OF SIBLINGS!
-            closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, len(self.LCP)-1, length, 0))
+            closed_intervals.append(LCPInterval(self.tokens, self.SA, self.LCP, start, len(self.LCP)-1, length, 0, self.collation))
 #             print("new: "+repr(closed_intervals[-1]))
         return closed_intervals
 
@@ -67,7 +68,7 @@ class ExtendedSuffixArray(object):
 # block_occurrences: the ranges within the suffix array that this block spans
 class LCPInterval(object):
     
-    def __init__(self, tokens, SA, LCP, start, end, length, number_of_siblings):
+    def __init__(self, tokens, SA, LCP, start, end, length, number_of_siblings, collation):
         self.tokens = tokens
         self.SA = SA
         self.LCP = LCP
@@ -75,6 +76,7 @@ class LCPInterval(object):
         self.end = end
         self.length = length
         self.number_of_siblings = number_of_siblings
+        self.collation = collation
         
     @property
     def minimum_block_length(self):
@@ -104,10 +106,11 @@ class LCPInterval(object):
             range.add_range(occurrence, occurrence + self.minimum_block_length)
         return range
 
-    def number_of_witnesses(self, collation):
+    @property
+    def number_of_witnesses(self):
         range = self._as_range()
         number_of_witnesses = 0
-        for witness_range in collation.witness_ranges.values():
+        for witness_range in self.collation.witness_ranges.values():
             if witness_range.intersection(range):
                 number_of_witnesses += 1
         return number_of_witnesses
