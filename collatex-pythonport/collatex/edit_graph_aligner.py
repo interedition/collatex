@@ -26,11 +26,11 @@ class EditGraphNode(object):
     Default implementation is a* based.
     '''
 class EditGraphAligner(CollationAlgorithm):
-    def __init__(self, collation, near_match=False, debug_scores=False, detect_transpositions=False):
+    def __init__(self, collation, near_match=False, debug_scores=False, detect_transpositions=False, properties_filter=None):
         self.collation = collation
         self.debug_scores = debug_scores
         self.detect_transpositions = detect_transpositions
-        self.scorer = Scorer(collation, near_match)
+        self.scorer = Scorer(collation, near_match=near_match, properties_filter=properties_filter)
         self.align_function = self._align_table
 
     def collate(self, graph, collation):

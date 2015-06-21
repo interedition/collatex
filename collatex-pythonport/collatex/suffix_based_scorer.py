@@ -23,10 +23,11 @@ except:
 '''
 
 class Scorer(object):
-    def __init__(self, collation, near_match=False):
+    def __init__(self, collation, near_match=False, properties_filter=None):
         self.collation = collation
         self.blocks = []
         self.global_tokens_to_occurrences = {}
+        self.properties_filter=properties_filter
         if near_match:
             self.match_function = self.near_match
         else:
@@ -109,7 +110,14 @@ class Scorer(object):
         else:
             match = False
         if match:
-            return 0
+            # Check whether the user has supplied a properties filter
+            if not self.properties_filter:
+                return 0
+            match = self.properties_filter(token_a.token_data, token_b.token_data)
+            if match:
+                return 0
+            else:
+                return -1
         else:
             return -1
 
