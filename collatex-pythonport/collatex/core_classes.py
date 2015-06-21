@@ -156,6 +156,7 @@ class Token(object):
         self.token_data = tokendata
 
     def __repr__(self):
+        #return str(self.token_data)
         return self.token_string
 
 class Witness(object):
@@ -191,15 +192,22 @@ class VariantGraph(object):
 #     
     # vertex creation uses a unique ID, since the token_content does not have to be unique   
     # we store the token content in the label 
-    def add_vertex(self, token):
+    def add_vertex(self, token, sigil=None):
         '''
         :type token: Token
         '''
         node_id = self.graph.number_of_nodes()
         #print("Adding node: "+node_id+":"+token_content)
-        self.graph.add_node(node_id, label= token.token_string)
+        tokens = {}
+        if sigil:
+            tokens[sigil]=token
+        self.graph.add_node(node_id, label= token.token_string, tokens=tokens)
         return node_id
-    
+
+    def add_token_to_vertex(self, node, token, sigil):
+        attributes = self.vertex_attributes(node)
+        attributes["tokens"][sigil]=token
+
     def connect(self, source, target, witnesses):
         """
         :type source: integer
@@ -255,9 +263,10 @@ class CollationAlgorithm(object):
         for token in witness_tokens:
             vertex = alignments.get(token, None)
             if vertex == None:
-                vertex = graph.add_vertex(token)
+                vertex = graph.add_vertex(token, witness_sigil)
                 token_to_vertex[token] = vertex
-            #TODO: add token to vertex, for example: vertex.add(token)
+            else:
+                graph.add_token_to_vertex(vertex, token, witness_sigil)
             graph.connect(last, vertex, witness_sigil)
             last = vertex
         graph.connect(last, graph.end, witness_sigil)
