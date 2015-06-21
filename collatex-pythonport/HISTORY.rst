@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.0pre13 (2015-06-21)
++++++++++++++++++++++++
+
+* Added properties_filter option to enable users to influence matching based on properties of tokens.
+* Improved blockification of witnesses.
+
 2.0.0pre12 (2015-05-12)
 +++++++++++++++++++++++
 
