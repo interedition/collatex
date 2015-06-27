@@ -214,45 +214,74 @@ class Scorer(object):
                 print("complete overlap; skip")
                 continue
 
-            # partial overlap
-            # we construct new pieces
-            # by walking over all the occurrences of the block
-            # a single occurrence can either be completely overlapped or partially overlapped
-            block_ranges_of_new_lcp_interval = []
-            # NOTE: it is not as simple as this!
-            for occurrence in item.block_occurrences():
-                occurrence_range = RangeSet()
-                occurrence_range.add_range(occurrence, occurrence + item.minimum_block_length)
-                print(occurrence_range)
-                print(block_intersection)
-                occurrence_difference = occurrence_range.difference(block_intersection)
-                print(occurrence_difference)
+            print("partial overlap!")
+            occurrence_difference = potential_block_range.difference(block_intersection)
+            print(occurrence_difference)
+            # in case of right partial overlap
+            # calculate the minimum allowed range
 
-                # complete overlap
-                if not occurrence_difference:
-                    continue
+            minimum_length = item.length
+            for range in occurrence_difference.contiguous():
+                if len(range) < minimum_length:
+                    minimum_length = len(range)
 
-                # no overlap
-                if occurrence_difference == occurrence_range:
-                    print("Remaining: "+str(occurrence_difference))
+            print(minimum_length)
 
-                    # create new block TODO: and group by length
-                    block_ranges_of_new_lcp_interval.append(occurrence_difference)
+            for range in occurrence_difference.contiguous():
+                if len(range) < minimum_length:
+                    minimum_length = len(range)
 
-            # check whether block_ranges is empty or not (must have to continuous blocks)
-            if (len(block_ranges_of_new_lcp_interval)) < 2:
-                print("Skipped remaining")
-            else:
-                # we select them for now... not sure if that is the best way to deal with it!
-                # otherwise we need to be able to add blocks to priority queue and extended
-                #  the block class functionality to be more like LCP interval
-                print("Selected remaining!")
-                range_set = RangeSet()
-                for block_range in block_ranges_of_new_lcp_interval:
-                    range_set.union_update(block_range)
+            result = RangeSet()
+            for range in occurrence_difference.contiguous():
+                result.add_range(range[0], range[0]+minimum_length)
+            print("Selecting partial result: "+str(result))
 
-                occupied.union_update(range_set)
-                real_blocks.append(Block(range_set))
+            occupied.union_update(result)
+            real_blocks.append(Block(result))
+
+
+            # # partial overlap
+            # # we construct new pieces
+            # # by walking over all the occurrences of the block
+            # # a single occurrence can either be completely overlapped or partially overlapped
+            # block_ranges_of_new_lcp_interval = []
+            # # NOTE: it is not as simple as this!
+            # for occurrence in item.block_occurrences():
+            #     occurrence_range = RangeSet()
+            #     occurrence_range.add_range(occurrence, occurrence + item.minimum_block_length)
+            #     print(occurrence_range)
+            #     print(block_intersection)
+            #     occurrence_difference = occurrence_range.difference(block_intersection)
+            #     print(occurrence_difference)
+            #
+            #     # complete overlap
+            #     if not occurrence_difference:
+            #         continue
+            #
+            #     # left overlap is not allowed
+            #     # if there is no overlap or partial right overlap
+            #     # we add it
+            #     # no overlap
+            #     if occurrence_difference == occurrence_range:
+            #         print("Remaining: "+str(occurrence_difference))
+            #
+            #         # create new block TODO: and group by length
+            #         block_ranges_of_new_lcp_interval.append(occurrence_difference)
+            #
+            # # check whether block_ranges is empty or not (must have to continuous blocks)
+            # if (len(block_ranges_of_new_lcp_interval)) < 2:
+            #     print("Skipped remaining")
+            # else:
+            #     # we select them for now... not sure if that is the best way to deal with it!
+            #     # otherwise we need to be able to add blocks to priority queue and extended
+            #     #  the block class functionality to be more like LCP interval
+            #     print("Selected remaining!")
+            #     range_set = RangeSet()
+            #     for block_range in block_ranges_of_new_lcp_interval:
+            #         range_set.union_update(block_range)
+            #
+            #     occupied.union_update(range_set)
+            #     real_blocks.append(Block(range_set))
 
 
 
