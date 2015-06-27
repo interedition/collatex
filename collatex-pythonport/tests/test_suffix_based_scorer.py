@@ -1,7 +1,7 @@
 import unittest
 from ClusterShell.RangeSet import RangeSet
 from collatex import Collation
-from collatex.collatex_suffix import Block
+from collatex.extended_suffix_array import Block
 from collatex.core_functions import collate_pretokenized_json
 from collatex.suffix_based_scorer import Scorer
 
@@ -30,6 +30,24 @@ class Test(unittest.TestCase):
         self.assertIn(Block(RangeSet("5-7, 22-24, 37-39")), blocks) # g h i
         self.assertIn(Block(RangeSet("10-14, 25-29, 40-44")), blocks) # ! q r s t
         self.assertIn(Block(RangeSet("4, 21")), blocks) # F
+
+    def test_non_overlapping_blocks_overlap_case(self):
+        collation = Collation()
+        collation.add_plain_witness("W1", "in the in the bleach")
+        collation.add_plain_witness("W2", "in the in the bleach in the")
+        algorithm = Scorer(collation)
+        blocks = algorithm._get_non_overlapping_repeating_blocks()
+        self.assertIn(Block(RangeSet("0-4, 7-11")), blocks) # in the in the bleach
+
+        collation = Collation()
+        collation.add_plain_witness("W1", "in the in the bleach")
+        collation.add_plain_witness("W2", "in the in the bleach in the")
+        collation.add_plain_witness("W3", "in the in the bleach in the")
+        algorithm = Scorer(collation)
+        blocks = algorithm._get_non_overlapping_repeating_blocks()
+        self.assertIn(Block(RangeSet("0-4, 7-11, 16-20")), blocks) # in the in the bleach
+        self.assertIn(Block(RangeSet("12-13, 21-22")), blocks) # in the
+
 
     def match_properties(self, token1_data, token2_data):
         return token1_data == token2_data

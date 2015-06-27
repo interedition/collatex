@@ -115,9 +115,10 @@ class LCPInterval(object):
                 number_of_witnesses += 1
         return number_of_witnesses
 
+    # TODO: delete this method!
     def calculate_non_overlapping_range_with(self, occupied):
         potential_block_range = self._as_range()
-        #check the intersection with the already occupied ranges
+        # check the intersection with the already occupied ranges
         block_intersection = potential_block_range.intersection(occupied)
         if not block_intersection:
             # no overlap, return complete block_range
@@ -139,11 +140,23 @@ class LCPInterval(object):
         # Assert: check that the first slice is not larger than potential block length!
         first_range = next(real_block_range.contiguous())
         if first_range[-1]-first_range[0]+1>self.minimum_block_length:
+            print(potential_block_range)
+            print(real_block_range)
             raise PartialOverlapException()
         return real_block_range
     
     def show_lcp_array(self):
         return self.LCP[self.start:self.end+1]
+
+    def __lt__(self, other):
+        same = other.number_of_witnesses == self.number_of_witnesses
+        if not same:
+            return other.number_of_witnesses < self.number_of_witnesses
+
+        smaller = other.length < self.length
+        return smaller
+
+
         
     def __str__(self):
         part1= "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])
@@ -153,6 +166,7 @@ class LCPInterval(object):
         return "LCPivl: "+str(self.token_start_position)+","+str(self.minimum_block_length)+","+str(self.number_of_occurrences)
             
   
+# This class is a simplified version of an LCP interval
 
 class Block(object):
 

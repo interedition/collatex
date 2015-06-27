@@ -3,10 +3,12 @@ Created on Aug 5, 2014
 
 @author: Ronald Haentjens Dekker
 '''
-from collatex.collatex_suffix import Occurrence, BlockWitness, Block,\
+from collatex.extended_suffix_array import Occurrence, BlockWitness, Block,\
     PartialOverlapException
 from operator import attrgetter
 from ClusterShell.RangeSet import RangeSet
+from queue import PriorityQueue
+#TODO: different in Python 2?
 # optionally load the Levenshtein dependency for near match functionality.
 # Consists of C code, needs to be compiled which is problematic on Windows.
 # There are pre-compiled binaries however, but this requires an extra step
@@ -185,36 +187,106 @@ class Scorer(object):
         # However some potential blocks overlap. To decide the definitive blocks we sort the potential blocks on the
         # amount of witnesses they occur in.
         potential_blocks = extended_suffix_array.split_lcp_array_into_intervals()
-        # Sort the blocks based on number of witnesses first,
-        # second length of LCP interval,
-        # third sort on parent LCP interval occurrences.
-        sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_witnesses", "minimum_block_length", "number_of_siblings"), reverse=True)
-        # Select the definitive blocks
+        print(potential_blocks)
+        # we add all the intervals to a priority queue based on 1) number of witnesses 2) block length
+        queue = PriorityQueue()
+        for interval in potential_blocks:
+            queue.put(interval)
+
         occupied = RangeSet()
         real_blocks = []
-        for potential_block in sorted_blocks_on_priority:
-            # print(potential_block.info())
-            try:
-                non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
-                if non_overlapping_range:
-                    #                     print("Selecting: "+str(potential_block))
-                    occupied.union_update(non_overlapping_range)
-                    real_blocks.append(Block(non_overlapping_range))
-            except PartialOverlapException:          
-                #                 print("Skip due to conflict: "+str(potential_block))
-                while potential_block.minimum_block_length > 1:
-                    # retry with a different length: one less
-                    for idx in range(potential_block.start+1, potential_block.end+1):
-                        potential_block.LCP[idx] -= 1
-                    potential_block.length -= 1
-                    try:
-                        non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
-                        if non_overlapping_range:
-                            #                             print("Retried and selecting: "+str(potential_block))
-                            occupied.union_update(non_overlapping_range)
-                            real_blocks.append(Block(non_overlapping_range))
-                            break
-                    except PartialOverlapException:          
-                        #                         print("Retried and failed again")
-                        pass
+
+        while not queue.empty():
+            item = queue.get()
+            print(item)
+            # test intersection with occupied
+            potential_block_range = item._as_range()
+            # check the intersection with the already occupied ranges
+            block_intersection = potential_block_range.intersection(occupied)
+            if not block_intersection:
+                print("Selected!")
+                occupied.union_update(potential_block_range)
+                real_blocks.append(Block(potential_block_range))
+                continue
+
+            # check complete overlap or partial
+            if block_intersection == potential_block_range:
+                print("complete overlap; skip")
+                continue
+
+            # partial overlap
+            # we construct new pieces
+            # by walking over all the occurrences of the block
+            # a single occurrence can either be completely overlapped or partially overlapped
+            block_ranges_of_new_lcp_interval = []
+            # NOTE: it is not as simple as this!
+            for occurrence in item.block_occurrences():
+                occurrence_range = RangeSet()
+                occurrence_range.add_range(occurrence, occurrence + item.minimum_block_length)
+
+                # check complete or no overlap
+                if occurrence_range in block_intersection:
+                    continue
+
+                print("Remaining: "+str(occurrence_range))
+                # TODO: check partial or no overlap
+
+                # create new block TODO: and group by length
+                block_ranges_of_new_lcp_interval.append(occurrence_range)
+
+            # check whether block_ranges is empty or not (must have to continuous blocks)
+            if (len(block_ranges_of_new_lcp_interval)) < 2:
+                print("Skipped remaining")
+            else:
+                # we select them for now... not sure if that is the best way to deal with it!
+                # otherwise we need to be able to add blocks to priority queue and extended
+                #  the block class functionality to be more like LCP interval
+                print("Selected remaining!")
+                range_set = RangeSet()
+                for block_range in block_ranges_of_new_lcp_interval:
+                    range_set.union_update(block_range)
+
+                occupied.union_update(range_set)
+                real_blocks.append(Block(range_set))
+
+
+
+
+
+
+
         return real_blocks
+
+        # # Sort the blocks based on number of witnesses first,
+        # # second length of LCP interval,
+        # # third sort on parent LCP interval occurrences.
+        # sorted_blocks_on_priority = sorted(potential_blocks, key=attrgetter("number_of_witnesses", "minimum_block_length", "number_of_siblings"), reverse=True)
+        # # Select the definitive blocks
+        # occupied = RangeSet()
+        # real_blocks = []
+        # for potential_block in sorted_blocks_on_priority:
+        #     # print(potential_block.info())
+        #     try:
+        #         non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+        #         if non_overlapping_range:
+        #             #                     print("Selecting: "+str(potential_block))
+        #             occupied.union_update(non_overlapping_range)
+        #             real_blocks.append(Block(non_overlapping_range))
+        #     except PartialOverlapException:
+        #         print("Skip due to conflict: "+str(potential_block))
+        #         while potential_block.minimum_block_length > 1:
+        #             # retry with a different length: one less
+        #             for idx in range(potential_block.start+1, potential_block.end+1):
+        #                 potential_block.LCP[idx] -= 1
+        #             potential_block.length -= 1
+        #             try:
+        #                 non_overlapping_range = potential_block.calculate_non_overlapping_range_with(occupied)
+        #                 if non_overlapping_range:
+        #                     #                             print("Retried and selecting: "+str(potential_block))
+        #                     occupied.union_update(non_overlapping_range)
+        #                     real_blocks.append(Block(non_overlapping_range))
+        #                     break
+        #             except PartialOverlapException:
+        #                 #                         print("Retried and failed again")
+        #                 pass
+        # return real_blocks

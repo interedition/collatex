@@ -4,7 +4,7 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 '''
 from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
-from collatex.collatex_suffix import ExtendedSuffixArray
+from collatex.extended_suffix_array import ExtendedSuffixArray
 from collatex.exceptions import UnsupportedError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
