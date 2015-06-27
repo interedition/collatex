@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.0pre14 (2015-06-27)
++++++++++++++++++++++++
+
+* Further improved blockification of witnesses.
+
 2.0.0pre13 (2015-06-21)
 +++++++++++++++++++++++
 
