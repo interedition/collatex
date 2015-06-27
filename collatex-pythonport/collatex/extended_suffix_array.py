@@ -123,8 +123,11 @@ class LCPInterval(object):
         if not same:
             return other.number_of_witnesses < self.number_of_witnesses
 
-        smaller = other.length < self.length
-        return smaller
+        same = other.length == self.length
+        if not same:
+            return other.length < self.length
+
+        return self.number_of_occurrences < other.number_of_occurrences
 
     def __str__(self):
         part1= "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])
