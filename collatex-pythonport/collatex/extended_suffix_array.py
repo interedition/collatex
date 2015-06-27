@@ -115,36 +115,6 @@ class LCPInterval(object):
                 number_of_witnesses += 1
         return number_of_witnesses
 
-    # TODO: delete this method!
-    def calculate_non_overlapping_range_with(self, occupied):
-        potential_block_range = self._as_range()
-        # check the intersection with the already occupied ranges
-        block_intersection = potential_block_range.intersection(occupied)
-        if not block_intersection:
-            # no overlap, return complete block_range
-            return potential_block_range
-        # There is overlap with occupied range
-        # we need to deal with it
-        real_block_range = RangeSet()
-        for lower in potential_block_range.contiguous():
-            # TODO: what I really want here is a find first over a generator
-            upper = [x for x in block_intersection.contiguous() if x[0] >= lower[0]]
-            if upper:
-                lower = lower[0]
-                upper = upper[0][0]
-                if lower != upper:
-                    real_block_range.add_range(lower, upper)
-        if not real_block_range:
-            # There is complete overlap, so return None
-            return None
-        # Assert: check that the first slice is not larger than potential block length!
-        first_range = next(real_block_range.contiguous())
-        if first_range[-1]-first_range[0]+1>self.minimum_block_length:
-            print(potential_block_range)
-            print(real_block_range)
-            raise PartialOverlapException()
-        return real_block_range
-    
     def show_lcp_array(self):
         return self.LCP[self.start:self.end+1]
 
@@ -156,8 +126,6 @@ class LCPInterval(object):
         smaller = other.length < self.length
         return smaller
 
-
-        
     def __str__(self):
         part1= "<"+" ".join(self.tokens[self.SA[self.start]:self.SA[self.start]+min(10, self.minimum_block_length)])
         return part1+"> with "+str(self.number_of_witnesses)+":"+str(self.number_of_occurrences)+" witnesses/occurrences and length: "+str(self.minimum_block_length)+" and number of siblings: "+str(self.number_of_siblings)
