@@ -223,16 +223,21 @@ class Scorer(object):
             for occurrence in item.block_occurrences():
                 occurrence_range = RangeSet()
                 occurrence_range.add_range(occurrence, occurrence + item.minimum_block_length)
+                print(occurrence_range)
+                print(block_intersection)
+                occurrence_difference = occurrence_range.difference(block_intersection)
+                print(occurrence_difference)
 
-                # check complete or no overlap
-                if occurrence_range in block_intersection:
+                # complete overlap
+                if not occurrence_difference:
                     continue
 
-                print("Remaining: "+str(occurrence_range))
-                # TODO: check partial or no overlap
+                # no overlap
+                if occurrence_difference == occurrence_range:
+                    print("Remaining: "+str(occurrence_difference))
 
-                # create new block TODO: and group by length
-                block_ranges_of_new_lcp_interval.append(occurrence_range)
+                    # create new block TODO: and group by length
+                    block_ranges_of_new_lcp_interval.append(occurrence_difference)
 
             # check whether block_ranges is empty or not (must have to continuous blocks)
             if (len(block_ranges_of_new_lcp_interval)) < 2:

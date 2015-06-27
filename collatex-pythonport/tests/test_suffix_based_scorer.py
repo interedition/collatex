@@ -39,6 +39,7 @@ class Test(unittest.TestCase):
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-4, 7-11")), blocks) # in the in the bleach
 
+    def test_2(self):
         collation = Collation()
         collation.add_plain_witness("W1", "in the in the bleach")
         collation.add_plain_witness("W2", "in the in the bleach in the")
