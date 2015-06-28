@@ -1,8 +1,8 @@
-'''
+"""
 Created on Jun 11, 2014
 
 @author: Ronald Haentjens Dekker
-'''
+"""
 import unittest
 from collatex.core_functions import Collation, collate
 
@@ -14,7 +14,8 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "This very quick very quick brown wombat")
         collation.add_plain_witness("B", "That very quick brown koala")
         collation.add_plain_witness("C", "That very quick brown kangaroo")
-        expected_output = """+---+-----------------+------------------+----------+
+        expected_output = """\
++---+-----------------+------------------+----------+
 | A | This very quick | very quick brown | wombat   |
 | B | That            | very quick brown | koala    |
 | C | That            | very quick brown | kangaroo |
@@ -54,13 +55,51 @@ class Test(unittest.TestCase):
         plain_text_output = str(collate(collation, layout="vertical"))
         self.assertEquals(expected_output, plain_text_output)
 
+    def testPlainTableRenderingVerticalNoSegmentation(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "This very quick very quick brown wombat")
+        collation.add_plain_witness("B", "That very quick brown koala")
+        collation.add_plain_witness("C", "That very quick brown kangaroo")
+        expected_output = """\
++--------+-------+----------+
+|   A    |   B   |    C     |
++--------+-------+----------+
+|  This  |  That |   That   |
++--------+-------+----------+
+|  very  |   -   |    -     |
++--------+-------+----------+
+| quick  |   -   |    -     |
++--------+-------+----------+
+|  very  |  very |   very   |
++--------+-------+----------+
+| quick  | quick |  quick   |
++--------+-------+----------+
+| brown  | brown |  brown   |
++--------+-------+----------+
+| wombat | koala | kangaroo |
++--------+-------+----------+"""
+        plain_text_output = str(collate(collation, layout="vertical", segmentation=None))
+        self.assertEquals(expected_output, plain_text_output)
+
     def testJSONAlignmentTableRendering(self):
         collation = Collation()
         collation.add_plain_witness("A", "This very quick very quick brown wombat")
         collation.add_plain_witness("B", "That very quick brown koala")
         collation.add_plain_witness("C", "That very quick brown kangaroo")
-        expected_output = '{"table": [[["This very quick"], ["very quick brown"], ["wombat"]], [["That"], ["very quick brown"], ["koala"]], [["That"], ["very quick brown"], ["kangaroo"]]], "witnesses": ["A", "B", "C"]}'
+        expected_output = """{"table": [[["This very quick"], ["very quick brown"], ["wombat"]], [["That"], \
+["very quick brown"], ["koala"]], [["That"], ["very quick brown"], ["kangaroo"]]], "witnesses": ["A", "B", "C"]}"""
         json = collate(collation, output="json")
+        self.assertEquals(expected_output, json)
+
+    def testJSONAlignmentTableRenderingNoSegmentation(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "This very quick very quick brown wombat")
+        collation.add_plain_witness("B", "That very quick brown koala")
+        collation.add_plain_witness("C", "That very quick brown kangaroo")
+        expected_output = """{"table": [[["This"], ["very"], ["quick"], ["very"], ["quick"], ["brown"], ["wombat"]], \
+[["That"], [null], [null], ["very"], ["quick"], ["brown"], ["koala"]], [["That"], [null], [null], ["very"], ["quick"],\
+ ["brown"], ["kangaroo"]]], "witnesses": ["A", "B", "C"]}"""
+        json = collate(collation, output="json", segmentation=False)
         self.assertEquals(expected_output, json)
 
     def testColumnStatusInAlignmentTable(self):
@@ -81,5 +120,4 @@ class Test(unittest.TestCase):
         self.assertEqual([False, True, False, True, False, True, False], status_array)
         
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

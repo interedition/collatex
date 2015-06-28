@@ -1,4 +1,4 @@
-'''
+"""
 Created on Apr 19, 2014
 
 @author: Ronald Haentjens Dekker
@@ -6,7 +6,7 @@ Created on Apr 19, 2014
 This module defines the core collation concepts of CollateX
 
 Tokenizer, Witness, VariantGraph, CollationAlgorithm
-'''
+"""
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
@@ -36,8 +36,6 @@ class Column(object):
 
     def put(self, sigil, token):
         self.tokens_per_witness[sigil]=token
-                
-    pass
 
 
 class AlignmentTable(object):
@@ -61,10 +59,10 @@ class AlignmentTable(object):
             for vertex in vertices:
                 if vertex == self.graph.start or vertex == self.graph.end:
                     continue
-                if column == None:
+                if not column:
                     column = Column()
                     self.columns.append(column)
-                #find incoming edges for this vertex and check their labels
+                # find incoming edges for this vertex and check their labels
                 edges = self.graph.in_edges(vertex, data=True)
                 for (_, _, attrs) in edges:
                     sigli = attrs["label"]
@@ -82,13 +80,11 @@ class AlignmentTable(object):
             row = Row(sigil)
             self.rows.append(row)
             for column in self.columns:
-                if sigil in column.tokens_per_witness:
-                    row.append(column.tokens_per_witness[sigil])
-                else:
-                    #TODO: Nil would be nicer here
-                    # since the dash is part of the visualization
-                    row.append("-")
-    
+                # Empty cells are represented with a None
+                # The create_table_visualization methods should transform the None in something readable
+                #  (like a dash)
+                row.append(column.tokens_per_witness.get(sigil, None))
+
     def __str__(self, *args, **kwargs):
         return str(create_table_visualization(self))
                     
@@ -106,10 +102,10 @@ def create_table_visualization(table):
 def visualizeTableHorizontal(table):
     # print the table horizontal
     x = PrettyTable()
-    x.header=False
+    x.header = False
     for row in table.rows:
         cells = [row.header]
-        cells.extend(row.cells)
+        cells.extend(cell if cell else "-" for cell in row.cells)
         x.add_row(cells)
     # alignment can only be set after the field names are known.
     # since add_row sets the field names, it has to be set after x.add_row(cells)
@@ -121,7 +117,7 @@ def visualizeTableVertically(table):
     x = PrettyTable()
     x.hrules = 1
     for row in table.rows:
-        x.add_column(row.header, [fill(cell, 20) for cell in row.cells])
+        x.add_column(row.header, [fill(cell, 20) if cell else "-" for cell in row.cells])
     return x
 
    
@@ -129,15 +125,15 @@ def visualizeTableVertically(table):
 # Tokenizer inside suffix array library is used
 class Tokenizer(object):
     
-    #by default the tokenizer splits on space characters    
+    # by default the tokenizer splits on space characters
     def tokenize(self, contents):
         return contents.split()
 
 class WordPunctuationTokenizer(object):
-    #tokenizer splits on punctuation or whitespace
+    # tokenizer splits on punctuation or whitespace
     def tokenize(self, contents):
-#       the remarked regular expression keeps the whitespace 
-#       return re.findall("[.?!,;:]+[\\s]*|[^.?!,;:\\s]+[\\s]*", contents)
+        # the remarked regular expression keeps the whitespace
+        # return re.findall("[.?!,;:]+[\\s]*|[^.?!,;:\\s]+[\\s]*", contents)
         return re.findall(r'\w+|[^\w\s]+', contents)
 
 class Token(object):
@@ -156,7 +152,7 @@ class Token(object):
         self.token_data = tokendata
 
     def __repr__(self):
-        #return str(self.token_data)
+        # return str(self.token_data)
         return self.token_string
 
 class Witness(object):
@@ -174,7 +170,7 @@ class Witness(object):
         elif 'tokens' in witnessdata:
             for tk in witnessdata['tokens']:
                 self._tokens.append(Token(tk))
-            # TODO no idea what this content string is needed for.
+            # content string is used for generation of the suffix and LCP arrays.
             self.content = ' '.join([x.token_string for x in self._tokens])
             
     def tokens(self):
@@ -197,25 +193,25 @@ class VariantGraph(object):
         :type token: Token
         '''
         node_id = self.graph.number_of_nodes()
-        #print("Adding node: "+node_id+":"+token_content)
+        # print("Adding node: "+node_id+":"+token_content)
         tokens = {}
         if sigil:
-            tokens[sigil]=token
-        self.graph.add_node(node_id, label= token.token_string, tokens=tokens)
+            tokens[sigil] = token
+        self.graph.add_node(node_id, label=token.token_string, tokens=tokens)
         return node_id
 
     def add_token_to_vertex(self, node, token, sigil):
         attributes = self.vertex_attributes(node)
-        attributes["tokens"][sigil]=token
+        attributes["tokens"][sigil] = token
 
     def connect(self, source, target, witnesses):
         """
         :type source: integer
         :type target: integer
         """
-        #print("Adding Edge: "+source+":"+target)
+        # print("Adding Edge: "+source+":"+target)
         if self.graph.has_edge(source, target):
-            self.graph[source][target]["label"]+=", "+str(witnesses)
+            self.graph[source][target]["label"] += ", "+str(witnesses)
         else:    
             self.graph.add_edge(source, target, label=witnesses)
         
@@ -232,7 +228,7 @@ class VariantGraph(object):
         return self.graph.edges()
     
     def edge_between(self, node, node2):
-        #return self.graph.get_edge_data(node, node2)
+        # return self.graph.get_edge_data(node, node2)
         return self.graph.has_edge(node, node2)
     
     def in_edges(self, node, data=False):
@@ -247,22 +243,22 @@ class VariantGraph(object):
     # Note: generator implementation
     def vertexWith(self, content):
         try:
-            vertex_to_find = (n for n in self.graph if self.graph.node[n]['label']==content).next()
+            vertex_to_find = (n for n in self.graph if self.graph.node[n]['label'] == content).next()
             return vertex_to_find    
         except StopIteration:
-            raise Exception("Vertex with "+content+" not found!")    
+            raise Exception("Vertex with "+content+" not found!")
   
 class CollationAlgorithm(object):
     def merge(self, graph, witness_sigil, witness_tokens, alignments = {}):  
         """
         :type graph: VariantGraph
         """
-        #NOTE: token_to_vertex only contains newly generated vertices
+        # NOTE: token_to_vertex only contains newly generated vertices
         token_to_vertex = {}
         last = graph.start
         for token in witness_tokens:
             vertex = alignments.get(token, None)
-            if vertex == None:
+            if not vertex:
                 vertex = graph.add_vertex(token, witness_sigil)
                 token_to_vertex[token] = vertex
             else:
@@ -272,7 +268,7 @@ class CollationAlgorithm(object):
         graph.connect(last, graph.end, witness_sigil)
         return token_to_vertex
 
-#TODO: define abstract collation class
+# TODO: define abstract collation class
 
 
 '''
@@ -298,9 +294,9 @@ def join(graph):
                 # a space character is added here for non punctuation tokens
                 label = graph.vertex_attributes(join_candidate)["label"]
                 if re.match(r'^\W', label):
-                    graph.vertex_attributes(vertex)["label"]+=label
+                    graph.vertex_attributes(vertex)["label"] += label
                 else:
-                    graph.vertex_attributes(vertex)["label"]+=" "+label
+                    graph.vertex_attributes(vertex)["label"] += " "+label
                 for (_, neighbor, data) in graph.out_edges(join_candidate, data=True):
                     graph.remove_edge(join_candidate, neighbor)
                     graph.connect(vertex, neighbor, data["label"])
@@ -311,7 +307,7 @@ def join(graph):
         processed.add(vertex)
         for (_, neighbor) in out_edges:
             # FIXME: Why do we run out of memory in some cases here, if this is not checked?
-            if not neighbor in processed:
+            if neighbor not in processed:
                 queue.appendleft(neighbor)
                 
 # Port of VariantGraphRanking class from Java
@@ -319,8 +315,8 @@ def join(graph):
 class VariantGraphRanking(object):
     # Do not class the constructor, use the of class method instead!
     def __init__(self):
-        #Note: A vertex can have only one rank
-        #however, a rank can be assigned to multiple vertices
+        # Note: A vertex can have only one rank
+        # however, a rank can be assigned to multiple vertices
         self.byVertex = {}
         self.byRank = {}
         
@@ -339,9 +335,6 @@ class VariantGraphRanking(object):
             variant_graph_ranking.byVertex[v]=rank
             variant_graph_ranking.byRank.setdefault(rank, []).append(v)
         return variant_graph_ranking
-
-    
-    
 
 
 

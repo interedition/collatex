@@ -1,8 +1,8 @@
-'''
+"""
 Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
-'''
+"""
 from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
 from collatex.extended_suffix_array import ExtendedSuffixArray
 from collatex.exceptions import UnsupportedError
@@ -46,10 +46,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     else:
         raise Exception("Unknown output type: "+output)
     
-
-
-#TODO: this only works with a table output at the moment
-#TODO: store the tokens on the graph instead
+# TODO: this only works with a table output at the moment
+# TODO: store the tokens on the graph instead
 def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
     # Takes more or less the same arguments as collate() above, but with some restrictions.
     # Only output types 'json' and 'table' are supported.
@@ -73,18 +71,15 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
         tokenized_at.rows.append(new_row)
         token_counter = 0
         for cell in row.cells:
-            if cell != "-":
-                new_row.cells.append(tokenized_witness[token_counter])
-                token_counter+=1
-            else:
-                #TODO: should probably be null or None instead, but that would break the rendering at the moment 
-                new_row.cells.append({"t":"-"})
-    if output=="json":
+            new_row.cells.append(tokenized_witness[token_counter] if cell else None)
+            if cell:
+                token_counter += 1
+    if output == "json":
         return export_alignment_table_as_json(tokenized_at)
-    if output=="table":
+    if output == "table":
         # transform JSON objects to "t" form.
         for row in tokenized_at.rows:
-            row.cells = [cell["t"]  for cell in row.cells]
+            row.cells = [cell["t"] if cell else None for cell in row.cells]
         return tokenized_at
 
 def export_alignment_table_as_json(table, indent=None, status=False):
@@ -94,12 +89,12 @@ def export_alignment_table_as_json(table, indent=None, status=False):
     for row in table.rows:
         sigli.append(row.header)
         json_output["table"].append([[cell] for cell in row.cells])
-    json_output["witnesses"]=sigli
+    json_output["witnesses"] = sigli
     if status:
         variant_status = []
         for column in table.columns:
             variant_status.append(column.variant)
-        json_output["status"]=variant_status
+        json_output["status"] = variant_status
     return json.dumps(json_output, sort_keys=True, indent=indent)
 
 '''
@@ -140,7 +135,7 @@ class Collation(object):
         witness_range = RangeSet()
         witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
         # the extra one is for the marker token
-        self.counter += len(witness.tokens()) +2 # $ + number 
+        self.counter += len(witness.tokens()) + 2  # $ + number
         self.witness_ranges[witness.sigil] = witness_range
         if not self.combined_string == "":
             self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
@@ -158,7 +153,7 @@ class Collation(object):
         return self.combined_string
 
     def get_sa(self):
-        #NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
+        # NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
         if not self.cached_suffix_array:
             # Unit byte is done to skip tokenization in third party library
             self.cached_suffix_array = SuffixArray(self.tokens, unit=UNIT_BYTE)
@@ -178,8 +173,8 @@ class Collation(object):
 
     @property
     def tokens(self):
-        #print("COLLATION TOKENIZE IS CALLED!")
-        #TODO: complete set of witnesses is retokenized here!
+        # print("COLLATION TOKENIZE IS CALLED!")
+        # TODO: complete set of witnesses is retokenized here!
         tokenizer = WordPunctuationTokenizer()
         tokens = tokenizer.tokenize(self.get_combined_string())
         return tokens
