@@ -3,6 +3,8 @@ Created on Nov 13, 2014
 
 @author: ronald
 '''
+from textwrap import fill
+from collatex.HTML import Table, TableRow, TableCell
 from collatex.core_classes import create_table_visualization
 
 # optionally load the IPython dependencies
@@ -14,6 +16,32 @@ try:
     from graphviz import Digraph
 except:
     pass
+
+
+
+def visualizeTableVerticallyWithColors(table, collation):
+    # print the table vertically
+    # switch columns and rows
+    rows = []
+    for column in table.columns:
+        cells = []
+        for witness in collation.witnesses:
+            cell = column.tokens_per_witness.get(witness.sigil)
+            cells.append(TableCell(text=fill(cell, 20) if cell else "-", bgcolor="FF0000" if column.variant else "00FF00"))
+        rows.append(TableRow(cells=cells))
+    sigli = []
+    for witness in collation.witnesses:
+        sigli.append(witness.sigil)
+    x = Table(header_row=sigli, rows=rows)
+    return display(HTML(str(x)))
+
+
+
+
+
+
+
+
 
 
 # create visualization of alignment table

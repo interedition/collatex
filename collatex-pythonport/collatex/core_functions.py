@@ -11,7 +11,7 @@ from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
-from collatex.display_module import display_alignment_table_as_HTML
+from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
 
 # Valid options for output are:
@@ -41,6 +41,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return export_alignment_table_as_json(table)
     if output == "html":
         return display_alignment_table_as_HTML(table)
+    if output == "html2":
+        return visualizeTableVerticallyWithColors(table, collation)
     if output == "table":
         return table
     else:
@@ -51,8 +53,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
     # Takes more or less the same arguments as collate() above, but with some restrictions.
     # Only output types 'json' and 'table' are supported.
-    if output not in ['json', 'table']:
-        raise UnsupportedError("Output type" + kwargs['output'] + "not supported for pretokenized collation")
+    if output not in ['json', 'table', 'html2']:
+        raise UnsupportedError("Output type " + output + " not supported for pretokenized collation")
     if 'segmentation' in kwargs and kwargs['segmentation']:
         raise UnsupportedError("Segmented output not supported for pretokenized collation")
     kwargs['segmentation'] = False
@@ -65,6 +67,9 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
         collation.add_witness(witness)
         tokenized_witnesses.append(witness["tokens"])
     at = collate(collation, output="table", **kwargs)
+    if output == "html2":
+        return visualizeTableVerticallyWithColors(at, collation)
+
     # record whether there is variation in each of the columns (horizontal) or rows (vertical layout)
     has_variation_array = []
     for column in at.columns:
