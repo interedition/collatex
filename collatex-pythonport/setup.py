@@ -19,12 +19,12 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='collatex',
-    version='2.0.0pre14',
+    version='2.0.0rc15',
     description='CollateX is a collation tool.',
     long_description=readme + '\n\n' + history,
     author='Ronald Haentjens Dekker',
     author_email='ronald.dekker@huygens.knaw.nl',
-    url='https://github.com/rhdekker/collatex',
+    url='https://github.com/interedition/collatex',
     packages=[
         'collatex','ClusterShell'
     ],

@@ -3,12 +3,17 @@
 History
 -------
 
-2.0.0pre14 (2015-06-27)
+2.0.0rc15 (2015-06-28)
++++++++++++++++++++++++
+
+* Fix a bug that was caused by the fact that a dash was stored in empty cells of the AlignmentTable. Now None is stored (this resolved a TODO). Plain text and HTML rendering of the table render a dash for empty cells. JSON output now returns null for empty cells. Fixes bug when a token with a dash in the content was screwing the rendering of the alignment table (caused of by one errors).
+
+2.0.0rc14 (2015-06-27)
 +++++++++++++++++++++++
 
 * Further improved blockification of witnesses.
 
-2.0.0pre13 (2015-06-21)
+2.0.0rc13 (2015-06-21)
 +++++++++++++++++++++++
 
 * Added properties_filter option to enable users to influence matching based on properties of tokens.
