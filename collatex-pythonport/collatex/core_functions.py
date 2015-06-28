@@ -65,6 +65,10 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
         collation.add_witness(witness)
         tokenized_witnesses.append(witness["tokens"])
     at = collate(collation, output="table", **kwargs)
+    # record whether there is variation in each of the columns (horizontal) or rows (vertical layout)
+    has_variation_array = []
+    for column in at.columns:
+        has_variation_array.append(column.variant)
     tokenized_at = AlignmentTable(collation, layout=layout)
     for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
         new_row = Row(row.header)
@@ -74,6 +78,9 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
             new_row.cells.append(tokenized_witness[token_counter] if cell else None)
             if cell:
                 token_counter += 1
+    # In order to have the same information as in the non pretokenized alignment table we
+    # add variation information to the pretokenized alignment table.
+    tokenized_at.has_rank_variation = has_variation_array
     if output == "json":
         return export_alignment_table_as_json(tokenized_at)
     if output == "table":
