@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.0rc16 (2015-06-28)
++++++++++++++++++++++++
+
+* Added output option 'html2' for colored alignment table rendering.
+
 2.0.0rc15 (2015-06-28)
 +++++++++++++++++++++++
 
