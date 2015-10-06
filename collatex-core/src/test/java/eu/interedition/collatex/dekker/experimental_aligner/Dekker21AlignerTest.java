@@ -15,14 +15,14 @@ import static org.junit.Assert.assertEquals;
 public class Dekker21AlignerTest extends AbstractTest {
 
     // helper method
-    // note: x = x of start coordinate
-    // note: y = y of start coordinate
+    // note: x = start coordinate of witness token
+    // note: y = start coordinate of base token
     //TODO: replace Island by a real Vector class
     private void assertIslandAsVectorEquals(int x, int y, int length, Collection<Island> islands) {
         Coordinate startCoordinate = new Coordinate(x, y);
         Coordinate endCoordinate = new Coordinate(x+length-1, y+length-1);
         Island expected = new Island(startCoordinate, endCoordinate);
-        Assert.assertTrue(islands.contains(expected));
+        Assert.assertTrue("Islands are: "+islands, islands.contains(expected));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class Dekker21AlignerTest extends AbstractTest {
         instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
         Assert.assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
 
-        Set<Island> islands = aligner.table.getIslands();
+        List<Island> islands = aligner.getIslands();
         assertIslandAsVectorEquals(0, 2, 2, islands); // the cat
         assertIslandAsVectorEquals(4, 6, 3, islands); // birds in the
         assertIslandAsVectorEquals(7, 5, 1, islands); // little

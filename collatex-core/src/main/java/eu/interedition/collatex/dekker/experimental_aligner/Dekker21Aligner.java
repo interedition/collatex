@@ -29,6 +29,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     private Map<VariantGraph.Vertex, Block> vertexToLCP;
     // for debugging purposes only
     protected MatchTable table;
+    protected List<Island> allIslands;
     protected List<Island> preferredIslands;
     protected List<List<Match>> transpositions;
 
@@ -83,7 +84,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
 
             // We have to create a set of Islands and a MatchTableSelection here
-            List<Island> islands = new ArrayList<>();
+            allIslands = new ArrayList<>();
             // get all the blocks for this token
             // we have to iterate over all the token positions of this witness
             int startTokenPositionForWitness = tokenIndex.getStartTokenPositionForWitness(tokens.iterator().next().getWitness());
@@ -93,6 +94,9 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 Block interval = tokenIndex.getLCP_intervalFor(tokenPosition);
                 tokenPosition++;
 
+                if (interval == null) {
+                    continue;
+                }
                 // We reuse Island class
                 // for that we transform block instances into Island...
                 for (Block.Instance instance : interval.getAllInstances()) {
@@ -118,6 +122,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                         Coordinate start = new Coordinate(rank, witnessTokenPointer);
                         Coordinate end = new Coordinate(rank+instance.length(), witnessTokenPointer+instance.length());
                         Island island = new Island(start, end);
+                        allIslands.add(island);
                     }
                 }
             }
@@ -184,4 +189,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
     }
 
 
+    public List<Island> getIslands() {
+        return allIslands;
+    }
 }
