@@ -1,16 +1,6 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.dekker.experimental_aligner;
 
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.Iterator;
-import java.util.List;
-
-import static eu.interedition.collatex.dekker.VariantGraphMatcher.graph;
-import static org.junit.Assert.*;
 
 /**
  * Created by ronald on 3/31/15.

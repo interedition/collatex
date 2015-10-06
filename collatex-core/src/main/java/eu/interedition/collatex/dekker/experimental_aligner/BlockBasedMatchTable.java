@@ -1,4 +1,4 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.dekker.experimental_aligner;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -6,7 +6,6 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import java.util.*;

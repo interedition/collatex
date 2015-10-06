@@ -4,6 +4,8 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.astar.AstarAlgorithm;
 import eu.interedition.collatex.dekker.astar.Cost;
+import eu.interedition.collatex.dekker.experimental_aligner.Block;
+import eu.interedition.collatex.dekker.experimental_aligner.Dekker21Aligner;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
@@ -14,7 +16,7 @@ import java.util.*;
  * Created by ronald on 4/24/15.
  */
 public class DecisionGraphAligner {
-    protected TokenIndex tokenIndex;
+    protected Dekker21Aligner.TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
     protected VariantGraph.Vertex[] vertex_array;
     private Map<VariantGraph.Vertex, Block> vertexToLCP;

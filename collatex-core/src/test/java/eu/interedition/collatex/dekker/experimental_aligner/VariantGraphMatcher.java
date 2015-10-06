@@ -1,4 +1,4 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.dekker.experimental_aligner;
 
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;

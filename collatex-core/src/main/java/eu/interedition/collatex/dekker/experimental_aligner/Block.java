@@ -1,7 +1,8 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.dekker.experimental_aligner;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,21 +10,21 @@ import java.util.stream.IntStream;
 
 public class Block {
     // every Block has a token index as a parent
-    private final TokenIndex tokenIndex;
+    private final Dekker21Aligner.TokenIndex tokenIndex;
     // length = number of tokens in this block of text
-    int length;
+    public int length;
     // start = start position in suffix array
-    int start;
+    public int start;
     // end = end position in suffix array
-    int end;
+    public int end;
 
-    public Block(TokenIndex tokenIndex, int suffix_start_position, int length) {
+    public Block(Dekker21Aligner.TokenIndex tokenIndex, int suffix_start_position, int length) {
         this.tokenIndex = tokenIndex;
         this.start = suffix_start_position;
         this.length = length;
     }
 
-    public Block(TokenIndex tokenIndex, int start, int end, int length) {
+    public Block(Dekker21Aligner.TokenIndex tokenIndex, int start, int end, int length) {
         this.tokenIndex = tokenIndex;
         this.start = start;
         this.end = end;
@@ -87,6 +88,7 @@ public class Block {
     }
 
     public static class Instance {
+        // position in token array
         public final int start_token;
         public final Block block;
 
@@ -105,11 +107,7 @@ public class Block {
 
         @Override
         public String toString() {
-            List<Token> tokens = new ArrayList<>();
-            for (int i = 0; i < this.length(); i++) {
-                Token t = block.tokenIndex.token_array.get(start_token + i);
-                tokens.add(t);
-            }
+            List<Token> tokens = getTokens();
             String normalized = "";
             for (Token t : tokens) {
                 SimpleToken st = (SimpleToken) t;
@@ -119,6 +117,16 @@ public class Block {
                 normalized += st.getNormalized();
             }
             return normalized;
+        }
+
+        @NotNull
+        public List<Token> getTokens() {
+            List<Token> tokens = new ArrayList<>();
+            for (int i = 0; i < this.length(); i++) {
+                Token t = block.tokenIndex.token_array.get(start_token + i);
+                tokens.add(t);
+            }
+            return tokens;
         }
     }
 }
