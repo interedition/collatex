@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 public class Block {
     // every Block has a token index as a parent
-    private final Dekker21Aligner.TokenIndex tokenIndex;
+    private final TokenIndex tokenIndex;
     // length = number of tokens in this block of text
     public int length;
     // start = start position in suffix array
@@ -18,13 +18,13 @@ public class Block {
     // end = end position in suffix array
     public int end;
 
-    public Block(Dekker21Aligner.TokenIndex tokenIndex, int suffix_start_position, int length) {
+    public Block(TokenIndex tokenIndex, int suffix_start_position, int length) {
         this.tokenIndex = tokenIndex;
         this.start = suffix_start_position;
         this.length = length;
     }
 
-    public Block(Dekker21Aligner.TokenIndex tokenIndex, int start, int end, int length) {
+    public Block(TokenIndex tokenIndex, int start, int end, int length) {
         this.tokenIndex = tokenIndex;
         this.start = start;
         this.end = end;

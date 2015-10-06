@@ -1,4 +1,4 @@
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.dekker.experimental_aligner;
 
 /**
  * Created by ronald on 4/25/15.
