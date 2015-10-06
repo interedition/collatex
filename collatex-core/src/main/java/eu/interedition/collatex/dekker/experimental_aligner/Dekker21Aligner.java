@@ -58,6 +58,7 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
         for (Iterable<Token> tokens : witnesses) {
             // first witness?
+            // TODO: WRONG!
             boolean first_witness = vertexToLCP.isEmpty();
             if (first_witness) {
                 super.merge(graph, tokens, new HashMap<>());
@@ -69,8 +70,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 for (Token token : tokens) {
                     VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
                     // remove
-                    Block interval = tokenIndex.getLCP_intervalFor(tokenPosition);
-                    vertexToLCP.put(vertex, interval);
+                    // Block interval = tokenIndex.getLCP_intervalFor(tokenPosition);
+                    vertexToLCP.put(vertex, null);
                     // end remove
                     vertex_array[tokenPosition] = vertex;
                     tokenPosition++;
@@ -91,45 +92,45 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             int tokenPosition = startTokenPositionForWitness;
             for (Token token : tokens) {
                 // gather block
-                Block interval = tokenIndex.getLCP_intervalFor(tokenPosition);
-                tokenPosition++;
-
-                if (interval == null) {
+                List<Block> intervals = tokenIndex.getLCP_intervalFor(tokenPosition);
+                //System.out.println(intervals+" for position: "+tokenPosition);
+                if (intervals == null) {
+                    tokenPosition++;
                     continue;
                 }
-                // We reuse Island class
-                // for that we transform block instances into Island...
-                for (Block.Instance instance : interval.getAllInstances()) {
+                for (Block interval : intervals) {
+                    // We reuse Island class
+                    // for that we transform block instances into Island...
+                    for (Block.Instance instance : interval.getAllInstances()) {
+                        if (instance.start_token < startTokenPositionForWitness) {
+                            System.out.println("Candidate: "+instance.getTokens()+" for token position: "+tokenPosition);
+                            // we need to create an Island or a series of matches out of this instance..
+                            // we got two pointers...
+                            // one is the token position so the witness token pointer =
+                            // token position - startTokenPositionForWitness
+                            int witnessTokenPointer = tokenPosition - startTokenPositionForWitness;
 
+                            // The other one is the start position in the token array
+                            // No, we can just ask for the tokens on the instance
+                            // the other pointer is the rank of the vertex associated with the token in the token array
+                            // so we have to do some black magic here
+                            // we go from token in token array -> token to vertex --> rank(vertex)
+                            // no wait it is a vertex array; not a map
+                            VariantGraph.Vertex baseVertex = vertex_array[instance.start_token];
+                            // -1 is to skip start vertex
+                            int rank = ranking.apply(baseVertex)-1;
 
-                    if (instance.start_token < startTokenPositionForWitness) {
-                        // we need to create an Island or a series of matches out of this instance..
-                        // we got two pointers...
-                        // one is the token position so the witness token pointer =
-                        // token position - startTokenPositionForWitness
-                        int witnessTokenPointer = tokenPosition - startTokenPositionForWitness;
-
-                        // The other one is the start position in the token array
-                        // No, we can just ask for the tokens on the instance
-                        // the other pointer is the rank of the vertex associated with the token in the token array
-                        // so we have to do some black magic here
-                        // we go from token in token array -> token to vertex --> rank(vertex)
-                        // no wait it is a vertex array; not a map
-                        VariantGraph.Vertex baseVertex = vertex_array[instance.start_token];
-                        int rank = ranking.apply(baseVertex);
-
-                        // TODO; geen idee wat nu de rank is en wat de witness token pointer
-                        Coordinate start = new Coordinate(rank, witnessTokenPointer);
-                        Coordinate end = new Coordinate(rank+instance.length(), witnessTokenPointer+instance.length());
-                        Island island = new Island(start, end);
-                        allIslands.add(island);
+                            // TODO; geen idee wat nu de rank is en wat de witness token pointer
+                            Coordinate start = new Coordinate(witnessTokenPointer, rank);
+                            Coordinate end = new Coordinate(witnessTokenPointer+instance.length()-1, rank+instance.length()-1);
+                            Island island = new Island(start, end);
+                            System.out.println("Adding island: "+island);
+                            allIslands.add(island);
+                        }
                     }
                 }
+                tokenPosition++;
             }
-
-
-
-
 
             // OLD!!!!!!!!
             table = BlockBasedMatchTable.create(this, graph, tokens);
@@ -190,6 +191,10 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
 
     public List<Island> getIslands() {
+
+//        for (Island land : allIslands) {
+//            System.out.println(l)
+//        }
         return allIslands;
     }
 }

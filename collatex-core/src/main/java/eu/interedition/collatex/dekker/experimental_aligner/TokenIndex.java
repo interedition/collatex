@@ -23,7 +23,7 @@ public class TokenIndex {
     public int[] suffix_array;
     public int[] LCP_array;
     public List<Block> blocks;
-    private Block[] block_array;
+    private Map<Integer, List<Block>> block_array;
 
 
     public TokenIndex(List<? extends Iterable<Token>> w) {
@@ -101,8 +101,9 @@ public class TokenIndex {
         return closedIntervals;
     }
 
-    private Block[] construct_LCP_interval_array() {
-        Block[] block_array = new Block[token_array.size()];
+    private Map<Integer, List<Block>> construct_LCP_interval_array() {
+        block_array = new HashMap<>();
+        // Block[] block_array = new Block[token_array.size()];
         for (Block interval : blocks) {
             //TODO: why are there empty LCP intervals in the LCP_interval_array ?
             if (interval.length==0) {
@@ -110,8 +111,20 @@ public class TokenIndex {
             }
             for (int i = interval.start; i <= interval.end; i++) {
                 int tokenPosition = suffix_array[i];
-                //Log("Adding interval: " + interval.toString() + " to token number: " + tokenIndex);
-                block_array[tokenPosition] = interval;
+                //System.out.println("Adding interval: " + interval.toString() + " to token number: " + tokenPosition);
+                List<Block> values = block_array.get(tokenPosition);
+                if (values == null) {
+                    values = new ArrayList<>();
+                    block_array.put(tokenPosition, values);
+                }
+                values.add(interval);
+
+
+
+//                if (block_array[tokenPosition]!=null) {
+//                    throw new RuntimeException("Multiple LCP intervals per token!");
+//                }
+//                block_array[tokenPosition] = interval;
             }
         }
         //        //NOTE: For tokens that are not repeated we create new LCP intervals here
@@ -128,12 +141,12 @@ public class TokenIndex {
     }
 
 
-    public Block getLCP_intervalFor(int tokenPosition) {
-        return block_array[tokenPosition];
+    public List<Block> getLCP_intervalFor(int tokenPosition) {
+        return block_array.get(tokenPosition);
     }
 
     public boolean hasLCP_intervalFor(int i) {
-        return block_array[i]!=null;
+        return block_array.containsKey(i);
     }
 
     // lcp intervals can overlap horizontally
