@@ -54,36 +54,38 @@ public class BlockBasedMatchTable implements MatchTable {
         List<Block.Instance> instances = aligner.tokenIndex.getBlockInstancesForWitness(witness);
         // we have to combine each instance in the witness with the other instances already present in the graph
         for (Block.Instance witnessInstance : instances) {
+            // System.out.println("Debug creating matches for witness block instance: "+witnessInstance);
+            // for every instance of a block in the witness we need to fetch the corresponding graph instances of the block
+            // calculate graph block instances
             // fetch block
             Block block = witnessInstance.block;
             List<Block.Instance> allInstances = block.getAllInstances();
-            // calc graph Instances
-            List<Block.Instance> graphInstances = allInstances.stream().filter(instance -> instance.start_token != witnessInstance.start_token).collect(Collectors.toList());
+            List<Block.Instance> graphInstances = allInstances.stream().filter(instance -> instance.start_token < startTokenPositionForWitness).collect(Collectors.toList());
+            // now for every graph block instance we have to create matches
+            // for backwards compatibility reasons we do that with the Island and Coordinates classes
             for (Block.Instance graphInstance : graphInstances) {
-                // combine witness and graph instance into an island
-                // project graph instance into vectorspace
-                int graph_start_token = graphInstance.start_token;
-                VariantGraph.Vertex v = aligner.vertex_array[graph_start_token];
-                if (v==null) {
-                    throw new RuntimeException("Vertex is null!");
-                }
-                Integer column = ranking.apply(v)-1;
-                int row = witnessInstance.start_token - startTokenPositionForWitness;
-                Coordinate startCoordinate = new Coordinate(row, column);
-                Coordinate endCoordinate = new Coordinate(row+block.length-1, column+block.length-1);
-                Island island = new Island(startCoordinate, endCoordinate);
-                result.add(island);
+                // we need to create an island for every block instance in the graph corresponding to this block instance in the witness
+                Island island = new Island();
+                // for every matching token from the witness with a vertex in the graph we need to create a coordinate and
+                // 1) add it to the island and 2) set the corresponding cell in the table
                 // set the tokens and vertices on the table
+                int graph_start_token = graphInstance.start_token;
                 for (int i = 0; i < block.length; i++) {
-                    v = aligner.vertex_array[graph_start_token+i];
+                    VariantGraph.Vertex v = aligner.vertex_array[graph_start_token+i];
                     if (v==null) {
-                        throw new RuntimeException("Vertex is null!");
+                        throw new RuntimeException("Vertex is null for token \"+graph_start_token+i+\" that is supposed to be mapped to a vertex in the graph!");
                     }
-                    column = ranking.apply(v)-1;
+                    int column = ranking.apply(v)-1;
                     int witnessStartToken = witnessInstance.start_token + i;
-                    row = witnessStartToken - startTokenPositionForWitness;
+                    int row = witnessStartToken - startTokenPositionForWitness;
+                    // create coordinate and at it to the Island for the combination of graph block instance and witness block instance
+                    // /*if (i == 0)*/ System.out.println("We go "+row + " "+column +" "+witnessStartToken);
+                    Coordinate coordinate = new Coordinate(row, column);
+                    island.add(coordinate);
+                    // set vertex and token combination as a cell on the table
                     table.set(row, column, aligner.tokenIndex.token_array.get(witnessStartToken), v);
                 }
+                result.add(island);
             }
         }
         return table;

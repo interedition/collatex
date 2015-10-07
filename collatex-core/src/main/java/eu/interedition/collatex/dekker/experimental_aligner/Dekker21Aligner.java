@@ -79,62 +79,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
                 continue;
             }
 
-            // rank the variant graph
-            VariantGraphRanking ranking = VariantGraphRanking.of(graph);
-
-
-
-            // We have to create a set of Islands and a MatchTableSelection here
-            allIslands = new ArrayList<>();
-            // get all the blocks for this token
-            // we have to iterate over all the token positions of this witness
-            int startTokenPositionForWitness = tokenIndex.getStartTokenPositionForWitness(tokens.iterator().next().getWitness());
-            int tokenPosition = startTokenPositionForWitness;
-            for (Token token : tokens) {
-                // gather block
-                List<Block> intervals = tokenIndex.getLCP_intervalFor(tokenPosition);
-                //System.out.println(intervals+" for position: "+tokenPosition);
-                if (intervals == null) {
-                    tokenPosition++;
-                    continue;
-                }
-                for (Block interval : intervals) {
-                    // We reuse Island class
-                    // for that we transform block instances into Island...
-                    for (Block.Instance instance : interval.getAllInstances()) {
-                        if (instance.start_token < startTokenPositionForWitness) {
-                            System.out.println("Candidate: "+instance.getTokens()+" for token position: "+tokenPosition);
-                            // we need to create an Island or a series of matches out of this instance..
-                            // we got two pointers...
-                            // one is the token position so the witness token pointer =
-                            // token position - startTokenPositionForWitness
-                            int witnessTokenPointer = tokenPosition - startTokenPositionForWitness;
-
-                            // The other one is the start position in the token array
-                            // No, we can just ask for the tokens on the instance
-                            // the other pointer is the rank of the vertex associated with the token in the token array
-                            // so we have to do some black magic here
-                            // we go from token in token array -> token to vertex --> rank(vertex)
-                            // no wait it is a vertex array; not a map
-                            VariantGraph.Vertex baseVertex = vertex_array[instance.start_token];
-                            // -1 is to skip start vertex
-                            int rank = ranking.apply(baseVertex)-1;
-
-                            // TODO; geen idee wat nu de rank is en wat de witness token pointer
-                            Coordinate start = new Coordinate(witnessTokenPointer, rank);
-                            Coordinate end = new Coordinate(witnessTokenPointer+instance.length()-1, rank+instance.length()-1);
-                            Island island = new Island(start, end);
-                            System.out.println("Adding island: "+island);
-                            allIslands.add(island);
-                        }
-                    }
-                }
-                tokenPosition++;
-            }
-
-            // OLD!!!!!!!!
+            // System.out.println("Aligning next witness; Creating block based match table!");
             table = BlockBasedMatchTable.create(this, graph, tokens);
-
 
             // Phase 2: do the actual alignment and find transpositions
             IslandConflictResolver resolver = new IslandConflictResolver(table);
@@ -168,7 +114,8 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
             // we filter out small transposed phrases over large distances
             List<List<Match>> falseTranspositions = new ArrayList<>();
 
-            ranking = VariantGraphRanking.of(graph);
+            // rank the variant graph
+            VariantGraphRanking ranking = VariantGraphRanking.of(graph);
 
             for (List<Match> transposedPhrase : transpositions) {
                 Match match = transposedPhrase.get(0);
@@ -186,15 +133,21 @@ public class Dekker21Aligner extends CollationAlgorithm.Base {
 
             // merge transpositions
             mergeTranspositions(graph, transpositions);
+
+            // we need to update the token -> vertex map
+            // that information is stored in protected map
+            int tokenPosition = tokenIndex.getStartTokenPositionForWitness(tokens.iterator().next().getWitness());
+            for (Token token : tokens) {
+                VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
+                vertex_array[tokenPosition] = vertex;
+                tokenPosition++;
+            }
         }
     }
 
 
-    public List<Island> getIslands() {
-
-//        for (Island land : allIslands) {
-//            System.out.println(l)
-//        }
-        return allIslands;
+    public Set<Island> getIslands() {
+//       return allIslands;
+        return table.getIslands();
     }
 }

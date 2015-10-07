@@ -20,6 +20,7 @@
 package eu.interedition.collatex;
 
 import eu.interedition.collatex.dekker.editgraphaligner.EditGraphAligner;
+import eu.interedition.collatex.dekker.experimental_aligner.Dekker21Aligner;
 import eu.interedition.collatex.medite.MediteAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 import eu.interedition.collatex.util.GreedyStringTilingAlgorithm;
@@ -40,7 +41,7 @@ public class CollationAlgorithmFactory {
     }
 
     public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
-        return new EditGraphAligner();
+        return new Dekker21Aligner();
     }
 
     public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {

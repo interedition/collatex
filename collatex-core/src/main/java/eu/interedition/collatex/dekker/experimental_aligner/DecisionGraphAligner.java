@@ -287,7 +287,7 @@ public class DecisionGraphAligner {
                 // calc position start position witness + position in witness
                 int token_position = startRangeWitness2 + current.startPosWitness2;
                 // hack
-                Block witness_interval = tokenIndex.getLCP_intervalFor(token_position).get(0);
+                Block witness_interval = null; tokenIndex.getLCP_intervalFor(token_position).get(0);
                 if (witness_interval==null) {
                     //TODO: this is a hack! We really want to do deal with this cases in a natural manner!
                     witness_interval = new Block(tokenIndex, 0, 0);
@@ -364,7 +364,7 @@ public class DecisionGraphAligner {
             if (edge!=null&&this.getTarget(edge).equals(neighbor)) {
                 Block graphInterval = edge.block;
                 // hack
-                Block witnessInterval = tokenIndex.getLCP_intervalFor(startRangeWitness2+current.startPosWitness2).get(0);
+                Block witnessInterval = null; tokenIndex.getLCP_intervalFor(startRangeWitness2+current.startPosWitness2).get(0);
                 if (graphInterval==witnessInterval) {
                     edge.match = true;
                     // set cost on neighbor if it is higher

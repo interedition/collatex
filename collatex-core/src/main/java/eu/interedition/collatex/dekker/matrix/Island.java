@@ -116,7 +116,8 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
     @Override
     public String toString() {
         if (islandCoordinates.isEmpty()) {
-            throw new RuntimeException("Unexpected situation: island coordinates empty!");
+            //throw new RuntimeException("Unexpected situation: island coordinates empty!");
+            return "Island has been modified after creation and has become empty!";
         }
         return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
     }

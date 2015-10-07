@@ -3,6 +3,8 @@ package eu.interedition.collatex.dekker.experimental_aligner;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.SimpleTokenNormalizedFormComparator;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
@@ -23,7 +25,7 @@ public class TokenIndex {
     public int[] suffix_array;
     public int[] LCP_array;
     public List<Block> blocks;
-    private Map<Integer, List<Block>> block_array;
+    private Map<Integer, List<Block.Instance>> block_array;
 
 
     public TokenIndex(List<? extends Iterable<Token>> w) {
@@ -67,7 +69,15 @@ public class TokenIndex {
                 counter++;
             }
             witnessToEndToken.put(witness, counter);
-            //TODO: add witness separation marker token
+            //NOTE: marker token is a simple token which could present problems for custom token comparators!
+            token_array.add(new MarkerToken(witnessToStartToken.size()));
+            counter++;
+        }
+    }
+
+    private class MarkerToken extends SimpleToken {
+        public MarkerToken(int size) {
+            super(null, "$"+size, "$"+size);
         }
     }
 
@@ -101,47 +111,29 @@ public class TokenIndex {
         return closedIntervals;
     }
 
-    private Map<Integer, List<Block>> construct_LCP_interval_array() {
+    private Map<Integer, List<Block.Instance>> construct_LCP_interval_array() {
         block_array = new HashMap<>();
-        // Block[] block_array = new Block[token_array.size()];
         for (Block interval : blocks) {
             //TODO: why are there empty LCP intervals in the LCP_interval_array ?
             if (interval.length==0) {
                 continue;
             }
-            for (int i = interval.start; i <= interval.end; i++) {
-                int tokenPosition = suffix_array[i];
-                //System.out.println("Adding interval: " + interval.toString() + " to token number: " + tokenPosition);
-                List<Block> values = block_array.get(tokenPosition);
+            for (Block.Instance instance : interval.getAllInstances()) {
+                int tokenPosition = instance.start_token;
+                //System.out.println("Adding interval instance: " + interval.toString() + " to token number: " + tokenPosition);
+                List<Block.Instance> values = block_array.get(tokenPosition);
                 if (values == null) {
                     values = new ArrayList<>();
                     block_array.put(tokenPosition, values);
                 }
-                values.add(interval);
-
-
-
-//                if (block_array[tokenPosition]!=null) {
-//                    throw new RuntimeException("Multiple LCP intervals per token!");
-//                }
-//                block_array[tokenPosition] = interval;
+                values.add(instance);
             }
         }
-        //        //NOTE: For tokens that are not repeated we create new LCP intervals here
-        //        //This is not very space efficient, but it makes life much easier for the code that follows
-        //        for (int i=0; i< this.token_array.size(); i++) {
-        //            if (lcp_interval_array[i]==null) {
-        //                // create new LCP interval for token
-        //                LCP_Interval lcp_interval;
-        //                //NOTE: I have to know the start and end position of token in the suffix array... not easy!
-        //                lcp_interval = new LCP_Interval()
-        //            }
-        //        }
         return block_array;
     }
 
 
-    public List<Block> getLCP_intervalFor(int tokenPosition) {
+    public List<Block.Instance> getLCP_intervalFor(int tokenPosition) {
         return block_array.get(tokenPosition);
     }
 
@@ -149,6 +141,8 @@ public class TokenIndex {
         return block_array.containsKey(i);
     }
 
+    // THIS SHOULD NOT BE HERE: IT CAN NOT BE DONE GLOBALLY!
+    // THE OVERLAP SHOULD BE REMOVED DUE THE ALIGNING AND NOT SOME OTHER TRICK!
     // lcp intervals can overlap horizontally
     // we prioritize the intervals with the biggest length
     // Note: with more than two witnesses we have to select the right instance of an interval
@@ -174,24 +168,16 @@ public class TokenIndex {
         return result;
     }
 
-    //NOTE: Much of the work done here can be prepared before hand
-    //and stored in the lcp_array.. should be transformed in a block instance array
     public List<Block.Instance> getBlockInstancesForWitness(Witness w) {
         Integer witnessStart = witnessToStartToken.get(w);
         Integer witnessEnd = witnessToEndToken.get(w);
-        //TODO: size: witnessEnd!
-        BitSet witnessRange = new BitSet();
-        witnessRange.set(witnessStart, witnessEnd);
-        //TODO: rewrite!
         List<Block.Instance> result = new ArrayList<>();
-        for (Block block : getNonOverlappingBlocks()) {
-            for (Block.Instance instance : block.getAllInstances()) {
-                if (instance.asRange().anyMatch(witnessRange::get)) {
-                    result.add(instance);
-                }
+        for (int i= witnessStart; i < witnessEnd; i++) {
+            List<Block.Instance> instance = block_array.get(i);
+            if (instance != null) {
+                result.addAll(instance);
             }
         }
-        result.sort((instance1, instance2) -> instance1.start_token - instance2.start_token);
         return result;
     }
 
