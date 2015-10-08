@@ -42,8 +42,8 @@ public class IslandConflictResolver {
     private final IslandCollection selection;
 
     //NOTE: outlierTranspositionLimit is ignored for now
-    public IslandConflictResolver(MatchTable table) {
-        selection = new IslandCollection(table.getIslands());
+    public IslandConflictResolver(Set<Island> islands) {
+        selection = new IslandCollection(islands);
     }
 
     /*

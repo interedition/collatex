@@ -86,7 +86,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
 
     private IslandCollection preferred(MatchTable matchTable) {
         // prepare
-        IslandConflictResolver resolver = new IslandConflictResolver(matchTable);
+        IslandConflictResolver resolver = new IslandConflictResolver(matchTable.getIslands());
         // find preferred islands
         return resolver.createNonConflictingVersion();
     }

@@ -23,7 +23,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.experimental_aligner.Block;
-import eu.interedition.collatex.dekker.experimental_aligner.BlockBasedMatchTable;
+import eu.interedition.collatex.dekker.experimental_aligner.TokenIndexToMatches;
 import eu.interedition.collatex.dekker.experimental_aligner.TokenIndex;
 import eu.interedition.collatex.dekker.matrix.*;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -45,7 +45,6 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     // TODO: REMOVE REMOVE REMOVE!
     private Map<VariantGraph.Vertex, Block> vertexToLCP;
     // for debugging purposes only
-    protected MatchTable table;
     protected List<Island> preferredIslands;
     //TODO: FIX!
     private final Comparator<Token> comparator;
@@ -54,6 +53,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     private List<List<Match>> phraseMatches;
     private List<List<Match>> transpositions;
     private boolean mergeTranspositions = false;
+    private Set<Island> allIslands;
 
     public DekkerAlgorithm() {
         this(new EqualityTokenComparator());
@@ -118,21 +118,21 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             }
 
             // System.out.println("Aligning next witness; Creating block based match table!");
-            table = BlockBasedMatchTable.create(tokenIndex, vertex_array, graph, tokens);
+            allIslands = TokenIndexToMatches.createMatches(tokenIndex, vertex_array, graph, tokens);
 
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Aligning witness and graph", new Object[]{graph, witness});
             }
 
             // Phase 2: do the actual alignment and find transpositions
-            IslandConflictResolver resolver = new IslandConflictResolver(table);
+            IslandConflictResolver resolver = new IslandConflictResolver(allIslands);
             preferredIslands = resolver.createNonConflictingVersion().getIslands();
             // we need to convert the islands into Map<Token, Vertex> for further processing
             // Here the result is put in a map
             Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
             for (Island island : preferredIslands) {
                 for (Coordinate c : island) {
-                    alignments.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
+                    alignments.put(c.match.token, c.match.vertex);
                 }
             }
 
@@ -258,7 +258,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
 
     //TODO; isn't this the same as getPhraseMatches?
     public Set<Island> getIslands() {
-        return table.getIslands();
+        return allIslands;
     }
 
     /*

@@ -6,48 +6,21 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
-import eu.interedition.collatex.dekker.matrix.MatchTable;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by ronald on 4/26/15.
  */
-public class BlockBasedMatchTable implements MatchTable {
-    private final List<Island> islands;
-    // NOTE: The table is sparse; so this is not the most efficient implementation.
-    // Note: In theory would could move all the lookup functionality to the islands
-    // Note: This would however introduce API changes
-    private final MatchTableCell[][] table;
-    private final Token[] witness;
-    private final int[] ranks;
+public class TokenIndexToMatches {
 
-    private BlockBasedMatchTable(List<Island> islands, Token[] tokens, int[] ranks) {
-        this.islands = islands;
-        this.table = new MatchTableCell[tokens.length][ranks.length];
-        this.witness = tokens;
-        this.ranks = ranks;
-    }
-
-    public static MatchTable create(TokenIndex tokenIndex, VariantGraph.Vertex[] vertex_array, VariantGraph graph, Iterable<Token> witness) {
-        return createMatchTable(tokenIndex, vertex_array, graph, witness);
-    }
-
-    public static MatchTable createMatchTable(TokenIndex tokenIndex, VariantGraph.Vertex[] vertex_array, VariantGraph g, Iterable<Token> w) {
+    public static Set<Island> createMatches(TokenIndex tokenIndex, VariantGraph.Vertex[] vertex_array, VariantGraph g, Iterable<Token> w) {
         // we need the variant graph ranking for the projection in the vector space
         VariantGraphRanking ranking = VariantGraphRanking.of(g);
-        // result
-        List<Island> result = new ArrayList<>();
-        // witness tokens
-        Token[] tokens = StreamSupport.stream(w.spliterator(), false).toArray(Token[]::new);
-        // graph ranks
-        int[] ranks = IntStream.range(0, Math.max(0, ranking.apply(g.getEnd()) - 1)).toArray();
-        // create table
-        BlockBasedMatchTable table = new BlockBasedMatchTable(result, tokens, ranks);
+        // init result
+        Set<Island> result = new HashSet<>();
         // based on the TokenIndex we build up the islands...
         // an island is a graph instance and a witness instance of the same block combined
         Witness witness = w.iterator().next().getWitness();
@@ -81,59 +54,14 @@ public class BlockBasedMatchTable implements MatchTable {
                     int row = witnessStartToken - startTokenPositionForWitness;
                     // create coordinate and at it to the Island for the combination of graph block instance and witness block instance
                     // /*if (i == 0)*/ System.out.println("We go "+row + " "+column +" "+witnessStartToken);
-                    //TODO: token!
-                    Match match = new Match(v, null);
+                    Token token = tokenIndex.token_array.get(witnessStartToken);
+                    Match match = new Match(v, token);
                     Coordinate coordinate = new Coordinate(row, column, match);
                     island.add(coordinate);
-                    // set vertex and token combination as a cell on the table
-                    table.set(row, column, tokenIndex.token_array.get(witnessStartToken), v);
                 }
                 result.add(island);
             }
         }
-        return table;
-    }
-
-    @Override
-    public VariantGraph.Vertex vertexAt(int rowIndex, int columnIndex) {
-        return cell(rowIndex, columnIndex).map(c -> c.vertex).orElseThrow(RuntimeException::new);
-    }
-
-    @Override
-    public Token tokenAt(int rowIndex, int columnIndex) {
-        return cell(rowIndex, columnIndex).map(c -> c.token).orElseThrow(RuntimeException::new);
-    }
-
-    private Optional<MatchTableCell> cell(int rowIndex, int columnIndex) {
-        return Optional.ofNullable(table[rowIndex][columnIndex]);
-    }
-
-    private void set(int rowIndex, int columnIndex, Token token, VariantGraph.Vertex vertex) {
-        table[rowIndex][columnIndex] = new MatchTableCell(token, vertex);
-    }
-
-    @Override
-    public List<Token> rowList() {
-        return null;
-    }
-
-    @Override
-    public List<Integer> columnList() {
-        return null;
-    }
-
-    @Override
-    public Set<Island> getIslands() {
-        return new HashSet<>(islands);
-    }
-
-    private class MatchTableCell {
-        public final Token token;
-        public final VariantGraph.Vertex vertex;
-
-        public MatchTableCell(Token token, VariantGraph.Vertex vertex) {
-            this.token = token;
-            this.vertex = vertex;
-        }
+        return result;
     }
 }

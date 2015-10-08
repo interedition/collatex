@@ -44,7 +44,7 @@ public class MatchTableLinker implements TokenLinker {
 
         // create IslandConflictResolver
         LOG.fine("create island conflict resolver");
-        IslandConflictResolver resolver = new IslandConflictResolver(table);
+        IslandConflictResolver resolver = new IslandConflictResolver(table.getIslands());
 
         // The IslandConflictResolver createNonConflictingVersion() method
         // selects the optimal islands

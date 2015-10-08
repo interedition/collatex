@@ -49,7 +49,7 @@ public class IslandConflictResolverTest extends AbstractTest {
                 possibleIslands.add(island);
             }
         }
-        IslandConflictResolver resolver = new IslandConflictResolver(table);
+        IslandConflictResolver resolver = new IslandConflictResolver(table.getIslands());
         Map<IslandCompetition, List<Island>> competition = resolver.analyzeConflictsBetweenPossibleIslands(possibleIslands);
         assertEquals(3, competition.get(IslandCompetition.CompetingIsland).size());
     }
