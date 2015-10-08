@@ -52,7 +52,7 @@ public class BeckettTest extends AbstractTest {
     public void testBeckettStrangeTransposition() {
         SimpleWitness[] w = createWitnesses("People with things, people without things, things without people, what does it matter. I'm confident I can soon scatter them.", "People with things, people without things, things without people, what does it matter, it will not take me long to scatter them.", "People with things, people without things, things without people, what does it matter, I flatter myself it will not take me long to scatter them, whenever I choose, to the winds.");
         final VariantGraph graph = collate(w[0], w[1]);
-        DekkerAlgorithm algo = new DekkerAlgorithm(new EqualityTokenComparator());
+        InspectableCollationAlgorithm algo = (InspectableCollationAlgorithm) CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
         algo.collate(graph, w[2]);
 //    List<List<Match>> phraseMatches = algo.getPhraseMatches();
 //    for (List<Match> phraseMatch: phraseMatches) {
@@ -124,7 +124,7 @@ public class BeckettTest extends AbstractTest {
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.", "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
         collate(w);
         assertPhraseMatches("Its soft", "light", "any light he could remember from the days", "nights when day followed", "night", "vice versa.");
-        assertTrue(((DekkerAlgorithm) collationAlgorithm).getTranspositions().isEmpty());
+        assertTrue(((InspectableCollationAlgorithm) collationAlgorithm).getTranspositions().isEmpty());
     }
 
     @Test
@@ -211,8 +211,8 @@ public class BeckettTest extends AbstractTest {
 
         // transpositions should be handled correctly for this test to succeed
         collate(graph, w[4]);
-        final List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
-        final List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
+        final List<List<Match>> phraseMatches = ((InspectableCollationAlgorithm) collationAlgorithm).getPhraseMatches();
+        final List<List<Match>> transpositions = ((InspectableCollationAlgorithm) collationAlgorithm).getTranspositions();
         assertEquals("The same", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));
         assertEquals("as when", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(1))));
         assertEquals("Darly", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(2))));

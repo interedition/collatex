@@ -116,7 +116,7 @@ public class AlignmentTest extends AbstractTest {
         final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello nice world", "Hello nice cruel world");
         collate(w[0], w[1], w[2]);
         assertPhraseMatches("Hello", "nice", "cruel", "world");
-        List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
+        List<List<Match>> transpositions = ((InspectableCollationAlgorithm) collationAlgorithm).getTranspositions();
         assertEquals(0, transpositions.size());
     }
 
@@ -125,7 +125,7 @@ public class AlignmentTest extends AbstractTest {
         final SimpleWitness[] w = createWitnesses("Hello cruel world", "Hello world");
         collate(w);
         assertPhraseMatches("Hello", "world");
-        List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
+        List<List<Match>> transpositions = ((InspectableCollationAlgorithm) collationAlgorithm).getTranspositions();
         assertEquals(0, transpositions.size());
     }
 
@@ -134,7 +134,7 @@ public class AlignmentTest extends AbstractTest {
         final SimpleWitness[] w = createWitnesses("Hello world", "Hello cruel world");
         collate(w);
         assertPhraseMatches("Hello", "world");
-        List<List<Match>> transpositions = ((DekkerAlgorithm) collationAlgorithm).getTranspositions();
+        List<List<Match>> transpositions = ((InspectableCollationAlgorithm) collationAlgorithm).getTranspositions();
         assertEquals(0, transpositions.size());
     }
 

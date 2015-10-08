@@ -3,7 +3,7 @@ package eu.interedition.collatex.io;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.dekker.DekkerAlgorithm;
+import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.*;
@@ -173,14 +173,14 @@ public class SimpleCollationJSONMessageBodyReader implements MessageBodyReader<S
                 // ignored
             }
 
-            if (collationAlgorithm instanceof DekkerAlgorithm) {
+            if (collationAlgorithm instanceof InspectableCollationAlgorithm) {
                 boolean mergeTranspositions = true;
                 try {
                     mergeTranspositions = collationObject.getBoolean("transpositions", true);
                 } catch (ClassCastException e) {
                     // ignored
                 }
-                ((DekkerAlgorithm) collationAlgorithm).setMergeTranspositions(mergeTranspositions);
+                ((InspectableCollationAlgorithm) collationAlgorithm).setMergeTranspositions(mergeTranspositions);
             }
             return new SimpleCollation(witnesses, collationAlgorithm, joined);
         }

@@ -20,6 +20,7 @@
 package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -37,8 +38,8 @@ public class TranspositionGraphTest extends AbstractTest {
 
     @Before
     public void setup() {
-        collationAlgorithm = new DekkerAlgorithm(new EqualityTokenComparator());
-        ((DekkerAlgorithm) collationAlgorithm).setMergeTranspositions(true);
+        collationAlgorithm = CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
+        ((InspectableCollationAlgorithm) collationAlgorithm).setMergeTranspositions(true);
     }
 
     @Test

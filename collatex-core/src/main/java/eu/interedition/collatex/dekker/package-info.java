@@ -22,7 +22,7 @@
  *
  * Supports progressive alignment of multiple witnesses including heuristic detection of transpositions.
  *
- * @see eu.interedition.collatex.dekker.DekkerAlgorithm
+ * @see eu.interedition.collatex.dekker.experimental_aligner.Dekker21Aligner
  *
  */
 package eu.interedition.collatex.dekker;

@@ -19,7 +19,7 @@
 
 package eu.interedition.collatex;
 
-import eu.interedition.collatex.dekker.DekkerAlgorithm;
+import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -187,7 +187,7 @@ public abstract class AbstractTest {
     }
 
     protected void assertPhraseMatches(String... expectedPhrases) {
-        List<List<Match>> phraseMatches = ((DekkerAlgorithm) collationAlgorithm).getPhraseMatches();
+        List<List<Match>> phraseMatches = ((InspectableCollationAlgorithm) collationAlgorithm).getPhraseMatches();
         int i = 0;
         for (List<Match> phraseMatch : phraseMatches) {
             Assert.assertEquals(expectedPhrases[i], SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch)));

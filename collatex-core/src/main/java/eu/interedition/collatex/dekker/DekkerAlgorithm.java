@@ -35,7 +35,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DekkerAlgorithm extends CollationAlgorithm.Base {
+public class DekkerAlgorithm extends CollationAlgorithm.Base implements InspectableCollationAlgorithm {
 
     private final Comparator<Token> comparator;
     private final TokenLinker tokenLinker;
@@ -155,20 +155,14 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
         }
     }
 
-    public Map<Token, VariantGraph.Vertex> getTokenLinks() {
-        return tokenLinks;
-    }
-
+    @Override
     public List<List<Match>> getPhraseMatches() {
         return Collections.unmodifiableList(phraseMatches);
     }
 
+    @Override
     public List<List<Match>> getTranspositions() {
         return Collections.unmodifiableList(transpositions);
-    }
-
-    public Map<Token, VariantGraph.Vertex> getAlignments() {
-        return Collections.unmodifiableMap(alignments);
     }
 
     /*
@@ -180,6 +174,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base {
      * the detected transpositions can look strange, since segments
      * may have split into smaller or larger parts.
      */
+    @Override
     public void setMergeTranspositions(boolean b) {
         this.mergeTranspositions = b;
     }
