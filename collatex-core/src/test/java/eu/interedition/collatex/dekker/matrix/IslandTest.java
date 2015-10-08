@@ -54,21 +54,6 @@ public class IslandTest extends AbstractTest {
     }
 
     @Test
-    public void testUndirectedIsland() {
-        Island isl = new Island();
-        isl.add(new Coordinate(0, 0));
-        assertEquals(1, isl.size());
-        isl.add(new Coordinate(0, 0));
-        assertEquals(1, isl.size());
-        isl.add(new Coordinate(1, 0));
-        assertEquals(1, isl.size());
-        isl.add(new Coordinate(2, 2));
-        assertEquals(1, isl.size());
-        isl.add(new Coordinate(1, 1));
-        assertEquals(2, isl.size());
-    }
-
-    @Test
     public void testDirectedIsland() {
         Island isl = new Island();
         isl.add(new Coordinate(0, 0));

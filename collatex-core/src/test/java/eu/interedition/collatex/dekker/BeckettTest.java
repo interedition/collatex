@@ -51,9 +51,9 @@ public class BeckettTest extends AbstractTest {
     @Test
     public void testBeckettStrangeTransposition() {
         SimpleWitness[] w = createWitnesses("People with things, people without things, things without people, what does it matter. I'm confident I can soon scatter them.", "People with things, people without things, things without people, what does it matter, it will not take me long to scatter them.", "People with things, people without things, things without people, what does it matter, I flatter myself it will not take me long to scatter them, whenever I choose, to the winds.");
-        final VariantGraph graph = collate(w[0], w[1]);
+        final VariantGraph graph = new VariantGraph();
         InspectableCollationAlgorithm algo = (InspectableCollationAlgorithm) CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
-        algo.collate(graph, w[2]);
+        algo.collate(graph, w);
 //    List<List<Match>> phraseMatches = algo.getPhraseMatches();
 //    for (List<Match> phraseMatch: phraseMatches) {
 //      System.out.println(SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatch)));
@@ -203,14 +203,14 @@ public class BeckettTest extends AbstractTest {
         final VariantGraph graph = collate(w[0], w[1]);
         assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "once", "died");
 
-        collate(graph, w[2]);
+        collate(graph, w[0], w[1], w[2]);
         assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "once", "died");
 
-        collate(graph, w[3]);
+        collate(graph, w[0], w[1], w[2], w[3]);
         assertGraphContains(graph, "the", "same", "clock", "as", "when", "for", "example", "magee", "mckee", "among", "others", "darly", "once", "died", "left", "him");
 
         // transpositions should be handled correctly for this test to succeed
-        collate(graph, w[4]);
+        collate(graph, w[0], w[1], w[2], w[3], w[4]);
         final List<List<Match>> phraseMatches = ((InspectableCollationAlgorithm) collationAlgorithm).getPhraseMatches();
         final List<List<Match>> transpositions = ((InspectableCollationAlgorithm) collationAlgorithm).getTranspositions();
         assertEquals("The same", SimpleToken.toString(PHRASE_MATCH_TO_TOKENS.apply(phraseMatches.get(0))));

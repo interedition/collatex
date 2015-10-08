@@ -32,11 +32,11 @@ public class BlockBasedMatchTable implements MatchTable {
         this.ranks = ranks;
     }
 
-    public static MatchTable create(Dekker21Aligner aligner, VariantGraph graph, Iterable<Token> witness) {
-        return createMatchTable(aligner, graph, witness);
+    public static MatchTable create(TokenIndex tokenIndex, VariantGraph.Vertex[] vertex_array, VariantGraph graph, Iterable<Token> witness) {
+        return createMatchTable(tokenIndex, vertex_array, graph, witness);
     }
 
-    public static MatchTable createMatchTable(Dekker21Aligner aligner, VariantGraph g, Iterable<Token> w) {
+    public static MatchTable createMatchTable(TokenIndex tokenIndex, VariantGraph.Vertex[] vertex_array, VariantGraph g, Iterable<Token> w) {
         // we need the variant graph ranking for the projection in the vector space
         VariantGraphRanking ranking = VariantGraphRanking.of(g);
         // result
@@ -50,8 +50,8 @@ public class BlockBasedMatchTable implements MatchTable {
         // based on the TokenIndex we build up the islands...
         // an island is a graph instance and a witness instance of the same block combined
         Witness witness = w.iterator().next().getWitness();
-        int startTokenPositionForWitness = aligner.tokenIndex.getStartTokenPositionForWitness(witness);
-        List<Block.Instance> instances = aligner.tokenIndex.getBlockInstancesForWitness(witness);
+        int startTokenPositionForWitness = tokenIndex.getStartTokenPositionForWitness(witness);
+        List<Block.Instance> instances = tokenIndex.getBlockInstancesForWitness(witness);
         // we have to combine each instance in the witness with the other instances already present in the graph
         for (Block.Instance witnessInstance : instances) {
             // System.out.println("Debug creating matches for witness block instance: "+witnessInstance);
@@ -71,7 +71,7 @@ public class BlockBasedMatchTable implements MatchTable {
                 // set the tokens and vertices on the table
                 int graph_start_token = graphInstance.start_token;
                 for (int i = 0; i < block.length; i++) {
-                    VariantGraph.Vertex v = aligner.vertex_array[graph_start_token+i];
+                    VariantGraph.Vertex v = vertex_array[graph_start_token+i];
                     if (v==null) {
                         throw new RuntimeException("Vertex is null for token \"+graph_start_token+i+\" that is supposed to be mapped to a vertex in the graph!");
                     }
@@ -83,7 +83,7 @@ public class BlockBasedMatchTable implements MatchTable {
                     Coordinate coordinate = new Coordinate(row, column);
                     island.add(coordinate);
                     // set vertex and token combination as a cell on the table
-                    table.set(row, column, aligner.tokenIndex.token_array.get(witnessStartToken), v);
+                    table.set(row, column, tokenIndex.token_array.get(witnessStartToken), v);
                 }
                 result.add(island);
             }

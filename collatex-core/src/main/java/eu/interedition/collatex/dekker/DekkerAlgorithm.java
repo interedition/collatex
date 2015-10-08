@@ -22,137 +22,227 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.matrix.MatchTableLinker;
+import eu.interedition.collatex.dekker.experimental_aligner.Block;
+import eu.interedition.collatex.dekker.experimental_aligner.BlockBasedMatchTable;
+import eu.interedition.collatex.dekker.experimental_aligner.TokenIndex;
+import eu.interedition.collatex.dekker.matrix.*;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base implements InspectableCollationAlgorithm {
+    public TokenIndex tokenIndex;
+    // tokens are mapped to vertices by their position in the token array
+    protected VariantGraph.Vertex[] vertex_array;
+    // map vertices to LCP
+    // NOTE: vertices contain tokens... tokens are already mapped to LCP intervals
+    // NOTE: It should be possible to remove this map
 
+    // TODO: REMOVE REMOVE REMOVE!
+    private Map<VariantGraph.Vertex, Block> vertexToLCP;
+    // for debugging purposes only
+    protected MatchTable table;
+    protected List<Island> preferredIslands;
+    //TODO: FIX!
     private final Comparator<Token> comparator;
-    private final TokenLinker tokenLinker;
     private final PhraseMatchDetector phraseMatchDetector;
     private final TranspositionDetector transpositionDetector;
-    private Map<Token, VariantGraph.Vertex> tokenLinks;
     private List<List<Match>> phraseMatches;
     private List<List<Match>> transpositions;
-    private Map<Token, VariantGraph.Vertex> alignments;
     private boolean mergeTranspositions = false;
 
-    public DekkerAlgorithm(Comparator<Token> comparator) {
-        this(comparator, new MatchTableLinker());
+    public DekkerAlgorithm() {
+        this(new EqualityTokenComparator());
     }
-
-    public DekkerAlgorithm(Comparator<Token> comparator, TokenLinker tokenLinker) {
+    public DekkerAlgorithm(Comparator<Token> comparator) {
         this.comparator = comparator;
-        this.tokenLinker = tokenLinker;
         this.phraseMatchDetector = new PhraseMatchDetector();
         this.transpositionDetector = new TranspositionDetector();
+        //TODO: remove!
+        vertexToLCP = new HashMap<>();
+    }
+
+    // The algorithm contains two phases:
+    // 1) Matching phase
+    // This phase is implemented using a token array -> suffix array -> LCP array -> LCP intervals
+    //
+    // 2) Alignment phase
+    // This phase uses a decision tree (implemented as a table) to find the optimal alignment and moves
+    @Override
+    public void collate(VariantGraph graph, List<? extends Iterable<Token>> witnesses) {
+        // matching phase
+        this.tokenIndex = new TokenIndex(witnesses);
+        tokenIndex.prepare();
+
+        this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.size()];
+
+        for (Iterable<Token> tokens : witnesses) {
+            // first witness?
+            // TODO: WRONG!
+            boolean first_witness = vertexToLCP.isEmpty();
+            if (first_witness) {
+                super.merge(graph, tokens, new HashMap<>());
+                // need to update vertex to lcp map
+
+                // we need tokens token -> vertex
+                // that information is stored in protected map
+                int tokenPosition = 0;
+                for (Token token : tokens) {
+                    VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
+                    // remove
+                    // Block interval = tokenIndex.getLCP_intervalFor(tokenPosition);
+                    vertexToLCP.put(vertex, null);
+                    // end remove
+                    vertex_array[tokenPosition] = vertex;
+                    tokenPosition++;
+                }
+                continue;
+            }
+
+            // align second + witness(es)
+            final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
+                .findFirst()
+                .map(Token::getWitness)
+                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "{0} + {1}: {2} vs. {3}", new Object[]{graph, witness, graph.vertices(), tokens});
+            }
+
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "{0} + {1}: Gather matches between variant graph and witness from token index", new Object[]{graph, witness});
+            }
+
+            // System.out.println("Aligning next witness; Creating block based match table!");
+            table = BlockBasedMatchTable.create(tokenIndex, vertex_array, graph, tokens);
+
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "{0} + {1}: Aligning witness and graph", new Object[]{graph, witness});
+            }
+
+            // Phase 2: do the actual alignment and find transpositions
+            IslandConflictResolver resolver = new IslandConflictResolver(table);
+            preferredIslands = resolver.createNonConflictingVersion().getIslands();
+            // we need to convert the islands into Map<Token, Vertex> for further processing
+            // Here the result is put in a map
+            Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
+            for (Island island : preferredIslands) {
+                for (Coordinate c : island) {
+                    alignments.put(table.tokenAt(c.row, c.column), table.vertexAt(c.row, c.column));
+                }
+            }
+
+            if (LOG.isLoggable(Level.FINER)) {
+                for (Map.Entry<Token, VariantGraph.Vertex> tokenLink : alignments.entrySet()) {
+                    LOG.log(Level.FINER, "{0} + {1}: Aligned token (incl transposed): {2} = {3}", new Object[]{graph, witness, tokenLink.getValue(), tokenLink.getKey()});
+                }
+            }
+
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "{0} + {1}: Detect phrase matches", new Object[]{graph, witness});
+            }
+
+            // detect phrases and transpositions
+            // NOTE: It is probable that phrases can be replaced by Islands
+            phraseMatches = phraseMatchDetector.detect(alignments, graph, tokens);
+
+            if (LOG.isLoggable(Level.FINER)) {
+                for (List<Match> phraseMatch : phraseMatches) {
+                    LOG.log(Level.FINER, "{0} + {1}: Phrase match: {2}", new Object[]{graph, witness, phraseMatch});
+                }
+            }
+
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "{0} + {1}: Detect transpositions", new Object[]{graph, witness});
+            }
+            transpositions = transpositionDetector.detect(phraseMatches, graph);
+
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "transpositions:{0}", transpositions);
+            }
+
+            if (LOG.isLoggable(Level.FINER)) {
+                for (List<Match> transposition : transpositions) {
+                    LOG.log(Level.FINER, "{0} + {1}: Transposition: {2}", new Object[]{graph, witness, transposition});
+                }
+            }
+
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "{0} + {1}: Determine aligned tokens by filtering transpositions", new Object[]{graph, witness});
+            }
+
+            //TODO: this seems to be a duplicate from the action above!
+            alignments = new HashMap<>();
+            for (List<Match> phrase : phraseMatches) {
+                for (Match match : phrase) {
+                    alignments.put(match.token, match.vertex);
+                }
+            }
+
+            // Filter out transpositions from linked tokens
+            for (List<Match> transposedPhrase : transpositions) {
+                for (Match match : transposedPhrase) {
+                    alignments.remove(match.token);
+                }
+            }
+
+            if (LOG.isLoggable(Level.FINER)) {
+                for (Map.Entry<Token, VariantGraph.Vertex> alignment : alignments.entrySet()) {
+                    LOG.log(Level.FINER, "{0} + {1}: Alignment: {2} = {3}", new Object[]{graph, witness, alignment.getValue(), alignment.getKey()});
+                }
+            }
+
+
+            // and merge
+            merge(graph, tokens, alignments);
+
+            // we filter out small transposed phrases over large distances
+            List<List<Match>> falseTranspositions = new ArrayList<>();
+
+            // rank the variant graph
+            VariantGraphRanking ranking = VariantGraphRanking.of(graph);
+
+            for (List<Match> transposedPhrase : transpositions) {
+                Match match = transposedPhrase.get(0);
+                VariantGraph.Vertex v1 = witnessTokenVertices.get(match.token);
+                VariantGraph.Vertex v2 = match.vertex;
+                int distance = Math.abs(ranking.apply(v1) - ranking.apply(v2)) - 1;
+                if (distance > transposedPhrase.size() * 3) {
+                    falseTranspositions.add(transposedPhrase);
+                }
+            }
+
+            for (List<Match> transposition : falseTranspositions) {
+                transpositions.remove(transposition);
+            }
+
+            // merge transpositions
+            if (mergeTranspositions) {
+                mergeTranspositions(graph, transpositions);
+            }
+
+            // we need to update the token -> vertex map
+            // that information is stored in protected map
+            int tokenPosition = tokenIndex.getStartTokenPositionForWitness(tokens.iterator().next().getWitness());
+            for (Token token : tokens) {
+                VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
+                vertex_array[tokenPosition] = vertex;
+                tokenPosition++;
+            }
+
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "!{0}: {1}", new Object[]{graph, StreamSupport.stream(graph.vertices().spliterator(), false).map(Object::toString).collect(Collectors.joining(", "))});
+            }
+        }
     }
 
     @Override
     public void collate(VariantGraph graph, Iterable<Token> tokens) {
-        final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
-            .findFirst()
-            .map(Token::getWitness)
-            .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
-
-        if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "{0} + {1}: {2} vs. {3}", new Object[]{graph, witness, graph.vertices(), tokens});
-        }
-
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "{0} + {1}: Match and link tokens", new Object[]{graph, witness});
-        }
-        tokenLinks = tokenLinker.link(graph, tokens, comparator);
-
-        if (LOG.isLoggable(Level.FINER)) {
-            for (Map.Entry<Token, VariantGraph.Vertex> tokenLink : tokenLinks.entrySet()) {
-                LOG.log(Level.FINER, "{0} + {1}: Token match: {2} = {3}", new Object[]{graph, witness, tokenLink.getValue(), tokenLink.getKey()});
-            }
-        }
-
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "{0} + {1}: Detect phrase matches", new Object[]{graph, witness});
-        }
-        phraseMatches = phraseMatchDetector.detect(tokenLinks, graph, tokens);
-        if (LOG.isLoggable(Level.FINER)) {
-            for (List<Match> phraseMatch : phraseMatches) {
-                LOG.log(Level.FINER, "{0} + {1}: Phrase match: {2}", new Object[]{graph, witness, phraseMatch});
-            }
-        }
-
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "{0} + {1}: Detect transpositions", new Object[]{graph, witness});
-        }
-        transpositions = transpositionDetector.detect(phraseMatches, graph);
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "transpositions:{0}", transpositions);
-        }
-
-        if (LOG.isLoggable(Level.FINER)) {
-            for (List<Match> transposition : transpositions) {
-                LOG.log(Level.FINER, "{0} + {1}: Transposition: {2}", new Object[]{graph, witness, transposition});
-            }
-        }
-
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "{0} + {1}: Determine aligned tokens by filtering transpositions", new Object[]{graph, witness});
-        }
-        alignments = new HashMap<>();
-        for (List<Match> phrase : phraseMatches) {
-            for (Match match : phrase) {
-                alignments.put(match.token, match.vertex);
-            }
-        }
-
-        for (List<Match> transposedPhrase : transpositions) {
-            for (Match match : transposedPhrase) {
-                alignments.remove(match.token);
-            }
-        }
-        if (LOG.isLoggable(Level.FINER)) {
-            for (Map.Entry<Token, VariantGraph.Vertex> alignment : alignments.entrySet()) {
-                LOG.log(Level.FINER, "{0} + {1}: Alignment: {2} = {3}", new Object[]{graph, witness, alignment.getValue(), alignment.getKey()});
-            }
-        }
-
-        merge(graph, tokens, alignments);
-
-        // we filter out small transposed phrases over large distances
-        List<List<Match>> falseTranspositions = new ArrayList<>();
-
-        VariantGraphRanking ranking = VariantGraphRanking.of(graph);
-
-        for (List<Match> transposedPhrase : transpositions) {
-            Match match = transposedPhrase.get(0);
-            VariantGraph.Vertex v1 = witnessTokenVertices.get(match.token);
-            VariantGraph.Vertex v2 = match.vertex;
-            int distance = Math.abs(ranking.apply(v1) - ranking.apply(v2)) - 1;
-            if (distance > transposedPhrase.size() * 3) {
-                falseTranspositions.add(transposedPhrase);
-            }
-        }
-
-        for (List<Match> transposition : falseTranspositions) {
-            transpositions.remove(transposition);
-        }
-
-        if (mergeTranspositions) {
-            mergeTranspositions(graph, transpositions);
-        }
-
-        if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "!{0}: {1}", new Object[]{graph, StreamSupport.stream(graph.vertices().spliterator(), false).map(Object::toString).collect(Collectors.joining(", "))});
-        }
+        throw new RuntimeException("Progressive alignment is not supported!");
     }
 
     @Override
@@ -163,6 +253,12 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     @Override
     public List<List<Match>> getTranspositions() {
         return Collections.unmodifiableList(transpositions);
+    }
+
+
+    //TODO; isn't this the same as getPhraseMatches?
+    public Set<Island> getIslands() {
+        return table.getIslands();
     }
 
     /*

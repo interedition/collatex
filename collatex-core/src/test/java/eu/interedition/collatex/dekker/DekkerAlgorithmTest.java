@@ -1,7 +1,8 @@
-package eu.interedition.collatex.dekker.experimental_aligner;
+package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.experimental_aligner.VariantGraphMatcher;
 import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -12,7 +13,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-public class Dekker21AlignerTest extends AbstractTest {
+public class DekkerAlgorithmTest extends AbstractTest {
 
     // helper method
     // note: x = start coordinate of witness token
@@ -28,7 +29,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testExample1() {
         final SimpleWitness[] w = createWitnesses("This morning the cat observed little birds in the trees.", "The cat was observing birds in the little trees this morning, it observed birds for two hours.");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         List<SimpleWitness> witnesses = new ArrayList<>();
         witnesses.addAll(Arrays.asList(w));
@@ -76,7 +77,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testHermansOverreachTest() {
         final SimpleWitness[] w = createWitnesses("a b c d F g h i ! K ! q r s t", "a b c d F g h i ! q r s t", "a b c d E g h i ! q r s t");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         List<SimpleWitness> witnesses = new ArrayList<>();
         witnesses.addAll(Arrays.asList(w));
@@ -97,7 +98,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testCaseVariantGraphThreeWitnesses() {
         final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, w);
 
@@ -109,7 +110,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void test3dMatching1() {
         SimpleWitness[] witnesses = createWitnesses("a", "b", "c", "a b c");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, witnesses);
         Assert.assertThat(graph, VariantGraphMatcher.graph(witnesses[3]).aligned("a", "b", "c"));
@@ -118,7 +119,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testCaseVariantGraphTwoDifferentWitnesses() {
         final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, w);
 
@@ -129,7 +130,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testMergeFirstWitness() {
         final SimpleWitness[] w = createWitnesses("The same stuff");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph g = new VariantGraph();
         // we collate the first witness --> is a simple add
         aligner.collate(g, w);
@@ -142,7 +143,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testTwoEqualWitnesses() {
         final SimpleWitness[] w = createWitnesses("The same stuff", "The same stuff");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, w);
         Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the", "same", "stuff"));
@@ -152,7 +153,7 @@ public class Dekker21AlignerTest extends AbstractTest {
     @Test
     public void testCaseTwoWitnessesReplacement() {
         final SimpleWitness[] w = createWitnesses("The black cat", "The red cat");
-        Dekker21Aligner aligner = new Dekker21Aligner();
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph g = new VariantGraph();
         aligner.collate(g, w);
         Assert.assertThat(g, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("black").aligned("cat"));
