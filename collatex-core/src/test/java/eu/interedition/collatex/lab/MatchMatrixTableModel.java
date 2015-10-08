@@ -23,7 +23,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.matrix.IslandCollection;
 import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
-import eu.interedition.collatex.dekker.matrix.MatchTable;
+import eu.interedition.collatex.dekker.legacy.MatchTable;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import javax.swing.table.AbstractTableModel;

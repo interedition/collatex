@@ -17,13 +17,19 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.dekker.matrix;
+package eu.interedition.collatex.dekker.legacy;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.dekker.legacy.MatchTable;
+import eu.interedition.collatex.dekker.legacy.MatchTableImpl;
+import eu.interedition.collatex.dekker.legacy.MatchTableSerializer;
+import eu.interedition.collatex.dekker.matrix.Island;
+import eu.interedition.collatex.dekker.matrix.IslandCollection;
+import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;

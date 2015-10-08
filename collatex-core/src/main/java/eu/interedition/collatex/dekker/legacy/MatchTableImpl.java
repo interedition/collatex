@@ -17,11 +17,13 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.dekker.matrix;
+package eu.interedition.collatex.dekker.legacy;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.dekker.matrix.Coordinate;
+import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
