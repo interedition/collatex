@@ -39,18 +39,18 @@ import java.util.logging.Logger;
 public class IslandConflictResolver {
     Logger LOG = Logger.getLogger(IslandConflictResolver.class.getName());
     // fixed islands contains all the islands that are selected for the final alignment
-    private final MatchTableSelection selection;
+    private final IslandCollection selection;
 
     //NOTE: outlierTranspositionLimit is ignored for now
     public IslandConflictResolver(MatchTable table) {
-        selection = new MatchTableSelection(table);
+        selection = new IslandCollection(table.getIslands());
     }
 
     /*
      * Create a non-conflicting version by simply taken all the islands that do
      * not conflict with each other, largest first.
      */
-    public MatchTableSelection createNonConflictingVersion() {
+    public IslandCollection createNonConflictingVersion() {
         List<Island> possibleIslands;
         do {
             possibleIslands = selection.getPossibleIslands();
@@ -96,7 +96,7 @@ public class IslandConflictResolver {
      * we have to move this code out of this method and move it to the caller
      * class
      */
-    private void resolveConflictsBySelectingPreferredIslands(MatchTableSelection selection, Map<IslandCompetition, List<Island>> islandConflictMap) {
+    private void resolveConflictsBySelectingPreferredIslands(IslandCollection selection, Map<IslandCompetition, List<Island>> islandConflictMap) {
         // First select competing islands that are on the ideal line
         LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
         makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIslandAndOnIdealIine, Collections.emptyList()))

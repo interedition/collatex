@@ -31,49 +31,35 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 // @author: Ronald Haentjens Dekker
 // Unselected islands reside in the islandMultimap.
 // Selected islands reside in the fixedIsland Archipelago.
 // Group the islands together by size;
 // islands may change after commit islands
-public class MatchTableSelection {
-    Logger LOG = Logger.getLogger(MatchTableSelection.class.getName());
+public class IslandCollection {
+    Logger LOG = Logger.getLogger(IslandCollection.class.getName());
     private final Map<Integer, List<Island>> islandMultimap;
     private final Archipelago fixedIslands;
     //this fields are needed for the locking of table cells
     private final Set<Integer> fixedRows;
     private final Set<VariantGraph.Vertex> fixedVertices;
-    private final MatchTable table;
 
-    public MatchTableSelection(MatchTable table) {
+    public IslandCollection(Set<Island> islands) {
         fixedRows = new HashSet<>();
         fixedVertices = new HashSet<>();
-        this.table = table;
         this.fixedIslands = new Archipelago();
         islandMultimap = new HashMap<>();
-        for (Island isl : table.getIslands()) {
+        for (Island isl : islands) {
             islandMultimap.computeIfAbsent(isl.size(), s -> new ArrayList<>()).add(isl);
         }
-    }
-
-    // copy constructor
-    public MatchTableSelection(MatchTableSelection orig) {
-        // table structure is read only, does not have to be copied
-        this.islandMultimap = orig.islandMultimap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new ArrayList<>(e.getValue())));
-        this.fixedIslands = new Archipelago(orig.fixedIslands);
-        this.fixedRows = new HashSet<>(orig.fixedRows);
-        this.fixedVertices = new HashSet<>(orig.fixedVertices);
-        this.table = orig.table;
     }
 
     /*
      * Return whether a coordinate overlaps with an already committed coordinate
      */
     public boolean doesCoordinateOverlapWithCommittedCoordinate(Coordinate coordinate) {
-        return fixedRows.contains(coordinate.row) || //
-            fixedVertices.contains(table.vertexAt(coordinate.row, coordinate.column));
+        return fixedRows.contains(coordinate.row) || fixedVertices.contains(coordinate.match.vertex);
     }
 
     /*
@@ -96,7 +82,7 @@ public class MatchTableSelection {
         }
         for (Coordinate coordinate : isl) {
             fixedRows.add(coordinate.row);
-            fixedVertices.add(table.vertexAt(coordinate.row, coordinate.column));
+            fixedVertices.add(coordinate.match.vertex);
         }
         fixedIslands.add(isl);
         islandMultimap.computeIfPresent(isl.size(), (s, i) -> {

@@ -49,7 +49,7 @@ public class MatchTableLinker implements TokenLinker {
         // The IslandConflictResolver createNonConflictingVersion() method
         // selects the optimal islands
         LOG.fine("select the optimal islands");
-        MatchTableSelection preferredIslands = resolver.createNonConflictingVersion();
+        IslandCollection preferredIslands = resolver.createNonConflictingVersion();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
         }

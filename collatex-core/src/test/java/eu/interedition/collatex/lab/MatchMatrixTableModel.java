@@ -21,9 +21,9 @@ package eu.interedition.collatex.lab;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.matrix.IslandCollection;
 import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
-import eu.interedition.collatex.dekker.matrix.MatchTableSelection;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import javax.swing.table.AbstractTableModel;
@@ -61,7 +61,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
         }
 
         // fill the cells with colors
-        MatchTableSelection preferred = preferred(matchTable);
+        IslandCollection preferred = preferred(matchTable);
         //LOG.debug(matchMatrix.toHtml(preferred));
         data = new MatchTableCell[rowNum][colNum];
         for (int row = 0; row < rowNum; row++) {
@@ -84,7 +84,7 @@ public class MatchMatrixTableModel extends AbstractTableModel {
         }
     }
 
-    private MatchTableSelection preferred(MatchTable matchTable) {
+    private IslandCollection preferred(MatchTable matchTable) {
         // prepare
         IslandConflictResolver resolver = new IslandConflictResolver(matchTable);
         // find preferred islands

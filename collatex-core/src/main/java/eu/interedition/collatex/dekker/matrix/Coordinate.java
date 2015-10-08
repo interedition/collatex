@@ -19,15 +19,25 @@
 
 package eu.interedition.collatex.dekker.matrix;
 
+import eu.interedition.collatex.dekker.Match;
+
 import java.util.Objects;
 
 public class Coordinate implements Comparable<Coordinate> {
     public int row;
     public int column;
+    public Match match;
 
     public Coordinate(int row, int column) {
         this.column = column;
         this.row = row;
+        this.match = null; //TODO: this constructor should be removed
+    }
+
+    public Coordinate(int row, int column, Match match) {
+        this.column = column;
+        this.row = row;
+        this.match = match;
     }
 
     Coordinate(Coordinate other) {

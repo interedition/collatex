@@ -21,6 +21,7 @@ package eu.interedition.collatex.dekker.matrix;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.util.VariantGraphRanking;
@@ -48,7 +49,7 @@ import java.util.stream.StreamSupport;
 * since you can use tokenAt(row, column) or vertexAt(row, column).
 * This class is read only.
 * Selections of vectors from the table can be made using the
-* MatchTableSelection class.
+* IslandCollection class.
 */
 public class MatchTableImpl implements MatchTable {
     private final MatchTableCell[][] table;
@@ -156,7 +157,6 @@ public class MatchTableImpl implements MatchTable {
 
     private void addToIslands(Map<Coordinate, Island> coordinateMapper, Coordinate c) {
         int diff = -1;
-        Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff);
         VariantGraph.Vertex neighbor = null;
         try {
             neighbor = vertexAt(c.row + diff, c.column + diff);
@@ -164,6 +164,7 @@ public class MatchTableImpl implements MatchTable {
             // ignored
         }
         if (neighbor != null) {
+            Coordinate neighborCoordinate = new Coordinate(c.row + diff, c.column + diff, new Match(neighbor, null));
             Island island = coordinateMapper.get(neighborCoordinate);
             if (island == null) {
                 //        LOG.debug("new island");
@@ -189,7 +190,8 @@ public class MatchTableImpl implements MatchTable {
         int cols = columnList().size();
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (vertexAt(i, j) != null) pairs.add(new Coordinate(i, j));
+                VariantGraph.Vertex vertex = vertexAt(i, j);
+                if (vertex != null) pairs.add(new Coordinate(i, j, new Match(vertex, null)));
             }
         }
         return pairs;

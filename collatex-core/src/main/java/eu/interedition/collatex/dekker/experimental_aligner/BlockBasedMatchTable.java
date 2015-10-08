@@ -3,6 +3,7 @@ package eu.interedition.collatex.dekker.experimental_aligner;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.dekker.matrix.MatchTable;
@@ -80,7 +81,9 @@ public class BlockBasedMatchTable implements MatchTable {
                     int row = witnessStartToken - startTokenPositionForWitness;
                     // create coordinate and at it to the Island for the combination of graph block instance and witness block instance
                     // /*if (i == 0)*/ System.out.println("We go "+row + " "+column +" "+witnessStartToken);
-                    Coordinate coordinate = new Coordinate(row, column);
+                    //TODO: token!
+                    Match match = new Match(v, null);
+                    Coordinate coordinate = new Coordinate(row, column, match);
                     island.add(coordinate);
                     // set vertex and token combination as a cell on the table
                     table.set(row, column, tokenIndex.token_array.get(witnessStartToken), v);
