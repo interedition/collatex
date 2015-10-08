@@ -90,7 +90,72 @@ public class Dekker21AlignerTest extends AbstractTest {
 //        Assert.assertEquals("[a b c d, F, g h i !, K !, q r s t]", instances.toString());
 //        instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
 //        Assert.assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
+            //TODO: add asserts!
 
+    }
 
+    @Test
+    public void testCaseVariantGraphThreeWitnesses() {
+        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog", "The red fox jumps over the fence");
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[2]).aligned("the").non_aligned("red").aligned("fox", "jumps", "over", "the").non_aligned("fence"));
+    }
+
+    @Test
+    public void test3dMatching1() {
+        SimpleWitness[] witnesses = createWitnesses("a", "b", "c", "a b c");
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, witnesses);
+        Assert.assertThat(graph, VariantGraphMatcher.graph(witnesses[3]).aligned("a", "b", "c"));
+    }
+
+    @Test
+    public void testCaseVariantGraphTwoDifferentWitnesses() {
+        final SimpleWitness[] w = createWitnesses("The quick brown fox jumps over the lazy dog", "The fast brown fox jumps over the black dog");
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
+    }
+
+    @Test
+    public void testMergeFirstWitness() {
+        final SimpleWitness[] w = createWitnesses("The same stuff");
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph g = new VariantGraph();
+        // we collate the first witness --> is a simple add
+        aligner.collate(g, w);
+        VariantGraph.Vertex[] vertices = aligner.vertex_array;
+        assertVertexEquals("the", vertices[0]);
+        assertVertexEquals("same", vertices[1]);
+        assertVertexEquals("stuff", vertices[2]);
+    }
+
+    @Test
+    public void testTwoEqualWitnesses() {
+        final SimpleWitness[] w = createWitnesses("The same stuff", "The same stuff");
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the", "same", "stuff"));
+        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the", "same", "stuff"));
+    }
+
+    @Test
+    public void testCaseTwoWitnessesReplacement() {
+        final SimpleWitness[] w = createWitnesses("The black cat", "The red cat");
+        Dekker21Aligner aligner = new Dekker21Aligner();
+        VariantGraph g = new VariantGraph();
+        aligner.collate(g, w);
+        Assert.assertThat(g, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("black").aligned("cat"));
+        Assert.assertThat(g, VariantGraphMatcher.graph(w[1]).aligned("the").non_aligned("red").aligned("cat"));
     }
 }

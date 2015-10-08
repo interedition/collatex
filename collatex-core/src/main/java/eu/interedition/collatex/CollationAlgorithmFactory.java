@@ -19,7 +19,6 @@
 
 package eu.interedition.collatex;
 
-import eu.interedition.collatex.dekker.editgraphaligner.EditGraphAligner;
 import eu.interedition.collatex.dekker.experimental_aligner.Dekker21Aligner;
 import eu.interedition.collatex.medite.MediteAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;

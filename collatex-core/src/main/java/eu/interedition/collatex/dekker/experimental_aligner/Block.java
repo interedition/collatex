@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker.experimental_aligner;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +118,6 @@ public class Block {
             return normalized;
         }
 
-        @NotNull
         public List<Token> getTokens() {
             List<Token> tokens = new ArrayList<>();
             for (int i = 0; i < this.length(); i++) {
