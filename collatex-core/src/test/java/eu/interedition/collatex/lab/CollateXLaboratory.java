@@ -22,6 +22,7 @@ package eu.interedition.collatex.lab;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.legacy.MatchTableImpl;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
@@ -205,7 +206,7 @@ public class CollateXLaboratory extends JFrame {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "Collating: {0}", witness.getSigil());
                 }
-                CollationAlgorithmFactory.dekkerMatchMatrix(comparator, outlierTranspositionsSizeLimit).collate(vg, witness);
+                new DekkerAlgorithm(comparator).collate(vg, witness);
             }
 
             SimpleWitness lastWitness = w.get(w.size() - 1);

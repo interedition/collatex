@@ -19,6 +19,7 @@
 
 package eu.interedition.collatex;
 
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -60,7 +61,7 @@ public abstract class AbstractTest {
 
     @Before
     public void initAlgorithm() {
-        collationAlgorithm = CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 2);
+        collationAlgorithm = new DekkerAlgorithm(new EqualityTokenComparator());
     }
 
     protected SimpleWitness[] createWitnesses(String... contents) {

@@ -36,10 +36,6 @@ import java.util.function.Function;
 public class CollationAlgorithmFactory {
 
     public static CollationAlgorithm dekker(Comparator<Token> comparator) {
-        return dekkerMatchMatrix(comparator, 3);
-    }
-
-    public static CollationAlgorithm dekkerMatchMatrix(Comparator<Token> comparator, int outlierTranspositionsSizeLimit) {
         return new DekkerAlgorithm(comparator);
     }
 

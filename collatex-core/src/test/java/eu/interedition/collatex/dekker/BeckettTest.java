@@ -19,11 +19,7 @@
 
 package eu.interedition.collatex.dekker;
 
-import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.CollationAlgorithmFactory;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.*;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -31,12 +27,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
@@ -77,7 +68,7 @@ public class BeckettTest extends AbstractTest {
 
     @Test
     public void dirkVincentWithMatchMatrixLinker() {
-        setCollationAlgorithm(CollationAlgorithmFactory.dekkerMatchMatrix(new EqualityTokenComparator(), 1));
+        setCollationAlgorithm(new DekkerAlgorithm(new EqualityTokenComparator()));
         final SimpleWitness[] w = createWitnesses(//
             "Its soft light neither daylight nor moonlight nor starlight nor any light he could remember from the days & nights when day followed night & vice versa.",//
             "Its soft changeless light unlike any light he could remember from the days and nights when day followed hard on night and vice versa.");
