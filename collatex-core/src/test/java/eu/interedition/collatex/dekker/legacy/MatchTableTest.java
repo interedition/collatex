@@ -175,7 +175,7 @@ public class MatchTableTest extends AbstractTest {
         MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         List<Island> islands = new ArrayList<>(table.getIslands());
         assertEquals(2, islands.size());
-        Collections.sort(islands);
+        Collections.sort(islands, new IslandPositionComparator());
         Island island = islands.get(1);
         assertIslandEquals(0, 2, 2, 4, island);
     }
@@ -187,7 +187,7 @@ public class MatchTableTest extends AbstractTest {
         MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         List<Island> islands = new ArrayList<>(table.getIslands());
         assertEquals(3, islands.size());
-        Collections.sort(islands);
+        Collections.sort(islands, new IslandPositionComparator());
         Island island = islands.get(0);
         assertIslandEquals(0, 0, 0, 0, island);
     }
@@ -198,7 +198,7 @@ public class MatchTableTest extends AbstractTest {
         VariantGraph graph = collate(w[0]);
         MatchTable table = MatchTableImpl.create(graph, w[1], new EqualityTokenComparator());
         List<Island> islands = new ArrayList<>(table.getIslands());
-        Collections.sort(islands);
+        Collections.sort(islands, new IslandPositionComparator());
         assertEquals(4, islands.size());
         assertVectorEquals(0, 0, 1, islands.get(0));
         assertVectorEquals(3, 0, 2, islands.get(1));

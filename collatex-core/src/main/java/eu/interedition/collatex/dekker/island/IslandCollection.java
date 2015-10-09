@@ -21,43 +21,36 @@ package eu.interedition.collatex.dekker.island;
 
 import eu.interedition.collatex.VariantGraph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // @author: Ronald Haentjens Dekker
-// Unselected islands reside in the islandMultimap.
+// Unselected islands reside in the islandPriorityQueue.
 // Selected islands reside in the fixedIsland Archipelago.
 // Group the islands together by size;
 // islands may change after commit islands
-public class IslandCollection {
+public class IslandCollection implements IslandSelection {
     Logger LOG = Logger.getLogger(IslandCollection.class.getName());
-    private final Map<Integer, List<Island>> islandMultimap;
+    private final PriorityQueue<Island> islandPriorityQueue;
     private final Archipelago fixedIslands;
     //this fields are needed for the locking of table cells
     private final Set<Integer> fixedRows;
     private final Set<VariantGraph.Vertex> fixedVertices;
+    private final Comparator<Island> comparator = new IslandSizeComparator();
 
     public IslandCollection(Set<Island> islands) {
         fixedRows = new HashSet<>();
         fixedVertices = new HashSet<>();
         this.fixedIslands = new Archipelago();
-        islandMultimap = new HashMap<>();
-        for (Island isl : islands) {
-            islandMultimap.computeIfAbsent(isl.size(), s -> new ArrayList<>()).add(isl);
-        }
+        islandPriorityQueue = new PriorityQueue<>(comparator);
+        islandPriorityQueue.addAll(islands);
     }
 
     /*
      * Return whether a coordinate overlaps with an already committed coordinate
      */
+    @Override
     public boolean doesCoordinateOverlapWithCommittedCoordinate(Coordinate coordinate) {
         return fixedRows.contains(coordinate.row) || fixedVertices.contains(coordinate.match.vertex);
     }
@@ -65,6 +58,7 @@ public class IslandCollection {
     /*
      * Return whether an island overlaps with an already committed island
      */
+    @Override
     public boolean isIslandPossibleCandidate(Island island) {
         for (Coordinate coordinate : island) {
             if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) return false;
@@ -73,9 +67,10 @@ public class IslandCollection {
     }
 
     /*
-     * Commit an island in the match table
+     * Commit an island
      * Island will be part of the final alignment
      */
+    @Override
     public void addIsland(Island isl) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "adding island: '{0}'", isl);
@@ -85,91 +80,48 @@ public class IslandCollection {
             fixedVertices.add(coordinate.match.vertex);
         }
         fixedIslands.add(isl);
-        islandMultimap.computeIfPresent(isl.size(), (s, i) -> {
-            i.remove(isl);
-            return (i.isEmpty() ? null : i);
-        });
     }
 
+    @Override
     public boolean doesCandidateLayOnVectorOfCommittedIsland(Island island) {
         Coordinate leftEnd = island.getLeftEnd();
         return fixedIslands.getIslandVectors().contains(leftEnd.row - leftEnd.column);
     }
 
+    @Override
     public int size() {
         return fixedIslands.size();
     }
 
+    @Override
     public List<Island> getIslands() {
         return fixedIslands.getIslands();
     }
 
+    @Override
     public boolean containsCoordinate(int row, int column) {
         return fixedIslands.containsCoordinate(row, column);
     }
 
-    /*
-     * For all the possible islands of a certain size this method checks whether
-     * they conflict with one of the previously committed islands. If so, the
-     * possible island is removed from the multimap. Or in case of overlap, split
-     * into a smaller island and then put in back into the map Note that this
-     * method changes the possible islands multimap.
-     */
-    //TODO: the original Island object is modified here
-    //TODO: That should not happen, if we want to build a decision tree.
-    public void removeOrSplitImpossibleIslands(Integer islandSize, Map<Integer, List<Island>> islandMultimap) {
-        Collection<Island> islandsToCheck = new ArrayList<>(islandMultimap.getOrDefault(islandSize, Collections.emptyList()));
-        for (Island island : islandsToCheck) {
-            if (!isIslandPossibleCandidate(island)) {
-                islandMultimap.computeIfPresent(islandSize, (s, i) -> {
-                    i.remove(island);
-                    return (i.isEmpty() ? null : i);
-                });
-                removeConflictingEndCoordinates(island);
-                if (island.size() > 0) {
-                    islandMultimap.computeIfAbsent(island.size(), s -> new ArrayList<>()).add(island);
-                }
-            }
-        }
-    }
-
-    private void removeConflictingEndCoordinates(Island island) {
-        boolean goOn = true;
-        while (goOn) {
-            Coordinate leftEnd = island.getLeftEnd();
-            if (doesCoordinateOverlapWithCommittedCoordinate(leftEnd)) {
-                island.removeCoordinate(leftEnd);
-                if (island.size() == 0) {
-                    return;
-                }
-            } else {
-                goOn = false;
-            }
-        }
-        goOn = true;
-        while (goOn) {
-            Coordinate rightEnd = island.getRightEnd();
-            if (doesCoordinateOverlapWithCommittedCoordinate(rightEnd)) {
-                island.removeCoordinate(rightEnd);
-                if (island.size() == 0) {
-                    return;
-                }
-            } else {
-                goOn = false;
-            }
-        }
-    }
-
+    @Override
     public List<Island> getPossibleIslands() {
         List<Island> possibleIslands = new ArrayList<>();
-        while (possibleIslands.isEmpty() && !islandMultimap.isEmpty()) {
-            // find the maximum island size and traverse groups in descending order
-            Integer max = Collections.max(islandMultimap.keySet());
-            LOG.fine("Checking islands of size: " + max);
-            // check the possible islands of a certain size against
-            // the already committed islands.
-            removeOrSplitImpossibleIslands(max, islandMultimap);
-            possibleIslands = new ArrayList<>(islandMultimap.getOrDefault(max, Collections.emptyList()));
+        while (possibleIslands.isEmpty() && !islandPriorityQueue.isEmpty()) {
+            Island highestRated = islandPriorityQueue.poll();
+            // LOG.log(Level.FINE, "Highest rated is: "+highestRated);
+            // add highest rated
+            possibleIslands.add(highestRated);
+            // check whether there are other islands with the same rating
+            while (!islandPriorityQueue.isEmpty() && comparator.compare(highestRated, islandPriorityQueue.peek()) == 0) {
+                possibleIslands.add(islandPriorityQueue.poll());
+            }
+            // check whether the selected islands are possible
+            Iterator<Island> candidates = possibleIslands.iterator();
+            while (candidates.hasNext()) {
+                if (!isIslandPossibleCandidate(candidates.next())) {
+                    candidates.remove();
+                }
+            }
         }
         return possibleIslands;
     }

@@ -22,10 +22,7 @@ package eu.interedition.collatex.dekker.legacy;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.TokenLinker;
-import eu.interedition.collatex.dekker.island.Coordinate;
-import eu.interedition.collatex.dekker.island.Island;
-import eu.interedition.collatex.dekker.island.IslandCollection;
-import eu.interedition.collatex.dekker.island.IslandConflictResolver;
+import eu.interedition.collatex.dekker.island.*;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -48,12 +45,12 @@ public class MatchTableLinker implements TokenLinker {
 
         // create IslandConflictResolver
         LOG.fine("create island conflict resolver");
-        IslandConflictResolver resolver = new IslandConflictResolver(table.getIslands());
+        IslandConflictResolver resolver = new IslandConflictResolver(new MatchTableSelection(table));
 
         // The IslandConflictResolver createNonConflictingVersion() method
         // selects the optimal islands
         LOG.fine("select the optimal islands");
-        IslandCollection preferredIslands = resolver.createNonConflictingVersion();
+        IslandSelection preferredIslands = resolver.createNonConflictingVersion();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "Number of preferred Islands: {0}", preferredIslands.size());
         }

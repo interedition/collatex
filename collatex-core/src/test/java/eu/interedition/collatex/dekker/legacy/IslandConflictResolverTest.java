@@ -52,7 +52,7 @@ public class IslandConflictResolverTest extends AbstractTest {
                 possibleIslands.add(island);
             }
         }
-        IslandConflictResolver resolver = new IslandConflictResolver(table.getIslands());
+        IslandConflictResolver resolver = new IslandConflictResolver(new MatchTableSelection(table));
         Map<IslandCompetition, List<Island>> competition = resolver.analyzeConflictsBetweenPossibleIslands(possibleIslands);
         assertEquals(3, competition.get(IslandCompetition.CompetingIsland).size());
     }

@@ -22,8 +22,8 @@ package eu.interedition.collatex.dekker.legacy;
 import eu.interedition.collatex.*;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.island.Island;
-import eu.interedition.collatex.dekker.island.IslandCollection;
 import eu.interedition.collatex.dekker.island.IslandConflictResolver;
+import eu.interedition.collatex.dekker.island.IslandSelection;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
@@ -72,7 +72,7 @@ public class HermansTest extends AbstractTest {
         VariantGraph vg = collate(sw[0]);
         MatchTable matchTable = MatchTableImpl.create(vg, sw[1], new EqualityTokenComparator());
         // System.out.println(buildMatrix.toHtml());
-        IslandConflictResolver archipelago = new IslandConflictResolver(matchTable.getIslands());
+        IslandConflictResolver archipelago = new IslandConflictResolver(new MatchTableSelection(matchTable));
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
 //    assertEquals(42, archipelago.size());
@@ -83,7 +83,7 @@ public class HermansTest extends AbstractTest {
         // assertEquals(500,archipelago.getVersion(0).value());
         // assertEquals(497,archipelago.getVersion(4).value());
 
-        IslandCollection firstVersion = archipelago.createNonConflictingVersion();
+        IslandSelection firstVersion = archipelago.createNonConflictingVersion();
         for (Island isl : firstVersion.getIslands()) {
             LOG.fine(" " + isl.size());
         }
@@ -118,10 +118,10 @@ public class HermansTest extends AbstractTest {
         // e.printStackTrace();
         // }
         // System.out.println(buildMatrix.toHtml());
-        IslandConflictResolver archipelago = new IslandConflictResolver(matchTable.getIslands());
+        IslandConflictResolver archipelago = new IslandConflictResolver(new MatchTableSelection(matchTable));
 //    LOG.fine("archipelago: " + archipelago);
 //    LOG.fine("archipelago.size(): " + archipelago.size());
-        IslandCollection firstVersion = archipelago.createNonConflictingVersion();
+        IslandSelection firstVersion = archipelago.createNonConflictingVersion();
         for (Island isl : firstVersion.getIslands()) {
             LOG.fine(" " + isl.size());
         }

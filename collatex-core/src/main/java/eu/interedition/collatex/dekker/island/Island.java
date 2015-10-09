@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class Island implements Iterable<Coordinate>, Comparable<Island> {
+public class Island implements Iterable<Coordinate> {
 
     private final List<Coordinate> islandCoordinates = new ArrayList<>();
 
@@ -122,8 +122,4 @@ public class Island implements Iterable<Coordinate>, Comparable<Island> {
         return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
     }
 
-    @Override
-    public int compareTo(Island i) {
-        return this.getLeftEnd().compareTo(i.getLeftEnd());
-    }
 }

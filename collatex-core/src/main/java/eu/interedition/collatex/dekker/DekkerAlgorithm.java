@@ -125,7 +125,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             }
 
             // Phase 2: do the actual alignment and find transpositions
-            IslandConflictResolver resolver = new IslandConflictResolver(allIslands);
+            IslandConflictResolver resolver = new IslandConflictResolver(new IslandCollection(allIslands));
             preferredIslands = resolver.createNonConflictingVersion().getIslands();
             // we need to convert the islands into Map<Token, Vertex> for further processing
             // Here the result is put in a map
