@@ -108,21 +108,55 @@ public class IslandCollection implements IslandSelection {
         List<Island> possibleIslands = new ArrayList<>();
         while (possibleIslands.isEmpty() && !islandPriorityQueue.isEmpty()) {
             Island highestRated = islandPriorityQueue.poll();
+//           LOG.fine( "Highest rated is: "+highestRated+ " "+highestRated.getDepth());
             // LOG.log(Level.FINE, "Highest rated is: "+highestRated);
             // add highest rated
             possibleIslands.add(highestRated);
             // check whether there are other islands with the same rating
             while (!islandPriorityQueue.isEmpty() && comparator.compare(highestRated, islandPriorityQueue.peek()) == 0) {
+//              LOG.fine("Same prio is: " + islandPriorityQueue.peek() + " " + islandPriorityQueue.peek().getDepth());
                 possibleIslands.add(islandPriorityQueue.poll());
             }
             // check whether the selected islands are possible
             Iterator<Island> candidates = possibleIslands.iterator();
             while (candidates.hasNext()) {
-                if (!isIslandPossibleCandidate(candidates.next())) {
-                    candidates.remove();
+                Island island = candidates.next();
+                Coordinate conflict = findConflictingCoordinate(island);
+                if (conflict == null) {
+                    continue;
+                }
+                // remove this candidate from the possible islands
+                candidates.remove();
+                Island smaller = createSmallerIslandSplitAtConflictingCoordinate(island, conflict);
+                // add the smaller island to the priority queue
+                // LOG.fine("Conflict detected! We add a smaller island! "+smaller);
+                if (smaller.size()>0) {
+                    islandPriorityQueue.add(smaller);
                 }
             }
         }
         return possibleIslands;
+    }
+
+    private Island createSmallerIslandSplitAtConflictingCoordinate(Island island, Coordinate conflict) {
+        // create a new island which contains the coordinates up to the overlapping coordinate.
+        Island smaller = new Island(island.getDepth(), island.getBlockInstance());
+        for (Coordinate c : island) {
+            if (c == conflict) {
+                break;
+            }
+            smaller.add(c);
+        }
+        return smaller;
+    }
+
+    // maybe going from the right to left makes this faster
+    private Coordinate findConflictingCoordinate(Island island){
+        for(Coordinate coordinate:island){
+            if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) {
+                return coordinate;
+            }
+        }
+        return null;
     }
 }

@@ -39,7 +39,7 @@ public class TokenIndexToMatches {
             // for backwards compatibility reasons we do that with the Island and Coordinates classes
             for (Block.Instance graphInstance : graphInstances) {
                 // we need to create an island for every block instance in the graph corresponding to this block instance in the witness
-                Island island = new Island();
+                Island island = new Island(witnessInstance.block.depth, witnessInstance);
                 // for every matching token from the witness with a vertex in the graph we need to create a coordinate and
                 // 1) add it to the island and 2) set the corresponding cell in the table
                 // set the tokens and vertices on the table

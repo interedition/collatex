@@ -19,6 +19,9 @@
 
 package eu.interedition.collatex.dekker.island;
 
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.token_index.Block;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,11 +31,24 @@ import java.util.List;
 public class Island implements Iterable<Coordinate> {
 
     private final List<Coordinate> islandCoordinates = new ArrayList<>();
+    private final int depth;
+    private final Block.Instance blockInstance;
 
-    public Island() {
+    public Island(int depth, Block.Instance blockInstance) {
+        this.depth = depth;
+        this.blockInstance = blockInstance;
     }
 
+    // for legacy code
+    public Island() {
+        depth = 0;
+        blockInstance = null;
+    }
+
+    // for legacy code
     public Island(Coordinate first, Coordinate last) {
+        depth = 0;
+        blockInstance = null;
         add(first);
         Coordinate newCoordinate = first;
         while (!newCoordinate.equals(last)) {
@@ -113,13 +129,33 @@ public class Island implements Iterable<Coordinate> {
         return result;
     }
 
-    @Override
-    public String toString() {
-        if (islandCoordinates.isEmpty()) {
-            //throw new RuntimeException("Unexpected situation: island coordinates empty!");
-            return "Island has been modified after creation and has become empty!";
+    public int getDepth() {
+        if (depth == 0) {
+            throw new RuntimeException("Depth value is not set on this island! It is probably constructed with legacy code!");
         }
-        return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
+        return depth;
     }
 
+    @Override
+    public String toString() {
+        List<Token> instance = getBlockInstance().getTokens();
+        String result = "";
+        for (int i = 0; i < this.size(); i++) {
+            result += instance.get(i)+" ";
+        }
+        return result;
+
+//        if (islandCoordinates.isEmpty()) {
+//            //throw new RuntimeException("Unexpected situation: island coordinates empty!");
+//            return "Island has been modified after creation and has become empty!";
+//        }
+//        return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
+    }
+
+    public Block.Instance getBlockInstance() {
+        if (blockInstance == null) {
+            throw new RuntimeException("Block instance is not set on this island! It is probably constructed with legacy code!");
+        }
+        return blockInstance;
+    }
 }
