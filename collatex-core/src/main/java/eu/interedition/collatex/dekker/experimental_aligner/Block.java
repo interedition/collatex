@@ -1,26 +1,34 @@
 package eu.interedition.collatex.dekker.experimental_aligner;
 
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 public class Block {
     // every Block has a token index as a parent
     private final TokenIndex tokenIndex;
     // length = number of tokens in this block of text
-    public int length;
+    public final int length;
     // start = start position in suffix array
-    public int start;
+    public final int start;
     // end = end position in suffix array
-    public int end;
+    public final int end;
+    // depth = number of witnesses this block of text occurs in
+    public final int depth;
 
+    // For building blocks only
     public Block(TokenIndex tokenIndex, int suffix_start_position, int length) {
         this.tokenIndex = tokenIndex;
         this.start = suffix_start_position;
         this.length = length;
+        this.end = 0;
+        this.depth = 0;
     }
 
     public Block(TokenIndex tokenIndex, int start, int end, int length) {
@@ -28,10 +36,22 @@ public class Block {
         this.start = start;
         this.end = end;
         this.length = length;
+        this.depth = calculateDepth();
     }
 
-    // depth = number of times this block of text occurrences in the text
-    public int depth() {
+    private int calculateDepth() {
+        // the same block can occur multiple times in one witness
+        Set<Witness> witnesses = new HashSet<>();
+        for (Block.Instance instance : getAllInstances()) {
+            Token firstToken = tokenIndex.token_array.get(instance.start_token);
+            Witness w = firstToken.getWitness();
+            witnesses.add(w);
+        }
+        return witnesses.size();
+    }
+
+    // numberOfTimes = number of times this block of text occurrences in complete witness set
+    public int numberOfTimes() {
         if (end == 0) {
             throw new IllegalStateException("LCP interval is unclosed!");
         }
@@ -62,28 +82,9 @@ public class Block {
         return result;
     }
 
-    protected String getNormalizedForm() {
-        int suffix_start = this.start;
-        int token_pos = tokenIndex.suffix_array[suffix_start];
-        List<Token> tokens = new ArrayList<>();
-        for (int i = 0; i < this.length; i++) {
-            Token t = tokenIndex.token_array.get(token_pos + i);
-            tokens.add(t);
-        }
-        String normalized = "";
-        for (Token t : tokens) {
-            SimpleToken st = (SimpleToken) t;
-            if (!normalized.isEmpty()) {
-                normalized += " ";
-            }
-            normalized += st.getNormalized();
-        }
-        return normalized;
-    }
-
     @Override
     public String toString() {
-        return ("LCP interval start at: " + start + " , length: " + this.length + " depth:" + depth());
+        return ("LCP interval start at: " + start + ", depth: " + this.depth + ", length: " + this.length + " numberOfTimes:" + numberOfTimes());
     }
 
     public static class Instance {
