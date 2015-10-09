@@ -21,11 +21,9 @@ package eu.interedition.collatex.dekker.legacy;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.legacy.MatchTable;
-import eu.interedition.collatex.dekker.legacy.MatchTableImpl;
-import eu.interedition.collatex.dekker.matrix.Island;
-import eu.interedition.collatex.dekker.matrix.IslandCompetition;
-import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
+import eu.interedition.collatex.dekker.island.Island;
+import eu.interedition.collatex.dekker.island.IslandCompetition;
+import eu.interedition.collatex.dekker.island.IslandConflictResolver;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 

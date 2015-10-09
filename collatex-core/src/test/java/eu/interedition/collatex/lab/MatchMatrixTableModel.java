@@ -21,8 +21,8 @@ package eu.interedition.collatex.lab;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.IslandCollection;
-import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
+import eu.interedition.collatex.dekker.island.IslandCollection;
+import eu.interedition.collatex.dekker.island.IslandConflictResolver;
 import eu.interedition.collatex.dekker.legacy.MatchTable;
 import eu.interedition.collatex.simple.SimpleToken;
 

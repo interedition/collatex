@@ -17,11 +17,9 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Matching of tokens to variant graph vertices based on the analyis of a matrix containing all possible matches.
- *
- * @see eu.interedition.collatex.dekker.legacy.MatchTableImpl
- * @see eu.interedition.collatex.dekker.legacy.MatchTableLinker
- *
- */
-package eu.interedition.collatex.dekker.matrix;
+package eu.interedition.collatex.dekker.island;
+
+public enum IslandCompetition {
+    CompetingIslandAndOnIdealIine, CompetingIsland, NonCompetingIsland
+
+}

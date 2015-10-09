@@ -1,10 +1,9 @@
-package eu.interedition.collatex.dekker.experimental_aligner;
+package eu.interedition.collatex.dekker.token_index;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.SimpleTokenNormalizedFormComparator;
 import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;

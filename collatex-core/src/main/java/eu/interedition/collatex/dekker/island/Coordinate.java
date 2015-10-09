@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.dekker.matrix;
+package eu.interedition.collatex.dekker.island;
 
 import eu.interedition.collatex.dekker.Match;
 

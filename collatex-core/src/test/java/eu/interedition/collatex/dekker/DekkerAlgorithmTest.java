@@ -2,15 +2,15 @@ package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.Island;
+import eu.interedition.collatex.dekker.island.Coordinate;
+import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.*;
 
-import static eu.interedition.collatex.dekker.experimental_aligner.VariantGraphMatcher.*;
+import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -159,5 +159,21 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertThat(graph, graph(w[0]).aligned("a b c d f g h i !").non_aligned("k !").aligned("q r s t"));
         assertThat(graph, graph(w[1]).aligned("a b c d f g h i ! q r s t"));
         assertThat(graph, graph(w[2]).aligned("a b c d").non_aligned("e").aligned("g h i ! q r s t"));
+    }
+
+    @Test
+    public void testDifficultCase3DepthShouldMatter() {
+        // 1: a, b, c, d, e
+        // 2: a, e, c, d
+        // 3: a, X, X, d, b
+        final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+        assertThat(graph, graph(w[0]).aligned("a b c d").non_aligned("e"));
+        assertThat(graph, graph(w[1]).aligned("a").non_aligned("e").aligned("c d"));
+        assertThat(graph, graph(w[2]).aligned("a").aligned("d").non_aligned("b"));
+
+
     }
 }

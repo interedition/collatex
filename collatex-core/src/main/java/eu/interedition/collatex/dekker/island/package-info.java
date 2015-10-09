@@ -17,9 +17,12 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.dekker.matrix;
-
-public enum IslandCompetition {
-    CompetingIslandAndOnIdealIine, CompetingIsland, NonCompetingIsland
-
-}
+/**
+ * An island is a data structure that contains a series of matches between tokens and variant graph vertices.
+ * Islands can conflict (overlap) with each other. This package contains a conflict resolver class to deal with this.
+ *
+ * @see eu.interedition.collatex.dekker.legacy.MatchTableImpl
+ * @see eu.interedition.collatex.dekker.legacy.MatchTableLinker
+ *
+ */
+package eu.interedition.collatex.dekker.island;

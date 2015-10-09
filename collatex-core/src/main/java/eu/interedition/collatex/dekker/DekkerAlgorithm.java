@@ -22,10 +22,10 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.experimental_aligner.Block;
-import eu.interedition.collatex.dekker.experimental_aligner.TokenIndexToMatches;
-import eu.interedition.collatex.dekker.experimental_aligner.TokenIndex;
-import eu.interedition.collatex.dekker.matrix.*;
+import eu.interedition.collatex.dekker.token_index.Block;
+import eu.interedition.collatex.dekker.token_index.TokenIndexToMatches;
+import eu.interedition.collatex.dekker.token_index.TokenIndex;
+import eu.interedition.collatex.dekker.island.*;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.util.VariantGraphRanking;
 

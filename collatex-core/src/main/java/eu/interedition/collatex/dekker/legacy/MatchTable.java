@@ -2,7 +2,7 @@ package eu.interedition.collatex.dekker.legacy;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.matrix.Island;
+import eu.interedition.collatex.dekker.island.Island;
 
 import java.util.List;
 import java.util.Set;

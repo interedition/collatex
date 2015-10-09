@@ -21,9 +21,9 @@ package eu.interedition.collatex.dekker.legacy;
 
 import eu.interedition.collatex.*;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
-import eu.interedition.collatex.dekker.matrix.Island;
-import eu.interedition.collatex.dekker.matrix.IslandCollection;
-import eu.interedition.collatex.dekker.matrix.IslandConflictResolver;
+import eu.interedition.collatex.dekker.island.Island;
+import eu.interedition.collatex.dekker.island.IslandCollection;
+import eu.interedition.collatex.dekker.island.IslandConflictResolver;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.StrictEqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;

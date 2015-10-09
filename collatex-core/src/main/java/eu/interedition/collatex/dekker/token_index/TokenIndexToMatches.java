@@ -1,11 +1,11 @@
-package eu.interedition.collatex.dekker.experimental_aligner;
+package eu.interedition.collatex.dekker.token_index;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.dekker.matrix.Coordinate;
-import eu.interedition.collatex.dekker.matrix.Island;
+import eu.interedition.collatex.dekker.island.Coordinate;
+import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import java.util.*;
