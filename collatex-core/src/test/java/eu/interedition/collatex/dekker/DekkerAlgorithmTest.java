@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.experimental_aligner.VariantGraphMatcher;
 import eu.interedition.collatex.dekker.matrix.Coordinate;
 import eu.interedition.collatex.dekker.matrix.Island;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -11,7 +10,9 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static eu.interedition.collatex.dekker.experimental_aligner.VariantGraphMatcher.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class DekkerAlgorithmTest extends AbstractTest {
 
@@ -70,29 +71,8 @@ public class DekkerAlgorithmTest extends AbstractTest {
         //        assertPhraseMatches("this morning", "observed", "little");
         //        System.out.println(aligner.transpositions);
 
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).non_aligned("this", "morning").aligned("the", "cat").non_aligned("observed").non_aligned("little").aligned("birds", "in", "the").aligned("trees", "."));
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the", "cat").non_aligned("was", "observing").aligned("birds", "in", "the").non_aligned("little").aligned("trees").non_aligned("this", "morning").non_aligned(",", "it").non_aligned("observed", "birds", "for", "two", "hours").aligned("."));
-    }
-
-    @Test
-    public void testHermansOverreachTest() {
-        final SimpleWitness[] w = createWitnesses("a b c d F g h i ! K ! q r s t", "a b c d F g h i ! q r s t", "a b c d E g h i ! q r s t");
-        DekkerAlgorithm aligner = new DekkerAlgorithm();
-        VariantGraph graph = new VariantGraph();
-        List<SimpleWitness> witnesses = new ArrayList<>();
-        witnesses.addAll(Arrays.asList(w));
-        aligner.collate(graph, witnesses);
-////        List<Block> blocks = aligner.tokenIndex.getNonOverlappingBlocks();
-////        Set<String> blocksAsString = new HashSet<>();
-////        blocks.stream().map(interval -> interval.getNormalizedForm()).forEach(blocksAsString::add);
-////        Set<String> expected = new HashSet<>(Arrays.asList("birds in the", "the cat", "this morning", ".", "little", "observed", "trees"));
-////        Assert.assertEquals(expected, blocksAsString);
-//        List<Block.Instance> instances = aligner.tokenIndex.getBlockInstancesForWitness(w[0]);
-//        Assert.assertEquals("[a b c d, F, g h i !, K !, q r s t]", instances.toString());
-//        instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
-//        Assert.assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
-            //TODO: add asserts!
-
+        assertThat(graph, graph(w[0]).non_aligned("this", "morning").aligned("the", "cat").non_aligned("observed").non_aligned("little").aligned("birds", "in", "the").aligned("trees", "."));
+        assertThat(graph, graph(w[1]).aligned("the", "cat").non_aligned("was", "observing").aligned("birds", "in", "the").non_aligned("little").aligned("trees").non_aligned("this", "morning").non_aligned(",", "it").non_aligned("observed", "birds", "for", "two", "hours").aligned("."));
     }
 
     @Test
@@ -102,9 +82,9 @@ public class DekkerAlgorithmTest extends AbstractTest {
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, w);
 
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[2]).aligned("the").non_aligned("red").aligned("fox", "jumps", "over", "the").non_aligned("fence"));
+        assertThat(graph, graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
+        assertThat(graph, graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
+        assertThat(graph, graph(w[2]).aligned("the").non_aligned("red").aligned("fox", "jumps", "over", "the").non_aligned("fence"));
     }
 
     @Test
@@ -113,7 +93,7 @@ public class DekkerAlgorithmTest extends AbstractTest {
         DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, witnesses);
-        Assert.assertThat(graph, VariantGraphMatcher.graph(witnesses[3]).aligned("a", "b", "c"));
+        assertThat(graph, graph(witnesses[3]).aligned("a", "b", "c"));
     }
 
     @Test
@@ -123,8 +103,8 @@ public class DekkerAlgorithmTest extends AbstractTest {
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, w);
 
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
+        assertThat(graph, graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
+        assertThat(graph, graph(w[1]).aligned("the").non_aligned("fast").aligned("brown", "fox", "jumps", "over", "the").non_aligned("black").aligned("dog"));
     }
 
     @Test
@@ -146,8 +126,8 @@ public class DekkerAlgorithmTest extends AbstractTest {
         DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph graph = new VariantGraph();
         aligner.collate(graph, w);
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[0]).aligned("the", "same", "stuff"));
-        Assert.assertThat(graph, VariantGraphMatcher.graph(w[1]).aligned("the", "same", "stuff"));
+        assertThat(graph, graph(w[0]).aligned("the", "same", "stuff"));
+        assertThat(graph, graph(w[1]).aligned("the", "same", "stuff"));
     }
 
     @Test
@@ -156,7 +136,28 @@ public class DekkerAlgorithmTest extends AbstractTest {
         DekkerAlgorithm aligner = new DekkerAlgorithm();
         VariantGraph g = new VariantGraph();
         aligner.collate(g, w);
-        Assert.assertThat(g, VariantGraphMatcher.graph(w[0]).aligned("the").non_aligned("black").aligned("cat"));
-        Assert.assertThat(g, VariantGraphMatcher.graph(w[1]).aligned("the").non_aligned("red").aligned("cat"));
+        assertThat(g, graph(w[0]).aligned("the").non_aligned("black").aligned("cat"));
+        assertThat(g, graph(w[1]).aligned("the").non_aligned("red").aligned("cat"));
+    }
+
+    @Test
+    public void testDifficultCase1TranspositionOrTwoReplacements() {
+        final SimpleWitness[] w = createWitnesses("the cat and the dog", "the dog and the cat");
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
+        VariantGraph g = new VariantGraph();
+        aligner.collate(g, w);
+        assertThat(g, graph(w[0]).aligned("the").non_aligned("cat").aligned("and the").non_aligned("dog"));
+        assertThat(g, graph(w[1]).aligned("the").non_aligned("dog").aligned("and the").non_aligned("cat"));
+    }
+
+    @Test
+    public void testDifficultCase2HermansOverreachTest() {
+        final SimpleWitness[] w = createWitnesses("a b c d F g h i ! K ! q r s t", "a b c d F g h i ! q r s t", "a b c d E g h i ! q r s t");
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+        assertThat(graph, graph(w[0]).aligned("a b c d f g h i !").non_aligned("k !").aligned("q r s t"));
+        assertThat(graph, graph(w[1]).aligned("a b c d f g h i ! q r s t"));
+        assertThat(graph, graph(w[2]).aligned("a b c d").non_aligned("e").aligned("g h i ! q r s t"));
     }
 }

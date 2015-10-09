@@ -37,12 +37,18 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
     }
 
     public VariantGraphMatcher non_aligned(String... tokens) {
-        expected.add(new ExpectationTuple(tokens, false));
+        for (String token : tokens) {
+            String[] split = token.split(" ");
+            expected.add(new ExpectationTuple(split, false));
+        }
         return this;
     }
 
     public VariantGraphMatcher aligned(String... tokens) {
-        expected.add(new ExpectationTuple(tokens, true));
+        for (String token : tokens) {
+            String[] split = token.split(" ");
+            expected.add(new ExpectationTuple(split, true));
+        }
         return this;
     }
 
@@ -105,15 +111,29 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
         VariantGraphTraversal graphTraversal = VariantGraphTraversal.of(g, Collections.singleton(w));
         Iterator<VariantGraph.Vertex> iterator = graphTraversal.iterator();
         iterator.next(); // skip start token
+        Boolean previousAligned = null;
         while (iterator.hasNext()) {
             VariantGraph.Vertex v = iterator.next();
             if (v.tokens().size()>0) { // skip end token
                 SimpleToken t = (SimpleToken) v.tokens().iterator().next();
                 if (v.tokens().size()>1) {
-                    description.appendText("aligned: " + t.getNormalized().toString()+", ");
+                    if (previousAligned==null||previousAligned==false) {
+                        if (previousAligned!=null){
+                            description.appendText(", ");
+                        }
+                        description.appendText("aligned: ");
+                        previousAligned=true;
+                    }
                 } else {
-                    description.appendText("non-aligned: "+ t.getNormalized().toString()+", ");
+                    if (previousAligned==null||previousAligned==true) {
+                        if (previousAligned!=null){
+                            description.appendText(", ");
+                        }
+                        description.appendText("non-aligned: ");
+                        previousAligned = false;
+                    }
                 }
+                description.appendText(t.getNormalized().toString()+" ");
             }
         }
     }
