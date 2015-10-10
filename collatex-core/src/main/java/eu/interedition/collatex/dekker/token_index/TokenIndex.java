@@ -3,22 +3,23 @@ package eu.interedition.collatex.dekker.token_index;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.SimpleTokenNormalizedFormComparator;
-import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by ronald on 4/20/15.
  */
 public class TokenIndex {
+    private final List<? extends Iterable<Token>> w;
+    private final Comparator<Token> comparator;
     //TODO: not sure this functionality should be in this class or in a separate class
     private Map<Witness, Integer> witnessToStartToken;
     private Map<Witness, Integer> witnessToEndToken;
-    private final List<? extends Iterable<Token>> w;
     public List<Token> token_array;
     //END witness data
     public int[] suffix_array;
@@ -27,14 +28,21 @@ public class TokenIndex {
     private Map<Integer, List<Block.Instance>> block_array;
 
 
-    public TokenIndex(List<? extends Iterable<Token>> w) {
-        this.w = w;
+    public TokenIndex(Iterable<Token>[] w) {
+        this(Arrays.asList(w));
     }
 
-    // met deze constructor is er maar 1 witness.. ik weet niet of dit niet zo handig is
-    public TokenIndex(Iterable<Token>[] w) {
-        List<Iterable<Token>> witnesses = Arrays.asList(w);
-        this.w = witnesses;
+    public TokenIndex(List<? extends Iterable<Token>> w) {
+        this(w, new SimpleTokenNormalizedFormComparator());
+    }
+
+    public TokenIndex(Comparator<Token> comparator, Iterable<Token>... tokens) {
+        this(Arrays.asList(tokens), comparator);
+    }
+
+    public TokenIndex(List<? extends Iterable<Token>> w, Comparator<Token> comparator) {
+        this.w = w;
+        this.comparator = new MarkerTokenComparatorWrapper(comparator);
     }
 
     public int getStartTokenPositionForWitness(Witness witness) {
@@ -45,9 +53,9 @@ public class TokenIndex {
     // 2. derive the suffix array
     // 3. derive LCP array
     // 4. derive LCP intervals
+    // TODO: we do not have to store w!
     public void prepare() {
         this.prepareTokenArray();
-        Comparator<Token> comparator = new SimpleTokenNormalizedFormComparator();
         SuffixData suffixData = SuffixArrays.createWithLCP(token_array.toArray(new Token[0]), new SAIS(), comparator);
         this.suffix_array = suffixData.getSuffixArray();
         this.LCP_array = suffixData.getLCP();
@@ -61,7 +69,11 @@ public class TokenIndex {
         witnessToStartToken = new HashMap<>();
         witnessToEndToken = new HashMap<>();
         for (Iterable<Token> tokens : w) {
-            Witness witness = tokens.iterator().next().getWitness();
+            final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
+                .findFirst()
+                .map(Token::getWitness)
+                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+
             witnessToStartToken.put(witness, counter);
             for (Token t : tokens) {
                 token_array.add(t);
@@ -74,9 +86,54 @@ public class TokenIndex {
         }
     }
 
-    private class MarkerToken extends SimpleToken {
+    private class MarkerToken implements Token {
+        private final int witnessIdentifier;
+
         public MarkerToken(int size) {
-            super(null, "$"+size, "$"+size);
+            this.witnessIdentifier = size;
+        }
+
+        @Override
+        public String toString() {
+            return "$"+witnessIdentifier;
+        }
+
+        @Override
+        public Witness getWitness() {
+            throw new RuntimeException("A marker token is not part of any witness! The call to this method should never have happened!");
+        }
+    }
+
+    static class MarkerTokenComparatorWrapper implements Comparator<Token> {
+        private Comparator<Token> delegate;
+
+        public MarkerTokenComparatorWrapper(Comparator<Token> delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public int compare(Token o1, Token o2) {
+            boolean o1isMarker = o1 instanceof MarkerToken;
+            boolean o2isMarker = o2 instanceof MarkerToken;
+            if (o1isMarker) {
+                // Both o1 and o2 could be marker tokens
+                if (o2isMarker) {
+                    MarkerToken mt1 = (MarkerToken) o1;
+                    MarkerToken mt2 = (MarkerToken) o2;
+                    // sort marker tokens from low to high
+                    return mt1.witnessIdentifier - mt2.witnessIdentifier;
+                }
+                // or one of them could be a marker token
+                // always put the marker token before the content
+                return -1;
+            }
+            // or one of them could be a marker token
+            // always put the content after the marker token
+            if (o2isMarker) {
+                return 1;
+            }
+            // Not a marker token; call delegate
+            return delegate.compare(o1, o2);
         }
     }
 
@@ -105,7 +162,9 @@ public class TokenIndex {
         }
         // add all the open intervals to the result
         for (Block interval : openIntervals) {
-            closedIntervals.add(new Block(this, interval.start, LCP_array.length - 1, interval.length));
+            if (interval.length > 0) {
+                closedIntervals.add(new Block(this, interval.start, LCP_array.length - 1, interval.length));
+            }
         }
         return closedIntervals;
     }
@@ -113,10 +172,6 @@ public class TokenIndex {
     private Map<Integer, List<Block.Instance>> construct_LCP_interval_array() {
         block_array = new HashMap<>();
         for (Block interval : blocks) {
-            //TODO: why are there empty LCP intervals in the LCP_interval_array ?
-            if (interval.length==0) {
-                continue;
-            }
             for (Block.Instance instance : interval.getAllInstances()) {
                 int tokenPosition = instance.start_token;
                 //System.out.println("Adding interval instance: " + interval.toString() + " to token number: " + tokenPosition);

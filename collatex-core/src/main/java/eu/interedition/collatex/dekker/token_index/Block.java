@@ -84,6 +84,9 @@ public class Block {
 
     @Override
     public String toString() {
+        if (end == 0) {
+            return "Unclosed LCP interval start at: " + start + ",  length: " + length;
+        }
         return ("LCP interval start at: " + start + ", depth: " + this.depth + ", length: " + this.length + " numberOfTimes:" + numberOfTimes());
     }
 

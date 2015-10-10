@@ -37,7 +37,6 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     public TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
     protected VariantGraph.Vertex[] vertex_array;
-    //TODO: FIX!
     private final Comparator<Token> comparator;
     private final PhraseMatchDetector phraseMatchDetector;
     private final TranspositionDetector transpositionDetector;
@@ -71,7 +70,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             LOG.fine("Building token index from the tokens of all witnesses");
         }
 
-        this.tokenIndex = new TokenIndex(witnesses);
+        this.tokenIndex = new TokenIndex(witnesses, comparator);
         tokenIndex.prepare();
 
         // phase 2: alignment phase
