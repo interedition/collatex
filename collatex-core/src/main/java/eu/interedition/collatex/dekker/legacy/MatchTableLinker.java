@@ -21,7 +21,6 @@ package eu.interedition.collatex.dekker.legacy;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.dekker.TokenLinker;
 import eu.interedition.collatex.dekker.island.*;
 
 import java.util.Comparator;
@@ -30,14 +29,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MatchTableLinker implements TokenLinker {
+public class MatchTableLinker {
     static Logger LOG = Logger.getLogger(MatchTableLinker.class.getName());
 
     public MatchTableLinker() {
         super();
     }
 
-    @Override
     public Map<Token, VariantGraph.Vertex> link(VariantGraph base, Iterable<Token> witness, Comparator<Token> comparator) {
         // create MatchTable and fill it with matches
         LOG.fine("create MatchTable and fill it with matches");
