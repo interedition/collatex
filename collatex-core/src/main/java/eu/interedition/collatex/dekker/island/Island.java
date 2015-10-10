@@ -21,6 +21,7 @@ package eu.interedition.collatex.dekker.island;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.token_index.Block;
+import eu.interedition.collatex.simple.SimpleToken;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -139,11 +140,16 @@ public class Island implements Iterable<Coordinate> {
     @Override
     public String toString() {
         List<Token> instance = getBlockInstance().getTokens();
-        String result = "";
+        String normalized = "";
         for (int i = 0; i < this.size(); i++) {
-            result += instance.get(i)+" ";
+            Token t = instance.get(i);
+            SimpleToken st = (SimpleToken) t;
+            if (!normalized.isEmpty()) {
+                normalized += " ";
+            }
+            normalized += st.getNormalized();
         }
-        return result;
+        return normalized;
 
 //        if (islandCoordinates.isEmpty()) {
 //            //throw new RuntimeException("Unexpected situation: island coordinates empty!");

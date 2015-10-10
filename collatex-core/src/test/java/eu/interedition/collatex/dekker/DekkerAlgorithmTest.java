@@ -1,7 +1,9 @@
 package eu.interedition.collatex.dekker;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.island.Coordinate;
 import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -174,5 +176,18 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertThat(graph, graph(w[0]).aligned("a b c d").non_aligned("e"));
         assertThat(graph, graph(w[1]).aligned("a").non_aligned("e").aligned("c d"));
         assertThat(graph, graph(w[2]).aligned("a").aligned("d").non_aligned("b"));
+    }
+
+    // NOTE: transpositions are asserted in another test
+    @Test
+    public void testDifficultCasePartialRightOverlapAndTranspositions() {
+        SimpleWitness[] w = createWitnesses("και αποκριθεισ ειπεν αυτω ου βλεπεισ ταυτασ μεγαλασ οικοδομασ αμην λεγω σοι ο(υ μη α)φεθη ωδε λιθοσ επι λιθω (οσ ου) μη καταλυθη", "και αποκριθεισ ο ι̅σ̅ ειπεν αυτω βλεπεισ Ταυτασ τασ μεγαλασ οικοδομασ λεγω υμιν ου μη αφεθη λιθοσ επι λιθου οσ ου μη καταλυθη", "και ο ι̅σ̅ αποκριθεισ ειπεν αυτω βλεπεισ ταυτασ τασ μεγαλασ οικοδομασ ου μη αφεθη λιθοσ επι λιθον οσ ου μη καταλυθη");
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+        List<SortedMap<Witness, Set<Token>>> t = table(graph);
+        assertEquals("|και| | |αποκριθεισ| | |ειπεν|αυτω|ου|βλεπεισ|ταυτασ| |μεγαλασ|οικοδομασ|αμην|λεγω|σοι|ο(υ|μη|α)φεθη|ωδε|λιθοσ|επι|λιθω|(οσ|ου)|μη|καταλυθη|", toString(t, w[0]));
+        assertEquals("|και| | |αποκριθεισ|ο|ι̅σ̅|ειπεν|αυτω| |βλεπεισ|ταυτασ|τασ|μεγαλασ|οικοδομασ| |λεγω|υμιν|ου|μη|αφεθη| |λιθοσ|επι|λιθου|οσ|ου|μη|καταλυθη|", toString(t, w[1]));
+        assertEquals("|και|ο|ι̅σ̅|αποκριθεισ| | |ειπεν|αυτω| |βλεπεισ|ταυτασ|τασ|μεγαλασ|οικοδομασ| | | |ου|μη|αφεθη| |λιθοσ|επι|λιθον|οσ|ου|μη|καταλυθη|", toString(t, w[2]));
     }
 }

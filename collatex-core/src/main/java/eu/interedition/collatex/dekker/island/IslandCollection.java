@@ -108,55 +108,74 @@ public class IslandCollection implements IslandSelection {
         List<Island> possibleIslands = new ArrayList<>();
         while (possibleIslands.isEmpty() && !islandPriorityQueue.isEmpty()) {
             Island highestRated = islandPriorityQueue.poll();
-//           LOG.fine( "Highest rated is: "+highestRated+ " "+highestRated.getDepth());
-            // LOG.log(Level.FINE, "Highest rated is: "+highestRated);
+            // LOG.fine( "Highest rated is: "+highestRated+ " "+highestRated.getDepth());
             // add highest rated
             possibleIslands.add(highestRated);
             // check whether there are other islands with the same rating
             while (!islandPriorityQueue.isEmpty() && comparator.compare(highestRated, islandPriorityQueue.peek()) == 0) {
-//              LOG.fine("Same prio is: " + islandPriorityQueue.peek() + " " + islandPriorityQueue.peek().getDepth());
+                // LOG.fine("Same prio is: " + islandPriorityQueue.peek() + " " + islandPriorityQueue.peek().getDepth());
                 possibleIslands.add(islandPriorityQueue.poll());
             }
             // check whether the selected islands are possible
-            Iterator<Island> candidates = possibleIslands.iterator();
-            while (candidates.hasNext()) {
-                Island island = candidates.next();
-                Coordinate conflict = findConflictingCoordinate(island);
-                if (conflict == null) {
-                    continue;
-                }
-                // remove this candidate from the possible islands
-                candidates.remove();
-                Island smaller = createSmallerIslandSplitAtConflictingCoordinate(island, conflict);
-                // add the smaller island to the priority queue
-                // LOG.fine("Conflict detected! We add a smaller island! "+smaller);
-                if (smaller.size()>0) {
-                    islandPriorityQueue.add(smaller);
-                }
-            }
+            checkPossibleIslandsForRightOverlap(possibleIslands);
         }
         return possibleIslands;
     }
 
-    private Island createSmallerIslandSplitAtConflictingCoordinate(Island island, Coordinate conflict) {
-        // create a new island which contains the coordinates up to the overlapping coordinate.
-        Island smaller = new Island(island.getDepth(), island.getBlockInstance());
-        for (Coordinate c : island) {
-            if (c == conflict) {
-                break;
+    // left overlap is not allowed; the whole island is discarded
+    // right overlap is allowed; the island is removed from the queue and a new, smaller island is added
+    // complete overlap or no overlap occurs most often
+    // so the code is optimized to deal with these cases the fastest
+    // complete overlap can be determined with one check
+    // no overlap required two checks
+    // partial overlap requires more, but since that doesn't happen often, it is not that bad
+    private void checkPossibleIslandsForRightOverlap(List<Island> possibleIslands) {
+        Iterator<Island> candidates = possibleIslands.iterator();
+        while (candidates.hasNext()) {
+            Island island = candidates.next();
+            // check whether there is complete overlap
+            // if left end coordinate is not available there is no use in checking this island any longer
+            if (doesCoordinateOverlapWithCommittedCoordinate(island.getLeftEnd())) {
+                candidates.remove();
+                continue;
             }
-            smaller.add(c);
+            // if right end coordinate is also available it means the whole island is available
+            if (!doesCoordinateOverlapWithCommittedCoordinate(island.getRightEnd())) {
+                // no further check necessary
+                continue;
+            }
+            // remove this candidate from the possible islands
+            candidates.remove();
+//          NOTE: only when we select islands based on depth islands with partial overlap should be split and added
+//            // partial overlap; find the starting point of the conflict
+//            Coordinate conflict = findConflictingCoordinate(island);
+//            Island smaller = createSmallerIslandSplitAtConflictingCoordinate(island, conflict);
+//            // add the smaller island to the priority queue
+//            // LOG.fine("Conflict detected! We add a smaller island! "+smaller);
+//            islandPriorityQueue.add(smaller);
         }
-        return smaller;
     }
 
-    // maybe going from the right to left makes this faster
-    private Coordinate findConflictingCoordinate(Island island){
-        for(Coordinate coordinate:island){
-            if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) {
-                return coordinate;
-            }
-        }
-        return null;
-    }
+//    NOTE: THE FOLLOWING CODE IS ONLY NEEDED WHEN WE ALIGN ON DEPTH! DEFAULT IS ON SIZE!
+//    //TODO: the following two methods can be put into one!
+//    private Coordinate findConflictingCoordinate(Island island){
+//        for(Coordinate coordinate:island){
+//            if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) {
+//                return coordinate;
+//            }
+//        }
+//        throw new RuntimeException("There should be a conflict! Weird!");
+//    }
+//
+//    private Island createSmallerIslandSplitAtConflictingCoordinate(Island island, Coordinate conflict) {
+//        // create a new island which contains the coordinates up to the overlapping coordinate.
+//        Island smaller = new Island(island.getDepth(), island.getBlockInstance());
+//        for (Coordinate c : island) {
+//            if (c == conflict) {
+//                return smaller;
+//            }
+//            smaller.add(c);
+//        }
+//        throw new RuntimeException("Weird! Should never happen!");
+//    }
 }
