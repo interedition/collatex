@@ -2,17 +2,14 @@ package eu.interedition.collatex.dekker.token_index;
 
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.DekkerAlgorithm;
+import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.*;
 
-import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * Created by ronald on 4/20/15.
@@ -66,7 +63,7 @@ public class TokenIndexTest extends AbstractTest {
         // 2: a, e, c, d
         // 3: a, d, b
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
-        TokenIndex tokenIndex = new TokenIndex(w);
+        TokenIndex tokenIndex = new TokenIndex(new EqualityTokenComparator(), w);
         tokenIndex.prepare();
         //Note: the suffix array can have multiple forms
         //outcome of sorting is not guaranteed
@@ -80,7 +77,7 @@ public class TokenIndexTest extends AbstractTest {
         // 2: a, e, c, d
         // 3: a, X, X, d, b
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
-        TokenIndex tokenIndex = new TokenIndex(w);
+        TokenIndex tokenIndex = new TokenIndex(new EqualityTokenComparator(), w);
         tokenIndex.prepare();
         List<Block> blocks = tokenIndex.splitLCP_ArrayIntoIntervals();
         assertLCP_Interval(3, 1, 3, 3, blocks.get(0)); // a
@@ -94,7 +91,7 @@ public class TokenIndexTest extends AbstractTest {
     @Test
     public void testDepthAndNumberOfTimes() {
         final SimpleWitness[] w = createWitnesses("the a the", "the a");
-        TokenIndex tokenIndex = new TokenIndex(w);
+        TokenIndex tokenIndex = new TokenIndex(new EqualityTokenComparator(), w);
         tokenIndex.prepare();
         List<Block> blocks = tokenIndex.splitLCP_ArrayIntoIntervals();
         assertLCP_Interval(2, 1, 2, 2, blocks.get(0)); // a

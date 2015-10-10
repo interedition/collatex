@@ -70,7 +70,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             LOG.fine("Building token index from the tokens of all witnesses");
         }
 
-        this.tokenIndex = new TokenIndex(witnesses, comparator);
+        this.tokenIndex = new TokenIndex(comparator, witnesses);
         tokenIndex.prepare();
 
         // phase 2: alignment phase

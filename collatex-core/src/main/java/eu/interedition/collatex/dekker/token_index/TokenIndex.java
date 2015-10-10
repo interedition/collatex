@@ -2,7 +2,6 @@ package eu.interedition.collatex.dekker.token_index;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.SimpleTokenNormalizedFormComparator;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
@@ -28,19 +27,11 @@ public class TokenIndex {
     private Map<Integer, List<Block.Instance>> block_array;
 
 
-    public TokenIndex(Iterable<Token>[] w) {
-        this(Arrays.asList(w));
-    }
-
-    public TokenIndex(List<? extends Iterable<Token>> w) {
-        this(w, new SimpleTokenNormalizedFormComparator());
-    }
-
     public TokenIndex(Comparator<Token> comparator, Iterable<Token>... tokens) {
-        this(Arrays.asList(tokens), comparator);
+        this(comparator, Arrays.asList(tokens));
     }
 
-    public TokenIndex(List<? extends Iterable<Token>> w, Comparator<Token> comparator) {
+    public TokenIndex(Comparator<Token> comparator, List<? extends Iterable<Token>> w) {
         this.w = w;
         this.comparator = new MarkerTokenComparatorWrapper(comparator);
     }
@@ -56,6 +47,7 @@ public class TokenIndex {
     // TODO: we do not have to store w!
     public void prepare() {
         this.prepareTokenArray();
+        //TODO: new TokenArray size is niet handig!
         SuffixData suffixData = SuffixArrays.createWithLCP(token_array.toArray(new Token[0]), new SAIS(), comparator);
         this.suffix_array = suffixData.getSuffixArray();
         this.LCP_array = suffixData.getLCP();
@@ -80,7 +72,6 @@ public class TokenIndex {
                 counter++;
             }
             witnessToEndToken.put(witness, counter);
-            //NOTE: marker token is a simple token which could present problems for custom token comparators!
             token_array.add(new MarkerToken(witnessToStartToken.size()));
             counter++;
         }
