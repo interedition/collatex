@@ -23,7 +23,6 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.token_index.Block;
 import eu.interedition.collatex.simple.SimpleToken;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,23 +31,19 @@ import java.util.List;
 public class Island implements Iterable<Coordinate> {
 
     private final List<Coordinate> islandCoordinates = new ArrayList<>();
-    private final int depth;
     private final Block.Instance blockInstance;
 
-    public Island(int depth, Block.Instance blockInstance) {
-        this.depth = depth;
+    public Island(Block.Instance blockInstance) {
         this.blockInstance = blockInstance;
     }
 
     // for legacy code
     public Island() {
-        depth = 0;
         blockInstance = null;
     }
 
     // for legacy code
     public Island(Coordinate first, Coordinate last) {
-        depth = 0;
         blockInstance = null;
         add(first);
         Coordinate newCoordinate = first;
@@ -130,11 +125,15 @@ public class Island implements Iterable<Coordinate> {
         return result;
     }
 
-    public int getDepth() {
-        if (depth == 0) {
-            throw new RuntimeException("Depth value is not set on this island! It is probably constructed with legacy code!");
+    public Block.Instance getBlockInstance() {
+        if (blockInstance == null) {
+            throw new RuntimeException("Block instance is not set on this island! It is probably constructed with legacy code!");
         }
-        return depth;
+        return blockInstance;
+    }
+
+    public int getDepth() {
+        return getBlockInstance().block.getDepth();
     }
 
     @Override
@@ -156,12 +155,5 @@ public class Island implements Iterable<Coordinate> {
 //            return "Island has been modified after creation and has become empty!";
 //        }
 //        return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
-    }
-
-    public Block.Instance getBlockInstance() {
-        if (blockInstance == null) {
-            throw new RuntimeException("Block instance is not set on this island! It is probably constructed with legacy code!");
-        }
-        return blockInstance;
     }
 }

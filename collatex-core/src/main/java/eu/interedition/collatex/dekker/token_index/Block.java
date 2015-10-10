@@ -20,7 +20,8 @@ public class Block {
     // end = end position in suffix array
     public final int end;
     // depth = number of witnesses this block of text occurs in
-    public final int depth;
+    // Note: depth is lazy initialized
+    private Integer depth;
 
     // For building blocks only
     public Block(TokenIndex tokenIndex, int suffix_start_position, int length) {
@@ -36,20 +37,18 @@ public class Block {
         this.start = start;
         this.end = end;
         this.length = length;
-        this.depth = calculateDepth();
+        this.depth = null;
     }
 
-    private int calculateDepth() {
-        // the same block can occur multiple times in one witness
-        Set<Witness> witnesses = new HashSet<>();
-        for (Block.Instance instance : getAllInstances()) {
-            witnesses.add(instance.getWitness());
+    public int getDepth() {
+        if (depth == null) {
+            depth = calculateDepth();
         }
-        return witnesses.size();
+        return depth;
     }
 
-    // numberOfTimes = number of times this block of text occurrences in complete witness set
-    public int numberOfTimes() {
+    // frequency = number of times this block of text occurrences in complete witness set
+    public int getFrequency() {
         if (end == 0) {
             throw new IllegalStateException("LCP interval is unclosed!");
         }
@@ -85,7 +84,16 @@ public class Block {
         if (end == 0) {
             return "Unclosed LCP interval start at: " + start + ",  length: " + length;
         }
-        return ("LCP interval start at: " + start + ", depth: " + this.depth + ", length: " + this.length + " numberOfTimes:" + numberOfTimes());
+        return ("LCP interval start at: " + start + ", depth: " + this.getDepth() + ", length: " + this.length + " getFrequency:" + getFrequency());
+    }
+
+    private int calculateDepth() {
+        // the same block can occur multiple times in one witness
+        Set<Witness> witnesses = new HashSet<>();
+        for (Block.Instance instance : getAllInstances()) {
+            witnesses.add(instance.getWitness());
+        }
+        return witnesses.size();
     }
 
     public static class Instance {

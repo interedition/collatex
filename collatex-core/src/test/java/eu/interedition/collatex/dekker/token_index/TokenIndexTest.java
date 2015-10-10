@@ -53,8 +53,8 @@ public class TokenIndexTest extends AbstractTest {
     private void assertLCP_Interval(int start, int length, int depth, int numberOfTimes, Block lcp_interval) {
         assertEquals(lcp_interval.toString(), start, lcp_interval.start);
         assertEquals(lcp_interval.toString(), length, lcp_interval.length);
-        assertEquals(lcp_interval.toString(), depth, lcp_interval.depth);
-        assertEquals(lcp_interval.toString(), numberOfTimes, lcp_interval.numberOfTimes());
+        assertEquals(lcp_interval.toString(), depth, lcp_interval.getDepth());
+        assertEquals(lcp_interval.toString(), numberOfTimes, lcp_interval.getFrequency());
     }
 
     @Test
