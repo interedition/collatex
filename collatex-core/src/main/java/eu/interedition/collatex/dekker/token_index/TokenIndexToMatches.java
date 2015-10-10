@@ -54,7 +54,7 @@ public class TokenIndexToMatches {
                     int row = witnessStartToken - startTokenPositionForWitness;
                     // create coordinate and at it to the Island for the combination of graph block instance and witness block instance
                     // /*if (i == 0)*/ System.out.println("We go "+row + " "+column +" "+witnessStartToken);
-                    Token token = tokenIndex.token_array.get(witnessStartToken);
+                    Token token = tokenIndex.token_array[witnessStartToken];
                     Match match = new Match(v, token);
                     Coordinate coordinate = new Coordinate(row, column, match);
                     island.add(coordinate);

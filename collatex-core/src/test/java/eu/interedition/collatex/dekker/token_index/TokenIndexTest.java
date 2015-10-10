@@ -120,8 +120,8 @@ public class TokenIndexTest extends AbstractTest {
         tokens2.add(t23);
         TokenIndex index = new TokenIndex(new MySpecialComparator(), tokens1, tokens2);
         index.prepare();
-        assertEquals("[interesting, nice, huh, $1, very, nice, right, $2]", index.token_array.toString());
-        Collections.sort(index.token_array, new TokenIndex.MarkerTokenComparatorWrapper(new MySpecialComparator()));
-        assertEquals("[$1, $2, huh, interesting, nice, nice, right, very]", index.token_array.toString());
+        assertEquals("[interesting, nice, huh, $1, very, nice, right, $2]", Arrays.toString(index.token_array));
+        Arrays.sort(index.token_array, new TokenIndex.MarkerTokenComparatorWrapper(new MySpecialComparator()));
+        assertEquals("[$1, $2, huh, interesting, nice, nice, right, very]", Arrays.toString(index.token_array));
     }
 }

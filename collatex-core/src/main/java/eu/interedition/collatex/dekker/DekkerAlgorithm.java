@@ -74,7 +74,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
         tokenIndex.prepare();
 
         // phase 2: alignment phase
-        this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.size()];
+        this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.length];
         boolean firstWitness = true;
 
         for (Iterable<Token> tokens : witnesses) {
