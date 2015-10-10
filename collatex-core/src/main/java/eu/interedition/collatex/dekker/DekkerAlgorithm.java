@@ -22,7 +22,6 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.token_index.Block;
 import eu.interedition.collatex.dekker.token_index.TokenIndexToMatches;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.dekker.island.*;
@@ -38,32 +37,25 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     public TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
     protected VariantGraph.Vertex[] vertex_array;
-    // map vertices to LCP
-    // NOTE: vertices contain tokens... tokens are already mapped to LCP intervals
-    // NOTE: It should be possible to remove this map
-
-    // TODO: REMOVE REMOVE REMOVE!
-    private Map<VariantGraph.Vertex, Block> vertexToLCP;
-    // for debugging purposes only
-    protected List<Island> preferredIslands;
     //TODO: FIX!
     private final Comparator<Token> comparator;
     private final PhraseMatchDetector phraseMatchDetector;
     private final TranspositionDetector transpositionDetector;
+    // for debugging purposes only
+    private Set<Island> allPossibleIslands;
+    private List<Island> preferredIslands;
     private List<List<Match>> phraseMatches;
     private List<List<Match>> transpositions;
     private boolean mergeTranspositions = false;
-    private Set<Island> allIslands;
 
     public DekkerAlgorithm() {
         this(new EqualityTokenComparator());
     }
+
     public DekkerAlgorithm(Comparator<Token> comparator) {
         this.comparator = comparator;
         this.phraseMatchDetector = new PhraseMatchDetector();
         this.transpositionDetector = new TranspositionDetector();
-        //TODO: remove!
-        vertexToLCP = new HashMap<>();
     }
 
     // The algorithm contains two phases:
@@ -71,64 +63,56 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     // This phase is implemented using a token array -> suffix array -> LCP array -> LCP intervals
     //
     // 2) Alignment phase
-    // This phase uses a decision tree (implemented as a table) to find the optimal alignment and moves
+    // This phase uses a priority queue and looks at overlap between possible matches to find the optimal alignment and moves
     @Override
     public void collate(VariantGraph graph, List<? extends Iterable<Token>> witnesses) {
-        // matching phase
+        // phase 1: matching phase
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Building token index from the tokens of all witnesses");
+        }
+
         this.tokenIndex = new TokenIndex(witnesses);
         tokenIndex.prepare();
 
+        // phase 2: alignment phase
         this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.size()];
+        boolean firstWitness = true;
 
         for (Iterable<Token> tokens : witnesses) {
-            // first witness?
-            // TODO: WRONG!
-            boolean first_witness = vertexToLCP.isEmpty();
-            if (first_witness) {
-                super.merge(graph, tokens, new HashMap<>());
-                // need to update vertex to lcp map
-
-                // we need tokens token -> vertex
-                // that information is stored in protected map
-                int tokenPosition = 0;
-                for (Token token : tokens) {
-                    VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
-                    // remove
-                    // Block interval = tokenIndex.getLCP_intervalFor(tokenPosition);
-                    vertexToLCP.put(vertex, null);
-                    // end remove
-                    vertex_array[tokenPosition] = vertex;
-                    tokenPosition++;
-                }
-                continue;
-            }
-
-            // align second + witness(es)
             final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
                 .findFirst()
                 .map(Token::getWitness)
                 .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
+            // first witness has a fast path
+            if (firstWitness) {
+                super.merge(graph, tokens, Collections.emptyMap());
+                updateTokenToVertexArray(tokens, witness);
+                firstWitness = false;
+                continue;
+            }
+
+            // align second, third, fourth witness etc.
             if (LOG.isLoggable(Level.FINER)) {
                 LOG.log(Level.FINER, "{0} + {1}: {2} vs. {3}", new Object[]{graph, witness, graph.vertices(), tokens});
             }
 
+            // Phase 2a: Gather matches from the token index
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Gather matches between variant graph and witness from token index", new Object[]{graph, witness});
             }
 
-            // System.out.println("Aligning next witness; Creating block based match table!");
-            allIslands = TokenIndexToMatches.createMatches(tokenIndex, vertex_array, graph, tokens);
+            allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertex_array, graph, tokens);
 
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Aligning witness and graph", new Object[]{graph, witness});
             }
 
-            // Phase 2: do the actual alignment and find transpositions
-            IslandConflictResolver resolver = new IslandConflictResolver(new IslandCollection(allIslands));
+            // Phase 2b: do the actual alignment
+            IslandConflictResolver resolver = new IslandConflictResolver(new IslandCollection(allPossibleIslands));
             preferredIslands = resolver.createNonConflictingVersion().getIslands();
+
             // we need to convert the islands into Map<Token, Vertex> for further processing
-            // Here the result is put in a map
             Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
             for (Island island : preferredIslands) {
                 for (Coordinate c : island) {
@@ -146,8 +130,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
                 LOG.log(Level.FINE, "{0} + {1}: Detect phrase matches", new Object[]{graph, witness});
             }
 
-            // detect phrases and transpositions
-            // NOTE: It is probable that phrases can be replaced by Islands
+            // Phase 2c: detect phrases and transpositions
             phraseMatches = phraseMatchDetector.detect(alignments, graph, tokens);
 
             if (LOG.isLoggable(Level.FINER)) {
@@ -159,6 +142,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Detect transpositions", new Object[]{graph, witness});
             }
+
             transpositions = transpositionDetector.detect(phraseMatches, graph);
 
             if (LOG.isLoggable(Level.FINE)) {
@@ -175,15 +159,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
                 LOG.log(Level.FINE, "{0} + {1}: Determine aligned tokens by filtering transpositions", new Object[]{graph, witness});
             }
 
-            //TODO: this seems to be a duplicate from the action above!
-            alignments = new HashMap<>();
-            for (List<Match> phrase : phraseMatches) {
-                for (Match match : phrase) {
-                    alignments.put(match.token, match.vertex);
-                }
-            }
-
-            // Filter out transpositions from linked tokens
+            // Filter out transposed tokens from aligned tokens
             for (List<Match> transposedPhrase : transpositions) {
                 for (Match match : transposedPhrase) {
                     alignments.remove(match.token);
@@ -196,8 +172,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
                 }
             }
 
-
-            // and merge
+            // Phase 2d: and merge
             merge(graph, tokens, alignments);
 
             // we filter out small transposed phrases over large distances
@@ -225,18 +200,22 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
                 mergeTranspositions(graph, transpositions);
             }
 
-            // we need to update the token -> vertex map
-            // that information is stored in protected map
-            int tokenPosition = tokenIndex.getStartTokenPositionForWitness(tokens.iterator().next().getWitness());
-            for (Token token : tokens) {
-                VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
-                vertex_array[tokenPosition] = vertex;
-                tokenPosition++;
-            }
+            updateTokenToVertexArray(tokens, witness);
 
             if (LOG.isLoggable(Level.FINER)) {
                 LOG.log(Level.FINER, "!{0}: {1}", new Object[]{graph, StreamSupport.stream(graph.vertices().spliterator(), false).map(Object::toString).collect(Collectors.joining(", "))});
             }
+        }
+    }
+
+    private void updateTokenToVertexArray(Iterable<Token> tokens, Witness witness) {
+        // we need to update the token -> vertex map
+        // that information is stored in protected map
+        int tokenPosition = tokenIndex.getStartTokenPositionForWitness(witness);
+        for (Token token : tokens) {
+            VariantGraph.Vertex vertex = witnessTokenVertices.get(token);
+            vertex_array[tokenPosition] = vertex;
+            tokenPosition++;
         }
     }
 
@@ -255,10 +234,12 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
         return Collections.unmodifiableList(transpositions);
     }
 
+    public Set<Island> getAllPossibleIslands() {
+        return Collections.unmodifiableSet(allPossibleIslands);
+    }
 
-    //TODO; isn't this the same as getPhraseMatches?
-    public Set<Island> getIslands() {
-        return allIslands;
+    public List<Island> getPreferredIslands() {
+        return Collections.unmodifiableList(preferredIslands);
     }
 
     /*

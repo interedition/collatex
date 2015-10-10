@@ -6,6 +6,7 @@ import eu.interedition.collatex.dekker.island.Coordinate;
 import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -45,7 +46,7 @@ public class DekkerAlgorithmTest extends AbstractTest {
 //        instances = aligner.tokenIndex.getBlockInstancesForWitness(w[1]);
 //        Assert.assertEquals("[the cat, birds in the, little, trees, this morning, observed, .]", instances.toString());
 
-        Set<Island> islands = aligner.getIslands();
+        Set<Island> islands = aligner.getAllPossibleIslands();
         assertIslandAsVectorEquals(0, 2, 2, islands); // the cat
         assertIslandAsVectorEquals(4, 6, 3, islands); // birds in the
         assertIslandAsVectorEquals(7, 5, 1, islands); // little
@@ -53,11 +54,9 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertIslandAsVectorEquals(9, 0, 2, islands); // this morning
         assertIslandAsVectorEquals(13, 4, 1, islands); // observed
         assertIslandAsVectorEquals(18, 10, 1, islands); // .
-        // When optimised it can be done with 7 islands instead 16
-        // non selected islands get modified during alignment into an extra (empty) island
-        // Assert.assertEquals(16, islands.size());
+        assertEquals(16, islands.size());
 
-        List<Island> selectedIslands = aligner.preferredIslands;
+        List<Island> selectedIslands = aligner.getPreferredIslands();
         assertIslandAsVectorEquals(0, 2, 2, selectedIslands); // the cat
         assertIslandAsVectorEquals(4, 6, 3, selectedIslands); // birds in the
         assertIslandAsVectorEquals(7, 5, 1, selectedIslands); // little
@@ -65,7 +64,7 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertIslandAsVectorEquals(9, 0, 2, selectedIslands); // this morning
         assertIslandAsVectorEquals(13, 4, 1, selectedIslands); // observed
         assertIslandAsVectorEquals(18, 10, 1, selectedIslands); // .
-        Assert.assertEquals(7, selectedIslands.size());
+        assertEquals(7, selectedIslands.size());
 
         //Todo: assert transpositions
         //        assertPhraseMatches("this morning", "observed", "little");
@@ -161,6 +160,8 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertThat(graph, graph(w[2]).aligned("a b c d").non_aligned("e").aligned("g h i ! q r s t"));
     }
 
+    // Depth should be taken into account during transposition phase
+    @Ignore
     @Test
     public void testDifficultCase3DepthShouldMatter() {
         // 1: a, b, c, d, e
@@ -173,7 +174,5 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertThat(graph, graph(w[0]).aligned("a b c d").non_aligned("e"));
         assertThat(graph, graph(w[1]).aligned("a").non_aligned("e").aligned("c d"));
         assertThat(graph, graph(w[2]).aligned("a").aligned("d").non_aligned("b"));
-
-
     }
 }
