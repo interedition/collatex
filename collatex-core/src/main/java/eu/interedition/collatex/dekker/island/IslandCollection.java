@@ -35,12 +35,12 @@ public class IslandCollection implements IslandSelection {
     private final PriorityQueue<Island> islandPriorityQueue;
     private final Archipelago fixedIslands;
     //this fields are needed for the locking of table cells
-    private final Set<Integer> fixedRows;
+    private final BitSet fixedRows;
     private final Set<VariantGraph.Vertex> fixedVertices;
     private final Comparator<Island> comparator = new IslandSizeComparator();
 
     public IslandCollection(Set<Island> islands) {
-        fixedRows = new HashSet<>();
+        fixedRows = new BitSet();
         fixedVertices = new HashSet<>();
         this.fixedIslands = new Archipelago();
         islandPriorityQueue = new PriorityQueue<>(comparator);
@@ -52,7 +52,7 @@ public class IslandCollection implements IslandSelection {
      */
     @Override
     public boolean doesCoordinateOverlapWithCommittedCoordinate(Coordinate coordinate) {
-        return fixedRows.contains(coordinate.row) || fixedVertices.contains(coordinate.match.vertex);
+        return fixedRows.get(coordinate.row) || fixedVertices.contains(coordinate.match.vertex);
     }
 
     /*
@@ -76,7 +76,7 @@ public class IslandCollection implements IslandSelection {
             LOG.log(Level.FINE, "adding island: '{0}'", isl);
         }
         for (Coordinate coordinate : isl) {
-            fixedRows.add(coordinate.row);
+            fixedRows.set(coordinate.row);
             fixedVertices.add(coordinate.match.vertex);
         }
         fixedIslands.add(isl);
