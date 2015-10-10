@@ -190,4 +190,16 @@ public class DekkerAlgorithmTest extends AbstractTest {
         assertEquals("|και| | |αποκριθεισ|ο|ι̅σ̅|ειπεν|αυτω| |βλεπεισ|ταυτασ|τασ|μεγαλασ|οικοδομασ| |λεγω|υμιν|ου|μη|αφεθη| |λιθοσ|επι|λιθου|οσ|ου|μη|καταλυθη|", toString(t, w[1]));
         assertEquals("|και|ο|ι̅σ̅|αποκριθεισ| | |ειπεν|αυτω| |βλεπεισ|ταυτασ|τασ|μεγαλασ|οικοδομασ| | | |ου|μη|αφεθη| |λιθοσ|επι|λιθον|οσ|ου|μη|καταλυθη|", toString(t, w[2]));
     }
+
+    @Test
+    public void testDifficultCasePartialDarwin() {
+        SimpleWitness[] w = createWitnesses("those to which the parent-species have been exposed under nature. There is, also, I think, some probability", "those to which the parent-species have been exposed under nature. There is also, I think, some probability", "those to which the parent-species had been exposed under nature. There is also, I think, some probability", "those to which the parent-species had been exposed under nature. There is, also, some probability");
+        DekkerAlgorithm aligner = new DekkerAlgorithm();
+        VariantGraph graph = new VariantGraph();
+        aligner.collate(graph, w);
+        assertThat(graph, graph(w[0]).aligned("those to which the parent-species have been exposed under nature . there is , also , i think , some probability"));
+        assertThat(graph, graph(w[1]).aligned("those to which the parent-species have been exposed under nature . there is also , i think , some probability"));
+        assertThat(graph, graph(w[2]).aligned("those to which the parent-species had been exposed under nature . there is also , i think , some probability"));
+        assertThat(graph, graph(w[3]).aligned("those to which the parent-species had been exposed under nature . there is , ").aligned(4, "also").aligned(", some probability"));
+    }
 }

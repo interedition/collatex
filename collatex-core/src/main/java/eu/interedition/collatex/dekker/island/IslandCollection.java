@@ -129,6 +129,8 @@ public class IslandCollection implements IslandSelection {
     // complete overlap can be determined with one check
     // no overlap required two checks
     // partial overlap requires more, but since that doesn't happen often, it is not that bad
+    //TODO: hard to make a unit test for the partial overlap case when islands are prioritized by size instead of depth!
+    //TODO: There is an integration test for this in Darwin paragraph 1 (Also)
     private void checkPossibleIslandsForRightOverlap(List<Island> possibleIslands) {
         Iterator<Island> candidates = possibleIslands.iterator();
         while (candidates.hasNext()) {
@@ -146,36 +148,23 @@ public class IslandCollection implements IslandSelection {
             }
             // remove this candidate from the possible islands
             candidates.remove();
-//          NOTE: only when we select islands based on depth islands with partial overlap should be split and added
-//            // partial overlap; find the starting point of the conflict
-//            Coordinate conflict = findConflictingCoordinate(island);
-//            Island smaller = createSmallerIslandSplitAtConflictingCoordinate(island, conflict);
-//            // add the smaller island to the priority queue
-//            // LOG.fine("Conflict detected! We add a smaller island! "+smaller);
-//            islandPriorityQueue.add(smaller);
+            // partial overlap; find the starting point of the conflict
+            Island smaller = findConflictingCoordinateAndCreateSmallerIslandSplitAtConflictingCoordinate(island);
+            // add the smaller island to the priority queue
+            // LOG.fine("Conflict detected! We add a smaller island! "+smaller);
+            islandPriorityQueue.add(smaller);
         }
     }
 
-//    NOTE: THE FOLLOWING CODE IS ONLY NEEDED WHEN WE ALIGN ON DEPTH! DEFAULT IS ON SIZE!
-//    //TODO: the following two methods can be put into one!
-//    private Coordinate findConflictingCoordinate(Island island){
-//        for(Coordinate coordinate:island){
-//            if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) {
-//                return coordinate;
-//            }
-//        }
-//        throw new RuntimeException("There should be a conflict! Weird!");
-//    }
-//
-//    private Island createSmallerIslandSplitAtConflictingCoordinate(Island island, Coordinate conflict) {
-//        // create a new island which contains the coordinates up to the overlapping coordinate.
-//        Island smaller = new Island(island.getDepth(), island.getBlockInstance());
-//        for (Coordinate c : island) {
-//            if (c == conflict) {
-//                return smaller;
-//            }
-//            smaller.add(c);
-//        }
-//        throw new RuntimeException("Weird! Should never happen!");
-//    }
+    private Island findConflictingCoordinateAndCreateSmallerIslandSplitAtConflictingCoordinate(Island island){
+        // create a new island which contains the coordinates up to the overlapping coordinate.
+        Island smaller = new Island(island.getBlockInstance());
+        for (Coordinate coordinate : island) {
+            if (doesCoordinateOverlapWithCommittedCoordinate(coordinate)) {
+                return smaller;
+            }
+            smaller.add(coordinate);
+        }
+        throw new RuntimeException("Expected a conflict! This should never happen!");
+    }
 }

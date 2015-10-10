@@ -15,12 +15,18 @@ import java.util.*;
 public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
 
     class ExpectationTuple {
+        private final int numberOfWitnesses; // check the number of nodes aligned to this vertices
         private String[] expected_content; // expected token content in the normalized form
         private boolean aligned; // should the tokens be aligned in the graph or not
 
         public ExpectationTuple(String[] tokens, boolean aligned) {
+            this(tokens, aligned, -1);
+        }
+
+        public ExpectationTuple(String[] tokens, boolean aligned, int numberOfWitnesses) {
             this.expected_content = tokens;
             this.aligned = aligned;
+            this.numberOfWitnesses = numberOfWitnesses;
         }
     }
 
@@ -45,9 +51,13 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
     }
 
     public VariantGraphMatcher aligned(String... tokens) {
+        return aligned(-1, tokens);
+    }
+
+    public VariantGraphMatcher aligned(int numberOfWitnesses, String... tokens) {
         for (String token : tokens) {
             String[] split = token.split(" ");
-            expected.add(new ExpectationTuple(split, true));
+            expected.add(new ExpectationTuple(split, true, numberOfWitnesses));
         }
         return this;
     }
@@ -75,6 +85,11 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
                 }
                 // Check whether token is aligned or not
                 if (expectation.aligned != v.tokens().size() > 1) {
+                    failed = expectation;
+                    return false;
+                }
+                // Check whether token has correct number of witnesses
+                if (expectation.numberOfWitnesses != -1 && expectation.numberOfWitnesses != v.tokens().size()) {
                     failed = expectation;
                     return false;
                 }
@@ -121,7 +136,7 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
                         if (previousAligned!=null){
                             description.appendText(", ");
                         }
-                        description.appendText("aligned: ");
+                        description.appendText("aligned ("+v.tokens().size()+"): ");
                         previousAligned=true;
                     }
                 } else {
