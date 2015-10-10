@@ -43,9 +43,7 @@ public class Block {
         // the same block can occur multiple times in one witness
         Set<Witness> witnesses = new HashSet<>();
         for (Block.Instance instance : getAllInstances()) {
-            Token firstToken = tokenIndex.token_array[instance.start_token];
-            Witness w = firstToken.getWitness();
-            witnesses.add(w);
+            witnesses.add(instance.getWitness());
         }
         return witnesses.size();
     }
@@ -129,6 +127,11 @@ public class Block {
                 tokens.add(t);
             }
             return tokens;
+        }
+
+        public Witness getWitness() {
+            Token startToken = block.tokenIndex.token_array[start_token];
+            return startToken.getWitness();
         }
     }
 }

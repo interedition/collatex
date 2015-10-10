@@ -7,7 +7,6 @@ import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 /**
@@ -24,7 +23,7 @@ public class TokenIndex {
     public int[] suffix_array;
     public int[] LCP_array;
     public List<Block> blocks;
-    private Map<Integer, List<Block.Instance>> block_array;
+    private Map<Witness, List<Block.Instance>> witnessToBlockInstances;
 
 
     public TokenIndex(Comparator<Token> comparator, Iterable<Token>... tokens) {
@@ -51,7 +50,7 @@ public class TokenIndex {
         this.suffix_array = suffixData.getSuffixArray();
         this.LCP_array = suffixData.getLCP();
         this.blocks = splitLCP_ArrayIntoIntervals();
-        block_array = construct_LCP_interval_array();
+        constructWitnessToBlockInstancesMap();
     }
 
     private Token[] prepareTokenArray() {
@@ -131,7 +130,7 @@ public class TokenIndex {
     protected List<Block> splitLCP_ArrayIntoIntervals() {
         List<Block> closedIntervals = new ArrayList<>();
         int previousLCP_value = 0;
-        Stack<Block> openIntervals = new Stack<Block>();
+        Stack<Block> openIntervals = new Stack<>();
         for (int idx = 0; idx < LCP_array.length; idx++) {
             int lcp_value = LCP_array[idx];
             if (lcp_value > previousLCP_value) {
@@ -160,70 +159,20 @@ public class TokenIndex {
         return closedIntervals;
     }
 
-    private Map<Integer, List<Block.Instance>> construct_LCP_interval_array() {
-        block_array = new HashMap<>();
+    private void constructWitnessToBlockInstancesMap() {
+        witnessToBlockInstances = new HashMap<>();
         for (Block interval : blocks) {
             for (Block.Instance instance : interval.getAllInstances()) {
-                int tokenPosition = instance.start_token;
-                //System.out.println("Adding interval instance: " + interval.toString() + " to token number: " + tokenPosition);
-                List<Block.Instance> values = block_array.get(tokenPosition);
-                if (values == null) {
-                    values = new ArrayList<>();
-                    block_array.put(tokenPosition, values);
-                }
-                values.add(instance);
+                Witness w = instance.getWitness();
+                List<Block.Instance> instances = witnessToBlockInstances.computeIfAbsent(w, v -> new ArrayList<>());
+                instances.add(instance);
             }
         }
-        return block_array;
     }
 
-
-    public List<Block.Instance> getLCP_intervalFor(int tokenPosition) {
-        return block_array.get(tokenPosition);
-    }
-
-    public boolean hasLCP_intervalFor(int i) {
-        return block_array.containsKey(i);
-    }
-
-    // THIS SHOULD NOT BE HERE: IT CAN NOT BE DONE GLOBALLY!
-    // THE OVERLAP SHOULD BE REMOVED DUE THE ALIGNING AND NOT SOME OTHER TRICK!
-    // lcp intervals can overlap horizontally
-    // we prioritize the intervals with the biggest length
-    // Note: with more than two witnesses we have to select the right instance of an interval
-    public List<Block> getNonOverlappingBlocks() {
-        // sort lcp intervals based on length in descending order
-        Collections.sort(blocks, (Block interval1, Block interval2) -> interval2.length - interval1.length);
-        //TODO: set size based on the length of the token array
-        BitSet occupied = new BitSet();
-        // set up predicate
-        // why is length check needed? empty lcp intervals should not be there
-        Predicate<Block> p = lcp_interval -> lcp_interval.length > 0 && !lcp_interval.getAllOccurrencesAsRanges().anyMatch(i -> occupied.get(i));
-
-        List<Block> result = new ArrayList<>();
-        for (Block interval : blocks) {
-            // test whether the interval is in occupied
-            //Note: filter
-            if (p.test(interval)) {
-                result.add(interval);
-                // mark all the occurrences of the lcp interval in the occupied bit set
-                interval.getAllOccurrencesAsRanges().forEach(occupied::set);
-            }
-        }
-        return result;
-    }
-
+    //NOTE: An empty list is returned when there are no instances for the specified witness
     public List<Block.Instance> getBlockInstancesForWitness(Witness w) {
-        Integer witnessStart = witnessToStartToken.get(w);
-        Integer witnessEnd = witnessToEndToken.get(w);
-        List<Block.Instance> result = new ArrayList<>();
-        for (int i= witnessStart; i < witnessEnd; i++) {
-            List<Block.Instance> instance = block_array.get(i);
-            if (instance != null) {
-                result.addAll(instance);
-            }
-        }
-        return result;
+        return witnessToBlockInstances.computeIfAbsent(w, v -> Collections.emptyList());
     }
 
     public int size() {
