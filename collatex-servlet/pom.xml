@@ -3,7 +3,7 @@
   <parent>
     <groupId>eu.interedition</groupId>
     <artifactId>collatex</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.7.0</version>
   </parent>
   <artifactId>collatex-servlet</artifactId>
   <name>CollateX Servlet</name> 
