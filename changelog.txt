@@ -1,11 +1,27 @@
+Release 1.7
+- Major rewrite of the matching phase of the Dekker algorithm. The MatchTable approach used in versions 1.2 - 1.6 of
+ CollateX would match the tokens of the witness to be aligned against the tokens present on the vertices of the variant
+ graph one witness at a time. This approach did not scale very well and it was unable to look ahead. The new
+ implementation of the matching phase builds a token index of all tokens of all witnesses before the alignment phase
+ based on sorting the tokens. This approach is faster and returns a complete overview of all the possible matches
+ including 1) the number of tokens present in a block, 2) in how many witnesses the block occurs and 3) how frequent
+ the block occurs in the complete witness set.
+- Optimizations of the alignment phase of the Dekker algorithm. A priority queue is now used instead of a multiple
+ value map to select the best possible match. The detection of possible overlap between possible matches now has a fast
+ path in case of complete overlap or no overlap between two possible blocks.
+- The alignment phase of algorithm (including the transposition detection) has stayed the same. There are same quality
+ improvements however based on the fact that the possible matches are now based on the tokens of the complete witness
+ set.
+
 Release 1.6.2
-- Added servlet module for easy deployment on servlet containers such as the Apache Tomcat webserver. Implementation is based on JAX-RS and Jersey 2.
+- Added servlet module for easy deployment on servlet containers such as the Apache Tomcat web-server.
+Implementation is based on JAX-RS and Jersey 2.
 
 Release 1.6.1
 - JSON processing: fix regression bug due to which "tokenComparator" and "algorithm" turned into mandatory fields
 
 Release 1.6
-- new aligorithm based on Greedy String Tiling
+- new algorithm based on Greedy String Tiling
 - Java 8 now required
 - provide our own implementation of variant graphs
 - remove optional and seldomly used integrations with Neo4j and Apache Cocoon
@@ -43,3 +59,15 @@ This approach improves the alignment quality greatly in case of longer witnesses
 - New ColateX Tools package, containing a web-service based on JAX-RS.
 - New Command-line interface.
 
+Release 1.2
+- Beta release of the MatchTable approach (only released internally to beta testers).
+
+Release 1.1
+- First release to allow a custom matching function by supplying a comparator<Token> function to the aligner.
+
+Release 1.0
+- First release to align against a variant graph instead of an alignment table. The alignment table is now a
+ visualization of the variant graph.
+
+Release 0.9
+- First public release (beta quality).
