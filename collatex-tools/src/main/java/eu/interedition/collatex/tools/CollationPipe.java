@@ -150,9 +150,7 @@ public class CollationPipe {
         }
 
         final VariantGraph variantGraph = new VariantGraph();
-        for (SimpleWitness witness : witnesses) {
-            collationAlgorithm.collate(variantGraph, witness);
-        }
+        collationAlgorithm.collate(variantGraph, witnesses);
 
         if (joined && !commandLine.hasOption("t")) {
             VariantGraph.JOIN.apply(variantGraph);
