@@ -20,6 +20,7 @@
 package eu.interedition.collatex.dekker.island;
 
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.token_index.Block;
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -155,5 +156,9 @@ public class Island implements Iterable<Coordinate> {
 //            return "Island has been modified after creation and has become empty!";
 //        }
 //        return MessageFormat.format("Island ({0}-{1}) size: {2}", islandCoordinates.get(0), islandCoordinates.get(islandCoordinates.size() - 1), size());
+    }
+
+    public Match getMatch(int i) {
+        return islandCoordinates.get(0).match;
     }
 }

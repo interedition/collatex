@@ -115,7 +115,7 @@ public class DekkerAlgorithmTest extends AbstractTest {
         VariantGraph g = new VariantGraph();
         // we collate the first witness --> is a simple add
         aligner.collate(g, w);
-        VariantGraph.Vertex[] vertices = aligner.vertex_array;
+        VariantGraph.Vertex[] vertices = aligner.vertexArray;
         assertVertexEquals("the", vertices[0]);
         assertVertexEquals("same", vertices[1]);
         assertVertexEquals("stuff", vertices[2]);
