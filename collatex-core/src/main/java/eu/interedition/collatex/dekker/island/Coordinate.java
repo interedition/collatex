@@ -24,7 +24,9 @@ import eu.interedition.collatex.dekker.Match;
 import java.util.Objects;
 
 public class Coordinate implements Comparable<Coordinate> {
+    // row = index in witness (counted in tokens)
     public int row;
+    // column = index in graph (counted in vertices)
     public int column;
     public Match match;
 
