@@ -57,15 +57,21 @@ public class AlignmentPhase {
         */
 
         Comparator<Island> comp = (pm1, pm2) -> {
+            // sort on 1) rank in the graph (lower rank first)
             int rank1 = ranking.apply(pm1.getMatch(0).vertex);
             int rank2 = ranking.apply(pm2.getMatch(0).vertex);
             int difference = rank1 - rank2;
             if (difference != 0) {
                 return difference;
             }
-            //NOTE: this code assumes that the phrase matches are already sorted in witness order
-            //This assumption is not always correct
-
+            // sort on 2) length of the phrase match (larger first)
+            int length1 = pm1.size();
+            int length2 = pm2.size();
+            int difference2 = length2 - length1;
+            if (difference2 != 0) {
+                return difference2;
+            }
+            // sort on 3) position in the witness (lower position first)
             int index1 = pm1.getLeftEnd().row;
             int index2 = pm2.getLeftEnd().row;
             return index1 - index2;
@@ -79,16 +85,25 @@ public class AlignmentPhase {
 
     private void sortPhraseMatchesOnWitnessOrder(List<Island> phraseMatches, VariantGraphRanking ranking) {
         Comparator<Island> comp2 = (pm1, pm2) -> {
+            // sort on 1) position in the witness (lower position first)
             int index1 = pm1.getLeftEnd().row;
             int index2 = pm2.getLeftEnd().row;
             int difference = index1 - index2;
             if (difference != 0) {
                 return difference;
             }
+            // sort on 2) length of the phrase match (larger first)
+            int length1 = pm1.size();
+            int length2 = pm2.size();
+            int difference2 = length2 - length1;
+            if (difference2 != 0) {
+                return difference2;
+            }
+            // sort on 3) rank in the graph (lowest rank first)
             int rank1 = ranking.apply(pm1.getMatch(0).vertex);
             int rank2 = ranking.apply(pm2.getMatch(0).vertex);
-            int difference2 = rank1 - rank2;
-            return difference2;
+            int difference3 = rank1 - rank2;
+            return difference3;
         };
 
         phraseMatchesWitnessOrder = new ArrayList<>(phraseMatches);

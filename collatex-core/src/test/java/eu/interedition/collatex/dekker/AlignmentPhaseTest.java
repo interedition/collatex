@@ -25,8 +25,8 @@ public class AlignmentPhaseTest extends AbstractTest {
         aligner.alignNextWitnessAndGraph(graph, true, w[0]);
         // align f2
         AlignmentPhase phase = aligner.alignNextWitnessAndGraph(graph, false, w[1]);
-        assertEquals("[the, the black, the black, the black cat on the table, the, the, black, black cat on the table, black, cat on the table, on the table, the, the, the table, the, table]", phase.phraseMatchesGraphOrder.toString());
-        assertEquals("[the, the black, the, black, the black, the black cat on the table, the, the, black cat on the table, black, cat on the table, on the table, the, the table, the, table]", phase.phraseMatchesWitnessOrder.toString());
+        assertEquals("[the black cat on the table, the black, the black, the, the, the, black cat on the table, black, black, cat on the table, on the table, the table, the, the, the, table]", phase.phraseMatchesGraphOrder.toString());
+        assertEquals("[the black, the, the, black, the black cat on the table, the black, the, the, black cat on the table, black, cat on the table, on the table, the table, the, the, table]", phase.phraseMatchesWitnessOrder.toString());
     }
 
 
