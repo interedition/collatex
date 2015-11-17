@@ -1,42 +1,25 @@
 from ClusterShell.RangeSet import RangeSet
 from collatex.core_classes import Token
-from collatex.extended_suffix_array import Stack
 from collatex.linsuffarr import SuffixArray
 from collatex.linsuffarr import UNIT_BYTE
 
 
+class Stack(list):
+    def push(self, item):
+        self.append(item)
+
+    def peek(self):
+        return self[-1]
 
 
 # TokenIndex
 class TokenIndex(object):
 
-
-    # public TokenIndex(Comparator<Token> comparator, List<? extends Iterable<Token>> w) {
-    #     this.w = w;
-    #     this.comparator = new MarkerTokenComparatorWrapper(comparator);
-    # }
     def __init__(self, witnesses):
         self.witnesses = witnesses
         self.counter = 0
         self.witness_ranges = {}
         self.token_array = []
-
-    # // 1. prepare token array
-    # // 2. derive the suffix array
-    # // 3. derive LCP array
-    # // 4. derive LCP intervals
-    # // TODO: we do not have to store w!
-    # public void prepare() {
-    #     this.token_array = this.prepareTokenArray();
-    #     SuffixData suffixData = SuffixArrays.createWithLCP(token_array, new SAIS(), comparator);
-    #     this.suffix_array = suffixData.getSuffixArray();
-    #     this.LCP_array = suffixData.getLCP();
-    #     this.blocks = splitLCP_ArrayIntoIntervals();
-    #     constructWitnessToBlockInstancesMap();
-    # }
-
-
-
 
     def prepare(self):
         self._prepare_token_array()
@@ -45,7 +28,7 @@ class TokenIndex(object):
         self.lcp_array = self.get_lcp_array()
 
     def _prepare_token_array(self):
-        #TODO: the lazy init should move to somewhere else
+        # TODO: the lazy init should move to somewhere else
         # clear the suffix array and LCP array cache
         self.cached_suffix_array = None
         for idx, witness in enumerate(self.witnesses):
@@ -59,6 +42,11 @@ class TokenIndex(object):
                 self.token_array.append(Token({"n":"$"+str(idx-1)}))
             # remember get tokens twice
             self.token_array.extend(witness.tokens())
+
+    def get_range_for_witness(self, witness_sigil):
+        if not witness_sigil in self.witness_ranges:
+            raise Exception("Witness "+witness_sigil+" is not added to the collation!")
+        return self.witness_ranges[witness_sigil]
 
     def get_sa(self):
         # NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
@@ -82,30 +70,31 @@ class TokenIndex(object):
         previous_lcp_value = 0
         open_intervals = Stack()
         for idx, lcp_value in enumerate(self.lcp_array):
-#             print(lcp_value)
+            #             print(lcp_value)
             if lcp_value > previous_lcp_value:
                 open_intervals.push((idx-1, lcp_value))
                 previous_lcp_value = lcp_value
             if lcp_value < previous_lcp_value:
                 # close open intervals that are larger than current lcp_value
                 while open_intervals and open_intervals.peek()[1] > lcp_value:
-#                     print("Peek: "+str(open_intervals.peek()))
+                    #                     print("Peek: "+str(open_intervals.peek()))
                     (start, length) = open_intervals.pop()
-                    #TODO: FIX NUMBER OF SIBLINGS!
+                    # TODO: FIX NUMBER OF SIBLINGS!
                     closed_intervals.append(LCPInterval(self, start, idx-1, length, 0))
-#                     print("new: "+repr(closed_intervals[-1]))
+                    #                     print("new: "+repr(closed_intervals[-1]))
                 # then: open a new interval starting with start filter open intervals.
                 if lcp_value > 0:
                     start = closed_intervals[-1].start
                     open_intervals.push((start, lcp_value))
                 previous_lcp_value = lcp_value
         # add all the open intervals to the result
-#         print("Closing remaining:")
+        #         print("Closing remaining:")
         for start, length in open_intervals:
-            #TODO: FIX NUMBER OF SIBLINGS!
+            # TODO: FIX NUMBER OF SIBLINGS!
             closed_intervals.append(LCPInterval(self, start, len(self.lcp_array)-1, length, 0))
-#             print("new: "+repr(closed_intervals[-1]))
+            #             print("new: "+repr(closed_intervals[-1]))
         return closed_intervals
+
 
 # parts of the LCP array become potential blocks.
 # minimum block_length: the number of tokens a single occurrence of this block spans

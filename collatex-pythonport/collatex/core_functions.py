@@ -109,9 +109,6 @@ def export_alignment_table_as_json(table, indent=None, status=False):
         json_output["status"] = variant_status
     return json.dumps(json_output, sort_keys=True, indent=indent)
 
-'''
-Suffix specific implementation of Collation object
-'''
 class Collation(object):
 
     @classmethod
@@ -132,64 +129,13 @@ class Collation(object):
 
     def __init__(self):
         self.witnesses = []
-        self.counter = 0
-        self.witness_ranges = {}
-        self.combined_string = ""
-        self.cached_suffix_array = None
 
-    # the tokenization process happens multiple times
-    # and by different tokenizers. This should be fixed
     def add_witness(self, witnessdata):
-        # clear the suffix array and LCP array cache
-        self.cached_suffix_array = None
         witness = Witness(witnessdata)
         self.witnesses.append(witness)
-        witness_range = RangeSet()
-        witness_range.add_range(self.counter, self.counter+len(witness.tokens()))
-        # the extra one is for the marker token
-        self.counter += len(witness.tokens()) + 2  # $ + number
-        self.witness_ranges[witness.sigil] = witness_range
-        if not self.combined_string == "":
-            self.combined_string += " $"+str(len(self.witnesses)-1)+ " "
-        self.combined_string += witness.content
 
     def add_plain_witness(self, sigil, content):
         return self.add_witness({'id':sigil, 'content':content})
-
-    def get_range_for_witness(self, witness_sigil):
-        if not witness_sigil in self.witness_ranges:
-            raise Exception("Witness "+witness_sigil+" is not added to the collation!")
-        return self.witness_ranges[witness_sigil]
-
-    def get_combined_string(self):
-        return self.combined_string
-
-    def get_sa(self):
-        # NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
-        if not self.cached_suffix_array:
-            # Unit byte is done to skip tokenization in third party library
-            self.cached_suffix_array = SuffixArray(self.tokens, unit=UNIT_BYTE)
-        return self.cached_suffix_array
-
-    def get_suffix_array(self):
-        sa = self.get_sa()
-        return sa.SA
-
-    def get_lcp_array(self):
-        sa = self.get_sa()
-        return sa._LCP_values
-
-
-    def to_extended_suffix_array(self):
-        return ExtendedSuffixArray(self.tokens, self.get_suffix_array(), self.get_lcp_array(), self)
-
-    @property
-    def tokens(self):
-        # print("COLLATION TOKENIZE IS CALLED!")
-        # TODO: complete set of witnesses is retokenized here!
-        tokenizer = WordPunctuationTokenizer()
-        tokens = tokenizer.tokenize(self.get_combined_string())
-        return tokens
 
 
 
