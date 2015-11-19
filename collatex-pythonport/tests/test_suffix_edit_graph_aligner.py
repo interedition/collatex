@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "a b c d F g h i ! q r s t")
         alignment_table = collate(collation)
         self.assertEquals(["a b c d F g h i!", "K!", "q r s t"], alignment_table.rows[0].to_list())
-        self.assertEquals(["a b c d F g h i!", "-", "q r s t"], alignment_table.rows[1].to_list())
+        self.assertEquals(["a b c d F g h i!", None, "q r s t"], alignment_table.rows[1].to_list())
 
     def test_hermans_witness_order_independence_case_three_witnesses(self):
         collation = Collation()
@@ -24,8 +24,8 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("C", "a b c d E g h i ! q r s t")
         alignment_table = collate(collation)
         self.assertEquals(["a b c d", "F", "g h i", "! K", "! q r s t"], alignment_table.rows[0].to_list())
-        self.assertEquals(["a b c d", "F", "g h i", "-", "! q r s t"], alignment_table.rows[1].to_list())
-        self.assertEquals(["a b c d", "E", "g h i", "-", "! q r s t"], alignment_table.rows[2].to_list())
+        self.assertEquals(["a b c d", "F", "g h i", None, "! q r s t"], alignment_table.rows[1].to_list())
+        self.assertEquals(["a b c d", "E", "g h i", None, "! q r s t"], alignment_table.rows[2].to_list())
 
     def test_witness_order(self):
         collation = Collation()
@@ -33,8 +33,8 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "x b y")
         collation.add_plain_witness("C", "x a b y")
         alignment_table = collate(collation)
-        self.assertEquals(["x", "a", "-", "y"], alignment_table.rows[0].to_list())
-        self.assertEquals(["x", "-", "b", "y"], alignment_table.rows[1].to_list())
+        self.assertEquals(["x", "a", None, "y"], alignment_table.rows[0].to_list())
+        self.assertEquals(["x", None, "b", "y"], alignment_table.rows[1].to_list())
         self.assertEquals(["x", "a", "b", "y"], alignment_table.rows[2].to_list())
 
     # TODO: test with x b a y

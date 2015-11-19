@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        expected_json = '{"table": [[[{"ref": 123, "t": "A"}], [{"adj": true, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [{"t": "-"}], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}'
+        expected_json = '{"table": [[[{"ref": 123, "t": "A"}], [{"adj": true, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [null], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}'
         json_out = collate_pretokenized_json(json_in, output="json")
         self.assertEqual(expected_json, json_out)
 
