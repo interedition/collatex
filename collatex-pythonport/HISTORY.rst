@@ -3,6 +3,11 @@
 History
 -------
 
+2.0.0rc17 (2015-11-25)
++++++++++++++++++++++++
+
+* Moved all the block and suffix, LCP interval code to new class TokenIndex.
+
 2.0.0rc16 (2015-06-28)
 +++++++++++++++++++++++
 
