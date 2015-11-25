@@ -3,6 +3,10 @@
 History
 -------
 
+2.0.0rc18 (2015-11-25)
+++++++++++++++++++++++
+* Renamed TokenIndex.py module to tokenindex.py to follow conventions.
+
 2.0.0rc17 (2015-11-25)
 +++++++++++++++++++++++
 
