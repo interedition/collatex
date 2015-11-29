@@ -22,7 +22,7 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.new_align.AlignmentPhase;
+import eu.interedition.collatex.dekker.new_align.DecisionTreeBuilder;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.dekker.island.*;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
@@ -35,7 +35,7 @@ import java.util.stream.StreamSupport;
 public class DekkerAlgorithm extends CollationAlgorithm.Base implements InspectableCollationAlgorithm {
     public TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
-    protected VariantGraph.Vertex[] vertexArray;
+    public VariantGraph.Vertex[] vertexArray;
     private final Comparator<Token> comparator;
     private final PhraseMatchDetector phraseMatchDetector;
     private final TranspositionDetector transpositionDetector;
@@ -186,15 +186,15 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
     }
 
 
-    public void createTokenIndex(SimpleWitness[] w) {
+    public TokenIndex createTokenIndex(SimpleWitness[] w) {
         List<SimpleWitness> wi = new ArrayList<>();
         for (int i=0; i<w.length; i++) {
             wi.add(w[i]);
         }
-        createTokenIndex(wi);
+        return createTokenIndex(wi);
     }
 
-    protected void createTokenIndex(List<? extends Iterable<Token>> witnesses) {
+    protected TokenIndex createTokenIndex(List<? extends Iterable<Token>> witnesses) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Building token index from the tokens of all witnesses");
         }
@@ -205,9 +205,11 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
 
         // init vertex array
         this.vertexArray = new VariantGraph.Vertex[tokenIndex.token_array.length];
+
+        return this.tokenIndex;
     }
 
-    protected AlignmentPhase alignNextWitnessAndGraph(VariantGraph graph, boolean firstWitness, Iterable<Token> tokens) {
+    public DecisionTreeBuilder alignNextWitnessAndGraph(VariantGraph graph, boolean firstWitness, Iterable<Token> tokens) {
         final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
             .findFirst()
             .map(Token::getWitness)
@@ -225,8 +227,8 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             LOG.log(Level.FINER, "{0} + {1}: {2} vs. {3}", new Object[]{graph, witness, graph.vertices(), tokens});
         }
 
-        AlignmentPhase phase = new AlignmentPhase();
-        phase.doAlign(tokenIndex, graph, tokens, vertexArray);
+        DecisionTreeBuilder phase = new DecisionTreeBuilder();
+        phase.create(tokenIndex, graph, tokens, vertexArray);
         return phase;
     }
 

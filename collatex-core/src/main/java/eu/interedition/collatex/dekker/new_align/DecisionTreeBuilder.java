@@ -12,13 +12,13 @@ import java.util.*;
 /**
  * Created by ronalddekker on 21/10/15.
  */
-public class AlignmentPhase {
+public class DecisionTreeBuilder {
 
     //TODO: the next field is public because of test... must be a better way to do this
     public List<Island> phraseMatchesGraphOrder;
     public List<Island> phraseMatchesWitnessOrder;
 
-    public void doAlign(TokenIndex tokenIndex, VariantGraph graph, Iterable<Token> tokens, VariantGraph.Vertex[] vertexArray) {
+    public DecisionTree create(TokenIndex tokenIndex, VariantGraph graph, Iterable<Token> tokens, VariantGraph.Vertex[] vertexArray) {
         // we need to get the potential matches from the token index
         Set<Island> allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertexArray, graph, tokens);
 
@@ -36,19 +36,27 @@ public class AlignmentPhase {
         // rank the graph (needed to sort the phrase matches)
         final VariantGraphRanking ranking = rankTheGraph(phraseMatches, base);
         // sort the blocks based on graph order (second witness order)
-        sortPhraseMatchesBasedOnGraphOrder(phraseMatches, ranking);
+        List<Island> phraseMatchesBasedOnGraphOrder = sortPhraseMatchesBasedOnGraphOrder(phraseMatches, ranking);
         // sort the blocks based on witness order
-        sortPhraseMatchesOnWitnessOrder(phraseMatches, ranking);
+        List<Island> phraseMatchesOnWitnessOrder = sortPhraseMatchesOnWitnessOrder(phraseMatches, ranking);
 
+        // we need to build a decision tree here
+        DecisionTree tree = new DecisionTree(phraseMatchesBasedOnGraphOrder, phraseMatchesOnWitnessOrder);
+        return tree;
 
-        // build a table in which the decisions are made based on traversing the two blocks arrays
-        // score diagnally
-
-        // for each cell we need to keep track of a lot of information
-        // to base the scoring on
+//        // set up astar tactics to find ideal combination of everything
+//        MyAStar search = new MyAStar(phraseMatchesBasedOnGraphOrder, phraseMatchesOnWitnessOrder);
+//        //search.
+//
+//        // OLD
+//        // build a table in which the decisions are made based on traversing the two blocks arrays
+//        // score diagnally
+//
+//        // for each cell we need to keep track of a lot of information
+//        // to base the scoring on
     }
 
-    private void sortPhraseMatchesBasedOnGraphOrder(List<Island> phraseMatches, VariantGraphRanking ranking) {
+    private List<Island> sortPhraseMatchesBasedOnGraphOrder(List<Island> phraseMatches, VariantGraphRanking ranking) {
         /*
          * We order the phrase matches in the topological order
         * of the graph (called rank). When the rank is equal
@@ -81,9 +89,11 @@ public class AlignmentPhase {
         Collections.sort(phraseMatchesGraphOrder, comp);
 
         System.out.println(phraseMatchesGraphOrder);
+
+        return phraseMatchesGraphOrder;
     }
 
-    private void sortPhraseMatchesOnWitnessOrder(List<Island> phraseMatches, VariantGraphRanking ranking) {
+    private List<Island> sortPhraseMatchesOnWitnessOrder(List<Island> phraseMatches, VariantGraphRanking ranking) {
         Comparator<Island> comp2 = (pm1, pm2) -> {
             // sort on 1) position in the witness (lower position first)
             int index1 = pm1.getLeftEnd().row;
@@ -110,6 +120,8 @@ public class AlignmentPhase {
         Collections.sort(phraseMatchesWitnessOrder, comp2);
 
         System.out.println(phraseMatchesWitnessOrder);
+
+        return phraseMatchesWitnessOrder;
     }
 
     /*
