@@ -159,6 +159,6 @@ public class Island implements Iterable<Coordinate> {
     }
 
     public Match getMatch(int i) {
-        return islandCoordinates.get(0).match;
+        return islandCoordinates.get(i).match;
     }
 }

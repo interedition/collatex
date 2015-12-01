@@ -47,6 +47,9 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         DecisionNode root = decisionTree.getRoot();
         System.out.println(root.getGraphPhrase());
         System.out.println(root.getWitnessPhrase());
+        DecisionNode witnessNode = root.getDecisionNodeChildForWitnessPhrase(decisionTree);
+        System.out.println(witnessNode.getGraphPhrase()+";"+witnessNode.getWitnessPhrase());
+
 
     }
 
