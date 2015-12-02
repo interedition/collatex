@@ -20,6 +20,7 @@ public class DecisionNode {
         this.positionGraph = 0;
         this.positionWitness = 0;
         this.tree = tree;
+        //Select should be one
         selected = new ArrayList<>();
         moved = new ArrayList<>();
     }
@@ -32,6 +33,20 @@ public class DecisionNode {
         return tree.getIslandOnWitnessPosition(positionWitness);
     }
 
+    public List<Island> getSelected() {
+        return selected;
+    }
+
+    public List<Island> getMoved() {
+        return moved;
+    }
+
+    @Override
+    public String toString() {
+        return getGraphPhrase()+"; "+getWitnessPhrase();
+    }
+
+    //TODO: should this method be public? I don't think so.
     public void select(Island selectWitnessPhraseMatch) {
         System.out.println("selected: "+selectWitnessPhraseMatch);
         selected.add(selectWitnessPhraseMatch);
@@ -43,24 +58,25 @@ public class DecisionNode {
     }
 
 
-
+    //TODO: this should eventually become a public method
     //NOTE: This stuff is still in an experimental state
-    protected DecisionNode getDecisionNodeChildForWitnessPhrase(DecisionTree decisionTree) {
-        DecisionNode child2 = new DecisionNode(decisionTree);
-        //child2.positionWitness++; // select the witness phrase match ("the cat")
-        //TODO: set positions
+    protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
+        DecisionNode child2 = new DecisionNode(tree);
+        // Set positions on the child node to the positions of the parent node and calculate from there
+        child2.positionGraph = positionGraph;
+        child2.positionWitness = positionWitness;
 
 
         // move all the phrase matches before the selected phrase match
-        Island selectWitnessPhraseMatch = decisionTree.getIslandOnWitnessPosition(child2.positionWitness);
+        Island selectWitnessPhraseMatch = tree.getIslandOnWitnessPosition(child2.positionWitness);
         // now find the position of the linked match in the other array
         //selectWitnessPhraseMatch.
-        Island graphPhraseMatch = decisionTree.getIslandOnGraphPosition(child2.positionGraph);
+        Island graphPhraseMatch = tree.getIslandOnGraphPosition(child2.positionGraph);
         while(graphPhraseMatch != selectWitnessPhraseMatch) {
             //TODO: check whether item is already occupied
             child2.move(graphPhraseMatch);
             child2.positionGraph++;
-            graphPhraseMatch = decisionTree.getIslandOnGraphPosition(child2.positionGraph);
+            graphPhraseMatch = tree.getIslandOnGraphPosition(child2.positionGraph);
         }
         // select witness phrase match
         child2.select(selectWitnessPhraseMatch);
@@ -72,8 +88,6 @@ public class DecisionNode {
         child2.positionGraph += selectWitnessPhraseMatch.size();
         child2.skipToNextAvailableGraph();
         child2.skipToNextAvailableWitness();
-
-        //TODO; check next phrase on witness order
         return child2;
     }
 
@@ -85,18 +99,18 @@ public class DecisionNode {
         BitSet positions = new BitSet();
         convert(vertices, positions, moved);
         convert(vertices, positions, selected);
-        System.out.println(vertices);
-        System.out.println(positions);
+//        System.out.println(vertices);
+//        System.out.println(positions);
         // check next phrase on graph order
         Island graphPhrase = getGraphPhrase();
-        System.out.println("testing: "+graphPhrase);
+//        System.out.println("testing: "+graphPhrase);
         //  check whether phrase is available
         //TODO: this check is too simple
         //if the first vertex and token are available it does not mean that the complete phrase
         //is available
         while (vertices.contains(graphPhrase.getMatch(0).vertex) || positions.get(graphPhrase.getLeftEnd().row)) {
             // skip graph phrase
-            System.out.println("skipped: "+graphPhrase);
+//            System.out.println("skipped: "+graphPhrase);
             positionGraph++;
             graphPhrase = getGraphPhrase();
         }
@@ -110,18 +124,18 @@ public class DecisionNode {
         BitSet positions = new BitSet();
         convert(vertices, positions, moved);
         convert(vertices, positions, selected);
-        System.out.println(vertices);
-        System.out.println(positions);
+//        System.out.println(vertices);
+//        System.out.println(positions);
         // check next phrase on witness order
         Island witnessPhrase = getWitnessPhrase();
-        System.out.println("testing: "+witnessPhrase);
+//        System.out.println("testing: "+witnessPhrase);
         //  check whether phrase is available
         //TODO: this check is too simple
         //if the first vertex and token are available it does not mean that the complete phrase
         //is available
         while (vertices.contains(witnessPhrase.getMatch(0).vertex) || positions.get(witnessPhrase.getLeftEnd().row)) {
             // skip witness phrase
-            System.out.println("skipped: "+witnessPhrase);
+//            System.out.println("skipped: "+witnessPhrase);
             positionWitness++;
             witnessPhrase = getWitnessPhrase();
         }
