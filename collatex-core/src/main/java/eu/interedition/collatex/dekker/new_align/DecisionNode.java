@@ -12,6 +12,7 @@ public class DecisionNode {
 
     int positionGraph;
     int positionWitness;
+    private final DecisionNode parent;
     private final DecisionTree tree;
     private final List<Island> selected;
     private final List<Island> moved;
@@ -20,7 +21,19 @@ public class DecisionNode {
         this.positionGraph = 0;
         this.positionWitness = 0;
         this.tree = tree;
-        //Select should be one
+        this.parent = null;
+        // Selected phrasematch should only be one
+        selected = new ArrayList<>();
+        moved = new ArrayList<>();
+    }
+
+    public DecisionNode(DecisionNode parent) {
+        // Set positions on the child node to the positions of the parent node and calculate from there
+        this.positionGraph = parent.positionGraph;
+        this.positionWitness = parent.positionWitness;
+        this.tree = parent.tree;
+        this.parent = parent;
+        // Selected phrasematch should only be one
         selected = new ArrayList<>();
         moved = new ArrayList<>();
     }
@@ -61,12 +74,7 @@ public class DecisionNode {
     //TODO: this should eventually become a public method
     //NOTE: This stuff is still in an experimental state
     protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
-        DecisionNode child2 = new DecisionNode(tree);
-        // Set positions on the child node to the positions of the parent node and calculate from there
-        child2.positionGraph = positionGraph;
-        child2.positionWitness = positionWitness;
-
-
+        DecisionNode child2 = new DecisionNode(this);
         // move all the phrase matches before the selected phrase match
         Island selectWitnessPhraseMatch = tree.getIslandOnWitnessPosition(child2.positionWitness);
         // now find the position of the linked match in the other array
@@ -95,12 +103,10 @@ public class DecisionNode {
         // now we need to skip elements that are not available anymore
         // we can do this the ugly way
         // transform the moved and the selected phrases into fixed bits for the witness positions and fixed vertices for the graph positions.
-        Set<VariantGraph.Vertex> vertices = new HashSet<>();
-        BitSet positions = new BitSet();
-        convert(vertices, positions, moved);
-        convert(vertices, positions, selected);
-//        System.out.println(vertices);
-//        System.out.println(positions);
+        FillAreaCovered fillAreaCovered = new FillAreaCovered().invoke();
+        Set<VariantGraph.Vertex> vertices = fillAreaCovered.getVertices();
+        BitSet positions = fillAreaCovered.getPositions();
+
         // check next phrase on graph order
         Island graphPhrase = getGraphPhrase();
 //        System.out.println("testing: "+graphPhrase);
@@ -120,12 +126,10 @@ public class DecisionNode {
         // now we need to skip elements that are not available anymore
         // we can do this the ugly way
         // transform the moved and the selected phrases into fixed bits for the witness positions and fixed vertices for the graph positions.
-        Set<VariantGraph.Vertex> vertices = new HashSet<>();
-        BitSet positions = new BitSet();
-        convert(vertices, positions, moved);
-        convert(vertices, positions, selected);
-//        System.out.println(vertices);
-//        System.out.println(positions);
+        FillAreaCovered fillAreaCovered = new FillAreaCovered().invoke();
+        Set<VariantGraph.Vertex> vertices = fillAreaCovered.getVertices();
+        BitSet positions = fillAreaCovered.getPositions();
+
         // check next phrase on witness order
         Island witnessPhrase = getWitnessPhrase();
 //        System.out.println("testing: "+witnessPhrase);
@@ -138,6 +142,37 @@ public class DecisionNode {
 //            System.out.println("skipped: "+witnessPhrase);
             positionWitness++;
             witnessPhrase = getWitnessPhrase();
+        }
+    }
+
+    private class FillAreaCovered {
+        private Set<VariantGraph.Vertex> vertices;
+        private BitSet positions;
+
+        public Set<VariantGraph.Vertex> getVertices() {
+            return vertices;
+        }
+
+        public BitSet getPositions() {
+            return positions;
+        }
+
+        public FillAreaCovered invoke() {
+            // now we need to skip elements that are not available anymore
+            // we can do this the ugly way
+            // transform the moved and the selected phrases into fixed bits for the witness positions and fixed vertices for the graph positions.
+            vertices = new HashSet<>();
+            positions = new BitSet();
+
+            DecisionNode current = DecisionNode.this;
+            do {
+                convert(vertices, positions, current.moved);
+                convert(vertices, positions, current.selected);
+                // System.out.println(vertices);
+                // System.out.println(positions);
+                current = current.parent;
+            }  while (current!=null);
+            return this;
         }
     }
 
@@ -154,5 +189,4 @@ public class DecisionNode {
             }
         }
     }
-
 }

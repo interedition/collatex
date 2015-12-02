@@ -45,6 +45,8 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         DecisionTreeBuilder builder = new DecisionTreeBuilder();
         DecisionTree decisionTree = builder.create(tokenIndex, graph, w[1], aligner.vertexArray);
         DecisionNode root = decisionTree.getRoot();
+
+        // 1
         DecisionNode witnessNode = root.getDecisionNodeChildForWitnessPhrase();
         // assert selection
         assertEquals("the cat", witnessNode.getSelected().get(0).toString());
@@ -52,6 +54,8 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         // assert new position
         assertEquals("observed", witnessNode.getGraphPhrase().toString());
         assertEquals("birds in the", witnessNode.getWitnessPhrase().toString());
+
+        // 2
         DecisionNode witnessNode2 = witnessNode.getDecisionNodeChildForWitnessPhrase();
         // assert selection
         assertEquals("birds in the", witnessNode2.getSelected().get(0).toString());
@@ -61,7 +65,16 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         assertEquals("trees", witnessNode2.getGraphPhrase().toString());
         assertEquals("trees", witnessNode2.getWitnessPhrase().toString());
 
-
+        // 3
+        DecisionNode witnessNode3 = witnessNode2.getDecisionNodeChildForWitnessPhrase();
+        System.out.println(witnessNode3);
+        // assert selection
+        assertEquals("trees", witnessNode3.getSelected().get(0).toString());
+        // assert moved (2)
+        assertEquals("[]", witnessNode3.getMoved().toString());
+        // assert new position
+        assertEquals(".", witnessNode3.getGraphPhrase().toString());
+        assertEquals(".", witnessNode3.getWitnessPhrase().toString());
     }
 
 
