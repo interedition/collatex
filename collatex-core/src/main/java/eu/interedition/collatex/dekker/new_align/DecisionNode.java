@@ -11,7 +11,7 @@ import java.util.*;
 public class DecisionNode {
 
     int positionGraph;
-    int positionWitness;
+    ListIterator<Island> witnessIterator;
     private final DecisionNode parent;
     private final DecisionTree tree;
     private final List<Island> selected;
@@ -19,7 +19,7 @@ public class DecisionNode {
 
     public DecisionNode(DecisionTree tree) {
         this.positionGraph = 0;
-        this.positionWitness = 0;
+        this.witnessIterator = tree.getWitnessIterator();
         this.tree = tree;
         this.parent = null;
         // Selected phrasematch should only be one
@@ -30,7 +30,7 @@ public class DecisionNode {
     public DecisionNode(DecisionNode parent) {
         // Set positions on the child node to the positions of the parent node and calculate from there
         this.positionGraph = parent.positionGraph;
-        this.positionWitness = parent.positionWitness;
+        this.witnessIterator = parent.tree.getWitnessIterator(parent.witnessIterator.nextIndex());
         this.tree = parent.tree;
         this.parent = parent;
         // Selected phrasematch should only be one
@@ -43,7 +43,7 @@ public class DecisionNode {
     }
 
     public Island getNextWitnessPhrase() {
-        return tree.getIslandOnWitnessPosition(positionWitness);
+        return tree.getIslandOnWitnessPosition(witnessIterator.nextIndex());
     }
 
     public List<Island> getSelected() {
@@ -76,7 +76,7 @@ public class DecisionNode {
     protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
         // create child node
         DecisionNode child2 = new DecisionNode(this);
-        Island selectWitnessPhraseMatch = tree.getIslandOnWitnessPosition(child2.positionWitness);
+        Island selectWitnessPhraseMatch = child2.getNextWitnessPhrase();
         // move stuff
         child2.moveEverythingInGraphBefore(selectWitnessPhraseMatch);
         // select witness phrase match
@@ -84,7 +84,7 @@ public class DecisionNode {
         // move the pointer further till the next available phrase match
         // wwe have to keep track of the selected vertices and selected tokens to test this
         // for now we can do this simply by moving the pointer by the length of selected
-        child2.positionWitness += selectWitnessPhraseMatch.size();
+        child2.witnessIterator.next();
         // the pointers of both positions should be moved
         child2.positionGraph += selectWitnessPhraseMatch.size();
         // skip if possible and necessary
@@ -155,7 +155,7 @@ public class DecisionNode {
         while (vertices.contains(witnessPhrase.getMatch(0).vertex) || positions.get(witnessPhrase.getLeftEnd().row)) {
             // skip witness phrase
 //            System.out.println("skipped: "+witnessPhrase);
-            positionWitness++;
+            witnessIterator.next();
             witnessPhrase = getNextWitnessPhrase();
         }
     }

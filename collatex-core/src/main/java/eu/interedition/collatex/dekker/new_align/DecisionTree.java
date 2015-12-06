@@ -3,6 +3,7 @@ package eu.interedition.collatex.dekker.new_align;
 import eu.interedition.collatex.dekker.island.Island;
 
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by ronalddekker on 24/11/15.
@@ -38,7 +39,7 @@ public class DecisionTree {
             System.out.println("hmm");
             return null;
         }
-        if (current.positionWitness == phraseMatchesOnWitnessOrder.size()) {
+        if (current.isWitnessEnd()) {
             System.out.println("interesting");
             return null;
         }
@@ -50,7 +51,16 @@ public class DecisionTree {
         return decisionNode.positionGraph == phraseMatchesOnGraphOrder.size();
     }
 
+    //TODO; could move to decision node completely
     public boolean isNodeAtwitnessEnd(DecisionNode decisionNode) {
-        return decisionNode.positionWitness == phraseMatchesOnWitnessOrder.size();
+        return !decisionNode.witnessIterator.hasNext();
+    }
+
+    public ListIterator<Island> getWitnessIterator() {
+        return phraseMatchesOnWitnessOrder.listIterator();
+    }
+
+    public ListIterator<Island> getWitnessIterator(int index) {
+        return phraseMatchesOnWitnessOrder.listIterator(index);
     }
 }
