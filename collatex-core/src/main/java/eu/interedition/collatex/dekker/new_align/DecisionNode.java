@@ -74,18 +74,11 @@ public class DecisionNode {
     //TODO: this should eventually become a public method
     //NOTE: This stuff is still in an experimental state
     protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
+        // create child node
         DecisionNode child2 = new DecisionNode(this);
-        // move all the phrase matches before the selected phrase match
         Island selectWitnessPhraseMatch = tree.getIslandOnWitnessPosition(child2.positionWitness);
-        // now find the position of the linked match in the other array
-        //selectWitnessPhraseMatch.
-        Island graphPhraseMatch = tree.getIslandOnGraphPosition(child2.positionGraph);
-        while(graphPhraseMatch != selectWitnessPhraseMatch) {
-            //TODO: check whether item is already occupied
-            child2.move(graphPhraseMatch);
-            child2.positionGraph++;
-            graphPhraseMatch = tree.getIslandOnGraphPosition(child2.positionGraph);
-        }
+        // move stuff
+        child2.moveEverythingInGraphBefore(selectWitnessPhraseMatch);
         // select witness phrase match
         child2.select(selectWitnessPhraseMatch);
         // move the pointer further till the next available phrase match
@@ -102,6 +95,23 @@ public class DecisionNode {
             child2.skipToNextAvailableWitness();
         }
         return child2;
+    }
+
+    private void moveEverythingInGraphBefore(Island selectWitnessPhraseMatch) {
+        // move all the phrase matches before the selected phrase match
+        // now find the position of the linked match in the other array
+        //NOTE: this implementation is probably too simple; only checks coverage of moved parts underling.
+        Set<VariantGraph.Vertex> vertices = new HashSet<>();
+        BitSet positions = new BitSet();
+        Island graphPhraseMatch = tree.getIslandOnGraphPosition(positionGraph);
+        while(graphPhraseMatch != selectWitnessPhraseMatch) {
+            if (!vertices.contains(graphPhraseMatch.getMatch(0).vertex) && !positions.get(graphPhraseMatch.getLeftEnd().row)) {
+                move(graphPhraseMatch);
+                convertSinglePhraseMatch(vertices, positions, graphPhraseMatch);
+            }
+            positionGraph++;
+            graphPhraseMatch = tree.getIslandOnGraphPosition(positionGraph);
+        }
     }
 
     private void skipToNextAvailableGraph() {
@@ -191,15 +201,19 @@ public class DecisionNode {
 
     private static void convert(Set<VariantGraph.Vertex> vertices, BitSet positions, List<Island> phrases) {
         for (Island taken : phrases) {
-            for (int i=0; i < taken.size(); i++) {
-                // Just storing and testing against the matches is not good enough
-                // matches can overlap with each other..
-                // storing the rank instead of the vertex is also not good enough
-                // there can be multiple vertices on the same rank
-                // locking one vertex, does not lock the other(s)
-                vertices.add(taken.getMatch(i).vertex);
-                positions.set(taken.getLeftEnd().row+i);
-            }
+            convertSinglePhraseMatch(vertices, positions, taken);
+        }
+    }
+
+    private static void convertSinglePhraseMatch(Set<VariantGraph.Vertex> vertices, BitSet positions, Island phraseMatch) {
+        for (int i=0; i < phraseMatch.size(); i++) {
+            // Just storing and testing against the matches is not good enough
+            // matches can overlap with each other..
+            // storing the rank instead of the vertex is also not good enough
+            // there can be multiple vertices on the same rank
+            // locking one vertex, does not lock the other(s)
+            vertices.add(phraseMatch.getMatch(i).vertex);
+            positions.set(phraseMatch.getLeftEnd().row+i);
         }
     }
 }

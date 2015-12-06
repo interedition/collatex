@@ -51,7 +51,8 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         DecisionNode witnessNode = root.getDecisionNodeChildForWitnessPhrase();
         // assert selection
         assertEquals("the cat", witnessNode.getSelected().get(0).toString());
-        //TODO: assert moved blocks; also assert number of selected and moved blocks
+        // assert moved (1)
+        assertEquals("[this morning]", witnessNode.getMoved().toString());
         // assert new position
         assertEquals("observed", witnessNode.getNextGraphPhrase().toString());
         assertEquals("birds in the", witnessNode.getNextWitnessPhrase().toString());
