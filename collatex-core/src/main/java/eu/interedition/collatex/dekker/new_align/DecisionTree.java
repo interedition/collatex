@@ -63,4 +63,8 @@ public class DecisionTree {
     public ListIterator<Island> getWitnessIterator(int index) {
         return phraseMatchesOnWitnessOrder.listIterator(index);
     }
+
+    public ListIterator<Island> getGraphIterator(int index) {
+        return phraseMatchesOnGraphOrder.listIterator(index);
+    }
 }

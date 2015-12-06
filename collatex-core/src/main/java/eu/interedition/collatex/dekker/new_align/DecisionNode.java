@@ -78,16 +78,13 @@ public class DecisionNode {
         DecisionNode child2 = new DecisionNode(this);
         Island selectWitnessPhraseMatch = child2.getNextWitnessPhrase();
         // move stuff
-        child2.moveEverythingInGraphBefore(selectWitnessPhraseMatch);
+        child2.moveEverythingInGraphBefore(tree.getGraphIterator(positionGraph), selectWitnessPhraseMatch);
         // select witness phrase match
         child2.select(selectWitnessPhraseMatch);
         // move the pointer further till the next available phrase match
-        // wwe have to keep track of the selected vertices and selected tokens to test this
-        // for now we can do this simply by moving the pointer by the length of selected
         child2.witnessIterator.next();
-        // the pointers of both positions should be moved
-        child2.positionGraph += selectWitnessPhraseMatch.size();
         // skip if possible and necessary
+        // we have to keep track of the selected vertices and selected tokens to test this
         if (!child2.isGraphEnd()) {
             child2.skipToNextAvailableGraph();
         }
@@ -97,20 +94,23 @@ public class DecisionNode {
         return child2;
     }
 
-    private void moveEverythingInGraphBefore(Island selectWitnessPhraseMatch) {
+    //TODO: rename variables so that graph and witness is no longer apparent.
+    // at the end of the method call we are PAST the island to look for!
+    private void moveEverythingInGraphBefore(ListIterator<Island> graphIterator, Island selectWitnessPhraseMatch) {
         // move all the phrase matches before the selected phrase match
         // now find the position of the linked match in the other array
         //NOTE: this implementation is probably too simple; only checks coverage of moved parts underling.
         Set<VariantGraph.Vertex> vertices = new HashSet<>();
         BitSet positions = new BitSet();
-        Island graphPhraseMatch = tree.getIslandOnGraphPosition(positionGraph);
+        Island graphPhraseMatch = graphIterator.next();
+        positionGraph++;
         while(graphPhraseMatch != selectWitnessPhraseMatch) {
             if (!vertices.contains(graphPhraseMatch.getMatch(0).vertex) && !positions.get(graphPhraseMatch.getLeftEnd().row)) {
                 move(graphPhraseMatch);
                 convertSinglePhraseMatch(vertices, positions, graphPhraseMatch);
             }
+            graphPhraseMatch = graphIterator.next();
             positionGraph++;
-            graphPhraseMatch = tree.getIslandOnGraphPosition(positionGraph);
         }
     }
 
