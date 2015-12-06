@@ -42,7 +42,7 @@ public class DecisionNode {
         return tree.getIslandOnGraphPosition(positionGraph);
     }
 
-    public Island getNextWitnessPhrase() {
+    public Island peekWitnessPhrase() {
         return tree.getIslandOnWitnessPosition(witnessIterator.nextIndex());
     }
 
@@ -56,7 +56,7 @@ public class DecisionNode {
 
     @Override
     public String toString() {
-        return getNextGraphPhrase()+"; "+ getNextWitnessPhrase();
+        return getNextGraphPhrase()+"; "+ peekWitnessPhrase();
     }
 
     //TODO: should this method be public? I don't think so.
@@ -76,7 +76,7 @@ public class DecisionNode {
     protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
         // create child node
         DecisionNode child2 = new DecisionNode(this);
-        Island selectWitnessPhraseMatch = child2.getNextWitnessPhrase();
+        Island selectWitnessPhraseMatch = child2.peekWitnessPhrase();
         // move stuff
         child2.moveEverythingInGraphBefore(tree.getGraphIterator(positionGraph), selectWitnessPhraseMatch);
         // select witness phrase match
@@ -89,7 +89,7 @@ public class DecisionNode {
             child2.skipToNextAvailableGraph();
         }
         if (!child2.isWitnessEnd()) {
-            child2.skipToNextAvailableWitness();
+            child2.skipToNextAvailablePhraseMatch(child2.witnessIterator);
         }
         return child2;
     }
@@ -137,7 +137,7 @@ public class DecisionNode {
         }
     }
 
-    private void skipToNextAvailableWitness() {
+    private void skipToNextAvailablePhraseMatch(ListIterator<Island> phraseMatches) {
         // now we need to skip elements that are not available anymore
         // we can do this the ugly way
         // transform the moved and the selected phrases into fixed bits for the witness positions and fixed vertices for the graph positions.
@@ -146,18 +146,18 @@ public class DecisionNode {
         BitSet positions = fillAreaCovered.getPositions();
 
         // check next phrase on witness order
-        Island witnessPhrase = getNextWitnessPhrase();
-//        System.out.println("testing: "+witnessPhrase);
+        Island witnessPhrase = phraseMatches.next();
         //  check whether phrase is available
         //TODO: this check is too simple
         //if the first vertex and token are available it does not mean that the complete phrase
         //is available
         while (vertices.contains(witnessPhrase.getMatch(0).vertex) || positions.get(witnessPhrase.getLeftEnd().row)) {
-            // skip witness phrase
-//            System.out.println("skipped: "+witnessPhrase);
-            witnessIterator.next();
-            witnessPhrase = getNextWitnessPhrase();
+            // skip phrase
+            witnessPhrase = phraseMatches.next();
         }
+        // the last returned witness phrase was allowed
+        // rewind iterator
+        phraseMatches.previous();
     }
 
     public boolean isGraphEnd() {
