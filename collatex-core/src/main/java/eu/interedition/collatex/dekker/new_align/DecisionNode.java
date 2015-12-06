@@ -38,11 +38,11 @@ public class DecisionNode {
         moved = new ArrayList<>();
     }
 
-    public Island getGraphPhrase() {
+    public Island getNextGraphPhrase() {
         return tree.getIslandOnGraphPosition(positionGraph);
     }
 
-    public Island getWitnessPhrase() {
+    public Island getNextWitnessPhrase() {
         return tree.getIslandOnWitnessPosition(positionWitness);
     }
 
@@ -56,7 +56,7 @@ public class DecisionNode {
 
     @Override
     public String toString() {
-        return getGraphPhrase()+"; "+getWitnessPhrase();
+        return getNextGraphPhrase()+"; "+ getNextWitnessPhrase();
     }
 
     //TODO: should this method be public? I don't think so.
@@ -94,8 +94,13 @@ public class DecisionNode {
         child2.positionWitness += selectWitnessPhraseMatch.size();
         // the pointers of both positions should be moved
         child2.positionGraph += selectWitnessPhraseMatch.size();
-        child2.skipToNextAvailableGraph();
-        child2.skipToNextAvailableWitness();
+        // skip if possible and necessary
+        if (!child2.isGraphEnd()) {
+            child2.skipToNextAvailableGraph();
+        }
+        if (!child2.isWitnessEnd()) {
+            child2.skipToNextAvailableWitness();
+        }
         return child2;
     }
 
@@ -108,7 +113,7 @@ public class DecisionNode {
         BitSet positions = fillAreaCovered.getPositions();
 
         // check next phrase on graph order
-        Island graphPhrase = getGraphPhrase();
+        Island graphPhrase = getNextGraphPhrase();
 //        System.out.println("testing: "+graphPhrase);
         //  check whether phrase is available
         //TODO: this check is too simple
@@ -118,7 +123,7 @@ public class DecisionNode {
             // skip graph phrase
 //            System.out.println("skipped: "+graphPhrase);
             positionGraph++;
-            graphPhrase = getGraphPhrase();
+            graphPhrase = getNextGraphPhrase();
         }
     }
 
@@ -131,7 +136,7 @@ public class DecisionNode {
         BitSet positions = fillAreaCovered.getPositions();
 
         // check next phrase on witness order
-        Island witnessPhrase = getWitnessPhrase();
+        Island witnessPhrase = getNextWitnessPhrase();
 //        System.out.println("testing: "+witnessPhrase);
         //  check whether phrase is available
         //TODO: this check is too simple
@@ -141,8 +146,16 @@ public class DecisionNode {
             // skip witness phrase
 //            System.out.println("skipped: "+witnessPhrase);
             positionWitness++;
-            witnessPhrase = getWitnessPhrase();
+            witnessPhrase = getNextWitnessPhrase();
         }
+    }
+
+    public boolean isGraphEnd() {
+        return tree.isNodeAtGraphEnd(this);
+    }
+
+    public boolean isWitnessEnd() {
+        return tree.isNodeAtwitnessEnd(this);
     }
 
     private class FillAreaCovered {

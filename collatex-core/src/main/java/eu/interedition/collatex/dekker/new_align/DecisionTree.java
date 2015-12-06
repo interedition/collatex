@@ -45,4 +45,12 @@ public class DecisionTree {
 
         return null;
     }
+
+    public boolean isNodeAtGraphEnd(DecisionNode decisionNode) {
+        return decisionNode.positionGraph == phraseMatchesOnGraphOrder.size();
+    }
+
+    public boolean isNodeAtwitnessEnd(DecisionNode decisionNode) {
+        return decisionNode.positionWitness == phraseMatchesOnWitnessOrder.size();
+    }
 }

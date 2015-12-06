@@ -8,6 +8,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by ronalddekker on 24/10/15.
@@ -52,8 +53,8 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         assertEquals("the cat", witnessNode.getSelected().get(0).toString());
         //TODO: assert moved blocks; also assert number of selected and moved blocks
         // assert new position
-        assertEquals("observed", witnessNode.getGraphPhrase().toString());
-        assertEquals("birds in the", witnessNode.getWitnessPhrase().toString());
+        assertEquals("observed", witnessNode.getNextGraphPhrase().toString());
+        assertEquals("birds in the", witnessNode.getNextWitnessPhrase().toString());
 
         // 2
         DecisionNode witnessNode2 = witnessNode.getDecisionNodeChildForWitnessPhrase();
@@ -62,20 +63,30 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         // assert moved (2)
         assertEquals("[observed, little]", witnessNode2.getMoved().toString());
         // assert new position
-        assertEquals("trees", witnessNode2.getGraphPhrase().toString());
-        assertEquals("trees", witnessNode2.getWitnessPhrase().toString());
+        assertEquals("trees", witnessNode2.getNextGraphPhrase().toString());
+        assertEquals("trees", witnessNode2.getNextWitnessPhrase().toString());
 
         // 3
         DecisionNode witnessNode3 = witnessNode2.getDecisionNodeChildForWitnessPhrase();
-        System.out.println(witnessNode3);
         // assert selection
         assertEquals("trees", witnessNode3.getSelected().get(0).toString());
-        // assert moved (2)
+        // assert moved
         assertEquals("[]", witnessNode3.getMoved().toString());
         // assert new position
-        assertEquals(".", witnessNode3.getGraphPhrase().toString());
-        assertEquals(".", witnessNode3.getWitnessPhrase().toString());
+        assertEquals(".", witnessNode3.getNextGraphPhrase().toString());
+        assertEquals(".", witnessNode3.getNextWitnessPhrase().toString());
+
+        // 4
+        DecisionNode witnessNode4 = witnessNode3.getDecisionNodeChildForWitnessPhrase();
+        // assert selection
+        assertEquals(".", witnessNode4.getSelected().get(0).toString());
+        // assert moved
+        assertEquals("[]", witnessNode4.getMoved().toString());
+        assertTrue(witnessNode4.isGraphEnd());
+        assertTrue(witnessNode4.isWitnessEnd());
     }
+
+
 
 
 //    assertThat(graph, graph(w[0]).aligned("the").non_aligned("quick").aligned("brown", "fox", "jumps", "over", "the").non_aligned("lazy").aligned("dog"));
