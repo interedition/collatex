@@ -54,7 +54,7 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         // assert moved (1)
         assertEquals("[this morning]", witnessNode.getMoved().toString());
         // assert new position
-        assertEquals("observed", witnessNode.getNextGraphPhrase().toString());
+        assertEquals("observed", witnessNode.peekGraphPhrase().toString());
         assertEquals("birds in the", witnessNode.peekWitnessPhrase().toString());
 
         // 2
@@ -64,7 +64,7 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         // assert moved (2)
         assertEquals("[observed, little]", witnessNode2.getMoved().toString());
         // assert new position
-        assertEquals("trees", witnessNode2.getNextGraphPhrase().toString());
+        assertEquals("trees", witnessNode2.peekGraphPhrase().toString());
         assertEquals("trees", witnessNode2.peekWitnessPhrase().toString());
 
         // 3
@@ -74,7 +74,7 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         // assert moved
         assertEquals("[]", witnessNode3.getMoved().toString());
         // assert new position
-        assertEquals(".", witnessNode3.getNextGraphPhrase().toString());
+        assertEquals(".", witnessNode3.peekGraphPhrase().toString());
         assertEquals(".", witnessNode3.peekWitnessPhrase().toString());
 
         // 4

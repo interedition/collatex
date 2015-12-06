@@ -35,7 +35,7 @@ public class DecisionTree {
     //TODO: implementation is unfinished
     List<DecisionNode> getChildren(DecisionNode current) {
         // check of we aan het einde zijn gekomen van een van de twee lijsten
-        if (current.positionGraph == phraseMatchesOnGraphOrder.size()) {
+        if (current.isGraphEnd()) {
             System.out.println("hmm");
             return null;
         }
@@ -47,8 +47,9 @@ public class DecisionTree {
         return null;
     }
 
+    //TODO; could move to decision node completely
     public boolean isNodeAtGraphEnd(DecisionNode decisionNode) {
-        return decisionNode.positionGraph == phraseMatchesOnGraphOrder.size();
+        return !decisionNode.graphIterator.hasNext();
     }
 
     //TODO; could move to decision node completely
@@ -56,15 +57,11 @@ public class DecisionTree {
         return !decisionNode.witnessIterator.hasNext();
     }
 
-    public ListIterator<Island> getWitnessIterator() {
-        return phraseMatchesOnWitnessOrder.listIterator();
-    }
-
-    public ListIterator<Island> getWitnessIterator(int index) {
+    protected ListIterator<Island> getWitnessIterator(int index) {
         return phraseMatchesOnWitnessOrder.listIterator(index);
     }
 
-    public ListIterator<Island> getGraphIterator(int index) {
+    protected ListIterator<Island> getGraphIterator(int index) {
         return phraseMatchesOnGraphOrder.listIterator(index);
     }
 }
