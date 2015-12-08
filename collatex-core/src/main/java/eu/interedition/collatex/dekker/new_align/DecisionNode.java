@@ -136,11 +136,11 @@ public class DecisionNode {
     }
 
     public boolean isGraphEnd() {
-        return tree.isNodeAtGraphEnd(this);
+        return !graphIterator.hasNext();
     }
 
     public boolean isWitnessEnd() {
-        return tree.isNodeAtwitnessEnd(this);
+        return !witnessIterator.hasNext();
     }
 
     private class FillAreaCovered {

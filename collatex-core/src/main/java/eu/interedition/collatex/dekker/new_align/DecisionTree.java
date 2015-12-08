@@ -47,16 +47,6 @@ public class DecisionTree {
         return null;
     }
 
-    //TODO; could move to decision node completely
-    public boolean isNodeAtGraphEnd(DecisionNode decisionNode) {
-        return !decisionNode.graphIterator.hasNext();
-    }
-
-    //TODO; could move to decision node completely
-    public boolean isNodeAtwitnessEnd(DecisionNode decisionNode) {
-        return !decisionNode.witnessIterator.hasNext();
-    }
-
     protected ListIterator<Island> getWitnessIterator(int index) {
         return phraseMatchesOnWitnessOrder.listIterator(index);
     }
