@@ -47,7 +47,17 @@ public class DecisionTreeBuilderTest extends AbstractTest {
         DecisionTree decisionTree = builder.create(tokenIndex, graph, w[1], aligner.vertexArray);
         DecisionNode root = decisionTree.getRoot();
 
-        // 1
+        // 1 graph
+        DecisionNode graphNode = root.getDecisionNodeChildForGraphPhrase();
+        // assert selection
+        assertEquals("this morning", graphNode.getSelected().get(0).toString());
+        // assert moved (1)
+        assertEquals("[the cat, birds in the, little, trees]", graphNode.getMoved().toString());
+        // assert new position
+        assertEquals("observed", graphNode.peekGraphPhrase().toString());
+        assertEquals("observed", graphNode.peekWitnessPhrase().toString());
+
+        // 1 witness
         DecisionNode witnessNode = root.getDecisionNodeChildForWitnessPhrase();
         // assert selection
         assertEquals("the cat", witnessNode.getSelected().get(0).toString());

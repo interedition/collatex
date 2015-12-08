@@ -60,29 +60,27 @@ public class DecisionNode {
     }
 
     //TODO: should this method be public? I don't think so.
-    public void select(Island selectWitnessPhraseMatch) {
-        System.out.println("selected: "+selectWitnessPhraseMatch);
-        selected.add(selectWitnessPhraseMatch);
+    public void select(Island phraseMatch) {
+        System.out.println("selected: "+phraseMatch);
+        selected.add(phraseMatch);
     }
 
-    private void move(Island graphPhraseMatch) {
-        System.out.println("considered as moved: "+graphPhraseMatch);
-        moved.add(graphPhraseMatch);
+    private void move(Island phraseMatch) {
+        System.out.println("considered as moved: "+phraseMatch);
+        moved.add(phraseMatch);
     }
-
 
     //TODO: this should eventually become a public method
     //NOTE: This stuff is still in an experimental state
-    protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
+    protected DecisionNode getDecisionNodeChildForGraphPhrase() {
         // create child node
         DecisionNode child2 = new DecisionNode(this);
-        Island selectWitnessPhraseMatch = child2.peekWitnessPhrase();
+        // move the pointer further to the next available phrase match
+        Island selectedGraphPhraseMatch = child2.graphIterator.next();
         // move stuff
-        child2.moveEverythingInGraphBefore(child2.graphIterator, selectWitnessPhraseMatch);
+        child2.moveEverythingInPhraseMatchIteratorBefore(child2.witnessIterator, selectedGraphPhraseMatch);
         // select witness phrase match
-        child2.select(selectWitnessPhraseMatch);
-        // move the pointer further till the next available phrase match
-        child2.witnessIterator.next();
+        child2.select(selectedGraphPhraseMatch);
         // skip if possible and necessary
         // we have to keep track of the selected vertices and selected tokens to test this
         if (!child2.isGraphEnd()) {
@@ -94,21 +92,44 @@ public class DecisionNode {
         return child2;
     }
 
-    //TODO: rename variables so that graph and witness is no longer apparent.
+
+
+    //TODO: this should eventually become a public method
+    //NOTE: This stuff is still in an experimental state
+    protected DecisionNode getDecisionNodeChildForWitnessPhrase() {
+        // create child node
+        DecisionNode child2 = new DecisionNode(this);
+        // move the pointer further to the next available phrase match
+        Island selectedWitnessPhraseMatch = child2.witnessIterator.next();
+        // move stuff
+        child2.moveEverythingInPhraseMatchIteratorBefore(child2.graphIterator, selectedWitnessPhraseMatch);
+        // select witness phrase match
+        child2.select(selectedWitnessPhraseMatch);
+        // skip if possible and necessary
+        // we have to keep track of the selected vertices and selected tokens to test this
+        if (!child2.isGraphEnd()) {
+            child2.skipToNextAvailablePhraseMatch(child2.graphIterator);
+        }
+        if (!child2.isWitnessEnd()) {
+            child2.skipToNextAvailablePhraseMatch(child2.witnessIterator);
+        }
+        return child2;
+    }
+
     // at the end of the method call we are PAST the island to look for!
-    private void moveEverythingInGraphBefore(ListIterator<Island> graphIterator, Island selectWitnessPhraseMatch) {
+    private void moveEverythingInPhraseMatchIteratorBefore(ListIterator<Island> phraseMatchIterator, Island selectedPhraseMatch) {
         // move all the phrase matches before the selected phrase match
         // now find the position of the linked match in the other array
         //NOTE: this implementation is probably too simple; only checks coverage of moved parts underling.
         Set<VariantGraph.Vertex> vertices = new HashSet<>();
         BitSet positions = new BitSet();
-        Island graphPhraseMatch = graphIterator.next();
-        while(graphPhraseMatch != selectWitnessPhraseMatch) {
-            if (!vertices.contains(graphPhraseMatch.getMatch(0).vertex) && !positions.get(graphPhraseMatch.getLeftEnd().row)) {
-                move(graphPhraseMatch);
-                convertSinglePhraseMatch(vertices, positions, graphPhraseMatch);
+        Island nextPhraseMatch = phraseMatchIterator.next();
+        while(nextPhraseMatch != selectedPhraseMatch) {
+            if (!vertices.contains(nextPhraseMatch.getMatch(0).vertex) && !positions.get(nextPhraseMatch.getLeftEnd().row)) {
+                move(nextPhraseMatch);
+                convertSinglePhraseMatch(vertices, positions, nextPhraseMatch);
             }
-            graphPhraseMatch = graphIterator.next();
+            nextPhraseMatch = phraseMatchIterator.next();
         }
     }
 
