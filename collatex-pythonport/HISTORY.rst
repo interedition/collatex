@@ -3,6 +3,10 @@
 History
 -------
 
+2.0.0rc19 (2015-12-10)
+++++++++++++++++++++++
+* Rename of TokenIndex.py was not in effect in the uploaded files. Fixed now.
+
 2.0.0rc18 (2015-11-25)
 ++++++++++++++++++++++
 * Renamed TokenIndex.py module to tokenindex.py to follow conventions.
