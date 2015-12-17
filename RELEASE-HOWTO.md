@@ -27,7 +27,11 @@ Edit `changelog.txt`.
 
     mvn versions:set -DnewVersion=1.2.3
 
-Edit `site/grunt/jade.js` and update `dist.options.data.version`.
+Edit `site/grunt/jade.js`, update `dist.options.data.version` and regenerate site via
+
+    grunt deploy
+
+from the `site/` directory.
 
 ## Deploy artifacts to staging area
 
