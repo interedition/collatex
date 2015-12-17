@@ -46,3 +46,7 @@ Push to Github and create a release.
 ## Release successfully staged artifacts
 
     mvn nexus-staging:release
+
+## Start new development cycle by updating to SNAPSHOT version
+
+    mvn versions:set -DnewVersion=1.2.4-SNAPSHOT
