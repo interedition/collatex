@@ -16,7 +16,7 @@ class Test(unittest.TestCase):
         alignment_table = collate(collation)
         self.assertEquals(["I bought", "this glass, because it matches", "those", "dinner plates"],
                           alignment_table.rows[0].to_list())
-        self.assertEquals(["I bought", "-", "those", "glasses"], alignment_table.rows[1].to_list())
+        self.assertEquals(["I bought", None, "those", "glasses"], alignment_table.rows[1].to_list())
 
     def test_near_matching(self):
         collation = Collation()

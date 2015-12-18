@@ -45,13 +45,13 @@ class Test(unittest.TestCase):
         result = collate_pretokenized_json(self.json_in)
         self.assertEquals(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
                           result.rows[0].to_list())
-        self.assertEquals(["I", "bought", "-", "-", "-", "-", "-", "-", "those", "glasses", "-", "."], result.rows[1].to_list())
+        self.assertEquals(["I", "bought", None, None, None, None, None, None, "those", "glasses", None, "."], result.rows[1].to_list())
 
     def test_near_matching(self):
         result = collate_pretokenized_json(self.json_in, near_match=True)
         self.assertEquals(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
                           result.rows[0].to_list())
-        self.assertEquals(["I", "bought", "those", "glasses", "-", "-", "-", "-", "-", "-", "-", "."], result.rows[1].to_list())
+        self.assertEquals(["I", "bought", "those", "glasses", None, None, None, None, None, None, None, "."], result.rows[1].to_list())
 
     # Re-enable this one if segmented output is ever supported on tokenized collation
     @unit_disabled

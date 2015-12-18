@@ -8,7 +8,7 @@ from collatex.extended_suffix_array import Occurrence, BlockWitness, Block,\
 from operator import attrgetter
 from ClusterShell.RangeSet import RangeSet
 from queue import PriorityQueue
-#TODO: different in Python 2?
+# TODO: different in Python 2?
 # optionally load the Levenshtein dependency for near match functionality.
 # Consists of C code, needs to be compiled which is problematic on Windows.
 # There are pre-compiled binaries however, but this requires an extra step
@@ -24,9 +24,10 @@ except:
  that are found in the witness set.
 '''
 
+
 class Scorer(object):
-    def __init__(self, collation, near_match=False, properties_filter=None):
-        self.collation = collation
+    def __init__(self, token_index, near_match=False, properties_filter=None):
+        self.token_index = token_index
         self.blocks = []
         self.global_tokens_to_occurrences = {}
         self.properties_filter=properties_filter
@@ -76,9 +77,9 @@ class Scorer(object):
         heuristic_gap_penalty = 0
 
         # step 1: check blocks for all the base tokens
-        #TODO: implement!
-        #TODO: isn't the correct heuristic to count all the tokens that do not have a block associated with them?
-        #TODO: for the base as the witness?
+        # TODO: implement!
+        # TODO: isn't the correct heuristic to count all the tokens that do not have a block associated with them?
+        # TODO: for the base as the witness?
 
 
         # step 2: add costs to get to the end to the heuristic gap penalty
@@ -88,14 +89,13 @@ class Scorer(object):
         #         print("heuristic penalty: "+str(node.y)+" "+str(node.x)+" penalty: "+str(-gap_penalty))
         return gap_penalty
 
-
     def prepare_witness(self, witness):
         # this code can probably done more efficient, for now the main goal is to make it work
         block_witness = self._get_block_witness(witness)
-        tokens_to_occurrences = self._build_tokens_to_occurrences(self.collation, witness, block_witness)
-        #NOTE: we do not have to store all tokens from the witness
-        #NOTE: if we split the dict into two: one for next witness and one for superbase
-        #NOTE: only the ones that are going to be aligned have to be stored in superbase dict.
+        tokens_to_occurrences = self._build_tokens_to_occurrences(self.token_index, witness, block_witness)
+        # NOTE: we do not have to store all tokens from the witness
+        # NOTE: if we split the dict into two: one for next witness and one for superbase
+        # NOTE: only the ones that are going to be aligned have to be stored in superbase dict.
         self.global_tokens_to_occurrences.update(tokens_to_occurrences)
         
     # return values:
@@ -135,11 +135,11 @@ class Scorer(object):
             return -1
         pass
     
-    #TODO: it should be possible to do this simpler, faster
+    # TODO: it should be possible to do this simpler, faster
     # An occurrence should know its tokens, since it knows its token range
-    def _build_tokens_to_occurrences(self, collation, witness, block_witness):
+    def _build_tokens_to_occurrences(self, token_index, witness, block_witness):
         tokens_to_occurrence = {}
-        witness_range = collation.get_range_for_witness(witness.sigil)
+        witness_range = token_index.get_range_for_witness(witness.sigil)
         token_counter = witness_range[0]
         # note: this can be done faster by focusing on the occurrences
         # instead of the tokens
@@ -150,16 +150,14 @@ class Scorer(object):
             token_counter += 1
         return tokens_to_occurrence
 
-    
-
-    '''
+    """
     Internal method to transform a Witness into a Block Witness.
-    '''
+    """
     def _get_block_witness(self, witness):
-#         print("Generating block witness for: "+witness.sigil)
+        #         print("Generating block witness for: "+witness.sigil)
         sigil_witness = witness.sigil
-        range_witness = self.collation.get_range_for_witness(sigil_witness)
-        #NOTE: to prevent recalculation of blocks
+        range_witness = self.token_index.get_range_for_witness(sigil_witness)
+        # NOTE: to prevent recalculation of blocks
         if not self.blocks:
             self.blocks = self._get_non_overlapping_repeating_blocks() 
         blocks = self.blocks 
@@ -174,19 +172,17 @@ class Scorer(object):
                 occurrences.append(occurrence) 
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=attrgetter('lower_end'))
-        block_witness = BlockWitness(sorted_o, self.collation.tokens)
+        block_witness = BlockWitness(sorted_o, self.token_index.token_array)
         return block_witness
 
     '''
     Find all the non overlapping repeating blocks in the witness set of this collation.
     '''
     def _get_non_overlapping_repeating_blocks(self):
-        extended_suffix_array = self.collation.to_extended_suffix_array()
-
         # The LCP intervals that are calculated from the extend suffix array are all potential blocks.
         # However some potential blocks overlap. To decide the definitive blocks we sort the potential blocks on the
         # amount of witnesses they occur in.
-        potential_blocks = extended_suffix_array.split_lcp_array_into_intervals()
+        potential_blocks = self.token_index.split_lcp_array_into_intervals()
         # we add all the intervals to a priority queue based on 1) number of witnesses 2) block length
         queue = PriorityQueue()
         for interval in potential_blocks:
