@@ -66,7 +66,7 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
     for witness in json["witnesses"]:
         collation.add_witness(witness)
         tokenized_witnesses.append(witness["tokens"])
-    collate(collation,output=output,**kwargs)
+    return collate(collation,output=output,**kwargs)
     # at = collate(collation, output="table", **kwargs)
     # if output == "html2":
     #     return visualizeTableVerticallyWithColors(at, collation)
