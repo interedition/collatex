@@ -18,7 +18,7 @@ from collatex.display_module import display_variant_graph_as_SVG
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
     if not astar:
         algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
     else:
@@ -32,7 +32,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         join(graph)
     # check which output format is requested: graph or table
     if output == "svg":
-        return display_variant_graph_as_SVG(graph)
+        return display_variant_graph_as_SVG(graph,svg_output)
     if output=="graph": 
         return graph
     # create alignment table

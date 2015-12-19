@@ -52,7 +52,7 @@ def display_alignment_table_as_HTML(at):
 
 # visualize the variant graph into SVG format
 # from networkx.drawing.nx_agraph import to_agraph
-def display_variant_graph_as_SVG(graph):
+def display_variant_graph_as_SVG(graph,svg_output):
         # create new Digraph
         dot = Digraph(format="svg", graph_attr={'rankdir': 'LR'})
         # add nodes
@@ -63,7 +63,10 @@ def display_variant_graph_as_SVG(graph):
             dot.edge(str(u), str(v), edgedata["label"])
         # render the dot graph to SVG
         # Note: this creates a file
-        svg = dot.render()
+        if svg_output:
+            svg = dot.render(svg_output,'svg_output')
+        else:
+            svg = dot.render()
         # display using the IPython SVG module
         return display(SVG(svg))
 
