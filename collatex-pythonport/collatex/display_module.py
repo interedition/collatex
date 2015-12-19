@@ -27,7 +27,7 @@ def visualizeTableVerticallyWithColors(table, collation):
         cells = []
         for witness in collation.witnesses:
             cell = column.tokens_per_witness.get(witness.sigil)
-            cells.append(TableCell(text=fill(cell, 20) if cell else "-", bgcolor="FF0000" if column.variant else "00FF00"))
+            cells.append(TableCell(text=fill(cell.token_data["t"], 20) if cell else "-", bgcolor="FF0000" if column.variant else "00FF00"))
         rows.append(TableRow(cells=cells))
     sigli = []
     for witness in collation.witnesses:

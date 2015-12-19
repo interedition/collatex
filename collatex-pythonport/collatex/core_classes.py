@@ -68,7 +68,7 @@ class AlignmentTable(object):
                     sigli = attrs["label"]
                     for sigil in sigli.split(", "):
                         vertex_attrs = self.graph.graph.node[vertex]
-                        token = vertex_attrs["label"]
+                        token = vertex_attrs["tokens"][sigil]
                         column.put(sigil, token)
                 # set status: is a column variant or invariant
                 column.variant = len(vertices) > 1 or len(column.tokens_per_witness) != len(self.collation.witnesses)
@@ -105,7 +105,7 @@ def visualizeTableHorizontal(table):
     x.header = False
     for row in table.rows:
         cells = [row.header]
-        cells.extend(cell if cell else "-" for cell in row.cells)
+        cells.extend(cell.token_data["t"] if cell else "-" for cell in row.cells)
         x.add_row(cells)
     # alignment can only be set after the field names are known.
     # since add_row sets the field names, it has to be set after x.add_row(cells)
@@ -117,7 +117,7 @@ def visualizeTableVertically(table):
     x = PrettyTable()
     x.hrules = 1
     for row in table.rows:
-        x.add_column(row.header, [fill(cell, 20) if cell else "-" for cell in row.cells])
+        x.add_column(row.header, [fill(cell.token_data["t"], 20) if cell else "-" for cell in row.cells])
     return x
 
    

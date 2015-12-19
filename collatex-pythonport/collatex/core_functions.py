@@ -53,7 +53,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
     # Takes more or less the same arguments as collate() above, but with some restrictions.
     # Only output types 'json' and 'table' are supported.
-    if output not in ['json', 'table', 'html2', 'svg']:
+    if output not in ['json', 'table', 'html2', 'html', 'svg']:
         raise UnsupportedError("Output type " + output + " not supported for pretokenized collation")
     # if 'segmentation' in kwargs and kwargs['segmentation']:
     #     raise UnsupportedError("Segmented output not supported for pretokenized collation")
@@ -101,7 +101,7 @@ def export_alignment_table_as_json(table, indent=None, status=False):
     sigli = []
     for row in table.rows:
         sigli.append(row.header)
-        json_output["table"].append([[cell] for cell in row.cells])
+        json_output["table"].append([[cell.token_data] for cell in row.cells])
     json_output["witnesses"] = sigli
     if status:
         variant_status = []
