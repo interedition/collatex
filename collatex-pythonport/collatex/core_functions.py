@@ -71,7 +71,7 @@ def export_alignment_table_as_json(table, indent=None, status=False):
         for column in table.columns:
             variant_status.append(column.variant)
         json_output["status"] = variant_status
-    return json.dumps(json_output, sort_keys=True, indent=indent)
+    return json.dumps(json_output, sort_keys=True, indent=indent,ensure_ascii=False)
 
 class Collation(object):
 
