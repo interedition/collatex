@@ -53,11 +53,11 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
     # Takes more or less the same arguments as collate() above, but with some restrictions.
     # Only output types 'json' and 'table' are supported.
-    if output not in ['json', 'table', 'html2']:
+    if output not in ['json', 'table', 'html2', 'svg']:
         raise UnsupportedError("Output type " + output + " not supported for pretokenized collation")
-    if 'segmentation' in kwargs and kwargs['segmentation']:
-        raise UnsupportedError("Segmented output not supported for pretokenized collation")
-    kwargs['segmentation'] = False
+    # if 'segmentation' in kwargs and kwargs['segmentation']:
+    #     raise UnsupportedError("Segmented output not supported for pretokenized collation")
+    # kwargs['segmentation'] = False
 
     # For each witness given, make a 'shadow' witness based on the normalization tokens
     # that will actually be collated.
@@ -66,33 +66,34 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
     for witness in json["witnesses"]:
         collation.add_witness(witness)
         tokenized_witnesses.append(witness["tokens"])
-    at = collate(collation, output="table", **kwargs)
-    if output == "html2":
-        return visualizeTableVerticallyWithColors(at, collation)
-
-    # record whether there is variation in each of the columns (horizontal) or rows (vertical layout)
-    has_variation_array = []
-    for column in at.columns:
-        has_variation_array.append(column.variant)
-    tokenized_at = AlignmentTable(collation, layout=layout)
-    for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
-        new_row = Row(row.header)
-        tokenized_at.rows.append(new_row)
-        token_counter = 0
-        for cell in row.cells:
-            new_row.cells.append(tokenized_witness[token_counter] if cell else None)
-            if cell:
-                token_counter += 1
-    # In order to have the same information as in the non pretokenized alignment table we
-    # add variation information to the pretokenized alignment table.
-    tokenized_at.has_rank_variation = has_variation_array
-    if output == "json":
-        return export_alignment_table_as_json(tokenized_at)
-    if output == "table":
-        # transform JSON objects to "t" form.
-        for row in tokenized_at.rows:
-            row.cells = [cell["t"] if cell else None for cell in row.cells]
-        return tokenized_at
+    collate(collation,output=output,**kwargs)
+    # at = collate(collation, output="table", **kwargs)
+    # if output == "html2":
+    #     return visualizeTableVerticallyWithColors(at, collation)
+    #
+    # # record whether there is variation in each of the columns (horizontal) or rows (vertical layout)
+    # has_variation_array = []
+    # for column in at.columns:
+    #     has_variation_array.append(column.variant)
+    # tokenized_at = AlignmentTable(collation, layout=layout)
+    # for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
+    #     new_row = Row(row.header)
+    #     tokenized_at.rows.append(new_row)
+    #     token_counter = 0
+    #     for cell in row.cells:
+    #         new_row.cells.append(tokenized_witness[token_counter] if cell else None)
+    #         if cell:
+    #             token_counter += 1
+    # # In order to have the same information as in the non pretokenized alignment table we
+    # # add variation information to the pretokenized alignment table.
+    # tokenized_at.has_rank_variation = has_variation_array
+    # if output == "json":
+    #     return export_alignment_table_as_json(tokenized_at)
+    # if output == "table":
+    #     # transform JSON objects to "t" form.
+    #     for row in tokenized_at.rows:
+    #         row.cells = [cell["t"] if cell else None for cell in row.cells]
+    #     return tokenized_at
 
 def export_alignment_table_as_json(table, indent=None, status=False):
     json_output = {}
