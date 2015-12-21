@@ -143,42 +143,6 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(3, 1, 2, split_intervals) # cat
         self.assertEqual(3, len(split_intervals), "More items: "+str(split_intervals))
 
-    # LCP interval is descending
-    def test_split_lcp_intervals_descending_LCP(self):
-        lcp_array = array('i', [0, 20, 20, 20, 4])
-        sa_array = array('i', [0, 1, 2, 3, 4]) # FAKED!
-        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
-        split_intervals = extsuffarr.split_lcp_array_into_intervals()
-        self.assertIntervalIn(0, 20, 4, split_intervals)
-        self.assertIntervalIn(0, 4, 5, split_intervals)
-        self.assertEqual(2, len(split_intervals), "More items: "+str(split_intervals))
-        
-    # LCP interval is first ascending, then descending
-    def test_split_lcp_intervals_ascending_then_descending_LCP(self):
-        lcp_array = array('i', [0, 10, 149, 93, 7, 1])
-        sa_array = array('i', [0, 1, 2, 3, 4, 5]) # FAKED!
-        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
-        split_intervals = extsuffarr.split_lcp_array_into_intervals()
-        self.assertIntervalIn(0, 10, 4, split_intervals)
-        self.assertIntervalIn(1, 149, 2, split_intervals)
-        self.assertIntervalIn(1, 93, 3, split_intervals)
-        self.assertIntervalIn(0, 7, 5, split_intervals)
-        self.assertIntervalIn(0, 1, 6, split_intervals)
-        self.assertEqual(5, len(split_intervals), "More items: "+str(split_intervals))
-        
-    def test_split_lcp_intervals_ascending_descending_ascending(self):
-        lcp_array =  array('i', [0, 4, 143, 87, 1, 1, 12, 93, 93, 37])
-        sa_array = array('i', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) # FAKED!
-        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
-        split_intervals = extsuffarr.split_lcp_array_into_intervals()
-        self.assertIntervalIn(1, 143, 2, split_intervals)
-        self.assertIntervalIn(1, 87, 3, split_intervals)
-        self.assertIntervalIn(0, 4, 4, split_intervals)
-        self.assertIntervalIn(6, 93, 3, split_intervals)
-        self.assertIntervalIn(0, 1, 10, split_intervals)
-        self.assertIntervalIn(5, 12, 5, split_intervals)
-        self.assertIntervalIn(6, 37, 4, split_intervals)
-
     @unit_disabled
     def test_filter_potential_blocks(self):
         collation = Collation()
