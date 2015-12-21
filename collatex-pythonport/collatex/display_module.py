@@ -18,7 +18,6 @@ except:
     pass
 
 
-
 def visualizeTableVerticallyWithColors(table, collation):
     # print the table vertically
     # switch columns and rows
@@ -27,21 +26,13 @@ def visualizeTableVerticallyWithColors(table, collation):
         cells = []
         for witness in collation.witnesses:
             cell = column.tokens_per_witness.get(witness.sigil)
-            cells.append(TableCell(text=fill(cell.token_data["t"], 20) if cell else "-", bgcolor="FF0000" if column.variant else "00FF00"))
+            cells.append(TableCell(text=fill(" ".join(item.token_data["t"] for item in cell) if cell else "-", 20), bgcolor="FF0000" if column.variant else "00FF00"))
         rows.append(TableRow(cells=cells))
     sigli = []
     for witness in collation.witnesses:
         sigli.append(witness.sigil)
     x = Table(header_row=sigli, rows=rows)
     return display(HTML(str(x)))
-
-
-
-
-
-
-
-
 
 
 # create visualization of alignment table

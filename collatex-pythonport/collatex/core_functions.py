@@ -56,7 +56,7 @@ def collate_pretokenized_json(json, output='table', layout='horizontal', **kwarg
     collation = Collation()
     for witness in json["witnesses"]:
         collation.add_witness(witness)
-    return collate(collation,output=output,**kwargs)
+    return collate(collation,output=output,layout=layout,**kwargs)
 
 def export_alignment_table_as_json(table, indent=None, status=False):
     json_output = {}
@@ -64,7 +64,7 @@ def export_alignment_table_as_json(table, indent=None, status=False):
     sigli = []
     for row in table.rows:
         sigli.append(row.header)
-        json_output["table"].append([[cell.token_data] if cell else None for cell in row.cells])
+        json_output["table"].append([[listItem.token_data for listItem in cell] if cell else None for cell in row.cells])
     json_output["witnesses"] = sigli
     if status:
         variant_status = []

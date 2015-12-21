@@ -105,7 +105,8 @@ def visualizeTableHorizontal(table):
     x.header = False
     for row in table.rows:
         cells = [row.header]
-        cells.extend(cell.token_data["t"] if cell else "-" for cell in row.cells)
+        t_list = [(token.token_data["t"] for token in cell) if cell else ["-"] for cell in row.cells]
+        cells.extend([" ".join(item) for item in t_list])
         x.add_row(cells)
     # alignment can only be set after the field names are known.
     # since add_row sets the field names, it has to be set after x.add_row(cells)
@@ -117,7 +118,9 @@ def visualizeTableVertically(table):
     x = PrettyTable()
     x.hrules = 1
     for row in table.rows:
-        x.add_column(row.header, [fill(cell.token_data["t"], 20) if cell else "-" for cell in row.cells])
+        # x.add_column(row.header, [fill(cell.token_data["t"], 20) if cell else "-" for cell in row.cells])
+        t_list = [(token.token_data["t"] for token in cell) if cell else ["-"] for cell in row.cells]
+        x.add_column(row.header,[fill(" ".join(item),20) for item in t_list])
     return x
 
    
@@ -196,13 +199,13 @@ class VariantGraph(object):
         # print("Adding node: "+node_id+":"+token_content)
         tokens = {}
         if sigil:
-            tokens[sigil] = token
+            tokens[sigil] = [token]
         self.graph.add_node(node_id, label=token.token_string, tokens=tokens)
         return node_id
 
     def add_token_to_vertex(self, node, token, sigil):
         attributes = self.vertex_attributes(node)
-        attributes["tokens"][sigil] = token
+        attributes["tokens"][sigil] = [token]
 
     def connect(self, source, target, witnesses):
         """
@@ -290,13 +293,7 @@ def join(graph):
             (_, join_candidate) = out_edges[0]
             can_join = join_candidate != end and len(graph.in_edges(join_candidate))==1
             if can_join:
-                # Note: since there is no normalized/non normalized content in the graph
-                # a space character is added here for non punctuation tokens
-                label = graph.vertex_attributes(join_candidate)["label"]
-                if re.match(r'^\W', label):
-                    graph.vertex_attributes(vertex)["label"] += label
-                else:
-                    graph.vertex_attributes(vertex)["label"] += " "+label
+                join_vertex_and_join_candidate(graph, join_candidate, vertex)
                 for (_, neighbor, data) in graph.out_edges(join_candidate, data=True):
                     graph.remove_edge(join_candidate, neighbor)
                     graph.connect(vertex, neighbor, data["label"])
@@ -309,7 +306,24 @@ def join(graph):
             # FIXME: Why do we run out of memory in some cases here, if this is not checked?
             if neighbor not in processed:
                 queue.appendleft(neighbor)
-                
+
+
+def join_vertex_and_join_candidate(graph, join_candidate, vertex):
+    # Note: since there is no normalized/non normalized content in the graph
+    # a space character is added here for non punctuation tokens
+
+    # print("Vertex label:  " + graph.vertex_attributes(vertex)["label"])
+    # print("Neighbor label:" + graph.vertex_attributes(join_candidate)["label"])
+
+    label = graph.vertex_attributes(join_candidate)["label"]
+    if re.match(r'^\W', label):
+        graph.vertex_attributes(vertex)["label"] += label
+    else:
+        graph.vertex_attributes(vertex)["label"] += " " + label
+    for siglum in graph.vertex_attributes(vertex)["tokens"]:
+        tokens = graph.vertex_attributes(vertex)["tokens"][siglum]
+        tokens.extend(graph.vertex_attributes(join_candidate)["tokens"][siglum])
+
 # Port of VariantGraphRanking class from Java
 # This is a minimal port; only bare bones
 class VariantGraphRanking(object):
