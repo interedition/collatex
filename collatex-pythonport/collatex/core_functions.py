@@ -64,7 +64,7 @@ def export_alignment_table_as_json(table, indent=None, status=False):
     sigli = []
     for row in table.rows:
         sigli.append(row.header)
-        json_output["table"].append([[cell.token_data] for cell in row.cells])
+        json_output["table"].append([[cell.token_data] if cell else None for cell in row.cells])
     json_output["witnesses"] = sigli
     if status:
         variant_status = []
