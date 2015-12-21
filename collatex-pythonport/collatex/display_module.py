@@ -49,12 +49,12 @@ def display_variant_graph_as_SVG(graph,svg_output):
         # add nodes
         for n,nodedata in graph.graph.nodes(data=True):
             # dot.node(str(n), nodedata["label"])
-            readings = ['n: ' + nodedata["label"]]
+            readings = ["<TR><TD ALIGN='LEFT'>Label" + "</TD><TD ALIGN='LEFT'>" + nodedata["label"] + "</TD></TR>"]
             for key, value in nodedata["tokens"].items():
                 # reading = ": ".join([key ," ".join(item.token_data["t"] for item in value)])
-                reading = ("{}: {}").format(key," ".join(item.token_data["t"] for item in value))
+                reading = ("<TR><TD ALIGN='LEFT'>{}</TD><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD></TR>").format(key," ".join(item.token_data["t"] for item in value))
                 readings.append(reading)
-            dot.node(str(n), "\n".join(readings))
+            dot.node(str(n), '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
         # add edges
         for u,v,edgedata in graph.graph.edges_iter(data=True):
             dot.edge(str(u), str(v), edgedata["label"])
