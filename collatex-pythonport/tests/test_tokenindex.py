@@ -16,15 +16,26 @@ class Test(unittest.TestCase):
         self.assertEquals(depth, lcp_interval.number_of_witnesses)
         self.assertEquals(numberOfTimes, lcp_interval.number_of_occurrences)
 
-    # ik heb drie witnesses nodig om de bug aan te tonen, met 1 gaat het al goed
-    def testTokenArray(self):
+    def assertTokenArray(self, expected, token_index):
+        self.assertEquals(expected, " ".join(str(token) for token in token_index.token_array))
+
+    def test_token_array_hermans_case(self):
+        collation = Collation()
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
+        token_index = TokenIndex(collation.witnesses)
+        token_index.prepare()
+        # $ is meant to separate witnesses here
+        self.assertTokenArray("a b c d F g h i ! K ! q r s t $0 a b c d F g h i ! q r s t", token_index)
+
+    def testTokenArrayMarkersWithThreeWitnesses(self):
         collation = Collation()
         collation.add_plain_witness("W1", "interesting nice huh")
         collation.add_plain_witness("W2", "very nice right")
         collation.add_plain_witness("W3", "especially interesting")
         token_index = TokenIndex(collation.witnesses)
         token_index.prepare()
-        self.assertEquals("[interesting, nice, huh, $0, very, nice, right, $1, especially, interesting]", str(token_index.token_array))
+        self.assertTokenArray("interesting nice huh $0 very nice right $1 especially interesting", token_index)
 
 
     # TODO: add suffix array test by asserting that the tokens are sorted correctly
