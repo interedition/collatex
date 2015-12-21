@@ -24,13 +24,6 @@ class Test(unittest.TestCase):
         if not found:
             self.fail("Interval with "+str(start)+" and "+str(length)+" and "+str(nr_of_occurrences)+" not found in "+str(intervals))
     
-    def test_combined_string_hermans_case(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        # $ is meant to separate witnesses here
-        self.assertEquals("a b c d F g h i ! K ! q r s t $1 a b c d F g h i ! q r s t", collation.get_combined_string())
-    
     # test whether the witness->range mapping works
     @unit_disabled
     def test_witness_ranges_hermans_case(self):
