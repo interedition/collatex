@@ -59,7 +59,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
             for key,value in sorted(reverseDict.items()):
                 reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,(', '.join(value) if len(reverseDict) > 1 else 'All'))
                 readings.append(reading)
-            dot.node(str(n), '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
+            dot.node(str(n), '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>',{'shape': 'box'})
         # add edges
         for u,v,edgedata in graph.graph.edges_iter(data=True):
             dot.edge(str(u), str(v), edgedata["label"])
