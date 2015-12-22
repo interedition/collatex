@@ -24,16 +24,7 @@ class Test(unittest.TestCase):
         if not found:
             self.fail("Interval with "+str(start)+" and "+str(length)+" and "+str(nr_of_occurrences)+" not found in "+str(intervals))
     
-    # test whether the witness->range mapping works
-    @unit_disabled
-    def test_witness_ranges_hermans_case(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        self.assertEquals(RangeSet("0-14"), collation.get_range_for_witness("W1"))
-        self.assertEquals(RangeSet("16-28"), collation.get_range_for_witness("W2"))
-
-# TODO: re-enable test!    
+# TODO: re-enable test!
     # Note: LCP intervals can overlap
     @unit_disabled
     def test_lcp_intervals_failing_use_case_old_algorithm(self):

@@ -1,6 +1,7 @@
 import unittest
 from array import array
 
+from ClusterShell.RangeSet import RangeSet
 from collatex import Collation
 from collatex.tokenindex import TokenIndex
 
@@ -46,6 +47,16 @@ class Test(unittest.TestCase):
         token_index = TokenIndex(collation.witnesses)
         token_index.prepare()
         self.assertTokenArray("interesting nice huh $0 very nice right $1 especially interesting", token_index)
+
+    # test whether the witness->range mapping works
+    def test_witness_ranges_hermans_case(self):
+        collation = Collation()
+        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
+        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
+        token_index = TokenIndex(collation.witnesses)
+        token_index.prepare()
+        self.assertEquals(RangeSet("0-14"), token_index.get_range_for_witness("W1"))
+        self.assertEquals(RangeSet("16-28"), token_index.get_range_for_witness("W2"))
 
     # TODO: add suffix array test by asserting that the tokens are sorted correctly
     # can't asserts the numbers due to randomness
@@ -124,6 +135,7 @@ class Test(unittest.TestCase):
         potential_block = intervals[1] # ! q r s t
         self.assertEqual(3, potential_block.number_of_witnesses)
 
+    # rename test, test does nothing regarding filtering
     def test_filter_potential_blocks(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a a")
