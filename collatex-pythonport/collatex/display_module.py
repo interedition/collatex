@@ -3,6 +3,7 @@ Created on Nov 13, 2014
 
 @author: ronald
 '''
+from collections import defaultdict
 from textwrap import fill
 from collatex.HTML import Table, TableRow, TableCell
 from collatex.core_classes import create_table_visualization
@@ -49,10 +50,14 @@ def display_variant_graph_as_SVG(graph,svg_output):
         # add nodes
         for n,nodedata in graph.graph.nodes(data=True):
             # dot.node(str(n), nodedata["label"])
-            readings = ["<TR><TD ALIGN='LEFT'>Label" + "</TD><TD ALIGN='LEFT'>" + nodedata["label"] + "</TD></TR>"]
-            for key, value in nodedata["tokens"].items():
-                # reading = ": ".join([key ," ".join(item.token_data["t"] for item in value)])
-                reading = ("<TR><TD ALIGN='LEFT'>{}</TD><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD></TR>").format(key," ".join(item.token_data["t"] for item in value))
+            readings = ["<TR><TD ALIGN='LEFT'><B>" + nodedata["label"] + "</B></TD><TD ALIGN='LEFT'><B>Label</B></TD></TR>"]
+            # for key, value in nodedata["tokens"].items():
+            #     # reading = ": ".join([key ," ".join(item.token_data["t"] for item in value)])
+            reverseDict = defaultdict(list)
+            for key,value in nodedata["tokens"].items():
+                reverseDict[" ".join(item.token_data["t"] for item in value)].append(key)
+            for key,value in sorted(reverseDict.items()):
+                reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,(', '.join(value) if len(reverseDict) > 1 else 'All'))
                 readings.append(reading)
             dot.node(str(n), '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
         # add edges
