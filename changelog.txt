@@ -1,3 +1,6 @@
+Release 1.7.1
+- Bug fix for the "non progressive alignment" exception in the command-line tool
+
 Release 1.7
 - Major rewrite of the matching phase of the Dekker algorithm. The MatchTable approach used in versions 1.2 - 1.6 of
  CollateX would match the tokens of the witness to be aligned against the tokens present on the vertices of the variant
