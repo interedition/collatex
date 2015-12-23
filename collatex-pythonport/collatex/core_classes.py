@@ -187,7 +187,7 @@ class VariantGraphVertex(object):
         self.label = token.token_string if token else ''
         self.tokens = {sigil: [token]} if sigil else {}
 
-    def add_token(self, token, sigil):
+    def add_token(self, sigil, token):
         if sigil in self.tokens:
             self.tokens[sigil].append(token)
         else:
@@ -266,7 +266,7 @@ class CollationAlgorithm(object):
                 vertex = graph.add_vertex(token, witness_sigil)
                 token_to_vertex[token] = vertex
             else:
-                vertex.add_token(token,witness_sigil)
+                vertex.add_token(witness_sigil, token)
                 # graph.add_token_to_vertex(vertex, token, witness_sigil)
             graph.connect(last, vertex, witness_sigil)
             last = vertex
@@ -317,17 +317,13 @@ def join_vertex_and_join_candidate(graph, join_candidate, vertex):
     # Note: since there is no normalized/non normalized content in the graph
     # a space character is added here for non punctuation tokens
 
-    # print("Vertex label:  " + graph.vertex_attributes(vertex)["label"])
-    # print("Neighbor label:" + graph.vertex_attributes(join_candidate)["label"])
-
-    label = graph.vertex_attributes(join_candidate)["label"]
-    if re.match(r'^\W', label):
-        graph.vertex_attributes(vertex)["label"] += label
+    if re.match(r'^\W', join_candidate.label):
+        vertex.label += join_candidate.label
     else:
-        graph.vertex_attributes(vertex)["label"] += " " + label
-    for siglum in graph.vertex_attributes(vertex)["tokens"]:
-        tokens = graph.vertex_attributes(vertex)["tokens"][siglum]
-        tokens.extend(graph.vertex_attributes(join_candidate)["tokens"][siglum])
+        vertex.label += (" " + join_candidate.label)
+    # join_candidate must have exactly one token (inside a list); left item may have more
+    for siglum, token in join_candidate.tokens.items():
+        vertex.add_token(siglum, token[0])
 
 
 # Port of VariantGraphRanking class from Java
