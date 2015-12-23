@@ -72,36 +72,43 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
             print('Before adjustment, rank ' + str(rank) + ' has ' + str(witnessesAtRankCount) + ' witnesses (out of ' + str(witnessCount) + ') on ' + str(len(nodesAtRank)) + ' nodes' )
             missingWitnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnessesAtRank)
             print('Missing witnesses: ' + ' '.join(missingWitnesses) + "\n")
+            witnessesWeveSeen = set()
             for missingWitness in missingWitnesses:
-                print('Looking for ' + missingWitness)
-                currentLabels = [node.label for node in ranking.byRank[rank]]
-                print('Labels at current location ' + str(rank) + ': ' + str(currentLabels))
-                (priorRank, priorNode) = findPriorNode(missingWitness,rank,graph,ranking)
-                priorLabel = priorNode.label
-                print('Prior label is ' + priorLabel + ' at ' + str(priorRank))
-                priorLabels = [node.label for node in ranking.byRank[priorRank]]
-                print('Labels at prior location ' + str(priorRank) + ': ' + str(priorLabels))
-                priorDistances = [distance(priorLabel,label) for label in priorLabels]
-                print('Prior distances = ' + str(priorDistances))
-                currentDistances = [distance(priorLabel,label) for label in currentLabels]
-                print('Current distances = ' + str(currentDistances))
-                leftTable = {}
-                for currentNode in ranking.byRank[priorRank]:
-                    if currentNode.label != priorLabel:
-                        leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                print('Left table:')
-                print(leftTable)
-                leftMin = min((value[0] for value in leftTable.values()))
-                leftMaxCount = max((value[1] for value in leftTable.values()))
-                print('Minimum distance on left is ' + str(leftMin) + ' and max witness count on left is ' + str(leftMaxCount))
-                print('Right table:')
-                rightTable = {}
-                for currentNode in ranking.byRank[rank]:
-                    rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                print(rightTable)
-                rightMin = min((value[0] for value in rightTable.values()))
-                rightMaxCount = max((value[1] for value in rightTable.values()))
-                print('Minimum distance on right is ' + str(rightMin) + ' and max witness count on right is ' + str(rightMaxCount))
+                if missingWitness not in witnessesWeveSeen:
+                    print('Looking for ' + missingWitness)
+                    currentLabels = [node.label for node in ranking.byRank[rank]]
+                    print('Labels at current location ' + str(rank) + ': ' + str(currentLabels))
+                    (priorRank, priorNode) = findPriorNode(missingWitness,rank,graph,ranking)
+                    priorLabel = priorNode.label
+                    priorNodeWitnesses = priorNode.tokens.keys()
+                    witnessesWeveSeen = witnessesWeveSeen.union(priorNodeWitnesses)
+                    print("We've seen witnesses: " + str(witnessesWeveSeen))
+                    print('Prior label is ' + priorLabel + ' at ' + str(priorRank))
+                    priorLabels = [node.label for node in ranking.byRank[priorRank]]
+                    print('Labels at prior location ' + str(priorRank) + ': ' + str(priorLabels))
+                    priorDistances = [distance(priorLabel,label) for label in priorLabels]
+                    print('Prior distances = ' + str(priorDistances))
+                    currentDistances = [distance(priorLabel,label) for label in currentLabels]
+                    print('Current distances = ' + str(currentDistances))
+
+                    leftTable = {}
+                    for currentNode in ranking.byRank[priorRank]:
+                        if currentNode.label != priorLabel:
+                            leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
+                    print('Left table:')
+                    print(leftTable)
+                    leftMin = min((value[0] for value in leftTable.values()))
+                    leftMaxCount = max((value[1] for value in leftTable.values()))
+                    print('Minimum distance on left is ' + str(leftMin) + ' and max witness count on left is ' + str(leftMaxCount))
+
+                    # print('Right table:')
+                    # rightTable = {}
+                    # for currentNode in ranking.byRank[rank]:
+                    #     rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
+                    # print(rightTable)
+                    # rightMin = min((value[0] for value in rightTable.values()))
+                    # rightMaxCount = max((value[1] for value in rightTable.values()))
+                    # print('Minimum distance on right is ' + str(rightMin) + ' and max witness count on right is ' + str(rightMaxCount))
                 break
         break
 
