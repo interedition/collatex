@@ -63,9 +63,9 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
         nodesAtRank = ranking.byRank[rank]
         witnessesAtRank = []
         for thisNode in nodesAtRank:
-            for key in graph.vertex_attributes(thisNode)["tokens"].keys():
+            for key in thisNode.tokens:
                 witnessesAtRank.append(str(key))
-        witnessesAtRankCount = sum([len(graph.vertex_attributes(thisNode)["tokens"].keys()) for thisNode in nodesAtRank])
+        witnessesAtRankCount = sum([len(thisNode.tokens) for thisNode in nodesAtRank])
         if witnessesAtRankCount == witnessCount:
             pass
         else:
@@ -74,26 +74,26 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
             print('Missing witnesses: ' + ' '.join(missingWitnesses) + "\n")
             for missingWitness in missingWitnesses:
                 print('Looking for ' + missingWitness)
-                currentLabels = [graph.vertex_attributes(node)["label"] for node in ranking.byRank[rank]]
+                currentLabels = [node.label for node in ranking.byRank[rank]]
                 print('Labels at current location ' + str(rank) + ': ' + str(currentLabels))
                 (priorRank, priorNode) = findPriorNode(missingWitness,rank,graph,ranking)
-                priorLabel = graph.vertex_attributes(priorNode)["label"]
-                print('Prior label is ' + priorLabel + ' at ' + str(priorRank) + ' at node ' + str(priorNode))
-                priorLabels = [graph.vertex_attributes(node)["label"] for node in ranking.byRank[priorRank]]
+                priorLabel = priorNode.label
+                print('Prior label is ' + priorLabel + ' at ' + str(priorRank))
+                priorLabels = [node.label for node in ranking.byRank[priorRank]]
                 print('Labels at prior location ' + str(priorRank) + ': ' + str(priorLabels))
                 priorDistances = [distance(priorLabel,label) for label in priorLabels]
                 print('Prior distances = ' + str(priorDistances))
                 currentDistances = [distance(priorLabel,label) for label in currentLabels]
                 print('Current distances = ' + str(currentDistances))
                 leftTable = {}
-                for currentNodeIndex in ranking.byRank[priorRank]:
-                    currentNode = graph.vertex_attributes(currentNodeIndex)
-                    leftTable[currentNode["label"]] = [distance(currentNode["label"],priorLabel),len(currentNode["tokens"])]
+                for currentNode in ranking.byRank[priorRank]:
+                    leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
+                print('Left table:')
                 print(leftTable)
+                print('Right table:')
                 rightTable = {}
-                for currentNodeIndex in ranking.byRank[rank]:
-                    currentNode = graph.vertex_attributes(currentNodeIndex)
-                    rightTable[currentNode["label"]] = [distance(currentNode["label"],priorLabel),len(currentNode["tokens"])]
+                for currentNode in ranking.byRank[rank]:
+                    rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
                 print(rightTable)
                 break
         break
@@ -106,14 +106,14 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
 
 def findReadingsToTest(graph,rank,ranking):
     rankToTest = ranking.byRank[rank]
-    labelsToTest = [graph.vertex_attributes(node)["label"] for node in rankToTest]
+    labelsToTest = [node.label for node in rankToTest]
     return labelsToTest
 
 def findPriorNode(witness,currentRank,graph,ranking):
     for rank in range(currentRank - 1, 1, -1):
-        nodeIdentifiersAtRank = ranking.byRank[rank]
-        for thisNode in nodeIdentifiersAtRank:
-            for key in graph.vertex_attributes(thisNode)["tokens"].keys():
+        nodesAtRank = ranking.byRank[rank]
+        for thisNode in nodesAtRank:
+            for key in thisNode.tokens:
                 if witness == key: # Worst case: will be found at start if not on a real node
                     return (rank,thisNode)
 
