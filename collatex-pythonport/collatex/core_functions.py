@@ -85,6 +85,16 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
                 print('Prior distances = ' + str(priorDistances))
                 currentDistances = [distance(priorLabel,label) for label in currentLabels]
                 print('Current distances = ' + str(currentDistances))
+                leftTable = {}
+                for currentNodeIndex in ranking.byRank[priorRank]:
+                    currentNode = graph.vertex_attributes(currentNodeIndex)
+                    leftTable[currentNode["label"]] = [distance(currentNode["label"],priorLabel),len(currentNode["tokens"])]
+                print(leftTable)
+                rightTable = {}
+                for currentNodeIndex in ranking.byRank[rank]:
+                    currentNode = graph.vertex_attributes(currentNodeIndex)
+                    rightTable[currentNode["label"]] = [distance(currentNode["label"],priorLabel),len(currentNode["tokens"])]
+                print(rightTable)
                 break
         break
 
