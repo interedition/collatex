@@ -65,8 +65,7 @@ class AlignmentTable(object):
                 for (_, _, attrs) in edges:
                     sigli = attrs["label"]
                     for sigil in sigli.split(", "):
-                        vertex_attrs = self.graph.graph.node[vertex]
-                        token = vertex_attrs["tokens"][sigil]
+                        token = vertex.tokens[sigil]
                         column.put(sigil, token)
                 # set status: is a column variant or invariant
                 column.variant = len(vertices) > 1 or len(column.tokens_per_witness) != len(self.collation.witnesses)
