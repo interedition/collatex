@@ -87,14 +87,21 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
                 print('Current distances = ' + str(currentDistances))
                 leftTable = {}
                 for currentNode in ranking.byRank[priorRank]:
-                    leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
+                    if currentNode.label != priorLabel:
+                        leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
                 print('Left table:')
                 print(leftTable)
+                leftMin = min((value[0] for value in leftTable.values()))
+                leftMaxCount = max((value[1] for value in leftTable.values()))
+                print('Minimum distance on left is ' + str(leftMin) + ' and max witness count on left is ' + str(leftMaxCount))
                 print('Right table:')
                 rightTable = {}
                 for currentNode in ranking.byRank[rank]:
                     rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
                 print(rightTable)
+                rightMin = min((value[0] for value in rightTable.values()))
+                rightMaxCount = max((value[1] for value in rightTable.values()))
+                print('Minimum distance on right is ' + str(rightMin) + ' and max witness count on right is ' + str(rightMaxCount))
                 break
         break
 
