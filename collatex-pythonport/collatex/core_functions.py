@@ -14,12 +14,15 @@ import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
-from Levenshtein import ratio,distance
+from collatex.near_matching import process_rank
+
 
 # Valid options for output are:
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
+
+
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
     if not astar:
         algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
@@ -64,10 +67,9 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
     rank = highestRank - 1
     condition = True
     while condition:
-        rank = processRank(rank, collation, graph, ranking, witnessCount)
+        rank = process_rank(rank, collation, ranking, witnessCount)
         rank -= 1
         condition = rank > 1
-    # check which output format is requested: graph or table
 
     # # Verify that nodes have been moved
     # print("\nLabels at each rank at end of processing: ")
@@ -75,9 +77,10 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
     #     print("\nRank: " + str(rank))
     #     print([node.label for node in ranking.byRank[rank]])
 
-    # join parallel segments
+    # Segmentation not supported; raise exception if necessary
     if segmentation:
         raise Exception("segmentation=True not supported for near matching; must be set to False")
+
     if output == "svg":
         return display_variant_graph_as_SVG(graph,svg_output)
     if output=="graph":
@@ -94,59 +97,6 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
         return table
     else:
         raise Exception("Unknown output type for near-match collation: "+output)
-
-def processRank(rank, collation, graph, ranking, witnessCount):
-    nodesAtRank = ranking.byRank[rank]
-    witnessesAtRank = []
-    for thisNode in nodesAtRank:
-        for key in thisNode.tokens:
-            witnessesAtRank.append(str(key))
-    witnessesAtRankCount = sum([len(thisNode.tokens) for thisNode in nodesAtRank])
-    if witnessesAtRankCount == witnessCount:
-        pass
-    else:
-        print("\nBefore adjustment, rank " + str(rank) + ' has ' + str(witnessesAtRankCount) + ' witnesses (out of ' + str(witnessCount) + ') on ' + str(len(nodesAtRank)) + ' nodes' )
-        missingWitnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnessesAtRank)
-        print('Missing witnesses: ' + ' '.join(missingWitnesses))
-        witnessesWeveSeen = set()
-        for missingWitness in missingWitnesses:
-            if missingWitness not in witnessesWeveSeen:
-                print('Looking for ' + missingWitness)
-                (priorRank, priorNode) = findPriorNode(missingWitness,rank,ranking)
-                if not(priorRank == None):
-                    priorLabel = priorNode.label
-                    priorNodeWitnesses = priorNode.tokens.keys()
-                    witnessesWeveSeen = witnessesWeveSeen.union(priorNodeWitnesses)
-
-                    leftTable = {}
-                    for currentNode in ranking.byRank[priorRank]:
-                        if currentNode.label != priorLabel:
-                            leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                    leftMin = min((value[0] for value in leftTable.values()))
-                    leftMaxCount = max((value[1] for value in leftTable.values()))
-
-                    rightTable = {}
-                    for currentNode in ranking.byRank[rank]:
-                        rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                    rightMin = min((value[0] for value in rightTable.values()))
-                    rightMaxCount = max((value[1] for value in rightTable.values()))
-
-                    if (rightMin,-rightMaxCount) < (leftMin,-leftMaxCount):
-                        #move the entire node from priorRank to (current) rank
-                        ranking.byRank[priorRank].remove(priorNode)
-                        ranking.byRank[rank].append(priorNode)
-                        ranking.byVertex[priorNode] = rank
-    return rank
-
-def findPriorNode(witness,currentRank,ranking):
-    for rank in range(currentRank - 1, 1, -1):
-        nodesAtRank = ranking.byRank[rank]
-        for thisNode in nodesAtRank:
-            for key in thisNode.tokens:
-                if witness == key: # Worst case: will be found at start if not on a real node
-                    return (rank,thisNode)
-    # The start node has no witnesses, so return a special value to indicate nothing found
-    return (None, None)
 
 def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
     # Takes the same arguments as collate() above
