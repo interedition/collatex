@@ -59,77 +59,97 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
     ranking = VariantGraphRanking.of(graph)
     highestRank = ranking.byVertex[graph.end]
     witnessCount = len(collation.witnesses)
-    for rank in range(highestRank - 1, 0, -1):
-        nodesAtRank = ranking.byRank[rank]
-        witnessesAtRank = []
-        for thisNode in nodesAtRank:
-            for key in thisNode.tokens:
-                witnessesAtRank.append(str(key))
-        witnessesAtRankCount = sum([len(thisNode.tokens) for thisNode in nodesAtRank])
-        if witnessesAtRankCount == witnessCount:
-            pass
-        else:
-            print('Before adjustment, rank ' + str(rank) + ' has ' + str(witnessesAtRankCount) + ' witnesses (out of ' + str(witnessCount) + ') on ' + str(len(nodesAtRank)) + ' nodes' )
-            missingWitnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnessesAtRank)
-            print('Missing witnesses: ' + ' '.join(missingWitnesses) + "\n")
-            witnessesWeveSeen = set()
-            for missingWitness in missingWitnesses:
-                if missingWitness not in witnessesWeveSeen:
-                    print('Looking for ' + missingWitness)
-                    currentLabels = [node.label for node in ranking.byRank[rank]]
-                    print('Labels at current location ' + str(rank) + ': ' + str(currentLabels))
-                    (priorRank, priorNode) = findPriorNode(missingWitness,rank,graph,ranking)
+
+    # do-while loop to avoid looping through ranking while modifying it
+    rank = highestRank - 1
+    condition = True
+    while condition:
+        rank = processRank(rank, collation, graph, ranking, witnessCount)
+        rank -= 1
+        condition = rank > 1
+    # check which output format is requested: graph or table
+
+    # # Verify that nodes have been moved
+    # print("\nLabels at each rank at end of processing: ")
+    # for rank in ranking.byRank:
+    #     print("\nRank: " + str(rank))
+    #     print([node.label for node in ranking.byRank[rank]])
+    # if output == "svg":
+    #     return display_variant_graph_as_SVG(graph,svg_output)
+    # else:
+    #     raise Exception("Unknown output type for near-match collation: "+output)
+
+def processRank(rank, collation, graph, ranking, witnessCount):
+    nodesAtRank = ranking.byRank[rank]
+    witnessesAtRank = []
+    for thisNode in nodesAtRank:
+        for key in thisNode.tokens:
+            witnessesAtRank.append(str(key))
+    witnessesAtRankCount = sum([len(thisNode.tokens) for thisNode in nodesAtRank])
+    if witnessesAtRankCount == witnessCount:
+        pass
+    else:
+        print("\nBefore adjustment, rank " + str(rank) + ' has ' + str(witnessesAtRankCount) + ' witnesses (out of ' + str(witnessCount) + ') on ' + str(len(nodesAtRank)) + ' nodes' )
+        missingWitnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnessesAtRank)
+        print('Missing witnesses: ' + ' '.join(missingWitnesses))
+        witnessesWeveSeen = set()
+        for missingWitness in missingWitnesses:
+            if missingWitness not in witnessesWeveSeen:
+                print('Looking for ' + missingWitness)
+                currentLabels = [node.label for node in ranking.byRank[rank]]
+                # print('Labels at current location ' + str(rank) + ': ' + str(currentLabels))
+                (priorRank, priorNode) = findPriorNode(missingWitness,rank,ranking)
+                if not(priorRank == None):
                     priorLabel = priorNode.label
                     priorNodeWitnesses = priorNode.tokens.keys()
                     witnessesWeveSeen = witnessesWeveSeen.union(priorNodeWitnesses)
-                    print("We've seen witnesses: " + str(witnessesWeveSeen))
-                    print('Prior label is ' + priorLabel + ' at ' + str(priorRank))
+                    # print("We've seen witnesses: " + str(witnessesWeveSeen))
+                    # print('Prior label is ' + priorLabel + ' at ' + str(priorRank))
                     priorLabels = [node.label for node in ranking.byRank[priorRank]]
-                    print('Labels at prior location ' + str(priorRank) + ': ' + str(priorLabels))
+                    # print('Labels at prior location ' + str(priorRank) + ': ' + str(priorLabels))
                     priorDistances = [distance(priorLabel,label) for label in priorLabels]
-                    print('Prior distances = ' + str(priorDistances))
+                    # print('Prior distances = ' + str(priorDistances))
                     currentDistances = [distance(priorLabel,label) for label in currentLabels]
-                    print('Current distances = ' + str(currentDistances))
+                    # print('Current distances = ' + str(currentDistances))
 
                     leftTable = {}
                     for currentNode in ranking.byRank[priorRank]:
                         if currentNode.label != priorLabel:
                             leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                    print('Left table:')
-                    print(leftTable)
+                    # print('Left table:')
+                    # print(leftTable)
                     leftMin = min((value[0] for value in leftTable.values()))
                     leftMaxCount = max((value[1] for value in leftTable.values()))
-                    print('Minimum distance on left is ' + str(leftMin) + ' and max witness count on left is ' + str(leftMaxCount))
+                    # print('Minimum distance on left is ' + str(leftMin) + ' and max witness count on left is ' + str(leftMaxCount))
 
-                    # print('Right table:')
-                    # rightTable = {}
-                    # for currentNode in ranking.byRank[rank]:
-                    #     rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                    # print(rightTable)
-                    # rightMin = min((value[0] for value in rightTable.values()))
-                    # rightMaxCount = max((value[1] for value in rightTable.values()))
-                    # print('Minimum distance on right is ' + str(rightMin) + ' and max witness count on right is ' + str(rightMaxCount))
-                break
-        break
+                    rightTable = {}
+                    for currentNode in ranking.byRank[rank]:
+                        rightTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
+                    rightMin = min((value[0] for value in rightTable.values()))
+                    rightMaxCount = max((value[1] for value in rightTable.values()))
 
-    # check which output format is requested: graph or table
-    if output == "svg":
-        return display_variant_graph_as_SVG(graph,svg_output)
-    else:
-        raise Exception("Unknown output type for near-match collation: "+output)
+                    if (rightMin,-rightMaxCount) < (leftMin,-leftMaxCount):
+                        #move the entire node from priorRank to (current) rank
+                        # print('Before: ranking.byRank[priorRank] = ' + str(ranking.byRank[priorRank]))
+                        # print('Before: ranking.byRank[rank] = ' + str(ranking.byRank[rank]))
+                        # print('Before: ranking.byVertex[priorNode] = ' + str(ranking.byVertex[priorNode]))
+                        ranking.byRank[priorRank].remove(priorNode)
+                        ranking.byRank[rank].append(priorNode)
+                        ranking.byVertex[priorNode] = rank
+                        # print('After: ranking.byRank[priorRank] = ' + str(ranking.byRank[priorRank]))
+                        # print('After: ranking.byRank[rank] = ' + str(ranking.byRank[rank]))
+                        # print('After: ranking.byVertex[priorNode] = ' + str(ranking.byVertex[priorNode]))
+    return rank
 
-def findReadingsToTest(graph,rank,ranking):
-    rankToTest = ranking.byRank[rank]
-    labelsToTest = [node.label for node in rankToTest]
-    return labelsToTest
-
-def findPriorNode(witness,currentRank,graph,ranking):
+def findPriorNode(witness,currentRank,ranking):
     for rank in range(currentRank - 1, 1, -1):
         nodesAtRank = ranking.byRank[rank]
         for thisNode in nodesAtRank:
             for key in thisNode.tokens:
                 if witness == key: # Worst case: will be found at start if not on a real node
                     return (rank,thisNode)
+    # The start node has no witnesses, so return a special value to indicate nothing found
+    return (None, None)
 
 def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
     # Takes the same arguments as collate() above
