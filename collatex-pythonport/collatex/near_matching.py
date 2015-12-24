@@ -7,8 +7,8 @@ from Levenshtein import distance
 def process_rank(rank, collation, ranking, witness_count):
     nodes_at_rank = ranking.byRank[rank]
     witnesses_at_rank = []
-    for thisNode in nodes_at_rank:
-        for key in thisNode.tokens:
+    for this_node in nodes_at_rank:
+        for key in this_node.tokens:
             witnesses_at_rank.append(str(key))
     witnesses_at_rank_count = sum([len(thisNode.tokens) for thisNode in nodes_at_rank])
     if witnesses_at_rank_count == witness_count:
@@ -20,7 +20,6 @@ def process_rank(rank, collation, ranking, witness_count):
             if missingWitness not in witnesses_weve_seen:
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
                 if prior_rank:
-                    prior_label = prior_node.label
                     prior_node_witnesses = prior_node.tokens.keys()
                     witnesses_weve_seen = witnesses_weve_seen.union(prior_node_witnesses)
 

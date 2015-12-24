@@ -33,23 +33,47 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
     # assume collation is collation (by now); no error trapping
     if not astar:
-        algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
+        algorithm = EditGraphAligner(collation, near_match=False, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
     else:
-        algorithm = ExperimentalAstarAligner(collation, near_match=near_match, debug_scores=debug_scores)
+        algorithm = ExperimentalAstarAligner(collation, near_match=False, debug_scores=debug_scores)
 
     # build graph
     graph = VariantGraph()
     algorithm.collate(graph, collation)
+    ranking = VariantGraphRanking.of(graph)
+    if near_match:
+        # Segmentation not supported for near matching; raise exception if necessary
+        if segmentation:
+            raise Exception("segmentation=True not supported for near matching; must be set to False")
+
+        highestRank = ranking.byVertex[graph.end]
+        witnessCount = len(collation.witnesses)
+
+        # do-while loop to avoid looping through ranking while modifying it
+        rank = highestRank - 1
+        condition = True
+        while condition:
+            rank = process_rank(rank, collation, ranking, witnessCount)
+            rank -= 1
+            condition = rank > 1
+
+        # # Verify that nodes have been moved
+        # print("\nLabels at each rank at end of processing: ")
+        # for rank in ranking.byRank:
+        #     print("\nRank: " + str(rank))
+        #     print([node.label for node in ranking.byRank[rank]])
+
     # join parallel segments
     if segmentation:
         join(graph)
+        ranking = VariantGraphRanking.of(graph)
     # check which output format is requested: graph or table
     if output == "svg":
         return display_variant_graph_as_SVG(graph,svg_output)
     if output=="graph": 
         return graph
     # create alignment table
-    table = AlignmentTable(collation, graph, layout)
+    table = AlignmentTable(collation, graph, layout, ranking)
     if output == "json":
         return export_alignment_table_as_json(table)
     if output == "html":
@@ -61,59 +85,6 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     else:
         raise Exception("Unknown output type: "+output)
     
-def collate_nearMatch(collation, output="table", detect_transpositions=False, layout="horizontal", segmentation=False, debug_scores=False, properties_filter=None, svg_output=None):
-
-    # collation may be collation or json; if it's the latter, use it to build a real collation
-    if isinstance(collation, dict):
-        json_collation = Collation()
-        for witness in collation["witnesses"]:
-            json_collation.add_witness(witness)
-        collation = json_collation
-
-    algorithm = EditGraphAligner(collation, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
-
-    # build graph
-    graph = VariantGraph()
-    algorithm.collate(graph, collation)
-    ranking = VariantGraphRanking.of(graph)
-    highestRank = ranking.byVertex[graph.end]
-    witnessCount = len(collation.witnesses)
-
-    # do-while loop to avoid looping through ranking while modifying it
-    rank = highestRank - 1
-    condition = True
-    while condition:
-        rank = process_rank(rank, collation, ranking, witnessCount)
-        rank -= 1
-        condition = rank > 1
-
-    # # Verify that nodes have been moved
-    # print("\nLabels at each rank at end of processing: ")
-    # for rank in ranking.byRank:
-    #     print("\nRank: " + str(rank))
-    #     print([node.label for node in ranking.byRank[rank]])
-
-    # Segmentation not supported; raise exception if necessary
-    if segmentation:
-        raise Exception("segmentation=True not supported for near matching; must be set to False")
-
-    if output == "svg":
-        return display_variant_graph_as_SVG(graph,svg_output)
-    if output=="graph":
-        return graph
-    # create alignment table
-    table = AlignmentTable(collation, graph, layout,ranks=ranking)
-    if output == "json":
-        return export_alignment_table_as_json(table)
-    if output == "html":
-        return display_alignment_table_as_HTML(table)
-    if output == "html2":
-        return visualizeTableVerticallyWithColors(table, collation)
-    if output == "table":
-        return table
-    else:
-        raise Exception("Unknown output type for near-match collation: "+output)
-
 def export_alignment_table_as_json(table, indent=None, status=False):
     json_output = {}
     json_output["table"]=[]
