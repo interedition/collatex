@@ -24,6 +24,14 @@ from collatex.near_matching import process_rank
 
 
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
+    # collation may be collation or json; if it's the latter, use it to build a real collation
+    if isinstance(collation, dict):
+        json_collation = Collation()
+        for witness in collation["witnesses"]:
+            json_collation.add_witness(witness)
+        collation = json_collation
+
+    # assume collation is collation (by now); no error trapping
     if not astar:
         algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
     else:
@@ -97,16 +105,6 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
         return table
     else:
         raise Exception("Unknown output type for near-match collation: "+output)
-
-def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
-    # Takes the same arguments as collate() above
-    if output not in ['json', 'table', 'html2', 'html', 'svg']:
-        raise UnsupportedError("Output type " + output + " not supported for pretokenized collation")
-
-    collation = Collation()
-    for witness in json["witnesses"]:
-        collation.add_witness(witness)
-    return collate(collation,output=output,layout=layout,**kwargs)
 
 def collate_pretokenized_json_nearMatch(json, output='table', layout='horizontal', **kwargs):
     # Takes the same arguments as collate() above
