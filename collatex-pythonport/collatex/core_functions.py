@@ -74,10 +74,23 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
     # for rank in ranking.byRank:
     #     print("\nRank: " + str(rank))
     #     print([node.label for node in ranking.byRank[rank]])
-    # if output == "svg":
-    #     return display_variant_graph_as_SVG(graph,svg_output)
-    # else:
-    #     raise Exception("Unknown output type for near-match collation: "+output)
+
+    if output == "svg":
+        return display_variant_graph_as_SVG(graph,svg_output)
+    if output=="graph":
+        return graph
+    # create alignment table
+    table = AlignmentTable(collation, graph, layout,ranks=ranking)
+    if output == "json":
+        return export_alignment_table_as_json(table)
+    if output == "html":
+        return display_alignment_table_as_HTML(table)
+    if output == "html2":
+        return visualizeTableVerticallyWithColors(table, collation)
+    if output == "table":
+        return table
+    else:
+        raise Exception("Unknown output type for near-match collation: "+output)
 
 def processRank(rank, collation, graph, ranking, witnessCount):
     nodesAtRank = ranking.byRank[rank]
