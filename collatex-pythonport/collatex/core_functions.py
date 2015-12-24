@@ -19,6 +19,13 @@ from collatex.display_module import display_variant_graph_as_SVG
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
+    # collation may be collation or json; if it's the latter, use it to build a real collation
+    if isinstance(collation, dict):
+        json_collation = Collation()
+        for witness in collation["witnesses"]:
+            json_collation.add_witness(witness)
+        collation = json_collation
+
     if not astar:
         algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
     else:
@@ -48,16 +55,6 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     else:
         raise Exception("Unknown output type: "+output)
     
-def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
-    # Takes the same arguments as collate() above
-    if output not in ['json', 'table', 'html2', 'html', 'svg']:
-        raise UnsupportedError("Output type " + output + " not supported for pretokenized collation")
-
-    collation = Collation()
-    for witness in json["witnesses"]:
-        collation.add_witness(witness)
-    return collate(collation,output=output,layout=layout,**kwargs)
-
 def export_alignment_table_as_json(table, indent=None, status=False):
     json_output = {}
     json_output["table"]=[]
