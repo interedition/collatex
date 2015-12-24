@@ -26,6 +26,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
             json_collation.add_witness(witness)
         collation = json_collation
 
+    # assume collation is collation (by now); no error trapping
     if not astar:
         algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
     else:
