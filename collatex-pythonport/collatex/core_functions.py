@@ -75,6 +75,9 @@ def collate_nearMatch(collation, output="table", detect_transpositions=False, la
     #     print("\nRank: " + str(rank))
     #     print([node.label for node in ranking.byRank[rank]])
 
+    # join parallel segments
+    if segmentation:
+        raise Exception("segmentation=True not supported for near matching; must be set to False")
     if output == "svg":
         return display_variant_graph_as_SVG(graph,svg_output)
     if output=="graph":
@@ -109,31 +112,18 @@ def processRank(rank, collation, graph, ranking, witnessCount):
         for missingWitness in missingWitnesses:
             if missingWitness not in witnessesWeveSeen:
                 print('Looking for ' + missingWitness)
-                currentLabels = [node.label for node in ranking.byRank[rank]]
-                # print('Labels at current location ' + str(rank) + ': ' + str(currentLabels))
                 (priorRank, priorNode) = findPriorNode(missingWitness,rank,ranking)
                 if not(priorRank == None):
                     priorLabel = priorNode.label
                     priorNodeWitnesses = priorNode.tokens.keys()
                     witnessesWeveSeen = witnessesWeveSeen.union(priorNodeWitnesses)
-                    # print("We've seen witnesses: " + str(witnessesWeveSeen))
-                    # print('Prior label is ' + priorLabel + ' at ' + str(priorRank))
-                    priorLabels = [node.label for node in ranking.byRank[priorRank]]
-                    # print('Labels at prior location ' + str(priorRank) + ': ' + str(priorLabels))
-                    priorDistances = [distance(priorLabel,label) for label in priorLabels]
-                    # print('Prior distances = ' + str(priorDistances))
-                    currentDistances = [distance(priorLabel,label) for label in currentLabels]
-                    # print('Current distances = ' + str(currentDistances))
 
                     leftTable = {}
                     for currentNode in ranking.byRank[priorRank]:
                         if currentNode.label != priorLabel:
                             leftTable[currentNode.label] = [distance(currentNode.label,priorLabel),len(currentNode.tokens)]
-                    # print('Left table:')
-                    # print(leftTable)
                     leftMin = min((value[0] for value in leftTable.values()))
                     leftMaxCount = max((value[1] for value in leftTable.values()))
-                    # print('Minimum distance on left is ' + str(leftMin) + ' and max witness count on left is ' + str(leftMaxCount))
 
                     rightTable = {}
                     for currentNode in ranking.byRank[rank]:
@@ -143,15 +133,9 @@ def processRank(rank, collation, graph, ranking, witnessCount):
 
                     if (rightMin,-rightMaxCount) < (leftMin,-leftMaxCount):
                         #move the entire node from priorRank to (current) rank
-                        # print('Before: ranking.byRank[priorRank] = ' + str(ranking.byRank[priorRank]))
-                        # print('Before: ranking.byRank[rank] = ' + str(ranking.byRank[rank]))
-                        # print('Before: ranking.byVertex[priorNode] = ' + str(ranking.byVertex[priorNode]))
                         ranking.byRank[priorRank].remove(priorNode)
                         ranking.byRank[rank].append(priorNode)
                         ranking.byVertex[priorNode] = rank
-                        # print('After: ranking.byRank[priorRank] = ' + str(ranking.byRank[priorRank]))
-                        # print('After: ranking.byRank[rank] = ' + str(ranking.byRank[rank]))
-                        # print('After: ranking.byVertex[priorNode] = ' + str(ranking.byVertex[priorNode]))
     return rank
 
 def findPriorNode(witness,currentRank,ranking):
