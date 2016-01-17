@@ -95,6 +95,13 @@ class TokenIndex(object):
             #             print("new: "+repr(closed_intervals[-1]))
         return closed_intervals
 
+    # factory method for testing purposes only!
+    @classmethod
+    def for_test(cls, sa_array, lcp_array):
+        token_index = TokenIndex(None)
+        token_index.suffix_array = sa_array
+        token_index.lcp_array = lcp_array
+        return token_index
 
 # parts of the LCP array become potential blocks.
 # minimum block_length: the number of tokens a single occurrence of this block spans
