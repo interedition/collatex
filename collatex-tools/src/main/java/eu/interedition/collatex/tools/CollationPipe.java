@@ -65,19 +65,19 @@ public class CollationPipe {
         boolean joined = true;
 
         final String[] witnessSpecs = commandLine.getArgs();
-        final URL[] inputResources = new URL[witnessSpecs.length];
+        final InputStream[] inputStreams = new InputStream[witnessSpecs.length];
         for (int wc = 0, wl = witnessSpecs.length; wc < wl; wc++) {
             try {
-                inputResources[wc] = argumentToInput(witnessSpecs[wc]);
+                inputStreams[wc] = argumentToInputStream(witnessSpecs[wc]);
             } catch (MalformedURLException urlEx) {
                 throw new ParseException("Invalid resource: " + witnessSpecs[wc]);
             }
         }
 
-        if (inputResources.length < 1) {
+        if (inputStreams.length < 1) {
             throw new ParseException("No input resource(s) given");
-        } else if (inputResources.length < 2) {
-            try (InputStream inputStream = inputResources[0].openStream()) {
+        } else if (inputStreams.length < 2) {
+            try (InputStream inputStream = inputStreams[0]) {
                 final SimpleCollation collation = JsonProcessor.read(inputStream);
                 witnesses = collation.getWitnesses();
                 collationAlgorithm = collation.getAlgorithm();
@@ -118,9 +118,9 @@ public class CollationPipe {
             final boolean xmlMode = commandLine.hasOption("xml");
             final XPathExpression tokenXPath = XPathFactory.newInstance().newXPath().compile(commandLine.getOptionValue("xp", "//text()"));
 
-            witnesses = new ArrayList<>(inputResources.length);
-            for (int wc = 0, wl = inputResources.length; wc < wl; wc++) {
-                try (InputStream stream = inputResources[wc].openStream()) {
+            witnesses = new ArrayList<>(inputStreams.length);
+            for (int wc = 0, wl = inputStreams.length; wc < wl; wc++) {
+                try (InputStream stream = inputStreams[wc]) {
                     final String sigil = "w" + (wc + 1);
                     if (!xmlMode) {
                         final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, inputCharset));
@@ -203,6 +203,18 @@ public class CollationPipe {
         }
     }
 
+    private static InputStream argumentToInputStream(String arg) throws MalformedURLException, IOException {
+        if ("-".equals(arg)) {
+	    return System.in;
+        }
+        final File witnessFile = new File(arg);
+        if (witnessFile.exists()) {
+            return witnessFile.toURI().normalize().toURL().openStream();
+        } else {
+            return new URL(arg).openStream();
+        }
+    }
+
     private static PrintWriter argumentToOutput(String arg, Charset outputCharset) throws ParseException, IOException {
         if ("-".equals(arg)) {
             return new PrintWriter(new OutputStreamWriter(System.out, outputCharset));
@@ -216,4 +228,3 @@ public class CollationPipe {
         }
     }
 }
-
