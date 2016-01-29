@@ -58,6 +58,7 @@ public class CollateX {
             error("Script error", e);
         } catch (Throwable t) {
             error("Unexpected error", t);
+            t.printStackTrace(ERROR_LOG);
         } finally {
             ERROR_LOG.flush();
         }
