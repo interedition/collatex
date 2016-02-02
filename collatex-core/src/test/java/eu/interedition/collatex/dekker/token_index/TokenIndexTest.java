@@ -65,10 +65,23 @@ public class TokenIndexTest extends AbstractTest {
         final SimpleWitness[] w = createWitnesses("a b c d e", "a e c d", "a d b");
         TokenIndex tokenIndex = new TokenIndex(new EqualityTokenComparator(), w);
         tokenIndex.prepare();
-        //Note: the suffix array can have multiple forms
-        //outcome of sorting is not guaranteed
-        //however the LCP array is fixed we can assert that
-        assertEquals("[-1, 0, 0, 0, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 1]", Arrays.toString(tokenIndex.LCP_array));
+        // N.B. The witness markers get *not* sorted first, because the
+        // GenericArrayAdapter has already replaced them with Integers
+        // by the time we arrive here.
+        //
+        // Position:     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+        // Tokens:       a  b  c  d  e $1  a  e  c  d $2  a  d  b $3
+        // Adapter-Id:   0  1  2  3  4  5  0  4  2  3  6  0  3  1  7
+        // SuffixArray:  0 11  6  1 13  2  8 12  3  9  7  4  5 10 14
+        //               -------------------------------------------
+        //               a  a  a  b  b  c  c  d  d  d  e  e $1 $2 $3
+        //               b  d  e  c $3  d  d  b  e $2  c $1  a  a
+        //               c  b  c  d     e $2 $3 $1  a  d  a  e  d
+        //               ...
+        // LCP:          -  1  1  0  1  0  2  0  1  1  0  1  0  0  0
+        //
+        assertEquals("[0, 11, 6, 1, 13, 2, 8, 12, 3, 9, 7, 4, 5, 10, 14]", Arrays.toString(tokenIndex.suffix_array));
+        assertEquals("[-1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 1, 0, 0, 0]", Arrays.toString(tokenIndex.LCP_array));
     }
 
     @Test
@@ -80,11 +93,12 @@ public class TokenIndexTest extends AbstractTest {
         TokenIndex tokenIndex = new TokenIndex(new EqualityTokenComparator(), w);
         tokenIndex.prepare();
         List<Block> blocks = tokenIndex.splitLCP_ArrayIntoIntervals();
-        assertLCP_Interval(3, 1, 3, 3, blocks.get(0)); // a
-        assertLCP_Interval(6, 1, 2, 2, blocks.get(1)); // b
-        assertLCP_Interval(8, 2, 2, 2, blocks.get(2)); // c d
-        assertLCP_Interval(10, 1, 3, 3, blocks.get(3)); // d
-        assertLCP_Interval(13, 1, 2, 2, blocks.get(4)); // e
+        // start, length, n_witness, n_suffix
+        assertLCP_Interval( 0, 1, 3, 3, blocks.get(0)); // a
+        assertLCP_Interval( 3, 1, 2, 2, blocks.get(1)); // b
+        assertLCP_Interval( 5, 2, 2, 2, blocks.get(2)); // c d
+        assertLCP_Interval( 7, 1, 3, 3, blocks.get(3)); // d
+        assertLCP_Interval(10, 1, 2, 2, blocks.get(4)); // e
         assertEquals(5, blocks.size());
     }
 
@@ -93,10 +107,25 @@ public class TokenIndexTest extends AbstractTest {
         final SimpleWitness[] w = createWitnesses("the a the", "the a");
         TokenIndex tokenIndex = new TokenIndex(new EqualityTokenComparator(), w);
         tokenIndex.prepare();
+        // Position:     0   1   2   3   4   5   6
+        // Tokens:       the a   the $1  the a   $2
+        // Adapter-Id:   0   1   0   2   0   1   3
+        // SuffixArray:  0   4   2   1   5   3   6
+        //               --------------------------
+        //               0   0   0   1   1   2   3
+        //               1   1   2   0   3   0
+        //               0   3   0   2       1
+        //               ...
+        // LCP:          -   2   1   0   1   0   0
+        //
+        assertEquals("[0, 4, 2, 1, 5, 3, 6]", Arrays.toString(tokenIndex.suffix_array));
+        assertEquals("[-1, 2, 1, 0, 1, 0, 0]", Arrays.toString(tokenIndex.LCP_array));
+
         List<Block> blocks = tokenIndex.splitLCP_ArrayIntoIntervals();
-        assertLCP_Interval(2, 1, 2, 2, blocks.get(0)); // a
-        assertLCP_Interval(4, 1, 2, 3, blocks.get(1)); // the
-        assertLCP_Interval(5, 2, 2, 2, blocks.get(2)); // the a
+        // start, length, n_witness, n_suffix
+        assertLCP_Interval(0, 2, 2, 2, blocks.get(0)); // 1 2 the a
+        assertLCP_Interval(0, 1, 2, 3, blocks.get(1)); // 1   the
+        assertLCP_Interval(3, 1, 2, 2, blocks.get(2)); // 2   a
         assertEquals(3, blocks.size());
     }
 

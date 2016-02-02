@@ -40,6 +40,7 @@ public class EditDistanceTokenComparator implements Comparator<Token> {
     public int compare(Token base, Token witness) {
         final String baseContent = ((SimpleToken) base).getNormalized();
         final String witnessContent = ((SimpleToken) witness).getNormalized();
-        return (EditDistance.compute(baseContent, witnessContent) <= threshold) ? 0 : -1;
+        return (EditDistance.compute(baseContent, witnessContent) <= threshold) ?
+                0 : baseContent.compareTo(witnessContent);
     }
 }

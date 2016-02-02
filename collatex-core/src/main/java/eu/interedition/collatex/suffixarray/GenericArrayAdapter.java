@@ -37,34 +37,23 @@ class GenericArrayAdapter<T> {
          * Allocate slightly more space, some suffix construction strategies need it and
          * we don't want to waste space for multiple symbol mappings.
          */
-        this.input = new int[length + SuffixArrays.MAX_EXTRA_TRAILING_SPACE];
+        input = new int[length + SuffixArrays.MAX_EXTRA_TRAILING_SPACE];
 
-        //System.out.println("Renaming tokens ...");
+        //System.out.println("Assigning token ids ...");
+
         /*
-         * Here we create a mapping for the token to an integer id which we
-         * can use in the suffax array construction algorithm.
+         * We associate every token to an id, all `equal´ tokens to the same id.
+         * The suffix array is built using only the the ids.
          */
-        this.tokIDs = new TreeMap<T, Integer>(comparator);
+        tokIDs = new TreeMap<T, Integer>(comparator);
 
-        // put and order all tokens in tokIDs
         for (int i = 0; i < length; i++) {
-            tokIDs.put(tokens[i], null); // null is temporary placeholder value
-        }
-
-        // assign each token an ascending id
-        int _id = 1;
-        for (Entry<T, Integer> entry : tokIDs.entrySet()) {
-            entry.setValue(_id++);
-        }
-
-        // fill input array with ids
-        for (int i = 0; i < length; i++) {
+            tokIDs.putIfAbsent(tokens[i], i);
             input[i] = tokIDs.get(tokens[i]);
         }
 
-        //System.out.println("Renaming tokens done.");
+        //System.out.println("Token ids assigned.");
 
         return delegate.buildSuffixArray(input, 0, length);
     }
 }
-
