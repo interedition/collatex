@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 The Interedition Development Group.
+ * Copyright (c) 2016 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -17,20 +17,26 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.interedition.collatex.matching;
+package eu.interedition.collatex.needlemanwunschgotoh;
 
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.simple.SimpleToken;
-
-import java.util.Comparator;
-
-public class StrictEqualityTokenComparator implements Comparator<Token> {
-
-    @Override
-    public int compare(Token base, Token witness) {
-        final String baseContent = ((SimpleToken) base).getContent();
-        final String witnessContent = ((SimpleToken) witness).getContent();
-        return baseContent.compareTo(witnessContent);
-    }
-
+/**
+ * A scorer for a {@code NeedlemanWunschGotohAligner}.
+ *
+ * Calculates the score of a match between two generic objects.
+ *
+ * @param <A> Type of the first object
+ * @param <B> Type of the second object
+ *
+ * @author Marcello Perathoner
+ */
+public interface NeedlemanWunschScorer<A, B> {
+    /**
+     * Calculate the score given to a match between a and b.
+     *
+     * @param a An object
+     * @param b An object
+     *
+     * @return The score
+     */
+    double score(A a, B b);
 }

@@ -24,6 +24,7 @@ import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
+import eu.interedition.collatex.matching.EditDistanceRatioTokenComparator;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleCollation;
@@ -41,6 +42,7 @@ import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
+import javax.json.JsonObjectBuilder;
 import javax.json.stream.JsonGenerator;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +50,11 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -155,38 +161,7 @@ public class JsonProcessor {
                 throw new IOException("No witnesses in collation");
             }
 
-            Comparator<eu.interedition.collatex.Token> tokenComparator = null;
-            final JsonValue tokenComparatorNode = collationObject.get("tokenComparator");
-            if (tokenComparatorNode != null && tokenComparatorNode.getValueType() == JsonValue.ValueType.OBJECT) {
-                final JsonObject tokenComparatorObject = (JsonObject) tokenComparatorNode;
-                try {
-                    if ("levenshtein".equals(tokenComparatorObject.getString("type"))) {
-                        final int configuredDistance = tokenComparatorObject.getInt("distance", 0);
-                        tokenComparator = new EditDistanceTokenComparator(configuredDistance == 0 ? 1 : configuredDistance);
-                    }
-                } catch (ClassCastException e) {
-                    // ignored
-                }
-            }
-            if (tokenComparator == null) {
-                tokenComparator = new EqualityTokenComparator();
-            }
-
-            CollationAlgorithm collationAlgorithm = null;
-            final JsonValue collationAlgorithmNode = collationObject.get("algorithm");
-            if (collationAlgorithmNode != null && collationAlgorithmNode.getValueType() == JsonValue.ValueType.STRING) {
-                final String collationAlgorithmValue = ((JsonString) collationAlgorithmNode).getString();
-                if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
-                    collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
-                } else if ("gst".equalsIgnoreCase(collationAlgorithmValue)) {
-                    collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(tokenComparator, 2);
-                } else if ("medite".equalsIgnoreCase(collationAlgorithmValue)) {
-                    collationAlgorithm = CollationAlgorithmFactory.medite(tokenComparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
-                }
-            }
-            if (collationAlgorithm == null) {
-                collationAlgorithm = CollationAlgorithmFactory.dekker(tokenComparator);
-            }
+            CollationAlgorithm collationAlgorithm = createFromJSON(collationObject);
 
             boolean joined = true;
             try {
@@ -221,6 +196,8 @@ public class JsonProcessor {
     }
 
     protected static void write(JsonGenerator jgen, VariantGraph graph) {
+        insertVertexIds(graph);
+
         ParallelSegmentationApparatus.generate(VariantGraphRanking.of(graph), new ParallelSegmentationApparatus.GeneratorCallback() {
             @Override
             public void start() {
@@ -265,7 +242,7 @@ public class JsonProcessor {
 
     public static class Token extends SimpleToken {
 
-        private final JsonObject jsonNode;
+        private JsonObject jsonNode;
 
         public Token(SimpleWitness witness, String content, String normalized, JsonObject jsonNode) {
             super(witness, content, normalized);
@@ -275,8 +252,83 @@ public class JsonProcessor {
         public JsonObject getJsonNode() {
             return jsonNode;
         }
+
+        public JsonObject setJsonNode(JsonObject jsonNode) {
+            JsonObject oldJsonNode = this.jsonNode;
+            this.jsonNode = jsonNode;
+            return oldJsonNode;
+        }
     }
 
     private JsonProcessor() {
+    }
+
+    private static void insertVertexIds(final VariantGraph graph) {
+        final List<Set<VariantGraph.Vertex>> ranking = new ArrayList<>();
+        Iterator<Set<VariantGraph.Vertex>> iter = VariantGraphRanking.of(graph).iterator();
+        while (iter.hasNext()) {
+            int id = 0;
+            for (VariantGraph.Vertex vertex : iter.next()) {
+                for (eu.interedition.collatex.Token t : vertex.tokens()) {
+                    if (t instanceof Token) {
+                        JsonObjectBuilder job = Json.createObjectBuilder();
+                        for (Map.Entry<String, JsonValue> entry : ((Token) t).getJsonNode().entrySet()) {
+                            job.add(entry.getKey(), entry.getValue());
+                        }
+                        job.add("_VertexId", id);
+                        ((Token) t).setJsonNode(job.build());
+                    }
+                }
+                id++;
+            }
+        }
+    }
+
+    /**
+     * Create CollationAlgorithm from a JSON snippet
+     *
+     * This method is duplicated in
+     * {@code SimpleCollationJSONMessageBodyReader}.
+     *
+     * FIXME: This method could be moved into {@code CollationAlgorithmFactory}
+     * but it would make collatex-core dependent on javax.json.
+     *
+     * @param collationObject The JSON snippet
+     * @return                The CollationAlgorithm subclass
+     */
+    private static CollationAlgorithm createFromJSON(JsonObject collationObject) {
+        Comparator<eu.interedition.collatex.Token> comparator = null;
+
+        final JsonValue tokenComparatorNode = collationObject.get("tokenComparator");
+        if (tokenComparatorNode != null && tokenComparatorNode.getValueType() == JsonValue.ValueType.OBJECT) {
+            final JsonObject tokenComparatorObject = (JsonObject) tokenComparatorNode;
+            try {
+                if ("levenshtein".equals(tokenComparatorObject.getString("type"))) {
+                    if (tokenComparatorObject.containsKey("ratio")) {
+                        comparator = CollationAlgorithmFactory.createComparator (
+                            "levenshtein.ratio",
+                            new Double (tokenComparatorObject.getJsonNumber("ratio").doubleValue()));
+                    } else {
+                        comparator = CollationAlgorithmFactory.createComparator (
+                            "levenshtein.distance",
+                            new Integer (tokenComparatorObject.getInt("distance", 1)));
+                    }
+                }
+            } catch (ClassCastException e) {
+                // ignored
+            }
+        }
+        if (comparator == null) {
+            comparator = CollationAlgorithmFactory.createComparator ("equality");
+        }
+
+        String algorithm = "dekker";
+        final JsonValue collationAlgorithmNode = collationObject.get("algorithm");
+        if (collationAlgorithmNode != null &&
+            collationAlgorithmNode.getValueType() == JsonValue.ValueType.STRING) {
+            algorithm = ((JsonString) collationAlgorithmNode).getString();
+        }
+
+        return CollationAlgorithmFactory.createAlgorithm(algorithm, comparator);
     }
 }

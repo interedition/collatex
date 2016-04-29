@@ -6,6 +6,8 @@ target
 *.iws
 *.ipynb
 *.egg-info
+*~
+java.hprof.txt
 
 .classpath
 .project
