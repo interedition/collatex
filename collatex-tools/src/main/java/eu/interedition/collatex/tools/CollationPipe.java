@@ -46,7 +46,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -98,19 +100,9 @@ public class CollationPipe {
             throw new ParseException("Failed to read script '" + script + "' - " + e.getMessage());
         }
 
-        switch (commandLine.getOptionValue("a", "").toLowerCase()) {
-            case "needleman-wunsch":
-                collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(comparator);
-                break;
-            case "medite":
-                collationAlgorithm = CollationAlgorithmFactory.medite(comparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
-                break;
-            case "gst":
-                collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(comparator, 2);
-                break;
-            default:
-                collationAlgorithm = Optional.ofNullable(collationAlgorithm).orElse(CollationAlgorithmFactory.dekker(comparator));
-                break;
+        String algorithm = commandLine.getOptionValue("a", "").toLowerCase();
+        if (!algorithm.equals ("")) {
+            collationAlgorithm = CollationAlgorithmFactory.createAlgorithm (algorithm, comparator);
         }
 
         if (witnesses == null) {

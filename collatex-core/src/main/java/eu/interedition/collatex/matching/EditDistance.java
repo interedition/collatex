@@ -23,6 +23,10 @@ public final class EditDistance {
     private static final int MAX_DISTANCE_COMPARISON = 2500;
 
     public static int compute(String str1, String str2) {
+        return compute(str1, str2, 1);
+    }
+
+    public static int compute(String str1, String str2, int subst_cost) {
         if ((str1.length() * str2.length() > MAX_DISTANCE_COMPARISON)) {
             return MAX_DISTANCE_COMPARISON;
         }
@@ -53,7 +57,7 @@ public final class EditDistance {
             final char str1Char = str1Chars[i - 1];
             for (int j = 1; j <= str2Length; j++) {
                 final char str2Char = str2Chars[j - 1];
-                final int cost = (str1Char == str2Char ? 0 : 1);
+                final int cost = (str1Char == str2Char ? 0 : subst_cost);
                 matrix[i][j] = min3(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
             }
         }

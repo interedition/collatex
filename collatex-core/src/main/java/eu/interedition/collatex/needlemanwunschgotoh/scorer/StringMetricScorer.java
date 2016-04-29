@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 The Interedition Development Group.
+ * Copyright (c) 2016 The Interedition Development Group.
  *
  * This file is part of CollateX.
  *
@@ -19,18 +19,19 @@
 
 package eu.interedition.collatex.matching;
 
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.simple.SimpleToken;
+/**
+ * Calculate a score based on string metrics.
+ *
+ * @author Marcello Perathoner
+ */
+public interface StringMetricScorer {
 
-import java.util.Comparator;
+    /** Calculate the score for a match between and b. */
+    double score(String a, String b);
 
-public class StrictEqualityTokenComparator implements Comparator<Token> {
+    /** Return the minimun score this scorer will ever calculate. */
+    double getMinScore();
 
-    @Override
-    public int compare(Token base, Token witness) {
-        final String baseContent = ((SimpleToken) base).getContent();
-        final String witnessContent = ((SimpleToken) witness).getContent();
-        return baseContent.compareTo(witnessContent);
-    }
-
+    /** Return the maximun score this scorer will ever calculate. */
+    double getMaxScore();
 }

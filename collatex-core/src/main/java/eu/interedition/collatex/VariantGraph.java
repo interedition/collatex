@@ -37,12 +37,16 @@ import java.util.stream.Collectors;
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class VariantGraph {
-    final VariantGraph.Vertex start;
-    final VariantGraph.Vertex end;
+    VariantGraph.Vertex start;
+    VariantGraph.Vertex end;
     final Map<Vertex, Set<Set<Vertex>>> transpositionIndex = new HashMap<>();
 
     public VariantGraph() {
         super();
+        init();
+    }
+
+    public void init() {
         this.start = new VariantGraph.Vertex(this);
         this.end = new VariantGraph.Vertex(this);
 

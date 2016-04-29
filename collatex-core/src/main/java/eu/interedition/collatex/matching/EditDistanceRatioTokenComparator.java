@@ -24,13 +24,24 @@ import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.Comparator;
 
-public class StrictEqualityTokenComparator implements Comparator<Token> {
+public class EditDistanceRatioTokenComparator implements Comparator<Token> {
 
-    @Override
-    public int compare(Token base, Token witness) {
-        final String baseContent = ((SimpleToken) base).getContent();
-        final String witnessContent = ((SimpleToken) witness).getContent();
-        return baseContent.compareTo(witnessContent);
+    private final double threshold;
+    private final LevenshteinRatioScorer scorer;
+
+    public EditDistanceRatioTokenComparator() {
+        this(0.6);
     }
 
+    public EditDistanceRatioTokenComparator(double threshold) {
+        this.threshold = threshold;
+        this.scorer = new LevenshteinRatioScorer();
+    }
+
+    @Override
+    public int compare(Token token_a, Token token_b) {
+        final String a = ((SimpleToken) token_a).getNormalized();
+        final String b = ((SimpleToken) token_b).getNormalized();
+        return (scorer.score(a, b) >= threshold) ? 0 : a.compareTo(b);
+    }
 }

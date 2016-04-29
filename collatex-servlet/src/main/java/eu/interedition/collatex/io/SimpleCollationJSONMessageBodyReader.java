@@ -4,6 +4,7 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
+import eu.interedition.collatex.matching.EditDistanceRatioTokenComparator;
 import eu.interedition.collatex.matching.EditDistanceTokenComparator;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.*;
@@ -21,6 +22,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -133,38 +136,7 @@ public class SimpleCollationJSONMessageBodyReader implements MessageBodyReader<S
                 throw new IOException("No witnesses in collation");
             }
 
-            Comparator<Token> tokenComparator = null;
-            final JsonValue tokenComparatorNode = collationObject.get("tokenComparator");
-            if (tokenComparatorNode != null && tokenComparatorNode.getValueType() == JsonValue.ValueType.OBJECT) {
-                final JsonObject tokenComparatorObject = (JsonObject) tokenComparatorNode;
-                try {
-                    if ("levenshtein".equals(tokenComparatorObject.getString("type"))) {
-                        final int configuredDistance = tokenComparatorObject.getInt("distance", 0);
-                        tokenComparator = new EditDistanceTokenComparator(configuredDistance == 0 ? 1 : configuredDistance);
-                    }
-                } catch (ClassCastException e) {
-                    // ignored
-                }
-            }
-            if (tokenComparator == null) {
-                tokenComparator = new EqualityTokenComparator();
-            }
-
-            CollationAlgorithm collationAlgorithm = null;
-            final JsonValue collationAlgorithmNode = collationObject.get("algorithm");
-            if (collationAlgorithmNode != null && collationAlgorithmNode.getValueType() == JsonValue.ValueType.STRING) {
-                final String collationAlgorithmValue = ((JsonString) collationAlgorithmNode).getString();
-                if ("needleman-wunsch".equalsIgnoreCase(collationAlgorithmValue)) {
-                    collationAlgorithm = CollationAlgorithmFactory.needlemanWunsch(tokenComparator);
-                } else if ("gst".equalsIgnoreCase(collationAlgorithmValue)) {
-                    collationAlgorithm = CollationAlgorithmFactory.greedyStringTiling(tokenComparator, 2);
-                } else if ("medite".equalsIgnoreCase(collationAlgorithmValue)) {
-                    collationAlgorithm = CollationAlgorithmFactory.medite(tokenComparator, SimpleToken.TOKEN_MATCH_EVALUATOR);
-                }
-            }
-            if (collationAlgorithm == null) {
-                collationAlgorithm = CollationAlgorithmFactory.dekker(tokenComparator);
-            }
+            CollationAlgorithm collationAlgorithm = createFromJSON(collationObject);
 
             boolean joined = true;
             try {
@@ -185,4 +157,52 @@ public class SimpleCollationJSONMessageBodyReader implements MessageBodyReader<S
             return new SimpleCollation(witnesses, collationAlgorithm, joined);
         }
     }
+
+    /**
+     * Create CollationAlgorithm from a JSON snippet
+     *
+     * This method is duplicated in {@code JsonProcessor}.
+     *
+     * FIXME: This method could be moved into {@code CollationAlgorithmFactory}
+     * but it would make collatex-core dependent on javax.json.
+     *
+     * @param collationObject The JSON snippet
+     * @return                The CollationAlgorithm subclass
+     */
+    private static CollationAlgorithm createFromJSON(JsonObject collationObject) {
+        Comparator<Token> comparator = null;
+
+        final JsonValue tokenComparatorNode = collationObject.get("tokenComparator");
+        if (tokenComparatorNode != null && tokenComparatorNode.getValueType() == JsonValue.ValueType.OBJECT) {
+            final JsonObject tokenComparatorObject = (JsonObject) tokenComparatorNode;
+            try {
+                if ("levenshtein".equals(tokenComparatorObject.getString("type"))) {
+                    if (tokenComparatorObject.containsKey("ratio")) {
+                        comparator = CollationAlgorithmFactory.createComparator (
+                            "levenshtein.ratio",
+                            new Double (tokenComparatorObject.getJsonNumber("ratio").doubleValue()));
+                    } else {
+                        comparator = CollationAlgorithmFactory.createComparator (
+                            "levenshtein.distance",
+                            new Integer (tokenComparatorObject.getInt("distance", 1)));
+                    }
+                }
+            } catch (ClassCastException e) {
+                // ignored
+            }
+        }
+        if (comparator == null) {
+            comparator = CollationAlgorithmFactory.createComparator ("equality");
+        }
+
+        String algorithm = "dekker";
+        final JsonValue collationAlgorithmNode = collationObject.get("algorithm");
+        if (collationAlgorithmNode != null &&
+            collationAlgorithmNode.getValueType() == JsonValue.ValueType.STRING) {
+            algorithm = ((JsonString) collationAlgorithmNode).getString();
+        }
+
+        return CollationAlgorithmFactory.createAlgorithm(algorithm, comparator);
+    }
+
 }

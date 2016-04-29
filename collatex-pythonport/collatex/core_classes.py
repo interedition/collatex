@@ -16,30 +16,30 @@ from textwrap import fill
 from collatex.exceptions import TokenError
 
 class Row(object):
-    
+
     def __init__(self, header):
         self.cells = []
         self.header = header
-    
+
     def append(self, cell):
         self.cells.append(cell)
-        
+
     def to_list(self):
         return self.cells
-    
+
 
 class Column(object):
-    
+
     def __init__(self):
         self.tokens_per_witness = {}
-        self.variant = False  
+        self.variant = False
 
     def put(self, sigil, token):
         self.tokens_per_witness[sigil]=token
 
 
 class AlignmentTable(object):
-    
+
     def __init__(self, collation, graph=None, layout="horizontal"):
         self.collation = collation
         self.graph = graph
@@ -52,7 +52,7 @@ class AlignmentTable(object):
     def _construct_table(self):
         ranking = VariantGraphRanking.of(self.graph)
         vertices_per_rank = ranking.byRank
-        # construct columns        
+        # construct columns
         for rank in vertices_per_rank:
             column = None
             vertices = vertices_per_rank[rank]
@@ -87,11 +87,11 @@ class AlignmentTable(object):
 
     def __str__(self, *args, **kwargs):
         return str(create_table_visualization(self))
-                    
+
 # DISPLAY PART OF THE VARIANT GRAPH IN PLAIN/HTML AND VERTICAL OR HORIZONTAL!
 def create_table_visualization(table):
     # create visualization of alignment table
-    if table.layout == "vertical":    
+    if table.layout == "vertical":
         prettytable = visualizeTableVertically(table)
     elif table.layout == "horizontal":
         prettytable = visualizeTableHorizontal(table)
@@ -120,11 +120,11 @@ def visualizeTableVertically(table):
         x.add_column(row.header, [fill(cell, 20) if cell else "-" for cell in row.cells])
     return x
 
-   
+
 # not used in the suffix implementation
 # Tokenizer inside suffix array library is used
 class Tokenizer(object):
-    
+
     # by default the tokenizer splits on space characters
     def tokenize(self, contents):
         return contents.split()
@@ -156,7 +156,7 @@ class Token(object):
         return self.token_string
 
 class Witness(object):
-    
+
     def __init__(self, witnessdata):
         self.sigil = witnessdata['id']
         self._tokens = []
@@ -172,22 +172,22 @@ class Witness(object):
                 self._tokens.append(Token(tk))
             # content string is used for generation of the suffix and LCP arrays.
             self.content = ' '.join([x.token_string for x in self._tokens])
-            
+
     def tokens(self):
         return self._tokens
 
 class VariantGraph(object):
-    
+
     def __init__(self):
         self.graph = nx.DiGraph()
         self.start = self.add_vertex(Token())
         self.end = self.add_vertex(Token())
-    
+
 #     def is_directed(self):
 #         return self.graph.is_directed()
-#     
-    # vertex creation uses a unique ID, since the token_content does not have to be unique   
-    # we store the token content in the label 
+#
+    # vertex creation uses a unique ID, since the token_content does not have to be unique
+    # we store the token content in the label
     def add_vertex(self, token, sigil=None):
         '''
         :type token: Token
@@ -196,13 +196,13 @@ class VariantGraph(object):
         # print("Adding node: "+node_id+":"+token_content)
         tokens = {}
         if sigil:
-            tokens[sigil] = token
+            tokens[sigil] = [token]
         self.graph.add_node(node_id, label=token.token_string, tokens=tokens)
         return node_id
 
     def add_token_to_vertex(self, node, token, sigil):
         attributes = self.vertex_attributes(node)
-        attributes["tokens"][sigil] = token
+        attributes["tokens"].setdefault(sigil, []).append (token)
 
     def connect(self, source, target, witnesses):
         """
@@ -212,44 +212,44 @@ class VariantGraph(object):
         # print("Adding Edge: "+source+":"+target)
         if self.graph.has_edge(source, target):
             self.graph[source][target]["label"] += ", "+str(witnesses)
-        else:    
+        else:
             self.graph.add_edge(source, target, label=witnesses)
-        
+
     def remove_edge(self, source, target):
         self.graph.remove_edge(source, target)
-        
+
     def remove_node(self, node):
-        self.graph.remove_node(node)      
-        
+        self.graph.remove_node(node)
+
     def vertices(self):
         return self.graph.nodes()
-    
+
     def edges(self):
         return self.graph.edges()
-    
+
     def edge_between(self, node, node2):
         # return self.graph.get_edge_data(node, node2)
         return self.graph.has_edge(node, node2)
-    
+
     def in_edges(self, node, data=False):
         return self.graph.in_edges(nbunch=node, data=data)
-    
+
     def out_edges(self, node, data=False):
         return self.graph.out_edges(nbunch=node, data=data)
-    
+
     def vertex_attributes(self, node):
         return self.graph.node[node]
-  
+
     # Note: generator implementation
     def vertexWith(self, content):
         try:
             vertex_to_find = (n for n in self.graph if self.graph.node[n]['label'] == content).next()
-            return vertex_to_find    
+            return vertex_to_find
         except StopIteration:
             raise Exception("Vertex with "+content+" not found!")
-  
+
 class CollationAlgorithm(object):
-    def merge(self, graph, witness_sigil, witness_tokens, alignments = {}):  
+    def merge(self, graph, witness_sigil, witness_tokens, alignments = {}):
         """
         :type graph: VariantGraph
         """
@@ -275,7 +275,7 @@ class CollationAlgorithm(object):
  This function joins the variant graph in place.
  This function is a straight port of the Java version of CollateX.
     :type graph: VariantGraph
- TODO: add transposition support!   
+ TODO: add transposition support!
 '''
 def join(graph):
     processed = set()
@@ -301,7 +301,7 @@ def join(graph):
                     graph.remove_edge(join_candidate, neighbor)
                     graph.connect(vertex, neighbor, data["label"])
                 graph.remove_edge(vertex, join_candidate)
-                graph.remove_node(join_candidate) 
+                graph.remove_node(join_candidate)
                 queue.appendleft(vertex);
                 continue;
         processed.add(vertex)
@@ -309,7 +309,7 @@ def join(graph):
             # FIXME: Why do we run out of memory in some cases here, if this is not checked?
             if neighbor not in processed:
                 queue.appendleft(neighbor)
-                
+
 # Port of VariantGraphRanking class from Java
 # This is a minimal port; only bare bones
 class VariantGraphRanking(object):
@@ -319,13 +319,13 @@ class VariantGraphRanking(object):
         # however, a rank can be assigned to multiple vertices
         self.byVertex = {}
         self.byRank = {}
-        
+
     def apply(self, vertex):
         return self.byVertex[vertex]
-    
+
     @classmethod
     def of(cls, graph):
-        variant_graph_ranking = VariantGraphRanking()                
+        variant_graph_ranking = VariantGraphRanking()
         topological_sorted_vertices = topological_sort(graph.graph)
         for v in topological_sorted_vertices:
             rank = -1
@@ -335,7 +335,3 @@ class VariantGraphRanking(object):
             variant_graph_ranking.byVertex[v]=rank
             variant_graph_ranking.byRank.setdefault(rank, []).append(v)
         return variant_graph_ranking
-
-
-
-
