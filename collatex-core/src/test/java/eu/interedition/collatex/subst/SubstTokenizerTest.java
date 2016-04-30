@@ -25,8 +25,13 @@ public class SubstTokenizerTest {
         List<XMLToken> tokens = tokenizer.tokenize();
 
         assertThat(tokens.get(0), hasProperty("text", equalTo("In")));
+        // NOTE: rename open tags to start tags?
         assertThat(tokens.get(0), hasProperty("open_tags", equalTo(Arrays.asList("wit","subst", "del"))));
-        // TODO: assert end tags (del)
+        assertThat(tokens.get(0), hasProperty("end_tags", equalTo(Arrays.asList("del"))));
+        assertThat(tokens.get(1), hasProperty("text", equalTo("At")));
+        assertThat(tokens.get(1), hasProperty("open_tags", equalTo(Arrays.asList("add"))));
+        assertThat(tokens.get(1), hasProperty("end_tags", equalTo(Arrays.asList("add", "subst"))));
+
     }
 
 

@@ -4,6 +4,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.StringReader;
@@ -32,7 +33,6 @@ public class SubstTokenizer {
                 if (next.isStartElement()) {
                     StartElement el = next.asStartElement();
                     String localName = el.getName().getLocalPart();
-                    //System.out.println(localName);
                     open_tags.add(localName);
                 } else if (next.isCharacters()) {
                     Characters ch = next.asCharacters();
@@ -40,12 +40,15 @@ public class SubstTokenizer {
                     XMLToken token = new XMLToken(text, open_tags);
                     tokens.add(token);
                     open_tags = new ArrayList<>();
+                } else if (next.isEndElement()) {
+                    EndElement el = next.asEndElement();
+                    String localName = el.getName().getLocalPart();
+                    tokens.get(tokens.size()-1).addEndTag(localName);
                 }
             }
         } catch (XMLStreamException e) {
             e.printStackTrace();
         }
         return tokens;
-
     }
 }
