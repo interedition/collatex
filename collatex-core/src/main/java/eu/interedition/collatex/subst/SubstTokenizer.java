@@ -1,5 +1,7 @@
 package eu.interedition.collatex.subst;
 
+import eu.interedition.collatex.simple.SimplePatternTokenizer;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -10,6 +12,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by ronalddekker on 30/04/16.
@@ -26,6 +31,7 @@ public class SubstTokenizer {
         XMLEventReader xmlStreamReader;
         List<XMLToken> tokens = new ArrayList<>();
         List<String> open_tags = new ArrayList<>();
+        Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
         try {
             xmlStreamReader = xmlInputFactory.createXMLEventReader(new StringReader(xml_in));
             while (xmlStreamReader.hasNext()) {
@@ -37,8 +43,10 @@ public class SubstTokenizer {
                 } else if (next.isCharacters()) {
                     Characters ch = next.asCharacters();
                     String text = ch.getData();
-                    XMLToken token = new XMLToken(text, open_tags);
-                    tokens.add(token);
+                    Stream<String> stringStream = textTokenizer.apply(text);
+                    List<XMLToken> newTokens = stringStream.map(content -> new XMLToken(content, new ArrayList<>())).collect(Collectors.toList());
+                    newTokens.get(0).getOpen_tags().addAll(open_tags);
+                    tokens.addAll(newTokens);
                     open_tags = new ArrayList<>();
                 } else if (next.isEndElement()) {
                     EndElement el = next.asEndElement();
