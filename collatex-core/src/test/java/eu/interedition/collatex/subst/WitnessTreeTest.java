@@ -21,10 +21,10 @@ public class WitnessTreeTest {
 
         Stream<WitnessTree.WitnessNode> witnessNodes = root.depthFirstNodeStream();
 
-        witnessNodes.forEach(System.out::println);
+        //witnessNodes.forEach(System.out::println);
 
-//        for (XMLToken token : tokens) {
-//            System.out.println(token.getText() + "," + token.getOpen_tags() + "," + token.getEnd_tags());
-//        }
+        Stream<WitnessTree.WitnessNodeEvent> witnessEventNodes = root.depthFirstNodeEventStream();
+
+        witnessEventNodes.forEach(System.out::println);
     }
 }

@@ -6,7 +6,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.StringReader;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by ronalddekker on 01/05/16.
@@ -29,7 +27,7 @@ public class WitnessTree {
         // NOTE: there is no implementation of Stream API for STAX
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlStreamReader;
-        WitnessNode currentNode = new WitnessNode("root");
+        WitnessNode currentNode = new WitnessNode("fakeroot");
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
         try {
             xmlStreamReader = xmlInputFactory.createXMLEventReader(new StringReader(witnessXML));
@@ -54,7 +52,7 @@ public class WitnessTree {
         } catch (XMLStreamException e) {
             e.printStackTrace();
         }
-        return currentNode;
+        return currentNode.children.get(0);
     }
 
 
@@ -83,6 +81,58 @@ public class WitnessTree {
         public Stream<WitnessNode> depthFirstNodeStream() {
             Stream<WitnessNode> witnessNodeStream = Stream.concat(Stream.of(this), children.stream().map(c -> c.depthFirstNodeStream()).flatMap(Function.identity()));
             return witnessNodeStream;
+        }
+
+        public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
+            // NOTE: this if can be removed with inheritance
+            if (this.children.isEmpty()) {
+                return Stream.of(new WitnessNodeTextEvent(this));
+            }
+
+            Stream a = Stream.of(new WitnessNodeStartElementEvent(this));
+            Stream b = children.stream().map(c -> c.depthFirstNodeEventStream()).flatMap(Function.identity());
+            Stream c = Stream.of(new WitnessNodeEndElementEvent(this));
+            return Stream.concat(a, Stream.concat(b, c));
+        }
+    }
+
+    static class WitnessNodeEvent {
+        protected WitnessNode node;
+        public WitnessNodeEvent(WitnessNode node) {
+            this.node = node;
+        }
+    }
+
+    static class WitnessNodeStartElementEvent extends WitnessNodeEvent {
+        public WitnessNodeStartElementEvent(WitnessNode node) {
+            super(node);
+        }
+
+        @Override
+        public String toString() {
+            return ">"+node.data;
+        }
+    }
+
+    static class WitnessNodeEndElementEvent extends WitnessNodeEvent {
+        public WitnessNodeEndElementEvent(WitnessNode node) {
+            super(node);
+        }
+
+        @Override
+        public String toString() {
+            return "/"+node.data;
+        }
+    }
+
+    static class WitnessNodeTextEvent extends WitnessNodeEvent {
+        public WitnessNodeTextEvent(WitnessNode node) {
+            super(node);
+        }
+
+        @Override
+        public String toString() {
+            return node.data;
         }
     }
 }
