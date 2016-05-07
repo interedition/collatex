@@ -61,7 +61,7 @@ public class WitnessTree {
 
     static class WitnessNode {
         private WitnessNode parent;
-        private String data;
+        String data;
         private List<WitnessNode> children;
 
         public WitnessNode(String data) {

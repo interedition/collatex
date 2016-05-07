@@ -1,11 +1,9 @@
 package eu.interedition.collatex.subst;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -13,6 +11,10 @@ import java.util.stream.Stream;
  * This is a special version of the edit graph aligner that can handle witnesses with substitutions in them.
  */
 public class EditGraphAligner {
+
+    final List<EditGraphTableLabel> labelsWitnessB;
+    final List<EditGraphTableLabel> labelsWitnessA;
+    final Score[][] cells;
 
     public static List<EditGraphTableLabel> createLabels(WitnessTree.WitnessNode wit_a) {
         Stream<WitnessTree.WitnessNodeEvent> nodeEventStream = wit_a.depthFirstNodeEventStream();
@@ -27,15 +29,7 @@ public class EditGraphAligner {
         // 1b. A text token followed by anything other than a close tag should not be grouped together
         // 2. When a close tag is followed by an open tag we should not group them together
         // 2b. When a close tag is followed by anything other than a close tag we should not group them together
-        BiPredicate<WitnessTree.WitnessNodeEvent, WitnessTree.WitnessNodeEvent> predicate = (event1, event2) -> {
-            if (event1.getClass().equals(WitnessTree.WitnessNodeTextEvent.class) && !event2.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class)) {
-                return false;
-            }
-            if (event1.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class) && !event2.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class)) {
-                return false;
-            }
-            return true;
-        };
+        BiPredicate<WitnessTree.WitnessNodeEvent, WitnessTree.WitnessNodeEvent> predicate = (event1, event2) -> !(event1.getClass().equals(WitnessTree.WitnessNodeTextEvent.class) && !event2.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class)) && !(event1.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class) && !event2.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class));
 
         List<List<WitnessTree.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
         Stream<EditGraphTableLabel> editGraphTableLabelStream = lists.stream().map(list -> list.stream().collect(new LabelCollector()));
@@ -45,9 +39,39 @@ public class EditGraphAligner {
 
 
 
-    public EditGraphAligner() {
+    public EditGraphAligner(WitnessTree.WitnessNode a, WitnessTree.WitnessNode b) {
+        labelsWitnessA = createLabels(a);
+        labelsWitnessB = createLabels(b);
 
-   }
+        cells = new Score[labelsWitnessB.size()+1][labelsWitnessA.size()+1];
+        Scorer scorer = new Scorer();
+
+        // init 0,0
+        cells[0][0] = new Score(0);
+
+        // fill the first row with gaps
+        IntStream.range(1, labelsWitnessA.size()+1).forEach(x -> {
+            cells[0][x] = scorer.gap(cells[0][x - 1]);
+        });
+
+        // fill the first column with gaps
+        IntStream.range(1, labelsWitnessB.size()+1).forEach(y -> {
+            cells[y][0] = scorer.gap(cells[y-1][0]);
+        });
+
+        // fill the rest of the cells in an y by x fashion
+        IntStream.range(1, labelsWitnessB.size()+1).forEach(y -> {
+            IntStream.range(1, labelsWitnessA.size()+1).forEach(x -> {
+                EditGraphTableLabel tokenB = labelsWitnessB.get(y - 1);
+                EditGraphTableLabel tokenA = labelsWitnessA.get(x - 1);
+                Score upperLeft = scorer.score(cells[y-1][x-1], tokenB, tokenA);
+                Score left = scorer.gap(cells[y][x-1]);
+                Score upper = scorer.gap(cells[y-1][x]);
+                Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
+                cells[y][x] = max;
+            });
+        });
+    }
 
     public void align() {
 
@@ -57,7 +81,7 @@ public class EditGraphAligner {
     private static class LabelCollector implements java.util.stream.Collector<WitnessTree.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
         @Override
         public Supplier<EditGraphTableLabel> supplier() {
-            return () -> new EditGraphTableLabel();
+            return EditGraphTableLabel::new;
         }
 
         @Override
@@ -115,10 +139,37 @@ public class EditGraphAligner {
 
         @Override
         public String toString() {
-            String a = startElements.stream().map(element -> element.toString()).collect(Collectors.joining(", "));
+            String a = startElements.stream().map(WitnessTree.WitnessNodeStartElementEvent::toString).collect(Collectors.joining(", "));
             String b = text.toString();
-            String c = endElements.stream().map(element -> element.toString()).collect(Collectors.joining(", "));
-            return a+":"+b+":"+c;
+            String c = endElements.stream().map(WitnessTree.WitnessNodeEndElementEvent::toString).collect(Collectors.joining(", "));
+            return b+":"+a+":"+c;
+        }
+    }
+
+    public class Score {
+        //TODO: set parent
+        int globalScore = 0;
+
+        public Score(int i) {
+            this.globalScore = i;
+        }
+
+        public Score(Score parent) {
+            this.globalScore = parent.globalScore;
+        }
+    }
+
+    private class Scorer {
+        public Score gap(Score parent) {
+            return new Score(parent.globalScore -1);
+        }
+
+        public Score score(Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
+            if (tokenB.text.node.data.equals(tokenA.text.node.data)) {
+                return new Score(parent);
+            } else {
+                return new Score(parent.globalScore - 2);
+            }
         }
     }
 }
