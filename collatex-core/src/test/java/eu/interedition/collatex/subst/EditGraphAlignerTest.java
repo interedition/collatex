@@ -19,12 +19,9 @@ public class EditGraphAlignerTest {
         String xml_in = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
 
         WitnessTree.WitnessNode wit_a = WitnessTree.createTree(xml_in);
-        List<List<WitnessTree.WitnessNodeEvent>> lists = EditGraphAligner.createLabels(wit_a);
+        List<EditGraphAligner.EditGraphTableLabel> labels = EditGraphAligner.createLabels(wit_a);
 
-        lists.forEach((list) -> {
-            list.forEach(System.out::println);
-            System.out.println("--");
-        });
+        labels.forEach(label -> System.out.println(label));
 
 
     }

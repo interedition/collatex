@@ -1,7 +1,11 @@
 package eu.interedition.collatex.subst;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.function.BiPredicate;
+import java.util.Set;
+import java.util.function.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -10,7 +14,7 @@ import java.util.stream.Stream;
  */
 public class EditGraphAligner {
 
-    public static List<List<WitnessTree.WitnessNodeEvent>> createLabels(WitnessTree.WitnessNode wit_a) {
+    public static List<EditGraphTableLabel> createLabels(WitnessTree.WitnessNode wit_a) {
         Stream<WitnessTree.WitnessNodeEvent> nodeEventStream = wit_a.depthFirstNodeEventStream();
         // I want to group all the open , text and close events together in a group
         // I first try to do that with a reduce operation
@@ -34,7 +38,8 @@ public class EditGraphAligner {
         };
 
         List<List<WitnessTree.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
-        return lists;
+        Stream<EditGraphTableLabel> editGraphTableLabelStream = lists.stream().map(list -> list.stream().collect(new LabelCollector()));
+        return editGraphTableLabelStream.collect(Collectors.toList());
     }
 
 
@@ -49,4 +54,71 @@ public class EditGraphAligner {
     }
 
 
+    private static class LabelCollector implements java.util.stream.Collector<WitnessTree.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
+        @Override
+        public Supplier<EditGraphTableLabel> supplier() {
+            return () -> new EditGraphTableLabel();
+        }
+
+        @Override
+        public BiConsumer<EditGraphTableLabel, WitnessTree.WitnessNodeEvent> accumulator() {
+            return (label, event) ->  {
+                if (event instanceof WitnessTree.WitnessNodeStartElementEvent) {
+                    label.addStartEvent((WitnessTree.WitnessNodeStartElementEvent)event);
+                } else if (event instanceof WitnessTree.WitnessNodeEndElementEvent) {
+                    label.addEndEvent((WitnessTree.WitnessNodeEndElementEvent)event);
+                } else if (event instanceof WitnessTree.WitnessNodeTextEvent) {
+                    label.addTextEvent((WitnessTree.WitnessNodeTextEvent)event);
+                } else {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+
+        @Override
+        public BinaryOperator<EditGraphTableLabel> combiner() {
+            return (item, item2) -> {
+                throw new UnsupportedOperationException();
+            };
+        }
+
+        @Override
+        public Function<EditGraphTableLabel, EditGraphTableLabel> finisher() {
+            return (label) -> label;
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return Collections.emptySet();
+        }
+    }
+
+    static class EditGraphTableLabel {
+        private List<WitnessTree.WitnessNodeStartElementEvent> startElements = new ArrayList<>();
+        private List<WitnessTree.WitnessNodeEndElementEvent> endElements = new ArrayList<>();
+        private WitnessTree.WitnessNodeTextEvent text;
+
+        public void addStartEvent(WitnessTree.WitnessNodeStartElementEvent event) {
+            startElements.add(event);
+        }
+
+        public void addEndEvent(WitnessTree.WitnessNodeEndElementEvent event) {
+            endElements.add(event);
+        }
+
+        public void addTextEvent(WitnessTree.WitnessNodeTextEvent event) {
+            if (text != null) {
+                throw new UnsupportedOperationException();
+            }
+            this.text = event;
+        }
+
+        @Override
+        public String toString() {
+            String a = startElements.stream().map(element -> element.toString()).collect(Collectors.joining(", "));
+            String b = text.toString();
+            String c = endElements.stream().map(element -> element.toString()).collect(Collectors.joining(", "));
+            return a+":"+b+":"+c;
+        }
+    }
 }
