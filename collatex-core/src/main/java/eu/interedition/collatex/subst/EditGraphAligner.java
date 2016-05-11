@@ -40,9 +40,15 @@ public class EditGraphAligner {
 
 
     public EditGraphAligner(WitnessTree.WitnessNode a, WitnessTree.WitnessNode b) {
+        // from the witness node trees we calculate the labels
         labelsWitnessA = createLabels(a);
         labelsWitnessB = createLabels(b);
 
+        // from the labels we map the nodes to cell coordinates
+        Map<WitnessTree.WitnessNode, Integer> nodeToXCoordinate = mapNodesToIndex(labelsWitnessA);
+        Map<WitnessTree.WitnessNode, Integer> nodeToYCoordinate = mapNodesToIndex(labelsWitnessB);
+
+        // init cells and scorer
         cells = new Score[labelsWitnessB.size()+1][labelsWitnessA.size()+1];
         Scorer scorer = new Scorer();
 
@@ -71,6 +77,23 @@ public class EditGraphAligner {
                 cells[y][x] = max;
             });
         });
+    }
+
+    private Map<WitnessTree.WitnessNode, Integer> mapNodesToIndex(List<EditGraphTableLabel> labels) {
+        // the following code has side effects. That is because Java 8 does not have an enumerate function for streams.
+        Map<WitnessTree.WitnessNode, Integer> nodesToCoordinate = new HashMap<>();
+
+        // calculate the y and x coordinates of the witness nodes in the table (so we can map from one to the other)
+        IntStream.range(0, labels.size()).forEach(index -> {
+            // map index to label
+            EditGraphTableLabel label = labels.get(index);
+            // we take the nodes that are opened at this label and map the nodes to the index
+            label.startElements.forEach(node -> nodesToCoordinate.put(node, index));
+            // we take the text node at this label and map it to the index
+            nodesToCoordinate.put(label.text, index);
+        });
+
+        return nodesToCoordinate;
     }
 
     public void align() {
@@ -118,9 +141,9 @@ public class EditGraphAligner {
     }
 
     static class EditGraphTableLabel {
-        private List<WitnessTree.WitnessNode> startElements = new ArrayList<>();
+        List<WitnessTree.WitnessNode> startElements = new ArrayList<>();
         private List<WitnessTree.WitnessNode> endElements = new ArrayList<>();
-        private WitnessTree.WitnessNode text;
+        WitnessTree.WitnessNode text;
 
         public void addStartEvent(WitnessTree.WitnessNode node) {
             startElements.add(node);
