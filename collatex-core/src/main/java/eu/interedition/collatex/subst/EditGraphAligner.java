@@ -88,11 +88,11 @@ public class EditGraphAligner {
         public BiConsumer<EditGraphTableLabel, WitnessTree.WitnessNodeEvent> accumulator() {
             return (label, event) ->  {
                 if (event instanceof WitnessTree.WitnessNodeStartElementEvent) {
-                    label.addStartEvent((WitnessTree.WitnessNodeStartElementEvent)event);
+                    label.addStartEvent(((WitnessTree.WitnessNodeStartElementEvent)event).node);
                 } else if (event instanceof WitnessTree.WitnessNodeEndElementEvent) {
-                    label.addEndEvent((WitnessTree.WitnessNodeEndElementEvent)event);
+                    label.addEndEvent(((WitnessTree.WitnessNodeEndElementEvent)event).node);
                 } else if (event instanceof WitnessTree.WitnessNodeTextEvent) {
-                    label.addTextEvent((WitnessTree.WitnessNodeTextEvent)event);
+                    label.addTextEvent(((WitnessTree.WitnessNodeTextEvent)event).node);
                 } else {
                     throw new UnsupportedOperationException();
                 }
@@ -118,30 +118,30 @@ public class EditGraphAligner {
     }
 
     static class EditGraphTableLabel {
-        private List<WitnessTree.WitnessNodeStartElementEvent> startElements = new ArrayList<>();
-        private List<WitnessTree.WitnessNodeEndElementEvent> endElements = new ArrayList<>();
-        private WitnessTree.WitnessNodeTextEvent text;
+        private List<WitnessTree.WitnessNode> startElements = new ArrayList<>();
+        private List<WitnessTree.WitnessNode> endElements = new ArrayList<>();
+        private WitnessTree.WitnessNode text;
 
-        public void addStartEvent(WitnessTree.WitnessNodeStartElementEvent event) {
-            startElements.add(event);
+        public void addStartEvent(WitnessTree.WitnessNode node) {
+            startElements.add(node);
         }
 
-        public void addEndEvent(WitnessTree.WitnessNodeEndElementEvent event) {
-            endElements.add(event);
+        public void addEndEvent(WitnessTree.WitnessNode node) {
+            endElements.add(node);
         }
 
-        public void addTextEvent(WitnessTree.WitnessNodeTextEvent event) {
+        public void addTextEvent(WitnessTree.WitnessNode node) {
             if (text != null) {
                 throw new UnsupportedOperationException();
             }
-            this.text = event;
+            this.text = node;
         }
 
         @Override
         public String toString() {
-            String a = startElements.stream().map(WitnessTree.WitnessNodeStartElementEvent::toString).collect(Collectors.joining(", "));
+            String a = startElements.stream().map(WitnessTree.WitnessNode::toString).collect(Collectors.joining(", "));
             String b = text.toString();
-            String c = endElements.stream().map(WitnessTree.WitnessNodeEndElementEvent::toString).collect(Collectors.joining(", "));
+            String c = endElements.stream().map(WitnessTree.WitnessNode::toString).collect(Collectors.joining(", "));
             return b+":"+a+":"+c;
         }
     }
@@ -165,7 +165,7 @@ public class EditGraphAligner {
         }
 
         public Score score(Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
-            if (tokenB.text.node.data.equals(tokenA.text.node.data)) {
+            if (tokenB.text.data.equals(tokenA.text.data)) {
                 return new Score(parent);
             } else {
                 return new Score(parent.globalScore - 2);
