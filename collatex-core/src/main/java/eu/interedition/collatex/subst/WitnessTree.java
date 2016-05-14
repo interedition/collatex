@@ -79,8 +79,7 @@ public class WitnessTree {
         }
 
         public Stream<WitnessNode> depthFirstNodeStream() {
-            Stream<WitnessNode> witnessNodeStream = Stream.concat(Stream.of(this), children.stream().map(c -> c.depthFirstNodeStream()).flatMap(Function.identity()));
-            return witnessNodeStream;
+            return Stream.concat(Stream.of(this), children.stream().map(WitnessNode::depthFirstNodeStream).flatMap(Function.identity()));
         }
 
         public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
@@ -90,9 +89,28 @@ public class WitnessTree {
             }
 
             Stream a = Stream.of(new WitnessNodeStartElementEvent(this));
-            Stream b = children.stream().map(c -> c.depthFirstNodeEventStream()).flatMap(Function.identity());
+            Stream b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
             Stream c = Stream.of(new WitnessNodeEndElementEvent(this));
             return Stream.concat(a, Stream.concat(b, c));
+        }
+
+        public Stream<WitnessNode> parentNodeStream() {
+            // note: this implementation is not lazy
+            List<WitnessNode> parents = new ArrayList<>();
+            WitnessNode current = this.parent;
+            while(current != null) {
+                parents.add(current);
+                current = current.parent;
+            }
+            return parents.stream();
+
+//          NOTE: this implementation should be faster, but it does not work
+//            if (this.parent == null) {
+//                return Stream.empty();
+//            }
+//            Stream a = Stream.of(this.parent);
+//            Stream b = Stream.of(this.parent.parentNodeStream());
+//            return Stream.concat(a, b);
         }
     }
 

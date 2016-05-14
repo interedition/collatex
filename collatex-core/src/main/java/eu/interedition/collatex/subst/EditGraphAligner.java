@@ -70,9 +70,60 @@ public class EditGraphAligner {
             IntStream.range(1, labelsWitnessA.size()+1).forEach(x -> {
                 EditGraphTableLabel tokenB = labelsWitnessB.get(y - 1);
                 EditGraphTableLabel tokenA = labelsWitnessA.get(x - 1);
-                Score upperLeft = scorer.score(cells[y-1][x-1], tokenB, tokenA);
-                Score left = scorer.gap(cells[y][x-1]);
-                Score upper = scorer.gap(cells[y-1][x]);
+                // the previous position does not have to be y-1 or x-1
+                // in the case of an OR operation.. at the start of each OR operand we have to reset the counter
+                // to the value before the start of the or operator.
+                // most of this could be calculated before hand and does not have to calculated again and again during the scoring
+
+                int previousY = y-1;
+                int previousX = x-1;
+
+
+
+                // check whether a label (a or b) has an opening add or del
+                // if so previous y and x are taken from the coordinates of the opening subst -1 (y and x)
+
+                // for the x axis
+                if (tokenA.containsStartAddOrDel()) { // start of an option (add / del)
+                    // every edit graph table label is associated with witness node (as the text)
+                    // we need to walk to the parent
+                    WitnessTree.WitnessNode currentNode = tokenA.text;
+                    Stream<WitnessTree.WitnessNode> parentNodeStream = currentNode.parentNodeStream();
+                    Optional<WitnessTree.WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
+                    if (!substOptional.isPresent()) {
+                        throw new RuntimeException("We found an OR operand but could not find the OR operator!");
+                    }
+                    WitnessTree.WitnessNode substNode = substOptional.get();
+                    // convert the substNode into index in the edit graph table
+                    Integer indexX = nodeToXCoordinate.get(substNode);
+                    previousX = indexX - 1;
+                    // debug
+                    // System.out.println("Label text on the horizontal axis >"+tokenA.text+"< maps to index "+previousX);
+                }
+
+                    // for the y axis
+                if (tokenB.containsStartAddOrDel()) { // start of an option
+                    // every edit graph table label is associated with witness node (as the text)
+                    // we need to walk to the parent
+                    WitnessTree.WitnessNode currentNode = tokenB.text;
+                    Stream<WitnessTree.WitnessNode> parentNodeStream = currentNode.parentNodeStream();
+                    Optional<WitnessTree.WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
+                    if (!substOptional.isPresent()) {
+                        throw new RuntimeException("We found an OR operand but could not find the OR operator!");
+                    }
+                    WitnessTree.WitnessNode substNode = substOptional.get();
+                    // convert the substNode into index in the edit graph table
+                    Integer indexY = nodeToYCoordinate.get(substNode);
+                    previousY = indexY - 1;
+                    // debug
+                    // System.out.println("Label text on the vertical axis >"+tokenB.text+"< maps to index "+previousY);
+                }
+
+
+
+                Score upperLeft = scorer.score(cells[previousY][previousX], tokenB, tokenA);
+                Score left = scorer.gap(cells[y][previousX]);
+                Score upper = scorer.gap(cells[previousY][x]);
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
                 cells[y][x] = max;
             });
@@ -88,9 +139,9 @@ public class EditGraphAligner {
             // map index to label
             EditGraphTableLabel label = labels.get(index);
             // we take the nodes that are opened at this label and map the nodes to the index
-            label.startElements.forEach(node -> nodesToCoordinate.put(node, index));
+            label.startElements.forEach(node -> nodesToCoordinate.put(node, index+1));
             // we take the text node at this label and map it to the index
-            nodesToCoordinate.put(label.text, index);
+            nodesToCoordinate.put(label.text, index+1);
         });
 
         return nodesToCoordinate;
@@ -166,6 +217,13 @@ public class EditGraphAligner {
             String b = text.toString();
             String c = endElements.stream().map(WitnessTree.WitnessNode::toString).collect(Collectors.joining(", "));
             return b+":"+a+":"+c;
+        }
+
+        public boolean containsStartAddOrDel() {
+            // find the first add or del tag...
+            // Note that this implementation is from the left to right
+            Optional<WitnessTree.WitnessNode> witnessNode = startElements.stream().filter(node -> node.data.equals("add") || node.data.equals("del")).findFirst();
+            return witnessNode.isPresent();
         }
     }
 
