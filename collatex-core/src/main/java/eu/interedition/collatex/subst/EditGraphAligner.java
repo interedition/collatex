@@ -84,41 +84,10 @@ public class EditGraphAligner {
                 // if so previous y and x are taken from the coordinates of the opening subst -1 (y and x)
 
                 // for the x axis
-                if (tokenA.containsStartAddOrDel()) { // start of an option (add / del)
-                    // every edit graph table label is associated with witness node (as the text)
-                    // we need to walk to the parent
-                    WitnessTree.WitnessNode currentNode = tokenA.text;
-                    Stream<WitnessTree.WitnessNode> parentNodeStream = currentNode.parentNodeStream();
-                    Optional<WitnessTree.WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
-                    if (!substOptional.isPresent()) {
-                        throw new RuntimeException("We found an OR operand but could not find the OR operator!");
-                    }
-                    WitnessTree.WitnessNode substNode = substOptional.get();
-                    // convert the substNode into index in the edit graph table
-                    Integer indexX = nodeToXCoordinate.get(substNode);
-                    previousX = indexX - 1;
-                    // debug
-                    // System.out.println("Label text on the horizontal axis >"+tokenA.text+"< maps to index "+previousX);
-                }
+                previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, previousX);
 
-                    // for the y axis
-                if (tokenB.containsStartAddOrDel()) { // start of an option
-                    // every edit graph table label is associated with witness node (as the text)
-                    // we need to walk to the parent
-                    WitnessTree.WitnessNode currentNode = tokenB.text;
-                    Stream<WitnessTree.WitnessNode> parentNodeStream = currentNode.parentNodeStream();
-                    Optional<WitnessTree.WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
-                    if (!substOptional.isPresent()) {
-                        throw new RuntimeException("We found an OR operand but could not find the OR operator!");
-                    }
-                    WitnessTree.WitnessNode substNode = substOptional.get();
-                    // convert the substNode into index in the edit graph table
-                    Integer indexY = nodeToYCoordinate.get(substNode);
-                    previousY = indexY - 1;
-                    // debug
-                    // System.out.println("Label text on the vertical axis >"+tokenB.text+"< maps to index "+previousY);
-                }
-
+                // for the y axis
+                previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, previousY);
 
 
                 Score upperLeft = scorer.score(cells[previousY][previousX], tokenB, tokenA);
@@ -128,6 +97,26 @@ public class EditGraphAligner {
                 cells[y][x] = max;
             });
         });
+    }
+
+    private int getPreviousCoordinateForLabel(Map<WitnessTree.WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
+        if (token.containsStartAddOrDel()) { // start of an option (add / del)
+            // every edit graph table label is associated with witness node (as the text)
+            // we need to walk to the parent
+            WitnessTree.WitnessNode currentNode = token.text;
+            Stream<WitnessTree.WitnessNode> parentNodeStream = currentNode.parentNodeStream();
+            Optional<WitnessTree.WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
+            if (!substOptional.isPresent()) {
+                throw new RuntimeException("We found an OR operand but could not find the OR operator!");
+            }
+            WitnessTree.WitnessNode substNode = substOptional.get();
+            // convert the substNode into index in the edit graph table
+            Integer index = nodeToCoordinate.get(substNode);
+            defaultCoordinate = index - 1;
+            // debug
+            // System.out.println("Label text on the horizontal axis >"+tokenA.text+"< maps to index "+previousX);
+        }
+        return defaultCoordinate;
     }
 
     private Map<WitnessTree.WitnessNode, Integer> mapNodesToIndex(List<EditGraphTableLabel> labels) {
