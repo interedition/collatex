@@ -57,12 +57,14 @@ public class EditGraphAligner {
 
         // fill the first row with gaps
         IntStream.range(1, labelsWitnessA.size()+1).forEach(x -> {
-            cells[0][x] = scorer.gap(cells[0][x - 1]);
+            int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, labelsWitnessA.get(x-1),x-1);
+            cells[0][x] = scorer.gap(cells[0][previousX]);
         });
 
         // fill the first column with gaps
         IntStream.range(1, labelsWitnessB.size()+1).forEach(y -> {
-            cells[y][0] = scorer.gap(cells[y-1][0]);
+            int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, labelsWitnessB.get(y-1),y-1);
+            cells[y][0] = scorer.gap(cells[previousY][0]);
         });
 
         // fill the rest of the cells in an y by x fashion
@@ -75,20 +77,10 @@ public class EditGraphAligner {
                 // to the value before the start of the or operator.
                 // most of this could be calculated before hand and does not have to calculated again and again during the scoring
 
-                int previousY = y-1;
-                int previousX = x-1;
-
-
-
                 // check whether a label (a or b) has an opening add or del
                 // if so previous y and x are taken from the coordinates of the opening subst -1 (y and x)
-
-                // for the x axis
-                previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, previousX);
-
-                // for the y axis
-                previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, previousY);
-
+                int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, x-1);
+                int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, y-1);
 
                 Score upperLeft = scorer.score(cells[previousY][previousX], tokenB, tokenA);
                 Score left = scorer.gap(cells[y][previousX]);
