@@ -19,7 +19,7 @@ public class EditGraphAlignerTest {
     public void testLabelsOneAxis() {
         String xml_in = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
 
-        WitnessTree.WitnessNode wit_a = WitnessTree.createTree(xml_in);
+        WitnessNode wit_a = WitnessNode.createTree(xml_in);
         List<EditGraphAligner.EditGraphTableLabel> labels = EditGraphAligner.createLabels(wit_a);
 
         labels.forEach(System.out::println);
@@ -32,14 +32,32 @@ public class EditGraphAlignerTest {
         String xml_a = "<wit n=\"1\">a b</wit>";
         String xml_b = "<wit n=\"2\">a c</wit>";
 
-        WitnessTree.WitnessNode wit_a = WitnessTree.createTree(xml_a);
-        WitnessTree.WitnessNode wit_b = WitnessTree.createTree(xml_b);
+        WitnessNode wit_a = WitnessNode.createTree(xml_a);
+        WitnessNode wit_b = WitnessNode.createTree(xml_b);
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        IntStream.range(0, aligner.labelsWitnessB.size()+1).forEach( y -> {
-            IntStream.range(0, aligner.labelsWitnessA.size()+1).forEach( x -> {
-                System.out.print(aligner.cells[y][x].globalScore+"|");
+        IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
+            IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
+                System.out.print(aligner.cells[y][x].globalScore + "|");
+            });
+            System.out.println();
+        });
+    }
+
+    @Test
+    public void testScoringSubstSimple() {
+        String xml_a = "<wit n=\"1\">a</wit>";
+        String xml_b = "<wit n=\"2\"><subst><add>a</add><del>b</del><add>c</add></subst></wit>";
+
+        WitnessNode wit_a = WitnessNode.createTree(xml_a);
+        WitnessNode wit_b = WitnessNode.createTree(xml_b);
+
+        EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
+
+        IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
+            IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
+                System.out.print(aligner.cells[y][x].globalScore + "|");
             });
             System.out.println();
         });
@@ -51,17 +69,16 @@ public class EditGraphAlignerTest {
         String xml_a = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
         String xml_b = "<wit n=\"2\">In <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
 
-        WitnessTree.WitnessNode wit_a = WitnessTree.createTree(xml_a);
-        WitnessTree.WitnessNode wit_b = WitnessTree.createTree(xml_b);
+        WitnessNode wit_a = WitnessNode.createTree(xml_a);
+        WitnessNode wit_b = WitnessNode.createTree(xml_b);
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        IntStream.range(0, aligner.labelsWitnessB.size()+1).forEach( y -> {
-            IntStream.range(0, aligner.labelsWitnessA.size()+1).forEach( x -> {
-              System.out.print(aligner.cells[y][x].globalScore+"|");
+        IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
+            IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
+                System.out.print(aligner.cells[y][x].globalScore + "|");
             });
             System.out.println();
         });
     }
-
 }

@@ -18,7 +18,60 @@ import java.util.stream.Stream;
 /**
  * Created by ronalddekker on 01/05/16.
  */
-public class WitnessTree {
+public class WitnessNode {
+    private WitnessNode parent;
+    String data;
+    private List<WitnessNode> children;
+
+    public WitnessNode(String data) {
+        this.data = data;
+        this.children = new ArrayList<>();
+    }
+    public void addChild(WitnessNode child) {
+        children.add(child);
+        child.parent = this;
+    }
+
+    @Override
+    public String toString() {
+        return data;
+    }
+
+    public Stream<WitnessNode> depthFirstNodeStream() {
+        return Stream.concat(Stream.of(this), children.stream().map(WitnessNode::depthFirstNodeStream).flatMap(Function.identity()));
+    }
+
+    public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
+        // NOTE: this if can be removed with inheritance
+        if (this.children.isEmpty()) {
+            return Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.TEXT));
+        }
+
+        Stream a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
+        Stream b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
+        Stream c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
+        return Stream.concat(a, Stream.concat(b, c));
+    }
+
+    public Stream<WitnessNode> parentNodeStream() {
+        // note: this implementation is not lazy
+        List<WitnessNode> parents = new ArrayList<>();
+        WitnessNode current = this.parent;
+        while (current != null) {
+            parents.add(current);
+            current = current.parent;
+        }
+        return parents.stream();
+    }
+
+//          NOTE: this implementation should be faster, but it does not work
+//            if (this.parent == null) {
+//                return Stream.empty();
+//            }
+//            Stream a = Stream.of(this.parent);
+//            Stream b = Stream.of(this.parent.parentNodeStream());
+//            return Stream.concat(a, b);
+//    }
 
     // this class creates a witness tree from a XML serialization of a witness
     // returns the root node of the tree
@@ -53,65 +106,6 @@ public class WitnessTree {
             e.printStackTrace();
         }
         return currentNode.children.get(0);
-    }
-
-
-
-
-
-    static class WitnessNode {
-        private WitnessNode parent;
-        String data;
-        private List<WitnessNode> children;
-
-        public WitnessNode(String data) {
-            this.data = data;
-            this.children = new ArrayList<>();
-        }
-        public void addChild(WitnessNode child) {
-            children.add(child);
-            child.parent = this;
-        }
-
-        @Override
-        public String toString() {
-            return data;
-        }
-
-        public Stream<WitnessNode> depthFirstNodeStream() {
-            return Stream.concat(Stream.of(this), children.stream().map(WitnessNode::depthFirstNodeStream).flatMap(Function.identity()));
-        }
-
-        public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
-            // NOTE: this if can be removed with inheritance
-            if (this.children.isEmpty()) {
-                return Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.TEXT));
-            }
-
-            Stream a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
-            Stream b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
-            Stream c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
-            return Stream.concat(a, Stream.concat(b, c));
-        }
-
-        public Stream<WitnessNode> parentNodeStream() {
-            // note: this implementation is not lazy
-            List<WitnessNode> parents = new ArrayList<>();
-            WitnessNode current = this.parent;
-            while(current != null) {
-                parents.add(current);
-                current = current.parent;
-            }
-            return parents.stream();
-
-//          NOTE: this implementation should be faster, but it does not work
-//            if (this.parent == null) {
-//                return Stream.empty();
-//            }
-//            Stream a = Stream.of(this.parent);
-//            Stream b = Stream.of(this.parent.parentNodeStream());
-//            return Stream.concat(a, b);
-        }
     }
 
     public enum WitnessNodeEventType {

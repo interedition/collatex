@@ -16,22 +16,22 @@ public class EditGraphAligner {
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
 
-    public static List<EditGraphTableLabel> createLabels(WitnessTree.WitnessNode wit_a) {
-        Stream<WitnessTree.WitnessNodeEvent> nodeEventStream = wit_a.depthFirstNodeEventStream();
+    public static List<EditGraphTableLabel> createLabels(WitnessNode wit_a) {
+        Stream<WitnessNode.WitnessNodeEvent> nodeEventStream = wit_a.depthFirstNodeEventStream();
         // I want to group all the open , text and close events together in a group
         // I first try to do that with a reduce operation
         // but for that to work (left and right) have to be of the same type
         // we might be able to accomplish the same thing with a collect operator
         // Otherwise we have to fall back to the StreamEx extension package.
-        // BiPredicate<WitnessTree.WitnessNodeEvent, WitnessTree.WitnessNodeEvent> predicate = (event1, event2) -> event1.getClass().equals(event2.getClass());
+        // BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1, event2) -> event1.getClass().equals(event2.getClass());
         // Two rules:
         // 1. When two text tokens follow each other we should not group them together
         // 1b. A text token followed by anything other than a close tag should not be grouped together
         // 2. When a close tag is followed by an open tag we should not group them together
         // 2b. When a close tag is followed by anything other than a close tag we should not group them together
-        BiPredicate<WitnessTree.WitnessNodeEvent, WitnessTree.WitnessNodeEvent> predicate = (event1, event2) -> !(event1.type.equals(WitnessTree.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessTree.WitnessNodeEventType.END)) && !(event1.type.equals(WitnessTree.WitnessNodeEventType.END) && !event2.type.equals(WitnessTree.WitnessNodeEventType.END));
+        BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1, event2) -> !(event1.type.equals(WitnessNode.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END)) && !(event1.type.equals(WitnessNode.WitnessNodeEventType.END) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END));
 
-        List<List<WitnessTree.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
+        List<List<WitnessNode.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
         Stream<EditGraphTableLabel> editGraphTableLabelStream = lists.stream().map(list -> list.stream().collect(new LabelCollector()));
         return editGraphTableLabelStream.collect(Collectors.toList());
     }
@@ -39,14 +39,14 @@ public class EditGraphAligner {
 
 
 
-    public EditGraphAligner(WitnessTree.WitnessNode a, WitnessTree.WitnessNode b) {
+    public EditGraphAligner(WitnessNode a, WitnessNode b) {
         // from the witness node trees we calculate the labels
         labelsWitnessA = createLabels(a);
         labelsWitnessB = createLabels(b);
 
         // from the labels we map the nodes to cell coordinates
-        Map<WitnessTree.WitnessNode, Integer> nodeToXCoordinate = mapNodesToIndex(labelsWitnessA);
-        Map<WitnessTree.WitnessNode, Integer> nodeToYCoordinate = mapNodesToIndex(labelsWitnessB);
+        Map<WitnessNode, Integer> nodeToXCoordinate = mapNodesToIndex(labelsWitnessA);
+        Map<WitnessNode, Integer> nodeToYCoordinate = mapNodesToIndex(labelsWitnessB);
 
         // init cells and scorer
         cells = new Score[labelsWitnessB.size()+1][labelsWitnessA.size()+1];
@@ -93,11 +93,11 @@ public class EditGraphAligner {
 //                // it will be interesting to see how we handle that
 //                if (tokenB.containsEndSubst()) {
 //                    // here we go look for the subst again (this can be done more efficient)
-//                    WitnessTree.WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
+//                    WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
 //                    // Nu hebben we een end subst node te pakken
 //                    // nu moet ik alle bij behorende adds en dels zien te vinden..
 //                    // dat zijn de kinderen van de betreffende subst
-//                    Stream<WitnessTree.WitnessNode> childNodes = endSubstNodes.depthFirstNodeStream();
+//                    Stream<WitnessNode> childNodes = endSubstNodes.depthFirstNodeStream();
 //                    // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
 //                    // van alle child nodes moet ik daar dan weer de laatste child van pakken
 //                    childNodes.map(node -> node.depthFirstNodeStream().re
@@ -114,17 +114,17 @@ public class EditGraphAligner {
         });
     }
 
-    private int getPreviousCoordinateForLabel(Map<WitnessTree.WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
+    private int getPreviousCoordinateForLabel(Map<WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
         if (token.containsStartAddOrDel()) { // start of an option (add / del)
             // every edit graph table label is associated with witness node (as the text)
             // we need to walk to the parent
-            WitnessTree.WitnessNode currentNode = token.text;
-            Stream<WitnessTree.WitnessNode> parentNodeStream = currentNode.parentNodeStream();
-            Optional<WitnessTree.WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
+            WitnessNode currentNode = token.text;
+            Stream<WitnessNode> parentNodeStream = currentNode.parentNodeStream();
+            Optional<WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
             if (!substOptional.isPresent()) {
                 throw new RuntimeException("We found an OR operand but could not find the OR operator!");
             }
-            WitnessTree.WitnessNode substNode = substOptional.get();
+            WitnessNode substNode = substOptional.get();
             // convert the substNode into index in the edit graph table
             Integer index = nodeToCoordinate.get(substNode);
             defaultCoordinate = index - 1;
@@ -134,9 +134,9 @@ public class EditGraphAligner {
         return defaultCoordinate;
     }
 
-    private Map<WitnessTree.WitnessNode, Integer> mapNodesToIndex(List<EditGraphTableLabel> labels) {
+    private Map<WitnessNode, Integer> mapNodesToIndex(List<EditGraphTableLabel> labels) {
         // the following code has side effects. That is because Java 8 does not have an enumerate function for streams.
-        Map<WitnessTree.WitnessNode, Integer> nodesToCoordinate = new HashMap<>();
+        Map<WitnessNode, Integer> nodesToCoordinate = new HashMap<>();
 
         // calculate the y and x coordinates of the witness nodes in the table (so we can map from one to the other)
         IntStream.range(0, labels.size()).forEach(index -> {
@@ -156,14 +156,14 @@ public class EditGraphAligner {
     }
 
 
-    private static class LabelCollector implements java.util.stream.Collector<WitnessTree.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
+    private static class LabelCollector implements java.util.stream.Collector<WitnessNode.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
         @Override
         public Supplier<EditGraphTableLabel> supplier() {
             return EditGraphTableLabel::new;
         }
 
         @Override
-        public BiConsumer<EditGraphTableLabel, WitnessTree.WitnessNodeEvent> accumulator() {
+        public BiConsumer<EditGraphTableLabel, WitnessNode.WitnessNodeEvent> accumulator() {
             return (label, event) ->  {
                 switch (event.type) {
                     case START:
@@ -200,19 +200,19 @@ public class EditGraphAligner {
     }
 
     static class EditGraphTableLabel {
-        List<WitnessTree.WitnessNode> startElements = new ArrayList<>();
-        private List<WitnessTree.WitnessNode> endElements = new ArrayList<>();
-        WitnessTree.WitnessNode text;
+        List<WitnessNode> startElements = new ArrayList<>();
+        private List<WitnessNode> endElements = new ArrayList<>();
+        WitnessNode text;
 
-        public void addStartEvent(WitnessTree.WitnessNode node) {
+        public void addStartEvent(WitnessNode node) {
             startElements.add(node);
         }
 
-        public void addEndEvent(WitnessTree.WitnessNode node) {
+        public void addEndEvent(WitnessNode node) {
             endElements.add(node);
         }
 
-        public void addTextEvent(WitnessTree.WitnessNode node) {
+        public void addTextEvent(WitnessNode node) {
             if (text != null) {
                 throw new UnsupportedOperationException();
             }
@@ -221,28 +221,28 @@ public class EditGraphAligner {
 
         @Override
         public String toString() {
-            String a = startElements.stream().map(WitnessTree.WitnessNode::toString).collect(Collectors.joining(", "));
+            String a = startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
             String b = text.toString();
-            String c = endElements.stream().map(WitnessTree.WitnessNode::toString).collect(Collectors.joining(", "));
+            String c = endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
             return b+":"+a+":"+c;
         }
 
         public boolean containsStartAddOrDel() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
-            Optional<WitnessTree.WitnessNode> witnessNode = startElements.stream().filter(node -> node.data.equals("add") || node.data.equals("del")).findFirst();
+            Optional<WitnessNode> witnessNode = startElements.stream().filter(node -> node.data.equals("add") || node.data.equals("del")).findFirst();
             return witnessNode.isPresent();
         }
 
         public boolean containsEndSubst() {
             // find the first end subst tag...
             // if we want to do this completely correct it should be from right to left
-            Optional<WitnessTree.WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
+            Optional<WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
             return witnessNode.isPresent();
         }
 
-        public WitnessTree.WitnessNode getEndSubstNodes() {
-            Optional<WitnessTree.WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
+        public WitnessNode getEndSubstNodes() {
+            Optional<WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
             if (!witnessNode.isPresent()) {
                 throw new RuntimeException("We expected one or more subst tags here!");
             }
