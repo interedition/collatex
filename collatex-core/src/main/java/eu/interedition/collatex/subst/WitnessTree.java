@@ -85,12 +85,12 @@ public class WitnessTree {
         public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
             // NOTE: this if can be removed with inheritance
             if (this.children.isEmpty()) {
-                return Stream.of(new WitnessNodeTextEvent(this));
+                return Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.TEXT));
             }
 
-            Stream a = Stream.of(new WitnessNodeStartElementEvent(this));
+            Stream a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
             Stream b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
-            Stream c = Stream.of(new WitnessNodeEndElementEvent(this));
+            Stream c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
             return Stream.concat(a, Stream.concat(b, c));
         }
 
@@ -114,43 +114,17 @@ public class WitnessTree {
         }
     }
 
+    public enum WitnessNodeEventType {
+        START, END, TEXT
+    }
+
     static class WitnessNodeEvent {
         protected WitnessNode node;
-        public WitnessNodeEvent(WitnessNode node) {
+        protected WitnessNodeEventType type;
+
+        public WitnessNodeEvent(WitnessNode node, WitnessNodeEventType type) {
             this.node = node;
-        }
-    }
-
-    static class WitnessNodeStartElementEvent extends WitnessNodeEvent {
-        public WitnessNodeStartElementEvent(WitnessNode node) {
-            super(node);
-        }
-
-        @Override
-        public String toString() {
-            return ">"+node.data;
-        }
-    }
-
-    static class WitnessNodeEndElementEvent extends WitnessNodeEvent {
-        public WitnessNodeEndElementEvent(WitnessNode node) {
-            super(node);
-        }
-
-        @Override
-        public String toString() {
-            return "/"+node.data;
-        }
-    }
-
-    static class WitnessNodeTextEvent extends WitnessNodeEvent {
-        public WitnessNodeTextEvent(WitnessNode node) {
-            super(node);
-        }
-
-        @Override
-        public String toString() {
-            return node.data;
+            this.type = type;
         }
     }
 }

@@ -29,7 +29,7 @@ public class EditGraphAligner {
         // 1b. A text token followed by anything other than a close tag should not be grouped together
         // 2. When a close tag is followed by an open tag we should not group them together
         // 2b. When a close tag is followed by anything other than a close tag we should not group them together
-        BiPredicate<WitnessTree.WitnessNodeEvent, WitnessTree.WitnessNodeEvent> predicate = (event1, event2) -> !(event1.getClass().equals(WitnessTree.WitnessNodeTextEvent.class) && !event2.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class)) && !(event1.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class) && !event2.getClass().equals(WitnessTree.WitnessNodeEndElementEvent.class));
+        BiPredicate<WitnessTree.WitnessNodeEvent, WitnessTree.WitnessNodeEvent> predicate = (event1, event2) -> !(event1.type.equals(WitnessTree.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessTree.WitnessNodeEventType.END)) && !(event1.type.equals(WitnessTree.WitnessNodeEventType.END) && !event2.type.equals(WitnessTree.WitnessNodeEventType.END));
 
         List<List<WitnessTree.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
         Stream<EditGraphTableLabel> editGraphTableLabelStream = lists.stream().map(list -> list.stream().collect(new LabelCollector()));
@@ -87,6 +87,29 @@ public class EditGraphAligner {
                 Score upper = scorer.gap(cells[previousY][x]);
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
                 cells[y][x] = max;
+
+//                // check whether a label (a or b) has a closing subst
+//                // note that there can be multiple subst that end here..
+//                // it will be interesting to see how we handle that
+//                if (tokenB.containsEndSubst()) {
+//                    // here we go look for the subst again (this can be done more efficient)
+//                    WitnessTree.WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
+//                    // Nu hebben we een end subst node te pakken
+//                    // nu moet ik alle bij behorende adds en dels zien te vinden..
+//                    // dat zijn de kinderen van de betreffende subst
+//                    Stream<WitnessTree.WitnessNode> childNodes = endSubstNodes.depthFirstNodeStream();
+//                    // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
+//                    // van alle child nodes moet ik daar dan weer de laatste child van pakken
+//                    childNodes.map(node -> node.depthFirstNodeStream().re
+//
+//                }
+//
+//                // if tokenB as well as tokenA contain subst tags we have to do something more complicated
+//                // for now we detected that situation and exit
+//                if (tokenA.containsEndSubst()) {
+//                    throw new UnsupportedOperationException();
+//                }
+
             });
         });
     }
@@ -142,14 +165,18 @@ public class EditGraphAligner {
         @Override
         public BiConsumer<EditGraphTableLabel, WitnessTree.WitnessNodeEvent> accumulator() {
             return (label, event) ->  {
-                if (event instanceof WitnessTree.WitnessNodeStartElementEvent) {
-                    label.addStartEvent(((WitnessTree.WitnessNodeStartElementEvent)event).node);
-                } else if (event instanceof WitnessTree.WitnessNodeEndElementEvent) {
-                    label.addEndEvent(((WitnessTree.WitnessNodeEndElementEvent)event).node);
-                } else if (event instanceof WitnessTree.WitnessNodeTextEvent) {
-                    label.addTextEvent(((WitnessTree.WitnessNodeTextEvent)event).node);
-                } else {
-                    throw new UnsupportedOperationException();
+                switch (event.type) {
+                    case START:
+                        label.addStartEvent(event.node);
+                        break;
+                    case END:
+                        label.addEndEvent(event.node);
+                        break;
+                    case TEXT:
+                        label.addTextEvent(event.node);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unknown event type");
                 }
             };
         }
@@ -205,6 +232,21 @@ public class EditGraphAligner {
             // Note that this implementation is from the left to right
             Optional<WitnessTree.WitnessNode> witnessNode = startElements.stream().filter(node -> node.data.equals("add") || node.data.equals("del")).findFirst();
             return witnessNode.isPresent();
+        }
+
+        public boolean containsEndSubst() {
+            // find the first end subst tag...
+            // if we want to do this completely correct it should be from right to left
+            Optional<WitnessTree.WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
+            return witnessNode.isPresent();
+        }
+
+        public WitnessTree.WitnessNode getEndSubstNodes() {
+            Optional<WitnessTree.WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
+            if (!witnessNode.isPresent()) {
+                throw new RuntimeException("We expected one or more subst tags here!");
+            }
+            return witnessNode.get();
         }
     }
 
