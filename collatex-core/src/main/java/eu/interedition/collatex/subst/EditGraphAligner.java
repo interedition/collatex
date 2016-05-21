@@ -88,21 +88,35 @@ public class EditGraphAligner {
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
                 cells[y][x] = max;
 
-//                // check whether a label (a or b) has a closing subst
-//                // note that there can be multiple subst that end here..
-//                // it will be interesting to see how we handle that
-//                if (tokenB.containsEndSubst()) {
-//                    // here we go look for the subst again (this can be done more efficient)
-//                    WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
-//                    // Nu hebben we een end subst node te pakken
-//                    // nu moet ik alle bij behorende adds en dels zien te vinden..
-//                    // dat zijn de kinderen van de betreffende subst
-//                    Stream<WitnessNode> childNodes = endSubstNodes.depthFirstNodeStream();
-//                    // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
-//                    // van alle child nodes moet ik daar dan weer de laatste child van pakken
-//                    childNodes.map(node -> node.depthFirstNodeStream().re
-//
-//                }
+                // check whether a label (a or b) has a closing subst
+                // note that there can be multiple subst that end here..
+                // it will be interesting to see how we handle that
+                if (tokenB.containsEndSubst()) {
+                    // here we go look for the subst again (this can be done more efficient)
+                    WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
+                    // Nu hebben we een end subst node te pakken
+                    // nu moet ik alle bij behorende adds en dels zien te vinden..
+                    // dat zijn de kinderen van de betreffende subst
+
+//                    // Debug code
+//                    Stream<WitnessNode> childNodes = endSubstNodes.children();
+//                    childNodes.forEach(System.out::println);
+
+                    Stream<WitnessNode> childNodes = endSubstNodes.children();
+                    // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
+                    // Van alle child nodes moet ik daar dan weer de laatste child van pakken
+                    // Daarna mappen we die childnodes naar cell coordinaten
+                    // in het geval van token in witness B naar Y coordinates
+                    List<Integer> yCoordinatesWithScoresOfAddDels = childNodes.map(WitnessNode::getLastChild).map(nodeToYCoordinate::get).collect(Collectors.toList());
+//                    System.out.println("All the possible cell containing the scores of the options of this subst are: "+yCoordinatesWithScoresOfAddDels);
+                    // now we have to find the maximum scoring cell of the possible cells..
+                    // TODO; in the future we also have to set the parent coordinates correctly
+                    // convert into scores;
+                    Optional<Score> maximumScoreOptional = yCoordinatesWithScoresOfAddDels.stream().map(addDelY -> cells[addDelY][x]).max((score, other) -> score.globalScore - other.globalScore);
+                    Score bestScore = maximumScoreOptional.get();
+                    // because it is the end of a subst; override the current score in the cell with the best score for the whole subst.
+                    cells[y][x] = bestScore;
+                }
 //
 //                // if tokenB as well as tokenA contain subst tags we have to do something more complicated
 //                // for now we detected that situation and exit
@@ -115,7 +129,8 @@ public class EditGraphAligner {
     }
 
     private int getPreviousCoordinateForLabel(Map<WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
-        if (token.containsStartAddOrDel()) { // start of an option (add / del)
+        if (token.containsStartAddOrDel()) {
+            // start of an option (add / del)
             // every edit graph table label is associated with witness node (as the text)
             // we need to walk to the parent
             WitnessNode currentNode = token.text;

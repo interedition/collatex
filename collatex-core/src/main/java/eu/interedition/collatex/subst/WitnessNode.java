@@ -27,9 +27,17 @@ public class WitnessNode {
         this.data = data;
         this.children = new ArrayList<>();
     }
+
     public void addChild(WitnessNode child) {
         children.add(child);
         child.parent = this;
+    }
+
+    public WitnessNode getLastChild() {
+        if (children.isEmpty()) {
+            throw new RuntimeException("There are no children!");
+        }
+        return children.get(children.size()-1);
     }
 
     @Override
@@ -37,12 +45,18 @@ public class WitnessNode {
         return data;
     }
 
+    public Stream<WitnessNode> children() {
+        return this.children.stream();
+    }
+
+    // traverses recursively
     public Stream<WitnessNode> depthFirstNodeStream() {
         return Stream.concat(Stream.of(this), children.stream().map(WitnessNode::depthFirstNodeStream).flatMap(Function.identity()));
     }
 
+    // traverses recursively; only instead of nodes we return events
     public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
-        // NOTE: this if can be removed with inheritance
+        // NOTE: this if can be removed with inheritance, but that would mean virtual dispatch, so it is not a big win.
         if (this.children.isEmpty()) {
             return Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.TEXT));
         }
@@ -80,7 +94,7 @@ public class WitnessNode {
         // NOTE: there is no implementation of Stream API for STAX
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlStreamReader;
-        WitnessNode currentNode = new WitnessNode("fakeroot");
+        WitnessNode currentNode = new WitnessNode("fake root");
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
         try {
             xmlStreamReader = xmlInputFactory.createXMLEventReader(new StringReader(witnessXML));
@@ -96,7 +110,7 @@ public class WitnessNode {
                     Characters ch = next.asCharacters();
                     String text = ch.getData();
                     Stream<String> stringStream = textTokenizer.apply(text);
-                    List<WitnessNode> newTokens = stringStream.map(content -> new WitnessNode(content)).collect(Collectors.toList());
+                    List<WitnessNode> newTokens = stringStream.map(WitnessNode::new).collect(Collectors.toList());
                     newTokens.forEach(currentNode::addChild);
                 } else if (next.isEndElement()) {
                     currentNode = currentNode.parent;

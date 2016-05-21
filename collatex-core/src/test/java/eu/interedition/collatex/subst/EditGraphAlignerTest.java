@@ -2,8 +2,13 @@ package eu.interedition.collatex.subst;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by ronalddekker on 01/05/16.
@@ -37,12 +42,25 @@ public class EditGraphAlignerTest {
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
-            IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
-                System.out.print(aligner.cells[y][x].globalScore + "|");
+        debugScoringTable(aligner);
+    }
+
+
+    // convenience method to convert a row of the scoring table into an Array of integers so we can easily test them
+    private void assertTableRow(EditGraphAligner aligner, int row, List<Integer> expected) {
+        List<Integer> actual = Stream.of(aligner.cells[row]).map(score -> score.globalScore).collect(toList());
+        assertListEquals(expected, actual, aligner);
+
+    }
+
+    private void assertListEquals(List<Integer> expected, List<Integer> actual, EditGraphAligner aligner) {
+        try {
+            IntStream.range(0, expected.size()).forEach( index -> {
+                assertEquals(expected.get(index), actual.get(index));
             });
-            System.out.println();
-        });
+        } catch (Exception e) {
+            debugScoringTable(aligner);
+        }
     }
 
     @Test
@@ -55,6 +73,13 @@ public class EditGraphAlignerTest {
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
+        assertTableRow(aligner, 0, Arrays.asList(0, -1));
+        assertTableRow(aligner, 1, Arrays.asList(-1, 0));
+        assertTableRow(aligner, 2, Arrays.asList(-1, -2));
+        assertTableRow(aligner, 3, Arrays.asList(-1, 0));
+    }
+
+    private void debugScoringTable(EditGraphAligner aligner) {
         IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
             IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
                 System.out.print(aligner.cells[y][x].globalScore + "|");
@@ -74,11 +99,6 @@ public class EditGraphAlignerTest {
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
-            IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
-                System.out.print(aligner.cells[y][x].globalScore + "|");
-            });
-            System.out.println();
-        });
+        debugScoringTable(aligner);
     }
 }
