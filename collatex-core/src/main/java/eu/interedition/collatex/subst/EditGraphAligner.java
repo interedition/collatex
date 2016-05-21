@@ -88,44 +88,69 @@ public class EditGraphAligner {
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
                 cells[y][x] = max;
 
+
                 // check whether a label (a or b) has a closing subst
                 // note that there can be multiple subst that end here..
                 // it will be interesting to see how we handle that
+                // NOTE: not only can there be a subst in both witnesses on the current position (y, x) in the table
+                // It might as well occur that there are substs in subst present in either one or both witnesses.
+                // There does not have to be an equal number of subst in both witnesses
+                // We will have to see how that works out..
+
+                // if tokenB as well as tokenA contain subst tags we have to do something more complicated
+                // for now we detected that situation and exit
+
+                if (tokenA.containsEndSubst() && tokenB.containsEndSubst()) {
+                    throw new UnsupportedOperationException("The witness set has a subst in both witnesses at the same time!");
+                }
+
+
+
                 if (tokenB.containsEndSubst()) {
-                    // here we go look for the subst again (this can be done more efficient)
-                    WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
-                    // Nu hebben we een end subst node te pakken
-                    // nu moet ik alle bij behorende adds en dels zien te vinden..
-                    // dat zijn de kinderen van de betreffende subst
+                    postprocesssubstVertical(nodeToYCoordinate, y, x, tokenB);
+                }
+
+                if (tokenA.containsEndSubst()) {
+                    postProcessSubstHorizontal(nodeToXCoordinate, y, x, tokenA);
+                }
+            });
+        });
+    }
+
+    private void postProcessSubstHorizontal(Map<WitnessNode, Integer> nodeToXCoordinate, int y, int x, EditGraphTableLabel tokenA) {
+        // NOTE: There can be more end subst nodes
+        WitnessNode endSubstNode = tokenA.getEndSubstNodes();
+        List<Integer> xCoordinatesWithScoresOfAddDels = endSubstNode.children().map(WitnessNode::getLastChild).map(nodeToXCoordinate::get).collect(Collectors.toList());
+        Optional<Score> maximumScoreOptional = xCoordinatesWithScoresOfAddDels.stream().map(addDelx -> cells[y][addDelx]).max((score, other) -> score.globalScore - other.globalScore);
+        Score bestScore = maximumScoreOptional.get();
+        cells[y][x] = bestScore;
+    }
+
+    private void postprocesssubstVertical(Map<WitnessNode, Integer> nodeToYCoordinate, int y, int x, EditGraphTableLabel tokenB) {
+        // here we go look for the subst again (this can be done more efficient)
+        WitnessNode endSubstNodes = tokenB.getEndSubstNodes();
+        // Nu hebben we een end subst node te pakken
+        // nu moet ik alle bij behorende adds en dels zien te vinden..
+        // dat zijn de kinderen van de betreffende subst
 
 //                    // Debug code
 //                    Stream<WitnessNode> childNodes = endSubstNodes.children();
 //                    childNodes.forEach(System.out::println);
 
-                    Stream<WitnessNode> childNodes = endSubstNodes.children();
-                    // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
-                    // Van alle child nodes moet ik daar dan weer de laatste child van pakken
-                    // Daarna mappen we die childnodes naar cell coordinaten
-                    // in het geval van token in witness B naar Y coordinates
-                    List<Integer> yCoordinatesWithScoresOfAddDels = childNodes.map(WitnessNode::getLastChild).map(nodeToYCoordinate::get).collect(Collectors.toList());
+        Stream<WitnessNode> childNodes = endSubstNodes.children();
+        // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
+        // Van alle child nodes moet ik daar dan weer de laatste child van pakken
+        // Daarna mappen we die childnodes naar cell coordinaten
+        // in het geval van token in witness B naar Y coordinates
+        List<Integer> yCoordinatesWithScoresOfAddDels = childNodes.map(WitnessNode::getLastChild).map(nodeToYCoordinate::get).collect(Collectors.toList());
 //                    System.out.println("All the possible cell containing the scores of the options of this subst are: "+yCoordinatesWithScoresOfAddDels);
-                    // now we have to find the maximum scoring cell of the possible cells..
-                    // TODO; in the future we also have to set the parent coordinates correctly
-                    // convert into scores;
-                    Optional<Score> maximumScoreOptional = yCoordinatesWithScoresOfAddDels.stream().map(addDelY -> cells[addDelY][x]).max((score, other) -> score.globalScore - other.globalScore);
-                    Score bestScore = maximumScoreOptional.get();
-                    // because it is the end of a subst; override the current score in the cell with the best score for the whole subst.
-                    cells[y][x] = bestScore;
-                }
-//
-//                // if tokenB as well as tokenA contain subst tags we have to do something more complicated
-//                // for now we detected that situation and exit
-//                if (tokenA.containsEndSubst()) {
-//                    throw new UnsupportedOperationException();
-//                }
-
-            });
-        });
+        // now we have to find the maximum scoring cell of the possible cells..
+        // TODO; in the future we also have to set the parent coordinates correctly
+        // convert into scores;
+        Optional<Score> maximumScoreOptional = yCoordinatesWithScoresOfAddDels.stream().map(addDelY -> cells[addDelY][x]).max((score, other) -> score.globalScore - other.globalScore);
+        Score bestScore = maximumScoreOptional.get();
+        // because it is the end of a subst; override the current score in the cell with the best score for the whole subst.
+        cells[y][x] = bestScore;
     }
 
     private int getPreviousCoordinateForLabel(Map<WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {

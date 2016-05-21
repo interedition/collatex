@@ -1,5 +1,6 @@
 package eu.interedition.collatex.subst;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -49,6 +50,9 @@ public class EditGraphAlignerTest {
     // convenience method to convert a row of the scoring table into an Array of integers so we can easily test them
     private void assertTableRow(EditGraphAligner aligner, int row, List<Integer> expected) {
         List<Integer> actual = Stream.of(aligner.cells[row]).map(score -> score.globalScore).collect(toList());
+        if (actual.size() != expected.size()) {
+            Assert.fail("Lists not of same size: expected: "+expected.size()+", but was: "+actual.size());
+        }
         assertListEquals(expected, actual, aligner);
 
     }
@@ -56,15 +60,16 @@ public class EditGraphAlignerTest {
     private void assertListEquals(List<Integer> expected, List<Integer> actual, EditGraphAligner aligner) {
         try {
             IntStream.range(0, expected.size()).forEach( index -> {
-                assertEquals(expected.get(index), actual.get(index));
+                assertEquals("Score at "+index+" differs: ", expected.get(index), actual.get(index));
             });
-        } catch (Exception e) {
+        } catch (AssertionError e) {
             debugScoringTable(aligner);
+            throw e;
         }
     }
 
     @Test
-    public void testScoringSubstSimple() {
+    public void testScoringSubstSimpleVertical() {
         String xml_a = "<wit n=\"1\">a</wit>";
         String xml_b = "<wit n=\"2\"><subst><add>a</add><del>b</del><add>c</add></subst></wit>";
 
@@ -78,6 +83,22 @@ public class EditGraphAlignerTest {
         assertTableRow(aligner, 2, Arrays.asList(-1, -2));
         assertTableRow(aligner, 3, Arrays.asList(-1, 0));
     }
+
+    @Test
+    public void testScoringSubstSimpleHorizontal() {
+        String xml_a = "<wit n=\"1\"><subst><add>a</add><del>b</del><add>c</add></subst></wit>";
+        String xml_b = "<wit n=\"2\">a</wit>";
+
+        WitnessNode wit_a = WitnessNode.createTree(xml_a);
+        WitnessNode wit_b = WitnessNode.createTree(xml_b);
+
+        EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
+
+        assertTableRow(aligner, 0, Arrays.asList(0, -1, -1, -1));
+        assertTableRow(aligner, 1, Arrays.asList(-1, 0, -2, 0));
+    }
+
+
 
     private void debugScoringTable(EditGraphAligner aligner) {
         IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
