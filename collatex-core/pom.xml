@@ -10,4 +10,19 @@
     <version>1.8-SNAPSHOT</version>
     <name>CollateX Core</name>
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.glassfish.jersey.bundles.repackaged</groupId>
+            <artifactId>jersey-guava</artifactId>
+            <version>2.17</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.vandermeer</groupId>
+            <artifactId>asciitable</artifactId>
+            <version>0.2.5</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
