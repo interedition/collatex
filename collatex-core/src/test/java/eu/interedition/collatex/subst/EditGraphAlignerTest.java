@@ -20,7 +20,6 @@ import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer;
 import de.vandermeer.asciitable.v2.render.WidthLongestWord;
 import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes;
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
@@ -56,7 +55,7 @@ public class EditGraphAlignerTest {
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        debugScoringTable(aligner);
+        visualizeScoringMatrix(aligner);
     }
 
     // convenience method to convert a row of the scoring table into an Array of integers so we can easily test them
@@ -75,7 +74,7 @@ public class EditGraphAlignerTest {
                 assertEquals("Score at " + index + " differs: ", expected.get(index), actual.get(index));
             });
         } catch (AssertionError e) {
-            debugScoringTable(aligner);
+            visualizeScoringMatrix(aligner);
             throw e;
         }
     }
@@ -139,11 +138,11 @@ public class EditGraphAlignerTest {
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        debugScoringTable(aligner);
+        visualizeScoringMatrix(aligner);
     }
 
     @Test
-    public void testSuperWitnessCreation() {
+    public void testBacktrackScoreStream() {
         String xml_a = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
         String xml_b = "<wit n=\"2\">In the very beginning, finding the right word.</wit>";
 
@@ -152,43 +151,46 @@ public class EditGraphAlignerTest {
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
-        debugScoringTable(aligner);
+        visualizeScoringMatrix(aligner);
 
         Stream<EditGraphAligner.Score> backtrackScoresStream = aligner.getBacktrackScoreStream();
         List<Integer> scores = backtrackScoresStream.map(s -> s.globalScore).collect(toList());
         List<Integer> expected = Arrays.asList(-5, -5, -5, -4, -3, -3, -3, -3, -3, -3, -2, -2, -1, 0);
         assertEquals(expected, scores);
-
-        VariantGraph superWitness = aligner.getSuperWitness();
-        assertNotNull(superWitness);
     }
 
-    private void debugScoringTable(EditGraphAligner aligner) {
+    private void visualizeScoringMatrix(EditGraphAligner aligner) {
         V2_AsciiTable at = new V2_AsciiTable();
+        at.addStrongRule();
         List<Object> row = aligner.labelsWitnessA.stream().map(this::labelText).collect(toList());
         row.add(0, "");
         row.add(0, "");
-        at.addStrongRule();
-        char[] a = new char[row.size()];
-        Arrays.fill(a, 'c');
-        at.addRow(row.toArray()).setAlignment(a);
-        at.addStrongRule();
+        addRow(at, row, 'c');
         for (int y = 0; y < aligner.labelsWitnessB.size() + 1; y++) {
             row.clear();
             row.add(y == 0 ? "" : labelText(aligner.labelsWitnessB.get(y - 1)));
             for (int x = 0; x < aligner.labelsWitnessA.size() + 1; x++) {
                 row.add(aligner.cells[y][x].globalScore);
             }
-            a = new char[row.size()];
-            Arrays.fill(a, 'r');
-            at.addRow(row.toArray()).setAlignment(a);
-            at.addRule();
+            addRow(at, row, 'r');
         }
         RenderedTable rt = new V2_AsciiTableRenderer()//
                 .setTheme(V2_E_TableThemes.UTF_LIGHT.get())//
                 .setWidth(new WidthLongestWord())//
                 .render(at);
         System.out.println(rt);
+    }
+
+    private void addRow(V2_AsciiTable at, List<Object> row, char alignment) {
+        at.addRow(row.toArray()).setAlignment(alignment(row, alignment));
+        at.addRule();
+    }
+
+    private char[] alignment(List<Object> row, char val2) {
+        char[] a;
+        a = new char[row.size()];
+        Arrays.fill(a, val2);
+        return a;
     }
 
     private String labelText(EditGraphTableLabel l) {
