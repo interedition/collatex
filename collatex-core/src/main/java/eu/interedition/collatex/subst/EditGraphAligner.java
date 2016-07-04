@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.VariantGraph.Vertex;
 
 /**
  * Created by ronalddekker on 30/04/16.
@@ -208,6 +209,10 @@ public class EditGraphAligner {
 
     public VariantGraph getSuperWitness() {
         final VariantGraph variantGraph = new VariantGraph();
+        Vertex vertex = variantGraph.getEnd();
+        getBacktrackScoreStream().forEach(score -> {
+            // build the variantgraph from end to start
+        });
 
         return variantGraph;
     }
@@ -326,19 +331,25 @@ public class EditGraphAligner {
         public boolean containsStartAddOrDel() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
-            Optional<WitnessNode> witnessNode = startElements.stream().filter(node -> node.data.equals("add") || node.data.equals("del")).findFirst();
-            return witnessNode.isPresent();
+            return startElements.stream()//
+                    .filter(node -> node.data.equals("add") || node.data.equals("del"))//
+                    .findFirst()//
+                    .isPresent();
         }
 
         public boolean containsEndSubst() {
             // find the first end subst tag...
             // if we want to do this completely correct it should be from right to left
-            Optional<WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
-            return witnessNode.isPresent();
+            return endElements.stream()//
+                    .filter(node -> node.data.equals("subst"))//
+                    .findFirst()//
+                    .isPresent();
         }
 
         public WitnessNode getEndSubstNodes() {
-            Optional<WitnessNode> witnessNode = endElements.stream().filter(node -> node.data.equals("subst")).findFirst();
+            Optional<WitnessNode> witnessNode = endElements.stream()//
+                    .filter(node -> node.data.equals("subst"))//
+                    .findFirst();
             if (!witnessNode.isPresent()) {
                 throw new RuntimeException("We expected one or more subst tags here!");
             }
@@ -349,6 +360,7 @@ public class EditGraphAligner {
     public class Score {
         // TODO: set parent
         public int globalScore = 0;
+        private boolean match = false;
 
         public Score(int i) {
             this.globalScore = i;
@@ -356,6 +368,7 @@ public class EditGraphAligner {
 
         public Score(Score parent) {
             this.globalScore = parent.globalScore;
+            this.match = true;
         }
 
         public int getGlobalScore() {
@@ -366,6 +379,10 @@ public class EditGraphAligner {
             this.globalScore = globalScore;
         }
 
+        public boolean isMatch() {
+            return match;
+        }
+
     }
 
     private class Scorer {
@@ -374,11 +391,15 @@ public class EditGraphAligner {
         }
 
         public Score score(Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
-            if (tokenB.text.data.equals(tokenA.text.data)) {
+            if (tokensMatch(tokenB, tokenA)) {
                 return new Score(parent);
-            } else {
-                return new Score(parent.globalScore - 2);
             }
+
+            return new Score(parent.globalScore - 2);
+        }
+
+        private boolean tokensMatch(EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
+            return tokenB.text.data.toLowerCase().trim().equals(tokenA.text.data.toLowerCase().trim());
         }
     }
 }

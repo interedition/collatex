@@ -24,6 +24,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
+import eu.interedition.collatex.subst.EditGraphAligner.Score;
 
 /**
  * Created by ronalddekker on 01/05/16.
@@ -157,7 +158,7 @@ public class EditGraphAlignerTest {
 
         Stream<EditGraphAligner.Score> backtrackScoresStream = aligner.getBacktrackScoreStream();
         List<Integer> scores = backtrackScoresStream.map(s -> s.globalScore).collect(toList());
-        List<Integer> expected = Arrays.asList(-5, -5, -5, -4, -3, -3, -3, -3, -3, -3, -2, -2, -1, 0);
+        List<Integer> expected = Arrays.asList(-1, -1, -1, -2, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0);
         assertEquals(expected, scores);
     }
 
@@ -172,7 +173,12 @@ public class EditGraphAlignerTest {
             row.clear();
             row.add(y == 0 ? "" : labelText(aligner.labelsWitnessB.get(y - 1)));
             for (int x = 0; x < aligner.labelsWitnessA.size() + 1; x++) {
-                row.add(aligner.cells[y][x].globalScore);
+                Score score = aligner.cells[y][x];
+                Object cell = score.globalScore;
+                if (score.isMatch()) {
+                    cell = ">" + cell + "<";
+                }
+                row.add(cell);
             }
             addRow(at, row, 'r');
         }
@@ -188,10 +194,9 @@ public class EditGraphAlignerTest {
         at.addRule();
     }
 
-    private char[] alignment(List<Object> row, char val2) {
-        char[] a;
-        a = new char[row.size()];
-        Arrays.fill(a, val2);
+    private char[] alignment(List<Object> row, char alignmentType) {
+        char[] a = new char[row.size()];
+        Arrays.fill(a, alignmentType);
         return a;
     }
 
