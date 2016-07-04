@@ -1,15 +1,29 @@
 package eu.interedition.collatex.subst;
 
+import static eu.interedition.collatex.subst.EditGraphAligner.createLabels;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import de.vandermeer.asciitable.v2.RenderedTable;
+import de.vandermeer.asciitable.v2.V2_AsciiTable;
+import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer;
+import de.vandermeer.asciitable.v2.render.WidthLongestWord;
+import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
 
 /**
  * Created by ronalddekker on 01/05/16.
@@ -26,10 +40,9 @@ public class EditGraphAlignerTest {
         String xml_in = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
 
         WitnessNode wit_a = WitnessNode.createTree(xml_in);
-        List<EditGraphAligner.EditGraphTableLabel> labels = EditGraphAligner.createLabels(wit_a);
+        List<EditGraphAligner.EditGraphTableLabel> labels = createLabels(wit_a);
 
         labels.forEach(System.out::println);
-
 
     }
 
@@ -46,12 +59,11 @@ public class EditGraphAlignerTest {
         debugScoringTable(aligner);
     }
 
-
     // convenience method to convert a row of the scoring table into an Array of integers so we can easily test them
     private void assertTableRow(EditGraphAligner aligner, int row, List<Integer> expected) {
         List<Integer> actual = Stream.of(aligner.cells[row]).map(score -> score.globalScore).collect(toList());
         if (actual.size() != expected.size()) {
-            Assert.fail("Lists not of same size: expected: "+expected.size()+", but was: "+actual.size());
+            Assert.fail("Lists not of same size: expected: " + expected.size() + ", but was: " + actual.size());
         }
         assertListEquals(expected, actual, aligner);
 
@@ -59,8 +71,8 @@ public class EditGraphAlignerTest {
 
     private void assertListEquals(List<Integer> expected, List<Integer> actual, EditGraphAligner aligner) {
         try {
-            IntStream.range(0, expected.size()).forEach( index -> {
-                assertEquals("Score at "+index+" differs: ", expected.get(index), actual.get(index));
+            IntStream.range(0, expected.size()).forEach(index -> {
+                assertEquals("Score at " + index + " differs: ", expected.get(index), actual.get(index));
             });
         } catch (AssertionError e) {
             debugScoringTable(aligner);
@@ -96,19 +108,26 @@ public class EditGraphAlignerTest {
 
         assertTableRow(aligner, 0, Arrays.asList(0, -1, -1, -1));
         assertTableRow(aligner, 1, Arrays.asList(-1, 0, -2, 0));
+
+        Witness superW = toSuperWitness(aligner);
+        assertNotNull(superW);
     }
 
+    private Witness toSuperWitness(EditGraphAligner aligner) {
+        SimpleWitness w = new SimpleWitness("S");
+        List<Token> tokens = new ArrayList<>();
+        w.setTokens(tokens);
+        return w;
+    }
 
-
-    private void debugScoringTable(EditGraphAligner aligner) {
+    private void debugScoringTable0(EditGraphAligner aligner) {
         IntStream.range(0, aligner.labelsWitnessB.size() + 1).forEach(y -> {
             IntStream.range(0, aligner.labelsWitnessA.size() + 1).forEach(x -> {
-                System.out.print(aligner.cells[y][x].globalScore + "|");
+                System.out.printf("%3d | ", aligner.cells[y][x].globalScore);
             });
             System.out.println();
         });
     }
-
 
     @Test
     public void testScoring() {
@@ -122,4 +141,58 @@ public class EditGraphAlignerTest {
 
         debugScoringTable(aligner);
     }
+
+    @Test
+    public void testSuperWitnessCreation() {
+        String xml_a = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
+        String xml_b = "<wit n=\"2\">In the very beginning, finding the right word.</wit>";
+
+        WitnessNode wit_a = WitnessNode.createTree(xml_a);
+        WitnessNode wit_b = WitnessNode.createTree(xml_b);
+
+        EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
+
+        debugScoringTable(aligner);
+
+        Stream<EditGraphAligner.Score> backtrackScoresStream = aligner.getBacktrackScoreStream();
+        List<Integer> scores = backtrackScoresStream.map(s -> s.globalScore).collect(toList());
+        List<Integer> expected = Arrays.asList(-5, -5, -5, -4, -3, -3, -3, -3, -3, -3, -2, -2, -1, 0);
+        assertEquals(expected, scores);
+
+        VariantGraph superWitness = aligner.getSuperWitness();
+        assertNotNull(superWitness);
+    }
+
+    private void debugScoringTable(EditGraphAligner aligner) {
+        V2_AsciiTable at = new V2_AsciiTable();
+        List<Object> row = aligner.labelsWitnessA.stream().map(this::labelText).collect(toList());
+        row.add(0, "");
+        row.add(0, "");
+        at.addStrongRule();
+        char[] a = new char[row.size()];
+        Arrays.fill(a, 'c');
+        at.addRow(row.toArray()).setAlignment(a);
+        at.addStrongRule();
+        for (int y = 0; y < aligner.labelsWitnessB.size() + 1; y++) {
+            row.clear();
+            row.add(y == 0 ? "" : labelText(aligner.labelsWitnessB.get(y - 1)));
+            for (int x = 0; x < aligner.labelsWitnessA.size() + 1; x++) {
+                row.add(aligner.cells[y][x].globalScore);
+            }
+            a = new char[row.size()];
+            Arrays.fill(a, 'r');
+            at.addRow(row.toArray()).setAlignment(a);
+            at.addRule();
+        }
+        RenderedTable rt = new V2_AsciiTableRenderer()//
+                .setTheme(V2_E_TableThemes.UTF_LIGHT.get())//
+                .setWidth(new WidthLongestWord())//
+                .render(at);
+        System.out.println(rt);
+    }
+
+    private String labelText(EditGraphTableLabel l) {
+        return l.text.data.replace(" ", "\u2022");
+    }
+
 }

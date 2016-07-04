@@ -1,10 +1,25 @@
 package eu.interedition.collatex.subst;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import eu.interedition.collatex.VariantGraph;
 
 /**
  * Created by ronalddekker on 30/04/16.
@@ -29,15 +44,14 @@ public class EditGraphAligner {
         // 1b. A text token followed by anything other than a close tag should not be grouped together
         // 2. When a close tag is followed by an open tag we should not group them together
         // 2b. When a close tag is followed by anything other than a close tag we should not group them together
-        BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1, event2) -> !(event1.type.equals(WitnessNode.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END)) && !(event1.type.equals(WitnessNode.WitnessNodeEventType.END) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END));
+        BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1,
+                event2) -> !(event1.type.equals(WitnessNode.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END))
+                        && !(event1.type.equals(WitnessNode.WitnessNodeEventType.END) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END));
 
         List<List<WitnessNode.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
         Stream<EditGraphTableLabel> editGraphTableLabelStream = lists.stream().map(list -> list.stream().collect(new LabelCollector()));
         return editGraphTableLabelStream.collect(Collectors.toList());
     }
-
-
-
 
     public EditGraphAligner(WitnessNode a, WitnessNode b) {
         // from the witness node trees we calculate the labels
@@ -49,27 +63,27 @@ public class EditGraphAligner {
         Map<WitnessNode, Integer> nodeToYCoordinate = mapNodesToIndex(labelsWitnessB);
 
         // init cells and scorer
-        cells = new Score[labelsWitnessB.size()+1][labelsWitnessA.size()+1];
+        cells = new Score[labelsWitnessB.size() + 1][labelsWitnessA.size() + 1];
         Scorer scorer = new Scorer();
 
         // init 0,0
         cells[0][0] = new Score(0);
 
         // fill the first row with gaps
-        IntStream.range(1, labelsWitnessA.size()+1).forEach(x -> {
-            int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, labelsWitnessA.get(x-1),x-1);
+        IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
+            int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, labelsWitnessA.get(x - 1), x - 1);
             cells[0][x] = scorer.gap(cells[0][previousX]);
         });
 
         // fill the first column with gaps
-        IntStream.range(1, labelsWitnessB.size()+1).forEach(y -> {
-            int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, labelsWitnessB.get(y-1),y-1);
+        IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
+            int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, labelsWitnessB.get(y - 1), y - 1);
             cells[y][0] = scorer.gap(cells[previousY][0]);
         });
 
         // fill the rest of the cells in an y by x fashion
-        IntStream.range(1, labelsWitnessB.size()+1).forEach(y -> {
-            IntStream.range(1, labelsWitnessA.size()+1).forEach(x -> {
+        IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
+            IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
                 EditGraphTableLabel tokenB = labelsWitnessB.get(y - 1);
                 EditGraphTableLabel tokenA = labelsWitnessA.get(x - 1);
                 // the previous position does not have to be y-1 or x-1
@@ -79,15 +93,14 @@ public class EditGraphAligner {
 
                 // check whether a label (a or b) has an opening add or del
                 // if so previous y and x are taken from the coordinates of the opening subst -1 (y and x)
-                int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, x-1);
-                int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, y-1);
+                int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, x - 1);
+                int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, y - 1);
 
                 Score upperLeft = scorer.score(cells[previousY][previousX], tokenB, tokenA);
                 Score left = scorer.gap(cells[y][previousX]);
                 Score upper = scorer.gap(cells[previousY][x]);
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
                 cells[y][x] = max;
-
 
                 // check whether a label (a or b) has a closing subst
                 // note that there can be multiple subst that end here..
@@ -103,8 +116,6 @@ public class EditGraphAligner {
                 if (tokenA.containsEndSubst() && tokenB.containsEndSubst()) {
                     throw new UnsupportedOperationException("The witness set has a subst in both witnesses at the same time!");
                 }
-
-
 
                 if (tokenB.containsEndSubst()) {
                     postprocesssubstVertical(nodeToYCoordinate, y, x, tokenB);
@@ -133,9 +144,9 @@ public class EditGraphAligner {
         // nu moet ik alle bij behorende adds en dels zien te vinden..
         // dat zijn de kinderen van de betreffende subst
 
-//                    // Debug code
-//                    Stream<WitnessNode> childNodes = endSubstNodes.children();
-//                    childNodes.forEach(System.out::println);
+        // // Debug code
+        // Stream<WitnessNode> childNodes = endSubstNodes.children();
+        // childNodes.forEach(System.out::println);
 
         Stream<WitnessNode> childNodes = endSubstNodes.children();
         // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
@@ -143,7 +154,7 @@ public class EditGraphAligner {
         // Daarna mappen we die childnodes naar cell coordinaten
         // in het geval van token in witness B naar Y coordinates
         List<Integer> yCoordinatesWithScoresOfAddDels = childNodes.map(WitnessNode::getLastChild).map(nodeToYCoordinate::get).collect(Collectors.toList());
-//                    System.out.println("All the possible cell containing the scores of the options of this subst are: "+yCoordinatesWithScoresOfAddDels);
+        // System.out.println("All the possible cell containing the scores of the options of this subst are: "+yCoordinatesWithScoresOfAddDels);
         // now we have to find the maximum scoring cell of the possible cells..
         // TODO; in the future we also have to set the parent coordinates correctly
         // convert into scores;
@@ -183,9 +194,9 @@ public class EditGraphAligner {
             // map index to label
             EditGraphTableLabel label = labels.get(index);
             // we take the nodes that are opened at this label and map the nodes to the index
-            label.startElements.forEach(node -> nodesToCoordinate.put(node, index+1));
+            label.startElements.forEach(node -> nodesToCoordinate.put(node, index + 1));
             // we take the text node at this label and map it to the index
-            nodesToCoordinate.put(label.text, index+1);
+            nodesToCoordinate.put(label.text, index + 1);
         });
 
         return nodesToCoordinate;
@@ -195,6 +206,51 @@ public class EditGraphAligner {
 
     }
 
+    public VariantGraph getSuperWitness() {
+        final VariantGraph variantGraph = new VariantGraph();
+
+        return variantGraph;
+    }
+
+    public Stream<Score> getBacktrackScoreStream() {
+        Iterable<Score> it = () -> new ScoreIterator(cells);
+        return StreamSupport.stream(it.spliterator(), false);
+    }
+
+    private static class ScoreIterator implements Iterator<Score> {
+        private Score[][] matrix;
+        Integer curX;
+        Integer curY;
+
+        ScoreIterator(Score[][] matrix) {
+            this.matrix = matrix;
+            curX = matrix.length - 1;
+            curY = matrix[0].length - 1;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curX >= 0 && curY >= 0;
+        }
+
+        @Override
+        public Score next() {
+            Score currentScore = matrix[curX][curY];
+            final float scoreDiag = (curX > 0 && curY > 0) ? matrix[curX - 1][curY - 1].globalScore : -1000;
+            final float scoreUp = (curY > 0) ? matrix[curX][curY - 1].globalScore : -1000;
+            final float scoreLeft = (curX > 0) ? matrix[curX - 1][curY].globalScore : -1000;
+            final float maxScore = Math.max(scoreDiag, Math.max(scoreUp, scoreLeft));
+            if (scoreDiag == maxScore) {
+                curX = curX - 1;
+                curY = curY - 1;
+            } else if (scoreUp == maxScore) {
+                curY = curY - 1;
+            } else {
+                curX = curX - 1;
+            }
+            return currentScore;
+        }
+    }
 
     private static class LabelCollector implements java.util.stream.Collector<WitnessNode.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
         @Override
@@ -204,19 +260,19 @@ public class EditGraphAligner {
 
         @Override
         public BiConsumer<EditGraphTableLabel, WitnessNode.WitnessNodeEvent> accumulator() {
-            return (label, event) ->  {
+            return (label, event) -> {
                 switch (event.type) {
-                    case START:
-                        label.addStartEvent(event.node);
-                        break;
-                    case END:
-                        label.addEndEvent(event.node);
-                        break;
-                    case TEXT:
-                        label.addTextEvent(event.node);
-                        break;
-                    default:
-                        throw new UnsupportedOperationException("Unknown event type");
+                case START:
+                    label.addStartEvent(event.node);
+                    break;
+                case END:
+                    label.addEndEvent(event.node);
+                    break;
+                case TEXT:
+                    label.addTextEvent(event.node);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown event type");
                 }
             };
         }
@@ -264,7 +320,7 @@ public class EditGraphAligner {
             String a = startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
             String b = text.toString();
             String c = endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
-            return b+":"+a+":"+c;
+            return b + ":" + a + ":" + c;
         }
 
         public boolean containsStartAddOrDel() {
@@ -291,8 +347,8 @@ public class EditGraphAligner {
     }
 
     public class Score {
-        //TODO: set parent
-        int globalScore = 0;
+        // TODO: set parent
+        public int globalScore = 0;
 
         public Score(int i) {
             this.globalScore = i;
@@ -301,11 +357,20 @@ public class EditGraphAligner {
         public Score(Score parent) {
             this.globalScore = parent.globalScore;
         }
+
+        public int getGlobalScore() {
+            return globalScore;
+        }
+
+        public void setGlobalScore(int globalScore) {
+            this.globalScore = globalScore;
+        }
+
     }
 
     private class Scorer {
         public Score gap(Score parent) {
-            return new Score(parent.globalScore -1);
+            return new Score(parent.globalScore - 1);
         }
 
         public Score score(Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
