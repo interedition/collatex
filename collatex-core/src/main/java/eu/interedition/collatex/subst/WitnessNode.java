@@ -132,6 +132,10 @@ public class WitnessNode {
         return type;
     }
 
+    public boolean isElement() {
+        return Type.element.equals(type);
+    }
+
     public String getSigil() {
         return sigil;
     }

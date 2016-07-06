@@ -56,37 +56,37 @@ public class EditGraphAligner {
 
     public EditGraphAligner(WitnessNode a, WitnessNode b) {
         // from the witness node trees we calculate the labels
-        labelsWitnessA = createLabels(a);
-        labelsWitnessB = createLabels(b);
+        this.labelsWitnessA = createLabels(a);
+        this.labelsWitnessB = createLabels(b);
 
         // from the labels we map the nodes to cell coordinates
-        Map<WitnessNode, Integer> nodeToXCoordinate = mapNodesToIndex(labelsWitnessA);
-        Map<WitnessNode, Integer> nodeToYCoordinate = mapNodesToIndex(labelsWitnessB);
+        Map<WitnessNode, Integer> nodeToXCoordinate = mapNodesToIndex(this.labelsWitnessA);
+        Map<WitnessNode, Integer> nodeToYCoordinate = mapNodesToIndex(this.labelsWitnessB);
 
         // init cells and scorer
-        cells = new Score[labelsWitnessB.size() + 1][labelsWitnessA.size() + 1];
+        this.cells = new Score[this.labelsWitnessB.size() + 1][this.labelsWitnessA.size() + 1];
         Scorer scorer = new Scorer();
 
         // init 0,0
-        cells[0][0] = new Score(Type.empty, 0, 0, null, 0);
+        this.cells[0][0] = new Score(Type.empty, 0, 0, null, 0);
 
         // fill the first row with gaps
-        IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
-            int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, labelsWitnessA.get(x - 1), x - 1);
-            cells[0][x] = scorer.gap(x, 0, cells[0][previousX]);
+        IntStream.range(1, this.labelsWitnessA.size() + 1).forEach(x -> {
+            int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, this.labelsWitnessA.get(x - 1), x - 1);
+            this.cells[0][x] = scorer.gap(x, 0, this.cells[0][previousX]);
         });
 
         // fill the first column with gaps
-        IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
-            int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, labelsWitnessB.get(y - 1), y - 1);
-            cells[y][0] = scorer.gap(0, y, cells[previousY][0]);
+        IntStream.range(1, this.labelsWitnessB.size() + 1).forEach(y -> {
+            int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, this.labelsWitnessB.get(y - 1), y - 1);
+            this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
         });
 
         // fill the rest of the cells in an y by x fashion
-        IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
-            IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
-                EditGraphTableLabel tokenB = labelsWitnessB.get(y - 1);
-                EditGraphTableLabel tokenA = labelsWitnessA.get(x - 1);
+        IntStream.range(1, this.labelsWitnessB.size() + 1).forEach(y -> {
+            IntStream.range(1, this.labelsWitnessA.size() + 1).forEach(x -> {
+                EditGraphTableLabel tokenB = this.labelsWitnessB.get(y - 1);
+                EditGraphTableLabel tokenA = this.labelsWitnessA.get(x - 1);
                 // the previous position does not have to be y-1 or x-1
                 // in the case of an OR operation.. at the start of each OR operand we have to reset the counter
                 // to the value before the start of the or operator.
@@ -97,11 +97,11 @@ public class EditGraphAligner {
                 int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, x - 1);
                 int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, y - 1);
 
-                Score upperLeft = scorer.score(x, y, cells[previousY][previousX], tokenB, tokenA);
-                Score left = scorer.gap(x, y, cells[y][previousX]);
-                Score upper = scorer.gap(x, y, cells[previousY][x]);
+                Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX], tokenB, tokenA);
+                Score left = scorer.gap(x, y, this.cells[y][previousX]);
+                Score upper = scorer.gap(x, y, this.cells[previousY][x]);
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
-                cells[y][x] = max;
+                this.cells[y][x] = max;
                 // System.err.println("[" + y + "," + x + "]:" + cells[y][x]);
 
                 // check whether a label (a or b) has a closing subst
@@ -115,9 +115,9 @@ public class EditGraphAligner {
                 // if tokenB as well as tokenA contain subst tags we have to do something more complicated
                 // for now we detected that situation and exit
 
-                if (tokenA.containsEndSubst() && tokenB.containsEndSubst()) {
-                    throw new UnsupportedOperationException("The witness set has a subst in both witnesses at the same time!");
-                }
+                // if (tokenA.containsEndSubst() && tokenB.containsEndSubst()) {
+                // throw new UnsupportedOperationException("The witness set has a subst in both witnesses at the same time!");
+                // }
 
                 if (tokenB.containsEndSubst()) {
                     postprocesssubstVertical(nodeToYCoordinate, y, x, tokenB);
@@ -134,9 +134,9 @@ public class EditGraphAligner {
         // NOTE: There can be more end subst nodes
         WitnessNode endSubstNode = tokenA.getEndSubstNodes();
         List<Integer> xCoordinatesWithScoresOfAddDels = endSubstNode.children().map(WitnessNode::getLastChild).map(nodeToXCoordinate::get).collect(Collectors.toList());
-        Optional<Score> maximumScoreOptional = xCoordinatesWithScoresOfAddDels.stream().map(addDelx -> cells[y][addDelx]).max((score, other) -> score.globalScore - other.globalScore);
+        Optional<Score> maximumScoreOptional = xCoordinatesWithScoresOfAddDels.stream().map(addDelx -> this.cells[y][addDelx]).max((score, other) -> score.globalScore - other.globalScore);
         Score bestScore = maximumScoreOptional.get();
-        cells[y][x] = bestScore;
+        this.cells[y][x] = bestScore;
     }
 
     private void postprocesssubstVertical(Map<WitnessNode, Integer> nodeToYCoordinate, int y, int x, EditGraphTableLabel tokenB) {
@@ -160,10 +160,10 @@ public class EditGraphAligner {
         // now we have to find the maximum scoring cell of the possible cells..
         // TODO; in the future we also have to set the parent coordinates correctly
         // convert into scores;
-        Optional<Score> maximumScoreOptional = yCoordinatesWithScoresOfAddDels.stream().map(addDelY -> cells[addDelY][x]).max((score, other) -> score.globalScore - other.globalScore);
+        Optional<Score> maximumScoreOptional = yCoordinatesWithScoresOfAddDels.stream().map(addDelY -> this.cells[addDelY][x]).max((score, other) -> score.globalScore - other.globalScore);
         Score bestScore = maximumScoreOptional.get();
         // because it is the end of a subst; override the current score in the cell with the best score for the whole subst.
-        cells[y][x] = bestScore;
+        this.cells[y][x] = bestScore;
     }
 
     private int getPreviousCoordinateForLabel(Map<WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
@@ -173,11 +173,12 @@ public class EditGraphAligner {
             // we need to walk to the parent
             WitnessNode currentNode = token.text;
             Stream<WitnessNode> parentNodeStream = currentNode.parentNodeStream();
-            Optional<WitnessNode> substOptional = parentNodeStream.filter(node -> node.data.equals("subst")).findFirst();
-            if (!substOptional.isPresent()) {
-                throw new RuntimeException("We found an OR operand but could not find the OR operator!");
-            }
-            WitnessNode substNode = substOptional.get();
+            Optional<WitnessNode> substOptional = parentNodeStream//
+                    .filter(WitnessNode::isElement)//
+                    .filter(node -> node.data.equals("subst"))//
+                    .findFirst();
+            WitnessNode substNode = substOptional//
+                    .orElseThrow(() -> new RuntimeException("We found an OR operand but could not find the OR operator!"));
             // convert the substNode into index in the edit graph table
             Integer index = nodeToCoordinate.get(substNode);
             // debug
@@ -221,9 +222,9 @@ public class EditGraphAligner {
     public List<WitnessNode> toNodes(Score score) {
         // System.err.println("score=" + score);
         List<WitnessNode> nodes = new ArrayList<>();
-        WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
+        WitnessNode nodeA = this.labelsWitnessA.get(score.x - 1).text;
         Optional<WitnessNode> nodeB = score.y > 0 //
-                ? Optional.of(labelsWitnessB.get(score.y - 1).text)//
+                ? Optional.of(this.labelsWitnessB.get(score.y - 1).text)//
                 : Optional.empty();
         switch (score.type) {
         case match:
@@ -266,7 +267,7 @@ public class EditGraphAligner {
     }
 
     public Stream<Score> getBacktrackScoreStream() {
-        Iterable<Score> it = () -> new ScoreIterator(cells);
+        Iterable<Score> it = () -> new ScoreIterator(this.cells);
         return StreamSupport.stream(it.spliterator(), false);
     }
 
@@ -277,40 +278,26 @@ public class EditGraphAligner {
 
         ScoreIterator(Score[][] matrix) {
             this.matrix = matrix;
-            x = matrix[0].length - 1;
-            y = matrix.length - 1;
+            this.x = matrix[0].length - 1;
+            this.y = matrix.length - 1;
         }
 
         @Override
         public boolean hasNext() {
-            return !(x == 0 && y == 0);
+            return !(this.x == 0 && this.y == 0);
         }
 
         @Override
         public Score next() {
-            Score currentScore = matrix[y][x];
-            x = currentScore.previousX;
-            y = currentScore.previousY;
+            Score currentScore = this.matrix[this.y][this.x];
+            this.x = currentScore.previousX;
+            this.y = currentScore.previousY;
             return currentScore;
         }
 
-        private void move0() {
-            final float scoreDiag = (y > 0 && x > 0) ? matrix[y - 1][x - 1].globalScore : -1000;
-            final float scoreUp = (x > 0) ? matrix[y][x - 1].globalScore : -1000;
-            final float scoreLeft = (y > 0) ? matrix[y - 1][x].globalScore : -1000;
-            final float maxScore = Math.max(scoreDiag, Math.max(scoreUp, scoreLeft));
-            if (scoreDiag == maxScore) {
-                y = y - 1;
-                x = x - 1;
-            } else if (scoreUp == maxScore) {
-                x = x - 1;
-            } else {
-                y = y - 1;
-            }
-        }
     }
 
-    private static class LabelCollector implements java.util.stream.Collector<WitnessNode.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
+    static class LabelCollector implements java.util.stream.Collector<WitnessNode.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
         @Override
         public Supplier<EditGraphTableLabel> supplier() {
             return EditGraphTableLabel::new;
@@ -359,15 +346,15 @@ public class EditGraphAligner {
         WitnessNode text;
 
         public void addStartEvent(WitnessNode node) {
-            startElements.add(node);
+            this.startElements.add(node);
         }
 
         public void addEndEvent(WitnessNode node) {
-            endElements.add(node);
+            this.endElements.add(node);
         }
 
         public void addTextEvent(WitnessNode node) {
-            if (text != null) {
+            if (this.text != null) {
                 throw new UnsupportedOperationException();
             }
             this.text = node;
@@ -375,17 +362,17 @@ public class EditGraphAligner {
 
         @Override
         public String toString() {
-            String a = startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
-            String b = text.toString();
-            String c = endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
+            String a = this.startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
+            String b = this.text.toString();
+            String c = this.endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
             return b + ":" + a + ":" + c;
         }
 
         public boolean containsStartAddOrDel() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
-            return startElements.stream()//
-                    .filter(node -> WitnessNode.Type.element.equals(node.getType()))//
+            return this.startElements.stream()//
+                    .filter(WitnessNode::isElement)//
                     .filter(node -> node.data.equals("add") || node.data.equals("del"))//
                     .findFirst()//
                     .isPresent();
@@ -394,14 +381,14 @@ public class EditGraphAligner {
         public boolean containsEndSubst() {
             // find the first end subst tag...
             // if we want to do this completely correct it should be from right to left
-            return endElements.stream()//
+            return this.endElements.stream()//
                     .filter(node -> node.data.equals("subst"))//
                     .findFirst()//
                     .isPresent();
         }
 
         public WitnessNode getEndSubstNodes() {
-            Optional<WitnessNode> witnessNode = endElements.stream()//
+            Optional<WitnessNode> witnessNode = this.endElements.stream()//
                     .filter(node -> node.data.equals("subst"))//
                     .findFirst();
             if (!witnessNode.isPresent()) {
@@ -455,12 +442,12 @@ public class EditGraphAligner {
 
         @Override
         public String toString() {
-            return "[" + y + "," + x + "]:" + this.globalScore;
+            return "[" + this.y + "," + this.x + "]:" + this.globalScore;
         }
 
     }
 
-    private class Scorer {
+    class Scorer {
         public Score gap(int x, int y, Score parent) {
             Type type = determineType(x, y, parent);
             return new Score(type, x, y, parent, parent.globalScore - 1);

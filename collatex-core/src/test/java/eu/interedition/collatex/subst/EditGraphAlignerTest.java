@@ -142,6 +142,9 @@ public class EditGraphAlignerTest {
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
 
         visualizeScoringMatrix(aligner);
+        List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
+        visualizeSuperWitness(superWitness);
+
     }
 
     @Test
