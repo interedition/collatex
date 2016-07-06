@@ -144,7 +144,7 @@ public class EditGraphAlignerTest {
     }
 
     @Test
-    public void testBacktrackScoreStream() {
+    public void testAlign_1_2() {
         String xml_a = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>arguably correct</del><add>indubitably right</add></subst> word.</wit>";
         String xml_b = "<wit n=\"2\">In the very beginning, finding the right word.</wit>";
 
@@ -157,8 +157,8 @@ public class EditGraphAlignerTest {
 
         Stream<EditGraphAligner.Score> backtrackScoresStream = aligner.getBacktrackScoreStream();
         List<Integer> scores = backtrackScoresStream.map(s -> s.globalScore).collect(toList());
-        List<Integer> expected = Arrays.asList(-2, -2, -2, -2, -3, -2, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0);
-        assertEquals(expected, scores);
+        List<Integer> expected = Arrays.asList(-2, -2, -2, -2, -1, -1, -1, -1, -1, 0, 0);
+        assertThat(scores).isEqualTo(expected);
 
         List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
         visualizeSuperWitness(superWitness);
@@ -178,6 +178,71 @@ public class EditGraphAlignerTest {
         List<String> assertableRepresentation = serialize(superWitness);
         assertThat(assertableRepresentation).containsExactlyElementsOf(expectedSuperWitness);
 
+    }
+
+    @Test
+    public void testAlign_2_1() throws Exception {
+        String xml_a = "<wit n=\"2\">But in the very beginning, finding the right word.</wit>";
+        String xml_b = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>arguably correct</del><add>indubitably right</add></subst> word.</wit>";
+        List<String> expectedSuperWitness = ImmutableList.<String> of(//
+                "A:But ", //
+                "A:in |B:In", //
+                "A:the |B:the ", //
+                "A:very ", //
+                "A:beginning|B:beginning", //
+                "A:, |B:, ", //
+                "A:finding |B:finding ", //
+                "A:the |B:the ", //
+                "B:indubitably ", //
+                "A:right |B:right", //
+                "A:word|B:word", //
+                "A:.|B:."//
+        );
+
+        visualizeAlignment(xml_a, xml_b, expectedSuperWitness);
+    }
+
+    @Test
+    public void testAlign_2_3() throws Exception {
+        String xml_a = "<wit n=\"wit2\">In <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
+        String xml_b = "<wit n=\"wit3\">At the outset, looking for the best word.</wit>";
+        List<String> expectedSuperWitness = ImmutableList.<String> of(//
+                "A:In ", //
+                "B:At ", //
+                "A:the|B:the ", //
+                "A:very ", //
+                "A:beginning", //
+                "B:outset", //
+                "A:, |B:, ", //
+                "B:looking ", //
+                "A:finding ", //
+                "B:for ", //
+                "A:the |B:the ", //
+                "A:right ", //
+                "B:best ", //
+                "A:word|B:word", //
+                "A:.|B:."//
+        );
+
+        visualizeAlignment(xml_a, xml_b, expectedSuperWitness);
+    }
+
+    private void visualizeAlignment(String xml_a, String xml_b, List<String> expectedSuperWitness) {
+        WitnessNode wit_a = WitnessNode.createTree("A", xml_a);
+        WitnessNode wit_b = WitnessNode.createTree("B", xml_b);
+
+        EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
+
+        visualizeScoringMatrix(aligner);
+        List<Integer> scores = aligner.getBacktrackScoreStream().map(s -> s.globalScore).collect(toList());
+        System.out.println("best path scores = " + scores);
+
+        List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
+        System.out.println("superwitness = " + serialize(superWitness));
+        visualizeSuperWitness(superWitness);
+
+        List<String> assertableRepresentation = serialize(superWitness);
+        assertThat(assertableRepresentation).containsExactlyElementsOf(expectedSuperWitness);
     }
 
     private List<String> serialize(List<List<WitnessNode>> superWitness) {
@@ -227,6 +292,9 @@ public class EditGraphAlignerTest {
                 if (score.isMatch()) {
                     cell = cell + "!";
 
+                } else if (score.isMismatch()) {
+                    cell = cell + "%";
+
                 } else if (score.isAddition()) {
                     cell = cell + "+";
 
@@ -237,6 +305,10 @@ public class EditGraphAlignerTest {
             }
             addRow(table, row, 'r');
         }
+        printTable(table);
+    }
+
+    private void printTable(V2_AsciiTable table) {
         RenderedTable rt = new V2_AsciiTableRenderer()//
                 .setTheme(V2_E_TableThemes.UTF_LIGHT.get())//
                 .setWidth(new WidthLongestWord())//
@@ -275,11 +347,7 @@ public class EditGraphAlignerTest {
         addRow(table, witATokens, 'c');
         addRow(table, witABTokens, 'c');
         addRow(table, witBTokens, 'c');
-        RenderedTable rt = new V2_AsciiTableRenderer()//
-                .setTheme(V2_E_TableThemes.UTF_LIGHT.get())//
-                .setWidth(new WidthLongestWord())//
-                .render(table);
-        System.out.println(rt);
+        printTable(table);
 
     }
 
@@ -314,11 +382,7 @@ public class EditGraphAlignerTest {
         addRow(table, witATokens, 'c');
         addRow(table, witABTokens, 'c');
         addRow(table, witBTokens, 'c');
-        RenderedTable rt = new V2_AsciiTableRenderer()//
-                .setTheme(V2_E_TableThemes.UTF_LIGHT.get())//
-                .setWidth(new WidthLongestWord())//
-                .render(table);
-        System.out.println(rt);
+        printTable(table);
     }
 
 }

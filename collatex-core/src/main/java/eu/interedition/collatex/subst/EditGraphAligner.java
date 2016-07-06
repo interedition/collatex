@@ -1,5 +1,7 @@
 package eu.interedition.collatex.subst;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,7 +68,7 @@ public class EditGraphAligner {
         Scorer scorer = new Scorer();
 
         // init 0,0
-        cells[0][0] = new Score(Type.empty, 0, 0, 0);
+        cells[0][0] = new Score(Type.empty, 0, 0, null, 0);
 
         // fill the first row with gaps
         IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
@@ -88,7 +90,7 @@ public class EditGraphAligner {
                 // the previous position does not have to be y-1 or x-1
                 // in the case of an OR operation.. at the start of each OR operand we have to reset the counter
                 // to the value before the start of the or operator.
-                // most of this could be calculated before hand and does not have to calculated again and again during the scoring
+                // most of this could be calculated beforehand and does not have to calculated again and again during the scoring
 
                 // check whether a label (a or b) has an opening add or del
                 // if so previous y and x are taken from the coordinates of the opening subst -1 (y and x)
@@ -178,9 +180,9 @@ public class EditGraphAligner {
             WitnessNode substNode = substOptional.get();
             // convert the substNode into index in the edit graph table
             Integer index = nodeToCoordinate.get(substNode);
-            defaultCoordinate = index - 1;
             // debug
             // System.out.println("Label text on the horizontal axis >"+tokenA.text+"< maps to index "+previousX);
+            return index - 1;
         }
         return defaultCoordinate;
     }
@@ -202,38 +204,54 @@ public class EditGraphAligner {
         return nodesToCoordinate;
     }
 
-    public void align() {
-
-    }
+    // public void align() {
+    //
+    // }
 
     public List<List<WitnessNode>> getSuperWitness() {
-        final List<List<WitnessNode>> superWitness = new ArrayList<>();
-        getBacktrackScoreStream().forEach(score -> {
-            // System.err.println("score=" + score);
-            List<WitnessNode> nodes = new ArrayList<>();
-            if (score.isMatch()) {
-                // diagonal
-                WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
-                WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
-                nodes.add(nodeA);
-                nodes.add(nodeB);
-            } else if (score.isDeletion()) {
-                // left
-                WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
-                nodes.add(nodeA);
-            } else if (score.isAddition()) {
-                // up
-                if (score.y > 0) {
-                    WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
-                    nodes.add(nodeB);
-                }
-            }
-            if (!nodes.isEmpty()) {
-                superWitness.add(0, nodes);
-            }
+        List<List<WitnessNode>> superwitness = getBacktrackScoreStream()//
+                .flatMap(this::splitMismatches)//
+                .map(this::toNodes)//
+                .filter(ln -> !ln.isEmpty())//
+                .collect(toList());
+        Collections.reverse(superwitness);// until there's a streaming .reverse()
+        return superwitness;
+    }
 
-        });
-        return superWitness;
+    public List<WitnessNode> toNodes(Score score) {
+        // System.err.println("score=" + score);
+        List<WitnessNode> nodes = new ArrayList<>();
+        if (score.isMatch()) {
+            // diagonal
+            WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
+            WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
+            nodes.add(nodeA);
+            nodes.add(nodeB);
+        } else if (score.isDeletion()) {
+            // left
+            WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
+            nodes.add(nodeA);
+        } else if (score.isAddition()) {
+            // up
+            if (score.y > 0) {
+                WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
+                nodes.add(nodeB);
+            }
+        }
+        return nodes;
+    }
+
+    public Stream<Score> splitMismatches(Score score) {
+        List<Score> list = new ArrayList<>();
+        if (score.isMismatch()) {
+            Score partB = new Score(Type.addition, score.x, score.y, score.parent);
+            list.add(partB);
+            Score partA = new Score(Type.deletion, score.x, score.y, score.parent);
+            list.add(partA);
+        } else {
+            list.add(score);
+        }
+        return list.stream();
     }
 
     public Stream<Score> getBacktrackScoreStream() {
@@ -243,36 +261,41 @@ public class EditGraphAligner {
 
     private static class ScoreIterator implements Iterator<Score> {
         private Score[][] matrix;
-        Integer curY;
-        Integer curX;
+        Integer y;
+        Integer x;
 
         ScoreIterator(Score[][] matrix) {
             this.matrix = matrix;
-            curX = matrix[0].length - 1;
-            curY = matrix.length - 1;
+            x = matrix[0].length - 1;
+            y = matrix.length - 1;
         }
 
         @Override
         public boolean hasNext() {
-            return curY >= 0 && curX >= 0;
+            return !(x == 0 && y == 0);
         }
 
         @Override
         public Score next() {
-            Score currentScore = matrix[curY][curX];
-            final float scoreDiag = (curY > 0 && curX > 0) ? matrix[curY - 1][curX - 1].globalScore : -1000;
-            final float scoreUp = (curX > 0) ? matrix[curY][curX - 1].globalScore : -1000;
-            final float scoreLeft = (curY > 0) ? matrix[curY - 1][curX].globalScore : -1000;
+            Score currentScore = matrix[y][x];
+            x = currentScore.previousX;
+            y = currentScore.previousY;
+            return currentScore;
+        }
+
+        private void move0() {
+            final float scoreDiag = (y > 0 && x > 0) ? matrix[y - 1][x - 1].globalScore : -1000;
+            final float scoreUp = (x > 0) ? matrix[y][x - 1].globalScore : -1000;
+            final float scoreLeft = (y > 0) ? matrix[y - 1][x].globalScore : -1000;
             final float maxScore = Math.max(scoreDiag, Math.max(scoreUp, scoreLeft));
             if (scoreDiag == maxScore) {
-                curY = curY - 1;
-                curX = curX - 1;
+                y = y - 1;
+                x = x - 1;
             } else if (scoreUp == maxScore) {
-                curX = curX - 1;
+                x = x - 1;
             } else {
-                curY = curY - 1;
+                y = y - 1;
             }
-            return currentScore;
         }
     }
 
@@ -378,20 +401,26 @@ public class EditGraphAligner {
     }
 
     public static class Score {
+
         enum Type {
-            match, addition, deletion, empty
+            match, mismatch, addition, deletion, empty
         }
 
-        // TODO: set parent
         public int globalScore = 0;
-        private int x;
-        private int y;
+        int x;
+        int y;
         private Type type;
+        public Score parent;
+        int previousX;
+        int previousY;
 
-        public Score(Type type, int x, int y, int i) {
+        public Score(Type type, int x, int y, Score parent, int i) {
             this.type = type;
             this.x = x;
             this.y = y;
+            this.parent = parent;
+            this.previousX = parent == null ? 0 : parent.x;
+            this.previousY = parent == null ? 0 : parent.y;
             this.globalScore = i;
         }
 
@@ -399,11 +428,14 @@ public class EditGraphAligner {
             this.type = type;
             this.x = x;
             this.y = y;
+            this.parent = parent;
+            this.previousX = parent.x;
+            this.previousY = parent.y;
             this.globalScore = parent.globalScore;
         }
 
         public int getGlobalScore() {
-            return globalScore;
+            return this.globalScore;
         }
 
         public void setGlobalScore(int globalScore) {
@@ -422,9 +454,13 @@ public class EditGraphAligner {
             return Type.deletion.equals(type);
         }
 
+        public boolean isMismatch() {
+            return Type.mismatch.equals(type);
+        }
+
         @Override
         public String toString() {
-            return "[" + y + "," + x + "]:" + globalScore;
+            return "[" + y + "," + x + "]:" + this.globalScore;
         }
 
     }
@@ -432,7 +468,7 @@ public class EditGraphAligner {
     private class Scorer {
         public Score gap(int x, int y, Score parent) {
             Type type = determineType(x, y, parent);
-            return new Score(type, x, y, parent.globalScore - 1);
+            return new Score(type, x, y, parent, parent.globalScore - 1);
         }
 
         public Score score(int x, int y, Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
@@ -440,8 +476,7 @@ public class EditGraphAligner {
                 return new Score(Type.match, x, y, parent);
             }
 
-            Type type = determineType(x, y, parent);
-            return new Score(type, x, y, parent.globalScore - 2);
+            return new Score(Type.mismatch, x, y, parent, parent.globalScore - 2);
         }
 
         private boolean tokensMatch(EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
