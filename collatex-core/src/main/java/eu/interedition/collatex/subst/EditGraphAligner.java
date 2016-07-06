@@ -71,13 +71,13 @@ public class EditGraphAligner {
         // fill the first row with gaps
         IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
             int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, labelsWitnessA.get(x - 1), x - 1);
-            cells[0][x] = scorer.gap(0, x, cells[0][previousX]);
+            cells[0][x] = scorer.gap(x, 0, cells[0][previousX]);
         });
 
         // fill the first column with gaps
         IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
             int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, labelsWitnessB.get(y - 1), y - 1);
-            cells[y][0] = scorer.gap(y, 0, cells[previousY][0]);
+            cells[y][0] = scorer.gap(0, y, cells[previousY][0]);
         });
 
         // fill the rest of the cells in an y by x fashion
