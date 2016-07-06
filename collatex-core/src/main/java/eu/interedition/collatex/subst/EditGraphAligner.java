@@ -19,15 +19,13 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.VariantGraph.Vertex;
+import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
 
 /**
  * Created by ronalddekker on 30/04/16.
  * This is a special version of the edit graph aligner that can handle witnesses with substitutions in them.
  */
 public class EditGraphAligner {
-
     final List<EditGraphTableLabel> labelsWitnessB;
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
@@ -68,22 +66,24 @@ public class EditGraphAligner {
         Scorer scorer = new Scorer();
 
         // init 0,0
-        cells[0][0] = new Score(0);
+        cells[0][0] = new Score(Type.empty, 0, 0, 0);
 
         // fill the first row with gaps
         IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
             int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, labelsWitnessA.get(x - 1), x - 1);
-            cells[0][x] = scorer.gap(cells[0][previousX]);
+            cells[0][x] = scorer.gap(0, x, cells[0][previousX]);
         });
 
         // fill the first column with gaps
         IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
             int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, labelsWitnessB.get(y - 1), y - 1);
-            cells[y][0] = scorer.gap(cells[previousY][0]);
+            cells[y][0] = scorer.gap(y, 0, cells[previousY][0]);
         });
 
         // fill the rest of the cells in an y by x fashion
+        // for (int y = 1; y <= labelsWitnessB.size(); y++) {
         IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
+            // for (int x = 1; x <= labelsWitnessA.size(); x++) {
             IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
                 EditGraphTableLabel tokenB = labelsWitnessB.get(y - 1);
                 EditGraphTableLabel tokenA = labelsWitnessA.get(x - 1);
@@ -97,11 +97,12 @@ public class EditGraphAligner {
                 int previousX = getPreviousCoordinateForLabel(nodeToXCoordinate, tokenA, x - 1);
                 int previousY = getPreviousCoordinateForLabel(nodeToYCoordinate, tokenB, y - 1);
 
-                Score upperLeft = scorer.score(cells[previousY][previousX], tokenB, tokenA);
-                Score left = scorer.gap(cells[y][previousX]);
-                Score upper = scorer.gap(cells[previousY][x]);
+                Score upperLeft = scorer.score(x, y, cells[previousY][previousX], tokenB, tokenA);
+                Score left = scorer.gap(x, y, cells[y][previousX]);
+                Score upper = scorer.gap(x, y, cells[previousY][x]);
                 Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
                 cells[y][x] = max;
+                // System.err.println("[" + y + "," + x + "]:" + cells[y][x]);
 
                 // check whether a label (a or b) has a closing subst
                 // note that there can be multiple subst that end here..
@@ -125,7 +126,9 @@ public class EditGraphAligner {
                 if (tokenA.containsEndSubst()) {
                     postProcessSubstHorizontal(nodeToXCoordinate, y, x, tokenA);
                 }
+                // }
             });
+            // }
         });
     }
 
@@ -207,14 +210,32 @@ public class EditGraphAligner {
 
     }
 
-    public VariantGraph getSuperWitness() {
-        final VariantGraph variantGraph = new VariantGraph();
-        Vertex vertex = variantGraph.getEnd();
+    public List<List<WitnessNode>> getSuperWitness() {
+        final List<List<WitnessNode>> superWitness = new ArrayList<>();
         getBacktrackScoreStream().forEach(score -> {
-            // build the variantgraph from end to start
-        });
+            // System.err.println("score=" + score);
+            List<WitnessNode> nodes = new ArrayList<>();
+            if (score.isMatch()) {
+                // diagonal
+                WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
+                WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
+                nodes.add(nodeA);
+                nodes.add(nodeB);
+            } else if (score.isDeletion()) {
+                // left
+                WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
+                nodes.add(nodeA);
+            } else {
+                // up
+                if (score.y > 0) {
+                    WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
+                    nodes.add(nodeB);
+                }
+            }
+            superWitness.add(0, nodes);
 
-        return variantGraph;
+        });
+        return superWitness;
     }
 
     public Stream<Score> getBacktrackScoreStream() {
@@ -224,34 +245,34 @@ public class EditGraphAligner {
 
     private static class ScoreIterator implements Iterator<Score> {
         private Score[][] matrix;
-        Integer curX;
         Integer curY;
+        Integer curX;
 
         ScoreIterator(Score[][] matrix) {
             this.matrix = matrix;
-            curX = matrix.length - 1;
-            curY = matrix[0].length - 1;
+            curX = matrix[0].length - 1;
+            curY = matrix.length - 1;
         }
 
         @Override
         public boolean hasNext() {
-            return curX >= 0 && curY >= 0;
+            return curY >= 0 && curX >= 0;
         }
 
         @Override
         public Score next() {
-            Score currentScore = matrix[curX][curY];
-            final float scoreDiag = (curX > 0 && curY > 0) ? matrix[curX - 1][curY - 1].globalScore : -1000;
-            final float scoreUp = (curY > 0) ? matrix[curX][curY - 1].globalScore : -1000;
-            final float scoreLeft = (curX > 0) ? matrix[curX - 1][curY].globalScore : -1000;
+            Score currentScore = matrix[curY][curX];
+            final float scoreDiag = (curY > 0 && curX > 0) ? matrix[curY - 1][curX - 1].globalScore : -1000;
+            final float scoreUp = (curX > 0) ? matrix[curY][curX - 1].globalScore : -1000;
+            final float scoreLeft = (curY > 0) ? matrix[curY - 1][curX].globalScore : -1000;
             final float maxScore = Math.max(scoreDiag, Math.max(scoreUp, scoreLeft));
             if (scoreDiag == maxScore) {
-                curX = curX - 1;
                 curY = curY - 1;
+                curX = curX - 1;
             } else if (scoreUp == maxScore) {
-                curY = curY - 1;
-            } else {
                 curX = curX - 1;
+            } else {
+                curY = curY - 1;
             }
             return currentScore;
         }
@@ -357,18 +378,29 @@ public class EditGraphAligner {
         }
     }
 
-    public class Score {
+    public static class Score {
+        enum Type {
+            match, addition, deletion, empty
+        }
+
         // TODO: set parent
         public int globalScore = 0;
-        private boolean match = false;
+        private int x;
+        private int y;
+        private Type type;
 
-        public Score(int i) {
+        public Score(Type type, int x, int y, int i) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
             this.globalScore = i;
         }
 
-        public Score(Score parent) {
+        public Score(Type type, int x, int y, Score parent) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
             this.globalScore = parent.globalScore;
-            this.match = true;
         }
 
         public int getGlobalScore() {
@@ -379,27 +411,61 @@ public class EditGraphAligner {
             this.globalScore = globalScore;
         }
 
+        public boolean justA() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
         public boolean isMatch() {
-            return match;
+            return Type.match.equals(type);
+        }
+
+        public boolean isAddition() {
+            return Type.addition.equals(type);
+        }
+
+        public boolean isDeletion() {
+            return Type.deletion.equals(type);
+        }
+
+        @Override
+        public String toString() {
+            return "[" + y + "," + x + "]:" + globalScore;
         }
 
     }
 
     private class Scorer {
-        public Score gap(Score parent) {
-            return new Score(parent.globalScore - 1);
+        public Score gap(int x, int y, Score parent) {
+            Type type = determineType(x, y, parent);
+            return new Score(type, x, y, parent.globalScore - 1);
         }
 
-        public Score score(Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
+        public Score score(int x, int y, Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
             if (tokensMatch(tokenB, tokenA)) {
-                return new Score(parent);
+                return new Score(Type.match, x, y, parent);
             }
 
-            return new Score(parent.globalScore - 2);
+            Type type = determineType(x, y, parent);
+            return new Score(type, x, y, parent.globalScore - 2);
         }
 
         private boolean tokensMatch(EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
-            return tokenB.text.data.toLowerCase().trim().equals(tokenA.text.data.toLowerCase().trim());
+            return normalized(tokenB).equals(normalized(tokenA));
+        }
+
+        private String normalized(EditGraphTableLabel tokenB) {
+            return tokenB.text.data.toLowerCase().trim();
+        }
+
+        private Type determineType(int x, int y, Score parent) {
+            if (x == parent.x) {
+                return Type.addition;
+            }
+            if (y == parent.y) {
+                return Type.deletion;
+            }
+            return Type.empty;
         }
     }
 }

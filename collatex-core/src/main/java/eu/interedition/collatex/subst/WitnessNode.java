@@ -1,13 +1,5 @@
 package eu.interedition.collatex.subst;
 
-import eu.interedition.collatex.simple.SimplePatternTokenizer;
-
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +7,30 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.XMLEvent;
+
+import eu.interedition.collatex.simple.SimplePatternTokenizer;
+
 /**
  * Created by ronalddekker on 01/05/16.
  */
 public class WitnessNode {
+    enum Type {
+        text, element
+    }
+
     private WitnessNode parent;
     String data;
     private List<WitnessNode> children;
+    private Type type;
+    private String sigil;
 
-    public WitnessNode(String data) {
+    public WitnessNode(String sigil, Type type, String data) {
+        this.sigil = sigil;
+        this.type = type;
         this.data = data;
         this.children = new ArrayList<>();
     }
@@ -37,7 +44,7 @@ public class WitnessNode {
         if (children.isEmpty()) {
             throw new RuntimeException("There are no children!");
         }
-        return children.get(children.size()-1);
+        return children.get(children.size() - 1);
     }
 
     @Override
@@ -61,9 +68,9 @@ public class WitnessNode {
             return Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.TEXT));
         }
 
-        Stream a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
-        Stream b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
-        Stream c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
+        Stream<WitnessNodeEvent> a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
+        Stream<WitnessNodeEvent> b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
+        Stream<WitnessNodeEvent> c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
         return Stream.concat(a, Stream.concat(b, c));
     }
 
@@ -78,40 +85,39 @@ public class WitnessNode {
         return parents.stream();
     }
 
-//          NOTE: this implementation should be faster, but it does not work
-//            if (this.parent == null) {
-//                return Stream.empty();
-//            }
-//            Stream a = Stream.of(this.parent);
-//            Stream b = Stream.of(this.parent.parentNodeStream());
-//            return Stream.concat(a, b);
-//    }
+    // NOTE: this implementation should be faster, but it does not work
+    // if (this.parent == null) {
+    // return Stream.empty();
+    // }
+    // Stream a = Stream.of(this.parent);
+    // Stream b = Stream.of(this.parent.parentNodeStream());
+    // return Stream.concat(a, b);
+    // }
 
     // this class creates a witness tree from a XML serialization of a witness
     // returns the root node of the tree
-    public static WitnessNode createTree(String witnessXML) {
+    public static WitnessNode createTree(String sigil, String witnessXML) {
         // use a stax parser to go from XML data to XML tokens
         // NOTE: there is no implementation of Stream API for STAX
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlStreamReader;
-        WitnessNode currentNode = new WitnessNode("fake root");
+        WitnessNode currentNode = new WitnessNode(sigil, Type.element, "fake root");
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
         try {
             xmlStreamReader = xmlInputFactory.createXMLEventReader(new StringReader(witnessXML));
             while (xmlStreamReader.hasNext()) {
                 XMLEvent next = xmlStreamReader.nextEvent();
                 if (next.isStartElement()) {
-                    StartElement el = next.asStartElement();
-                    String localName = el.getName().getLocalPart();
-                    WitnessNode child = new WitnessNode(localName);
+                    String localName = next.asStartElement().getName().getLocalPart();
+                    WitnessNode child = new WitnessNode(sigil, Type.element, localName);
                     currentNode.addChild(child);
                     currentNode = child;
                 } else if (next.isCharacters()) {
-                    Characters ch = next.asCharacters();
-                    String text = ch.getData();
-                    Stream<String> stringStream = textTokenizer.apply(text);
-                    List<WitnessNode> newTokens = stringStream.map(WitnessNode::new).collect(Collectors.toList());
-                    newTokens.forEach(currentNode::addChild);
+                    String text = next.asCharacters().getData();
+                    textTokenizer.apply(text)//
+                            .map(s -> new WitnessNode(sigil, Type.text, s))//
+                            .collect(Collectors.toList())//
+                            .forEach(currentNode::addChild);
                 } else if (next.isEndElement()) {
                     currentNode = currentNode.parent;
                 }
@@ -120,6 +126,14 @@ public class WitnessNode {
             e.printStackTrace();
         }
         return currentNode.children.get(0);
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String getSigil() {
+        return sigil;
     }
 
     public enum WitnessNodeEventType {
@@ -135,4 +149,5 @@ public class WitnessNode {
             this.type = type;
         }
     }
+
 }

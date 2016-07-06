@@ -19,17 +19,17 @@
 
 package eu.interedition.collatex.needlemanwunsch;
 
-import eu.interedition.collatex.CollationAlgorithm;
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.util.VariantGraphRanking;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.StreamSupport;
+
+import eu.interedition.collatex.CollationAlgorithm;
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.VariantGraphRanking;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
