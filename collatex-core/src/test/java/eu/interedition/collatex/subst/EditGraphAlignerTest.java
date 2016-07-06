@@ -289,22 +289,27 @@ public class EditGraphAlignerTest {
             for (int x = 0; x < aligner.labelsWitnessA.size() + 1; x++) {
                 Score score = aligner.cells[y][x];
                 Object cell = score.globalScore;
-                if (score.isMatch()) {
+                switch (score.getType()) {
+                case match:
                     cell = cell + "!";
-
-                } else if (score.isMismatch()) {
+                    break;
+                case mismatch:
                     cell = cell + "%";
-
-                } else if (score.isAddition()) {
+                    break;
+                case addition:
                     cell = cell + "+";
-
-                } else if (score.isDeletion()) {
+                    break;
+                case deletion:
                     cell = cell + "-";
+                    break;
+                default:
+                    break;
                 }
                 row.add(cell);
             }
             addRow(table, row, 'r');
         }
+
         printTable(table);
     }
 

@@ -221,35 +221,46 @@ public class EditGraphAligner {
     public List<WitnessNode> toNodes(Score score) {
         // System.err.println("score=" + score);
         List<WitnessNode> nodes = new ArrayList<>();
-        if (score.isMatch()) {
+        WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
+        Optional<WitnessNode> nodeB = score.y > 0 //
+                ? Optional.of(labelsWitnessB.get(score.y - 1).text)//
+                : Optional.empty();
+        switch (score.getType()) {
+        case match:
             // diagonal
-            WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
-            WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
             nodes.add(nodeA);
-            nodes.add(nodeB);
-        } else if (score.isDeletion()) {
+            nodes.add(nodeB.get());
+            break;
+
+        case deletion:
             // left
-            WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
             nodes.add(nodeA);
-        } else if (score.isAddition()) {
+            break;
+
+        case addition:
             // up
-            if (score.y > 0) {
-                WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
-                nodes.add(nodeB);
-            }
+            nodeB.ifPresent(node -> nodes.add(node));
+            break;
+
+        default:
+            break;
         }
         return nodes;
     }
 
     public Stream<Score> splitMismatches(Score score) {
         List<Score> list = new ArrayList<>();
-        if (score.isMismatch()) {
+        switch (score.getType()) {
+        case mismatch:
             Score partB = new Score(Type.addition, score.x, score.y, score.parent);
             list.add(partB);
             Score partA = new Score(Type.deletion, score.x, score.y, score.parent);
             list.add(partA);
-        } else {
+            break;
+
+        default:
             list.add(score);
+            break;
         }
         return list.stream();
     }
@@ -402,17 +413,17 @@ public class EditGraphAligner {
 
     public static class Score {
 
-        enum Type {
+        public static enum Type {
             match, mismatch, addition, deletion, empty
         }
 
-        public int globalScore = 0;
+        private Type type;
         int x;
         int y;
-        private Type type;
         public Score parent;
         int previousX;
         int previousY;
+        public int globalScore = 0;
 
         public Score(Type type, int x, int y, Score parent, int i) {
             this.type = type;
@@ -434,28 +445,16 @@ public class EditGraphAligner {
             this.globalScore = parent.globalScore;
         }
 
+        public Type getType() {
+            return this.type;
+        }
+
         public int getGlobalScore() {
             return this.globalScore;
         }
 
         public void setGlobalScore(int globalScore) {
             this.globalScore = globalScore;
-        }
-
-        public boolean isMatch() {
-            return Type.match.equals(type);
-        }
-
-        public boolean isAddition() {
-            return Type.addition.equals(type);
-        }
-
-        public boolean isDeletion() {
-            return Type.deletion.equals(type);
-        }
-
-        public boolean isMismatch() {
-            return Type.mismatch.equals(type);
         }
 
         @Override
