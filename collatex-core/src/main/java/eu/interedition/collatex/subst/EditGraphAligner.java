@@ -225,7 +225,7 @@ public class EditGraphAligner {
         Optional<WitnessNode> nodeB = score.y > 0 //
                 ? Optional.of(labelsWitnessB.get(score.y - 1).text)//
                 : Optional.empty();
-        switch (score.getType()) {
+        switch (score.type) {
         case match:
             // diagonal
             nodes.add(nodeA);
@@ -250,7 +250,7 @@ public class EditGraphAligner {
 
     public Stream<Score> splitMismatches(Score score) {
         List<Score> list = new ArrayList<>();
-        switch (score.getType()) {
+        switch (score.type) {
         case mismatch:
             Score partB = new Score(Type.addition, score.x, score.y, score.parent);
             list.add(partB);
@@ -417,7 +417,7 @@ public class EditGraphAligner {
             match, mismatch, addition, deletion, empty
         }
 
-        private Type type;
+        public Type type;
         int x;
         int y;
         public Score parent;
@@ -443,10 +443,6 @@ public class EditGraphAligner {
             this.previousX = parent.x;
             this.previousY = parent.y;
             this.globalScore = parent.globalScore;
-        }
-
-        public Type getType() {
-            return this.type;
         }
 
         public int getGlobalScore() {

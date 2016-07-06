@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -276,6 +277,13 @@ public class EditGraphAlignerTest {
         return l.text.data.replace(" ", "\u2022");
     }
 
+    static final Map<Score.Type, String> TYPEINDICATORS = ImmutableMap.<Score.Type, String> builder()//
+            .put(Score.Type.match, "!")//
+            .put(Score.Type.mismatch, "%")//
+            .put(Score.Type.addition, "+")//
+            .put(Score.Type.deletion, "-")//
+            .build();
+
     private void visualizeScoringMatrix(EditGraphAligner aligner) {
         V2_AsciiTable table = new V2_AsciiTable();
         table.addStrongRule();
@@ -289,21 +297,8 @@ public class EditGraphAlignerTest {
             for (int x = 0; x < aligner.labelsWitnessA.size() + 1; x++) {
                 Score score = aligner.cells[y][x];
                 Object cell = score.globalScore;
-                switch (score.getType()) {
-                case match:
-                    cell = cell + "!";
-                    break;
-                case mismatch:
-                    cell = cell + "%";
-                    break;
-                case addition:
-                    cell = cell + "+";
-                    break;
-                case deletion:
-                    cell = cell + "-";
-                    break;
-                default:
-                    break;
+                if (TYPEINDICATORS.containsKey(score.type)) {
+                    cell = cell + TYPEINDICATORS.get(score.type);
                 }
                 row.add(cell);
             }
