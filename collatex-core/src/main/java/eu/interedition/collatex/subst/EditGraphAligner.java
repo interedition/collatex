@@ -81,9 +81,7 @@ public class EditGraphAligner {
         });
 
         // fill the rest of the cells in an y by x fashion
-        // for (int y = 1; y <= labelsWitnessB.size(); y++) {
         IntStream.range(1, labelsWitnessB.size() + 1).forEach(y -> {
-            // for (int x = 1; x <= labelsWitnessA.size(); x++) {
             IntStream.range(1, labelsWitnessA.size() + 1).forEach(x -> {
                 EditGraphTableLabel tokenB = labelsWitnessB.get(y - 1);
                 EditGraphTableLabel tokenA = labelsWitnessA.get(x - 1);
@@ -126,9 +124,7 @@ public class EditGraphAligner {
                 if (tokenA.containsEndSubst()) {
                     postProcessSubstHorizontal(nodeToXCoordinate, y, x, tokenA);
                 }
-                // }
             });
-            // }
         });
     }
 
@@ -225,14 +221,16 @@ public class EditGraphAligner {
                 // left
                 WitnessNode nodeA = labelsWitnessA.get(score.x - 1).text;
                 nodes.add(nodeA);
-            } else {
+            } else if (score.isAddition()) {
                 // up
                 if (score.y > 0) {
                     WitnessNode nodeB = labelsWitnessB.get(score.y - 1).text;
                     nodes.add(nodeB);
                 }
             }
-            superWitness.add(0, nodes);
+            if (!nodes.isEmpty()) {
+                superWitness.add(0, nodes);
+            }
 
         });
         return superWitness;
@@ -353,6 +351,7 @@ public class EditGraphAligner {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
             return startElements.stream()//
+                    .filter(node -> WitnessNode.Type.element.equals(node.getType()))//
                     .filter(node -> node.data.equals("add") || node.data.equals("del"))//
                     .findFirst()//
                     .isPresent();
@@ -409,11 +408,6 @@ public class EditGraphAligner {
 
         public void setGlobalScore(int globalScore) {
             this.globalScore = globalScore;
-        }
-
-        public boolean justA() {
-            // TODO Auto-generated method stub
-            return false;
         }
 
         public boolean isMatch() {
