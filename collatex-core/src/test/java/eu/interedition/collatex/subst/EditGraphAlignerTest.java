@@ -3,6 +3,7 @@ package eu.interedition.collatex.subst;
 import static eu.interedition.collatex.subst.EditGraphAligner.createLabels;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
@@ -16,6 +17,11 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import de.vandermeer.asciitable.v2.RenderedTable;
 import de.vandermeer.asciitable.v2.V2_AsciiTable;
 import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer;
@@ -28,9 +34,6 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
 import eu.interedition.collatex.subst.EditGraphAligner.Score;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import jersey.repackaged.com.google.common.base.Preconditions;
-import jersey.repackaged.com.google.common.collect.Lists;
-import jersey.repackaged.com.google.common.collect.Maps;
 
 /**
  * Created by ronalddekker on 01/05/16.
@@ -159,6 +162,38 @@ public class EditGraphAlignerTest {
 
         List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
         visualizeSuperWitness(superWitness);
+        List<String> expectedSuperWitness = ImmutableList.<String> of(//
+                "A:In|B:In ", //
+                "A:the |B:the ", //
+                "B:very ", //
+                "A:beginning|B:beginning", //
+                "A:, |B:, ", //
+                "A:finding |B:finding ", //
+                "A:the |B:the ", //
+                "A:indubitably ", //
+                "A:right|B:right ", //
+                "A:word|B:word", //
+                "A:.|B:."//
+        );
+        List<String> assertableRepresentation = serialize(superWitness);
+        assertThat(assertableRepresentation).containsExactlyElementsOf(expectedSuperWitness);
+
+    }
+
+    private List<String> serialize(List<List<WitnessNode>> superWitness) {
+        return superWitness.stream()//
+                .map(this::serializeWitnessNodeList)//
+                .collect(toList());
+    }
+
+    private String serializeWitnessNodeList(List<WitnessNode> list) {
+        return list.stream()//
+                .map(this::serializeWitnessNode)//
+                .collect(joining("|"));
+    }
+
+    private String serializeWitnessNode(WitnessNode wn) {
+        return wn.getSigil() + ":" + wn.data;
     }
 
     private void addRow(V2_AsciiTable at, List<Object> row, char alignment) {
