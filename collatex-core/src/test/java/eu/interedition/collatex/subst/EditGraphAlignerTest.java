@@ -167,8 +167,8 @@ public class EditGraphAlignerTest {
 
         visualizeScoringMatrix(aligner);
 
-        Stream<EditGraphAligner.Score> backtrackScoresStream = aligner.getBacktrackScoreStream();
-        List<Integer> scores = backtrackScoresStream.map(s -> s.globalScore).collect(toList());
+        List<Integer> scores = aligner.getBacktrackScoreStream()//
+                .map(s -> s.globalScore).collect(toList());
         List<Integer> expected = Arrays.asList(-2, -2, -2, -2, -1, -1, -1, -1, -1, 0, 0);
         assertThat(scores).isEqualTo(expected);
 
@@ -176,12 +176,16 @@ public class EditGraphAlignerTest {
         visualizeSuperWitness(superWitness);
         List<String> expectedSuperWitness = ImmutableList.<String> of(//
                 "A:In|B:In ", //
+                "A:At", //
                 "A:the |B:the ", //
                 "B:very ", //
                 "A:beginning|B:beginning", //
+                "A:outset", //
                 "A:, |B:, ", //
                 "A:finding |B:finding ", //
                 "A:the |B:the ", //
+                "A:arguably ", //
+                "A:correct", //
                 "A:indubitably ", //
                 "A:right|B:right ", //
                 "A:word|B:word", //
@@ -199,16 +203,16 @@ public class EditGraphAlignerTest {
         List<String> expectedSuperWitness = ImmutableList.<String> of(//
                 "A:But ", //
                 "A:in |B:In", //
-                // "B:At", //
+                "B:At", //
                 "A:the |B:the ", //
                 "A:very ", //
                 "A:beginning|B:beginning", //
-                // "B:outset", //
+                "B:outset", //
                 "A:, |B:, ", //
                 "A:finding |B:finding ", //
                 "A:the |B:the ", //
-                // "B:arguably ", //
-                // "B:correct", //
+                "B:arguably ", //
+                "B:correct", //
                 "B:indubitably ", //
                 "A:right |B:right", //
                 "A:word|B:word", //
@@ -226,7 +230,7 @@ public class EditGraphAlignerTest {
                 "A:In ", //
                 "B:At ", //
                 "A:the|B:the ", //
-                // "A:this ", //
+                "A:this", //
                 "A:very ", //
                 "A:beginning", //
                 "B:outset", //
@@ -294,7 +298,11 @@ public class EditGraphAlignerTest {
     }
 
     private String labelText(EditGraphTableLabel l) {
-        return l.text.data.replace(" ", "\u2022");
+        return witnessNodeText(l.text);
+    }
+
+    private String witnessNodeText(WitnessNode witnessNode) {
+        return witnessNode.data.replace(" ", "\u2022");
     }
 
     static final Map<Score.Type, String> TYPEINDICATORS = ImmutableMap.<Score.Type, String> builder()//
@@ -343,20 +351,21 @@ public class EditGraphAlignerTest {
 
         superWitness.forEach(l -> {
             // System.err.println("l=" + l);
+            WitnessNode witnessNode = l.get(0);
+            String witnessNodeText = witnessNodeText(witnessNode);
             if (l.size() == 2) {
                 witATokens.add("");
-                witABTokens.add(l.get(0).data);
+                witABTokens.add(witnessNodeText);
                 witBTokens.add("");
 
             } else if (l.size() == 1) {
-                WitnessNode witnessNode = l.get(0);
                 witABTokens.add("");
                 if ("A".equals(witnessNode.getSigil())) {
-                    witATokens.add(witnessNode.data);
+                    witATokens.add(witnessNodeText);
                     witBTokens.add("");
                 } else if ("B".equals(witnessNode.getSigil())) {
                     witATokens.add("");
-                    witBTokens.add(witnessNode.data);
+                    witBTokens.add(witnessNodeText);
                 }
 
             }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
@@ -22,6 +23,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -220,7 +222,64 @@ public class EditGraphAligner {
                 .filter(ln -> !ln.isEmpty())//
                 .collect(toList());
         Collections.reverse(superwitness);// until there's a streaming .reverse()
+        superwitness = addRejectedChoices(superwitness);
         return groupNonMatchingTokensByWitness(superwitness);
+    }
+
+    private List<List<WitnessNode>> addRejectedChoices(List<List<WitnessNode>> superwitness) {
+        List<List<WitnessNode>> list = Lists.newArrayList();
+
+        Map<String, Iterator<WitnessNode>> witnessIterators = new TreeMap<>();
+        Map<String, WitnessNode> currentWitnessNodes = new HashMap<>();
+
+        Iterator<WitnessNode> witnessNodesA = witnessNodeIterator(labelsWitnessA);
+        WitnessNode nextA = witnessNodesA.next();
+        String sigilA = nextA.getSigil();
+        witnessIterators.put(sigilA, witnessNodesA);
+        currentWitnessNodes.put(sigilA, nextA);
+
+        Iterator<WitnessNode> witnessNodesB = witnessNodeIterator(labelsWitnessB);
+        WitnessNode nextB = witnessNodesB.next();
+        String sigilB = nextB.getSigil();
+        witnessIterators.put(sigilB, witnessNodesB);
+        currentWitnessNodes.put(sigilB, nextB);
+
+        for (List<WitnessNode> column : superwitness) {
+            // add rejected choices before this column
+            for (WitnessNode witnessNode : column) {
+                String sigil = witnessNode.getSigil();
+                WitnessNode currentNodeForThisWitness = currentWitnessNodes.get(sigil);
+                while (!currentNodeForThisWitness.equals(witnessNode)) {
+                    list.add(ImmutableList.of(currentNodeForThisWitness));
+                    if (witnessIterators.get(sigil).hasNext()) {
+                        currentWitnessNodes.put(sigil, witnessIterators.get(sigil).next());
+                        currentNodeForThisWitness = currentWitnessNodes.get(sigil);
+                    }
+                }
+            }
+            list.add(column);
+            column.stream()//
+                    .map(WitnessNode::getSigil)//
+                    .forEach(sigil -> {
+                        if (witnessIterators.get(sigil).hasNext()) {
+                            currentWitnessNodes.put(sigil, witnessIterators.get(sigil).next());
+                        }
+                    });
+        }
+        // add rejected choices at the end
+        witnessIterators.values().forEach(iterator -> {
+            while (iterator.hasNext()) {
+                list.add(ImmutableList.of(iterator.next()));
+            }
+        });
+        return list;
+    }
+
+    private Iterator<WitnessNode> witnessNodeIterator(List<EditGraphTableLabel> labels) {
+        return labels.stream()//
+                .map(l -> l.text)//
+                .collect(toList())//
+                .iterator();
     }
 
     private List<List<WitnessNode>> groupNonMatchingTokensByWitness(List<List<WitnessNode>> superwitness) {
