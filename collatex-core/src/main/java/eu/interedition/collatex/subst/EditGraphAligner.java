@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +22,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+
 import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
 
 /**
@@ -28,6 +33,7 @@ import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
  * This is a special version of the edit graph aligner that can handle witnesses with substitutions in them.
  */
 public class EditGraphAligner {
+    private static final String SUBST = "subst";
     final List<EditGraphTableLabel> labelsWitnessB;
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
@@ -119,13 +125,18 @@ public class EditGraphAligner {
                 // throw new UnsupportedOperationException("The witness set has a subst in both witnesses at the same time!");
                 // }
 
-                Function<Integer, Score> mapperB = addDelY -> this.cells[addDelY][x];
-                postProcessSubst(tokenB, y, x, nodeToYCoordinate, mapperB);
-
-                Function<Integer, Score> mapperA = addDelx -> this.cells[y][addDelx];
-                postProcessSubst(tokenA, y, x, nodeToXCoordinate, mapperA);
+                postProcessSubst(tokenA, y, x, nodeToXCoordinate, mapperA(y));
+                postProcessSubst(tokenB, y, x, nodeToYCoordinate, mapperB(x));
             });
         });
+    }
+
+    private Function<Integer, Score> mapperA(int y) {
+        return addDelx -> this.cells[y][addDelx];
+    }
+
+    private Function<Integer, Score> mapperB(int x) {
+        return addDelY -> this.cells[addDelY][x];
     }
 
     private void postProcessSubst(EditGraphTableLabel editGraphTableLabel, int y, int x, Map<WitnessNode, Integer> nodeToCoordinate, Function<Integer, Score> toScoreMapper) {
@@ -168,7 +179,7 @@ public class EditGraphAligner {
             Stream<WitnessNode> parentNodeStream = currentNode.parentNodeStream();
             Optional<WitnessNode> substOptional = parentNodeStream//
                     .filter(WitnessNode::isElement)//
-                    .filter(node -> node.data.equals("subst"))//
+                    .filter(node -> node.data.equals(SUBST))//
                     .findFirst();
             WitnessNode substNode = substOptional//
                     .orElseThrow(() -> new RuntimeException("We found an OR operand but could not find the OR operator!"));
@@ -209,7 +220,37 @@ public class EditGraphAligner {
                 .filter(ln -> !ln.isEmpty())//
                 .collect(toList());
         Collections.reverse(superwitness);// until there's a streaming .reverse()
-        return superwitness;
+        return groupNonMatchingTokensByWitness(superwitness);
+    }
+
+    private List<List<WitnessNode>> groupNonMatchingTokensByWitness(List<List<WitnessNode>> superwitness) {
+        List<List<WitnessNode>> grouped = Lists.newArrayList();
+        Multimap<String, List<WitnessNode>> nonMatches = LinkedListMultimap.create();
+        for (List<WitnessNode> column : superwitness) {
+            if (isMatch(column)) {
+                addGrouped(nonMatches, grouped);
+                grouped.add(column);
+            } else {
+                String sigil = column.get(0).getSigil();
+                nonMatches.put(sigil, column);
+            }
+        }
+        addGrouped(nonMatches, grouped);
+        return grouped;
+    }
+
+    private boolean isMatch(List<WitnessNode> column) {
+        return column.size() == 2;
+    }
+
+    private void addGrouped(Multimap<String, List<WitnessNode>> nonMatches, List<List<WitnessNode>> grouped) {
+        Map<String, Collection<List<WitnessNode>>> nonMatchMap = nonMatches.asMap();
+        nonMatchMap.keySet()//
+                .stream()//
+                .sorted()//
+                .map(nonMatchMap::get)//
+                .forEach(grouped::addAll);
+        nonMatches.clear();
     }
 
     public List<WitnessNode> toNodes(Score score) {
@@ -375,19 +416,19 @@ public class EditGraphAligner {
             // find the first end subst tag...
             // if we want to do this completely correct it should be from right to left
             return this.endElements.stream()//
-                    .filter(node -> node.data.equals("subst"))//
+                    .filter(this::isSubst)//
                     .findFirst()//
                     .isPresent();
         }
 
         public WitnessNode getEndSubstNodes() {
-            Optional<WitnessNode> witnessNode = this.endElements.stream()//
-                    .filter(node -> node.data.equals("subst"))//
-                    .findFirst();
-            if (!witnessNode.isPresent()) {
-                throw new RuntimeException("We expected one or more subst tags here!");
-            }
-            return witnessNode.get();
+            return this.endElements.stream()//
+                    .filter(this::isSubst)//
+                    .findFirst().orElseThrow(() -> new RuntimeException("We expected one or more subst tags here!"));
+        }
+
+        private Boolean isSubst(WitnessNode node) {
+            return node.isElement() && SUBST.equals(node.data);
         }
     }
 

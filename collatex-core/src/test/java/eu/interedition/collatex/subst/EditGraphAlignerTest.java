@@ -136,15 +136,23 @@ public class EditGraphAlignerTest {
         String xml_a = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
         String xml_b = "<wit n=\"2\">In <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
 
-        WitnessNode wit_a = WitnessNode.createTree("A", xml_a);
-        WitnessNode wit_b = WitnessNode.createTree("B", xml_b);
+        visualizeAlignment(xml_a, xml_b);
+    }
 
-        EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
+    @Test
+    public void testScoring2() {
+        String xml_a = "<wit n=\"1\"><subst><del>In</del><add>At</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
+        String xml_b = "<wit n=\"2\"><subst><del>Since</del><add>From</add></subst> <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
 
-        visualizeScoringMatrix(aligner);
-        List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
-        visualizeSuperWitness(superWitness);
+        visualizeAlignment(xml_a, xml_b);
+    }
 
+    @Test
+    public void testScoring3() {
+        String xml_a = "<wit n=\"1\"><subst><del>Apparently, in</del><add>So, at</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
+        String xml_b = "<wit n=\"2\"><subst><del>Apparently, at</del><add>So, in</add></subst> <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
+
+        visualizeAlignment(xml_a, xml_b);
     }
 
     @Test
@@ -191,12 +199,16 @@ public class EditGraphAlignerTest {
         List<String> expectedSuperWitness = ImmutableList.<String> of(//
                 "A:But ", //
                 "A:in |B:In", //
+                // "B:At", //
                 "A:the |B:the ", //
                 "A:very ", //
                 "A:beginning|B:beginning", //
+                // "B:outset", //
                 "A:, |B:, ", //
                 "A:finding |B:finding ", //
                 "A:the |B:the ", //
+                // "B:arguably ", //
+                // "B:correct", //
                 "B:indubitably ", //
                 "A:right |B:right", //
                 "A:word|B:word", //
@@ -214,12 +226,13 @@ public class EditGraphAlignerTest {
                 "A:In ", //
                 "B:At ", //
                 "A:the|B:the ", //
+                // "A:this ", //
                 "A:very ", //
                 "A:beginning", //
                 "B:outset", //
                 "A:, |B:, ", //
-                "B:looking ", //
                 "A:finding ", //
+                "B:looking ", //
                 "B:for ", //
                 "A:the |B:the ", //
                 "A:right ", //
@@ -231,20 +244,24 @@ public class EditGraphAlignerTest {
         visualizeAlignment(xml_a, xml_b, expectedSuperWitness);
     }
 
-    private void visualizeAlignment(String xml_a, String xml_b, List<String> expectedSuperWitness) {
+    private List<List<WitnessNode>> visualizeAlignment(String xml_a, String xml_b) {
         WitnessNode wit_a = WitnessNode.createTree("A", xml_a);
         WitnessNode wit_b = WitnessNode.createTree("B", xml_b);
 
         EditGraphAligner aligner = new EditGraphAligner(wit_a, wit_b);
-
         visualizeScoringMatrix(aligner);
+
         List<Integer> scores = aligner.getBacktrackScoreStream().map(s -> s.globalScore).collect(toList());
         System.out.println("best path scores = " + scores);
 
         List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
         System.out.println("superwitness = " + serialize(superWitness));
         visualizeSuperWitness(superWitness);
+        return superWitness;
+    }
 
+    private void visualizeAlignment(String xml_a, String xml_b, List<String> expectedSuperWitness) {
+        List<List<WitnessNode>> superWitness = visualizeAlignment(xml_a, xml_b);
         List<String> assertableRepresentation = serialize(superWitness);
         assertThat(assertableRepresentation).containsExactlyElementsOf(expectedSuperWitness);
     }
