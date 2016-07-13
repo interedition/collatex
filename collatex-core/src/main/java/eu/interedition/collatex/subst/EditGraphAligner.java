@@ -2,6 +2,7 @@ package eu.interedition.collatex.subst;
 
 import static java.util.stream.Collectors.toList;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -458,15 +459,14 @@ public class EditGraphAligner {
             String a = this.startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
             String b = this.text.toString();
             String c = this.endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
-            return b + ":" + a + ":" + c;
+            return MessageFormat.format("{0}:{1}:{2}", b, a, c);
         }
 
         public boolean containsStartAddOrDel() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
             return this.startElements.stream()//
-                    .filter(WitnessNode::isElement)//
-                    .filter(node -> node.data.equals("add") || node.data.equals("del"))//
+                    .filter(this::isAddOrDel)//
                     .findFirst()//
                     .isPresent();
         }
@@ -487,7 +487,13 @@ public class EditGraphAligner {
         }
 
         private Boolean isSubst(WitnessNode node) {
-            return node.isElement() && SUBST.equals(node.data);
+            return node.isElement()//
+                    && SUBST.equals(node.data);
+        }
+
+        private Boolean isAddOrDel(WitnessNode node) {
+            return node.isElement()//
+                    && (node.data.equals("add") || node.data.equals("del"));
         }
     }
 
