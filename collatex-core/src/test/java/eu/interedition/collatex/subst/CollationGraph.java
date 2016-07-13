@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
@@ -31,12 +32,9 @@ public class CollationGraph {
 
     private void createRoot(String name) {
         this.name = name;
-        try (Session session = this.neo4j.session()) {
-            try (Transaction tx = session.beginTransaction()) {
-                tx.run("merge (c:Collation {name:{name}})", Values.parameters("name", name));
-                tx.success();
-            }
-        }
+        runInSessionTransaction(tx -> {
+            tx.run("merge (c:Collation {name:{name}})", Values.parameters("name", name));
+        });
     }
 
     public void addWitness(String sigil, String xml) {
@@ -44,18 +42,15 @@ public class CollationGraph {
         WitnessNode wn = WitnessNode.createTree(sigil, xml);
         witnesses.add(wn);
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
-        try (Session session = this.neo4j.session()) {
-            try (Transaction tx = session.beginTransaction()) {
-                String cypher = labels.stream()//
-                        .map(l -> toTokenNode(l, tokenId(sigil, counter.getAndIncrement())))//
-                        .collect(joining("-[:NEXT{witness:{sigil}}]->"));
-                tx.run("match (c:Collation{name:{name}})\n create (c)-[:WITNESS]->(w:Witness{sigil:{sigil}})-[:FIRST_TOKEN]->" + cypher, //
-                        Values.parameters(//
-                                "name", this.name, //
-                                "sigil", sigil));
-                tx.success();
-            }
-        }
+        runInSessionTransaction(tx -> {
+            String cypher = labels.stream()//
+                    .map(l -> toTokenNode(l, tokenId(sigil, counter.getAndIncrement())))//
+                    .collect(joining("-[:NEXT{witness:{sigil}}]->"));
+            tx.run("match (c:Collation{name:{name}})\n create (c)-[:WITNESS]->(w:Witness{sigil:{sigil}})-[:FIRST_TOKEN]->" + cypher, //
+                    Values.parameters(//
+                            "name", this.name, //
+                            "sigil", sigil));
+        });
     }
 
     public void collate() {
@@ -80,18 +75,12 @@ public class CollationGraph {
                 counters.get(sigil).getAndIncrement();
             }
         });
-        try (Session session = this.neo4j.session()) {
-            try (Transaction tx = session.beginTransaction()) {
-                matches.forEach(m -> {
-                    tx.run("match (t1:Token{id:{id1}}), (t2:Token{id:{id2}}) create (t1)-[:MATCHES]->(t2)", //
-                            Values.parameters(//
-                                    "id1", m.left, //
-                                    "id2", m.right));
-
-                });
-                tx.success();
-            }
-        }
+        runInSessionTransaction(tx -> {
+            matches.forEach(m -> {
+                tx.run("match (t1:Token{id:{id1}}), (t2:Token{id:{id2}}) create (t1)-[:MATCHES]->(t2)", //
+                        Values.parameters("id1", m.left, "id2", m.right));
+            });
+        });
 
     }
 
@@ -112,15 +101,22 @@ public class CollationGraph {
     }
 
     public void foldMatches() {
+        runInSessionTransaction(tx -> {
+            tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token)-[n:NEXT]->(t3) create (t1)-[n1:NEXT]->(t3) set n1 = n delete n");
+            tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token)<-[n:NEXT]-(t3) create (t3)-[n1:NEXT]->(t1) set n1 = n delete n");
+            tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token)<-[r:FIRST_TOKEN]->(w) create (w)-[r1:FIRST_TOKEN]->(t1) set r1 = r delete r");
+            tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token) set t1.id = t1.id+\" + \"+t2.id delete m,t2");
+        });
+    }
+
+    public void runInSessionTransaction(Consumer<Transaction> consumer) {
         try (Session session = this.neo4j.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token)-[n:NEXT]->(t3) create (t1)-[n1:NEXT]->(t3) set n1 = n delete n");
-                tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token)<-[n:NEXT]-(t3) create (t3)-[n1:NEXT]->(t1) set n1 = n delete n");
-                tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token)<-[r:FIRST_TOKEN]->(w) create (w)-[r1:FIRST_TOKEN]->(t1) set r1 = r delete r");
-                tx.run("match (t1:Token)-[m:MATCHES]->(t2:Token) set t1.id = t1.id+\" + \"+t2.id delete m,t2");
+                consumer.accept(tx);
                 tx.success();
             }
         }
+
     }
 
 }
