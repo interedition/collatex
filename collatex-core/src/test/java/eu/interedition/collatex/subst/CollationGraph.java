@@ -32,20 +32,18 @@ public class CollationGraph {
 
     private void createRoot(String name) {
         this.name = name;
-        runInSessionTransaction(tx -> {
-            tx.run("merge (c:Collation {name:{name}})", Values.parameters("name", name));
-        });
+        runInSessionTransaction(tx -> tx.run("merge (c:Collation {name:{name}})", Values.parameters("name", name)));
     }
 
     public void addWitness(String sigil, String xml) {
         AtomicInteger counter = new AtomicInteger(1);
         WitnessNode wn = WitnessNode.createTree(sigil, xml);
-        witnesses.add(wn);
+        this.witnesses.add(wn);
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
         runInSessionTransaction(tx -> {
             String cypher = labels.stream()//
                     .map(l -> toTokenNode(l, tokenId(sigil, counter.getAndIncrement())))//
-                    .collect(joining("-[:NEXT{witness:{sigil}}]->"));
+                    .collect(joining("-[:NEXT{witness:{sigil},layer:\"main\"}]->"));
             tx.run("match (c:Collation{name:{name}})\n create (c)-[:WITNESS]->(w:Witness{sigil:{sigil}})-[:FIRST_TOKEN]->" + cypher, //
                     Values.parameters(//
                             "name", this.name, //
@@ -60,7 +58,7 @@ public class CollationGraph {
         EditGraphAligner ega = new EditGraphAligner(this.witnesses.get(0), this.witnesses.get(1));
         Set<Tuple<String>> matches = new HashSet<>();
         Map<String, AtomicInteger> counters = new HashMap<>();
-        witnesses.stream()//
+        this.witnesses.stream()//
                 .map(WitnessNode::getSigil)//
                 .forEach(sigil -> counters.put(sigil, new AtomicInteger(1)));
         ega.getSuperWitness().forEach(lwn -> {
@@ -75,12 +73,10 @@ public class CollationGraph {
                 counters.get(sigil).getAndIncrement();
             }
         });
-        runInSessionTransaction(tx -> {
-            matches.forEach(m -> {
-                tx.run("match (t1:Token{id:{id1}}), (t2:Token{id:{id2}}) create (t1)-[:MATCHES]->(t2)", //
-                        Values.parameters("id1", m.left, "id2", m.right));
-            });
-        });
+        runInSessionTransaction(tx -> matches.forEach(m -> {
+            tx.run("match (t1:Token{id:{id1}}), (t2:Token{id:{id2}}) create (t1)-[:MATCHES]->(t2)", //
+                    Values.parameters("id1", m.left, "id2", m.right));
+        }));
 
     }
 

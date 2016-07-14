@@ -6,9 +6,7 @@ import org.junit.Test;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 
 public class TextGraphTest {
@@ -22,21 +20,6 @@ public class TextGraphTest {
     @AfterClass
     public static void afterClass() throws Exception {
         neo4j.close();
-    }
-
-    // @Test
-    public void test1() {
-        try (Session session = neo4j.session()) {
-
-            session.run("merge (a:Person {name:'Arthur', title:'King'})");
-
-            StatementResult result = session.run("MATCH (a:Person) WHERE a.name = 'Arthur' RETURN a.name AS name, a.title AS title");
-            while (result.hasNext()) {
-                Record record = result.next();
-                System.out.println(record.get("title").asString() + " " + record.get("name").asString());
-            }
-
-        }
     }
 
     @Test
