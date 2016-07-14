@@ -174,7 +174,7 @@ public class EditGraphAligner {
     }
 
     private int getPreviousCoordinateForLabel(Map<WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
-        if (token.containsStartAddOrDel()) {
+        if (token.containsStartSubstOption()) {
             // start of an option (add / del)
             // every edit graph table label is associated with witness node (as the text)
             // we need to walk to the parent
@@ -462,11 +462,32 @@ public class EditGraphAligner {
             return MessageFormat.format("{0}:{1}:{2}", b, a, c);
         }
 
-        public boolean containsStartAddOrDel() {
+        public boolean containsStartSubstOption() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
-            return this.startElements.stream()//
-                    .filter(this::isAddOrDel)//
+            return containsSubstOption(this.startElements);
+        }
+
+        public boolean containsEndSubstOption() {
+            // find the first add or del tag...
+            // Note that this implementation is from the left to right
+            return containsSubstOption(this.endElements);
+        }
+
+        private boolean containsSubstOption(List<WitnessNode> witnessNodeList) {
+            return witnessNodeList.stream()//
+                    .filter(this::isSubstOption)//
+                    .findFirst()//
+                    .isPresent();
+        }
+
+        public boolean containsStartSubst() {
+            return containsSubst(this.startElements);
+        }
+
+        private boolean containsSubst(List<WitnessNode> witnessNodeList) {
+            return witnessNodeList.stream()//
+                    .filter(this::isSubst)//
                     .findFirst()//
                     .isPresent();
         }
@@ -474,10 +495,7 @@ public class EditGraphAligner {
         public boolean containsEndSubst() {
             // find the first end subst tag...
             // if we want to do this completely correct it should be from right to left
-            return this.endElements.stream()//
-                    .filter(this::isSubst)//
-                    .findFirst()//
-                    .isPresent();
+            return containsSubst(this.endElements);
         }
 
         public WitnessNode getEndSubstNodes() {
@@ -491,7 +509,7 @@ public class EditGraphAligner {
                     && SUBST.equals(node.data);
         }
 
-        private Boolean isAddOrDel(WitnessNode node) {
+        private Boolean isSubstOption(WitnessNode node) {
             return node.isElement()//
                     && (node.data.equals("add") || node.data.equals("del"));
         }

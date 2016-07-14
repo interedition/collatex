@@ -13,14 +13,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
 
 public class CollationGraph {
-
     private Driver neo4j;
     private String name;
     private List<WitnessNode> witnesses = new ArrayList<>();
@@ -39,16 +42,81 @@ public class CollationGraph {
         AtomicInteger counter = new AtomicInteger(1);
         WitnessNode wn = WitnessNode.createTree(sigil, xml);
         this.witnesses.add(wn);
+        String t0Id = tokenId(sigil, 0);
+        Set<String> cypherStatements = new TreeSet<>();
+        cypherStatements.add("create (:Token{id:\"" + t0Id + "\",data:\"\"})");
+        List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
+        List<String> choiceEndIds = Lists.newArrayList();
+        String substStart = t0Id;
+        String prevId = t0Id;
+        for (EditGraphTableLabel label : labels) {
+            String tokenId = tokenId(sigil, counter.getAndIncrement());
+            cypherStatements.add("create " + toTokenNode(label, tokenId));
+            if (!label.startElements.isEmpty()) {
+                if (label.containsStartSubst()) {
+                    substStart = prevId;
+                }
+                if (label.containsStartSubstOption()) {
+                    if (!tokenId.equals(substStart)) {
+                        cypherStatements.add(createNextRelationBetween(substStart, tokenId, sigil, "option"));
+                    }
+                }
+            } else {
+                if (!prevId.isEmpty()) {
+                    cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil, "main"));
+                }
+            }
+            if (label.containsEndSubstOption()) {
+                choiceEndIds.add(tokenId);
+            }
+            if (label.containsEndSubst()) {
+                String nextTokenId = tokenId(sigil, counter.get());
+                System.out.println(choiceEndIds);
+                choiceEndIds.forEach(//
+                        optionEndTokenId -> cypherStatements.add(createNextRelationBetween(optionEndTokenId, nextTokenId, sigil, "option"))//
+                );
+                substStart = "";
+                choiceEndIds.clear();
+            }
+            prevId = tokenId;
+        }
+
+        runInSessionTransaction(tx -> {
+            System.out.println(Joiner.on("\n").join(cypherStatements));
+            cypherStatements.forEach(cs -> tx.run(cs));
+            tx.run("match (c:Collation{name:{name}}), (t0:Token{id:{t0Id}}) create (c)-[:WITNESS]->(w:Witness{sigil:{sigil}})-[:FIRST_TOKEN]->(t0)", //
+                    Values.parameters(//
+                            "name", this.name, //
+                            "sigil", sigil, //
+                            "t0Id", t0Id//
+            ));
+        });
+    }
+
+    private String createNextRelationBetween(String substStart, String tokenId, String sigil, String layer) {
+        layer = "main";
+        return "match (t0:Token{id:\"" + substStart + "\"}), (t1:Token{id:\"" + tokenId + "\"}) merge (t0)-[:NEXT{witness:\"" + sigil + "\",layer:\"" + layer + "\"}]->(t1)";
+    }
+
+    public void addWitness0(String sigil, String xml) {
+        AtomicInteger counter = new AtomicInteger(1);
+        WitnessNode wn = WitnessNode.createTree(sigil, xml);
+        this.witnesses.add(wn);
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
         runInSessionTransaction(tx -> {
-            String cypher = labels.stream()//
-                    .map(l -> toTokenNode(l, tokenId(sigil, counter.getAndIncrement())))//
-                    .collect(joining("-[:NEXT{witness:{sigil},layer:\"main\"}]->"));
+            String cypher = witnessAsCypher(sigil, counter, labels);
             tx.run("match (c:Collation{name:{name}})\n create (c)-[:WITNESS]->(w:Witness{sigil:{sigil}})-[:FIRST_TOKEN]->" + cypher, //
                     Values.parameters(//
                             "name", this.name, //
                             "sigil", sigil));
         });
+    }
+
+    private String witnessAsCypher(String sigil, AtomicInteger counter, List<EditGraphTableLabel> labels) {
+        String cypher = labels.stream()//
+                .map(l -> toTokenNode(l, tokenId(sigil, counter.getAndIncrement())))//
+                .collect(joining("-[:NEXT{witness:{sigil},layer:\"main\"}]->"));
+        return cypher;
     }
 
     public void collate() {
