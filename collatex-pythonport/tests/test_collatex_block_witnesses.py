@@ -24,23 +24,7 @@ class Test(unittest.TestCase):
         if not found:
             self.fail("Interval with "+str(start)+" and "+str(length)+" and "+str(nr_of_occurrences)+" not found in "+str(intervals))
     
-    def test_combined_string_hermans_case(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        # $ is meant to separate witnesses here
-        self.assertEquals("a b c d F g h i ! K ! q r s t $1 a b c d F g h i ! q r s t", collation.get_combined_string())
-    
-    # test whether the witness->range mapping works
-    @unit_disabled
-    def test_witness_ranges_hermans_case(self):
-        collation = Collation()
-        collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
-        collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
-        self.assertEquals(RangeSet("0-14"), collation.get_range_for_witness("W1"))
-        self.assertEquals(RangeSet("16-28"), collation.get_range_for_witness("W2"))
-
-# TODO: re-enable test!    
+# TODO: re-enable test!
     # Note: LCP intervals can overlap
     @unit_disabled
     def test_lcp_intervals_failing_use_case_old_algorithm(self):
@@ -149,42 +133,6 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(2, 2, 2, split_intervals) # the cat
         self.assertIntervalIn(3, 1, 2, split_intervals) # cat
         self.assertEqual(3, len(split_intervals), "More items: "+str(split_intervals))
-
-    # LCP interval is descending
-    def test_split_lcp_intervals_descending_LCP(self):
-        lcp_array = array('i', [0, 20, 20, 20, 4])
-        sa_array = array('i', [0, 1, 2, 3, 4]) # FAKED!
-        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
-        split_intervals = extsuffarr.split_lcp_array_into_intervals()
-        self.assertIntervalIn(0, 20, 4, split_intervals)
-        self.assertIntervalIn(0, 4, 5, split_intervals)
-        self.assertEqual(2, len(split_intervals), "More items: "+str(split_intervals))
-        
-    # LCP interval is first ascending, then descending
-    def test_split_lcp_intervals_ascending_then_descending_LCP(self):
-        lcp_array = array('i', [0, 10, 149, 93, 7, 1])
-        sa_array = array('i', [0, 1, 2, 3, 4, 5]) # FAKED!
-        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
-        split_intervals = extsuffarr.split_lcp_array_into_intervals()
-        self.assertIntervalIn(0, 10, 4, split_intervals)
-        self.assertIntervalIn(1, 149, 2, split_intervals)
-        self.assertIntervalIn(1, 93, 3, split_intervals)
-        self.assertIntervalIn(0, 7, 5, split_intervals)
-        self.assertIntervalIn(0, 1, 6, split_intervals)
-        self.assertEqual(5, len(split_intervals), "More items: "+str(split_intervals))
-        
-    def test_split_lcp_intervals_ascending_descending_ascending(self):
-        lcp_array =  array('i', [0, 4, 143, 87, 1, 1, 12, 93, 93, 37])
-        sa_array = array('i', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]) # FAKED!
-        extsuffarr = ExtendedSuffixArray(None, sa_array, lcp_array)
-        split_intervals = extsuffarr.split_lcp_array_into_intervals()
-        self.assertIntervalIn(1, 143, 2, split_intervals)
-        self.assertIntervalIn(1, 87, 3, split_intervals)
-        self.assertIntervalIn(0, 4, 4, split_intervals)
-        self.assertIntervalIn(6, 93, 3, split_intervals)
-        self.assertIntervalIn(0, 1, 10, split_intervals)
-        self.assertIntervalIn(5, 12, 5, split_intervals)
-        self.assertIntervalIn(6, 37, 4, split_intervals)
 
     @unit_disabled
     def test_filter_potential_blocks(self):
