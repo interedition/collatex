@@ -195,6 +195,9 @@ class VariantGraphVertex(object):
         else:
             self.tokens[sigil] = [token]
 
+    def __str__(self):
+        return self.label if self.label else 'no label'
+
 
 class VariantGraph(object):
     def __init__(self):
@@ -248,7 +251,7 @@ class VariantGraph(object):
     # Note: generator implementation
     def vertexWith(self, content):
         try:
-            vertex_to_find = (n for n in self.graph if self.graph.node[n]['label'] == content).next()
+            vertex_to_find = next(n for n in self.vertices() if n.label == content)
             return vertex_to_find
         except StopIteration:
             raise Exception("Vertex with " + content + " not found!")
