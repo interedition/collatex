@@ -5,7 +5,7 @@ from tests import unit_disabled
 __author__ = 'ronalddekker'
 
 class TestTranspositionDetection(unittest.TestCase):
-
+    @unittest.skip("demonstrating skipping")
     def testThisMorningExample(self):
         collation = Collation()
         collation.add_plain_witness("A", "This morning the cat observed little birds in the trees.")
