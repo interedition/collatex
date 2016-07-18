@@ -7,6 +7,7 @@ This module defines the core collation concepts of CollateX
 
 Tokenizer, Witness, VariantGraph, CollationAlgorithm
 """
+import json
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
