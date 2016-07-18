@@ -3,6 +3,15 @@
 History
 -------
 
+2.0.0rc20 (2016-07-18)
+++++++++++++++++++++++
+* Merged old collate_pretokenized_json() function into collate() function
+* JSON output contains full JSON representation of the tokens
+* Enabled segmentation support for all input formats, and for SVG output
+* Enhanced SVG output to include "n" value and all "t" values of JSON input
+* JSON output is raw Unicode, instead of escaped characters
+* Test suite updated
+
 2.0.0rc19 (2015-12-10)
 ++++++++++++++++++++++
 * Rename of TokenIndex.py was not in effect in the uploaded files. Fixed now.
