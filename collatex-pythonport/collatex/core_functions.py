@@ -21,8 +21,6 @@ from collatex.near_matching import process_rank
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-
-
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
@@ -99,34 +97,3 @@ def export_alignment_table_as_json(table, indent=None, status=False):
             variant_status.append(column.variant)
         json_output["status"] = variant_status
     return json.dumps(json_output, sort_keys=True, indent=indent,ensure_ascii=False)
-
-class Collation(object):
-
-    @classmethod
-    def create_from_dict(cls, data, limit=None):
-        witnesses = data["witnesses"]
-        collation = Collation()
-        for witness in witnesses[:limit]:
-            # generate collation object from json_data
-            collation.add_witness(witness)
-        return collation
-
-    @classmethod
-    # json_data can be a string or a file
-    def create_from_json(cls, json_data):
-        data = json.load(json_data)
-        collation = cls.create_from_dict(data)
-        return collation
-
-    def __init__(self):
-        self.witnesses = []
-
-    def add_witness(self, witnessdata):
-        witness = Witness(witnessdata)
-        self.witnesses.append(witness)
-
-    def add_plain_witness(self, sigil, content):
-        return self.add_witness({'id':sigil, 'content':content})
-
-
-

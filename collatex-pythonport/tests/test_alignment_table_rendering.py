@@ -3,6 +3,7 @@ Created on Jun 11, 2014
 
 @author: Ronald Haentjens Dekker
 """
+import json
 import unittest
 from collatex.core_functions import Collation, collate
 
@@ -86,21 +87,21 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "This very quick very quick brown wombat")
         collation.add_plain_witness("B", "That very quick brown koala")
         collation.add_plain_witness("C", "That very quick brown kangaroo")
-        expected_output = """{"table": [[["This very quick"], ["very quick brown"], ["wombat"]], [["That"], \
-["very quick brown"], ["koala"]], [["That"], ["very quick brown"], ["kangaroo"]]], "witnesses": ["A", "B", "C"]}"""
-        json = collate(collation, output="json")
-        self.assertEquals(expected_output, json)
+        expected_output = {"table": [[[{"t": "This"}, {"t": "very"}, {"t": "quick"}], [{"t": "very"}, {"t": "quick"}, {"t": "brown"}], [{"t":"wombat"}]], [[{"t":"That"}], \
+[{"t": "very"}, {"t": "quick"}, {"t": "brown"}], [{"t":"koala"}]], [[{"t": "That"}], [{"t": "very"}, {"t": "quick"}, {"t": "brown"}], [{"t": "kangaroo"}]]], "witnesses": ["A", "B", "C"]}
+        json_out = collate(collation, output="json")
+        self.assertEquals(expected_output, json.loads(json_out))
 
     def testJSONAlignmentTableRenderingNoSegmentation(self):
         collation = Collation()
         collation.add_plain_witness("A", "This very quick very quick brown wombat")
         collation.add_plain_witness("B", "That very quick brown koala")
         collation.add_plain_witness("C", "That very quick brown kangaroo")
-        expected_output = """{"table": [[["This"], ["very"], ["quick"], ["very"], ["quick"], ["brown"], ["wombat"]], \
-[["That"], [null], [null], ["very"], ["quick"], ["brown"], ["koala"]], [["That"], [null], [null], ["very"], ["quick"],\
- ["brown"], ["kangaroo"]]], "witnesses": ["A", "B", "C"]}"""
-        json = collate(collation, output="json", segmentation=False)
-        self.assertEquals(expected_output, json)
+        expected_output = {"table": [[[{"t":"This"}], [{"t":"very"}], [{"t":"quick"}], [{"t":"very"}], [{"t":"quick"}], [{"t":"brown"}], [{"t":"wombat"}]], \
+[[{"t":"That"}], None, None, [{"t":"very"}], [{"t":"quick"}], [{"t":"brown"}], [{"t":"koala"}]], [[{"t":"That"}], None, None, [{"t":"very"}], [{"t":"quick"}],\
+ [{"t":"brown"}], [{"t":"kangaroo"}]]], "witnesses": ["A", "B", "C"]}
+        json_out = collate(collation, output="json", segmentation=False)
+        self.assertEquals(expected_output, json.loads(json_out))
 
     def testColumnStatusInAlignmentTable(self):
         collation = Collation()

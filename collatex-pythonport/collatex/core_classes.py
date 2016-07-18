@@ -7,6 +7,7 @@ This module defines the core collation concepts of CollateX
 
 Tokenizer, Witness, VariantGraph, CollationAlgorithm
 """
+import json
 import networkx as nx
 from _collections import deque
 from networkx.algorithms.dag import topological_sort
@@ -14,6 +15,35 @@ import re
 from prettytable import PrettyTable
 from textwrap import fill
 from collatex.exceptions import TokenError
+
+
+class Collation(object):
+
+    @classmethod
+    def create_from_dict(cls, data, limit=None):
+        witnesses = data["witnesses"]
+        collation = Collation()
+        for witness in witnesses[:limit]:
+            # generate collation object from json_data
+            collation.add_witness(witness)
+        return collation
+
+    @classmethod
+    # json_data can be a string or a file
+    def create_from_json(cls, json_data):
+        data = json.load(json_data)
+        collation = cls.create_from_dict(data)
+        return collation
+
+    def __init__(self):
+        self.witnesses = []
+
+    def add_witness(self, witnessdata):
+        witness = Witness(witnessdata)
+        self.witnesses.append(witness)
+
+    def add_plain_witness(self, sigil, content):
+        return self.add_witness({'id':sigil, 'content':content})
 
 
 class Row(object):
@@ -26,6 +56,10 @@ class Row(object):
 
     def to_list(self):
         return self.cells
+
+    def to_list_of_strings(self):
+        # TODO : the tokenizer mishandles whitespace (or its absence) before punctuation
+        return [" ".join([listItem.token_data['t'] for listItem in cell]) if cell else None for cell in self.cells]
 
 
 class Column(object):

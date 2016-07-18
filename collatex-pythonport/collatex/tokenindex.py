@@ -27,6 +27,12 @@ class TokenIndex(object):
         self.suffix_array = self.get_suffix_array()
         self.lcp_array = self.get_lcp_array()
 
+    @classmethod
+    def create_token_index(cls, collation):
+        token_index = TokenIndex(collation.witnesses)
+        token_index.prepare()
+        return token_index
+
     def _prepare_token_array(self):
         # TODO: the lazy init should move to somewhere else
         # clear the suffix array and LCP array cache
