@@ -21,6 +21,7 @@ class Test(unittest.TestCase):
         self.assertEquals(["the cat", "is", "black"], alignment_table.rows[0].to_list())
         self.assertEquals(["black", "is", "the cat"], alignment_table.rows[1].to_list())
 
+    @unit_disabled
     def testDoubleTransposition2(self):
         # Either the 'a' can align or the 'b' can. See also #3 below.
         collation = Collation()
@@ -37,6 +38,7 @@ class Test(unittest.TestCase):
                 matching_tokens.append(witness_a_list[idx])
         self.assertEquals(len(matching_tokens), 1)
 
+    @unit_disabled
     def testDoubleTransposition3(self):
         # Tricky. Aligning a and c can work; so can aligning b and c. Both
         # are equally valid, and both can crop up.
@@ -56,6 +58,15 @@ class Test(unittest.TestCase):
                 matching_tokens.append(witness_a_list[idx])
         self.assertEquals(len(matching_tokens), 2)
         self.assertIn("c", matching_tokens)
+
+    @unit_disabled
+    def testThisMorningExample(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "This morning the cat observed little birds in the trees.")
+        collation.add_plain_witness("B",
+                                    "The cat was observing birds in the little trees this morning, it observed birds for two hours.")
+        alignment_table = collate(collation, detect_transpositions=True)
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
