@@ -5,7 +5,7 @@ Created on Sep 12, 2014
 '''
 import unittest
 from tests import unit_disabled
-from collatex.core_functions import collate_pretokenized_json
+from collatex.core_functions import collate
 
 
 class Test(unittest.TestCase):
@@ -42,24 +42,24 @@ class Test(unittest.TestCase):
     }
 
     def test_exact_matching(self):
-        result = collate_pretokenized_json(self.json_in)
+        result = collate(self.json_in, segmentation=False)
         self.assertEquals(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
-                          result.rows[0].to_list())
-        self.assertEquals(["I", "bought", None, None, None, None, None, None, "those", "glasses", None, "."], result.rows[1].to_list())
+                          result.rows[0].to_list_of_strings())
+        self.assertEquals(["I", "bought", None, None, None, None, None, None, "those", "glasses", None, "."], result.rows[1].to_list_of_strings())
 
     def test_near_matching(self):
-        result = collate_pretokenized_json(self.json_in, near_match=True)
+        result = collate(self.json_in, near_match=True, segmentation=False)
         self.assertEquals(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
-                          result.rows[0].to_list())
-        self.assertEquals(["I", "bought", "those", "glasses", None, None, None, None, None, None, None, "."], result.rows[1].to_list())
+                          result.rows[0].to_list_of_strings())
+        self.assertEquals(["I", "bought", "those", "glasses", None, None, None, None, None, None, None, "."], result.rows[1].to_list_of_strings())
 
     # Re-enable this one if segmented output is ever supported on tokenized collation
     @unit_disabled
     def test_near_matching_segmented(self):
-        result = collate_pretokenized_json(self.json_in, near_match=True, segmentation=True)
+        result = collate(self.json_in, near_match=True, segmentation=True)
         self.assertEquals(["I bought", "this glass, because it matches those dinner plates."],
-                          result.rows[0].to_list())
-        self.assertEquals(["I bought", "those glasses."], result.rows[1].to_list())
+                          result.rows[0].to_list_of_strings())
+        self.assertEquals(["I bought", "those glasses."], result.rows[1].to_list_of_strings())
 
 
 if __name__ == "__main__":
