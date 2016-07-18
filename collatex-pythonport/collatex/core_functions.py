@@ -3,12 +3,8 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
-from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
-from collatex.extended_suffix_array import ExtendedSuffixArray
-from collatex.exceptions import UnsupportedError
+from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
-from collatex.linsuffarr import SuffixArray, UNIT_BYTE
-from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
@@ -70,34 +66,3 @@ def export_alignment_table_as_json(table, indent=None, status=False):
             variant_status.append(column.variant)
         json_output["status"] = variant_status
     return json.dumps(json_output, sort_keys=True, indent=indent,ensure_ascii=False)
-
-class Collation(object):
-
-    @classmethod
-    def create_from_dict(cls, data, limit=None):
-        witnesses = data["witnesses"]
-        collation = Collation()
-        for witness in witnesses[:limit]:
-            # generate collation object from json_data
-            collation.add_witness(witness)
-        return collation
-
-    @classmethod
-    # json_data can be a string or a file
-    def create_from_json(cls, json_data):
-        data = json.load(json_data)
-        collation = cls.create_from_dict(data)
-        return collation
-
-    def __init__(self):
-        self.witnesses = []
-
-    def add_witness(self, witnessdata):
-        witness = Witness(witnessdata)
-        self.witnesses.append(witness)
-
-    def add_plain_witness(self, sigil, content):
-        return self.add_witness({'id':sigil, 'content':content})
-
-
-
