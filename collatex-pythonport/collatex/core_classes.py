@@ -27,6 +27,10 @@ class Row(object):
     def to_list(self):
         return self.cells
 
+    def to_list_of_strings(self):
+        # TODO : the tokenizer mishandles whitespace (or its absence) before punctuation
+        return [" ".join([listItem.token_data['t'] for listItem in cell]) if cell else None for cell in self.cells]
+
 
 class Column(object):
     def __init__(self):
