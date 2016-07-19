@@ -3,6 +3,7 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
+from lxml import etree
 from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 import json
@@ -37,7 +38,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     # check which output format is requested: graph or table
     if output == "svg":
         return display_variant_graph_as_SVG(graph,svg_output)
-    if output=="graph": 
+    if output=="graph":
         return graph
     # create alignment table
     table = AlignmentTable(collation, graph, layout)
@@ -49,9 +50,11 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return visualizeTableVerticallyWithColors(table, collation)
     if output == "table":
         return table
+    if output == "xml":
+        return export_alignment_table_as_xml(table)
     else:
         raise Exception("Unknown output type: "+output)
-    
+
 def export_alignment_table_as_json(table, indent=None, status=False):
     json_output = {}
     json_output["table"]=[]
@@ -66,3 +69,17 @@ def export_alignment_table_as_json(table, indent=None, status=False):
             variant_status.append(column.variant)
         json_output["status"] = variant_status
     return json.dumps(json_output, sort_keys=True, indent=indent,ensure_ascii=False)
+
+def export_alignment_table_as_xml(table, indent=None):
+    readings = []
+    for column in table.columns:
+        app = etree.Element('app')
+        for key, value in sorted(column.tokens_per_witness.items()):
+            child = etree.Element('rdg')
+            child.attrib['wit'] = "#" + key
+            child.text = " ".join(str(item) for item in value)
+            app.append(child)
+        # Without the encoding specification, outputs bytes instead of a string
+        result = etree.tostring(app, encoding="unicode")
+        readings.append(result)
+    return "<root>" + "".join(readings) + "</root>"
