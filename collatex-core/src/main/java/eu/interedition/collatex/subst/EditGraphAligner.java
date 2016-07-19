@@ -436,7 +436,7 @@ public class EditGraphAligner {
 
     static class EditGraphTableLabel {
         List<WitnessNode> startElements = new ArrayList<>();
-        private List<WitnessNode> endElements = new ArrayList<>();
+        List<WitnessNode> endElements = new ArrayList<>();
         WitnessNode text;
 
         public void addStartEvent(WitnessNode node) {

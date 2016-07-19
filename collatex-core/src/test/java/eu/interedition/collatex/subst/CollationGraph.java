@@ -45,10 +45,12 @@ public class CollationGraph {
         String t0Id = tokenId(sigil, 0);
         Set<String> cypherStatements = new TreeSet<>();
         cypherStatements.add("create (:Token{id:\"" + t0Id + "\",data:\"\"})");
+        cypherStatements.add(createNextRelationBetween(t0Id, tokenId(sigil, 1), sigil, "option"));
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
         List<String> choiceEndIds = Lists.newArrayList();
         String substStart = t0Id;
         String prevId = t0Id;
+        Map<WitnessNode, Integer> elementMap = new HashMap<>();
         for (EditGraphTableLabel label : labels) {
             String tokenId = tokenId(sigil, counter.getAndIncrement());
             cypherStatements.add("create " + toTokenNode(label, tokenId));
@@ -79,6 +81,18 @@ public class CollationGraph {
                 choiceEndIds.clear();
             }
             prevId = tokenId;
+            label.startElements.forEach(se -> {
+                elementMap.putIfAbsent(se, elementMap.size());
+                Integer annotationIndex = elementMap.get(se);
+                String id = annotationId(sigil, annotationIndex);
+                cypherStatements.add("create (:Annotation{id:\"" + id + "\", title:\"" + se.data + "\"})");
+                cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:BEGINS_AT]->(t)");
+            });
+            label.endElements.forEach(se -> {
+                Integer annotationId = elementMap.get(se);
+                String id = annotationId(sigil, annotationId);
+                cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:ENDS_AT]->(t)");
+            });
         }
 
         runInSessionTransaction(tx -> {
@@ -93,8 +107,13 @@ public class CollationGraph {
         });
     }
 
+    private String annotationId(String sigil, Integer annotationId) {
+        String e = "annotation-" + sigil + "-" + annotationId;
+        return e;
+    }
+
     private String createNextRelationBetween(String substStart, String tokenId, String sigil, String layer) {
-        layer = "main";
+        // layer = "main";
         return "match (t0:Token{id:\"" + substStart + "\"}), (t1:Token{id:\"" + tokenId + "\"}) merge (t0)-[:NEXT{witness:\"" + sigil + "\",layer:\"" + layer + "\"}]->(t1)";
     }
 
@@ -180,6 +199,10 @@ public class CollationGraph {
                 tx.success();
             }
         }
+
+    }
+
+    public void joinNonVariantTokens() {
 
     }
 
