@@ -15,7 +15,7 @@ from collatex.display_module import display_variant_graph_as_SVG
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -51,7 +51,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if output == "table":
         return table
     if output == "xml":
-        return export_alignment_table_as_xml(table)
+        return export_alignment_table_as_xml(table, indent)
     else:
         raise Exception("Unknown output type: "+output)
 
@@ -80,6 +80,6 @@ def export_alignment_table_as_xml(table, indent=None):
             child.text = " ".join(str(item) for item in value)
             app.append(child)
         # Without the encoding specification, outputs bytes instead of a string
-        result = etree.tostring(app, encoding="unicode")
+        result = etree.tostring(app, encoding="unicode", pretty_print=indent)
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
