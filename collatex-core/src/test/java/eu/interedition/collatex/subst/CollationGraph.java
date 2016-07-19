@@ -81,14 +81,14 @@ public class CollationGraph {
                 choiceEndIds.clear();
             }
             prevId = tokenId;
-            label.startElements.forEach(se -> {
+            label.startElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
                 elementMap.putIfAbsent(se, elementMap.size());
                 Integer annotationIndex = elementMap.get(se);
                 String id = annotationId(sigil, annotationIndex);
                 cypherStatements.add("create (:Annotation{id:\"" + id + "\", title:\"" + se.data + "\"})");
                 cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:BEGINS_AT]->(t)");
             });
-            label.endElements.forEach(se -> {
+            label.endElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
                 Integer annotationId = elementMap.get(se);
                 String id = annotationId(sigil, annotationId);
                 cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:ENDS_AT]->(t)");
@@ -108,8 +108,7 @@ public class CollationGraph {
     }
 
     private String annotationId(String sigil, Integer annotationId) {
-        String e = "annotation-" + sigil + "-" + annotationId;
-        return e;
+        return "annotation-" + sigil + "-" + annotationId;
     }
 
     private String createNextRelationBetween(String substStart, String tokenId, String sigil, String layer) {
