@@ -80,19 +80,8 @@ public class CollationGraph {
                 substStart = "";
                 choiceEndIds.clear();
             }
+            addAnnotations(cypherStatements, sigil, elementMap, label, tokenId);
             prevId = tokenId;
-            label.startElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
-                elementMap.putIfAbsent(se, elementMap.size());
-                Integer annotationIndex = elementMap.get(se);
-                String id = annotationId(sigil, annotationIndex);
-                cypherStatements.add("create (:Annotation{id:\"" + id + "\", title:\"" + se.data + "\"})");
-                cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:BEGINS_AT]->(t)");
-            });
-            label.endElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
-                Integer annotationId = elementMap.get(se);
-                String id = annotationId(sigil, annotationId);
-                cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:ENDS_AT]->(t)");
-            });
         }
 
         runInSessionTransaction(tx -> {
@@ -104,6 +93,21 @@ public class CollationGraph {
                             "sigil", sigil, //
                             "t0Id", t0Id//
             ));
+        });
+    }
+
+    private void addAnnotations(Set<String> cypherStatements, String sigil, Map<WitnessNode, Integer> elementMap, EditGraphTableLabel label, String tokenId) {
+        label.startElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
+            elementMap.putIfAbsent(se, elementMap.size());
+            Integer annotationIndex = elementMap.get(se);
+            String id = annotationId(sigil, annotationIndex);
+            cypherStatements.add("create (:Annotation{id:\"" + id + "\", title:\"" + se.data + "\"})");
+            cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:BEGINS_AT]->(t)");
+        });
+        label.endElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
+            Integer annotationId = elementMap.get(se);
+            String id = annotationId(sigil, annotationId);
+            cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:ENDS_AT]->(t)");
         });
     }
 
