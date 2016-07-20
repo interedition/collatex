@@ -1,4 +1,5 @@
 import unittest
+from tests import unit_disabled
 from collatex import *
 
 
@@ -11,6 +12,8 @@ class Test(unittest.TestCase):
         output = collate(collation, output="xml")
         self.assertEquals(output_expected, output)
 
+    @unit_disabled # ElementTree doesn't pretty print
+    # TODO: Remove this test entirely; don't just disable it
     def test_export_alignment_table_as_xml_prettyprint(self):
         output_expected = """<root><app>
   <rdg wit="#A">The</rdg>

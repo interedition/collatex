@@ -3,7 +3,7 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
-from lxml import etree
+from xml.etree import ElementTree as etree
 from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 import json
@@ -54,7 +54,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if output == "table":
         return table
     if output == "xml":
-        return export_alignment_table_as_xml(table, indent)
+        return export_alignment_table_as_xml(table)
     if output == "tei":
         return export_alignment_table_as_tei(table, indent)
     else:
@@ -77,7 +77,7 @@ def export_alignment_table_as_json(table, indent=None, status=False):
     return json.dumps(json_output, sort_keys=True, indent=indent, ensure_ascii=False)
 
 
-def export_alignment_table_as_xml(table, indent=None):
+def export_alignment_table_as_xml(table):
     readings = []
     for column in table.columns:
         app = etree.Element('app')
@@ -87,7 +87,7 @@ def export_alignment_table_as_xml(table, indent=None):
             child.text = " ".join(str(item) for item in value)
             app.append(child)
         # Without the encoding specification, outputs bytes instead of a string
-        result = etree.tostring(app, encoding="unicode", pretty_print=indent)
+        result = etree.tostring(app, encoding="unicode")
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
 
