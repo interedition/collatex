@@ -4,7 +4,7 @@ Created on May 3, 2014
 @author: Ronald Haentjens Dekker
 """
 from xml.etree import ElementTree as etree
-from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
+from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable, VariantGraphRanking
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
