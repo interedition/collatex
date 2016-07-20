@@ -5,11 +5,19 @@ General:
 		DONE: pip based installation works on Mac
 	Port code to Python 3 to support Unicode characters: DONE
 	
+Documentation:
+    Reference guide (cookbook)
+    Plus tutorials for the workshop(s)
+
 Preparation:
 	DONE: Tokenization: There are two tokenizers:
 		One based on whitespace, punctuation not treated as separate tokens
 		Another based on whitespace or punctuation, punctuation is treated as separate tokens (default)
-	Normalization: None
+	TODO: Tokenizer does not yet store the whitespace (if added, normalization needs to be added)
+	Normalization: None yet, TODO (whitespace normalization, upper/lowercase)
+
+Matching:
+    Near matching as a post process (in experimental branch of David's fork)
 
 Alignment:
 	Build global string array: DONE
@@ -24,6 +32,7 @@ Alignment:
 	Combine dekker_suffix_alignment + edit graph aligner approaches into one: DONE
 
 	Transposition detection:
+	TODO: there is no transposition detection
 	Find match phrases: NOT YET NEEDED, optional
 	Find transpositions: NOT YET NEEDED, optional
 	Merge transpositions into graph: TODO
@@ -38,7 +47,7 @@ Presentation:
 	HTML output: DONE
 	SVG output: DONE
 	JSON output: DONE
-	XML output: TODO
+	XML output: TODO (generic output format; based on the JSON output)
 	TEI output: TODO
 		
 Special cases:
