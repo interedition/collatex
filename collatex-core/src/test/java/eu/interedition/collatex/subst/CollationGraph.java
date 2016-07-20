@@ -45,7 +45,7 @@ public class CollationGraph {
         String t0Id = tokenId(sigil, 0);
         Set<String> cypherStatements = new TreeSet<>();
         cypherStatements.add("create (:Token{id:\"" + t0Id + "\",data:\"\"})");
-        cypherStatements.add(createNextRelationBetween(t0Id, tokenId(sigil, 1), sigil, "option"));
+        cypherStatements.add(createNextRelationBetween(t0Id, tokenId(sigil, 1), sigil));
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
         List<String> choiceEndIds = Lists.newArrayList();
         String substStart = t0Id;
@@ -60,12 +60,12 @@ public class CollationGraph {
                 }
                 if (label.containsStartSubstOption()) {
                     if (!tokenId.equals(substStart)) {
-                        cypherStatements.add(createNextRelationBetween(substStart, tokenId, sigil, "option"));
+                        cypherStatements.add(createNextRelationBetween(substStart, tokenId, sigil));
                     }
                 }
             } else {
                 if (!prevId.isEmpty()) {
-                    cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil, "main"));
+                    cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil));
                 }
             }
             if (label.containsEndSubstOption()) {
@@ -75,7 +75,7 @@ public class CollationGraph {
                 String nextTokenId = tokenId(sigil, counter.get());
                 System.out.println(choiceEndIds);
                 choiceEndIds.forEach(//
-                        optionEndTokenId -> cypherStatements.add(createNextRelationBetween(optionEndTokenId, nextTokenId, sigil, "option"))//
+                        optionEndTokenId -> cypherStatements.add(createNextRelationBetween(optionEndTokenId, nextTokenId, sigil))//
                 );
                 substStart = "";
                 choiceEndIds.clear();
@@ -115,9 +115,8 @@ public class CollationGraph {
         return "annotation-" + sigil + "-" + annotationId;
     }
 
-    private String createNextRelationBetween(String substStart, String tokenId, String sigil, String layer) {
-        // layer = "main";
-        return "match (t0:Token{id:\"" + substStart + "\"}), (t1:Token{id:\"" + tokenId + "\"}) merge (t0)-[:NEXT{witness:\"" + sigil + "\",layer:\"" + layer + "\"}]->(t1)";
+    private String createNextRelationBetween(String substStart, String tokenId, String sigil) {
+        return "match (t0:Token{id:\"" + substStart + "\"}), (t1:Token{id:\"" + tokenId + "\"}) merge (t0)-[:NEXT{witness:\"" + sigil + "\"}]->(t1)";
     }
 
     public void addWitness0(String sigil, String xml) {
