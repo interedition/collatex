@@ -3,10 +3,8 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
-from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer, \
-    VariantGraphRanking
-from collatex.extended_suffix_array import ExtendedSuffixArray
-from collatex.exceptions import UnsupportedError
+from xml.etree import ElementTree as etree
+from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 from collatex.linsuffarr import SuffixArray, UNIT_BYTE
 from ClusterShell.RangeSet import RangeSet
@@ -21,7 +19,8 @@ from collatex.near_matching import process_rank
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
+            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -67,8 +66,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         ranking = VariantGraphRanking.of(graph)
     # check which output format is requested: graph or table
     if output == "svg":
-        return display_variant_graph_as_SVG(graph,svg_output)
-    if output=="graph": 
+        return display_variant_graph_as_SVG(graph, svg_output)
+    if output == "graph":
         return graph
     # create alignment table
     table = AlignmentTable(collation, graph, layout, ranking)
@@ -80,20 +79,80 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return visualizeTableVerticallyWithColors(table, collation)
     if output == "table":
         return table
+    if output == "xml":
+        return export_alignment_table_as_xml(table)
+    if output == "tei":
+        return export_alignment_table_as_tei(table, indent)
     else:
-        raise Exception("Unknown output type: "+output)
-    
+        raise Exception("Unknown output type: " + output)
+
+
 def export_alignment_table_as_json(table, indent=None, status=False):
-    json_output = {}
-    json_output["table"]=[]
+    json_output = {"table": []}
     sigli = []
     for row in table.rows:
         sigli.append(row.header)
-        json_output["table"].append([[listItem.token_data for listItem in cell] if cell else None for cell in row.cells])
+        json_output["table"].append(
+            [[listItem.token_data for listItem in cell] if cell else None for cell in row.cells])
     json_output["witnesses"] = sigli
     if status:
         variant_status = []
         for column in table.columns:
             variant_status.append(column.variant)
         json_output["status"] = variant_status
-    return json.dumps(json_output, sort_keys=True, indent=indent,ensure_ascii=False)
+    return json.dumps(json_output, sort_keys=True, indent=indent, ensure_ascii=False)
+
+
+def export_alignment_table_as_xml(table):
+    readings = []
+    for column in table.columns:
+        app = etree.Element('app')
+        for key, value in sorted(column.tokens_per_witness.items()):
+            child = etree.Element('rdg')
+            child.attrib['wit'] = "#" + key
+            child.text = " ".join(str(item) for item in value)
+            app.append(child)
+        # Without the encoding specification, outputs bytes instead of a string
+        result = etree.tostring(app, encoding="unicode")
+        readings.append(result)
+    return "<root>" + "".join(readings) + "</root>"
+
+
+def export_alignment_table_as_tei(table, indent=None):
+    # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
+    # TODO: To fix pretty printing indirectly, fix tokenization
+    p = etree.Element('p')
+    app = None
+    for column in table.columns:
+        if not column.variant:  # no variation
+            text_node = " ".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
+            if not (len(p)):  # Result starts with non-varying reading
+                p.text = text_node + "\n" if indent else text_node
+            else:  # Non-varying reading after some <app>
+                app.tail = "\n" + text_node + "\n" if indent else text_node
+        else:
+            app = etree.Element('app')
+            preceding = None  # If preceding is None, we're processing the first <rdg> child
+            app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
+            value_dict = {}  # keys are readings, values are an unsorted lists of sigla
+            for key, value in column.tokens_per_witness.items():
+                group = value_dict.setdefault(" ".join([item.token_data["t"] for item in value]), [])
+                group.append(key)
+            rdg_dict = {}  # keys are sorted lists of sigla, with "#" prepended; values are readings
+            for key, value in value_dict.items():
+                rdg_dict[" ".join("#" + item for item in sorted(value))] = key
+            for key, value in sorted(rdg_dict.items()):  # sort <rdg> elements by @wit values
+                if preceding is not None and indent:  # Change tail of preceding <rdg> to indent current one
+                    preceding.tail = "\n  "
+                child = etree.Element('rdg')
+                child.attrib['wit'] = key
+                child.text = value
+                app.append(child)
+                child.tail = "\n" if indent else None
+                # If preceding is not None on an iteration, use its tail indent non-initial current <rdg>
+                preceding = child
+            p.append(app)
+            app.tail = "\n" if indent else None
+    # Without the encoding specification, outputs bytes instead of a string
+    result = etree.tostring(p, encoding="unicode")
+    return result
