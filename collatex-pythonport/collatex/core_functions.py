@@ -11,11 +11,13 @@ from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
 
+
 # Valid options for output are:
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
+            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -25,7 +27,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
     # assume collation is collation (by now); no error trapping
     if not astar:
-        algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
+        algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions,
+                                     debug_scores=debug_scores, properties_filter=properties_filter)
     else:
         algorithm = ExperimentalAstarAligner(collation, near_match=near_match, debug_scores=debug_scores)
 
@@ -37,8 +40,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         join(graph)
     # check which output format is requested: graph or table
     if output == "svg":
-        return display_variant_graph_as_SVG(graph,svg_output)
-    if output=="graph":
+        return display_variant_graph_as_SVG(graph, svg_output)
+    if output == "graph":
         return graph
     # create alignment table
     table = AlignmentTable(collation, graph, layout)
@@ -52,25 +55,27 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return table
     if output == "xml":
         return export_alignment_table_as_xml(table, indent)
-        if output == "tei":
-            return export_alignment_table_as_tei(table, indent)
+    if output == "tei":
+        return export_alignment_table_as_tei(table, indent)
     else:
-        raise Exception("Unknown output type: "+output)
+        raise Exception("Unknown output type: " + output)
+
 
 def export_alignment_table_as_json(table, indent=None, status=False):
-    json_output = {}
-    json_output["table"]=[]
+    json_output = {"table": []}
     sigli = []
     for row in table.rows:
         sigli.append(row.header)
-        json_output["table"].append([[listItem.token_data for listItem in cell] if cell else None for cell in row.cells])
+        json_output["table"].append(
+            [[listItem.token_data for listItem in cell] if cell else None for cell in row.cells])
     json_output["witnesses"] = sigli
     if status:
         variant_status = []
         for column in table.columns:
             variant_status.append(column.variant)
         json_output["status"] = variant_status
-    return json.dumps(json_output, sort_keys=True, indent=indent,ensure_ascii=False)
+    return json.dumps(json_output, sort_keys=True, indent=indent, ensure_ascii=False)
+
 
 def export_alignment_table_as_xml(table, indent=None):
     readings = []
@@ -86,20 +91,23 @@ def export_alignment_table_as_xml(table, indent=None):
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
 
+
 def export_alignment_table_as_tei(table, indent=None):
+    # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
+    # TODO: To fix pretty printing indirectly, fix tokenization
     p = etree.Element('p')
     app = None
     for column in table.columns:
-        if not column.variant:
+        if not column.variant:  # no variation
             text_node = " ".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
-            if not (len(p)):
-                p.text = text_node + "\n"
-            else:
-                app.tail = "\n" + text_node + "\n"
+            if not (len(p)):  # Result starts with non-varying reading
+                p.text = text_node + "\n" if indent else text_node
+            else:  # Non-varying reading after some <app>
+                app.tail = "\n" + text_node + "\n" if indent else text_node
         else:
             app = etree.Element('app')
             preceding = None  # If preceding is None, we're processing the first <rdg> child
-            app.text = "\n  "  # Indent first <rdg>
+            app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
             value_dict = {}  # keys are readings, values are an unsorted lists of sigla
             for key, value in column.tokens_per_witness.items():
                 group = value_dict.setdefault(" ".join([item.token_data["t"] for item in value]), [])
@@ -108,16 +116,17 @@ def export_alignment_table_as_tei(table, indent=None):
             for key, value in value_dict.items():
                 rdg_dict[" ".join("#" + item for item in sorted(value))] = key
             for key, value in sorted(rdg_dict.items()):  # sort <rdg> elements by @wit values
-                if preceding is not None:  # Change tail of preceding <rdg> to indent current one
+                if preceding is not None and indent:  # Change tail of preceding <rdg> to indent current one
                     preceding.tail = "\n  "
                 child = etree.Element('rdg')
                 child.attrib['wit'] = key
                 child.text = value
                 app.append(child)
-                child.tail = "\n"
+                child.tail = "\n" if indent else None
                 # If preceding is not None on an iteration, use its tail indent non-initial current <rdg>
                 preceding = child
             p.append(app)
+            app.tail = "\n" if indent else None
     # Without the encoding specification, outputs bytes instead of a string
     result = etree.tostring(p, encoding="unicode")
     return result
