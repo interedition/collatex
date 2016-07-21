@@ -58,8 +58,7 @@ class Row(object):
         return self.cells
 
     def to_list_of_strings(self):
-        # TODO : the tokenizer mishandles whitespace (or its absence) before punctuation
-        return [" ".join([listItem.token_data['t'] for listItem in cell]) if cell else None for cell in self.cells]
+        return ["".join([listItem.token_data['t'] for listItem in cell]) if cell else None for cell in self.cells]
 
 
 class Column(object):
@@ -142,7 +141,7 @@ def visualizeTableHorizontal(table):
     for row in table.rows:
         cells = [row.header]
         t_list = [(token.token_data["t"] for token in cell) if cell else ["-"] for cell in row.cells]
-        cells.extend([" ".join(item) for item in t_list])
+        cells.extend([re.sub('\s+$','',"".join(cell)) for cell in t_list])
         x.add_row(cells)
     # alignment can only be set after the field names are known.
     # since add_row sets the field names, it has to be set after x.add_row(cells)
@@ -157,24 +156,15 @@ def visualizeTableVertically(table):
     for row in table.rows:
         # x.add_column(row.header, [fill(cell.token_data["t"], 20) if cell else "-" for cell in row.cells])
         t_list = [(token.token_data["t"] for token in cell) if cell else ["-"] for cell in row.cells]
-        x.add_column(row.header, [fill(" ".join(item), 20) for item in t_list])
+        x.add_column(row.header, [fill("".join(item), 20) for item in t_list])
     return x
-
-
-# not used in the suffix implementation
-# Tokenizer inside suffix array library is used
-class Tokenizer(object):
-    # by default the tokenizer splits on space characters
-    def tokenize(self, contents):
-        return contents.split()
 
 
 class WordPunctuationTokenizer(object):
     # tokenizer splits on punctuation or whitespace
     def tokenize(self, contents):
-        # the remarked regular expression keeps the whitespace
-        # return re.findall("[.?!,;:]+[\\s]*|[^.?!,;:\\s]+[\\s]*", contents)
-        return re.findall(r'\w+|[^\w\s]+', contents)
+        # whitespace is kept with whatever precedes it
+        return re.findall(r'\w+\s*|\W+', contents)
 
 
 class Token(object):
@@ -193,7 +183,6 @@ class Token(object):
         self.token_data = tokendata
 
     def __repr__(self):
-        # return str(self.token_data)
         return self.token_string
 
 
@@ -207,7 +196,7 @@ class Witness(object):
             tokenizer = WordPunctuationTokenizer()
             tokens_as_strings = tokenizer.tokenize(self.content)
             for token_string in tokens_as_strings:
-                self._tokens.append(Token({'t': token_string}))
+                self._tokens.append(Token({'t': token_string, 'n': re.sub(r'\s+$', '', token_string)}))
         elif 'tokens' in witnessdata:
             for tk in witnessdata['tokens']:
                 self._tokens.append(Token(tk))
