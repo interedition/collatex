@@ -5,9 +5,8 @@ Created on May 3, 2014
 """
 from xml.etree import ElementTree as etree
 from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable, VariantGraphRanking
+from collatex.exceptions import SegmentationError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
-from collatex.linsuffarr import SuffixArray, UNIT_BYTE
-from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
@@ -19,6 +18,14 @@ from collatex.near_matching import process_rank
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
+# "xml" for the alignment table as pseudo-TEI XML
+#   All columns are output as <app> elements, regardless of whether they have variation
+#   Each witness is in a separate <rdg> element with the siglum in a @wit attribute
+#       (i.e, witnesses with identical readings are nonetheless in separate <rdg> elements)
+# "tei" for the alignment table as TEI XML parallel segmentation (but in no namespace)
+#   Wrapper element is always <p>
+#   indent=True pretty-prints the output
+#       (for proofreading convenience only; does not observe proper white-space behavior)
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
             detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
@@ -41,7 +48,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if near_match:
         # Segmentation not supported for near matching; raise exception if necessary
         if segmentation:
-            raise Exception("segmentation=True not supported for near matching; must be set to False")
+            raise SegmentationError('segmentation must be set to False for near matching')
 
         highestRank = ranking.byVertex[graph.end]
         witnessCount = len(collation.witnesses)

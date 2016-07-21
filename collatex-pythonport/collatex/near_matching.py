@@ -1,5 +1,5 @@
 """Functions and objects for near matching
-    Called by: collate_pretokenized_json_nearMatch() and collate_nearMatch() (in core_functions.py)
+    Called by: collate() (in core_functions.py) with near_match=True, segmentation=False
 """
 from Levenshtein import distance
 
