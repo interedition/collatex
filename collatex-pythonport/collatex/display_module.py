@@ -27,7 +27,7 @@ def visualizeTableVerticallyWithColors(table, collation):
         cells = []
         for witness in collation.witnesses:
             cell = column.tokens_per_witness.get(witness.sigil)
-            cells.append(TableCell(text=fill(" ".join(item.token_data["t"] for item in cell) if cell else "-", 20), bgcolor="FF0000" if column.variant else "00FF00"))
+            cells.append(TableCell(text=fill("".join(item.token_data["t"] for item in cell) if cell else "-", 20), bgcolor="FF0000" if column.variant else "00FF00"))
         rows.append(TableRow(cells=cells))
     sigli = []
     for witness in collation.witnesses:
@@ -55,11 +55,9 @@ def display_variant_graph_as_SVG(graph,svg_output):
             mapping[n] = str(counter)
             # dot.node(str(n), nodedata["label"])
             readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'><B>Sigla</B></TD></TR>"]
-            # for key, value in nodedata["tokens"].items():
-            #     # reading = ": ".join([key ," ".join(item.token_data["t"] for item in value)])
             reverseDict = defaultdict(list)
             for key,value in n.tokens.items():
-                reverseDict[" ".join(item.token_data["t"] for item in value)].append(key)
+                reverseDict["".join(item.token_data["t"] for item in value)].append(key)
             for key,value in sorted(reverseDict.items()):
                 reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
                 readings.append(reading)

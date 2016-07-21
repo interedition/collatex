@@ -87,8 +87,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "This very quick very quick brown wombat")
         collation.add_plain_witness("B", "That very quick brown koala")
         collation.add_plain_witness("C", "That very quick brown kangaroo")
-        expected_output = {"table": [[[{"t": "This"}, {"t": "very"}, {"t": "quick"}], [{"t": "very"}, {"t": "quick"}, {"t": "brown"}], [{"t":"wombat"}]], [[{"t":"That"}], \
-[{"t": "very"}, {"t": "quick"}, {"t": "brown"}], [{"t":"koala"}]], [[{"t": "That"}], [{"t": "very"}, {"t": "quick"}, {"t": "brown"}], [{"t": "kangaroo"}]]], "witnesses": ["A", "B", "C"]}
+        expected_output = {"table": [[[{"n": "This", "t": "This "}, {"n": "very", "t": "very "}, {"n": "quick", "t": "quick "}], [{"n": "very", "t": "very "}, {"n": "quick", "t": "quick "}, {"n": "brown", "t": "brown "}], [{"n": "wombat", "t": "wombat"}]], [[{"n": "That", "t": "That "}], [{"n": "very", "t": "very "}, {"n": "quick", "t": "quick "}, {"n": "brown", "t": "brown "}], [{"n": "koala", "t": "koala"}]], [[{"n": "That", "t": "That "}], [{"n": "very", "t": "very "}, {"n": "quick", "t": "quick "}, {"n": "brown", "t": "brown "}], [{"n": "kangaroo", "t": "kangaroo"}]]], "witnesses": ["A", "B", "C"]}
         json_out = collate(collation, output="json")
         self.assertEquals(expected_output, json.loads(json_out))
 
@@ -97,9 +96,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "This very quick very quick brown wombat")
         collation.add_plain_witness("B", "That very quick brown koala")
         collation.add_plain_witness("C", "That very quick brown kangaroo")
-        expected_output = {"table": [[[{"t":"This"}], [{"t":"very"}], [{"t":"quick"}], [{"t":"very"}], [{"t":"quick"}], [{"t":"brown"}], [{"t":"wombat"}]], \
-[[{"t":"That"}], None, None, [{"t":"very"}], [{"t":"quick"}], [{"t":"brown"}], [{"t":"koala"}]], [[{"t":"That"}], None, None, [{"t":"very"}], [{"t":"quick"}],\
- [{"t":"brown"}], [{"t":"kangaroo"}]]], "witnesses": ["A", "B", "C"]}
+        expected_output = {"table": [[[{"n": "This", "t": "This "}], [{"n": "very", "t": "very "}], [{"n": "quick", "t": "quick "}], [{"n": "very", "t": "very "}], [{"n": "quick", "t": "quick "}], [{"n": "brown", "t": "brown "}], [{"n": "wombat", "t": "wombat"}]], [[{"n": "That", "t": "That "}], None, None, [{"n": "very", "t": "very "}], [{"n": "quick", "t": "quick "}], [{"n": "brown", "t": "brown "}], [{"n": "koala", "t": "koala"}]], [[{"n": "That", "t": "That "}], None, None, [{"n": "very", "t": "very "}], [{"n": "quick", "t": "quick "}], [{"n": "brown", "t": "brown "}], [{"n": "kangaroo", "t": "kangaroo"}]]], "witnesses": ["A", "B", "C"]}
         json_out = collate(collation, output="json", segmentation=False)
         self.assertEquals(expected_output, json.loads(json_out))
 

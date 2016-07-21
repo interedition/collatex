@@ -3,6 +3,7 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
+import re
 from xml.etree import ElementTree as etree
 from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
@@ -84,7 +85,7 @@ def export_alignment_table_as_xml(table):
         for key, value in sorted(column.tokens_per_witness.items()):
             child = etree.Element('rdg')
             child.attrib['wit'] = "#" + key
-            child.text = " ".join(str(item) for item in value)
+            child.text = "".join(str(item.token_data["t"]) for item in value)
             app.append(child)
         # Without the encoding specification, outputs bytes instead of a string
         result = etree.tostring(app, encoding="unicode")
@@ -99,18 +100,18 @@ def export_alignment_table_as_tei(table, indent=None):
     app = None
     for column in table.columns:
         if not column.variant:  # no variation
-            text_node = " ".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
+            text_node = "".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
             if not (len(p)):  # Result starts with non-varying reading
-                p.text = text_node + "\n" if indent else text_node
+                p.text = re.sub('\s+$','',text_node) + "\n" if indent else text_node
             else:  # Non-varying reading after some <app>
-                app.tail = "\n" + text_node + "\n" if indent else text_node
+                app.tail = "\n" + re.sub('\s+$','',text_node) + "\n" if indent else text_node
         else:
             app = etree.Element('app')
             preceding = None  # If preceding is None, we're processing the first <rdg> child
             app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
             value_dict = {}  # keys are readings, values are an unsorted lists of sigla
             for key, value in column.tokens_per_witness.items():
-                group = value_dict.setdefault(" ".join([item.token_data["t"] for item in value]), [])
+                group = value_dict.setdefault("".join([item.token_data["t"] for item in value]), [])
                 group.append(key)
             rdg_dict = {}  # keys are sorted lists of sigla, with "#" prepended; values are readings
             for key, value in value_dict.items():
