@@ -53,7 +53,7 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
                 # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
                 if prior_rank:
-                    need_to_move_node, witnesses_weve_seen = scheduler.create_and_execute_task("determine whether node should be moved", determine_whether_we_need_to_move_a_node, prior_node, prior_rank, rank, ranking, witnesses_weve_seen)
+                    need_to_move_node = scheduler.create_and_execute_task("determine whether node should be moved", determine_whether_we_need_to_move_a_node, prior_node, prior_rank, rank, ranking, witnesses_weve_seen)
                     if need_to_move_node:
                         scheduler.create_and_execute_task("move node from prior rank to rank", move_node_from_prior_rank_to_rank, prior_node, prior_rank, rank, ranking)
     return rank
@@ -67,7 +67,8 @@ def determine_whether_we_need_to_move_a_node(prior_node, prior_rank, rank, ranki
     # print('left near match table values = ' + str(left))
     # print('right near match table values = ' + str(right))
     need_to_move_node = right.return_values < left.return_values
-    return need_to_move_node, witnesses_weve_seen
+    # return need_to_move_node, witnesses_weve_seen
+    return need_to_move_node
 
 
 def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
