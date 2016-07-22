@@ -77,8 +77,10 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "The brown fox jumps over this dog.")
         collation.add_plain_witness("B", "The brown fox jumps over there that dog.")
         alignment_table = str(collate(collation, near_match=True, segmentation=False, tasks=tasks))
-        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], tasks[0])
-        self.assertEquals(1, len(tasks))
+        self.assertTask("determine whether node should be moved", ["this"], tasks[0])
+        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], tasks[1])
+        self.assertTask("determine whether node should be moved", ["over"], tasks[2])
+        self.assertEquals(3, len(tasks))
         expected = """\
 +---+-----+-------+-----+-------+------+-------+------+-----+---+
 | A | The | brown | fox | jumps | over | -     | this | dog | . |

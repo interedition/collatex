@@ -11,7 +11,7 @@ class Task(object):
         self.args = args
 
     def execute(self):
-        self.func(*self.args)
+        return self.func(*self.args)
 
     def __repr__(self):
         return "Task: "+self.name+", "+str(self.args)
@@ -37,19 +37,29 @@ def process_rank(tasks, rank, collation, ranking, witness_count):
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
                 # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
                 if prior_rank:
-                    prior_node_witnesses = prior_node.tokens.keys()
-                    witnesses_weve_seen = witnesses_weve_seen.union(prior_node_witnesses)
-                    left = NearMatchTable(ranking, prior_rank, prior_node)
-                    right = NearMatchTable(ranking, rank, prior_node)
-                    # print('left near match table values = ' + str(left))
-                    # print('right near match table values = ' + str(right))
-                    if right.return_values < left.return_values:
+                    func = determine_whether_we_need_to_move_a_node
+                    args = [prior_node, prior_rank, rank, ranking, witnesses_weve_seen]
+                    task = Task("determine whether node should be moved", func, args)
+                    tasks.append(task)
+                    need_to_move_node, witnesses_weve_seen = task.execute()
+                    if need_to_move_node:
                         func = move_node_from_prior_rank_to_rank
                         args = [prior_node, prior_rank, rank, ranking]
                         task = Task("move node from prior rank to rank", func, args)
                         tasks.append(task)
                         task.execute()
     return rank
+
+
+def determine_whether_we_need_to_move_a_node(prior_node, prior_rank, rank, ranking, witnesses_weve_seen):
+    prior_node_witnesses = prior_node.tokens.keys()
+    witnesses_weve_seen = witnesses_weve_seen.union(prior_node_witnesses)
+    left = NearMatchTable(ranking, prior_rank, prior_node)
+    right = NearMatchTable(ranking, rank, prior_node)
+    # print('left near match table values = ' + str(left))
+    # print('right near match table values = ' + str(right))
+    need_to_move_node = right.return_values < left.return_values
+    return need_to_move_node, witnesses_weve_seen
 
 
 def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
