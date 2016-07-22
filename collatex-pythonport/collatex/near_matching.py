@@ -22,9 +22,10 @@ def process_rank(rank, collation, ranking, witness_count):
                 if prior_rank:
                     prior_node_witnesses = prior_node.tokens.keys()
                     witnesses_weve_seen = witnesses_weve_seen.union(prior_node_witnesses)
-
                     left = NearMatchTable(ranking, prior_rank, prior_node)
                     right = NearMatchTable(ranking, rank, prior_node)
+                    # print('left near match table values = ' + str(left))
+                    # print('right near match table values = ' + str(right))
                     if right.return_values < left.return_values:
                         # if (right_min, -right_max_count) < (left_min, -left_max_count):
                         # move the entire node from prior_rank to (current) rank
@@ -40,6 +41,7 @@ def find_prior_node(witness, current_rank, ranking):
         for this_node in nodes_at_rank:
             for key in this_node.tokens:
                 if witness == key:  # Worst case: will be found at start if not on a real node
+                    # print('find_prior_node returns: ' + str(this_node))
                     return rank, this_node
     # The start node has no witnesses, so return a special value to indicate nothing found
     return None, None
@@ -56,8 +58,13 @@ class NearMatchTable(object):
                 self.table[current_node.label] = distance(current_node.label, prior_node.label), len(
                     current_node.tokens)
 
+    def __str__(self):
+        return str(self.table.items())
+
     @property
     def return_values(self):
-        min_distance = min((value[0] for value in self.table.values()))
-        max_witness_count = max((value[1] for value in self.table.values()))
+        min_distance = min((value[0] for value in self.table.values())) if self.table else 0
+        # TODO: Replace the arbitrarily high value with witness count + 1
+        max_witness_count = max((value[1] for value in self.table.values())) if self.table else 100
+        # If distances are the same, break the tie according to number of witnesses with that reading
         return min_distance, -max_witness_count
