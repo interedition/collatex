@@ -12,8 +12,10 @@ def process_rank(rank, collation, ranking, witness_count):
             witnesses_at_rank.append(str(key))
     witnesses_at_rank_count = sum([len(thisNode.tokens) for thisNode in nodes_at_rank])
     if witnesses_at_rank_count == witness_count:
+        # print('no variation in witnesses at rank ' + str(rank))
         pass
     else:
+        # print('variation found at rank ' + str(rank))
         missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
         witnesses_weve_seen = set()
         for missingWitness in missing_witnesses:

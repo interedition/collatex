@@ -60,7 +60,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         while condition:
             rank = process_rank(rank, collation, ranking, witnessCount)
             rank -= 1
-            condition = rank > 1
+            condition = rank > 0
 
         # # Verify that nodes have been moved
         # print("\nLabels at each rank at end of processing: ")
