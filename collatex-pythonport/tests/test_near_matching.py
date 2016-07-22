@@ -6,6 +6,7 @@ Created on Sep 12, 2014
 import unittest
 from collatex import Collation, collate
 from collatex.exceptions import SegmentationError
+from collatex.near_matching import Scheduler
 
 
 class Test(unittest.TestCase):
@@ -72,15 +73,15 @@ class Test(unittest.TestCase):
 
     def test_near_matching_accidentally_incorrect_long(self):
         self.maxDiff = None
-        tasks = []
+        scheduler = Scheduler()
         collation = Collation()
         collation.add_plain_witness("A", "The brown fox jumps over this dog.")
         collation.add_plain_witness("B", "The brown fox jumps over there that dog.")
-        alignment_table = str(collate(collation, near_match=True, segmentation=False, tasks=tasks))
-        self.assertTask("determine whether node should be moved", ["this"], tasks[0])
-        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], tasks[1])
-        self.assertTask("determine whether node should be moved", ["over"], tasks[2])
-        self.assertEquals(3, len(tasks))
+        alignment_table = str(collate(collation, near_match=True, segmentation=False, scheduler=scheduler))
+        self.assertTask("determine whether node should be moved", ["this"], scheduler[0])
+        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], scheduler[1])
+        self.assertTask("determine whether node should be moved", ["over"], scheduler[2])
+        self.assertEquals(3, len(scheduler))
         expected = """\
 +---+-----+-------+-----+-------+------+-------+------+-----+---+
 | A | The | brown | fox | jumps | over | -     | this | dog | . |

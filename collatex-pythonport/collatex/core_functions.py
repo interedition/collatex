@@ -12,7 +12,7 @@ import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
-from collatex.near_matching import process_rank
+from collatex.near_matching import process_rank, Scheduler
 
 
 # Valid options for output are:
@@ -28,7 +28,7 @@ from collatex.near_matching import process_rank
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
-            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False, tasks=[]):
+            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False, scheduler=Scheduler()):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -58,7 +58,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         rank = highestRank - 1
         condition = True
         while condition:
-            rank = process_rank(tasks, rank, collation, ranking, witnessCount)
+            rank = process_rank(scheduler, rank, collation, ranking, witnessCount)
             rank -= 1
             condition = rank > 0
 

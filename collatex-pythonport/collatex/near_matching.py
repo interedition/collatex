@@ -4,6 +4,22 @@
 from Levenshtein import distance
 
 
+class Scheduler(object):
+    def __init__(self):
+        self.tasks = []
+
+    def create_and_execute_task(self, description, funct, *args):
+        task = Task(description, funct, args)
+        self.tasks.append(task)
+        return task.execute()
+
+    def __getitem__(self, item):
+        return self.tasks[item]
+
+    def __len__(self):
+        return len(self.tasks)
+
+
 class Task(object):
     def __init__(self, name, func, args):
         self.name = name
@@ -17,7 +33,7 @@ class Task(object):
         return "Task: "+self.name+", "+str(self.args)
 
 
-def process_rank(tasks, rank, collation, ranking, witness_count):
+def process_rank(scheduler, rank, collation, ranking, witness_count):
     nodes_at_rank = ranking.byRank[rank]
     witnesses_at_rank = []
     for this_node in nodes_at_rank:
@@ -37,17 +53,9 @@ def process_rank(tasks, rank, collation, ranking, witness_count):
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
                 # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
                 if prior_rank:
-                    func = determine_whether_we_need_to_move_a_node
-                    args = [prior_node, prior_rank, rank, ranking, witnesses_weve_seen]
-                    task = Task("determine whether node should be moved", func, args)
-                    tasks.append(task)
-                    need_to_move_node, witnesses_weve_seen = task.execute()
+                    need_to_move_node, witnesses_weve_seen = scheduler.create_and_execute_task("determine whether node should be moved", determine_whether_we_need_to_move_a_node, prior_node, prior_rank, rank, ranking, witnesses_weve_seen)
                     if need_to_move_node:
-                        func = move_node_from_prior_rank_to_rank
-                        args = [prior_node, prior_rank, rank, ranking]
-                        task = Task("move node from prior rank to rank", func, args)
-                        tasks.append(task)
-                        task.execute()
+                        scheduler.create_and_execute_task("move node from prior rank to rank", move_node_from_prior_rank_to_rank, prior_node, prior_rank, rank, ranking)
     return rank
 
 
