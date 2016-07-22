@@ -221,6 +221,9 @@ class VariantGraphVertex(object):
     def __str__(self):
         return self.label if self.label else 'no label'
 
+    def __repr__(self):
+        return str(self)
+
 
 class VariantGraph(object):
     def __init__(self):

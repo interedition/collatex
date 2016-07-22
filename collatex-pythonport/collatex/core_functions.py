@@ -28,7 +28,7 @@ from collatex.near_matching import process_rank
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
-            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
+            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False, tasks=[]):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -58,7 +58,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         rank = highestRank - 1
         condition = True
         while condition:
-            rank = process_rank(rank, collation, ranking, witnessCount)
+            rank = process_rank(tasks, rank, collation, ranking, witnessCount)
             rank -= 1
             condition = rank > 0
 

@@ -10,6 +10,14 @@ from collatex.exceptions import SegmentationError
 
 class Test(unittest.TestCase):
 
+    def assertTask(self, expected_description, expected_args, actual):
+        # compare description (as string)
+        self.assertEqual(expected_description, actual.name)
+        # compare arguments (as strings; does not test same number of args!)
+        for counter, expected_arg in enumerate(expected_args):
+            actual_arg = str(actual.args[counter])
+            self.assertEqual(expected_arg, actual_arg)
+
     def test_exact_matching(self):
         collation = Collation()
         collation.add_plain_witness("A", "I bought this glass , because it matches those dinner plates")
@@ -64,10 +72,13 @@ class Test(unittest.TestCase):
 
     def test_near_matching_accidentally_incorrect_long(self):
         self.maxDiff = None
+        tasks = []
         collation = Collation()
         collation.add_plain_witness("A", "The brown fox jumps over this dog.")
         collation.add_plain_witness("B", "The brown fox jumps over there that dog.")
-        alignment_table = str(collate(collation, near_match=True, segmentation=False))
+        alignment_table = str(collate(collation, near_match=True, segmentation=False, tasks=tasks))
+        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], tasks[0])
+        self.assertEquals(1, len(tasks))
         expected = """\
 +---+-----+-------+-----+-------+------+-------+------+-----+---+
 | A | The | brown | fox | jumps | over | -     | this | dog | . |

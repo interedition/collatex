@@ -4,7 +4,16 @@
 from Levenshtein import distance
 
 
-def process_rank(rank, collation, ranking, witness_count):
+class Task(object):
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
+
+    def __repr__(self):
+        return "Task: "+self.name+", "+str(self.args)
+
+
+def process_rank(tasks, rank, collation, ranking, witness_count):
     nodes_at_rank = ranking.byRank[rank]
     witnesses_at_rank = []
     for this_node in nodes_at_rank:
@@ -31,12 +40,19 @@ def process_rank(rank, collation, ranking, witness_count):
                     # print('left near match table values = ' + str(left))
                     # print('right near match table values = ' + str(right))
                     if right.return_values < left.return_values:
-                        # if (right_min, -right_max_count) < (left_min, -left_max_count):
-                        # move the entire node from prior_rank to (current) rank
-                        ranking.byRank[prior_rank].remove(prior_node)
-                        ranking.byRank[rank].append(prior_node)
-                        ranking.byVertex[prior_node] = rank
+                        args = [prior_node, prior_rank, rank, ranking]
+                        task = Task("move node from prior rank to rank", args)
+                        tasks.append(task)
+                        move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking)
     return rank
+
+
+def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
+    # if (right_min, -right_max_count) < (left_min, -left_max_count):
+    # move the entire node from prior_rank to (current) rank
+    ranking.byRank[prior_rank].remove(prior_node)
+    ranking.byRank[rank].append(prior_node)
+    ranking.byVertex[prior_node] = rank
 
 
 def find_prior_node(witness, current_rank, ranking):
