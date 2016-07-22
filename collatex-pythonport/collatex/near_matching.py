@@ -5,9 +5,13 @@ from Levenshtein import distance
 
 
 class Task(object):
-    def __init__(self, name, args):
+    def __init__(self, name, func, args):
         self.name = name
+        self.func = func
         self.args = args
+
+    def execute(self):
+        self.func(*self.args)
 
     def __repr__(self):
         return "Task: "+self.name+", "+str(self.args)
@@ -40,10 +44,11 @@ def process_rank(tasks, rank, collation, ranking, witness_count):
                     # print('left near match table values = ' + str(left))
                     # print('right near match table values = ' + str(right))
                     if right.return_values < left.return_values:
+                        func = move_node_from_prior_rank_to_rank
                         args = [prior_node, prior_rank, rank, ranking]
-                        task = Task("move node from prior rank to rank", args)
+                        task = Task("move node from prior rank to rank", func, args)
                         tasks.append(task)
-                        move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking)
+                        task.execute()
     return rank
 
 
