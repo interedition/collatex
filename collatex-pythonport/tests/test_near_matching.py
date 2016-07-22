@@ -75,6 +75,18 @@ class Test(unittest.TestCase):
 +---+-----+-------+-----+-------+------+-------+------+-----+---+"""
         self.assertEquals(expected, alignment_table)
 
+    def test_near_matching_rank_0(self):
+        # find_prior_node() should check ranks back through 0, not 1
+        collation = Collation()
+        collation.add_plain_witness("A", "this")
+        collation.add_plain_witness("B", "there thin")
+        output = str(collate(collation, near_match=True, segmentation=False))
+        expected = """\
++---+-------+------+
+| A | -     | this |
+| B | there | thin |
++---+-------+------+"""
+        self.assertEqual(expected, output)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']

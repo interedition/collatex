@@ -17,10 +17,12 @@ def process_rank(rank, collation, ranking, witness_count):
     else:
         # print('variation found at rank ' + str(rank))
         missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
+        # print('missing witnesses: ' + str(missing_witnesses))
         witnesses_weve_seen = set()
         for missingWitness in missing_witnesses:
             if missingWitness not in witnesses_weve_seen:
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
+                # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
                 if prior_rank:
                     prior_node_witnesses = prior_node.tokens.keys()
                     witnesses_weve_seen = witnesses_weve_seen.union(prior_node_witnesses)
@@ -38,10 +40,11 @@ def process_rank(rank, collation, ranking, witness_count):
 
 
 def find_prior_node(witness, current_rank, ranking):
-    for rank in range(current_rank - 1, 1, -1):
+    for rank in range(current_rank - 1, 0, -1):
         nodes_at_rank = ranking.byRank[rank]
         for this_node in nodes_at_rank:
             for key in this_node.tokens:
+                # print('looking for key ' + key + ' in prior node')
                 if witness == key:  # Worst case: will be found at start if not on a real node
                     # print('find_prior_node returns: ' + str(this_node))
                     return rank, this_node
