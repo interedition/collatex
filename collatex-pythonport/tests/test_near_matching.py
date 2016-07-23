@@ -104,6 +104,112 @@ class Test(unittest.TestCase):
 +---+-------+------+"""
         self.assertEqual(expected, output)
 
+    def test_near_matching_middle(self):
+        # Three candidates, closest is middle, match rank 2 0 1 (0 is closest)
+        # Should go to the middle; incorrectly goes right
+        self.maxDiff = None
+        scheduler = Scheduler()
+        collation = Collation()
+        collation.add_plain_witness("A", "abcd 0123 efgh")
+        collation.add_plain_witness("B", "abcd 0xxx 012x 01xx efgh")
+        alignment_table = str(collate(collation, near_match=True, segmentation=False, scheduler=scheduler))
+        # Find the rightmost rank with a gap (rank 4); this is activeRank
+        # Find the first witness with a gap at that rank (A)
+        # Find first token to the left of the gap for the first gappy witness ("0123" in A at rank 2)
+        #   and check whether to move it
+        # Calculate strength of match for all columns from the token's current rank (2) through activeRank (4)
+        #   parameters are token string and rank to check
+        self.assertTask("build column for rank", ["0123", "2"], scheduler[0])
+        self.assertTask("build column for rank", ["0123", "3"], scheduler[1])
+        self.assertTask("build column for rank", ["0123", "4"], scheduler[2])
+        # The best (max()) fit of "0123" among all ranks between current rank 2 and activeRank 4
+        #   is at rank 3, so move "0123" from current rank 2 to rank 3
+        self.assertTask("move node from current rank to rank with best match", ["0123", "2", "3"], scheduler[3])
+        # No more gaps at activeRank 4, no gaps at rank 3, so move to next rank with a gap
+        #   (rank 2, gap in A), with "abcd" at rank 1
+        self.assertTask("build column for rank", ["abcd", "1"], scheduler[4])
+        self.assertTask("build column for rank", ["abcd", "2"], scheduler[5])
+        # Don't move it because it's closer to current location
+        # No more gaps at rank 2, non gaps at rank 1, no more ranks
+        self.assertEquals(6, len(scheduler))
+        expected = """\
++---+------+------+------+------+------+
+| A | abcd | -    | 0123 | -    | efgh |
+| B | abcd | 0xxx | 012x | 01xx | efgh |
++---+------+------+------+------+------+"""
+        self.assertEqual(expected, alignment_table)
+
+    def test_near_matching_three_witnesses(self):
+        self.maxDiff = None
+        scheduler = Scheduler()
+        collation = Collation()
+        collation.add_plain_witness("A", "abcd 012345 efgh")
+        collation.add_plain_witness("B", "abcd 0xxxxx 01xxxx 01234x 012xxx 0123xx efgh")
+        collation.add_plain_witness("C", "abcd 01xxxx zz23xx efgh")
+        alignment_table = str(collate(collation, near_match=True, segmentation=False, scheduler=scheduler))
+        # Find the rightmost rank with a gap (rank 6); this is activeRank
+        # Find the first witness (alphabetically by siglum) with a gap at that rank (A)
+        # Get the first token to the left of the gap for the first gappy witness ("012345" in A at rank 2)
+        #   and check whether to move it
+        # Calculate strength of match for all columns from current rank (2) through activeRank (6), inclusive
+        self.assertTask("build column for rank", ["012345", "2"], scheduler[0])
+        self.assertTask("build column for rank", ["012345", "3"], scheduler[1])
+        self.assertTask("build column for rank", ["012345", "4"], scheduler[2])
+        self.assertTask("build column for rank", ["012345", "5"], scheduler[3])
+        self.assertTask("build column for rank", ["012345", "6"], scheduler[4])
+        # The best (max()) fit of "012345" among all ranks between current rank 2 and activeRank 6
+        #   is at rank 4, so move "012345" from current rank 2 to rank 4
+        self.assertTask("move node from current rank to rank with best match", ["012345", "2", "4"], scheduler[5])
+        # Find next (alphabetically) witness with a gap at activeRank (still 6), which is witness C
+        # Get the first token to the left of the gap ("zz23xx" in C at rank 4)
+        #   and check whether to move it
+        # Calculate strength of match for all columns from current rank (4) through activeRank (6), inclusive
+        self.assertTask("build column for rank", ["zz23xx", "4"], scheduler[6])
+        self.assertTask("build column for rank", ["zz23xx", "5"], scheduler[7])
+        self.assertTask("build column for rank", ["zz23xx", "6"], scheduler[8])
+        # The best (max()) fit of "zz23xx" among all ranks between current rank 4 and activeRank 6
+        #   is at rank 6, so move "zz23xx" from current rank 4 to rank 6
+        self.assertTask("move node from current rank to rank with best match", ["zz23xx", "4", "6"], scheduler[9])
+        # No more gaps at rank 6, so advance to rank 5, which has gaps in witnesses A and C
+        # First gap (alphabetically by siglum) at rank 5 is in witness A, where left node is "012345" at rank 4
+        self.assertTask("build column for rank", ["012345", "4"], scheduler[10])
+        self.assertTask("build column for rank", ["012345", "5"], scheduler[11])
+        # Match is closest at current rank 4, so don't move the node
+        # Next gap at rank 5 is in witness C, where left node is "01xxxx" at rank 3
+        self.assertTask("build column for rank", ["01xxxx", "3"], scheduler[12])
+        self.assertTask("build column for rank", ["01xxxx", "4"], scheduler[13])
+        self.assertTask("build column for rank", ["01xxxx", "5"], scheduler[14])
+        # Exact match at current rank 3, so don't move it
+        # No more gaps at rank 5, so advance to rank 4, which has a gap in witness C,
+        #   where left node is "01xxxx" at rank 3
+        self.assertTask("build column for rank", ["01xxxx", "3"], scheduler[15])
+        self.assertTask("build column for rank", ["01xxxx", "4"], scheduler[16])
+        # Exact match at rank 3, so don't move it
+        # No more gaps at rank 4, so advance to rank 3, where only gap is in witness A, with "abcd" at rank 1
+        self.assertTask("build column for rank", ["abcd", "1"], scheduler[17])
+        self.assertTask("build column for rank", ["abcd", "2"], scheduler[18])
+        self.assertTask("build column for rank", ["abcd", "3"], scheduler[19])
+        # Exact match at rank 1, so don't move it
+        # No more gaps at rank 3, so advance to rank 2, with gaps in witnesses A and C and "abcd" at rank 1
+        # Check witness A first
+        self.assertTask("build column for rank", ["abcd", "1"], scheduler[20])
+        self.assertTask("build column for rank", ["abcd", "2"], scheduler[21])
+        # Exact match at rank 1, so don't move it
+        # Check witness C
+        self.assertTask("build column for rank", ["abcd", "1"], scheduler[22])
+        self.assertTask("build column for rank", ["abcd", "2"], scheduler[23])
+        # Exact match at rank 1, so don't move it
+        # No more gaps at rank 2, no gaps at rank 1
+        self.assertEquals(24, len(scheduler))
+        expected = """\
++---+------+--------+--------+--------+--------+--------+------+
+| A | abcd | -      | -      | 012345 | -      | -      | efgh |
+| B | abcd | 0xxxxx | 01xxxx | 01234x | 012xxx | 0123xx | efgh |
+| C | abcd | -      | 01xxxx | -      | -      | zz23xx | efgh |
++---+------+--------+--------+--------+--------+--------+------+"""
+        self.assertEqual(expected, alignment_table)
+
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']
     unittest.main()
