@@ -19,6 +19,10 @@ class Scheduler(object):
     def __len__(self):
         return len(self.tasks)
 
+    def debug_tasks(self):
+        for task in self.tasks:
+            print(task)
+
 
 class Task(object):
     def __init__(self, name, func, args):
