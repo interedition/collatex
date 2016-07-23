@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
         alignment_table = str(collate(collation, near_match=True, segmentation=False, scheduler=scheduler))
         self.assertTask("build column for rank", ["this", "6"], scheduler[0])
         self.assertTask("build column for rank", ["this", "7"], scheduler[1])
-        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], scheduler[2])
+        self.assertTask("move node from prior rank to rank with best match", ["this", "6", "7"], scheduler[2])
         self.assertTask("build column for rank", ["over", "5"], scheduler[3])
         self.assertTask("build column for rank", ["over", "6"], scheduler[4])
         self.assertEquals(5, len(scheduler))
@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
         self.assertTask("build column for rank", ["0123", "4"], scheduler[2])
         # The best (max()) fit of "0123" among all ranks between current rank 2 and activeRank 4
         #   is at rank 3, so move "0123" from current rank 2 to rank 3
-        self.assertTask("move node from current rank to rank with best match", ["0123", "2", "3"], scheduler[3])
+        self.assertTask("move node from prior rank to rank with best match", ["0123", "2", "3"], scheduler[3])
         # No more gaps at activeRank 4, no gaps at rank 3, so move to next rank with a gap
         #   (rank 2, gap in A), with "abcd" at rank 1
         self.assertTask("build column for rank", ["abcd", "1"], scheduler[4])
@@ -159,7 +159,7 @@ class Test(unittest.TestCase):
         self.assertTask("build column for rank", ["012345", "6"], scheduler[4])
         # The best (max()) fit of "012345" among all ranks between current rank 2 and activeRank 6
         #   is at rank 4, so move "012345" from current rank 2 to rank 4
-        self.assertTask("move node from current rank to rank with best match", ["012345", "2", "4"], scheduler[5])
+        self.assertTask("move node from prior rank to rank with best match", ["012345", "2", "4"], scheduler[5])
         # Find next (alphabetically) witness with a gap at activeRank (still 6), which is witness C
         # Get the first token to the left of the gap ("zz23xx" in C at rank 4)
         #   and check whether to move it
@@ -169,7 +169,7 @@ class Test(unittest.TestCase):
         self.assertTask("build column for rank", ["zz23xx", "6"], scheduler[8])
         # The best (max()) fit of "zz23xx" among all ranks between current rank 4 and activeRank 6
         #   is at rank 6, so move "zz23xx" from current rank 4 to rank 6
-        self.assertTask("move node from current rank to rank with best match", ["zz23xx", "4", "6"], scheduler[9])
+        self.assertTask("move node from prior rank to rank with best match", ["zz23xx", "4", "6"], scheduler[9])
         # No more gaps at rank 6, so advance to rank 5, which has gaps in witnesses A and C
         # First gap (alphabetically by siglum) at rank 5 is in witness A, where left node is "012345" at rank 4
         self.assertTask("build column for rank", ["012345", "4"], scheduler[10])

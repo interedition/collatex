@@ -48,25 +48,23 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
         missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
         # print('missing witnesses: ' + str(missing_witnesses))
         witnesses_weve_seen = set()
-        for missingWitness in missing_witnesses:
+        for missingWitness in sorted(missing_witnesses): # alphabetize witnesses for testing consistency
             if missingWitness not in witnesses_weve_seen:
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
                 # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
                 if prior_rank:
-                    prior_node_witnesses = prior_node.tokens.keys()
-                    witnesses_weve_seen.update(prior_node_witnesses)
-                    # TODO this needs to be extended to consider more alternatives!
-                    left = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, prior_rank, ranking)
-                    right = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, rank, ranking)
-                    need_to_move_node = right.return_values < left.return_values
-
-                    if need_to_move_node:
-                        scheduler.create_and_execute_task("move node from prior rank to rank", move_node_from_prior_rank_to_rank, prior_node, prior_rank, rank, ranking)
+                    candidate_ranks = {} # keys are ranks, values are distances
+                    for candidate_rank in range(prior_rank, rank + 1):
+                        candidate_ranks[candidate_rank] = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, candidate_rank, ranking)
+                    new_rank = min(candidate_ranks, key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
+                    need_to_move = prior_rank != new_rank
+                    if need_to_move:
+                        scheduler.create_and_execute_task("move node from prior rank to rank with best match", move_node_from_prior_rank_to_rank, prior_node, prior_rank, new_rank, ranking)
     return rank
 
 
 def create_near_match_table(prior_node, prior_rank, ranking):
-    return NearMatchTable(ranking, prior_rank, prior_node)
+    return NearMatchTable(ranking, prior_rank, prior_node).return_values
 
 
 def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
