@@ -53,22 +53,20 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
                 (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
                 # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
                 if prior_rank:
-                    need_to_move_node = scheduler.create_and_execute_task("determine whether node should be moved", determine_whether_we_need_to_move_a_node, prior_node, prior_rank, rank, ranking, witnesses_weve_seen)
+                    prior_node_witnesses = prior_node.tokens.keys()
+                    witnesses_weve_seen.update(prior_node_witnesses)
+                    # TODO this needs to be extended to consider more alternatives!
+                    left = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, prior_rank, ranking)
+                    right = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, rank, ranking)
+                    need_to_move_node = right.return_values < left.return_values
+
                     if need_to_move_node:
                         scheduler.create_and_execute_task("move node from prior rank to rank", move_node_from_prior_rank_to_rank, prior_node, prior_rank, rank, ranking)
     return rank
 
 
-def determine_whether_we_need_to_move_a_node(prior_node, prior_rank, rank, ranking, witnesses_weve_seen):
-    prior_node_witnesses = prior_node.tokens.keys()
-    witnesses_weve_seen = witnesses_weve_seen.union(prior_node_witnesses)
-    left = NearMatchTable(ranking, prior_rank, prior_node)
-    right = NearMatchTable(ranking, rank, prior_node)
-    # print('left near match table values = ' + str(left))
-    # print('right near match table values = ' + str(right))
-    need_to_move_node = right.return_values < left.return_values
-    # return need_to_move_node, witnesses_weve_seen
-    return need_to_move_node
+def create_near_match_table(prior_node, prior_rank, ranking):
+    return NearMatchTable(ranking, prior_rank, prior_node)
 
 
 def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):

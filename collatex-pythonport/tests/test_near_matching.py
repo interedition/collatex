@@ -78,10 +78,12 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "The brown fox jumps over this dog.")
         collation.add_plain_witness("B", "The brown fox jumps over there that dog.")
         alignment_table = str(collate(collation, near_match=True, segmentation=False, scheduler=scheduler))
-        self.assertTask("determine whether node should be moved", ["this"], scheduler[0])
-        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], scheduler[1])
-        self.assertTask("determine whether node should be moved", ["over"], scheduler[2])
-        self.assertEquals(3, len(scheduler))
+        self.assertTask("build column for rank", ["this", "6"], scheduler[0])
+        self.assertTask("build column for rank", ["this", "7"], scheduler[1])
+        self.assertTask("move node from prior rank to rank", ["this", "6", "7"], scheduler[2])
+        self.assertTask("build column for rank", ["over", "5"], scheduler[3])
+        self.assertTask("build column for rank", ["over", "6"], scheduler[4])
+        self.assertEquals(5, len(scheduler))
         expected = """\
 +---+-----+-------+-----+-------+------+-------+------+-----+---+
 | A | The | brown | fox | jumps | over | -     | this | dog | . |
