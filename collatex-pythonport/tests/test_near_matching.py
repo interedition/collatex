@@ -210,6 +210,78 @@ class Test(unittest.TestCase):
         self.assertEqual(expected, alignment_table)
 
 
+    def test_near_matching_repetition(self):
+        self.maxDiff = None
+        scheduler = Scheduler()
+        collation = Collation()
+        collation.add_plain_witness("A", "abcd 01234x 0123xx efgh")
+        collation.add_plain_witness("B", "abcd 01xxxx 01234x 01234x 012xxx 0123xx efgh")
+        collation.add_plain_witness("C", "abcd 012345 efgh")
+        alignment_table = str(collate(collation, near_match=True, segmentation=False, scheduler=scheduler))
+        scheduler.debug_tasks()
+        # Without near matching, output is:
+        # +---+------+--------+--------+--------+--------+--------+------+
+        # | A | abcd | -      | 01234x | -      | -      | 0123xx | efgh |
+        # | B | abcd | 01xxxx | 01234x | 01234x | 012xxx | 0123xx | efgh |
+        # | C | abcd | 012345 | -      | -      | -      | -      | efgh |
+        # +---+------+--------+--------+--------+--------+--------+------+
+        # Gap at rank 6 for witness C; try to move "012345" from rank 2 for witness C
+        self.assertTask("build column for rank", ["012345", "2"], scheduler[0])
+        self.assertTask("build column for rank", ["012345", "3"], scheduler[1])
+        self.assertTask("build column for rank", ["012345", "4"], scheduler[2])
+        self.assertTask("build column for rank", ["012345", "5"], scheduler[3])
+        self.assertTask("build column for rank", ["012345", "6"], scheduler[4])
+        # Closest match is rank 3, so move "012345" from rank 2 to rank 3
+        self.assertTask("move node from prior rank to rank with best match", ["012345", "2", "3"], scheduler[5])
+        # Structure is now
+        # +---+------+--------+--------+--------+--------+--------+------+
+        # | A | abcd | -      | 01234x | -      | -      | 0123xx | efgh |
+        # | B | abcd | 01xxxx | 01234x | 01234x | 012xxx | 0123xx | efgh |
+        # | C | abcd | -      | 012345 | -      | -      | -      | efgh |
+        # +---+------+--------+--------+--------+--------+--------+------+
+        # No more gaps in rank 6; advance to rank 5
+        # Try to move "01234x" from rank 3 for witness A
+        self.assertTask("build column for rank", ["01234x", "3"], scheduler[6])
+        self.assertTask("build column for rank", ["01234x", "4"], scheduler[7])
+        self.assertTask("build column for rank", ["01234x", "5"], scheduler[8])
+        # Can't move node with "01234x" from rank 3 to rank 5 because the rank 3 reading is shared
+        #   with witness B, which is already present at rank 5
+        # Try to move "012345" from rank 3 for witness C
+        self.assertTask("build column for rank", ["012345", "3"], scheduler[9])
+        self.assertTask("build column for rank", ["012345", "4"], scheduler[10])
+        self.assertTask("build column for rank", ["012345", "5"], scheduler[11])
+        # Strongest match for "012345" in witness C is current location (rank 3), so don't move
+        # No more gaps at rank 5, advance to rank 4
+        # Try to move "01234x" from rank 3 for witness A
+        self.assertTask("build column for rank", ["01234x", "3"], scheduler[12])
+        self.assertTask("build column for rank", ["01234x", "4"], scheduler[13])
+        # Can't move node with "01234x" from rank 3 to rank 4 because the rank 3 reading is shared
+        #   with witness B, which is already present at rank 4
+        # Try to move "012345" from rank 3 for witness C
+        self.assertTask("build column for rank", ["012345", "3"], scheduler[14])
+        self.assertTask("build column for rank", ["012345", "4"], scheduler[15])
+        # Tie for current rank 3 and rank 4; don't move
+        # TODO: verify behavior in case of ties
+        # No more gaps at rank 4, advance to rank 3
+        # No gaps at rank 3, advance to rank 2
+        # Try to move "abcd" from rank 1 for witness A
+        self.assertTask("build column for rank", ["abcd", "1"], scheduler[16])
+        self.assertTask("build column for rank", ["abcd", "2"], scheduler[17])
+        # Closer match at current location; don't move
+        # Try to move "abcd" from rank 1 for witness C
+        self.assertTask("build column for rank", ["abcd", "1"], scheduler[18])
+        self.assertTask("build column for rank", ["abcd", "2"], scheduler[19])
+        # Closer match at current location; don't move
+        # No more gaps at rank 2, advance to rank 1; no gaps at rank 1
+        self.assertEquals(20, len(scheduler))
+        expected = """\
++---+------+--------+--------+--------+--------+--------+------+
+| A | abcd | -      | 01234x | -      | -      | 0123xx | efgh |
+| B | abcd | 01xxxx | 01234x | 01234x | 012xxx | 0123xx | efgh |
+| C | abcd | -      | 012345 | -      | -      | -      | efgh |
++---+------+--------+--------+--------+--------+--------+------+"""
+        self.assertEqual(expected, alignment_table)
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']
     unittest.main()
