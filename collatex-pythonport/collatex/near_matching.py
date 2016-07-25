@@ -61,13 +61,6 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
                 print('prior node is ' + str(prior_node) + ' at rank ' + str(prior_rank)) if debug else None
                 print('current node has witnesses: ' + str(witnesses_at_rank)) if debug else None
                 print('prior_node has witnesses: ' + str([key for key in prior_node.tokens.keys()])) if debug else None
-                # If prior_node and witnesses_at_rank share a witness, don't move
-                # If prior_node is start, it will have no tokens, so trap that
-                try:
-                    can_move = len(set(witnesses_at_rank) & set(prior_node.tokens.keys())) == 0
-                except:
-                    can_move = False
-                print('node can be moved? ' + str(can_move)) if debug else None
                 if prior_rank:
                     candidate_ranks = {} # keys are ranks, values are distances
                     for candidate_rank in range(prior_rank, rank + 1):
@@ -75,9 +68,13 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
                     new_rank = min(candidate_ranks, key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
                     need_to_move = prior_rank != new_rank
                     print('need to move? ' + str(need_to_move)) if debug else None
-                    if need_to_move and can_move:
-                        print('moving node ' + str(prior_node) + ' from rank ' + str(prior_rank) + ' to rank ' + str(new_rank)) if debug else None
-                        scheduler.create_and_execute_task("move node from prior rank to rank with best match", move_node_from_prior_rank_to_rank, prior_node, prior_rank, new_rank, ranking)
+                    if need_to_move:
+                        # If prior_node and witnesses_at_rank share a witness, don't move
+                        can_move = not (set(witnesses_at_rank) & set(prior_node.tokens.keys()))
+                        print('node can be moved? ' + str(can_move)) if debug else None
+                        if can_move:
+                            print('moving node ' + str(prior_node) + ' from rank ' + str(prior_rank) + ' to rank ' + str(new_rank)) if debug else None
+                            scheduler.create_and_execute_task("move node from prior rank to rank with best match", move_node_from_prior_rank_to_rank, prior_node, prior_rank, new_rank, ranking)
     return rank
 
 
