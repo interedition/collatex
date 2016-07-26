@@ -101,6 +101,10 @@ def find_prior_node(witness, current_rank, ranking):
     # The start node has no witnesses, so return a special value to indicate nothing found
     return None, None
 
+def get_nodes_in_reverse_rank_order(current_rank, ranking):
+    for rank in range(current_rank - 1, 0, -1):
+        for this_node in ranking.byRank[rank]: # variant graph vertex
+            yield this_node
 
 class NearMatchTable(object):
     def __init__(self, ranking, rank, prior_node):

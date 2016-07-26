@@ -5,8 +5,9 @@ Created on Sep 12, 2014
 '''
 import unittest
 from collatex import Collation, collate
+from collatex.core_classes import VariantGraphRanking
 from collatex.exceptions import SegmentationError
-from collatex.near_matching import Scheduler
+from collatex.near_matching import Scheduler, get_nodes_in_reverse_rank_order
 
 
 class Test(unittest.TestCase):
@@ -281,6 +282,31 @@ class Test(unittest.TestCase):
 | C | abcd | -      | 012345 | -      | -      | -      | efgh |
 +---+------+--------+--------+--------+--------+--------+------+"""
         self.assertEqual(expected, alignment_table)
+
+    def test_get_nodes_in_reverse_rank_order(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "The koala jumped over the lazy wombat")
+        collation.add_plain_witness("B", "The koala jumped over the industrious wombat")
+        graph = collate(collation, output="graph", segmentation=False)
+        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8), 10 verticies
+        generator = get_nodes_in_reverse_rank_order(9, ranking) # starts on rank  9 - 1 = 8 = end node
+        self.assertRaises(Exception, next(generator).label) # no label on end vertex
+        expected7 = 'wombat'
+        self.assertEqual(expected7, next(generator).label)
+        expected6 = {'industrious', 'lazy'}
+        self.assertIn(next(generator).label, expected6)
+        self.assertIn(next(generator).label, expected6)
+        expected5 = 'the'
+        self.assertEqual(expected5, next(generator).label)
+        expected4 = 'over'
+        self.assertEqual(expected4, next(generator).label)
+        expected3 = 'jumped'
+        self.assertEqual(expected3, next(generator).label)
+        expected2 = 'koala'
+        self.assertEqual(expected2, next(generator).label)
+        expected1 = 'The'
+        self.assertEqual(expected1, next(generator).label)
+        self.assertRaises(StopIteration, lambda: next(generator))  # no label on start vertex
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']
