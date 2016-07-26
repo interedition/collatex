@@ -91,13 +91,12 @@ def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
 
 
 def find_prior_node(witness, current_rank, ranking):
-    for rank in range(current_rank - 1, 0, -1):
-        nodes_at_rank = ranking.byRank[rank]
-        for this_node in nodes_at_rank:
-            for key in this_node.tokens:
-                print('looking for witness ' + witness + ' at witness ' + key + ' at rank ' + str(rank)) if debug else None
-                if witness == key:  # Worst case: will be found at start if not on a real node
-                    return rank, this_node
+    for this_node in get_nodes_in_reverse_rank_order(current_rank, ranking):
+        for key in this_node.tokens:
+            rank = ranking.byVertex[this_node]
+            print('looking for witness ' + witness + ' at witness ' + key + ' at rank ' + str(rank)) if debug else None
+            if witness == key:  # Worst case: will be found at start if not on a real node
+                return rank, this_node
     # The start node has no witnesses, so return a special value to indicate nothing found
     return None, None
 
