@@ -54,9 +54,8 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
         missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
         # print('missing witnesses: ' + str(missing_witnesses))
         witnesses_weve_seen = set()
-        for missingWitness in filter(lambda x: not(x in witnesses_weve_seen), sorted(missing_witnesses)): # alphabetize witnesses for testing consistency
-            print('\nlooking at gap in witness ' + missingWitness + ' at rank ' + str(rank)) if debug else None
-            (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
+        filtered_missing_witnesses = filter(lambda x: not(x in witnesses_weve_seen), sorted(missing_witnesses))
+        for (prior_rank, prior_node) in map(lambda x: find_prior_node(x, rank, ranking), filtered_missing_witnesses): # alphabetize witnesses for testing consistency
             print('prior node is ' + str(prior_node) + ' at rank ' + str(prior_rank)) if debug else None
             print('current node has witnesses: ' + str(witnesses_at_rank)) if debug else None
             print('prior_node has witnesses: ' + str([key for key in prior_node.tokens.keys()])) if debug else None
