@@ -7,7 +7,7 @@ import unittest
 from collatex import Collation, collate
 from collatex.core_classes import VariantGraphRanking
 from collatex.exceptions import SegmentationError
-from collatex.near_matching import Scheduler, get_nodes_in_reverse_rank_order
+from collatex.near_matching import Scheduler, get_nodes_in_reverse_rank_order, find_prior_node
 
 
 class Test(unittest.TestCase):
@@ -307,6 +307,20 @@ class Test(unittest.TestCase):
         expected1 = 'The'
         self.assertEqual(expected1, next(generator).label)
         self.assertRaises(StopIteration, lambda: next(generator))  # no label on start vertex
+
+    def test_next_matching_node_filter(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "The koala jumped over the red pink grey blue wombat")
+        collation.add_plain_witness("B", "The koala jumped over the gray wombat")
+        graph = collate(collation, output="graph", segmentation=False)
+        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8), 10 verticies
+        test_rank = 9
+        expected_rank = 6
+        expected_label = "gray"
+        (returned_rank, returned_node) = find_prior_node('B', test_rank, ranking)
+        self.assertEqual(expected_rank, returned_rank)
+        self.assertEqual(expected_label, returned_node.label)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']
