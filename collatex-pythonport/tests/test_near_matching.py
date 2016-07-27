@@ -321,6 +321,17 @@ class Test(unittest.TestCase):
         self.assertEqual(expected_rank, returned_rank)
         self.assertEqual(expected_label, returned_node.label)
 
+    def test_near_matching_node_filter_start_node(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "koala and the bettong jumped over wombat")
+        collation.add_plain_witness("B", "bettong jumped over wombat")
+        graph = collate(collation, output="graph", segmentation=False)
+        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8), 10 verticies
+        test_rank = 3
+        (returned_rank, returned_node) = find_prior_node('B', test_rank, ranking)
+        self.assertIsNone(returned_rank)
+        self.assertIsNone(returned_node)
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']
