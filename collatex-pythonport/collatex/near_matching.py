@@ -104,14 +104,12 @@ def get_nodes_in_reverse_rank_order(current_rank, ranking):
 
 class NearMatchTable(object):
     def __init__(self, ranking, rank, prior_node):
-        self.table = {}
-        self._construct_table(ranking, rank, prior_node)
+        self.table = self._construct_table(ranking, rank, prior_node)
 
     def _construct_table(self, ranking, rank, prior_node):
-        for current_node in ranking.byRank[rank]:
-            if current_node != prior_node:
-                self.table[current_node.label] = distance(current_node.label, prior_node.label), len(
-                    current_node.tokens)
+        table = {current_node.label: (distance(current_node.label, prior_node.label), len(current_node.tokens))\
+            for current_node in ranking.byRank[rank] if current_node != prior_node}
+        return table
 
     def __str__(self):
         return str(self.table.items())
