@@ -7,7 +7,7 @@ import unittest
 from collatex import Collation, collate
 from collatex.core_classes import VariantGraphRanking
 from collatex.exceptions import SegmentationError
-from collatex.near_matching import Scheduler, get_nodes_in_reverse_rank_order, find_prior_node
+from collatex.near_matching import Scheduler, get_nodes_in_reverse_rank_order, find_prior_node, create_near_match_table
 
 
 class Test(unittest.TestCase):
@@ -361,6 +361,30 @@ class Test(unittest.TestCase):
         self.assertIsNone(returned_rank)
         self.assertIsNone(returned_node)
 
+    def test_build_ranking_table(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "0123 0120 0100 0000")
+        collation.add_plain_witness("B", "0124 0120 0100 0000")
+        collation.add_plain_witness("C", "010x")
+        graph = collate(collation, output="graph", segmentation=False)
+        ranking = VariantGraphRanking.of(graph)  # 15 ranks (0–14, not counting end), 19 verticies
+        prior_node = next(x for x in ranking.byRank[1] if x.label == '010x') # witness C
+        prior_rank1 = 1
+        rank1_expected = (2, -1)
+        table1 = create_near_match_table(prior_node, prior_rank1, ranking)
+        self.assertEqual(rank1_expected, table1)
+        prior_rank2 = 2
+        rank2_expected = (2, -2)
+        table2 = create_near_match_table(prior_node, prior_rank2, ranking)
+        self.assertEqual(rank2_expected, table2)
+        prior_rank3 = 3
+        rank3_expected = (1, -2)
+        table3 = create_near_match_table(prior_node, prior_rank3, ranking)
+        self.assertEqual(rank3_expected, table3)
+        prior_rank4 = 4
+        rank4_expected = (2, -2)
+        table4 = create_near_match_table(prior_node, prior_rank4, ranking)
+        self.assertEqual(rank4_expected, table4)
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testOmission']
