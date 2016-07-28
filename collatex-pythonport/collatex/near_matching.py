@@ -60,19 +60,18 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
             print('prior node is ' + str(prior_node) + ' at rank ' + str(prior_rank)) if debug else None
             print('current node has witnesses: ' + str(witnesses_at_rank)) if debug else None
             print('prior_node has witnesses: ' + str([key for key in prior_node.tokens.keys()])) if debug else None
-            candidate_ranks = {} # keys are ranks, values are distances
-            for candidate_rank in range(prior_rank, rank + 1):
-                candidate_ranks[candidate_rank] = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, candidate_rank, ranking)
-            new_rank = min(candidate_ranks, key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
+            build_candidate_rank_dict = {candidate_rank : scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, candidate_rank, ranking) for candidate_rank in range(prior_rank, rank + 1)}
+            new_rank = min(build_candidate_rank_dict, key=build_candidate_rank_dict.get) # returns key (rank number) of min (closest) prior node
+            print('new rank = ' + str(new_rank)) if debug else None
+            # Need to move only if there's a better match elsewhere
             need_to_move = prior_rank != new_rank
             print('need to move? ' + str(need_to_move)) if debug else None
-            if need_to_move:
-                # If prior_node and witnesses_at_rank share a witness, don't move
-                can_move = not (set(witnesses_at_rank) & set(prior_node.tokens.keys()))
-                print('node can be moved? ' + str(can_move)) if debug else None
-                if can_move:
-                    print('moving node ' + str(prior_node) + ' from rank ' + str(prior_rank) + ' to rank ' + str(new_rank)) if debug else None
-                    scheduler.create_and_execute_task("move node from prior rank to rank with best match", move_node_from_prior_rank_to_rank, prior_node, prior_rank, new_rank, ranking)
+            # If prior_node and witnesses_at_rank already share a witness, don't move
+            can_move = not (set(witnesses_at_rank) & set(prior_node.tokens.keys()))
+            print('node can be moved? ' + str(can_move)) if debug else None
+            if need_to_move and can_move:
+                print('moving node ' + str(prior_node) + ' from rank ' + str(prior_rank) + ' to rank ' + str(new_rank)) if debug else None
+                scheduler.create_and_execute_task("move node from prior rank to rank with best match", move_node_from_prior_rank_to_rank, prior_node, prior_rank, new_rank, ranking)
     return rank
 
 
