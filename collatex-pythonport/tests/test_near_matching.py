@@ -313,7 +313,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "The koala jumped over the red pink grey blue wombat")
         collation.add_plain_witness("B", "The koala jumped over the gray wombat")
         graph = collate(collation, output="graph", segmentation=False)
-        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8), 10 verticies
+        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8, not counting end), 10 verticies
         test_rank = 9
         expected_rank = 6
         expected_label = "gray"
@@ -326,11 +326,43 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "koala and the bettong jumped over wombat")
         collation.add_plain_witness("B", "bettong jumped over wombat")
         graph = collate(collation, output="graph", segmentation=False)
-        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8), 10 verticies
+        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8, not counting end), 10 verticies
         test_rank = 3
         (returned_rank, returned_node) = find_prior_node('B', test_rank, ranking)
         self.assertIsNone(returned_rank)
         self.assertIsNone(returned_node)
+
+    def test_near_matching_dict_comprehension_ranking_table(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "blue no green gray yellow purple koala and the 0123 0120 0100 0000 wombat")
+        collation.add_plain_witness("B", "numerous grey koala and the 010x wombat")
+        graph = collate(collation, output="graph", segmentation=False)
+        ranking = VariantGraphRanking.of(graph)  # 15 ranks (0–14, not counting end), 19 verticies
+        # test_rank is the location of the gap
+        # expected_rank is where the node to be moved is found originally
+        test_rank_1 = 13
+        expected_rank_1 = 10
+        expected_label_1 = "010x"
+        (returned_rank_1, returned_node_1) = find_prior_node('B', test_rank_1, ranking)
+        self.assertEqual(expected_rank_1, returned_rank_1)
+        self.assertEqual(expected_label_1, returned_node_1.label)
+        test_rank_2 = 6
+        expected_rank_2 = 2
+        expected_label_2 = "grey"
+        (returned_rank_2, returned_node_2) = find_prior_node('B', test_rank_2, ranking)
+        self.assertEqual(expected_rank_2, returned_rank_2)
+        self.assertEqual(expected_label_2, returned_node_2.label)
+        test_rank_3 = 2
+        expected_rank_3 = 1
+        expected_label_3 = "numerous"
+        (returned_rank_3, returned_node_3) = find_prior_node('B', test_rank_3, ranking)
+        self.assertEqual(expected_rank_3, returned_rank_3)
+        self.assertEqual(expected_label_3, returned_node_3.label)
+        test_rank_4 = 1
+        (returned_rank, returned_node) = find_prior_node('B', test_rank_4, ranking)
+        self.assertIsNone(returned_rank)
+        self.assertIsNone(returned_node)
+
 
 
 if __name__ == "__main__":
