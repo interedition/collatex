@@ -1,8 +1,8 @@
-'''
+"""
 Created on Sep 12, 2014
 
 @author: Ronald Haentjens Dekker
-'''
+"""
 import unittest
 from collatex import Collation, collate
 from collatex.core_classes import VariantGraphRanking
@@ -11,7 +11,6 @@ from collatex.near_matching import Scheduler, get_nodes_in_reverse_rank_order, f
 
 
 class Test(unittest.TestCase):
-
     def assertTask(self, expected_description, expected_args, actual):
         # compare description (as string)
         self.assertEqual(expected_description, actual.name)
@@ -210,7 +209,6 @@ class Test(unittest.TestCase):
 +---+------+--------+--------+--------+--------+--------+------+"""
         self.assertEqual(expected, alignment_table)
 
-
     def test_near_matching_repetition(self):
         self.maxDiff = None
         scheduler = Scheduler()
@@ -288,9 +286,9 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "The koala jumped over the lazy wombat")
         collation.add_plain_witness("B", "The koala jumped over the industrious wombat")
         graph = collate(collation, output="graph", segmentation=False)
-        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8), 10 verticies
-        generator = get_nodes_in_reverse_rank_order(9, ranking) # starts on rank  9 - 1 = 8 = end node
-        self.assertRaises(Exception, next(generator).label) # no label on end vertex
+        ranking = VariantGraphRanking.of(graph)  # 9 ranks (0–8), 10 verticies
+        generator = get_nodes_in_reverse_rank_order(9, ranking)  # starts on rank  9 - 1 = 8 = end node
+        self.assertRaises(Exception, next(generator).label)  # no label on end vertex
         expected7 = 'wombat'
         self.assertEqual(expected7, next(generator).label)
         expected6 = {'industrious', 'lazy'}
@@ -313,7 +311,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "The koala jumped over the red pink grey blue wombat")
         collation.add_plain_witness("B", "The koala jumped over the gray wombat")
         graph = collate(collation, output="graph", segmentation=False)
-        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8, not counting end), 10 verticies
+        ranking = VariantGraphRanking.of(graph)  # 9 ranks (0–8, not counting end), 10 verticies
         test_rank = 9
         expected_rank = 6
         expected_label = "gray"
@@ -326,7 +324,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "koala and the bettong jumped over wombat")
         collation.add_plain_witness("B", "bettong jumped over wombat")
         graph = collate(collation, output="graph", segmentation=False)
-        ranking = VariantGraphRanking.of(graph) # 9 ranks (0–8, not counting end), 10 verticies
+        ranking = VariantGraphRanking.of(graph)  # 9 ranks (0–8, not counting end), 10 verticies
         test_rank = 3
         (returned_rank, returned_node) = find_prior_node('B', test_rank, ranking)
         self.assertIsNone(returned_rank)
@@ -362,7 +360,6 @@ class Test(unittest.TestCase):
         (returned_rank, returned_node) = find_prior_node('B', test_rank_4, ranking)
         self.assertIsNone(returned_rank)
         self.assertIsNone(returned_node)
-
 
 
 if __name__ == "__main__":
