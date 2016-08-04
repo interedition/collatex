@@ -8,6 +8,7 @@ target
 *.egg-info
 
 .classpath
+.eggs
 .project
 .settings/
 bin/

@@ -3,6 +3,7 @@ Created on Nov 13, 2014
 
 @author: ronald
 '''
+from collections import defaultdict
 from textwrap import fill
 from collatex.HTML import Table, TableRow, TableCell
 from collatex.core_classes import create_table_visualization
@@ -18,7 +19,6 @@ except:
     pass
 
 
-
 def visualizeTableVerticallyWithColors(table, collation):
     # print the table vertically
     # switch columns and rows
@@ -27,21 +27,13 @@ def visualizeTableVerticallyWithColors(table, collation):
         cells = []
         for witness in collation.witnesses:
             cell = column.tokens_per_witness.get(witness.sigil)
-            cells.append(TableCell(text=fill(cell, 20) if cell else "-", bgcolor="FF0000" if column.variant else "00FF00"))
+            cells.append(TableCell(text=fill("".join(item.token_data["t"] for item in cell) if cell else "-", 20), bgcolor="FF0000" if column.variant else "00FF00"))
         rows.append(TableRow(cells=cells))
     sigli = []
     for witness in collation.witnesses:
         sigli.append(witness.sigil)
     x = Table(header_row=sigli, rows=rows)
     return display(HTML(str(x)))
-
-
-
-
-
-
-
-
 
 
 # create visualization of alignment table
@@ -52,18 +44,33 @@ def display_alignment_table_as_HTML(at):
 
 # visualize the variant graph into SVG format
 # from networkx.drawing.nx_agraph import to_agraph
-def display_variant_graph_as_SVG(graph):
+def display_variant_graph_as_SVG(graph,svg_output):
         # create new Digraph
         dot = Digraph(format="svg", graph_attr={'rankdir': 'LR'})
         # add nodes
-        for n,nodedata in graph.graph.nodes(data=True):
-            dot.node(str(n), nodedata["label"])
+        counter = 0
+        mapping = {}
+        for n in graph.graph.nodes():
+            counter += 1
+            mapping[n] = str(counter)
+            # dot.node(str(n), nodedata["label"])
+            readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'><B>Sigla</B></TD></TR>"]
+            reverseDict = defaultdict(list)
+            for key,value in n.tokens.items():
+                reverseDict["".join(item.token_data["t"] for item in value)].append(key)
+            for key,value in sorted(reverseDict.items()):
+                reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
+                readings.append(reading)
+            dot.node(mapping[n], '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>',{'shape': 'box'})
         # add edges
         for u,v,edgedata in graph.graph.edges_iter(data=True):
-            dot.edge(str(u), str(v), edgedata["label"])
+            dot.edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
         # render the dot graph to SVG
         # Note: this creates a file
-        svg = dot.render()
+        if svg_output:
+            svg = dot.render(svg_output,'svg_output')
+        else:
+            svg = dot.render()
         # display using the IPython SVG module
         return display(SVG(svg))
 
