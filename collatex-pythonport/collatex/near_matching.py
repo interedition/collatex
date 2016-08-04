@@ -67,9 +67,9 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
             .filter_not(lambda x: x[0] is None)\
             .map(lambda x: [(x[0], x[1], candidate_rank) for candidate_rank in range(x[0], rank + 1)])\
             .flatten()\
-            .map(lambda x: (x[0], (scheduler.create_and_execute_task("build column for rank", create_near_match_table, x[1], x[2], ranking), x[1], x[2])))\
+            .map(lambda x: ((x[0], x[1]), (scheduler.create_and_execute_task("build column for rank", create_near_match_table, x[1], x[2], ranking), x[2])))\
             .reduce_by_key(lambda x, y: min(x, y))
-        for (prior_rank, (near_match_score, prior_node, new_rank)) in result:
+        for ((prior_rank, prior_node), (near_match_score, new_rank)) in result:
             print('new rank = ' + str(new_rank)) if debug else None
             # Need to move only if there's a better match elsewhere
             need_to_move = prior_rank != new_rank
