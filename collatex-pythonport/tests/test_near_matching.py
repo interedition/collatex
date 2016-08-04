@@ -157,16 +157,16 @@ class Test(unittest.TestCase):
         self.assertTask("build column for rank", ["012345", "4"], scheduler[2])
         self.assertTask("build column for rank", ["012345", "5"], scheduler[3])
         self.assertTask("build column for rank", ["012345", "6"], scheduler[4])
-        # The best (max()) fit of "012345" among all ranks between current rank 2 and activeRank 6
-        #   is at rank 4, so move "012345" from current rank 2 to rank 4
-        self.assertTask("move node from prior rank to rank with best match", ["012345", "2", "4"], scheduler[5])
         # Find next (alphabetically) witness with a gap at activeRank (still 6), which is witness C
         # Get the first token to the left of the gap ("zz23xx" in C at rank 4)
         #   and check whether to move it
         # Calculate strength of match for all columns from current rank (4) through activeRank (6), inclusive
-        self.assertTask("build column for rank", ["zz23xx", "4"], scheduler[6])
-        self.assertTask("build column for rank", ["zz23xx", "5"], scheduler[7])
-        self.assertTask("build column for rank", ["zz23xx", "6"], scheduler[8])
+        self.assertTask("build column for rank", ["zz23xx", "4"], scheduler[5])
+        self.assertTask("build column for rank", ["zz23xx", "5"], scheduler[6])
+        self.assertTask("build column for rank", ["zz23xx", "6"], scheduler[7])
+        # The best (max()) fit of "012345" among all ranks between current rank 2 and activeRank 6
+        #   is at rank 4, so move "012345" from current rank 2 to rank 4
+        self.assertTask("move node from prior rank to rank with best match", ["012345", "2", "4"], scheduler[8])
         # The best (max()) fit of "zz23xx" among all ranks between current rank 4 and activeRank 6
         #   is at rank 6, so move "zz23xx" from current rank 4 to rank 6
         self.assertTask("move node from prior rank to rank with best match", ["zz23xx", "4", "6"], scheduler[9])

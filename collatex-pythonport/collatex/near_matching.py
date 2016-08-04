@@ -2,6 +2,7 @@
     Called by: collate() (in core_functions.py) with near_match=True, segmentation=False
 """
 from Levenshtein import distance
+from functional import seq
 
 debug = 0 # set to 1 for debug output about near matching
 
@@ -54,14 +55,21 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
         missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
         # print('missing witnesses: ' + str(missing_witnesses))
         witnesses_weve_seen = set()
-        filtered_missing_witnesses = filter(lambda x: not(x in witnesses_weve_seen), sorted(missing_witnesses))
-        prior_ranks_and_nodes = map(lambda x: find_prior_node(x, rank, ranking), filtered_missing_witnesses)
-        for (prior_rank, prior_node) in filter(lambda x: x[0] is not None, prior_ranks_and_nodes): # alphabetize witnesses for testing consistency
-            print('prior node is ' + str(prior_node) + ' at rank ' + str(prior_rank)) if debug else None
-            print('current node has witnesses: ' + str(witnesses_at_rank)) if debug else None
-            print('prior_node has witnesses: ' + str([key for key in prior_node.tokens.keys()])) if debug else None
-            build_candidate_rank_dict = {candidate_rank : scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, candidate_rank, ranking) for candidate_rank in range(prior_rank, rank + 1)}
-            new_rank = min(build_candidate_rank_dict, key=build_candidate_rank_dict.get) # returns key (rank number) of min (closest) prior node
+
+        # alphabetize witnesses for testing consistency
+        # we map each prior rank to a list of candidate ranks (possible move positions).
+        # The possible move positions are a list
+        # then flatten the whole shebang
+        # then map the prior rank to a tuple of (distance from the near match table, candidate_rank)
+        result = seq(sorted(missing_witnesses))\
+            .filter_not(lambda x: x in witnesses_weve_seen)\
+            .map(lambda x: find_prior_node(x, rank, ranking))\
+            .filter_not(lambda x: x[0] is None)\
+            .map(lambda x: [(x[0], x[1], candidate_rank) for candidate_rank in range(x[0], rank + 1)])\
+            .flatten()\
+            .map(lambda x: (x[0], (scheduler.create_and_execute_task("build column for rank", create_near_match_table, x[1], x[2], ranking), x[1], x[2])))\
+            .reduce_by_key(lambda x, y: min(x, y))
+        for (prior_rank, (near_match_score, prior_node, new_rank)) in result:
             print('new rank = ' + str(new_rank)) if debug else None
             # Need to move only if there's a better match elsewhere
             need_to_move = prior_rank != new_rank
