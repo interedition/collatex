@@ -51,7 +51,6 @@ public class TextGraphTest {
         cg.addWitness("B", xml_b);
         cg.collate();
         // cg.foldMatches();
-        cg.joinNonVariantTokens();
     }
 
     private void clearGraph() {

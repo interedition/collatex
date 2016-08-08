@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
@@ -47,38 +46,19 @@ public class CollationGraph {
         cypherStatements.add("create (:Token{id:\"" + t0Id + "\",data:\"\"})");
         cypherStatements.add(createNextRelationBetween(t0Id, tokenId(sigil, 1), sigil));
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
-        List<String> choiceEndIds = Lists.newArrayList();
-        String substStart = t0Id;
         String prevId = t0Id;
         Map<WitnessNode, Integer> elementMap = new HashMap<>();
         for (EditGraphTableLabel label : labels) {
             String tokenId = tokenId(sigil, counter.getAndIncrement());
             cypherStatements.add("create " + toTokenNode(label, tokenId));
             if (!label.startElements.isEmpty()) {
-                if (label.containsStartSubst()) {
-                    substStart = prevId;
-                }
-                if (label.containsStartSubstOption()) {
-                    if (!tokenId.equals(substStart)) {
-                        cypherStatements.add(createNextRelationBetween(substStart, tokenId, sigil));
-                    }
+                if (label.containsStartSubstOption() || label.containsStartSubst()) {
+                    cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil));
                 }
             } else {
                 if (!prevId.isEmpty()) {
                     cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil));
                 }
-            }
-            if (label.containsEndSubstOption()) {
-                choiceEndIds.add(tokenId);
-            }
-            if (label.containsEndSubst()) {
-                String nextTokenId = tokenId(sigil, counter.get());
-                System.out.println(choiceEndIds);
-                choiceEndIds.forEach(//
-                        optionEndTokenId -> cypherStatements.add(createNextRelationBetween(optionEndTokenId, nextTokenId, sigil))//
-                );
-                substStart = "";
-                choiceEndIds.clear();
             }
             addAnnotations(cypherStatements, sigil, elementMap, label, tokenId);
             prevId = tokenId;
@@ -97,14 +77,14 @@ public class CollationGraph {
     }
 
     private void addAnnotations(Set<String> cypherStatements, String sigil, Map<WitnessNode, Integer> elementMap, EditGraphTableLabel label, String tokenId) {
-        label.startElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
+        label.startElements.stream().forEach(se -> {
             elementMap.putIfAbsent(se, elementMap.size());
             Integer annotationIndex = elementMap.get(se);
             String id = annotationId(sigil, annotationIndex);
             cypherStatements.add("create (:Annotation{id:\"" + id + "\", title:\"" + se.data + "\"})");
             cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:BEGINS_AT]->(t)");
         });
-        label.endElements.stream().filter(e -> !e.data.equals("subst")).forEach(se -> {
+        label.endElements.stream().forEach(se -> {
             Integer annotationId = elementMap.get(se);
             String id = annotationId(sigil, annotationId);
             cypherStatements.add("match (t:Token{id:\"" + tokenId + "\"}), (a:Annotation{id:\"" + id + "\"}) merge (a)-[:ENDS_AT]->(t)");
@@ -201,10 +181,6 @@ public class CollationGraph {
                 tx.success();
             }
         }
-
-    }
-
-    public void joinNonVariantTokens() {
 
     }
 
