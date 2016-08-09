@@ -2,30 +2,37 @@ package eu.interedition.collatex.subst;
 
 import static java.util.stream.Collectors.joining;
 
+import org.assertj.core.util.Sets;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Session;
+import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.Values;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import com.google.common.base.Joiner;
 
+import eu.interedition.collatex.Token;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
 
 public class CollationGraph {
     private Driver neo4j;
     private String name;
-    private List<WitnessNode> witnesses = new ArrayList<>();
+    private List<WitnessNode> witnessNodes = new ArrayList<>();
 
     public CollationGraph(String name, Driver neo4j) {
         this.neo4j = neo4j;
@@ -37,20 +44,21 @@ public class CollationGraph {
         runInSessionTransaction(tx -> tx.run("merge (c:Collation {name:{name}})", Values.parameters("name", name)));
     }
 
-    public void addWitness(String sigil, String xml) {
+    public Witness addWitness(String sigil, String xml) {
         AtomicInteger counter = new AtomicInteger(1);
         WitnessNode wn = WitnessNode.createTree(sigil, xml);
-        this.witnesses.add(wn);
-        String t0Id = tokenId(sigil, 0);
+        this.witnessNodes.add(wn);
+        String t0Id = tokenId(sigil, 1);
         Set<String> cypherStatements = new TreeSet<>();
-        cypherStatements.add("create (:Token{id:\"" + t0Id + "\",data:\"\"})");
-        cypherStatements.add(createNextRelationBetween(t0Id, tokenId(sigil, 1), sigil));
+        // cypherStatements.add("create (:Token{id:\"" + t0Id + "\",data:\"\"})");
+        // cypherStatements.add(createNextRelationBetween(t0Id, tokenId(sigil, 1), sigil));
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
-        String prevId = t0Id;
+        String prevId = "";
         Map<WitnessNode, Integer> elementMap = new HashMap<>();
         for (EditGraphTableLabel label : labels) {
-            String tokenId = tokenId(sigil, counter.getAndIncrement());
-            cypherStatements.add("create " + toTokenNode(label, tokenId));
+            int index = counter.getAndIncrement();
+            String tokenId = tokenId(sigil, index);
+            cypherStatements.add("create " + toTokenNode(label, tokenId, index));
             if (!label.startElements.isEmpty()) {
                 if (label.containsStartSubstOption() || label.containsStartSubst()) {
                     cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil));
@@ -74,6 +82,7 @@ public class CollationGraph {
                             "t0Id", t0Id//
             ));
         });
+        return new MyWitness(sigil);
     }
 
     private void addAnnotations(Set<String> cypherStatements, String sigil, Map<WitnessNode, Integer> elementMap, EditGraphTableLabel label, String tokenId) {
@@ -102,7 +111,7 @@ public class CollationGraph {
     public void addWitness0(String sigil, String xml) {
         AtomicInteger counter = new AtomicInteger(1);
         WitnessNode wn = WitnessNode.createTree(sigil, xml);
-        this.witnesses.add(wn);
+        this.witnessNodes.add(wn);
         List<EditGraphTableLabel> labels = EditGraphAligner.createLabels(wn);
         runInSessionTransaction(tx -> {
             String cypher = witnessAsCypher(sigil, counter, labels);
@@ -115,19 +124,19 @@ public class CollationGraph {
 
     private String witnessAsCypher(String sigil, AtomicInteger counter, List<EditGraphTableLabel> labels) {
         String cypher = labels.stream()//
-                .map(l -> toTokenNode(l, tokenId(sigil, counter.getAndIncrement())))//
+                .map(l -> toTokenNode(l, tokenId(sigil, counter.get()), counter.getAndIncrement()))//
                 .collect(joining("-[:NEXT{witness:{sigil},layer:\"main\"}]->"));
         return cypher;
     }
 
     public void collate() {
-        if (this.witnesses.size() != 2) {
+        if (this.witnessNodes.size() != 2) {
             throw new RuntimeException("At the moment, ony collation with 2 witnesses is possible.");
         }
-        EditGraphAligner ega = new EditGraphAligner(this.witnesses.get(0), this.witnesses.get(1));
+        EditGraphAligner ega = new EditGraphAligner(this.witnessNodes.get(0), this.witnessNodes.get(1));
         Set<Tuple<String>> matches = new HashSet<>();
         Map<String, AtomicInteger> counters = new HashMap<>();
-        this.witnesses.stream()//
+        this.witnessNodes.stream()//
                 .map(WitnessNode::getSigil)//
                 .forEach(sigil -> counters.put(sigil, new AtomicInteger(1)));
         ega.getSuperWitness().forEach(lwn -> {
@@ -161,8 +170,8 @@ public class CollationGraph {
         return id1;
     }
 
-    private String toTokenNode(EditGraphTableLabel label, String id) {
-        return "(:Token{id:\"" + id + "\",data:\"" + label.text.data + "\"})";
+    private String toTokenNode(EditGraphTableLabel label, String id, int index) {
+        return "(:Token{id:\"" + id + "\",data:\"" + label.text.data + "\",index:\"" + index + "\"})";
     }
 
     public void foldMatches() {
@@ -181,7 +190,187 @@ public class CollationGraph {
                 tx.success();
             }
         }
+    }
 
+    public List<SortedMap<Witness, Set<Token>>> asTable() {
+        List<SortedMap<Witness, Set<Token>>> alignmentTable = new ArrayList<>();
+        Map<String, List<MyToken>> tokensPerWitness = new HashMap<>();
+        runInSessionTransaction(tx -> {
+            witnessNodes.stream().map(WitnessNode::getSigil).forEach(s -> {
+                StatementResult result = tx.run("match (w:Witness{sigil:\"" + s + "\"})-[:FIRST_TOKEN]->(t0:Token) with t0 match (t0)-[:NEXT*]->(t1) return t1.id, t1.index, t1.data");
+                List<MyToken> witnessTokens = new ArrayList<>();
+                result.forEachRemaining(r -> {
+                    String id = r.get("t1.id").asString();
+                    Integer index = r.get("t1.inedx").asInt();
+                    String value = r.get("t1.data").asString();
+                    Integer matchIndex = matchIndex(tx, id);
+                    witnessTokens.add(new MyToken(s, id, value, index, matchIndex));
+                });
+                tokensPerWitness.put(s, witnessTokens);
+            });
+
+            String sigilA = witnessNodes.get(0).getSigil();
+            Iterator<MyTokenGroup> tokensA = group(tokensPerWitness.get(sigilA));
+
+            String sigilB = witnessNodes.get(1).getSigil();
+            Iterator<MyTokenGroup> tokensB = group(tokensPerWitness.get(sigilB));
+
+            MyTokenGroup tokenGroupA = tokensA.next();
+            MyTokenGroup tokenGroupB = tokensB.next();
+
+            while (tokenGroupA != null && tokenGroupB != null) {
+                boolean groupsInSameMatchState = (tokenGroupA.isMatched() && tokenGroupB.isMatched()) //
+                        || (!tokenGroupA.isMatched() && !tokenGroupB.isMatched());
+                final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
+                if (groupsInSameMatchState) {
+                    tokenGroupA = useGroup(sigilA, tokensA, tokenGroupA, row);
+                    tokenGroupB = useGroup(sigilB, tokensB, tokenGroupB, row);
+
+                } else if (tokenGroupA.isMatched()) {
+                    tokenGroupB = useGroup(sigilB, tokensB, tokenGroupB, row);
+
+                } else {
+                    tokenGroupA = useGroup(sigilA, tokensA, tokenGroupA, row);
+                }
+                alignmentTable.add(row);
+            }
+
+            final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
+            if (tokenGroupA != null && tokenGroupB == null) {
+                useGroup(sigilA, tokensA, tokenGroupA, row);
+                alignmentTable.add(row);
+
+            } else if (tokenGroupB != null && tokenGroupA == null) {
+                useGroup(sigilB, tokensB, tokenGroupB, row);
+                alignmentTable.add(row);
+            }
+
+        });
+        return alignmentTable;
+    }
+
+    private MyTokenGroup useGroup(String sigil, Iterator<MyTokenGroup> tokensIterator, MyTokenGroup tokenGroup, final SortedMap<Witness, Set<Token>> row) {
+        row.put(new MyWitness(sigil), tokenGroup.getTokenSet());
+        return tokensIterator.hasNext() ? tokensIterator.next() : null;
+    }
+
+    enum State {
+        initial, match, mismatch
+    }
+
+    private Iterator<MyTokenGroup> group(List<MyToken> list) {
+        List<MyTokenGroup> groupList = new ArrayList<>();
+        State lastState = State.initial;
+        Integer lastMatchIndex = 0;
+        for (MyToken t : list) {
+            State state = t.hasMatch() ? State.match : State.mismatch;
+            MyTokenGroup group = null;
+            if (state.equals(lastState)) { //
+                group = groupList.get(groupList.size() - 1);
+            } else {
+                group = new MyTokenGroup(t.hasMatch());
+                groupList.add(group);
+            }
+            group.addToken(t);
+            lastState = state;
+            lastMatchIndex++;
+        }
+        return groupList.iterator();
+    }
+
+    private Integer matchIndex(Transaction tx, String id) {
+        StatementResult result = tx.run("match (t:Token{id:{id}})-[:MATCHES]-(t1) return t1.index", Values.parameters("id", id));
+        if (result.hasNext()) {
+            return result.next().get(0).asInt();
+        }
+        return -1;
+    }
+
+    public static class MyToken implements Token, Comparable<MyToken> {
+        private String id;
+        private String data;
+        private Boolean hasMatch;
+        private int index;
+        private int matchIndex;
+
+        private Witness witness;
+
+        public MyToken(String sigil, String id, String data, int index, int matchIndex) {
+            this.id = id;
+            this.data = data;
+            this.index = index;
+            this.matchIndex = matchIndex;
+            this.hasMatch = matchIndex > 0;
+            witness = new MyWitness(sigil);
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public Boolean hasMatch() {
+            return hasMatch;
+        }
+
+        public int getMatchIndex() {
+            return matchIndex;
+        }
+
+        @Override
+        public Witness getWitness() {
+            return witness;
+        }
+
+        @Override
+        public int compareTo(MyToken other) {
+            return getId().compareTo(other.getId());
+        }
+    }
+
+    public static class MyWitness implements Witness {
+        private String sigil;
+
+        public MyWitness(String sigil) {
+            this.sigil = sigil;
+        }
+
+        @Override
+        public String getSigil() {
+            return sigil;
+        }
+    }
+
+    public static class MyTokenGroup {
+        private Set<Token> tokenSet = Sets.newHashSet();
+        private Boolean matched;
+
+        public MyTokenGroup(Boolean matched) {
+            this.setMatched(matched);
+        }
+
+        public Set<Token> getTokenSet() {
+            return tokenSet;
+        }
+
+        public void addToken(Token token) {
+            this.tokenSet.add(token);
+        }
+
+        public Boolean isMatched() {
+            return matched;
+        }
+
+        public void setMatched(Boolean matched) {
+            this.matched = matched;
+        }
     }
 
 }
