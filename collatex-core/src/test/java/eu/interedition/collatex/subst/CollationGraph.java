@@ -82,7 +82,7 @@ public class CollationGraph {
                             "t0Id", t0Id//
             ));
         });
-        MyWitness myWitness = new MyWitness(sigil);
+        LayeredWitness myWitness = new LayeredWitness(sigil);
         this.witnesses.add(myWitness);
         return myWitness;
     }
@@ -199,18 +199,19 @@ public class CollationGraph {
 
     public List<SortedMap<Witness, Set<Token>>> asTable() {
         List<SortedMap<Witness, Set<Token>>> alignmentTable = new ArrayList<>();
-        Map<String, List<MyToken>> tokensPerWitness = new HashMap<>();
+        Map<String, List<LayerToken>> tokensPerWitness = new HashMap<>();
         runInSessionTransaction(tx -> {
             witnessNodes.stream().map(WitnessNode::getSigil).forEach(s -> {
+                Witness witness = new LayeredWitness(s);
                 StatementResult result = tx.run("match (w:Witness{sigil:\"" + s + "\"})-[:FIRST_TOKEN|NEXT*]->(t:Token) return t.id, t.index, t.data, t.layer");
-                List<MyToken> witnessTokens = new ArrayList<>();
+                List<LayerToken> witnessTokens = new ArrayList<>();
                 result.forEachRemaining(r -> {
                     String id = r.get("t.id").asString();
                     Integer index = r.get("t.index").asInt();
                     String value = r.get("t.data").asString();
                     String layer = r.get("t.layer").asString();
                     Integer matchIndex = matchIndex(tx, id);
-                    witnessTokens.add(new MyToken(s, id, value, index, matchIndex, layer));
+                    witnessTokens.add(new LayerToken(witness, id, value, index, matchIndex, layer));
                 });
                 tokensPerWitness.put(s, witnessTokens);
             });
@@ -256,7 +257,7 @@ public class CollationGraph {
     }
 
     private MyTokenGroup useGroup(String sigil, Iterator<MyTokenGroup> tokensIterator, MyTokenGroup tokenGroup, final SortedMap<Witness, Set<Token>> row) {
-        row.put(new MyWitness(sigil), tokenGroup.getTokenSet());
+        row.put(new LayeredWitness(sigil), tokenGroup.getTokenSet());
         return tokensIterator.hasNext() ? tokensIterator.next() : null;
     }
 
@@ -264,11 +265,11 @@ public class CollationGraph {
         initial, match, mismatch
     }
 
-    private Iterator<MyTokenGroup> group(List<MyToken> list) {
+    private Iterator<MyTokenGroup> group(List<LayerToken> list) {
         List<MyTokenGroup> groupList = new ArrayList<>();
         State lastState = State.initial;
         Integer lastMatchIndex = 0;
-        for (MyToken t : list) {
+        for (LayerToken t : list) {
             State state = t.hasMatch() ? State.match : State.mismatch;
             MyTokenGroup group = null;
             boolean addToCurrentGroup = state.equals(State.mismatch) && lastState.equals(State.mismatch)//
@@ -283,8 +284,8 @@ public class CollationGraph {
             }
             group.addToken(t);
             lastState = state;
-            if (t.hasMatch) {
-                lastMatchIndex = t.matchIndex;
+            if (t.hasMatch()) {
+                lastMatchIndex = t.matchIndex();
             }
         }
         return groupList.iterator();
@@ -296,74 +297,6 @@ public class CollationGraph {
             return result.next().get(0).asInt();
         }
         return -1;
-    }
-
-    public static class MyToken implements Token, Comparable<MyToken> {
-        private String id;
-        private String data;
-        private Boolean hasMatch;
-        private int index;
-        private int matchIndex;
-
-        private Witness witness;
-        private String layer;
-
-        public MyToken(String sigil, String id, String data, int index, int matchIndex, String layer) {
-            this.id = id;
-            this.data = data;
-            this.index = index;
-            this.matchIndex = matchIndex;
-            this.layer = layer;
-            this.hasMatch = matchIndex > 0;
-            witness = new MyWitness(sigil);
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public Boolean hasMatch() {
-            return hasMatch;
-        }
-
-        public int getMatchIndex() {
-            return matchIndex;
-        }
-
-        @Override
-        public Witness getWitness() {
-            return witness;
-        }
-
-        @Override
-        public int compareTo(MyToken other) {
-            return getId().compareTo(other.getId());
-        }
-
-        public String getLayer() {
-            return layer;
-        }
-    }
-
-    public static class MyWitness implements Witness {
-        private String sigil;
-
-        public MyWitness(String sigil) {
-            this.sigil = sigil;
-        }
-
-        @Override
-        public String getSigil() {
-            return sigil;
-        }
     }
 
     public static class MyTokenGroup {
