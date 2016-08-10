@@ -9,6 +9,7 @@ import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Transaction;
 import org.neo4j.driver.v1.Values;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,8 +23,6 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import com.google.common.base.Joiner;
-
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Tuple;
@@ -33,6 +32,7 @@ public class CollationGraph {
     private Driver neo4j;
     private String name;
     private List<WitnessNode> witnessNodes = new ArrayList<>();
+    private List<Witness> witnesses = new ArrayList<>();
 
     public CollationGraph(String name, Driver neo4j) {
         this.neo4j = neo4j;
@@ -73,7 +73,7 @@ public class CollationGraph {
         }
 
         runInSessionTransaction(tx -> {
-            System.out.println(Joiner.on("\n").join(cypherStatements));
+            // System.out.println(Joiner.on("\n").join(cypherStatements));
             cypherStatements.forEach(cs -> tx.run(cs));
             tx.run("match (c:Collation{name:{name}}), (t0:Token{id:{t0Id}}) create (c)-[:WITNESS]->(w:Witness{sigil:{sigil}})-[:FIRST_TOKEN]->(t0)", //
                     Values.parameters(//
@@ -82,7 +82,13 @@ public class CollationGraph {
                             "t0Id", t0Id//
             ));
         });
-        return new MyWitness(sigil);
+        MyWitness myWitness = new MyWitness(sigil);
+        this.witnesses.add(myWitness);
+        return myWitness;
+    }
+
+    public List<Witness> getWitnesses() {
+        return witnesses;
     }
 
     private void addAnnotations(Set<String> cypherStatements, String sigil, Map<WitnessNode, Integer> elementMap, EditGraphTableLabel label, String tokenId) {
@@ -101,7 +107,7 @@ public class CollationGraph {
     }
 
     private String annotationId(String sigil, Integer annotationId) {
-        return "annotation-" + sigil + "-" + annotationId;
+        return MessageFormat.format("annotation-{0}-{1,number,000}", sigil, annotationId);
     }
 
     private String createNextRelationBetween(String substStart, String tokenId, String sigil) {
@@ -166,12 +172,11 @@ public class CollationGraph {
     }
 
     private String tokenId(String sigil1, int i1) {
-        String id1 = this.name + ":" + sigil1 + ":" + i1;
-        return id1;
+        return MessageFormat.format("{0}:{1}:{2,number,00}", this.name, sigil1, i1);
     }
 
     private String toTokenNode(EditGraphTableLabel label, String id, int index) {
-        return "(:Token{id:\"" + id + "\",data:\"" + label.text.data + "\",index:\"" + index + "\"})";
+        return "(:Token{id:\"" + id + "\",data:\"" + label.text.data + "\",index:" + index + ",layer:\"" + label.layer + "\"})";
     }
 
     public void foldMatches() {
@@ -197,14 +202,15 @@ public class CollationGraph {
         Map<String, List<MyToken>> tokensPerWitness = new HashMap<>();
         runInSessionTransaction(tx -> {
             witnessNodes.stream().map(WitnessNode::getSigil).forEach(s -> {
-                StatementResult result = tx.run("match (w:Witness{sigil:\"" + s + "\"})-[:FIRST_TOKEN]->(t0:Token) with t0 match (t0)-[:NEXT*]->(t1) return t1.id, t1.index, t1.data");
+                StatementResult result = tx.run("match (w:Witness{sigil:\"" + s + "\"})-[:FIRST_TOKEN|NEXT*]->(t:Token) return t.id, t.index, t.data, t.layer");
                 List<MyToken> witnessTokens = new ArrayList<>();
                 result.forEachRemaining(r -> {
-                    String id = r.get("t1.id").asString();
-                    Integer index = r.get("t1.inedx").asInt();
-                    String value = r.get("t1.data").asString();
+                    String id = r.get("t.id").asString();
+                    Integer index = r.get("t.index").asInt();
+                    String value = r.get("t.data").asString();
+                    String layer = r.get("t.layer").asString();
                     Integer matchIndex = matchIndex(tx, id);
-                    witnessTokens.add(new MyToken(s, id, value, index, matchIndex));
+                    witnessTokens.add(new MyToken(s, id, value, index, matchIndex, layer));
                 });
                 tokensPerWitness.put(s, witnessTokens);
             });
@@ -265,7 +271,11 @@ public class CollationGraph {
         for (MyToken t : list) {
             State state = t.hasMatch() ? State.match : State.mismatch;
             MyTokenGroup group = null;
-            if (state.equals(lastState)) { //
+            boolean addToCurrentGroup = state.equals(State.mismatch) && lastState.equals(State.mismatch)//
+                    || ((state.equals(State.match) && lastState.equals(State.match)) //
+                            && t.getMatchIndex() == lastMatchIndex + 1//
+                    );
+            if (addToCurrentGroup) { //
                 group = groupList.get(groupList.size() - 1);
             } else {
                 group = new MyTokenGroup(t.hasMatch());
@@ -273,7 +283,9 @@ public class CollationGraph {
             }
             group.addToken(t);
             lastState = state;
-            lastMatchIndex++;
+            if (t.hasMatch) {
+                lastMatchIndex = t.matchIndex;
+            }
         }
         return groupList.iterator();
     }
@@ -294,12 +306,14 @@ public class CollationGraph {
         private int matchIndex;
 
         private Witness witness;
+        private String layer;
 
-        public MyToken(String sigil, String id, String data, int index, int matchIndex) {
+        public MyToken(String sigil, String id, String data, int index, int matchIndex, String layer) {
             this.id = id;
             this.data = data;
             this.index = index;
             this.matchIndex = matchIndex;
+            this.layer = layer;
             this.hasMatch = matchIndex > 0;
             witness = new MyWitness(sigil);
         }
@@ -332,6 +346,10 @@ public class CollationGraph {
         @Override
         public int compareTo(MyToken other) {
             return getId().compareTo(other.getId());
+        }
+
+        public String getLayer() {
+            return layer;
         }
     }
 

@@ -1,10 +1,11 @@
 package eu.interedition.collatex.subst;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -42,7 +43,7 @@ public class TextGraphTest {
         neo4j.close();
     }
 
-    // @Test
+    @Test
     public void testexample1() {
         String xml_a = "<wit n=\"1\"><subst><del>Apparently, in</del><add>So, at</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
         String xml_b = "<wit n=\"2\"><subst><del>Apparently, at</del><add>So, in</add></subst> <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
@@ -53,19 +54,19 @@ public class TextGraphTest {
         collate(xml_a, xml_b, atRowA, atRowB);
     }
 
-    // @Test
+    @Test
     public void testExample5() {
         String xml_a = "<wit n=\"1\">It is not an easy thing at all with long substitutions.</wit>";
-        String xml_b = "<wit n=\"2\">It<subst><del>is not easy at all</del><add>all gets complicated</add></subst>with long substitutions.</wit>";
+        String xml_b = "<wit n=\"2\">It <subst><del>is not easy at all</del><add>all gets complicated</add></subst> with long substitutions.</wit>";
         String atRowA = "|Apparently, |in So, at |the | |beginning| outset |, finding the |correct |right word.|";
         String atRowB = "|Apparently, |at So, in |the |this very |beginning| |, finding the | |right word.|";
         collate(xml_a, xml_b, atRowA, atRowB);
     }
 
-    // @Test
+    @Test
     public void testExample6() {
         String xml_a = "<wit n=\"1\">It is not an easy thing at all with long substitutions.</wit>";
-        String xml_b = "<wit n=\"2\">It<subst><del>is not</del><add>gets</add></subst><subst><del>easy</del><add>complicated</add></subst><subst><add>very quickly</add></subst>with long substitutions.</wit>";
+        String xml_b = "<wit n=\"2\">It <subst><del>is not</del><add>gets</add></subst> <subst><del>easy</del><add>complicated</add></subst> <subst><add>very quickly</add></subst> with long substitutions.</wit>";
         String atRowA = "|Apparently, |in So, at |the | |beginning| outset |, finding the |correct |right word.|";
         String atRowB = "|Apparently, |at So, in |the |this very |beginning| |, finding the | |right word.|";
         collate(xml_a, xml_b, atRowA, atRowB);
@@ -80,9 +81,20 @@ public class TextGraphTest {
         cg.collate();
         List<SortedMap<Witness, Set<Token>>> table = cg.asTable();
         // cg.foldMatches();
-        visualizeAlignmentTable(table, wA, wB);
-        assertEquals(atRowA, toString(table, wA));
-        assertEquals(atRowB, toString(table, wB));
+        // visualizeAlignmentTable(table, wA, wB);
+        System.out.println("<pre>");
+        System.out.println(toHTML(xml_a));
+        System.out.println(toHTML(xml_b));
+        System.out.println("</pre>");
+        System.out.println(toHTMLTable(table, cg.getWitnesses()));
+        System.out.println("<hr/>");
+        // assertEquals(atRowA, toString(table, wA));
+        // assertEquals(atRowB, toString(table, wB));
+    }
+
+
+    private String toHTML(String xml) {
+        return StringEscapeUtils.escapeHtml4(xml);
     }
 
     private void clearGraph() {
@@ -112,6 +124,41 @@ public class TextGraphTest {
                         .collect(Collectors.joining("|")));
     }
 
+    private String toHTMLTable(List<SortedMap<Witness, Set<Token>>> alignmentTable, List<Witness> witnesses) {
+        StringBuilder html = new StringBuilder("<table>\n");
+        witnesses.stream().forEach(w -> {
+            html.append("<tr>");
+            alignmentTable.stream()//
+                    .map(r -> r.getOrDefault(w, Collections.emptySet()))//
+                    .map(this::toHTMLCell)//
+                    .map(cell -> cell.isEmpty() ? "" : cell)//
+                    .forEach(cell -> html.append("<td>").append(cell).append("</td>"));
+            html.append("</tr>\n");
+        });
+        html.append("</table>");
+        return html.toString();
+    }
+
+    private String toHTMLCell(Set<Token> tokens) {
+        return tokens.stream()//
+                .map(t -> (MyToken) t)//
+                .sorted()//
+                .map(this::tokenAsHTML)//
+                .collect(Collectors.joining());
+    }
+
+    private String tokenAsHTML(MyToken t) {
+        switch (t.getLayer()) {
+        case "del":
+            return "<del>" + t.getData() + "</del>";
+
+        case "add":
+            return "<sup>" + t.getData() + "</sup>";
+
+        }
+        return t.getData();
+    }
+
     private void visualizeAlignmentTable(List<SortedMap<Witness, Set<Token>>> alignmentTable, Witness witnessA, Witness witnessB) {
         V2_AsciiTable table = new V2_AsciiTable();
         table.addStrongRule();
@@ -124,14 +171,18 @@ public class TextGraphTest {
     private void addRow(List<SortedMap<Witness, Set<Token>>> alignmentTable, Witness witnessA, V2_AsciiTable table) {
         List<Object> row = alignmentTable.stream()//
                 .map(r -> r.getOrDefault(witnessA, Collections.emptySet()))//
-                .map(tokens -> tokens.stream()//
-                        .map(t -> (MyToken) t)//
-                        .sorted()//
-                        .map(MyToken::getData)//
-                        .collect(Collectors.joining(":")))
+                .map(this::toCell)//
                 .map(cell -> cell.isEmpty() ? " " : cell)//
                 .collect(toList());
         addRow(table, row, 'c');
+    }
+
+    private String toCell(Set<Token> tokens) {
+        return tokens.stream()//
+                .map(t -> (MyToken) t)//
+                .sorted()//
+                .map(t -> t.getData().replace(" ", "\u2022") + "^" + t.getLayer().substring(0, 1))//
+                .collect(Collectors.joining(":"));
     }
 
     private void addRow(V2_AsciiTable at, List<Object> row, char alignment) {
