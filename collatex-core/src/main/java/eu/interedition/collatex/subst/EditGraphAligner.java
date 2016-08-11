@@ -1,8 +1,10 @@
 package eu.interedition.collatex.subst;
 
+import static eu.interedition.collatex.subst.Score.Type.addition;
+import static eu.interedition.collatex.subst.Score.Type.deletion;
+import static eu.interedition.collatex.subst.Score.Type.empty;
 import static java.util.stream.Collectors.toList;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,13 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -29,14 +27,11 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
-import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
-
 /**
  * Created by ronalddekker on 30/04/16.
  * This is a special version of the edit graph aligner that can handle witnesses with substitutions in them.
  */
 public class EditGraphAligner {
-    private static final String SUBST = "subst";
     final List<EditGraphTableLabel> labelsWitnessB;
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
@@ -77,7 +72,7 @@ public class EditGraphAligner {
         Scorer scorer = new Scorer();
 
         // init 0,0
-        this.cells[0][0] = new Score(Type.empty, 0, 0, null, 0);
+        this.cells[0][0] = new Score(empty, 0, 0, null, 0);
 
         // fill the first row with gaps
         IntStream.range(1, this.labelsWitnessA.size() + 1).forEach(x -> {
@@ -91,7 +86,7 @@ public class EditGraphAligner {
             this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
         });
 
-        // fill the rest of the cells in an y by x fashion
+        // fill the rest of the cells in a y by x fashion
         IntStream.range(1, this.labelsWitnessB.size() + 1).forEach(y -> {
             IntStream.range(1, this.labelsWitnessA.size() + 1).forEach(x -> {
                 EditGraphTableLabel tokenB = this.labelsWitnessB.get(y - 1);
@@ -132,6 +127,9 @@ public class EditGraphAligner {
                 postProcessSubst(tokenB, y, x, nodeToYCoordinate, mapperB(x));
             });
         });
+    }
+
+    public void collate(List<List<WitnessNode>> superwitness, WitnessNode w) {
     }
 
     private Function<Integer, Score> mapperA(int y) {
@@ -182,7 +180,7 @@ public class EditGraphAligner {
             Stream<WitnessNode> parentNodeStream = currentNode.parentNodeStream();
             Optional<WitnessNode> substOptional = parentNodeStream//
                     .filter(WitnessNode::isElement)//
-                    .filter(node -> node.data.equals(SUBST))//
+                    .filter(node -> node.data.equals(EditGraphTableLabel.SUBST))//
                     .findFirst();
             WitnessNode substNode = substOptional//
                     .orElseThrow(() -> new RuntimeException("We found an OR operand but could not find the OR operator!"));
@@ -211,10 +209,6 @@ public class EditGraphAligner {
 
         return nodesToCoordinate;
     }
-
-    // public void align() {
-    //
-    // }
 
     public List<List<WitnessNode>> getSuperWitness() {
         List<List<WitnessNode>> superwitness = getBacktrackScoreStream()//
@@ -347,9 +341,9 @@ public class EditGraphAligner {
         List<Score> list = new ArrayList<>();
         switch (score.type) {
         case mismatch:
-            Score partB = new Score(Type.addition, score.x, score.y, score.parent);
+            Score partB = new Score(addition, score.x, score.y, score.parent);
             list.add(partB);
-            Score partA = new Score(Type.deletion, score.x, score.y, score.parent);
+            Score partA = new Score(deletion, score.x, score.y, score.parent);
             list.add(partA);
             break;
 
@@ -365,238 +359,4 @@ public class EditGraphAligner {
         return StreamSupport.stream(it.spliterator(), false);
     }
 
-    private static class ScoreIterator implements Iterator<Score> {
-        private Score[][] matrix;
-        Integer y;
-        Integer x;
-
-        ScoreIterator(Score[][] matrix) {
-            this.matrix = matrix;
-            this.x = matrix[0].length - 1;
-            this.y = matrix.length - 1;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return !(this.x == 0 && this.y == 0);
-        }
-
-        @Override
-        public Score next() {
-            Score currentScore = this.matrix[this.y][this.x];
-            this.x = currentScore.previousX;
-            this.y = currentScore.previousY;
-            return currentScore;
-        }
-
-    }
-
-    static class LabelCollector implements java.util.stream.Collector<WitnessNode.WitnessNodeEvent, EditGraphTableLabel, EditGraphTableLabel> {
-        @Override
-        public Supplier<EditGraphTableLabel> supplier() {
-            return EditGraphTableLabel::new;
-        }
-
-        @Override
-        public BiConsumer<EditGraphTableLabel, WitnessNode.WitnessNodeEvent> accumulator() {
-            return (label, event) -> {
-                switch (event.type) {
-                case START:
-                    label.addStartEvent(event.node);
-                    break;
-                case END:
-                    label.addEndEvent(event.node);
-                    break;
-                case TEXT:
-                    label.addTextEvent(event.node);
-                    String parentTag = event.node.parentNodeStream().iterator().next().data;
-                    label.layer = parentTag.equals("wit") ? "base" : parentTag;
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unknown event type");
-                }
-            };
-        }
-
-        @Override
-        public BinaryOperator<EditGraphTableLabel> combiner() {
-            return (item, item2) -> {
-                throw new UnsupportedOperationException();
-            };
-        }
-
-        @Override
-        public Function<EditGraphTableLabel, EditGraphTableLabel> finisher() {
-            return (label) -> label;
-        }
-
-        @Override
-        public Set<Characteristics> characteristics() {
-            return Collections.emptySet();
-        }
-    }
-
-    static class EditGraphTableLabel {
-        String layer;
-        List<WitnessNode> startElements = new ArrayList<>();
-        List<WitnessNode> endElements = new ArrayList<>();
-        WitnessNode text;
-
-        public void addStartEvent(WitnessNode node) {
-            this.startElements.add(node);
-        }
-
-        public void addEndEvent(WitnessNode node) {
-            this.endElements.add(node);
-        }
-
-        public void addTextEvent(WitnessNode node) {
-            if (this.text != null) {
-                throw new UnsupportedOperationException();
-            }
-            this.text = node;
-        }
-
-        @Override
-        public String toString() {
-            String a = this.startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
-            String b = this.text.toString();
-            String c = this.endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
-            return MessageFormat.format("{0}:{1}:{2}", b, a, c);
-        }
-
-        public boolean containsStartSubstOption() {
-            // find the first add or del tag...
-            // Note that this implementation is from the left to right
-            return containsSubstOption(this.startElements);
-        }
-
-        public boolean containsEndSubstOption() {
-            // find the first add or del tag...
-            // Note that this implementation is from the left to right
-            return containsSubstOption(this.endElements);
-        }
-
-        private boolean containsSubstOption(List<WitnessNode> witnessNodeList) {
-            return witnessNodeList.stream()//
-                    .filter(this::isSubstOption)//
-                    .findFirst()//
-                    .isPresent();
-        }
-
-        public boolean containsStartSubst() {
-            return containsSubst(this.startElements);
-        }
-
-        private boolean containsSubst(List<WitnessNode> witnessNodeList) {
-            return witnessNodeList.stream()//
-                    .filter(this::isSubst)//
-                    .findFirst()//
-                    .isPresent();
-        }
-
-        public boolean containsEndSubst() {
-            // find the first end subst tag...
-            // if we want to do this completely correct it should be from right to left
-            return containsSubst(this.endElements);
-        }
-
-        public WitnessNode getEndSubstNodes() {
-            return this.endElements.stream()//
-                    .filter(this::isSubst)//
-                    .findFirst().orElseThrow(() -> new RuntimeException("We expected one or more subst tags here!"));
-        }
-
-        private Boolean isSubst(WitnessNode node) {
-            return node.isElement()//
-                    && SUBST.equals(node.data);
-        }
-
-        private Boolean isSubstOption(WitnessNode node) {
-            return node.isElement()//
-                    && (node.data.equals("add") || node.data.equals("del"));
-        }
-    }
-
-    public static class Score {
-
-        public static enum Type {
-            match, mismatch, addition, deletion, empty
-        }
-
-        public Type type;
-        int x;
-        int y;
-        public Score parent;
-        int previousX;
-        int previousY;
-        public int globalScore = 0;
-
-        public Score(Type type, int x, int y, Score parent, int i) {
-            this.type = type;
-            this.x = x;
-            this.y = y;
-            this.parent = parent;
-            this.previousX = parent == null ? 0 : parent.x;
-            this.previousY = parent == null ? 0 : parent.y;
-            this.globalScore = i;
-        }
-
-        public Score(Type type, int x, int y, Score parent) {
-            this.type = type;
-            this.x = x;
-            this.y = y;
-            this.parent = parent;
-            this.previousX = parent.x;
-            this.previousY = parent.y;
-            this.globalScore = parent.globalScore;
-        }
-
-        public int getGlobalScore() {
-            return this.globalScore;
-        }
-
-        public void setGlobalScore(int globalScore) {
-            this.globalScore = globalScore;
-        }
-
-        @Override
-        public String toString() {
-            return "[" + this.y + "," + this.x + "]:" + this.globalScore;
-        }
-
-    }
-
-    class Scorer {
-        public Score gap(int x, int y, Score parent) {
-            Type type = determineType(x, y, parent);
-            return new Score(type, x, y, parent, parent.globalScore - 1);
-        }
-
-        public Score score(int x, int y, Score parent, EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
-            if (tokensMatch(tokenB, tokenA)) {
-                return new Score(Type.match, x, y, parent);
-            }
-
-            return new Score(Type.mismatch, x, y, parent, parent.globalScore - 2);
-        }
-
-        private boolean tokensMatch(EditGraphTableLabel tokenB, EditGraphTableLabel tokenA) {
-            return normalized(tokenB).equals(normalized(tokenA));
-        }
-
-        private String normalized(EditGraphTableLabel tokenB) {
-            return tokenB.text.data.toLowerCase().trim();
-        }
-
-        private Type determineType(int x, int y, Score parent) {
-            if (x == parent.x) {
-                return Type.addition;
-            }
-            if (y == parent.y) {
-                return Type.deletion;
-            }
-            return Type.empty;
-        }
-    }
 }

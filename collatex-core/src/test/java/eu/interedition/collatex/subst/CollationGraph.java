@@ -26,7 +26,6 @@ import java.util.function.Consumer;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Tuple;
-import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
 
 public class CollationGraph {
     private Driver neo4j;

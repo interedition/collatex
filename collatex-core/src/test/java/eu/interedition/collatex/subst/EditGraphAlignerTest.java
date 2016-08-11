@@ -32,8 +32,6 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.subst.EditGraphAligner.EditGraphTableLabel;
-import eu.interedition.collatex.subst.EditGraphAligner.Score;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 /**
