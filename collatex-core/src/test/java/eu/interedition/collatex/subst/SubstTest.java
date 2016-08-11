@@ -91,6 +91,8 @@ public class SubstTest extends AbstractTest {
         System.out.println();
         System.out.println(variantGraphVisualizer.toASCII());
         System.out.println();
+        System.out.println(variantGraphVisualizer.toHTML());
+        System.out.println();
         System.out.println("================================================================================");
     }
 
@@ -101,7 +103,6 @@ public class SubstTest extends AbstractTest {
     }
 
     static class VariantGraphVisualizer {
-
         private VariantGraph variantGraph;
 
         public VariantGraphVisualizer(VariantGraph variantGraph) {
@@ -109,45 +110,86 @@ public class SubstTest extends AbstractTest {
         }
 
         public String toASCII() {
-            V2_AsciiTable table = new V2_AsciiTable();
-            table.addStrongRule();
-            variantGraph.witnesses().forEach(w -> addRow(w, table));
-            return printTable(table);
+            return ASCII.render(variantGraph);
         }
 
-        private void addRow(Witness witness, V2_AsciiTable table) {
-            List<Object> row = StreamSupport.stream(variantGraph.vertices().spliterator(), false)//
-                    .filter(vertex -> !vertex.tokens().isEmpty())//
-                    .map(vertex -> toCell(vertex, witness))//
-                    .collect(toList());
-            addRow(table, row, 'c');
+        public String toHTML() {
+            return HTML.render(variantGraph);
         }
 
-        private String toCell(Vertex vertex, Witness witness) {
-            return vertex.tokens().stream()//
-                    .filter(t -> t.getWitness().equals(witness))//
-                    .map(SimpleToken.class::cast)//
-                    .map(SimpleToken::getContent)//
-                    .collect(joining(" "));
+        static class ASCII {
+            public static String render(VariantGraph variantGraph) {
+                V2_AsciiTable table = new V2_AsciiTable();
+                table.addStrongRule();
+                variantGraph.witnesses().forEach(w -> addRow(w, table, variantGraph));
+                return printTable(table);
+            }
+
+            private static void addRow(Witness witness, V2_AsciiTable table, VariantGraph variantGraph) {
+                List<Object> row = StreamSupport.stream(variantGraph.vertices().spliterator(), false)//
+                        .filter(vertex -> !vertex.tokens().isEmpty())//
+                        .map(vertex -> toCell(vertex, witness))//
+                        .collect(toList());
+                addRow(table, row, 'c');
+            }
+
+            private static String toCell(Vertex vertex, Witness witness) {
+                return vertex.tokens().stream()//
+                        .filter(t -> t.getWitness().equals(witness))//
+                        .map(SimpleToken.class::cast)//
+                        .map(SimpleToken::getContent)//
+                        .collect(joining(" "));
+            }
+
+            private static void addRow(V2_AsciiTable at, List<Object> row, char alignment) {
+                at.addRow(row.toArray()).setAlignment(alignment(row, alignment));
+                at.addRule();
+            }
+
+            private static char[] alignment(List<Object> row, char alignmentType) {
+                char[] a = new char[row.size()];
+                Arrays.fill(a, alignmentType);
+                return a;
+            }
+
+            private static String printTable(V2_AsciiTable table) {
+                return new V2_AsciiTableRenderer()//
+                        .setTheme(V2_E_TableThemes.PLAIN_7BIT.get())//
+                        .setWidth(new WidthLongestWord())//
+                        .render(table)//
+                        .toString();
+            }
         }
 
-        private void addRow(V2_AsciiTable at, List<Object> row, char alignment) {
-            at.addRow(row.toArray()).setAlignment(alignment(row, alignment));
-            at.addRule();
-        }
+        static class HTML {
+            public static String render(VariantGraph variantGraph) {
+                StringBuilder html = new StringBuilder("<table>\n");
+                variantGraph.witnesses().forEach(w -> addRow(html, variantGraph, w));
+                html.append("</table>");
+                return html.toString();
+            }
 
-        private char[] alignment(List<Object> row, char alignmentType) {
-            char[] a = new char[row.size()];
-            Arrays.fill(a, alignmentType);
-            return a;
-        }
+            private static void addRow(StringBuilder html, VariantGraph variantGraph, Witness w) {
+                html.append("<tr>");
+                StreamSupport.stream(variantGraph.vertices().spliterator(), false)//
+                        .filter(vertex -> !vertex.tokens().isEmpty())//
+                        .forEach(v -> addCell(html, v, w));
+                // variantGraph.stream()//
+                // .map(r -> r.getOrDefault(w, Collections.emptySet()))//
+                // .map(this::toHTMLCell)//
+                // .map(cell -> cell.isEmpty() ? "" : cell)//
+                // .forEach(cell -> html.append("<td>").append(cell).append("</td>"));
+                html.append("</tr>\n");
+            }
 
-        private String printTable(V2_AsciiTable table) {
-            return new V2_AsciiTableRenderer()//
-                    .setTheme(V2_E_TableThemes.PLAIN_7BIT.get())//
-                    .setWidth(new WidthLongestWord())//
-                    .render(table)//
-                    .toString();
+            private static void addCell(StringBuilder html, Vertex vertex, Witness witness) {
+                String cell = vertex.tokens().stream()//
+                        .filter(t -> t.getWitness().equals(witness))//
+                        .map(SimpleToken.class::cast)//
+                        .map(SimpleToken::getContent)//
+                        .collect(joining(" "));
+                html.append("<td>").append(cell).append("</td>");
+            }
         }
 
     }

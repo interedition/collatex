@@ -116,7 +116,7 @@ public class TextGraphTest {
                                 .filter(t -> LayerToken.class.isAssignableFrom(t.getClass()))//
                                 .map(t -> (LayerToken) t)//
                                 .sorted()//
-                                .map(LayerToken::getData)//
+                                .map(LayerToken::getContent)//
                                 .map(t -> t.replace(" ", "\u2022"))//
                                 .collect(Collectors.joining(":")))
                         .map(cell -> cell.isEmpty() ? " " : cell)//
@@ -149,13 +149,13 @@ public class TextGraphTest {
     private String tokenAsHTML(LayerToken t) {
         switch (t.getLayer()) {
         case "del":
-            return "<del>" + t.getData() + "</del>";
+            return "<del>" + t.getContent() + "</del>";
 
         case "add":
-            return "<sup>" + t.getData() + "</sup>";
+            return "<sup>" + t.getContent() + "</sup>";
 
         }
-        return t.getData();
+        return t.getContent();
     }
 
     private void visualizeAlignmentTable(List<SortedMap<Witness, Set<Token>>> alignmentTable, Witness witnessA, Witness witnessB) {
@@ -180,7 +180,7 @@ public class TextGraphTest {
         return tokens.stream()//
                 .map(t -> (LayerToken) t)//
                 .sorted()//
-                .map(t -> t.getData().replace(" ", "\u2022") + "^" + t.getLayer().substring(0, 1))//
+                .map(t -> t.getContent().replace(" ", "\u2022") + "^" + t.getLayer().substring(0, 1))//
                 .collect(Collectors.joining(":"));
     }
 

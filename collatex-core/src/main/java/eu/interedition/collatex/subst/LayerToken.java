@@ -5,7 +5,7 @@ import eu.interedition.collatex.Witness;
 
 public class LayerToken implements Token, Comparable<LayerToken> {
     private String id;
-    private String data;
+    private String content;
     private Boolean hasMatch;
     private int index;
     private int matchIndex;
@@ -14,7 +14,7 @@ public class LayerToken implements Token, Comparable<LayerToken> {
 
     public LayerToken(Witness witness, String id, String data, int index, int matchIndex, String layer) {
         this.id = id;
-        this.data = data;
+        this.content = data;
         this.index = index;
         this.matchIndex = matchIndex;
         this.layer = layer;
@@ -30,8 +30,8 @@ public class LayerToken implements Token, Comparable<LayerToken> {
         return index;
     }
 
-    public String getData() {
-        return data;
+    public String getContent() {
+        return content;
     }
 
     public Boolean hasMatch() {
