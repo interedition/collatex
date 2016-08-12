@@ -58,9 +58,9 @@ public class EditGraphAligner {
                 event2) -> !(event1.type.equals(WitnessNode.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END))
                         && !(event1.type.equals(WitnessNode.WitnessNodeEventType.END) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END));
 
-        List<List<WitnessNode.WitnessNodeEvent>> lists = nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate));
-        Stream<EditGraphTableLabel> editGraphTableLabelStream = lists.stream().map(list -> list.stream().collect(new LabelCollector()));
-        return editGraphTableLabelStream.collect(Collectors.toList());
+        return nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate)).stream()//
+                .map(list -> list.stream().collect(new LabelCollector()))//
+                .collect(Collectors.toList());
     }
 
     public EditGraphAligner(WitnessNode a, WitnessNode b) {
@@ -409,6 +409,8 @@ public class EditGraphAligner {
                     break;
                 case TEXT:
                     label.addTextEvent(event.node);
+                    String parentTag = event.node.parentNodeStream().iterator().next().data;
+                    label.layer = parentTag.equals("wit") ? "base" : parentTag;
                     break;
                 default:
                     throw new UnsupportedOperationException("Unknown event type");
@@ -435,6 +437,7 @@ public class EditGraphAligner {
     }
 
     static class EditGraphTableLabel {
+        String layer;
         List<WitnessNode> startElements = new ArrayList<>();
         List<WitnessNode> endElements = new ArrayList<>();
         WitnessNode text;
