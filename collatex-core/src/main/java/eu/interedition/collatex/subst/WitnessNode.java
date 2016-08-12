@@ -152,6 +152,11 @@ public class WitnessNode {
             this.node = node;
             this.type = type;
         }
+
+        @Override
+        public String toString() {
+            return type.toString()+": "+node.toString();
+        }
     }
 
 }
