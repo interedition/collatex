@@ -39,7 +39,7 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 /**
  * Created by ronalddekker on 01/05/16.
  */
-public class EditGraphAlignerTest {
+public class EditGraphAlignerTest extends AbstractAlignmentTest {
 
     // for the alignment to work with the different layers of the text
     // we have to treat the start of an add/del tag differently
@@ -286,23 +286,8 @@ public class EditGraphAlignerTest {
         return wn.getSigil() + ":" + wn.data;
     }
 
-    private void addRow(V2_AsciiTable at, List<Object> row, char alignment) {
-        at.addRow(row.toArray()).setAlignment(alignment(row, alignment));
-        at.addRule();
-    }
-
-    private char[] alignment(List<Object> row, char alignmentType) {
-        char[] a = new char[row.size()];
-        Arrays.fill(a, alignmentType);
-        return a;
-    }
-
     private String labelText(EditGraphTableLabel l) {
         return witnessNodeText(l.text);
-    }
-
-    private String witnessNodeText(WitnessNode witnessNode) {
-        return witnessNode.data.replace(" ", "\u2022");
     }
 
     static final Map<Score.Type, String> TYPEINDICATORS = ImmutableMap.<Score.Type, String> builder()//
@@ -334,50 +319,6 @@ public class EditGraphAlignerTest {
         }
 
         printTable(table);
-    }
-
-    private void printTable(V2_AsciiTable table) {
-        RenderedTable rt = new V2_AsciiTableRenderer()//
-                .setTheme(V2_E_TableThemes.UTF_LIGHT.get())//
-                .setWidth(new WidthLongestWord())//
-                .render(table);
-        System.out.println(rt);
-    }
-
-    private void visualizeSuperWitness(List<List<WitnessNode>> superWitness) {
-        List<Object> witATokens = Lists.newArrayList("A:");
-        List<Object> witABTokens = Lists.newArrayList("A+B:");
-        List<Object> witBTokens = Lists.newArrayList("B:");
-
-        superWitness.forEach(l -> {
-            // System.err.println("l=" + l);
-            WitnessNode witnessNode = l.get(0);
-            String witnessNodeText = witnessNodeText(witnessNode);
-            if (l.size() == 2) {
-                witATokens.add("");
-                witABTokens.add(witnessNodeText);
-                witBTokens.add("");
-
-            } else if (l.size() == 1) {
-                witABTokens.add("");
-                if ("A".equals(witnessNode.getSigil())) {
-                    witATokens.add(witnessNodeText);
-                    witBTokens.add("");
-                } else if ("B".equals(witnessNode.getSigil())) {
-                    witATokens.add("");
-                    witBTokens.add(witnessNodeText);
-                }
-
-            }
-        });
-
-        V2_AsciiTable table = new V2_AsciiTable();
-        table.addRule();
-        addRow(table, witATokens, 'c');
-        addRow(table, witABTokens, 'c');
-        addRow(table, witBTokens, 'c');
-        printTable(table);
-
     }
 
     private void visualizeVariantGraph(VariantGraph vGraph) {
