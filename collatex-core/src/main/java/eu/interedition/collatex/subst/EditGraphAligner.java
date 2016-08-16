@@ -365,6 +365,23 @@ public class EditGraphAligner {
         return StreamSupport.stream(it.spliterator(), false);
     }
 
+    public Map<WitnessNode, String> getWitnessLabelsForSuperwitness(List<List<WitnessNode>> superWitness) {
+        Map<WitnessNode, String> result = new HashMap<>();
+        superWitness.stream().forEach(l -> l.stream().forEach(n -> {
+            String label = n.getSigil();
+            StringBuilder x = new StringBuilder();
+            n.parentNodeStream().forEach(p -> {
+                if (p.data != "wit" && p.data != "fake root") {
+                    x.insert(0, "-"+p.data);
+                }
+            });
+            label += x.toString();
+            result.put(n, label);
+        }
+        ));
+        return result;
+    }
+
     private static class ScoreIterator implements Iterator<Score> {
         private Score[][] matrix;
         Integer y;
