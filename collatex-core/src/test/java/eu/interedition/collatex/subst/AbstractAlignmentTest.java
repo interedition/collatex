@@ -7,8 +7,10 @@ import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer;
 import de.vandermeer.asciitable.v2.render.WidthLongestWord;
 import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ronalddekker on 15/08/16.
@@ -43,7 +45,6 @@ public class AbstractAlignmentTest {
 
         V2_AsciiTable table = new V2_AsciiTable();
         table.addRule();
-        System.out.println(witATokens);
         addRow(table, witATokens, 'c');
         addRow(table, witABTokens, 'c');
         addRow(table, witBTokens, 'c');
@@ -72,5 +73,18 @@ public class AbstractAlignmentTest {
                 .setWidth(new WidthLongestWord())//
                 .render(table);
         System.out.println(rt);
+    }
+
+    protected List<Integer> convertWitnessNodeRankMapToList(Map<WitnessNode, Integer> witnessNodeToRank, List<List<WitnessNode>> superWitness) {
+        List<WitnessNode> superwitnessflattened = new ArrayList<>();
+        superWitness.stream().forEach( l -> { l.stream().forEach( n -> {
+                superwitnessflattened.add(n);
+            });
+        });
+        List<Integer> result = new ArrayList<>();
+        superwitnessflattened.forEach(n -> {
+            result.add(witnessNodeToRank.get(n));
+        });
+        return result;
     }
 }
