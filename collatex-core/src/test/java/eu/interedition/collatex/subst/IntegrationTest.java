@@ -61,8 +61,9 @@ public class IntegrationTest extends AbstractAlignmentTest {
 
     }
 
-    // we have assign a witness to each witness node in the superwitness
-    // this is a bit more complex in the case of layers, since each layer should be its own witness
+    // We have assign a rank to each witness node in the superwitness.
+    // This is a bit more complex in the case of layers, since each layer should be its own witness
+    // We rank the individual items in the superwitness.
     @Test
     public void testTwoWitnessesRanks() {
         String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
@@ -73,8 +74,8 @@ public class IntegrationTest extends AbstractAlignmentTest {
         List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
         visualizeSuperWitness(superWitness);
 
-        Map<WitnessNode, Integer> witnessNodeToRank = aligner.getRanksForSuperwitness(superWitness);
-        List<Integer> expectedRanks = Arrays.asList(0, 0, 1, 1, 1, 2, 2, 3, 3);
+        Map<List<WitnessNode>, Integer> witnessNodeToRank = aligner.getRanksForSuperwitness(superWitness);
+        List<Integer> expectedRanks = Arrays.asList(0, 1, 1, 2, 3);
         assertEquals(expectedRanks, convertWitnessNodeRankMapToList(witnessNodeToRank, superWitness));
     }
 

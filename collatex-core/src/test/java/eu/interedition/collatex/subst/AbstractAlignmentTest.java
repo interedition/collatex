@@ -75,14 +75,9 @@ public class AbstractAlignmentTest {
         System.out.println(rt);
     }
 
-    protected List<Integer> convertWitnessNodeRankMapToList(Map<WitnessNode, Integer> witnessNodeToRank, List<List<WitnessNode>> superWitness) {
-        List<WitnessNode> superwitnessflattened = new ArrayList<>();
-        superWitness.stream().forEach( l -> { l.stream().forEach( n -> {
-                superwitnessflattened.add(n);
-            });
-        });
+    protected List<Integer> convertWitnessNodeRankMapToList(Map<List<WitnessNode>, Integer> witnessNodeToRank, List<List<WitnessNode>> superWitness) {
         List<Integer> result = new ArrayList<>();
-        superwitnessflattened.forEach(n -> {
+        superWitness.forEach(n -> {
             result.add(witnessNodeToRank.get(n));
         });
         return result;

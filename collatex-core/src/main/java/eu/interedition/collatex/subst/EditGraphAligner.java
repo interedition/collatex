@@ -383,21 +383,15 @@ public class EditGraphAligner {
     }
 
     // TODO: this implementation is too rigid!
-    public Map<WitnessNode,Integer> getRanksForSuperwitness(List<List<WitnessNode>> superWitness) {
+    public Map<List<WitnessNode>, Integer> getRanksForSuperwitness(List<List<WitnessNode>> superWitness) {
         // TODO: hardcoded!
-        List<Integer> ranksAsRange = Arrays.asList(0,0,1,1,1,2,2,3,3);
+        List<Integer> ranksAsRange = Arrays.asList(0, 1, 1, 2, 3);
         // Java 8 has no stream with counter, nor a zip function... sigh
-        // so we flatten the list...
-        // then we walk over the index using a range on an int stream ...
-        List<WitnessNode> superwitnessflattened = new ArrayList<>();
-        superWitness.stream().forEach( l -> { l.stream().forEach( n -> {
-                superwitnessflattened.add(n);
-            });
-        });
+        // We walk over the index using a range on an int stream ...
         IntStream index = IntStream.range(0, ranksAsRange.size());
-        Map<WitnessNode, Integer> ranks = new HashMap<>();
+        Map<List<WitnessNode>, Integer> ranks = new HashMap<>();
         index.forEach( i -> {
-            ranks.put(superwitnessflattened.get(i), ranksAsRange.get(i));
+            ranks.put(superWitness.get(i), ranksAsRange.get(i));
         });
         return ranks;
    }
