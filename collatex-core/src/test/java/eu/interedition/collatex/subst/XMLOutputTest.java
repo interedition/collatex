@@ -65,12 +65,12 @@ public class XMLOutputTest extends AbstractAlignmentTest {
     // TODO: this test is a work in progress!
 //            The
 //            <app>
-//        <rdg wit=”#Wit1-subst-del #Wit3”>white</rdg>
-//        <rdg wit=”#Wit1-subst-add #Wit2”>black</rdg>
-//        <rdg wit=”#Wit4”>blue</rdg>
+//        <rdg wit=”#WitA-subst-del”>white</rdg>
+//        <rdg wit=”#WitA-subst-add #WitB”>black</rdg>
 //        </app>
 //            dog.
-    @Ignore
+
+//    @Ignore
     @Test
     public void testXMLOutputTwoWitnesses() {
         String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
@@ -84,10 +84,10 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         Iterator<XMLOutput.Column> columns = table.iterator();
         XMLOutput.Column column1 = columns.next();
         assertFalse(column1.hasVariation());
-        assertEquals("The ", column1.getReading());
+        assertEquals("The ", column1.getLemma());
         XMLOutput.Column column2 = columns.next();
         assertTrue(column2.hasVariation());
-        assertEquals("white", column2.getReading("A-subst-del"));
+        assertEquals("A-subst-del", column2.getWitnessesForReading("white").get(0));
 
 
 
