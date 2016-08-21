@@ -365,20 +365,6 @@ public class EditGraphAligner {
         return StreamSupport.stream(it.spliterator(), false);
     }
 
-    // TODO: this implementation is too rigid!
-    public Map<List<WitnessNode>, Integer> getRanksForSuperwitness(List<List<WitnessNode>> superWitness) {
-        // TODO: hardcoded!
-        List<Integer> ranksAsRange = Arrays.asList(0, 1, 1, 2, 3);
-        // Java 8 has no stream with counter, nor a zip function... sigh
-        // We walk over the index using a range on an int stream ...
-        IntStream index = IntStream.range(0, ranksAsRange.size());
-        Map<List<WitnessNode>, Integer> ranks = new HashMap<>();
-        index.forEach( i -> {
-            ranks.put(superWitness.get(i), ranksAsRange.get(i));
-        });
-        return ranks;
-   }
-
     private static class ScoreIterator implements Iterator<Score> {
         private Score[][] matrix;
         Integer y;

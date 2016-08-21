@@ -16,7 +16,7 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 
     // Can we derive the correct XML output from a simple example?
     // First we start with two witnesses
-    // we have assign a witness to each witness node in the superwitness
+    // we have assign a witness/layer label/identifier to each witness node in the superwitness
     // this is a bit more complex in the case of layers, since each layer should be its own witness
     @Test
     public void testTwoWitnessesLayerIdentifiers() {
@@ -42,7 +42,27 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 
     }
 
-// TODO: this test is a work in progress!
+    // We have assign a rank to each witness node in the superwitness.
+    // This is a bit more complex in the case of layers, since each layer should be its own witness
+    // We rank the individual items in the superwitness.
+    @Test
+    public void testTwoWitnessesRanks() {
+        String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
+        String w2 = "<wit n=\"2\">The black dog.</wit>";
+        WitnessNode a = WitnessNode.createTree("A", w1);
+        WitnessNode b = WitnessNode.createTree("B", w2);
+        EditGraphAligner aligner = new EditGraphAligner(a, b);
+        List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
+        visualizeSuperWitness(superWitness);
+
+        XMLOutput output = new XMLOutput(superWitness);
+        Map<List<WitnessNode>, Integer> witnessNodeToRank = output.getRanksForMatchesAndNonMatches();
+        List<Integer> expectedRanks = Arrays.asList(0, 1, 1, 2, 3);
+        assertEquals(expectedRanks, convertWitnessNodeRankMapToList(witnessNodeToRank, superWitness));
+    }
+
+
+    // TODO: this test is a work in progress!
 //            The
 //            <app>
 //        <rdg wit=”#Wit1-subst-del #Wit3”>white</rdg>

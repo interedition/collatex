@@ -1,9 +1,7 @@
 package eu.interedition.collatex.subst;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Created by ronalddekker on 18/08/16.
@@ -38,11 +36,16 @@ public class XMLOutput {
     public XMLOutput(List<List<WitnessNode>> superWitness) {
         // To create the table we need the layer identifiers as witness identifiers (NB: not per witness, but per layer!)
         // Then we need the ranks per element of the superwitness (element -> in other words: groups of tokens that match)
-        this.table = new ArrayList<>();
         this.superWitness = superWitness;
+        this.table = new ArrayList<>();
     }
 
     public List<Column> getTable() {
+        // To create the table we need to label each of the layers in the witnesses.
+        Map<WitnessNode, String> witnessLabels = getWitnessLabels();
+        // We need to rank all the matches / non-matches
+        Map<List<WitnessNode>, Integer> ranksForMatchesAndNonMatches = getRanksForMatchesAndNonMatches();
+
         return table;
     }
 
@@ -62,6 +65,22 @@ public class XMLOutput {
         ));
         return result;
     }
+
+    // TODO: this implementation is too rigid!
+    public Map<List<WitnessNode>, Integer> getRanksForMatchesAndNonMatches() {
+        // TODO: hardcoded!
+        List<Integer> ranksAsRange = Arrays.asList(0, 1, 1, 2, 3);
+        // Java 8 has no stream with counter, nor a zip function... sigh
+        // We walk over the index using a range on an int stream ...
+        IntStream index = IntStream.range(0, ranksAsRange.size());
+        Map<List<WitnessNode>, Integer> ranks = new HashMap<>();
+        index.forEach( i -> {
+            ranks.put(superWitness.get(i), ranksAsRange.get(i));
+        });
+        return ranks;
+    }
+
+
 
 
 }
