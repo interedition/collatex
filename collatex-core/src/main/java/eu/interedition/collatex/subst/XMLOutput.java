@@ -30,6 +30,11 @@ public class XMLOutput {
         public List<String> getWitnessesForReading(String reading) {
             return readingToLayerIdentifiers.get(reading);
         }
+
+        public List<String> getReadings() {
+            //NOTE: key set is a linked set!
+            return new ArrayList<>(readingToLayerIdentifiers.keySet());
+        }
     }
 
     public XMLOutput(List<List<WitnessNode>> superWitness) {
@@ -54,11 +59,17 @@ public class XMLOutput {
         for (int i=0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
             // in the most simple case we treat all the witness nodes separately
-            Map<String, String> labelToNode = new HashMap<>();
+            LinkedHashMap<String, String> labelToNode = new LinkedHashMap<>();
             for (List<WitnessNode> match : matches) {
                 for (WitnessNode node : match) {
-                    labelToNode.put(witnessLabels.get(node), node.data);
-                }
+                    // Only normalize when there is variation in a column.
+                    String value = node.data;
+                    if (matches.size()>1) {
+                        // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
+                        value = value.trim();
+                    }
+                    labelToNode.put(witnessLabels.get(node), value);
+               }
             }
             Map<String, List<String>> readingToLayerIdentifiers = inverseMap(labelToNode);
             Column column = new Column(readingToLayerIdentifiers);

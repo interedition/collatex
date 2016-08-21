@@ -87,10 +87,8 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         assertEquals("The ", column1.getLemma());
         XMLOutput.Column column2 = columns.next();
         assertTrue(column2.hasVariation());
+        assertEquals(Arrays.asList("white", "black"), column2.getReadings());
         assertEquals("A-subst-del", column2.getWitnessesForReading("white").get(0));
-
-
-
     }
 
 }
