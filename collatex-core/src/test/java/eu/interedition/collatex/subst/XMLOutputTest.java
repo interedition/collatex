@@ -62,7 +62,6 @@ public class XMLOutputTest extends AbstractAlignmentTest {
     }
 
 
-    // TODO: this test is a work in progress!
 //            The
 //            <app>
 //        <rdg wit=”#WitA-subst-del”>white</rdg>
@@ -72,7 +71,7 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 
 //    @Ignore
     @Test
-    public void testXMLOutputTwoWitnesses() {
+    public void testColumnGenerationTwoWitnesses() {
         String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
         String w2 = "<wit n=\"2\">The black dog.</wit>";
         WitnessNode a = WitnessNode.createTree("A", w1);
@@ -89,6 +88,14 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         assertTrue(column2.hasVariation());
         assertEquals(Arrays.asList("white", "black"), column2.getReadings());
         assertEquals("A-subst-del", column2.getWitnessesForReading("white").get(0));
+        assertEquals(Arrays.asList("A-subst-add", "B"), column2.getWitnessesForReading("black"));
+        XMLOutput.Column column3 = columns.next();
+        assertFalse(column3.hasVariation());
+        assertEquals("dog", column3.getLemma());
+        XMLOutput.Column column4 = columns.next();
+        assertFalse(column4.hasVariation());
+        assertEquals(".", column4.getLemma());
+        assertFalse(columns.hasNext());
     }
 
 }
