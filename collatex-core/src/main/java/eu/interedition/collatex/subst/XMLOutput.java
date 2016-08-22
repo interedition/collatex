@@ -1,5 +1,9 @@
 package eu.interedition.collatex.subst;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.Writer;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -9,9 +13,22 @@ import java.util.stream.IntStream;
 public class XMLOutput {
     private final List<List<WitnessNode>> superWitness;
 
+    public void printXML(Writer writer) throws XMLStreamException {
+        XMLOutputFactory output = XMLOutputFactory.newInstance();
+        XMLStreamWriter xwriter = output.createXMLStreamWriter(writer);
+        xwriter.writeStartDocument();
+        // add root element
+        xwriter.writeStartElement("apparatus");
+        // here we have to go over the columns
+        // TODO: hardcoded to get data from first column
+        Column c1 = getTable().get(0);
+        xwriter.writeCharacters(c1.getLemma());
+        xwriter.writeEndElement();
+        xwriter.writeEndDocument();
+    }
+
     // We now have the matches, witness labels and ranks
-    // Ik wil eigenlijk een type opslaan op de column
-    // er kan variatie zijn of niet
+    // A column can contain variation or not
     public class Column {
         private final Map<String, List<String>> readingToLayerIdentifiers;
 
@@ -58,6 +75,7 @@ public class XMLOutput {
         List<Column> columns = new ArrayList<>();
         for (int i=0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
+            //TODO: matches.stream().map(TODO)
             // in the most simple case we treat all the witness nodes separately
             LinkedHashMap<String, String> labelToNode = new LinkedHashMap<>();
             for (List<WitnessNode> match : matches) {
@@ -71,6 +89,8 @@ public class XMLOutput {
                     labelToNode.put(witnessLabels.get(node), value);
                }
             }
+            //TODO: the inverseMap method has no garanteed order
+            //TODO: unit tests should fail, but don't at this time!
             Map<String, List<String>> readingToLayerIdentifiers = inverseMap(labelToNode);
             Column column = new Column(readingToLayerIdentifiers);
             columns.add(column);

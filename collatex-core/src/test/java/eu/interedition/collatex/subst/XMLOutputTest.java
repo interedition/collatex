@@ -3,6 +3,8 @@ package eu.interedition.collatex.subst;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.*;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -69,7 +71,6 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 //        </app>
 //            dog.
 
-//    @Ignore
     @Test
     public void testColumnGenerationTwoWitnesses() {
         String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
@@ -98,4 +99,27 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         assertFalse(columns.hasNext());
     }
 
+
+    //            The
+//            <app>
+//        <rdg wit=”#WitA-subst-del”>white</rdg>
+//        <rdg wit=”#WitA-subst-add #WitB”>black</rdg>
+//        </app>
+//            dog.
+
+    // From the columns we go to the actual XML
+    @Test
+    public void testGenerateXML() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
+        String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
+        String w2 = "<wit n=\"2\">The black dog.</wit>";
+        WitnessNode a = WitnessNode.createTree("A", w1);
+        WitnessNode b = WitnessNode.createTree("B", w2);
+        EditGraphAligner aligner = new EditGraphAligner(a, b);
+        List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
+        XMLOutput x = new XMLOutput(superWitness);
+        StringWriter writer = new StringWriter();
+        x.printXML(writer);
+        String content = writer.toString();
+        assertEquals("<?xml version=\"1.0\" ?><apparatus>The </apparatus>", content);
+    }
 }
