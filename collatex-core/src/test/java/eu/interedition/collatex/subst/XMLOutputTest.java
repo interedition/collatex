@@ -100,7 +100,7 @@ public class XMLOutputTest extends AbstractAlignmentTest {
     }
 
 
-    //            The
+//            The
 //            <app>
 //        <rdg wit=”#WitA-subst-del”>white</rdg>
 //        <rdg wit=”#WitA-subst-add #WitB”>black</rdg>
@@ -120,6 +120,6 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         StringWriter writer = new StringWriter();
         x.printXML(writer);
         String content = writer.toString();
-        assertEquals("<?xml version=\"1.0\" ?><apparatus>The </apparatus>", content);
+        assertEquals("<?xml version=\"1.0\" ?><apparatus>The <app><rdg wit=\"A-subst-del\">white</rdg></app></apparatus>", content);
     }
 }

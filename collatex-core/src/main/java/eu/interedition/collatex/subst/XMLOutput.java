@@ -23,6 +23,16 @@ public class XMLOutput {
         // TODO: hardcoded to get data from first column
         Column c1 = getTable().get(0);
         xwriter.writeCharacters(c1.getLemma());
+        // TODO: hardcoded to get data from two column
+        Column c2 = getTable().get(1);
+        xwriter.writeStartElement("app");
+        xwriter.writeStartElement("rdg");
+        List<String> readings = c2.getReadings();
+        String witnesses = String.join(" ", c2.getWitnessesForReading(readings.get(0)));
+        xwriter.writeAttribute("wit", witnesses);
+        xwriter.writeCharacters(readings.get(0));
+        xwriter.writeEndElement();
+        xwriter.writeEndElement();
         xwriter.writeEndElement();
         xwriter.writeEndDocument();
     }
@@ -75,7 +85,7 @@ public class XMLOutput {
         List<Column> columns = new ArrayList<>();
         for (int i=0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
-            //TODO: matches.stream().map(TODO)
+            //TODO: insteads of "for" statements, rewrite using: matches.stream().map(TODO)
             // in the most simple case we treat all the witness nodes separately
             LinkedHashMap<String, String> labelToNode = new LinkedHashMap<>();
             for (List<WitnessNode> match : matches) {
@@ -89,7 +99,7 @@ public class XMLOutput {
                     labelToNode.put(witnessLabels.get(node), value);
                }
             }
-            //TODO: the inverseMap method has no garanteed order
+            //TODO: the inverseMap method has no guaranteed order
             //TODO: unit tests should fail, but don't at this time!
             Map<String, List<String>> readingToLayerIdentifiers = inverseMap(labelToNode);
             Column column = new Column(readingToLayerIdentifiers);
@@ -98,9 +108,9 @@ public class XMLOutput {
         return columns;
     }
 
-    private static <T, U> Map<T, List<U>> inverseMap(Map<U, T> ranksForMatchesAndNonMatches) {
+    private static <T, U> Map<T, List<U>> inverseMap(Map<U, T> original) {
         Map<T, List<U>> inverse = new HashMap<>();
-        Set<Map.Entry<U, T>> entries = ranksForMatchesAndNonMatches.entrySet();
+        Set<Map.Entry<U, T>> entries = original.entrySet();
         for (Map.Entry<U, T> entry : entries) {
             if (inverse.containsKey(entry.getValue())) {
                 inverse.get(entry.getValue()).add(entry.getKey());
