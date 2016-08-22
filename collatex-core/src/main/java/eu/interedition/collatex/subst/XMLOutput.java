@@ -26,12 +26,14 @@ public class XMLOutput {
         // TODO: hardcoded to get data from two column
         Column c2 = getTable().get(1);
         xwriter.writeStartElement("app");
-        xwriter.writeStartElement("rdg");
         List<String> readings = c2.getReadings();
-        String witnesses = String.join(" ", c2.getWitnessesForReading(readings.get(0)));
-        xwriter.writeAttribute("wit", witnesses);
-        xwriter.writeCharacters(readings.get(0));
-        xwriter.writeEndElement();
+        for (String reading : readings) {
+            xwriter.writeStartElement("rdg");
+            String witnesses = String.join(" ", c2.getWitnessesForReading(reading));
+            xwriter.writeAttribute("wit", witnesses);
+            xwriter.writeCharacters(reading);
+            xwriter.writeEndElement();
+        }
         xwriter.writeEndElement();
         xwriter.writeEndElement();
         xwriter.writeEndDocument();
