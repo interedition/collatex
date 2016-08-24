@@ -1,9 +1,10 @@
 package eu.interedition.collatex.subst;
 
-import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
 
-public class LayerToken implements Token, Comparable<LayerToken> {
+public class LayerToken extends SimpleToken/* implements Comparable<LayerToken> */ {
     private String id;
     private String content;
     private Boolean hasMatch;
@@ -13,6 +14,7 @@ public class LayerToken implements Token, Comparable<LayerToken> {
     private String layer;
 
     public LayerToken(Witness witness, String id, String data, int index, int matchIndex, String layer) {
+        super((SimpleWitness) witness, data, data);
         this.id = id;
         this.content = data;
         this.index = index;
@@ -30,6 +32,7 @@ public class LayerToken implements Token, Comparable<LayerToken> {
         return index;
     }
 
+    @Override
     public String getContent() {
         return content;
     }
@@ -55,9 +58,9 @@ public class LayerToken implements Token, Comparable<LayerToken> {
         return witness;
     }
 
-    @Override
-    public int compareTo(LayerToken other) {
-        return getId().compareTo(other.getId());
-    }
+    // @Override
+    // public int compareTo(LayerToken other) {
+    // return getId().compareTo(other.getId());
+    // }
 
 }

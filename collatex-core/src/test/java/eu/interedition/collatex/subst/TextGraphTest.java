@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -42,7 +41,7 @@ public class TextGraphTest {
         neo4j.close();
     }
 
-    @Test
+    // @Test
     public void testexample1() {
         String xml_a = "<wit n=\"1\"><subst><del>Apparently, in</del><add>So, at</add></subst> the <subst><del>beginning</del><add>outset</add></subst>, finding the <subst><del>correct</del><add>right</add></subst> word.</wit>";
         String xml_b = "<wit n=\"2\"><subst><del>Apparently, at</del><add>So, in</add></subst> <subst><del>the</del><add>this</add></subst> very beginning, finding the right word.</wit>";
@@ -53,7 +52,7 @@ public class TextGraphTest {
         collate(xml_a, xml_b, atRowA, atRowB);
     }
 
-    @Test
+    // @Test
     public void testExample5() {
         String xml_a = "<wit n=\"1\">It is not an easy thing at all with long substitutions.</wit>";
         String xml_b = "<wit n=\"2\">It <subst><del>is not easy at all</del><add>all gets complicated</add></subst> with long substitutions.</wit>";
@@ -62,7 +61,7 @@ public class TextGraphTest {
         collate(xml_a, xml_b, atRowA, atRowB);
     }
 
-    @Test
+    // @Test
     public void testExample6() {
         String xml_a = "<wit n=\"1\">It is not an easy thing at all with long substitutions.</wit>";
         String xml_b = "<wit n=\"2\">It <subst><del>is not</del><add>gets</add></subst> <subst><del>easy</del><add>complicated</add></subst> <subst><add>very quickly</add></subst> with long substitutions.</wit>";
@@ -90,7 +89,6 @@ public class TextGraphTest {
         // assertEquals(atRowA, toString(table, wA));
         // assertEquals(atRowB, toString(table, wB));
     }
-
 
     private String toHTML(String xml) {
         return StringEscapeUtils.escapeHtml4(xml);
