@@ -25,18 +25,31 @@ public class XMLOutput {
         xwriter.writeCharacters(c1.getLemma());
         // TODO: hardcoded to get data from two column
         Column c2 = getTable().get(1);
+        renderApp(xwriter, c2);
+        // render the third column
+        Column c3 = getTable().get(2);
+        xwriter.writeCharacters(c3.getLemma());
+        // render the fourth column
+        Column c4 = getTable().get(3);
+        xwriter.writeCharacters(c4.getLemma());
+
+
+        //end root element
+        xwriter.writeEndElement();
+        xwriter.writeEndDocument();
+    }
+
+    private void renderApp(XMLStreamWriter xwriter, Column column) throws XMLStreamException {
         xwriter.writeStartElement("app");
-        List<String> readings = c2.getReadings();
+        List<String> readings = column.getReadings();
         for (String reading : readings) {
             xwriter.writeStartElement("rdg");
-            String witnesses = String.join(" ", c2.getWitnessesForReading(reading));
+            String witnesses = String.join(" ", column.getWitnessesForReading(reading));
             xwriter.writeAttribute("wit", witnesses);
             xwriter.writeCharacters(reading);
             xwriter.writeEndElement();
         }
         xwriter.writeEndElement();
-        xwriter.writeEndElement();
-        xwriter.writeEndDocument();
     }
 
     // We now have the matches, witness labels and ranks

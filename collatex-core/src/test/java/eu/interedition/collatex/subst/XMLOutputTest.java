@@ -108,6 +108,7 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 //            dog.
 
     // From the columns we go to the actual XML
+    // TODO: whitespace in the dog token is still a problem, since it is preceding the token and not following it.
     @Test
     public void testGenerateXML() throws FileNotFoundException, UnsupportedEncodingException, XMLStreamException {
         String w1 = "<wit n=\"1\">The <subst><del hand=\"#AA\">white</del><add hand=\"#AA\">black</add></subst> dog.</wit>";
@@ -120,6 +121,6 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         StringWriter writer = new StringWriter();
         x.printXML(writer);
         String content = writer.toString();
-        assertEquals("<?xml version=\"1.0\" ?><apparatus>The <app><rdg wit=\"A-subst-del\">white</rdg><rdg wit=\"A-subst-add B\">black</rdg></app></apparatus>", content);
+        assertEquals("<?xml version=\"1.0\" ?><apparatus>The <app><rdg wit=\"A-subst-del\">white</rdg><rdg wit=\"A-subst-add B\">black</rdg></app>dog.</apparatus>", content);
     }
 }
