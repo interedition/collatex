@@ -8,7 +8,8 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- * Created by ronalddekker on 18/08/16.
+ *
+ * Created by Ronald Haentjens Dekker on 18/08/16.
  */
 public class XMLOutput {
     private final List<List<WitnessNode>> superWitness;
@@ -20,23 +21,20 @@ public class XMLOutput {
         // add root element
         xwriter.writeStartElement("apparatus");
         // here we have to go over the columns
-        // TODO: hardcoded to get data from first column
-        Column c1 = getTable().get(0);
-        xwriter.writeCharacters(c1.getLemma());
-        // TODO: hardcoded to get data from two column
-        Column c2 = getTable().get(1);
-        renderApp(xwriter, c2);
-        // render the third column
-        Column c3 = getTable().get(2);
-        xwriter.writeCharacters(c3.getLemma());
-        // render the fourth column
-        Column c4 = getTable().get(3);
-        xwriter.writeCharacters(c4.getLemma());
-
-
+        for (Column c : getTable()) {
+            if (c.hasVariation()) {
+                renderApp(xwriter, c);
+            } else {
+                renderLemma(xwriter, c);
+            }
+        }
         //end root element
         xwriter.writeEndElement();
         xwriter.writeEndDocument();
+    }
+
+    private void renderLemma(XMLStreamWriter xwriter, Column column) throws XMLStreamException {
+        xwriter.writeCharacters(column.getLemma());
     }
 
     private void renderApp(XMLStreamWriter xwriter, Column column) throws XMLStreamException {
@@ -92,13 +90,12 @@ public class XMLOutput {
         Map<List<WitnessNode>, Integer> ranksForMatchesAndNonMatches = getRanksForMatchesAndNonMatches();
         Map<Integer, List<List<WitnessNode>>> rankToWitnessNodes = inverseMap(ranksForMatchesAndNonMatches);
         // Given the ranks and the labels we create the columns
-        List<Column> columns = createColumns(witnessLabels, rankToWitnessNodes);
-        return columns;
+        return createColumns(witnessLabels, rankToWitnessNodes);
     }
 
     private List<Column> createColumns(Map<WitnessNode, String> witnessLabels, Map<Integer, List<List<WitnessNode>>> inverse) {
         List<Column> columns = new ArrayList<>();
-        for (int i=0; i < inverse.keySet().size(); i++) {
+        for (int i = 0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
             //TODO: insteads of "for" statements, rewrite using: matches.stream().map(TODO)
             // in the most simple case we treat all the witness nodes separately
@@ -107,12 +104,12 @@ public class XMLOutput {
                 for (WitnessNode node : match) {
                     // Only normalize when there is variation in a column.
                     String value = node.data;
-                    if (matches.size()>1) {
+                    if (matches.size() > 1) {
                         // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
                         value = value.trim();
                     }
                     labelToNode.put(witnessLabels.get(node), value);
-               }
+                }
             }
             //TODO: the inverseMap method has no guaranteed order
             //TODO: unit tests should fail, but don't at this time!
@@ -142,8 +139,8 @@ public class XMLOutput {
                 String label = n.getSigil();
                 StringBuilder x = new StringBuilder();
                 n.parentNodeStream().forEach(p -> {
-                    if (p.data != "wit" && p.data != "fake root") {
-                        x.insert(0, "-"+p.data);
+                    if (!p.data.equals("wit") && !p.data.equals("fake root")) {
+                        x.insert(0, "-" + p.data);
                     }
                 });
                 label += x.toString();
@@ -161,13 +158,7 @@ public class XMLOutput {
         // We walk over the index using a range on an int stream ...
         IntStream index = IntStream.range(0, ranksAsRange.size());
         Map<List<WitnessNode>, Integer> ranks = new HashMap<>();
-        index.forEach( i -> {
-            ranks.put(superWitness.get(i), ranksAsRange.get(i));
-        });
+        index.forEach(i -> ranks.put(superWitness.get(i), ranksAsRange.get(i)));
         return ranks;
     }
-
-
-
-
 }
