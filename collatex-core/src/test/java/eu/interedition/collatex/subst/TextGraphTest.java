@@ -27,7 +27,6 @@ import de.vandermeer.asciitable.v2.render.WidthLongestWord;
 import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.subst.CollationGraph.MyToken;
 
 public class TextGraphTest {
     Logger LOG = Logger.getLogger(this.getClass().getName());
@@ -114,10 +113,10 @@ public class TextGraphTest {
                 table.stream()//
                         .map(r -> r.getOrDefault(witness, Collections.emptySet()))//
                         .map(tokens -> tokens.stream()//
-                                .filter(t -> MyToken.class.isAssignableFrom(t.getClass()))//
-                                .map(t -> (MyToken) t)//
+                                .filter(t -> LayerToken.class.isAssignableFrom(t.getClass()))//
+                                .map(t -> (LayerToken) t)//
                                 .sorted()//
-                                .map(MyToken::getData)//
+                                .map(LayerToken::getData)//
                                 .map(t -> t.replace(" ", "\u2022"))//
                                 .collect(Collectors.joining(":")))
                         .map(cell -> cell.isEmpty() ? " " : cell)//
@@ -141,13 +140,13 @@ public class TextGraphTest {
 
     private String toHTMLCell(Set<Token> tokens) {
         return tokens.stream()//
-                .map(t -> (MyToken) t)//
+                .map(t -> (LayerToken) t)//
                 .sorted()//
                 .map(this::tokenAsHTML)//
                 .collect(Collectors.joining());
     }
 
-    private String tokenAsHTML(MyToken t) {
+    private String tokenAsHTML(LayerToken t) {
         switch (t.getLayer()) {
         case "del":
             return "<del>" + t.getData() + "</del>";
@@ -179,7 +178,7 @@ public class TextGraphTest {
 
     private String toCell(Set<Token> tokens) {
         return tokens.stream()//
-                .map(t -> (MyToken) t)//
+                .map(t -> (LayerToken) t)//
                 .sorted()//
                 .map(t -> t.getData().replace(" ", "\u2022") + "^" + t.getLayer().substring(0, 1))//
                 .collect(Collectors.joining(":"));
