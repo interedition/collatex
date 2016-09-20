@@ -13,3 +13,4 @@ target
 bin/
 site/vendor
 node_modules
+/.pydevproject
