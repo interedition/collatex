@@ -3,12 +3,9 @@
 
 __author__ = 'Ronald Haentjens Dekker'
 __email__ = 'ronald.dekker@huygens.knaw.nl'
-__version__ = '2.0.0rc16'
+__version__ = '2.0.0rc20'
 
-from collatex.core_functions import Collation
+from collatex.core_classes import Collation
 from collatex.core_functions import collate
-from collatex.core_functions import collate_pretokenized_json
 
-__all__ = ["Collation", "collate", "collate_pretokenized_json"]
-
-
+__all__ = ["Collation", "collate"]

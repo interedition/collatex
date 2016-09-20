@@ -3,24 +3,33 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
-from collatex.core_classes import VariantGraph, Witness, join, AlignmentTable, Row, WordPunctuationTokenizer
-from collatex.extended_suffix_array import ExtendedSuffixArray
-from collatex.exceptions import UnsupportedError
+import re
+from xml.etree import ElementTree as etree
+from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
-from collatex.linsuffarr import SuffixArray, UNIT_BYTE
-from ClusterShell.RangeSet import RangeSet
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
 
+
 # Valid options for output are:
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
-def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False, detect_transpositions=False, debug_scores=False, properties_filter=None):
+def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
+            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
+    # collation may be collation or json; if it's the latter, use it to build a real collation
+    if isinstance(collation, dict):
+        json_collation = Collation()
+        for witness in collation["witnesses"]:
+            json_collation.add_witness(witness)
+        collation = json_collation
+
+    # assume collation is collation (by now); no error trapping
     if not astar:
-        algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
+        algorithm = EditGraphAligner(collation, near_match=near_match, detect_transpositions=detect_transpositions,
+                                     debug_scores=debug_scores, properties_filter=properties_filter)
     else:
         algorithm = ExperimentalAstarAligner(collation, near_match=near_match, debug_scores=debug_scores)
 
@@ -32,8 +41,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         join(graph)
     # check which output format is requested: graph or table
     if output == "svg":
-        return display_variant_graph_as_SVG(graph)
-    if output=="graph": 
+        return display_variant_graph_as_SVG(graph, svg_output)
+    if output == "graph":
         return graph
     # create alignment table
     table = AlignmentTable(collation, graph, layout)
@@ -45,97 +54,80 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return visualizeTableVerticallyWithColors(table, collation)
     if output == "table":
         return table
+    if output == "xml":
+        return export_alignment_table_as_xml(table)
+    if output == "tei":
+        return export_alignment_table_as_tei(table, indent)
     else:
-        raise Exception("Unknown output type: "+output)
-    
-# TODO: this only works with a table output at the moment
-# TODO: store the tokens on the graph instead
-def collate_pretokenized_json(json, output='table', layout='horizontal', **kwargs):
-    # Takes more or less the same arguments as collate() above, but with some restrictions.
-    # Only output types 'json' and 'table' are supported.
-    if output not in ['json', 'table', 'html2']:
-        raise UnsupportedError("Output type " + output + " not supported for pretokenized collation")
-    if 'segmentation' in kwargs and kwargs['segmentation']:
-        raise UnsupportedError("Segmented output not supported for pretokenized collation")
-    kwargs['segmentation'] = False
+        raise Exception("Unknown output type: " + output)
 
-    # For each witness given, make a 'shadow' witness based on the normalization tokens
-    # that will actually be collated.
-    tokenized_witnesses = []
-    collation = Collation()
-    for witness in json["witnesses"]:
-        collation.add_witness(witness)
-        tokenized_witnesses.append(witness["tokens"])
-    at = collate(collation, output="table", **kwargs)
-    if output == "html2":
-        return visualizeTableVerticallyWithColors(at, collation)
-
-    # record whether there is variation in each of the columns (horizontal) or rows (vertical layout)
-    has_variation_array = []
-    for column in at.columns:
-        has_variation_array.append(column.variant)
-    tokenized_at = AlignmentTable(collation, layout=layout)
-    for row, tokenized_witness in zip(at.rows, tokenized_witnesses):
-        new_row = Row(row.header)
-        tokenized_at.rows.append(new_row)
-        token_counter = 0
-        for cell in row.cells:
-            new_row.cells.append(tokenized_witness[token_counter] if cell else None)
-            if cell:
-                token_counter += 1
-    # In order to have the same information as in the non pretokenized alignment table we
-    # add variation information to the pretokenized alignment table.
-    tokenized_at.has_rank_variation = has_variation_array
-    if output == "json":
-        return export_alignment_table_as_json(tokenized_at)
-    if output == "table":
-        # transform JSON objects to "t" form.
-        for row in tokenized_at.rows:
-            row.cells = [cell["t"] if cell else None for cell in row.cells]
-        return tokenized_at
 
 def export_alignment_table_as_json(table, indent=None, status=False):
-    json_output = {}
-    json_output["table"]=[]
+    json_output = {"table": []}
     sigli = []
     for row in table.rows:
         sigli.append(row.header)
-        json_output["table"].append([[cell] for cell in row.cells])
+        json_output["table"].append(
+            [[listItem.token_data for listItem in cell] if cell else None for cell in row.cells])
     json_output["witnesses"] = sigli
     if status:
         variant_status = []
         for column in table.columns:
             variant_status.append(column.variant)
         json_output["status"] = variant_status
-    return json.dumps(json_output, sort_keys=True, indent=indent)
-
-class Collation(object):
-
-    @classmethod
-    def create_from_dict(cls, data, limit=None):
-        witnesses = data["witnesses"]
-        collation = Collation()
-        for witness in witnesses[:limit]:
-            # generate collation object from json_data
-            collation.add_witness(witness)
-        return collation
-
-    @classmethod
-    # json_data can be a string or a file
-    def create_from_json(cls, json_data):
-        data = json.load(json_data)
-        collation = cls.create_from_dict(data)
-        return collation
-
-    def __init__(self):
-        self.witnesses = []
-
-    def add_witness(self, witnessdata):
-        witness = Witness(witnessdata)
-        self.witnesses.append(witness)
-
-    def add_plain_witness(self, sigil, content):
-        return self.add_witness({'id':sigil, 'content':content})
+    return json.dumps(json_output, sort_keys=True, indent=indent, ensure_ascii=False)
 
 
+def export_alignment_table_as_xml(table):
+    readings = []
+    for column in table.columns:
+        app = etree.Element('app')
+        for key, value in sorted(column.tokens_per_witness.items()):
+            child = etree.Element('rdg')
+            child.attrib['wit'] = "#" + key
+            child.text = "".join(str(item.token_data["t"]) for item in value)
+            app.append(child)
+        # Without the encoding specification, outputs bytes instead of a string
+        result = etree.tostring(app, encoding="unicode")
+        readings.append(result)
+    return "<root>" + "".join(readings) + "</root>"
 
+
+def export_alignment_table_as_tei(table, indent=None):
+    # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
+    # TODO: To fix pretty printing indirectly, fix tokenization
+    p = etree.Element('p')
+    app = None
+    for column in table.columns:
+        if not column.variant:  # no variation
+            text_node = "".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
+            if not (len(p)):  # Result starts with non-varying reading
+                p.text = re.sub('\s+$','',text_node) + "\n" if indent else text_node
+            else:  # Non-varying reading after some <app>
+                app.tail = "\n" + re.sub('\s+$','',text_node) + "\n" if indent else text_node
+        else:
+            app = etree.Element('app')
+            preceding = None  # If preceding is None, we're processing the first <rdg> child
+            app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
+            value_dict = {}  # keys are readings, values are an unsorted lists of sigla
+            for key, value in column.tokens_per_witness.items():
+                group = value_dict.setdefault("".join([item.token_data["t"] for item in value]), [])
+                group.append(key)
+            rdg_dict = {}  # keys are sorted lists of sigla, with "#" prepended; values are readings
+            for key, value in value_dict.items():
+                rdg_dict[" ".join("#" + item for item in sorted(value))] = key
+            for key, value in sorted(rdg_dict.items()):  # sort <rdg> elements by @wit values
+                if preceding is not None and indent:  # Change tail of preceding <rdg> to indent current one
+                    preceding.tail = "\n  "
+                child = etree.Element('rdg')
+                child.attrib['wit'] = key
+                child.text = value
+                app.append(child)
+                child.tail = "\n" if indent else None
+                # If preceding is not None on an iteration, use its tail indent non-initial current <rdg>
+                preceding = child
+            p.append(app)
+            app.tail = "\n" if indent else None
+    # Without the encoding specification, outputs bytes instead of a string
+    result = etree.tostring(p, encoding="unicode")
+    return result
