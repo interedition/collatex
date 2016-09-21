@@ -51,15 +51,15 @@ public class XMLOutput {
         List<String> readings = column.getReadings();
         AtomicInteger varSeqCounter = new AtomicInteger();
         for (String reading : readings) {
-            List<String> witnessesForReading = column.getWitnessesForReading(reading);
-            if (witnessesForReading.size() == 1) {
-                String sigil = witnessesForReading.get(0);
-                renderRdg(xwriter, sigil, varSeqCounter, reading);
+            List<TokenInfo> tokenInfoForReading = column.getTokenInfoForReading(reading);
+            if (tokenInfoForReading.size() == 1) {
+                TokenInfo tokenInfo = tokenInfoForReading.get(0);
+                renderRdg(xwriter, tokenInfo, varSeqCounter, reading);
             } else {
                 xwriter.writeStartElement("rdgGrp");
                 xwriter.writeAttribute("type", "tag_variation_only");
-                for (String sigil : witnessesForReading) {
-                    renderRdg(xwriter, sigil, varSeqCounter, reading);
+                for (TokenInfo tokenInfo : tokenInfoForReading) {
+                    renderRdg(xwriter, tokenInfo, varSeqCounter, reading);
                 }
                 xwriter.writeEndElement();
             }
@@ -68,14 +68,20 @@ public class XMLOutput {
         xwriter.writeCharacters(" ");
     }
 
-    private void renderRdg(XMLStreamWriter xwriter, String sigil, AtomicInteger varSeqCounter, String reading) throws XMLStreamException {
-        String baseSigil = sigil.replaceAll("-subst.*", "");
+    private void renderRdg(XMLStreamWriter xwriter, TokenInfo tokenInfo, AtomicInteger varSeqCounter, String reading) throws XMLStreamException {
         xwriter.writeStartElement("rdg");
-        xwriter.writeAttribute("wit", "#" + baseSigil);
-        if (!sigil.equals(baseSigil)) {
-            String layer = sigil.split("-")[2];
+        xwriter.writeAttribute("wit", "#" + tokenInfo.getSigil());
+        if (tokenInfo.inLayer()) {
+            String layer = tokenInfo.getLayerName();
             xwriter.writeAttribute("varSeq", String.valueOf(varSeqCounter.getAndIncrement()));
             xwriter.writeStartElement(layer);
+            tokenInfo.getLayerAttributes().forEach((k, v) -> {
+                try {
+                    xwriter.writeAttribute(k, v);
+                } catch (XMLStreamException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             xwriter.writeCharacters(reading);
             xwriter.writeEndElement();
 
@@ -88,10 +94,10 @@ public class XMLOutput {
     // We now have the matches, witness labels and ranks
     // A column can contain variation or not
     public class Column {
-        private final Map<String, List<String>> readingToLayerIdentifiers;
+        private final Map<String, List<TokenInfo>> readingToLayerIdentifiers;
 
-        public Column(Map<String, List<String>> readingToLayerIdentifiers) {
-            this.readingToLayerIdentifiers = readingToLayerIdentifiers;
+        public Column(Map<String, List<TokenInfo>> readingToTokenInfosMap) {
+            this.readingToLayerIdentifiers = readingToTokenInfosMap;
         }
 
         public boolean hasVariation() {
@@ -102,7 +108,7 @@ public class XMLOutput {
             return readingToLayerIdentifiers.keySet().iterator().next();
         }
 
-        public List<String> getWitnessesForReading(String reading) {
+        public List<TokenInfo> getTokenInfoForReading(String reading) {
             return readingToLayerIdentifiers.get(reading);
         }
 
@@ -133,7 +139,7 @@ public class XMLOutput {
         for (int i = 0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
             // in the most simple case we treat all the witness nodes separately
-            LinkedHashMap<String, String> labelToNode = new LinkedHashMap<>();
+            LinkedHashMap<TokenInfo, String> labelToNode = new LinkedHashMap<>();
             matches.stream()//
                     .flatMap(List::stream)//
                     .forEach(node -> {
@@ -143,11 +149,20 @@ public class XMLOutput {
                             // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
                             value = value.trim();
                         }
-                        labelToNode.put(witnessLabels.get(node), value);
+                        TokenInfo tokenInfo = new TokenInfo();
+                        String witnessLabel = witnessLabels.get(node);
+                        tokenInfo.setSigil(witnessLabel);
+                        WitnessNode parent = node.parentNodeStream().iterator().next();
+                        // TODO: remove these statics
+                        if (parent.data.equals("add") || parent.data.equals("del")) {
+                            tokenInfo.setLayerName(parent.data);
+                            tokenInfo.setLayerAttributes(parent.attributes);
+                        }
+                        labelToNode.put(tokenInfo, value);
                     });
             // TODO: the inverseMap method has no guaranteed order
             // TODO: unit tests should fail, but don't at this time!
-            Map<String, List<String>> readingToLayerIdentifiers = inverseMap(labelToNode);
+            Map<String, List<TokenInfo>> readingToLayerIdentifiers = inverseMap(labelToNode);
             Column column = new Column(readingToLayerIdentifiers);
             columns.add(column);
         }
@@ -171,13 +186,13 @@ public class XMLOutput {
         Map<WitnessNode, String> result = new HashMap<>();
         superWitness.stream().flatMap(List::stream).forEach(n -> {
             String label = n.getSigil();
-            StringBuilder x = new StringBuilder();
-            n.parentNodeStream().forEach(p -> {
-                if (!p.data.equals("wit") && !p.data.equals("fake root")) {
-                    x.insert(0, "-" + p.data);
-                }
-            });
-            label += x.toString();
+            // StringBuilder x = new StringBuilder();
+            // n.parentNodeStream().forEach(p -> {
+            // if (!p.data.equals("wit") && !p.data.equals("fake root")) {
+            // x.insert(0, "-" + p.data);
+            // }
+            // });
+            // label += x.toString();
             result.put(n, label);
         });
         return result;

@@ -2,7 +2,9 @@ package eu.interedition.collatex.subst;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,7 +12,11 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
+import com.google.common.collect.Maps;
 
 import eu.interedition.collatex.simple.SimplePatternTokenizer;
 
@@ -27,11 +33,13 @@ public class WitnessNode {
     private List<WitnessNode> children;
     private Type type;
     private String sigil;
+    Map<String, String> attributes;
 
-    public WitnessNode(String sigil, Type type, String data) {
+    public WitnessNode(String sigil, Type type, String data, Map<String, String> attributes) {
         this.sigil = sigil;
         this.type = type;
         this.data = data;
+        this.attributes = attributes;
         this.children = new ArrayList<>();
     }
 
@@ -101,21 +109,20 @@ public class WitnessNode {
         // NOTE: there is no implementation of Stream API for STAX
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlStreamReader;
-        WitnessNode currentNode = new WitnessNode(sigil, Type.element, "fake root");
+        WitnessNode currentNode = new WitnessNode(sigil, Type.element, "fake root", null);
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
         try {
             xmlStreamReader = xmlInputFactory.createXMLEventReader(new StringReader(witnessXML));
             while (xmlStreamReader.hasNext()) {
                 XMLEvent next = xmlStreamReader.nextEvent();
                 if (next.isStartElement()) {
-                    String localName = next.asStartElement().getName().getLocalPart();
-                    WitnessNode child = new WitnessNode(sigil, Type.element, localName);
+                    WitnessNode child = WitnessNode.fromStartElement(sigil,next.asStartElement() );
                     currentNode.addChild(child);
                     currentNode = child;
                 } else if (next.isCharacters()) {
                     String text = next.asCharacters().getData();
                     textTokenizer.apply(text)//
-                            .map(s -> new WitnessNode(sigil, Type.text, s))//
+                            .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>()))//
                             .collect(Collectors.toList())//
                             .forEach(currentNode::addChild);
                 } else if (next.isEndElement()) {
@@ -126,6 +133,16 @@ public class WitnessNode {
             e.printStackTrace();
         }
         return currentNode.children.get(0);
+    }
+
+    private static WitnessNode fromStartElement(String sigil, StartElement startElement) {
+        Map<String, String> attributes = Maps.newHashMap();
+        startElement.getAttributes().forEachRemaining(a -> {
+            Attribute attribute = (Attribute) a;
+            attributes.put(attribute.getName().getLocalPart(), attribute.getValue());
+        });
+        String data2 = startElement.getName().getLocalPart();
+        return new WitnessNode(sigil, Type.element, data2, attributes);
     }
 
     public Type getType() {
