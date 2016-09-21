@@ -216,13 +216,13 @@ public class CollationGraph {
             });
 
             String sigilA = witnessNodes.get(0).getSigil();
-            Iterator<MyTokenGroup> tokensA = group(tokensPerWitness.get(sigilA));
+            Iterator<TokenGroup> tokensA = group(tokensPerWitness.get(sigilA));
 
             String sigilB = witnessNodes.get(1).getSigil();
-            Iterator<MyTokenGroup> tokensB = group(tokensPerWitness.get(sigilB));
+            Iterator<TokenGroup> tokensB = group(tokensPerWitness.get(sigilB));
 
-            MyTokenGroup tokenGroupA = tokensA.next();
-            MyTokenGroup tokenGroupB = tokensB.next();
+            TokenGroup tokenGroupA = tokensA.next();
+            TokenGroup tokenGroupB = tokensB.next();
 
             while (tokenGroupA != null && tokenGroupB != null) {
                 boolean groupsInSameMatchState = (tokenGroupA.isMatched() && tokenGroupB.isMatched()) //
@@ -255,7 +255,7 @@ public class CollationGraph {
         return alignmentTable;
     }
 
-    private MyTokenGroup useGroup(String sigil, Iterator<MyTokenGroup> tokensIterator, MyTokenGroup tokenGroup, final SortedMap<Witness, Set<Token>> row) {
+    private TokenGroup useGroup(String sigil, Iterator<TokenGroup> tokensIterator, TokenGroup tokenGroup, final SortedMap<Witness, Set<Token>> row) {
         row.put(new LayeredWitness(sigil), tokenGroup.getTokenSet());
         return tokensIterator.hasNext() ? tokensIterator.next() : null;
     }
@@ -264,13 +264,13 @@ public class CollationGraph {
         initial, match, mismatch
     }
 
-    private Iterator<MyTokenGroup> group(List<LayerToken> list) {
-        List<MyTokenGroup> groupList = new ArrayList<>();
+    private Iterator<TokenGroup> group(List<LayerToken> list) {
+        List<TokenGroup> groupList = new ArrayList<>();
         State lastState = State.initial;
         Integer lastMatchIndex = 0;
         for (LayerToken t : list) {
             State state = t.hasMatch() ? State.match : State.mismatch;
-            MyTokenGroup group = null;
+            TokenGroup group = null;
             boolean addToCurrentGroup = state.equals(State.mismatch) && lastState.equals(State.mismatch)//
                     || ((state.equals(State.match) && lastState.equals(State.match)) //
                             && t.getMatchIndex() == lastMatchIndex + 1//
@@ -278,7 +278,7 @@ public class CollationGraph {
             if (addToCurrentGroup) { //
                 group = groupList.get(groupList.size() - 1);
             } else {
-                group = new MyTokenGroup(t.hasMatch());
+                group = new TokenGroup(t.hasMatch());
                 groupList.add(group);
             }
             group.addToken(t);
@@ -298,11 +298,11 @@ public class CollationGraph {
         return -1;
     }
 
-    public static class MyTokenGroup {
+    public static class TokenGroup {
         private Set<Token> tokenSet = Sets.newHashSet();
         private Boolean matched;
 
-        public MyTokenGroup(Boolean matched) {
+        public TokenGroup(Boolean matched) {
             this.setMatched(matched);
         }
 
