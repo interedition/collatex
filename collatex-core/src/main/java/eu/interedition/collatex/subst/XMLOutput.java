@@ -62,17 +62,10 @@ public class XMLOutput {
                     renderRdg(xwriter, sigil, varSeqCounter, reading);
                 }
                 xwriter.writeEndElement();
-
             }
-            // String witAttr = witnessesForReading.stream()//
-            // .map(w -> "#" + w)//
-            // .collect(joining(" "));
-            // xwriter.writeAttribute("wit", witAttr);
-            // xwriter.writeAttribute("varSeq", String.valueOf(varSeqCounter.getAndIncrement()));
-            // xwriter.writeCharacters(reading);
-            // xwriter.writeEndElement();
         }
         xwriter.writeEndElement();
+        xwriter.writeCharacters(" ");
     }
 
     private void renderRdg(XMLStreamWriter xwriter, String sigil, AtomicInteger varSeqCounter, String reading) throws XMLStreamException {
@@ -139,20 +132,30 @@ public class XMLOutput {
         List<Column> columns = new ArrayList<>();
         for (int i = 0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
-            // TODO: instead of "for" statements, rewrite using: matches.stream().map(TODO)
             // in the most simple case we treat all the witness nodes separately
             LinkedHashMap<String, String> labelToNode = new LinkedHashMap<>();
-            for (List<WitnessNode> match : matches) {
-                for (WitnessNode node : match) {
-                    // Only normalize when there is variation in a column.
-                    String value = node.data;
-                    if (matches.size() > 1) {
-                        // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
-                        value = value.trim();
-                    }
-                    labelToNode.put(witnessLabels.get(node), value);
-                }
-            }
+            matches.stream()//
+                    .flatMap(List::stream)//
+                    .forEach(node -> {
+                        // Only normalize when there is variation in a column.
+                        String value = node.data;
+                        if (matches.size() > 1) {
+                            // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
+                            value = value.trim();
+                        }
+                        labelToNode.put(witnessLabels.get(node), value);
+                    });
+            // for (List<WitnessNode> match : matches) {
+            // for (WitnessNode node : match) {
+            // // Only normalize when there is variation in a column.
+            // String value = node.data;
+            // if (matches.size() > 1) {
+            // // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
+            // value = value.trim();
+            // }
+            // labelToNode.put(witnessLabels.get(node), value);
+            // }
+            // }
             // TODO: the inverseMap method has no guaranteed order
             // TODO: unit tests should fail, but don't at this time!
             Map<String, List<String>> readingToLayerIdentifiers = inverseMap(labelToNode);
@@ -177,7 +180,8 @@ public class XMLOutput {
 
     public Map<WitnessNode, String> getWitnessLabels() {
         Map<WitnessNode, String> result = new HashMap<>();
-        superWitness.stream().forEach(l -> l.stream().forEach(n -> {
+        superWitness.stream().flatMap(List::stream).forEach(n -> {
+            // superWitness.stream().forEach(l -> l.stream().forEach(n -> {
             String label = n.getSigil();
             StringBuilder x = new StringBuilder();
             n.parentNodeStream().forEach(p -> {
@@ -187,7 +191,8 @@ public class XMLOutput {
             });
             label += x.toString();
             result.put(n, label);
-        }));
+            // }));
+        });
         return result;
     }
 
