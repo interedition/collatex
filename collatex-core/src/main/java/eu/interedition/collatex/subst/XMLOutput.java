@@ -1,11 +1,20 @@
 package eu.interedition.collatex.subst;
 
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.Writer;
-import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  *
@@ -28,7 +37,7 @@ public class XMLOutput {
                 renderLemma(xwriter, c);
             }
         }
-        //end root element
+        // end root element
         xwriter.writeEndElement();
         xwriter.writeEndDocument();
     }
@@ -40,12 +49,45 @@ public class XMLOutput {
     private void renderApp(XMLStreamWriter xwriter, Column column) throws XMLStreamException {
         xwriter.writeStartElement("app");
         List<String> readings = column.getReadings();
+        AtomicInteger varSeqCounter = new AtomicInteger();
         for (String reading : readings) {
-            xwriter.writeStartElement("rdg");
-            String witnesses = String.join(" ", column.getWitnessesForReading(reading));
-            xwriter.writeAttribute("wit", witnesses);
+            List<String> witnessesForReading = column.getWitnessesForReading(reading);
+            if (witnessesForReading.size() == 1) {
+                String sigil = witnessesForReading.get(0);
+                renderRdg(xwriter, sigil, varSeqCounter, reading);
+            } else {
+                xwriter.writeStartElement("rdgGrp");
+                xwriter.writeAttribute("type", "tag_variation_only");
+                for (String sigil : witnessesForReading) {
+                    renderRdg(xwriter, sigil, varSeqCounter, reading);
+                }
+                xwriter.writeEndElement();
+
+            }
+            // String witAttr = witnessesForReading.stream()//
+            // .map(w -> "#" + w)//
+            // .collect(joining(" "));
+            // xwriter.writeAttribute("wit", witAttr);
+            // xwriter.writeAttribute("varSeq", String.valueOf(varSeqCounter.getAndIncrement()));
+            // xwriter.writeCharacters(reading);
+            // xwriter.writeEndElement();
+        }
+        xwriter.writeEndElement();
+    }
+
+    private void renderRdg(XMLStreamWriter xwriter, String sigil, AtomicInteger varSeqCounter, String reading) throws XMLStreamException {
+        String baseSigil = sigil.replaceAll("-subst.*", "");
+        xwriter.writeStartElement("rdg");
+        xwriter.writeAttribute("wit", "#" + baseSigil);
+        if (!sigil.equals(baseSigil)) {
+            String layer = sigil.split("-")[2];
+            xwriter.writeAttribute("varSeq", String.valueOf(varSeqCounter.getAndIncrement()));
+            xwriter.writeStartElement(layer);
             xwriter.writeCharacters(reading);
             xwriter.writeEndElement();
+
+        } else {
+            xwriter.writeCharacters(reading);
         }
         xwriter.writeEndElement();
     }
@@ -72,7 +114,7 @@ public class XMLOutput {
         }
 
         public List<String> getReadings() {
-            //NOTE: key set is a linked set!
+            // NOTE: key set is a linked set!
             return new ArrayList<>(readingToLayerIdentifiers.keySet());
         }
     }
@@ -97,7 +139,7 @@ public class XMLOutput {
         List<Column> columns = new ArrayList<>();
         for (int i = 0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
-            //TODO: insteads of "for" statements, rewrite using: matches.stream().map(TODO)
+            // TODO: instead of "for" statements, rewrite using: matches.stream().map(TODO)
             // in the most simple case we treat all the witness nodes separately
             LinkedHashMap<String, String> labelToNode = new LinkedHashMap<>();
             for (List<WitnessNode> match : matches) {
@@ -111,8 +153,8 @@ public class XMLOutput {
                     labelToNode.put(witnessLabels.get(node), value);
                 }
             }
-            //TODO: the inverseMap method has no guaranteed order
-            //TODO: unit tests should fail, but don't at this time!
+            // TODO: the inverseMap method has no guaranteed order
+            // TODO: unit tests should fail, but don't at this time!
             Map<String, List<String>> readingToLayerIdentifiers = inverseMap(labelToNode);
             Column column = new Column(readingToLayerIdentifiers);
             columns.add(column);
@@ -136,17 +178,16 @@ public class XMLOutput {
     public Map<WitnessNode, String> getWitnessLabels() {
         Map<WitnessNode, String> result = new HashMap<>();
         superWitness.stream().forEach(l -> l.stream().forEach(n -> {
-                String label = n.getSigil();
-                StringBuilder x = new StringBuilder();
-                n.parentNodeStream().forEach(p -> {
-                    if (!p.data.equals("wit") && !p.data.equals("fake root")) {
-                        x.insert(0, "-" + p.data);
-                    }
-                });
-                label += x.toString();
-                result.put(n, label);
-            }
-        ));
+            String label = n.getSigil();
+            StringBuilder x = new StringBuilder();
+            n.parentNodeStream().forEach(p -> {
+                if (!p.data.equals("wit") && !p.data.equals("fake root")) {
+                    x.insert(0, "-" + p.data);
+                }
+            });
+            label += x.toString();
+            result.put(n, label);
+        }));
         return result;
     }
 

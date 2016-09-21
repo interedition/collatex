@@ -5,11 +5,15 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.StringWriter;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamException;
+
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.VariantGraph;
 
 public class ESTSUseCases extends AbstractTest {
-    @Ignore
+    // @Ignore
     @Test
     public void testStandardSubstitution1() {
         String wit1 = "<wit n=\"Wit1\">The "//
@@ -26,8 +30,8 @@ public class ESTSUseCases extends AbstractTest {
     public void testStandardSubstitution2() {
         String wit1 = "<wit n=\"Wit1\">The "//
                 + "<app type=\"revision\">"//
-                + "<rdg type=\"\"><del hand=\"#AA\">white</del></rdg>"//
-                + "<rdg type=\"\"><add hand=\"#AA\">black</add></rdg>"//
+                + "<rdg><del hand=\"#AA\">white</del></rdg>"//
+                + "<rdg><add hand=\"#AA\">black</add></rdg>"//
                 + "<rdg type=\"lit\"><del>white</del><hi rend=\"superscript\"><del>black</del></hi></rdg>"//
                 + "</app>"//
                 + " god.</wit>";
@@ -40,7 +44,7 @@ public class ESTSUseCases extends AbstractTest {
                 + "<app>"//
                 + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del hand=\"#AA\">white</del></rdg>"//
                 + "<rdgGrp type=\"tag_variation_only\">"//
-                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><del hand=\"#AA\">black</del></rdg>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><add hand=\"#AA\">black</add></rdg>"//
                 + "<rdg wit=\"#Wit2\">black</rdg>"//
                 + "</rdgGrp>"//
                 + "</app> god.";
@@ -91,16 +95,24 @@ public class ESTSUseCases extends AbstractTest {
 
     private void verifyCollationTEI(String wit1, String wit2, String expectedTEI) {
         String collationTei = collate2tei(wit1, wit2);
-        assertEquals(expectedTEI, collationTei);
+        String wrapped = "<?xml version=\"1.0\" ?><apparatus>" + expectedTEI + "</apparatus>";
+        assertEquals(wrapped, collationTei);
     }
 
-    private String collate2tei(String wit1, String wit2) {
+    private String collate2tei(String w1, String w2) {
+        WitnessNode a = WitnessNode.createTree("Wit1", w1);
+        WitnessNode b = WitnessNode.createTree("Wit2", w2);
+        EditGraphAligner aligner = new EditGraphAligner(a, b);
+        List<List<WitnessNode>> superWitness = aligner.getSuperWitness();
 
-        VariantGraph variantGraph = collate(wit1, wit2);
-        variantGraph.vertices().forEach(v -> {
-
-        });
-        return null;
+        XMLOutput xmlOutput = new XMLOutput(superWitness);
+        StringWriter writer = new StringWriter();
+        try {
+            xmlOutput.printXML(writer);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        return writer.toString();
     }
 
 }
