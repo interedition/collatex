@@ -2,7 +2,6 @@ package eu.interedition.collatex.subst;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.StringWriter;
@@ -25,9 +24,9 @@ public class ESTSUseCases extends AbstractTest {
         standardSubstitutionTest(wit1);
     }
 
-    @Ignore
+    // @Ignore
     @Test
-    public void testStandardSubstitution2() {
+    public void testStandardSubstitution3() {
         String wit1 = "<wit n=\"Wit1\">The "//
                 + "<app type=\"revision\">"//
                 + "<rdg><del hand=\"#AA\">white</del></rdg>"//
@@ -52,7 +51,7 @@ public class ESTSUseCases extends AbstractTest {
         verifyCollationTEI(wit1, wit2, output);
     }
 
-    @Ignore
+    // @Ignore
     @Test
     public void testSubstitutionWithinSubstitution1() {
         String wit1 = "<wit n=\"Wit1\">The "//
@@ -65,7 +64,22 @@ public class ESTSUseCases extends AbstractTest {
                 + "</subst>"//
                 + "</add>"//
                 + "</subst>"//
-                + "attempt.</wit>";
+                + " attempt.</wit>";
+        substitutionWithinSubstitutionTest(wit1);
+    }
+
+    // @Ignore
+    @Test
+    public void testSubstitutionWithinSubstitution3() {
+        String wit1 = "<wit n=\"Wit1\">The"//
+                + "<app type=\"revision\">"//
+                + "<rdg><del hand=\"AA\">first</del></rdg>"//
+                + "<rdg><add hand=\"AA\"><del hand=\"BB\">second</del></add></rdg>"//
+                + "<rdg><add hand=\"BB\">third</add></rdg>"//
+                + "<rdg type=\"lit\"><strike>first</strike><superscript><strike>second</strike></superscript><superscript>third</superscript></rdg>"//
+                + "</app>"//
+                + " attempt."//
+                + "</wit>";
         substitutionWithinSubstitutionTest(wit1);
     }
 
@@ -90,6 +104,173 @@ public class ESTSUseCases extends AbstractTest {
 
                 + "</app>"//
                 + "attempt.";
+        verifyCollationTEI(wit1, wit2, output);
+    }
+
+    // @Ignore
+    @Test
+    public void testSubstitutionWithinAWord1() {
+        String wit1 = "<wit n=\"Wit1\">"//
+                + "<app>"//
+                + "<rdg type=\"orig\">This</rdg>"//
+                + "<rdg type=\"c1\">The</rdg>"//
+                + "<rdg type=\"lit\">Th<strike>is</strike>e</rdg>"//
+                + "</app>"//
+                + " dog.</wit>";
+        substitutionWithinAWordTest(wit1);
+    }
+
+    // @Ignore
+    @Test
+    public void testSubstitutionWithinAWord3() {
+        String wit1 = "<wit n=\"Wit1\">"//
+                + "<app type=\"revision\">"//
+                + "<rdg>This</rdg>"//
+                + "<rdg>The</rdg>"//
+                + "<rdg type=\"lit\">Th<del>is</del><add>e</add></rdg>"//
+                + "</app>"//
+                + " dog.</wit>";
+        substitutionWithinAWordTest(wit1);
+    }
+
+    private void substitutionWithinAWordTest(String wit1) {
+        String wit2 = "<wit n=\"Wit2\">The dog</wit>";
+        String output = "Th"//
+                + "<app>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del hand=\"#AA\">is</del>v</rdg>"//
+                + "<rdgGrp type=\"tag_variation_only>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><add hand=\"#AA\">e</add></rdg>"//
+                + "<rdg wit=\"#Wit2\">e</rdg>"//
+                + "</rdgGrp>"//
+                + "</app>"//
+                + " dog.";
+
+        String output2 = "<app>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del hand=\"#AA\">This</del></rdg>"//
+                + "<rdgGrp type=\"tag_variation_only\">"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><add hand=\"#AA\">The</add></rdg>"//
+                + "<rdg wit=\"#Wit2\">The</rdg>"//
+                + "</rdgGrp>"//
+                + "</app>"//
+                + " dog.";
+        verifyCollationTEI(wit1, wit2, output);
+    }
+
+    // @Ignore
+    @Test
+    public void testAlternativeReading1() {
+        String wit1 = "<wit n=\"Wit1\">"//
+                + "The <seg xml:id=\"alt1\">leather</seg> <add xml:id=\"alt2\">parchment</add> page."//
+                + "<alt target=\"#alt1 #alt2\"/></wit>";
+        alternativeReadingTest(wit1);
+    }
+
+    // @Ignore
+    @Test
+    public void testAlternativeReading3a() {
+        String wit1 = "<wit n=\"Wit1\">"//
+                + "The"//
+                + "<app type=\"revision\">"//
+                + "<rdg type=\"\"><seg type=\"alternative\">leather</seg></rdg>"//
+                + "<rdg type=\"\"><add type=\"alternative\">parchment</add></rdg>"//
+                + "<rdg type=\"lit\">leather <hi rend=\"superscript\">parchment</hi></rdg>"//
+                + "</app>"//
+                + "page.</wit>";
+        alternativeReadingTest(wit1);
+    }
+
+    // @Ignore
+    @Test
+    public void testAlternativeReading3b() {
+        String wit1 = "<wit n=\"Wit1\">"//
+                + "<app>"//
+                + "<rdg><seg type=\"alternative\">leather</seg></rdg>"//
+                + "<rdg><add type=\"alternative\">parchment</add></rdg>"//
+                + "<rdg type=\"lit\">leather<hi rend=\"superscript\">parchment</hi></rdg>"//
+                + "</app>"//
+                + " page."//
+                + "</wit>";
+        alternativeReadingTest(wit1);
+    }
+
+    private void alternativeReadingTest(String wit1) {
+        String wit2 = "<wit n=\"Wit2\">The parchment page.</wit>";
+        String output = "The "//
+                + "<app>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\">"//
+                + "<seg type=\"alternative\">leather</seg>"//
+                + "</rdg>"//
+                + "<rdgGrp type=\"tag_variation_only\">"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\">"//
+                + "<add type=\"alternative\">parchment</add>"//
+                + "</rdg>"//
+                + "<rdg wit=\"#Wit2\">parchment</rdg>"//
+                + "</rdgGrp>"//
+                + "</app>"//
+                + " page.";
+        verifyCollationTEI(wit1, wit2, output);
+    }
+
+    // @Ignore
+    @Test
+    public void testLongSubstitutions1() {
+        String wit1 = "<wit n=\"Wit1\">The "//
+                + "<subst>"//
+                + "<del hand=\"#AA\">big black ears</del>"//
+                + "<add hand=\"#AA\">brown eyes</add>"//
+                + "</subst>"//
+                + " of the dog.</wit>";
+        longSubstitutionTest(wit1);
+    }
+
+    // @Ignore
+    @Test
+    public void testLongSubstitutions3() {
+        String wit1 = "<wit n=\"Wit1\">The "//
+                + "<app type=\"revision\">"//
+                + "<rdg varSeq=\"0\"><del hand=\"#AA\">big black ears</del></rdg>"//
+                + "<rdg varSeq=\"1\"><add hand=\"#AA\">brown eyes</add></rdg>"//
+                + "<rdg type=\"lit\"><del>big black ears</del><hi rend=\"superscript\"><del>brown eyes</del></hi></rdg>"//
+                + "</app>"//
+                + " of the dog.</wit>";
+        longSubstitutionTest(wit1);
+    }
+
+    private void longSubstitutionTest(String wit1) {
+        String wit2 = "<wit n=\"Wit2\">The big eyes of the dog.</wit>";
+        // matching words is dominant
+        String output = "The "//
+                + "<app>"//
+                + "<rdgGrp type=\"tag_variation_only\">"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del hand=\"#AA\">big</del></rdg>"//
+                + "<rdg wit=\"#Wit2\">big</rdg>"//
+                + "</rdgGrp>"//
+                + "</app>"//
+
+                + "<app>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del hand=\"#AA\">black</del></rdg>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><add hand=\"#AA\">brown</add></rdg>"//
+                + "<rdg wit=\"#Wit2\"></rdg>"//
+                + "</app>"//
+
+                + "<app>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del hand=\"#AA\">ears</del></rdg>"//
+                + "<rdgGrp type=\"tag_variation_only\">"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><add hand=\"#AA\">eyes</add></rdg>"//
+                + "<rdg wit=\"#Wit2\">eyes</rdg>"//
+                + "</rdgGrp>"//
+                + "</app>"//
+
+                + " of the dog.";
+
+        // substitution is dominant
+        String output2 = "The "//
+                + "<app>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"0\"><del>big black ears</del></rdg>"//
+                + "<rdg wit=\"#Wit1\" varSeq=\"1\"><add>brown eyes</add></rdg>"//
+                + "<rdg wit=\"#Wit2\">big eyes</rdg>"//
+                + "</app>"//
+                + " of the dog.";
         verifyCollationTEI(wit1, wit2, output);
     }
 
