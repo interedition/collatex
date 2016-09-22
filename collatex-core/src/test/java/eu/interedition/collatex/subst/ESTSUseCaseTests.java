@@ -11,7 +11,7 @@ import javax.xml.stream.XMLStreamException;
 
 import eu.interedition.collatex.AbstractTest;
 
-public class ESTSUseCases extends AbstractTest {
+public class ESTSUseCaseTests extends AbstractTest {
     // @Ignore
     @Test
     public void testStandardSubstitution1() {

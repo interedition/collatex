@@ -45,7 +45,8 @@ public class XMLOutputTest extends AbstractAlignmentTest {
         superWitness.forEach(l -> l.forEach(n -> witnessLabels.add(witnessNodeToWitnessLabel.get(n))));
         System.out.println(witnessLabels);
 
-        List<String> expectedWitnessLabels = Arrays.asList("A", "B", "A-subst-del", "A-subst-add", "B", "A", "B", "A", "B");
+        List<String> expectedWitnessLabels = Arrays.asList("A", "B", "A", "A", "B", "A", "B", "A", "B");
+        // List<String> expectedWitnessLabels = Arrays.asList("A", "B", "A-subst-del", "A-subst-add", "B", "A", "B", "A", "B");
         assertEquals(expectedWitnessLabels, witnessLabels);
 
     }
