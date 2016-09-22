@@ -51,7 +51,7 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 
     }
 
-    // We have assign a rank to each witness node in the superwitness.
+    // We have to assign a rank to each witness node in the superwitness.
     // This is a bit more complex in the case of layers, since each layer should be its own witness
     // We rank the individual items in the superwitness.
     @Test

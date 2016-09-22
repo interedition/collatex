@@ -110,13 +110,7 @@ public class ESTSUseCaseTests extends AbstractTest {
     // @Ignore
     @Test
     public void testSubstitutionWithinAWord1() {
-        String wit1 = "<wit n=\"Wit1\">"//
-                + "<app>"//
-                + "<rdg type=\"orig\">This</rdg>"//
-                + "<rdg type=\"c1\">The</rdg>"//
-                + "<rdg type=\"lit\">Th<strike>is</strike>e</rdg>"//
-                + "</app>"//
-                + " dog.</wit>";
+        String wit1 = "<wit n=\"Wit1\">Th<subst><del>is</del><add>e</add></subst> dog.</wit>";
         substitutionWithinAWordTest(wit1);
     }
 
