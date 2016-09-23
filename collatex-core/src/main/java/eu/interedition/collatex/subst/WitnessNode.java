@@ -1,6 +1,5 @@
 package eu.interedition.collatex.subst;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,12 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 
 import com.google.common.collect.Maps;
 
@@ -106,33 +101,31 @@ public class WitnessNode {
     // returns the root node of the tree
     public static WitnessNode createTree(String sigil, String witnessXML) {
         // use a stax parser to go from XML data to XML tokens
-        // NOTE: there is no implementation of Stream API for STAX
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        XMLEventReader xmlStreamReader;
-        WitnessNode currentNode = new WitnessNode(sigil, Type.element, "fake root", null);
+        final Context context = new Context();
+        context.currentNode = new WitnessNode(sigil, Type.element, "fake root", null);
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
-        try {
-            xmlStreamReader = xmlInputFactory.createXMLEventReader(new StringReader(witnessXML));
-            while (xmlStreamReader.hasNext()) {
-                XMLEvent next = xmlStreamReader.nextEvent();
-                if (next.isStartElement()) {
-                    WitnessNode child = WitnessNode.fromStartElement(sigil,next.asStartElement() );
-                    currentNode.addChild(child);
-                    currentNode = child;
-                } else if (next.isCharacters()) {
-                    String text = next.asCharacters().getData();
-                    textTokenizer.apply(text)//
-                            .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>()))//
-                            .collect(Collectors.toList())//
-                            .forEach(currentNode::addChild);
-                } else if (next.isEndElement()) {
-                    currentNode = currentNode.parent;
-                }
+        XMLUtil.getXMLEventStream(witnessXML).forEach(xmlEvent -> {
+            if (xmlEvent.isStartElement()) {
+                WitnessNode child = WitnessNode.fromStartElement(sigil, xmlEvent.asStartElement());
+                context.currentNode.addChild(child);
+                context.currentNode = child;
+            } else if (xmlEvent.isCharacters()) {
+                String text = xmlEvent.asCharacters().getData();
+                textTokenizer.apply(text)//
+                        .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>()))//
+                        .collect(Collectors.toList())//
+                        .forEach(context.currentNode::addChild);
+            } else if (xmlEvent.isEndElement()) {
+                context.currentNode = context.currentNode.parent;
             }
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        }
-        return currentNode.children.get(0);
+
+        });
+
+        return context.currentNode.children.get(0);
+    }
+
+    static class Context {
+        public WitnessNode currentNode;
     }
 
     private static WitnessNode fromStartElement(String sigil, StartElement startElement) {
@@ -172,7 +165,7 @@ public class WitnessNode {
 
         @Override
         public String toString() {
-            return type.toString()+": "+node.toString();
+            return type.toString() + ": " + node.toString();
         }
     }
 
