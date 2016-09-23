@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -101,32 +102,30 @@ public class WitnessNode {
     // returns the root node of the tree
     public static WitnessNode createTree(String sigil, String witnessXML) {
         // use a stax parser to go from XML data to XML tokens
-        final Context context = new Context();
-        context.currentNode = new WitnessNode(sigil, Type.element, "fake root", null);
+        WitnessNode initialValue = new WitnessNode(sigil, Type.element, "fake root", null);
+        final AtomicReference<WitnessNode> currentNodeRef = new AtomicReference<>(initialValue);
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
         XMLUtil.getXMLEventStream(witnessXML).forEach(xmlEvent -> {
             if (xmlEvent.isStartElement()) {
                 WitnessNode child = WitnessNode.fromStartElement(sigil, xmlEvent.asStartElement());
-                context.currentNode.addChild(child);
-                context.currentNode = child;
+                currentNodeRef.get().addChild(child);
+                currentNodeRef.set(child);
+
             } else if (xmlEvent.isCharacters()) {
                 String text = xmlEvent.asCharacters().getData();
                 textTokenizer.apply(text)//
                         .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>()))//
                         .collect(Collectors.toList())//
-                        .forEach(context.currentNode::addChild);
-            } else if (xmlEvent.isEndElement()) {
-                context.currentNode = context.currentNode.parent;
-            }
+                        .forEach(currentNodeRef.get()::addChild);
 
+            } else if (xmlEvent.isEndElement()) {
+                currentNodeRef.set(currentNodeRef.get().parent);
+            }
         });
 
-        return context.currentNode.children.get(0);
+        return currentNodeRef.get().children.get(0);
     }
 
-    static class Context {
-        public WitnessNode currentNode;
-    }
 
     private static WitnessNode fromStartElement(String sigil, StartElement startElement) {
         Map<String, String> attributes = Maps.newHashMap();
