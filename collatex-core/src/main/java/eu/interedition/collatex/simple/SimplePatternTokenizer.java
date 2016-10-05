@@ -49,6 +49,6 @@ public class SimplePatternTokenizer {
 
     public static final Function<String, Stream<String>> BY_WS_AND_PUNCT = tokenizer(Pattern.compile("[\\s" + PUNCT + "]*?[^\\s" + PUNCT + "]+[\\s" + PUNCT + "]*"));
 
-    public static final Function<String, Stream<String>> BY_WS_OR_PUNCT = tokenizer(Pattern.compile("[" + PUNCT + "]+[\\s]*|[^" + PUNCT + "\\s]+[\\s]*"));
+    public static final Function<String, Stream<String>> BY_WS_OR_PUNCT = tokenizer(Pattern.compile("[" + PUNCT + "]+[\\s]*|[\\s]*[^" + PUNCT + "\\s]+[\\s]*"));
 
 }

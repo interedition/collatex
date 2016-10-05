@@ -173,7 +173,7 @@ public class EditGraphAlignerTest extends AbstractAlignmentTest {
         List<String> expectedSuperWitness = ImmutableList.<String> of(//
                 "A:In|B:In ", //
                 "A:At", //
-                "A:the |B:the ", //
+                "A: the |B:the ", //
                 "B:very ", //
                 "A:beginning|B:beginning", //
                 "A:outset", //
@@ -184,7 +184,7 @@ public class EditGraphAlignerTest extends AbstractAlignmentTest {
                 "A:correct", //
                 "A:indubitably ", //
                 "A:right|B:right ", //
-                "A:word|B:word", //
+                "A: word|B:word", //
                 "A:.|B:."//
         );
         List<String> assertableRepresentation = serialize(superWitness);
@@ -200,7 +200,7 @@ public class EditGraphAlignerTest extends AbstractAlignmentTest {
                 "A:But ", //
                 "A:in |B:In", //
                 "B:At", //
-                "A:the |B:the ", //
+                "A:the |B: the ", //
                 "A:very ", //
                 "A:beginning|B:beginning", //
                 "B:outset", //
@@ -211,7 +211,7 @@ public class EditGraphAlignerTest extends AbstractAlignmentTest {
                 "B:correct", //
                 "B:indubitably ", //
                 "A:right |B:right", //
-                "A:word|B:word", //
+                "A:word|B: word", //
                 "A:.|B:."//
         );
 
@@ -227,7 +227,7 @@ public class EditGraphAlignerTest extends AbstractAlignmentTest {
                 "B:At ", //
                 "A:the|B:the ", //
                 "A:this", //
-                "A:very ", //
+                "A: very ", //
                 "A:beginning", //
                 "B:outset", //
                 "A:, |B:, ", //
