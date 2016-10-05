@@ -1,20 +1,13 @@
 package eu.interedition.collatex.xmltokenizer;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
@@ -24,26 +17,19 @@ import javax.xml.stream.events.XMLEvent;
 public class XMLTokenizer {
 
     private Iterator<XMLEvent> iterator;
+    private String xml;
 
     public XMLTokenizer(String xml) {
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-        InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
-        try {
-            XMLEventReader eventReader = factory.createXMLEventReader(inputStream);
-            this.iterator = new XMLEventIterator(eventReader);
-        } catch (XMLStreamException e) {
-            throw new RuntimeException();
-        }
+        this.xml = xml;
     }
 
     public Stream<XMLNode> getXMLNodeStream() {
-        Iterable<XMLEvent> iterable = () -> this.iterator;
-        return StreamSupport.stream(iterable.spliterator(), false)//
+        return eu.interedition.collatex.subst.XMLUtil.getXMLEventStream(xml)//
                 .map(this::event2node)//
                 .filter(Objects::nonNull);
     }
 
-    public XMLNode event2node(XMLEvent xmlEvent) {
+    private XMLNode event2node(XMLEvent xmlEvent) {
         switch (xmlEvent.getEventType()) {
         case XMLStreamConstants.START_ELEMENT:
             return startElementNode(xmlEvent);

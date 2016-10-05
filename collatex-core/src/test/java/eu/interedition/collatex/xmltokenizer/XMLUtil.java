@@ -3,6 +3,7 @@ package eu.interedition.collatex.xmltokenizer;
 import java.util.Map;
 
 public class XMLUtil {
+
     public static String getMilestoneTag(String name, Map<String, String> attributes) {
         return openingTagBuilder(name, attributes).append("/>").toString();
     }

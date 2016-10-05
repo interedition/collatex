@@ -6,7 +6,13 @@ import org.junit.Test;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import eu.interedition.collatex.simple.SimplePatternTokenizer;
 
 public class XMLTokenizerTest {
     @Test
@@ -34,18 +40,33 @@ public class XMLTokenizerTest {
                 + " attempt."//
                 + "</wit>";
 
-        XMLTokenizer xt = new XMLTokenizer(xml3);
+        XMLTokenizer xt = new XMLTokenizer(xml2);
         Stream<XMLNode> xmlTokenStream = xt.getXMLNodeStream();
         // xmlTokenStream.forEach(xmlnode -> System.out.println(xmlnode.toString()));
 
         // xmlTokenStream.filter(XMLTextNode.class::isInstance).forEach(xmlnode -> System.out.println(xmlnode.toString()));
 
+        Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
+
+        AtomicReference<String> sigilRef = new AtomicReference<>();
         Deque<XMLStartElementNode> openedElements = new ArrayDeque<>();
         xmlTokenStream.forEach(xmlnode -> {
             if (xmlnode instanceof XMLStartElementNode) {
-                openedElements.push((XMLStartElementNode) xmlnode);
+                XMLStartElementNode xmlStartElementNode = (XMLStartElementNode) xmlnode;
+                if (xmlStartElementNode.getName().equals("wit")) {
+                    sigilRef.set(xmlStartElementNode.getAttributes().get("n"));
+                }
+                openedElements.push(xmlStartElementNode);
             }
+
             if (xmlnode instanceof XMLTextNode) {
+                XMLTextNode xmlTextNode = (XMLTextNode) xmlnode;
+                String text = xmlTextNode.getText();
+                List<LayeredTextToken> textTokens = textTokenizer.apply(text)//
+                        .map(tokenText -> new LayeredTextToken(sigilRef.get(), tokenText, openedElements))//
+                        .collect(Collectors.toList());//
+                System.out.println(textTokens.stream().map(LayeredTextToken::toString).collect(joining(";")));
+
                 System.out.println(//
                         ((XMLTextNode) xmlnode).toString() //
                                 + " | ancestors = " //
@@ -54,6 +75,7 @@ public class XMLTokenizerTest {
                                         .collect(joining())//
                 );
             }
+
             if (xmlnode instanceof XMLEndElementNode) {
                 openedElements.pop();
             }
