@@ -1,0 +1,15 @@
+<witnesses>
+
+<wit n="Wit1a">bench by the <subst><del hand="#SB">lock</del><add hand="#SB">weir</add></subst></wit>
+<wit n="Wit1b">bench by the <app><rdg type="deletion"><del hand="#SB">lock</del></rdg><rdg type="addition"><add hand="#SB">weir</add></rdg><rdg type="lit"><hi rend="strike">lock</hi> <hi rend="sup">weir</hi></rdg></app></wit>
+<wit n="Wit2">bench by the weir</wit>
+
+<wit n="Wit3a">The <subst><del hand="#AA">first</del><add hand="#AA"><subst><del hand="#BB">second</del><add hand="#BB">third</add></subst></add></subst> attempt.</wit>
+<wit n="Wit3b">The <app><rdg type="deletion"><del hand="#AA">first</del></rdg><rdg type="deletion addition"><add hand="#AA"><del hand="#BB">second</del></add></rdg><rdg type="addition"><add hand="#BB">third</add></rdg><rdg type="lit"> <hi rend="strike">first</hi><hi rend="supralinear"><hi rend="strike">second</hi></hi><hi rend="supralinear">third</hi></rdg></app> attempt.</wit>
+<wit n="Wit4">The second attempt.</wit>
+
+<wit n="Wit5a">the <w>f<subst><del type="overwritten">u</del><add place="overwritten"><metamark>⁁</metamark></add><add place="supralinear">a</add></subst>rthest</w></wit>
+<wit n="Wit5b">the <app><rdg wit="#Wit1" type="deletion" varSeq="0">f<del>u</del>rthest</rdg><rdgGrp type="tag_variation_only"><rdg wit="#Wit1" type="addition" varSeq="1">f<add>a</add>rthest</rdg><rdg wit="#Wit2">farthest</rdg></rdgGrp></app></wit>
+<wit n="Wit6">the farthest</wit>
+
+</witnesses>
