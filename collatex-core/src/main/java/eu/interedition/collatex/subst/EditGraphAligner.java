@@ -127,12 +127,12 @@ public class EditGraphAligner {
                 // if tokenB as well as tokenA contain subst tags we have to do something more complicated
                 // for now we detected that situation and exit
 
-                // if (tokenA.containsEndSubst() && tokenB.containsEndSubst()) {
+                // if (tokenA.containsEndOrOperator() && tokenB.containsEndOrOperator()) {
                 // throw new UnsupportedOperationException("The witness set has a subst in both witnesses at the same time!");
                 // }
 
-                postProcessSubst(tokenA, y, x, nodeToXCoordinate, mapperA(y));
-                postProcessSubst(tokenB, y, x, nodeToYCoordinate, mapperB(x));
+                postProcessOrOperator(tokenA, y, x, nodeToXCoordinate, mapperA(y));
+                postProcessOrOperator(tokenB, y, x, nodeToYCoordinate, mapperB(x));
             });
         });
     }
@@ -145,8 +145,8 @@ public class EditGraphAligner {
         return addDelY -> this.cells[addDelY][x];
     }
 
-    private void postProcessSubst(EditGraphTableLabel editGraphTableLabel, int y, int x, Map<WitnessNode, Integer> nodeToCoordinate, Function<Integer, Score> toScoreMapper) {
-        if (editGraphTableLabel.containsEndSubst()) {
+    private void postProcessOrOperator(EditGraphTableLabel editGraphTableLabel, int y, int x, Map<WitnessNode, Integer> nodeToCoordinate, Function<Integer, Score> toScoreMapper) {
+        if (editGraphTableLabel.containsEndOrOperator()) {
             // NOTE: There can be more end subst nodes
             // here we go look for the subst again (this can be done more efficient)
             editGraphTableLabel.getEndOrperatorNodes()//
@@ -177,7 +177,7 @@ public class EditGraphAligner {
     }
 
     private int getPreviousCoordinateForLabel(Map<WitnessNode, Integer> nodeToCoordinate, EditGraphTableLabel token, int defaultCoordinate) {
-        if (token.containsStartSubstOption()) {
+        if (token.containsStartOrOperand()) {
             // start of an option (add / del)
             // every edit graph table label is associated with witness node (as the text)
             // we need to walk to the parent
@@ -472,26 +472,26 @@ public class EditGraphAligner {
             return MessageFormat.format("{0}:{1}:{2}", b, a, c);
         }
 
-        public boolean containsStartSubstOption() {
+        public boolean containsStartOrOperand() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
-            return containsSubstOption(this.startElements);
+            return containsOrOperand(this.startElements);
         }
 
-        public boolean containsEndSubstOption() {
+        public boolean containsEndOrOperand() {
             // find the first add or del tag...
             // Note that this implementation is from the left to right
-            return containsSubstOption(this.endElements);
+            return containsOrOperand(this.endElements);
         }
 
-        private boolean containsSubstOption(List<WitnessNode> witnessNodeList) {
+        private boolean containsOrOperand(List<WitnessNode> witnessNodeList) {
             return witnessNodeList.stream()//
-                    .filter(this::isSubstOption)//
+                    .filter(this::isOrOperand)//
                     .findFirst()//
                     .isPresent();
         }
 
-        public boolean containsStartSubst() {
+        public boolean containsStartOrOperator() {
             return containsOrOperator(this.startElements);
         }
 
@@ -502,7 +502,7 @@ public class EditGraphAligner {
                     .isPresent();
         }
 
-        public boolean containsEndSubst() {
+        public boolean containsEndOrOperator() {
             // find the first end OR-operator tag...
             // if we want to do this completely correct it should be from right to left
             return containsOrOperator(this.endElements);
@@ -519,7 +519,7 @@ public class EditGraphAligner {
                     && orOperatorNames.contains(node.data);
         }
 
-        private Boolean isSubstOption(WitnessNode node) {
+        private Boolean isOrOperand(WitnessNode node) {
             return node.isElement()//
                     && (node.data.equals("add") || node.data.equals("del"));
         }

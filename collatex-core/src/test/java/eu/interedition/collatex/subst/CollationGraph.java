@@ -60,7 +60,7 @@ public class CollationGraph {
             String tokenId = tokenId(sigil, index);
             cypherStatements.add("create " + toTokenNode(label, tokenId, index));
             if (!label.startElements.isEmpty()) {
-                if (label.containsStartSubstOption() || label.containsStartSubst()) {
+                if (label.containsStartOrOperand() || label.containsStartOrOperator()) {
                     cypherStatements.add(createNextRelationBetween(prevId, tokenId, sigil));
                 }
             } else {
