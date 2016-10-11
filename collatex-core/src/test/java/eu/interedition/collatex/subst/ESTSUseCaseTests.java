@@ -50,6 +50,44 @@ public class ESTSUseCaseTests extends AbstractTest {
 
         verifyCollationTEI(wit1, wit2, output);
     }
+    // @Ignore
+    @Test
+    public void testStandardSubstitutionA1() {
+        String wit1 = "<wit n=\"Wit1\">bench by the "//
+                + "<subst>"//
+                + "<del hand=\"#SB\">lock</del>"//
+                + "<add hand=\"#SB\">weir</add>"//
+                + "</subst>"//
+                + "</wit>";
+        standardSubstitutionTestA(wit1);
+    }
+
+    // @Ignore
+    @Test
+    public void testStandardSubstitutionA3() {
+        String wit1 = "<wit n=\"Wit1\">bench by the "//
+                + "<app>"//
+                + "<rdg type=\"deletion\"><del hand=\"#SB\">lock</del></rdg>"//
+                + "<rdg type=\"addition\"><add hand=\"#SB\">weir</add></rdg>"//
+                + "<rdg type=\"lit\"><hi rend=\"strike\">lock</hi> <hi rend=\"sup\">weir</hi></rdg>"//
+                + "</app>"//
+                + "</wit>";
+        standardSubstitutionTestA(wit1);
+    }
+
+    private void standardSubstitutionTestA(String wit1) {
+        String wit2 = "<wit n=\"Wit2\">bench by the weir</wit>";
+        String output = "bench by the "//
+                + "<app>"//
+                + "<rdg wit=\"#Wit1\" type=\"deletion\" varSeq=\"0\"><del hand=\"#SB\">lock</del></rdg>"//
+                + "<rdgGrp type=\"tag_variation_only\">"//
+                + "<rdg wit=\"#Wit1\" type=\"addition\" varSeq=\"1\"><add hand=\"#SB\">weir</add></rdg>"//
+                + "<rdg wit=\"#Wit2\">weir</rdg>"//
+                + "</rdgGrp>"//
+                + "</app>";
+
+        verifyCollationTEI(wit1, wit2, output);
+    }
 
     // @Ignore
     @Test

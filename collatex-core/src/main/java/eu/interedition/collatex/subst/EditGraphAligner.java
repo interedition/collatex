@@ -1,6 +1,7 @@
 package eu.interedition.collatex.subst;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -36,7 +37,9 @@ import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
  * This is a special version of the edit graph aligner that can handle witnesses with substitutions in them.
  */
 public class EditGraphAligner {
-    private static final String SUBST = "subst";
+    final static LayerDefinition layerDefinition = LayerDefinition.getDefault();
+    final static Set<String> orOperatorNames = layerDefinition.getOrOperators().stream().map(OrOperator::getName).collect(toSet());
+
     final List<EditGraphTableLabel> labelsWitnessB;
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
@@ -146,7 +149,7 @@ public class EditGraphAligner {
         if (editGraphTableLabel.containsEndSubst()) {
             // NOTE: There can be more end subst nodes
             // here we go look for the subst again (this can be done more efficient)
-            editGraphTableLabel.getEndSubstNodes()//
+            editGraphTableLabel.getEndOrperatorNodes()//
                     // Nu hebben we een end subst node te pakken
                     // nu moet ik alle bij behorende adds en dels zien te vinden..
                     // dat zijn de kinderen van de betreffende subst
@@ -182,7 +185,7 @@ public class EditGraphAligner {
             Stream<WitnessNode> parentNodeStream = currentNode.parentNodeStream();
             Optional<WitnessNode> substOptional = parentNodeStream//
                     .filter(WitnessNode::isElement)//
-                    .filter(node -> node.data.equals(SUBST))//
+                    .filter(this::isOrOperatorNode)//
                     .findFirst();
             WitnessNode substNode = substOptional//
                     .orElseThrow(() -> new RuntimeException("We found an OR operand but could not find the OR operator!"));
@@ -193,6 +196,10 @@ public class EditGraphAligner {
             return index - 1;
         }
         return defaultCoordinate;
+    }
+
+    private boolean isOrOperatorNode(WitnessNode node) {
+        return orOperatorNames.contains(node.data);
     }
 
     private Map<WitnessNode, Integer> mapNodesToIndex(List<EditGraphTableLabel> labels) {
@@ -485,31 +492,31 @@ public class EditGraphAligner {
         }
 
         public boolean containsStartSubst() {
-            return containsSubst(this.startElements);
+            return containsOrOperator(this.startElements);
         }
 
-        private boolean containsSubst(List<WitnessNode> witnessNodeList) {
+        private boolean containsOrOperator(List<WitnessNode> witnessNodeList) {
             return witnessNodeList.stream()//
-                    .filter(this::isSubst)//
+                    .filter(this::isOrOperator)//
                     .findFirst()//
                     .isPresent();
         }
 
         public boolean containsEndSubst() {
-            // find the first end subst tag...
+            // find the first end OR-operator tag...
             // if we want to do this completely correct it should be from right to left
-            return containsSubst(this.endElements);
+            return containsOrOperator(this.endElements);
         }
 
-        public WitnessNode getEndSubstNodes() {
+        public WitnessNode getEndOrperatorNodes() {
             return this.endElements.stream()//
-                    .filter(this::isSubst)//
-                    .findFirst().orElseThrow(() -> new RuntimeException("We expected one or more subst tags here!"));
+                    .filter(this::isOrOperator)//
+                    .findFirst().orElseThrow(() -> new RuntimeException("We expected one or more OR-operator tags here!"));
         }
 
-        private Boolean isSubst(WitnessNode node) {
+        private Boolean isOrOperator(WitnessNode node) {
             return node.isElement()//
-                    && SUBST.equals(node.data);
+                    && orOperatorNames.contains(node.data);
         }
 
         private Boolean isSubstOption(WitnessNode node) {
