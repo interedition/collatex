@@ -17,9 +17,11 @@ public class WitnessNodeTest {
 
         WitnessNode root = WitnessNode.createTree("A", xml_in);
 
-        Stream<WitnessNode> witnessNodes = root.depthFirstNodeStream();
+//        Stream<WitnessNode> witnessNodes = root.depthFirstNodeStream();
+//
+//        witnessNodes.forEach(node ->
+//                System.out.println(node+": "+node.parentNodeStream().findFirst().get().toString()));
 
-        //witnessNodes.forEach(System.out::println);
 
         Stream<WitnessNode.WitnessNodeEvent> witnessEventNodes = root.depthFirstNodeEventStream();
 
