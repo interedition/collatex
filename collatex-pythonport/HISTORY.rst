@@ -3,6 +3,14 @@
 History
 -------
 
+2.0.0 (2016-10-15)
+++++++++++++++++++
+* First official release for the Dixit code and collation workshop in Amsterdam
+* Added XML as an output format
+* Added TEI parallel segmentation as an output format
+* Tokenizer: retain whitespace in the t-property of preceding token
+* Witness: added normalization: strips whitespace
+
 2.0.0rc20 (2016-07-18)
 ++++++++++++++++++++++
 * Merged old collate_pretokenized_json() function into collate() function

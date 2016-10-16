@@ -13,8 +13,9 @@ Preparation:
 	DONE: Tokenization: There are two tokenizers:
 		One based on whitespace, punctuation not treated as separate tokens
 		Another based on whitespace or punctuation, punctuation is treated as separate tokens (default)
-	TODO: Tokenizer does not yet store the whitespace (if added, normalization needs to be added)
-	Normalization: None yet, TODO (whitespace normalization, upper/lowercase)
+	DONE: Tokenizer retains whitespace (in t-property of the preceding token)
+	Normalization:  DONE: whitespace normalization
+	                TODO: upper/lowercase
 
 Matching:
     Near matching as a post process (in experimental branch of David's fork)
@@ -47,8 +48,8 @@ Presentation:
 	HTML output: DONE
 	SVG output: DONE
 	JSON output: DONE
-	XML output: TODO (generic output format; based on the JSON output)
-	TEI output: TODO
+	XML output: DONE (generic output format; based on the JSON output)
+	TEI output: DONE
 		
 Special cases:
 	TODO: failing use case in test_collatex_block_witnesses.py
