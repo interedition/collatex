@@ -1,2 +1,5 @@
-sudo setup.py sdist bdist_egg upload
+# in collatex-pythonport directory
+sudo python setup.py sdist bdist_egg upload
+# update documentation on pypi
+# sudo python setup.py register
 
