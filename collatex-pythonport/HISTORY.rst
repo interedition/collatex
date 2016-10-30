@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.1 (2016-10-30)
+++++++++++++++++++
+* Bug fix release for the Dixit code and collation workshop in Amsterdam
+* Fixed index out of range bug when multiple very short witnesses (= one token) were collated
+* Disabled debug statements for near matching
+
 2.1.0rc1 (2016-10-16)
 +++++++++++++++++++++
 * New near match functionality, implemented as a post process after alignment.

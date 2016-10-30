@@ -34,6 +34,8 @@ class EditGraphAligner(CollationAlgorithm):
         self.token_index = TokenIndex(collation.witnesses)
         self.scorer = Scorer(self.token_index, near_match=near_match, properties_filter=properties_filter)
         self.align_function = self._align_table
+        self.added_witness = []
+        self.omitted_base = []
 
     def collate(self, graph, collation):
         """
@@ -89,6 +91,10 @@ class EditGraphAligner(CollationAlgorithm):
         
 
     def _align_table(self, superbase, witness, token_to_vertex):
+        if not superbase:
+            raise Exception("Superbase is empty!")
+
+        # print(""+str(superbase)+":"+str(witness.tokens()))
         self.tokens_witness_a = superbase
         self.tokens_witness_b = witness.tokens()
         self.length_witness_a = len(self.tokens_witness_a)
@@ -101,11 +107,6 @@ class EditGraphAligner(CollationAlgorithm):
         alignment = {}
         self.additions = []
         self.omissions = []
-
-        # segment stuff
-        # note we traverse from right to left!
-        self.last_x = self.length_witness_a
-        self.last_y = self.length_witness_b
         self.new_superbase=[]
         
         # start lower right cell
@@ -113,6 +114,7 @@ class EditGraphAligner(CollationAlgorithm):
         y = self.length_witness_b
         # work our way to the upper left
         while x > 0 and y > 0:
+            cell = self.table[y][x]
             self._process_cell(token_to_vertex, self.tokens_witness_a, self.tokens_witness_b, alignment, x, y)
             # examine neighbor nodes
             nodes_to_examine = set()
@@ -124,46 +126,50 @@ class EditGraphAligner(CollationAlgorithm):
             # move position
             if self.table[y-1][x-1] == parent_node:
                 # another match or replacement
-                y = y -1
-                x = x -1
+                if not cell.match:
+                    self.omitted_base.insert(0, self.tokens_witness_a[x-1])
+                    self.added_witness.insert(0, self.tokens_witness_b[y-1])
+                    # print("replacement:"+str(self.tokens_witness_a[x-1])+":"+str(self.tokens_witness_b[y-1]))
+                # else:
+                    # print("match:"+str(self.tokens_witness_a[x-1]))
+                y -= 1
+                x -= 1
             else:
                 if self.table[y-1][x] == parent_node:
-                    #omission?
-                    y = y -1
+                    # addition?
+                    self.added_witness.insert(0, self.tokens_witness_b[y - 1])
+                    # print("added:" + str(self.tokens_witness_b[y - 1]))
+                    y -= 1
                 else:
                     if self.table[y][x-1] == parent_node:
-                        #addition?
-                        x = x -1
+                        # omission?
+                        self.omitted_base.insert(0, self.tokens_witness_a[x - 1])
+                        # print("omitted:" + str(self.tokens_witness_a[x - 1]))
+                        x -= 1
+
         # process additions/omissions in the begin of the superbase/witness
-        self.add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, 0, 0)
+        if x > 0:
+            self.omitted_base = self.tokens_witness_a[0:x] + self.omitted_base
+        if y > 0:
+            self.added_witness = self.tokens_witness_b[0:y] + self.added_witness
+        self.add_to_superbase()
         return alignment
         
-    def add_to_superbase(self, witness_a, witness_b, x, y):
-        # detect additions/omissions compared to the superbase
-        # print self.last_x - x - 1, self.last_y - y - 1
-        if self.last_x - x - 1 > 0 or self.last_y - y - 1 > 0:
-            # print x, self.last_x, y, self.last_y
-            # create new segment
-            omitted_base = witness_a[x:self.last_x - 1]
-            # print omitted_base
-            # add segment to the omissions
-            self.omissions.extend(omitted_base)
-            added_witness = witness_b[y:self.last_y - 1]
-            # print added_witness
-            self.additions.extend(added_witness)
+    def add_to_superbase(self):
+        if self.omitted_base or self.added_witness:
+            # print("update superbase:" + str(self.omitted_base) + ":" + str(self.added_witness))
             # update superbase with additions, omissions
-            self.new_superbase = added_witness + self.new_superbase
-            self.new_superbase = omitted_base + self.new_superbase
+            self.new_superbase = self.added_witness + self.new_superbase
+            self.new_superbase = self.omitted_base + self.new_superbase
+            self.added_witness = []
+            self.omitted_base = []
 
     def _process_cell(self, token_to_vertex, witness_a, witness_b, alignment, x, y):
         cell = self.table[y][x]
-        # process segments
         if cell.match:
-            self.add_to_superbase(witness_a, witness_b, x, y)
-            self.last_x = x
-            self.last_y = y
-        # process alignment
-        if cell.match:
+            # process segments
+            self.add_to_superbase()
+            # process alignment
             token = witness_a[x-1]
             token2 = witness_b[y-1]
             vertex = token_to_vertex[token]
@@ -179,8 +185,8 @@ class EditGraphAligner(CollationAlgorithm):
         m = self.length_witness_b+1
         n = self.length_witness_a+1
         for _slice in range(0, m + n - 1, 1):
-            z1 = 0 if _slice < n else _slice - n + 1;
-            z2 = 0 if _slice < m else _slice - m + 1;
+            z1 = 0 if _slice < n else _slice - n + 1
+            z2 = 0 if _slice < m else _slice - m + 1
             j = _slice - z2
             while j >= z1:
                 x = _slice - j

@@ -128,7 +128,7 @@ class Scorer(object):
         if result==0:
             return 0
         r = ratio(token_a.token_string, token_b.token_string)
-        print(str(token_a)+" "+str(token_b)+" "+str(r))
+        # print(str(token_a)+" "+str(token_b)+" "+str(r))
         if r > 0.6: 
             return 1
         else:
