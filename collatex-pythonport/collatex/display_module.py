@@ -44,7 +44,7 @@ def display_alignment_table_as_HTML(at):
 
 # visualize the variant graph into SVG format
 # from networkx.drawing.nx_agraph import to_agraph
-def display_variant_graph_as_SVG(graph,svg_output):
+def display_variant_graph_as_SVG(graph,svg_output,output):
         # create new Digraph
         dot = Digraph(format="svg", graph_attr={'rankdir': 'LR'})
         # add nodes
@@ -54,14 +54,20 @@ def display_variant_graph_as_SVG(graph,svg_output):
             counter += 1
             mapping[n] = str(counter)
             # dot.node(str(n), nodedata["label"])
-            readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'><B>Sigla</B></TD></TR>"]
-            reverseDict = defaultdict(list)
-            for key,value in n.tokens.items():
-                reverseDict["".join(item.token_data["t"] for item in value)].append(key)
-            for key,value in sorted(reverseDict.items()):
-                reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
-                readings.append(reading)
-            dot.node(mapping[n], '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>',{'shape': 'box'})
+            if output == "svg_simple":
+                label = n.label
+                if label == '':
+                    label = '#'
+                dot.node( mapping[n], label )
+            else:
+                readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'><B>Sigla</B></TD></TR>"]
+                reverseDict = defaultdict(list)
+                for key,value in n.tokens.items():
+                    reverseDict["".join(item.token_data["t"] for item in value)].append(key)
+                for key,value in sorted(reverseDict.items()):
+                    reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
+                    readings.append(reading)
+                dot.node(mapping[n], '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>',{'shape': 'box'})
         # add edges
         for u,v,edgedata in graph.graph.edges_iter(data=True):
             dot.edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
@@ -87,7 +93,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
 
 
 
-# display alignment table 
+# display alignment table
 #     if in_ipython():
 #         return display(JSON(json))
 #     if in_ipython():
@@ -101,4 +107,4 @@ def display_variant_graph_as_SVG(graph,svg_output):
 #         from networkx.drawing.nx_agraph import to_agraph
 #         agraph = to_agraph(graph.graph)
 #         svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
-#         return display(SVG(svg)) 
+#         return display(SVG(svg))
