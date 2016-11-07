@@ -11,3 +11,6 @@ class TokenError(Exception):
 
 class UnsupportedError(Exception):
     pass
+
+class SegmentationError(Exception):
+    pass

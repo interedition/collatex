@@ -3,6 +3,22 @@
 History
 -------
 
+2.1.0 (2016-11-01)
+++++++++++++++++++
+* Official release for the Dixit code and collation workshop in Amsterdam
+* This release contains the new near match functionality implemented as a post process after alignment. Same as RC1.
+* It also contains the multiple short witnesses bugfix done in 2.0.1
+
+2.0.1 (2016-10-30)
+++++++++++++++++++
+* Bug fix release for the Dixit code and collation workshop in Amsterdam
+* Fixed index out of range bug when multiple very short witnesses (= one token) were collated
+* Disabled debug statements for near matching
+
+2.1.0rc1 (2016-10-16)
++++++++++++++++++++++
+* New near match functionality, implemented as a post process after alignment.
+
 2.0.0 (2016-10-15)
 ++++++++++++++++++
 * First official release for the Dixit code and collation workshop in Amsterdam
@@ -29,27 +45,27 @@ History
 * Renamed TokenIndex.py module to tokenindex.py to follow conventions.
 
 2.0.0rc17 (2015-11-25)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Moved all the block and suffix, LCP interval code to new class TokenIndex.
 
 2.0.0rc16 (2015-06-28)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Added output option 'html2' for colored alignment table rendering.
 
 2.0.0rc15 (2015-06-28)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Fix a bug that was caused by the fact that a dash was stored in empty cells of the AlignmentTable. Now None is stored (this resolved a TODO). Plain text and HTML rendering of the table render a dash for empty cells. JSON output now returns null for empty cells. Fixes bug when a token with a dash in the content was screwing the rendering of the alignment table (caused of by one errors).
 
 2.0.0rc14 (2015-06-27)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Further improved blockification of witnesses.
 
 2.0.0rc13 (2015-06-21)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Added properties_filter option to enable users to influence matching based on properties of tokens.
 * Improved blockification of witnesses.

@@ -71,17 +71,20 @@ class Column(object):
 
 
 class AlignmentTable(object):
-    def __init__(self, collation, graph=None, layout="horizontal"):
+    def __init__(self, collation, graph=None, layout="horizontal",ranks=None):
         self.collation = collation
         self.graph = graph
         self.layout = layout
         self.columns = []
         self.rows = []
         if graph:
-            self._construct_table()
+            self._construct_table(ranks)
 
-    def _construct_table(self):
-        ranking = VariantGraphRanking.of(self.graph)
+    def _construct_table(self,ranks):
+        if ranks:
+            ranking = ranks
+        else:
+            ranking = VariantGraphRanking.of(self.graph)
         vertices_per_rank = ranking.byRank
         # construct columns        
         for rank in vertices_per_rank:
@@ -217,6 +220,9 @@ class VariantGraphVertex(object):
 
     def __str__(self):
         return self.label if self.label else 'no label'
+
+    def __repr__(self):
+        return str(self)
 
 
 class VariantGraph(object):
