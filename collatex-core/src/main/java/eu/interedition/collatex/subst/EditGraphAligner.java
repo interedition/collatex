@@ -1,36 +1,21 @@
 package eu.interedition.collatex.subst;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-
-import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Created by ronalddekker on 30/04/16.
@@ -39,32 +24,15 @@ import eu.interedition.collatex.subst.EditGraphAligner.Score.Type;
 public class EditGraphAligner {
     final static LayerDefinition layerDefinition = LayerDefinition.getDefault();
     final static Set<String> orOperatorNames = layerDefinition.getOrOperators().stream().map(OrOperator::getName).collect(toSet());
+    final static Predicate<WitnessNode> nodesToIgnorePredicate = (Predicate<WitnessNode>) witnessNode -> {
+        String typeToIgnore = "lit";
+        return witnessNode.attributes.containsKey("type") && witnessNode.attributes.get("type").equals(typeToIgnore);
+    };
+
 
     final List<EditGraphTableLabel> labelsWitnessB;
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
-
-    public static List<EditGraphTableLabel> createLabels(WitnessNode wit_a) {
-        Stream<WitnessNode.WitnessNodeEvent> nodeEventStream = wit_a.depthFirstNodeEventStream();
-        // I want to group all the open , text and close events together in a group
-        // I first try to do that with a reduce operation
-        // but for that to work (left and right) have to be of the same type
-        // we might be able to accomplish the same thing with a collect operator
-        // Otherwise we have to fall back to the StreamEx extension package.
-        // BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1, event2) -> event1.getClass().equals(event2.getClass());
-        // Two rules:
-        // 1. When two text tokens follow each other we should not group them together
-        // 1b. A text token followed by anything other than a close tag should not be grouped together
-        // 2. When a close tag is followed by an open tag we should not group them together
-        // 2b. When a close tag is followed by anything other than a close tag we should not group them together
-        BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1,
-                event2) -> !(event1.type.equals(WitnessNode.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END))
-                        && !(event1.type.equals(WitnessNode.WitnessNodeEventType.END) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END));
-
-        return nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate)).stream()//
-                .map(list -> list.stream().collect(new LabelCollector()))//
-                .collect(Collectors.toList());
-    }
 
     public EditGraphAligner(WitnessNode a, WitnessNode b) {
         // from the witness node trees we calculate the labels
@@ -94,7 +62,7 @@ public class EditGraphAligner {
             this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
         });
 
-        // fill the rest of the cells in an y by x fashion
+        // fill the rest of the cells in a  y by x fashion
         IntStream.range(1, this.labelsWitnessB.size() + 1).forEach(y -> {
             IntStream.range(1, this.labelsWitnessA.size() + 1).forEach(x -> {
                 EditGraphTableLabel tokenB = this.labelsWitnessB.get(y - 1);
@@ -137,6 +105,34 @@ public class EditGraphAligner {
         });
     }
 
+    public static List<EditGraphTableLabel> createLabels(WitnessNode wit_a) {
+        Stream<WitnessNode.WitnessNodeEvent> nodeEventStream = wit_a.depthFirstNodeEventStream(nodesToIgnorePredicate);
+        // I want to group all the open , text and close events together in a group
+        // I first try to do that with a reduce operation
+        // but for that to work (left and right) have to be of the same type
+        // we might be able to accomplish the same thing with a collect operator
+        // Otherwise we have to fall back to the StreamEx extension package.
+        // BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1, event2) -> event1.getClass().equals(event2.getClass());
+        // Two rules:
+        // 1. When two text tokens follow each other we should not group them together
+        // 1b. A text token followed by anything other than a close tag should not be grouped together
+        // 2. When a close tag is followed by an open tag we should not group them together
+        // 2b. When a close tag is followed by anything other than a close tag we should not group them together
+        BiPredicate<WitnessNode.WitnessNodeEvent, WitnessNode.WitnessNodeEvent> predicate = (event1, event2)//
+            -> !(event1.type.equals(WitnessNode.WitnessNodeEventType.TEXT) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END))
+            && !(event1.type.equals(WitnessNode.WitnessNodeEventType.END) && !event2.type.equals(WitnessNode.WitnessNodeEventType.END));
+
+        return nodeEventStream.collect(new GroupOnPredicateCollector<>(predicate)).stream()//
+            .map(list -> list.stream().collect(new LabelCollector()))//
+//            .map(EditGraphAligner::log)
+            .collect(Collectors.toList());
+    }
+
+    private static <T> T log(T obj) {
+        System.out.println(obj);
+        return obj;
+    }
+
     private Function<Integer, Score> mapperA(int y) {
         return addDelx -> this.cells[y][addDelx];
     }
@@ -150,29 +146,29 @@ public class EditGraphAligner {
             // NOTE: There can be more end subst nodes
             // here we go look for the subst again (this can be done more efficient)
             editGraphTableLabel.getEndOrperatorNodes()//
-                    // Nu hebben we een end subst node te pakken
-                    // nu moet ik alle bij behorende adds en dels zien te vinden..
-                    // dat zijn de kinderen van de betreffende subst
-                    .children()//
+                // Nu hebben we een end subst node te pakken
+                // nu moet ik alle bij behorende adds en dels zien te vinden..
+                // dat zijn de kinderen van de betreffende subst
+                .children()//
 
-                    // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
-                    // Van alle child nodes moet ik daar dan weer de laatste child van pakken
-                    .map(WitnessNode::getLastChild)//
+                // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
+                // Van alle child nodes moet ik daar dan weer de laatste child van pakken
+                .map(WitnessNode::getLastChild)//
 
-                    // Daarna mappen we die childnodes naar cell coordinaten
-                    // in het geval van token in witness A naar X coordinates
-                    // in het geval van token in witness B naar Y coordinates
-                    .map(nodeToCoordinate::get)//
+                // Daarna mappen we die childnodes naar cell coordinaten
+                // in het geval van token in witness A naar X coordinates
+                // in het geval van token in witness B naar Y coordinates
+                .map(nodeToCoordinate::get)//
 
-                    // System.out.println("All the possible cell containing the scores of the options of this subst are: "+yCoordinatesWithScoresOfAddDels);
-                    // now we have to find the maximum scoring cell of the possible cells..
-                    // TODO; in the future we also have to set the parent coordinates correctly
-                    // convert into scores;
-                    .map(toScoreMapper)//
-                    .max((score, other) -> score.globalScore - other.globalScore)//
+                // System.out.println("All the possible cell containing the scores of the options of this subst are: "+yCoordinatesWithScoresOfAddDels);
+                // now we have to find the maximum scoring cell of the possible cells..
+                // TODO; in the future we also have to set the parent coordinates correctly
+                // convert into scores;
+                .map(toScoreMapper)//
+                .max((score, other) -> score.globalScore - other.globalScore)//
 
-                    // because it is the end of a subst; override the current score in the cell with the best score for the whole subst.
-                    .ifPresent(bestScore -> this.cells[y][x] = bestScore);
+                // because it is the end of a subst; override the current score in the cell with the best score for the whole subst.
+                .ifPresent(bestScore -> this.cells[y][x] = bestScore);
         }
     }
 
@@ -184,11 +180,11 @@ public class EditGraphAligner {
             WitnessNode currentNode = token.text;
             Stream<WitnessNode> parentNodeStream = currentNode.parentNodeStream();
             Optional<WitnessNode> substOptional = parentNodeStream//
-                    .filter(WitnessNode::isElement)//
-                    .filter(this::isOrOperatorNode)//
-                    .findFirst();
+                .filter(WitnessNode::isElement)//
+                .filter(this::isOrOperatorNode)//
+                .findFirst();
             WitnessNode substNode = substOptional//
-                    .orElseThrow(() -> new RuntimeException("We found an OR operand but could not find the OR operator!"));
+                .orElseThrow(() -> new RuntimeException("We found an OR operand but could not find the OR operator!"));
             // convert the substNode into index in the edit graph table
             Integer index = nodeToCoordinate.get(substNode);
             // debug
@@ -225,10 +221,10 @@ public class EditGraphAligner {
 
     public List<List<WitnessNode>> getSuperWitness() {
         List<List<WitnessNode>> superwitness = getBacktrackScoreStream()//
-                .flatMap(this::splitMismatches)//
-                .map(this::toNodes)//
-                .filter(ln -> !ln.isEmpty())//
-                .collect(toList());
+            .flatMap(this::splitMismatches)//
+            .map(this::toNodes)//
+            .filter(ln -> !ln.isEmpty())//
+            .collect(toList());
         Collections.reverse(superwitness);// until there's a streaming .reverse()
         superwitness = addRejectedChoices(superwitness);
         return groupNonMatchingTokensByWitness(superwitness);
@@ -267,12 +263,12 @@ public class EditGraphAligner {
             }
             list.add(column);
             column.stream()//
-                    .map(WitnessNode::getSigil)//
-                    .forEach(sigil -> {
-                        if (witnessIterators.get(sigil).hasNext()) {
-                            currentWitnessNodes.put(sigil, witnessIterators.get(sigil).next());
-                        }
-                    });
+                .map(WitnessNode::getSigil)//
+                .forEach(sigil -> {
+                    if (witnessIterators.get(sigil).hasNext()) {
+                        currentWitnessNodes.put(sigil, witnessIterators.get(sigil).next());
+                    }
+                });
         }
         // add rejected choices at the end
         witnessIterators.values().forEach(iterator -> {
@@ -285,9 +281,9 @@ public class EditGraphAligner {
 
     private Iterator<WitnessNode> witnessNodeIterator(List<EditGraphTableLabel> labels) {
         return labels.stream()//
-                .map(l -> l.text)//
-                .collect(toList())//
-                .iterator();
+            .map(l -> l.text)//
+            .collect(toList())//
+            .iterator();
     }
 
     private List<List<WitnessNode>> groupNonMatchingTokensByWitness(List<List<WitnessNode>> superwitness) {
@@ -313,10 +309,10 @@ public class EditGraphAligner {
     private void addGrouped(Multimap<String, List<WitnessNode>> nonMatches, List<List<WitnessNode>> grouped) {
         Map<String, Collection<List<WitnessNode>>> nonMatchMap = nonMatches.asMap();
         nonMatchMap.keySet()//
-                .stream()//
-                .sorted()//
-                .map(nonMatchMap::get)//
-                .forEach(grouped::addAll);
+            .stream()//
+            .sorted()//
+            .map(nonMatchMap::get)//
+            .forEach(grouped::addAll);
         nonMatches.clear();
     }
 
@@ -325,27 +321,27 @@ public class EditGraphAligner {
         List<WitnessNode> nodes = new ArrayList<>();
         WitnessNode nodeA = this.labelsWitnessA.get(score.x - 1).text;
         Optional<WitnessNode> nodeB = score.y > 0 //
-                ? Optional.of(this.labelsWitnessB.get(score.y - 1).text)//
-                : Optional.empty();
+            ? Optional.of(this.labelsWitnessB.get(score.y - 1).text)//
+            : Optional.empty();
         switch (score.type) {
-        case match:
-            // diagonal
-            nodes.add(nodeA);
-            nodes.add(nodeB.get());
-            break;
+            case match:
+                // diagonal
+                nodes.add(nodeA);
+                nodes.add(nodeB.get());
+                break;
 
-        case deletion:
-            // left
-            nodes.add(nodeA);
-            break;
+            case deletion:
+                // left
+                nodes.add(nodeA);
+                break;
 
-        case addition:
-            // up
-            nodeB.ifPresent(node -> nodes.add(node));
-            break;
+            case addition:
+                // up
+                nodeB.ifPresent(node -> nodes.add(node));
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
         return nodes;
     }
@@ -353,16 +349,16 @@ public class EditGraphAligner {
     public Stream<Score> splitMismatches(Score score) {
         List<Score> list = new ArrayList<>();
         switch (score.type) {
-        case mismatch:
-            Score partB = new Score(Type.addition, score.x, score.y, score.parent);
-            list.add(partB);
-            Score partA = new Score(Type.deletion, score.x, score.y, score.parent);
-            list.add(partA);
-            break;
+            case mismatch:
+                Score partB = new Score(Type.addition, score.x, score.y, score.parent);
+                list.add(partB);
+                Score partA = new Score(Type.deletion, score.x, score.y, score.parent);
+                list.add(partA);
+                break;
 
-        default:
-            list.add(score);
-            break;
+            default:
+                list.add(score);
+                break;
         }
         return list.stream();
     }
@@ -373,9 +369,9 @@ public class EditGraphAligner {
     }
 
     private static class ScoreIterator implements Iterator<Score> {
-        private Score[][] matrix;
         Integer y;
         Integer x;
+        private Score[][] matrix;
 
         ScoreIterator(Score[][] matrix) {
             this.matrix = matrix;
@@ -408,19 +404,19 @@ public class EditGraphAligner {
         public BiConsumer<EditGraphTableLabel, WitnessNode.WitnessNodeEvent> accumulator() {
             return (label, event) -> {
                 switch (event.type) {
-                case START:
-                    label.addStartEvent(event.node);
-                    break;
-                case END:
-                    label.addEndEvent(event.node);
-                    break;
-                case TEXT:
-                    label.addTextEvent(event.node);
-                    String parentTag = event.node.parentNodeStream().iterator().next().data;
-                    label.layer = parentTag.equals("wit") ? "base" : parentTag;
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unknown event type");
+                    case START:
+                        label.addStartEvent(event.node);
+                        break;
+                    case END:
+                        label.addEndEvent(event.node);
+                        break;
+                    case TEXT:
+                        label.addTextEvent(event.node);
+                        String parentTag = event.node.parentNodeStream().iterator().next().data;
+                        label.layer = parentTag.equals("wit") ? "base" : parentTag;
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unknown event type");
                 }
             };
         }
@@ -469,7 +465,7 @@ public class EditGraphAligner {
             String a = this.startElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
             String b = this.text.toString();
             String c = this.endElements.stream().map(WitnessNode::toString).collect(Collectors.joining(", "));
-            return MessageFormat.format("{0}:{1}:{2}", b, a, c);
+            return MessageFormat.format("<{0}>{1}</{2}>", a, b, c);
         }
 
         public boolean containsStartOrOperand() {
@@ -486,9 +482,9 @@ public class EditGraphAligner {
 
         private boolean containsOrOperand(List<WitnessNode> witnessNodeList) {
             return witnessNodeList.stream()//
-                    .filter(this::isOrOperand)//
-                    .findFirst()//
-                    .isPresent();
+                .filter(this::isOrOperand)//
+                .findFirst()//
+                .isPresent();
         }
 
         public boolean containsStartOrOperator() {
@@ -497,9 +493,9 @@ public class EditGraphAligner {
 
         private boolean containsOrOperator(List<WitnessNode> witnessNodeList) {
             return witnessNodeList.stream()//
-                    .filter(this::isOrOperator)//
-                    .findFirst()//
-                    .isPresent();
+                .filter(this::isOrOperator)//
+                .findFirst()//
+                .isPresent();
         }
 
         public boolean containsEndOrOperator() {
@@ -510,35 +506,30 @@ public class EditGraphAligner {
 
         public WitnessNode getEndOrperatorNodes() {
             return this.endElements.stream()//
-                    .filter(this::isOrOperator)//
-                    .findFirst().orElseThrow(() -> new RuntimeException("We expected one or more OR-operator tags here!"));
+                .filter(this::isOrOperator)//
+                .findFirst().orElseThrow(() -> new RuntimeException("We expected one or more OR-operator tags here!"));
         }
 
         private Boolean isOrOperator(WitnessNode node) {
             return node.isElement()//
-                    && orOperatorNames.contains(node.data);
+                && orOperatorNames.contains(node.data);
         }
 
         private Boolean isOrOperand(WitnessNode node) {
             return node.isElement()//
-                    && (node.data.equals("add") || node.data.equals("del"));
+                && (node.data.equals("add") || node.data.equals("del"));
         }
     }
 
     public static class Score {
 
-        public static enum Type {
-            match, mismatch, addition, deletion, empty
-        }
-
         public Type type;
+        public Score parent;
+        public int globalScore = 0;
         int x;
         int y;
-        public Score parent;
         int previousX;
         int previousY;
-        public int globalScore = 0;
-
         public Score(Type type, int x, int y, Score parent, int i) {
             this.type = type;
             this.x = x;
@@ -570,6 +561,10 @@ public class EditGraphAligner {
         @Override
         public String toString() {
             return "[" + this.y + "," + this.x + "]:" + this.globalScore;
+        }
+
+        public static enum Type {
+            match, mismatch, addition, deletion, empty
         }
 
     }

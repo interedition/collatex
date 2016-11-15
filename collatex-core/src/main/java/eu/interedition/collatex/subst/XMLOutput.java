@@ -1,23 +1,13 @@
 package eu.interedition.collatex.subst;
 
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.Writer;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
  * Created by Ronald Haentjens Dekker on 18/08/16.
  */
 public class XMLOutput {
@@ -135,31 +125,32 @@ public class XMLOutput {
     }
 
     private List<Column> createColumns(Map<WitnessNode, String> witnessLabels, Map<Integer, List<List<WitnessNode>>> inverse) {
+        System.out.println(inverse);
         List<Column> columns = new ArrayList<>();
         for (int i = 0; i < inverse.keySet().size(); i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
             // in the most simple case we treat all the witness nodes separately
             LinkedHashMap<TokenInfo, String> labelToNode = new LinkedHashMap<>();
             matches.stream()//
-                    .flatMap(List::stream)//
-                    .forEach(node -> {
-                        // Only normalize when there is variation in a column.
-                        String value = node.data;
-                        if (matches.size() > 1) {
-                            // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
-                            value = value.trim();
-                        }
-                        TokenInfo tokenInfo = new TokenInfo();
-                        String witnessLabel = witnessLabels.get(node);
-                        tokenInfo.setSigil(witnessLabel);
-                        WitnessNode parent = node.parentNodeStream().iterator().next();
-                        // TODO: remove these statics
-                        if (parent.data.equals("add") || parent.data.equals("del")) {
-                            tokenInfo.setLayerName(parent.data);
-                            tokenInfo.setLayerAttributes(parent.attributes);
-                        }
-                        labelToNode.put(tokenInfo, value);
-                    });
+                .flatMap(List::stream)//
+                .forEach(node -> {
+                    // Only normalize when there is variation in a column.
+                    String value = node.data;
+                    if (matches.size() > 1) {
+                        // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
+                        value = value.trim();
+                    }
+                    TokenInfo tokenInfo = new TokenInfo();
+                    String witnessLabel = witnessLabels.get(node);
+                    tokenInfo.setSigil(witnessLabel);
+                    WitnessNode parent = node.parentNodeStream().iterator().next();
+                    // TODO: remove these statics
+                    if (parent.data.equals("add") || parent.data.equals("del")) {
+                        tokenInfo.setLayerName(parent.data);
+                        tokenInfo.setLayerAttributes(parent.attributes);
+                    }
+                    labelToNode.put(tokenInfo, value);
+                });
             // TODO: the inverseMap method has no guaranteed order
             // TODO: unit tests should fail, but don't at this time!
             Map<String, List<TokenInfo>> readingToLayerIdentifiers = inverseMap(labelToNode);
@@ -198,15 +189,26 @@ public class XMLOutput {
         return result;
     }
 
-    // TODO: this implementation is too rigid!
+    //     TODO: this implementation is too rigid!
     public Map<List<WitnessNode>, Integer> getRanksForMatchesAndNonMatches() {
         // TODO: hardcoded!
-        List<Integer> ranksAsRange = Arrays.asList(0, 1, 1, 2, 3);
+//        List<Integer> ranksAsRange = Arrays.asList(0, 1, 1, 2, 3);
         // Java 8 has no stream with counter, nor a zip function... sigh
         // We walk over the index using a range on an int stream ...
-        IntStream index = IntStream.range(0, ranksAsRange.size());
+//        IntStream index = IntStream.range(0, ranksAsRange.size());
         Map<List<WitnessNode>, Integer> ranks = new HashMap<>();
-        index.forEach(i -> ranks.put(superWitness.get(i), ranksAsRange.get(i)));
+        superWitness.forEach(witnessnodes -> {
+            AtomicInteger witnessNodesRank = new AtomicInteger(-1);
+            witnessnodes.forEach(node -> {
+                Integer nodeRank = node.getRank();
+                System.out.println(node.data + ":" + nodeRank);
+                Integer currentRank = witnessNodesRank.get();
+                witnessNodesRank.set(Math.max(currentRank, nodeRank));
+            });
+            ranks.put(witnessnodes, witnessNodesRank.get());
+        });
+        System.out.println(ranks);
+//        index.forEach(i -> ranks.put(superWitness.get(i), ranksAsRange.get(i)));
         return ranks;
     }
 }
