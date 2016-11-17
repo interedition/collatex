@@ -189,26 +189,19 @@ public class XMLOutput {
         return result;
     }
 
-    //     TODO: this implementation is too rigid!
     public Map<List<WitnessNode>, Integer> getRanksForMatchesAndNonMatches() {
-        // TODO: hardcoded!
-//        List<Integer> ranksAsRange = Arrays.asList(0, 1, 1, 2, 3);
-        // Java 8 has no stream with counter, nor a zip function... sigh
-        // We walk over the index using a range on an int stream ...
-//        IntStream index = IntStream.range(0, ranksAsRange.size());
         Map<List<WitnessNode>, Integer> ranks = new HashMap<>();
         superWitness.forEach(witnessnodes -> {
             AtomicInteger witnessNodesRank = new AtomicInteger(-1);
             witnessnodes.forEach(node -> {
                 Integer nodeRank = node.getRank();
-                System.out.println(node.data + ":" + nodeRank);
+                // System.out.println(node.data + ":" + nodeRank);
                 Integer currentRank = witnessNodesRank.get();
                 witnessNodesRank.set(Math.max(currentRank, nodeRank));
             });
             ranks.put(witnessnodes, witnessNodesRank.get());
         });
-        System.out.println(ranks);
-//        index.forEach(i -> ranks.put(superWitness.get(i), ranksAsRange.get(i)));
+        // System.out.println(ranks);
         return ranks;
     }
 }
