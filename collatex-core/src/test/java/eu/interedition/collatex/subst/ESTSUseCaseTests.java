@@ -2,8 +2,8 @@ package eu.interedition.collatex.subst;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.StringWriter;
 import java.util.List;
@@ -50,6 +50,7 @@ public class ESTSUseCaseTests extends AbstractTest {
 
         verifyCollationTEI(wit1, wit2, output);
     }
+
     @Ignore
     @Test
     public void testStandardSubstitutionA1() {
@@ -294,6 +295,7 @@ public class ESTSUseCaseTests extends AbstractTest {
                 + "</app>"//
 
                 + " of the dog.";
+        verifyCollationTEI(wit1, wit2, output);
 
         // substitution is dominant
         String output2 = "The "//
@@ -303,7 +305,7 @@ public class ESTSUseCaseTests extends AbstractTest {
                 + "<rdg wit=\"#Wit2\">big eyes</rdg>"//
                 + "</app>"//
                 + " of the dog.";
-        verifyCollationTEI(wit1, wit2, output);
+        verifyCollationTEI(wit1, wit2, output2);
     }
 
     private void verifyCollationTEI(String wit1, String wit2, String expectedTEI) {

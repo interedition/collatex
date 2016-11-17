@@ -1,25 +1,26 @@
 package eu.interedition.collatex.subst;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.collect.Maps;
+import eu.interedition.collatex.simple.SimplePatternTokenizer;
 
 import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
-
-import com.google.common.collect.Maps;
-
-import eu.interedition.collatex.simple.SimplePatternTokenizer;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by ronalddekker on 01/05/16.
  */
 public class WitnessNode {
+
+    private Integer rank = 0;
+
     enum Type {
         text, element
     }
@@ -31,11 +32,12 @@ public class WitnessNode {
     private String sigil;
     Map<String, String> attributes;
 
-    public WitnessNode(String sigil, Type type, String data, Map<String, String> attributes) {
+    public WitnessNode(String sigil, Type type, String data, Map<String, String> attributes, Integer rank) {
         this.sigil = sigil;
         this.type = type;
         this.data = data;
         this.attributes = attributes;
+        this.rank = rank;
         this.children = new ArrayList<>();
     }
 
@@ -49,6 +51,10 @@ public class WitnessNode {
             throw new RuntimeException("There are no children!");
         }
         return children.get(children.size() - 1);
+    }
+
+    public Integer getRank() {
+        return rank;
     }
 
     @Override
@@ -67,13 +73,24 @@ public class WitnessNode {
 
     // traverses recursively; only instead of nodes we return events
     public Stream<WitnessNodeEvent> depthFirstNodeEventStream() {
+        return depthFirstNodeEventStream(w -> true);
+    }
+
+    public Stream<WitnessNodeEvent> depthFirstNodeEventStream(Predicate<WitnessNode> node2ignorePredicate) {
         // NOTE: this if can be removed with inheritance, but that would mean virtual dispatch, so it is not a big win.
         if (this.children.isEmpty()) {
             return Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.TEXT));
         }
 
+        boolean ignoreThisSubTree = node2ignorePredicate.test(this);
+        if (ignoreThisSubTree) {
+            return Stream.empty();
+        }
+
         Stream<WitnessNodeEvent> a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
-        Stream<WitnessNodeEvent> b = children.stream().map(WitnessNode::depthFirstNodeEventStream).flatMap(Function.identity());
+        Stream<WitnessNodeEvent> b = children.stream()//
+            .map(n -> n.depthFirstNodeEventStream(node2ignorePredicate))
+            .flatMap(Function.identity());
         Stream<WitnessNodeEvent> c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
         return Stream.concat(a, Stream.concat(b, c));
     }
@@ -102,23 +119,56 @@ public class WitnessNode {
     // returns the root node of the tree
     public static WitnessNode createTree(String sigil, String witnessXML) {
         // use a stax parser to go from XML data to XML tokens
-        WitnessNode initialValue = new WitnessNode(sigil, Type.element, "fake root", null);
+        WitnessNode initialValue = new WitnessNode(sigil, Type.element, "fake root", null, -1); // rank only needed for text nodes
         final AtomicReference<WitnessNode> currentNodeRef = new AtomicReference<>(initialValue);
         Function<String, Stream<String>> textTokenizer = SimplePatternTokenizer.BY_WS_OR_PUNCT;
+        AtomicInteger rank = new AtomicInteger(0);
+        Stack<Integer> rankStack = new Stack<>();
+        Stack<Integer> highestChoiceStack = new Stack<>();
         XMLUtil.getXMLEventStream(witnessXML).forEach(xmlEvent -> {
             if (xmlEvent.isStartElement()) {
-                WitnessNode child = WitnessNode.fromStartElement(sigil, xmlEvent.asStartElement());
+                StartElement startElement = xmlEvent.asStartElement();
+                switch (startElement.getName().toString()) {
+                    case "subst":
+                    case "app":
+                        rankStack.push(rank.get());
+                        highestChoiceStack.push(rank.get());
+                        break;
+                    case "del":
+                    case "add":
+                    case "rdg":
+                        rank.set(rankStack.peek());
+                        break;
+                }
+                WitnessNode child = WitnessNode.fromStartElement(sigil, startElement);
                 currentNodeRef.get().addChild(child);
                 currentNodeRef.set(child);
 
             } else if (xmlEvent.isCharacters()) {
                 String text = xmlEvent.asCharacters().getData();
                 textTokenizer.apply(text)//
-                        .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>()))//
-                        .collect(Collectors.toList())//
-                        .forEach(currentNodeRef.get()::addChild);
+                    .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>(), rank.getAndIncrement()))//
+                    .collect(Collectors.toList())//
+                    .forEach(currentNodeRef.get()::addChild);
 
             } else if (xmlEvent.isEndElement()) {
+                EndElement endElement = xmlEvent.asEndElement();
+                switch (endElement.getName().toString()) {
+                    case "rdg":
+                    case "del":
+                    case "add":
+                        Integer rankAtEndOfChoice = rank.get();
+                        Integer currentHighestRankAtEndOfChoice = highestChoiceStack.pop();
+                        highestChoiceStack.push(Math.max(rankAtEndOfChoice,currentHighestRankAtEndOfChoice));
+                        rank.set(rankStack.peek());
+                        break;
+                    case "app":
+                    case "subst":
+                        Integer newRank = rankStack.pop();
+                        highestChoiceStack.pop();
+                        rank.set(newRank);
+                        break;
+                }
                 currentNodeRef.set(currentNodeRef.get().parent);
             }
         });
@@ -134,7 +184,7 @@ public class WitnessNode {
             attributes.put(attribute.getName().getLocalPart(), attribute.getValue());
         });
         String data2 = startElement.getName().getLocalPart();
-        return new WitnessNode(sigil, Type.element, data2, attributes);
+        return new WitnessNode(sigil, Type.element, data2, attributes, -1);
     }
 
     public Type getType() {
