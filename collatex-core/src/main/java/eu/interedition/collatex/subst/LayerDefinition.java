@@ -12,14 +12,17 @@ public class LayerDefinition {
 
     public static LayerDefinition getDefault() {
         LayerDefinition LayerDefinition = new LayerDefinition();
+
         OrOperator substOperator = new OrOperator("subst");
         substOperator.getOrOperands().add("del");
         substOperator.getOrOperands().add("add");
+        LayerDefinition.getOrOperators().add(substOperator);
+
         OrOperator appOperator = new OrOperator("app");
         appOperator.getOrOperands().add("rdg");
         appOperator.setTypeToIgnore("lit");
-        LayerDefinition.getOrOperators().add(substOperator);
         LayerDefinition.getOrOperators().add(appOperator);
+
         return LayerDefinition;
     }
 
