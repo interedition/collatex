@@ -1,18 +1,24 @@
 package eu.interedition.collatex.subst;
 
-import com.google.common.collect.Maps;
-import eu.interedition.collatex.simple.SimplePatternTokenizer;
-
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+
+import com.google.common.collect.Maps;
+
+import eu.interedition.collatex.simple.SimplePatternTokenizer;
 
 /**
  * Created by ronalddekker on 01/05/16.
@@ -89,8 +95,7 @@ public class WitnessNode {
 
         Stream<WitnessNodeEvent> a = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.START));
         Stream<WitnessNodeEvent> b = children.stream()//
-            .map(n -> n.depthFirstNodeEventStream(node2ignorePredicate))
-            .flatMap(Function.identity());
+                .map(n -> n.depthFirstNodeEventStream(node2ignorePredicate)).flatMap(Function.identity());
         Stream<WitnessNodeEvent> c = Stream.of(new WitnessNodeEvent(this, WitnessNodeEventType.END));
         return Stream.concat(a, Stream.concat(b, c));
     }
@@ -126,19 +131,22 @@ public class WitnessNode {
         Stack<Integer> rankStack = new Stack<>();
         Stack<Integer> highestChoiceStack = new Stack<>();
         XMLUtil.getXMLEventStream(witnessXML).forEach(xmlEvent -> {
+            // System.out.println();
+
             if (xmlEvent.isStartElement()) {
                 StartElement startElement = xmlEvent.asStartElement();
+                // System.out.println("start element " + startElement.getName().toString());
                 switch (startElement.getName().toString()) {
-                    case "subst":
-                    case "app":
-                        rankStack.push(rank.get());
-                        highestChoiceStack.push(rank.get());
-                        break;
-                    case "del":
-                    case "add":
-                    case "rdg":
-                        rank.set(rankStack.peek());
-                        break;
+                case "subst":
+                case "app":
+                    rankStack.push(rank.get());
+                    highestChoiceStack.push(rank.get());
+                    break;
+                case "del":
+                case "add":
+                case "rdg":
+                    rank.set(rankStack.peek());
+                    break;
                 }
                 WitnessNode child = WitnessNode.fromStartElement(sigil, startElement);
                 currentNodeRef.get().addChild(child);
@@ -146,36 +154,41 @@ public class WitnessNode {
 
             } else if (xmlEvent.isCharacters()) {
                 String text = xmlEvent.asCharacters().getData();
+                // System.out.println("text = " + text);
                 textTokenizer.apply(text)//
-                    .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>(), rank.getAndIncrement()))//
-                    .collect(Collectors.toList())//
-                    .forEach(currentNodeRef.get()::addChild);
+                        .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>(), rank.getAndIncrement()))//
+                        .collect(Collectors.toList())//
+                        .forEach(currentNodeRef.get()::addChild);
 
             } else if (xmlEvent.isEndElement()) {
                 EndElement endElement = xmlEvent.asEndElement();
+                // System.out.println("end element " + endElement.getName().toString());
                 switch (endElement.getName().toString()) {
-                    case "rdg":
-                    case "del":
-                    case "add":
-                        Integer rankAtEndOfChoice = rank.get();
-                        Integer currentHighestRankAtEndOfChoice = highestChoiceStack.pop();
-                        highestChoiceStack.push(Math.max(rankAtEndOfChoice,currentHighestRankAtEndOfChoice));
-                        rank.set(rankStack.peek());
-                        break;
-                    case "app":
-                    case "subst":
-                        Integer newRank = rankStack.pop();
-                        highestChoiceStack.pop();
-                        rank.set(newRank);
-                        break;
+                case "rdg":
+                case "del":
+                case "add":
+                    Integer rankAtEndOfChoice = rank.get();
+                    Integer currentHighestRankAtEndOfChoice = highestChoiceStack.pop();
+                    highestChoiceStack.push(Math.max(rankAtEndOfChoice, currentHighestRankAtEndOfChoice));
+                    rank.set(rankStack.peek());
+                    break;
+                case "app":
+                case "subst":
+                    rankStack.pop();
+                    Integer newRank = highestChoiceStack.pop();
+                    rank.set(newRank);
+                    break;
                 }
                 currentNodeRef.set(currentNodeRef.get().parent);
             }
+
+            // System.out.println("rank = " + rank.get());
+            // System.out.println("rankStack.peek() = " + (rankStack.isEmpty() ? null : rankStack.peek()));
+            // System.out.println("highestChoiceStack.peek() = " + (highestChoiceStack.isEmpty() ? null : highestChoiceStack.peek()));
         });
 
         return currentNodeRef.get().children.get(0);
     }
-
 
     private static WitnessNode fromStartElement(String sigil, StartElement startElement) {
         Map<String, String> attributes = Maps.newHashMap();

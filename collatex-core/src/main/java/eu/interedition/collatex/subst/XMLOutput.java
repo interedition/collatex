@@ -1,11 +1,18 @@
 package eu.interedition.collatex.subst;
 
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.Writer;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Ronald Haentjens Dekker on 18/08/16.
@@ -195,13 +202,13 @@ public class XMLOutput {
             AtomicInteger witnessNodesRank = new AtomicInteger(-1);
             witnessnodes.forEach(node -> {
                 Integer nodeRank = node.getRank();
-                // System.out.println(node.data + ":" + nodeRank);
+                System.out.println(node.data + ":" + nodeRank);
                 Integer currentRank = witnessNodesRank.get();
                 witnessNodesRank.set(Math.max(currentRank, nodeRank));
             });
             ranks.put(witnessnodes, witnessNodesRank.get());
         });
-        // System.out.println(ranks);
+        System.out.println(ranks);
         return ranks;
     }
 }
