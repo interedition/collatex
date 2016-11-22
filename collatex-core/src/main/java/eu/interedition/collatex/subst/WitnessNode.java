@@ -7,8 +7,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -116,6 +116,35 @@ public class WitnessNode {
     // return Stream.concat(a, b);
     // }
 
+    private static class XmlEventStreamContext {
+        boolean ignoreXmlEvents = false;
+
+        public boolean eventIsRelevant(XMLEvent xmlEvent) {
+            boolean isRelevant = !ignoreXmlEvents;
+            if (xmlEvent.isStartElement()) {
+                if (isStartOfLitRdg(xmlEvent.asStartElement())) {
+                    ignoreXmlEvents = true;
+                    isRelevant = false;
+                }
+            } else if (xmlEvent.isEndElement()) {
+                boolean isEndOfLitRdg = ignoreXmlEvents && xmlEvent.asEndElement().getName().toString().equals("rdg");
+                if (isEndOfLitRdg) {
+                    ignoreXmlEvents = false;
+                    isRelevant = false;
+                }
+            }
+            return isRelevant;
+        }
+
+        private static boolean isStartOfLitRdg(StartElement startElement) {
+//        System.out.println("startElement="+startElement);
+            Attribute typeAttribute = startElement.getAttributeByName(QName.valueOf("type"));
+            return startElement.getName().toString().equals("rdg")//
+                && typeAttribute != null //
+                && typeAttribute.getValue().equals("lit");
+        }
+    }
+
     // this class creates a witness tree from a XML serialization of a witness
     // returns the root node of the tree
     public static WitnessNode createTree(String sigil, String witnessXML) {
@@ -126,17 +155,13 @@ public class WitnessNode {
         AtomicInteger rank = new AtomicInteger(0);
         Stack<Integer> rankStack = new Stack<>();
         Stack<Integer> highestChoiceStack = new Stack<>();
-        AtomicBoolean ignoreSubTree = new AtomicBoolean(false);
-        XMLUtil.getXMLEventStream(witnessXML).forEach(xmlEvent -> {
-            // System.out.println();
-
-            if (xmlEvent.isStartElement()) {
-                StartElement startElement = xmlEvent.asStartElement();
-                if (isStartOfLitRdg(startElement)) {
-                    ignoreSubTree.set(true);
-                }
-
-                if (!ignoreSubTree.get()) {
+        XmlEventStreamContext context = new XmlEventStreamContext();
+        XMLUtil.getXMLEventStream(witnessXML)//
+            .filter(context::eventIsRelevant)//
+            .forEach(xmlEvent -> {
+                // System.out.println();
+                if (xmlEvent.isStartElement()) {
+                    StartElement startElement = xmlEvent.asStartElement();
 //                    System.out.println("start element <" + startElement.getName().toString() + ">");
                     switch (startElement.getName().toString()) {
                         case "subst":
@@ -153,21 +178,17 @@ public class WitnessNode {
                     WitnessNode child = WitnessNode.fromStartElement(sigil, startElement);
                     currentNodeRef.get().addChild(child);
                     currentNodeRef.set(child);
-                }
 
-            } else if (xmlEvent.isCharacters()) {
-                if (!ignoreSubTree.get()) {
+                } else if (xmlEvent.isCharacters()) {
                     String text = xmlEvent.asCharacters().getData();
 //                    System.out.println("text = " + text);
                     textTokenizer.apply(text)//
                         .map(s -> new WitnessNode(sigil, Type.text, s, new HashMap<>(), rank.getAndIncrement()))//
                         .collect(Collectors.toList())//
                         .forEach(currentNodeRef.get()::addChild);
-                }
 
-            } else if (xmlEvent.isEndElement()) {
-                EndElement endElement = xmlEvent.asEndElement();
-                if (!ignoreSubTree.get()) {
+                } else if (xmlEvent.isEndElement()) {
+                    EndElement endElement = xmlEvent.asEndElement();
 //                    System.out.println("end element </" + endElement.getName().toString() + ">");
                     switch (endElement.getName().toString()) {
                         case "rdg":
@@ -187,25 +208,13 @@ public class WitnessNode {
                     }
                     currentNodeRef.set(currentNodeRef.get().parent);
                 }
-                if (ignoreSubTree.get() & endElement.getName().toString().equals("rdg")) {
-                    ignoreSubTree.set(false);
-                }
-            }
 
-            // System.out.println("rank = " + rank.get());
-            // System.out.println("rankStack.peek() = " + (rankStack.isEmpty() ? null : rankStack.peek()));
-            // System.out.println("highestChoiceStack.peek() = " + (highestChoiceStack.isEmpty() ? null : highestChoiceStack.peek()));
-        });
+                // System.out.println("rank = " + rank.get());
+                // System.out.println("rankStack.peek() = " + (rankStack.isEmpty() ? null : rankStack.peek()));
+                // System.out.println("highestChoiceStack.peek() = " + (highestChoiceStack.isEmpty() ? null : highestChoiceStack.peek()));
+            });
 
         return currentNodeRef.get().children.get(0);
-    }
-
-    private static boolean isStartOfLitRdg(StartElement startElement) {
-//        System.out.println("startElement="+startElement);
-        Attribute typeAttribute = startElement.getAttributeByName(QName.valueOf("type"));
-        return startElement.getName().toString().equals("rdg")//
-            && typeAttribute != null //
-            && typeAttribute.getValue().equals("lit");
     }
 
 
