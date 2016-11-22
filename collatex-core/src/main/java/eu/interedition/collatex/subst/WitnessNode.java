@@ -139,9 +139,9 @@ public class WitnessNode {
         private static boolean isStartOfLitRdg(StartElement startElement) {
 //        System.out.println("startElement="+startElement);
             Attribute typeAttribute = startElement.getAttributeByName(QName.valueOf("type"));
-            return startElement.getName().toString().equals("rdg")//
+            return "rdg".equals(startElement.getName().toString())//
                 && typeAttribute != null //
-                && typeAttribute.getValue().equals("lit");
+                && "lit".equals(typeAttribute.getValue());
         }
     }
 
