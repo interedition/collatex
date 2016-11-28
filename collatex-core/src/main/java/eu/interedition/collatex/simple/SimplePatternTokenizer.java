@@ -38,8 +38,14 @@ public class SimplePatternTokenizer {
         return input -> {
             final Matcher matcher = pattern.matcher(input);
             final List<String> tokens = new LinkedList<>();
+            boolean first = true;
             while (matcher.find()) {
-                tokens.add(input.substring(matcher.start(), matcher.end()));
+                int start = matcher.start();
+                if (first && start > 0) {
+                    // tokens.add(input.substring(0, start));
+                }
+                tokens.add(input.substring(start, matcher.end()));
+                first = false;
             }
             return tokens.stream();
         };

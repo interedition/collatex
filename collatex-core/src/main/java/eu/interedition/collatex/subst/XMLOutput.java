@@ -1,18 +1,17 @@
 package eu.interedition.collatex.subst;
 
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import static java.util.stream.Collectors.toSet;
+
+import com.google.common.collect.Sets;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import java.io.Writer;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Created by Ronald Haentjens Dekker on 18/08/16.
@@ -28,6 +27,7 @@ public class XMLOutput {
         xwriter.writeStartElement("apparatus");
         // here we have to go over the columns
         for (Column c : getTable()) {
+            System.out.println("column(lemma,variation)=('" + c.getLemma() + "', " + c.hasVariation() + ")");
             if (c.hasVariation()) {
                 renderApp(xwriter, c);
             } else {
@@ -46,6 +46,12 @@ public class XMLOutput {
     private void renderApp(XMLStreamWriter xwriter, Column column) throws XMLStreamException {
         xwriter.writeStartElement("app");
         List<String> readings = column.getReadings();
+        Comparator<String> bySigil = (s1, s2) -> {
+            String sigil1 = column.getTokenInfoForReading(s1).get(0).getSigil();
+            String sigil2 = column.getTokenInfoForReading(s2).get(0).getSigil();
+            return sigil1.compareToIgnoreCase(sigil2);
+        };
+        Collections.sort(readings, bySigil);
         AtomicInteger varSeqCounter = new AtomicInteger();
         for (String reading : readings) {
             List<TokenInfo> tokenInfoForReading = column.getTokenInfoForReading(reading);
@@ -53,16 +59,20 @@ public class XMLOutput {
                 TokenInfo tokenInfo = tokenInfoForReading.get(0);
                 renderRdg(xwriter, tokenInfo, varSeqCounter, reading);
             } else {
-                xwriter.writeStartElement("rdgGrp");
-                xwriter.writeAttribute("type", "tag_variation_only");
-                for (TokenInfo tokenInfo : tokenInfoForReading) {
-                    renderRdg(xwriter, tokenInfo, varSeqCounter, reading);
-                }
-                xwriter.writeEndElement();
+                renderRdgGrp(xwriter, tokenInfoForReading, varSeqCounter, reading);
             }
         }
         xwriter.writeEndElement();
-        xwriter.writeCharacters(" ");
+        xwriter.writeCharacters(" "); // TODO: this is not always required!
+    }
+
+    private void renderRdgGrp(XMLStreamWriter xwriter, List<TokenInfo> tokenInfoForReading, AtomicInteger varSeqCounter, String reading) throws XMLStreamException {
+        xwriter.writeStartElement("rdgGrp");
+        xwriter.writeAttribute("type", "tag_variation_only");
+        for (TokenInfo tokenInfo : tokenInfoForReading) {
+            renderRdg(xwriter, tokenInfo, varSeqCounter, reading);
+        }
+        xwriter.writeEndElement();
     }
 
     private void renderRdg(XMLStreamWriter xwriter, TokenInfo tokenInfo, AtomicInteger varSeqCounter, String reading) throws XMLStreamException {
@@ -127,37 +137,40 @@ public class XMLOutput {
         // We need to rank all the matches / non-matches
         Map<List<WitnessNode>, Integer> ranksForMatchesAndNonMatches = getRanksForMatchesAndNonMatches();
         Map<Integer, List<List<WitnessNode>>> rankToWitnessNodes = inverseMap(ranksForMatchesAndNonMatches);
+        Set<String> sigils = witnessLabels.values().stream().collect(toSet());
         // Given the ranks and the labels we create the columns
-        return createColumns(witnessLabels, rankToWitnessNodes);
+        return createColumns(witnessLabels, rankToWitnessNodes, sigils);
     }
 
-    private List<Column> createColumns(Map<WitnessNode, String> witnessLabels, Map<Integer, List<List<WitnessNode>>> inverse) {
-        System.out.println(inverse);
+    private List<Column> createColumns(Map<WitnessNode, String> witnessLabels, Map<Integer, List<List<WitnessNode>>> inverse, Set<String> sigils) {
+        System.out.println("inverse=" + inverse);
         List<Column> columns = new ArrayList<>();
-        for (int i = 0; i < inverse.keySet().size(); i++) {
+        int size = inverse.keySet().size();
+        for (int i = 0; i < size; i++) {
             List<List<WitnessNode>> matches = inverse.get(i);
             // in the most simple case we treat all the witness nodes separately
             LinkedHashMap<TokenInfo, String> labelToNode = new LinkedHashMap<>();
             matches.stream()//
-                .flatMap(List::stream)//
-                .forEach(node -> {
-                    // Only normalize when there is variation in a column.
-                    String value = node.data;
-                    if (matches.size() > 1) {
-                        // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
-                        value = value.trim();
-                    }
-                    TokenInfo tokenInfo = new TokenInfo();
-                    String witnessLabel = witnessLabels.get(node);
-                    tokenInfo.setSigil(witnessLabel);
-                    WitnessNode parent = node.parentNodeStream().iterator().next();
-                    // TODO: remove these statics
-                    if (parent.data.equals("add") || parent.data.equals("del")) {
-                        tokenInfo.setLayerName(parent.data);
-                        tokenInfo.setLayerAttributes(parent.attributes);
-                    }
-                    labelToNode.put(tokenInfo, value);
-                });
+                    .flatMap(List::stream)//
+                    .forEach(node -> {
+                        // Only normalize when there is variation in a column.
+                        String value = node.data;
+                        if (matches.size() > 1) {
+                            // TODO: MOVE NORMALIZATION TO A DIFFERENT PLACE!
+                            value = value.trim();
+                        }
+                        TokenInfo tokenInfo = new TokenInfo();
+                        String witnessLabel = witnessLabels.get(node);
+                        tokenInfo.setSigil(witnessLabel);
+                        WitnessNode parent = node.parentNodeStream().iterator().next();
+                        // TODO: remove these statics
+                        if (parent.data.equals("add") || parent.data.equals("del")) {
+                            tokenInfo.setLayerName(parent.data);
+                            tokenInfo.setLayerAttributes(parent.attributes);
+                        }
+                        labelToNode.put(tokenInfo, value);
+                    });
+            addEmptyForMissingSigils(sigils, labelToNode);
             // TODO: the inverseMap method has no guaranteed order
             // TODO: unit tests should fail, but don't at this time!
             Map<String, List<TokenInfo>> readingToLayerIdentifiers = inverseMap(labelToNode);
@@ -165,6 +178,18 @@ public class XMLOutput {
             columns.add(column);
         }
         return columns;
+    }
+
+    private void addEmptyForMissingSigils(Set<String> sigils, LinkedHashMap<TokenInfo, String> labelToNode) {
+        Set<String> sigilsUsed = labelToNode.keySet().stream().map(TokenInfo::getSigil).collect(Collectors.toSet());
+        Set<String> unusedSigils = Sets.newHashSet();
+        unusedSigils.addAll(sigils);
+        unusedSigils.removeAll(sigilsUsed);
+        unusedSigils.forEach(sigil -> {
+            TokenInfo tokenInfo = new TokenInfo();
+            tokenInfo.setSigil(sigil);
+            labelToNode.put(tokenInfo, "");
+        });
     }
 
     private static <T, U> Map<T, List<U>> inverseMap(Map<U, T> original) {
@@ -179,6 +204,8 @@ public class XMLOutput {
         }
         return inverse;
     }
+
+    private static final Comparator<WitnessNode> SORT_BY_SIGIL = (wn1, wn2) -> wn1.getSigil().compareToIgnoreCase(wn2.getSigil());
 
     public Map<WitnessNode, String> getWitnessLabels() {
         Map<WitnessNode, String> result = new HashMap<>();

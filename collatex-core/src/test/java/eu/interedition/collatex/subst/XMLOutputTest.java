@@ -4,18 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
+import javax.xml.stream.XMLStreamException;
 
 import java.io.FileNotFoundException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import javax.xml.stream.XMLStreamException;
+import org.junit.Test;
 
 /**
  * Created by ronalddekker on 15/08/16.
@@ -24,7 +20,7 @@ public class XMLOutputTest extends AbstractAlignmentTest {
 
     // Can we derive the correct XML output from a simple example?
     // First we start with two witnesses
-    // we have assign a witness/layer label/identifier to each witness node in the superwitness
+    // we have to assign a witness/layer label/identifier to each witness node in the superwitness
     // this is a bit more complex in the case of layers, since each layer should be its own witness
     @Test
     public void testTwoWitnessesLayerIdentifiers() {
