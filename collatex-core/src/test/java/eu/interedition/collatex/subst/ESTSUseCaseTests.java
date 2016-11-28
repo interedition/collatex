@@ -269,6 +269,7 @@ public class ESTSUseCaseTests extends AbstractTest {
         longSubstitutionTest(wit1);
     }
 
+    // BB: doesn't putting black/brown and ears/eyes in the same app require knowledge of the type of words?
     private void longSubstitutionTest(String wit1) {
         String wit2 = "<wit n=\"Wit2\">The big eyes of the dog.</wit>";
         // matching words is dominant
