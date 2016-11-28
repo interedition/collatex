@@ -33,6 +33,7 @@ public class EditGraphAligner {
     final List<EditGraphTableLabel> labelsWitnessB;
     final List<EditGraphTableLabel> labelsWitnessA;
     final Score[][] cells;
+    private Stream<WitnessNode> witnessNodeStream;
 
     public EditGraphAligner(WitnessNode a, WitnessNode b) {
         // from the witness node trees we calculate the labels
@@ -145,7 +146,7 @@ public class EditGraphAligner {
         if (editGraphTableLabel.containsEndOrOperator()) {
             // NOTE: There can be more end subst nodes
             // here we go look for the subst again (this can be done more efficient)
-            editGraphTableLabel.getEndOrperatorNodes()//
+            witnessNodeStream = editGraphTableLabel.getEndOrperatorNodes()//
                 // Nu hebben we een end subst node te pakken
                 // nu moet ik alle bij behorende adds en dels zien te vinden..
                 // dat zijn de kinderen van de betreffende subst
@@ -153,8 +154,9 @@ public class EditGraphAligner {
 
                 // ik moet eigenlijk filteren maar dat ga ik nu even niet doen
                 // Van alle child nodes moet ik daar dan weer de laatste child van pakken
-                .map(WitnessNode::getLastChild)//
+                .map(WitnessNode::getLastChild);
 
+            witnessNodeStream//
                 // Daarna mappen we die childnodes naar cell coordinaten
                 // in het geval van token in witness A naar X coordinates
                 // in het geval van token in witness B naar Y coordinates
