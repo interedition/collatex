@@ -1,6 +1,7 @@
 package eu.interedition.collatex.dekker.new_align;
 
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.island.Island;
 
 import java.util.*;
@@ -46,8 +47,8 @@ public class DecisionNode {
         return tree.getIslandOnWitnessPosition(witnessIterator.nextIndex());
     }
 
-    public List<Island> getSelected() {
-        return selected;
+    public Match getSelected() {
+        return selected.get(0).getMatch(0);
     }
 
     public List<Island> getMoved() {
@@ -147,7 +148,7 @@ public class DecisionNode {
         //TODO: this check is too simple
         //if the first vertex and token are available it does not mean that the complete phrase
         //is available
-        while (vertices.contains(witnessPhrase.getMatch(0).vertex) || positions.get(witnessPhrase.getLeftEnd().row)) {
+        while (phraseMatches.hasNext() && vertices.contains(witnessPhrase.getMatch(0).vertex) || phraseMatches.hasNext() && positions.get(witnessPhrase.getLeftEnd().row)) {
             // skip phrase
             witnessPhrase = phraseMatches.next();
         }
