@@ -34,7 +34,7 @@ class Task(object):
         return self.func(*self.args)
 
     def __repr__(self):
-        return "Task: "+self.name+", "+str(self.args)
+        return "Task: " + self.name + ", " + str(self.args)
 
 
 def process_rank(scheduler, rank, collation, ranking, witness_count):
@@ -51,19 +51,25 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
         # print('variation found at rank ' + str(rank))
         missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
         # print('missing witnesses: ' + str(missing_witnesses))
-        witnesses_weve_seen = set()
-        for missingWitness in sorted(missing_witnesses): # alphabetize witnesses for testing consistency
-            if missingWitness not in witnesses_weve_seen:
-                (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
-                # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
-                if prior_rank:
-                    candidate_ranks = {} # keys are ranks, values are distances
-                    for candidate_rank in range(prior_rank, rank + 1):
-                        candidate_ranks[candidate_rank] = scheduler.create_and_execute_task("build column for rank", create_near_match_table, prior_node, candidate_rank, ranking)
-                    new_rank = min(candidate_ranks, key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
-                    need_to_move = prior_rank != new_rank
-                    if need_to_move:
-                        scheduler.create_and_execute_task("move node from prior rank to rank with best match", move_node_from_prior_rank_to_rank, prior_node, prior_rank, new_rank, ranking)
+        for missingWitness in sorted(missing_witnesses):  # alphabetize witnesses for testing consistency
+            (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
+            # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
+            if prior_rank:
+                candidate_ranks = {}  # keys are ranks, values are distances
+                for candidate_rank in range(prior_rank, rank + 1):
+                    candidate_ranks[candidate_rank] = scheduler.create_and_execute_task("build column for rank",
+                                                                                        create_near_match_table,
+                                                                                        prior_node, candidate_rank,
+                                                                                        ranking)
+                new_rank = min(candidate_ranks,
+                               key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
+                prior_rank_witnesses = set(prior_node.tokens.keys())
+                new_rank_witnesses = [key for node in ranking.byRank[new_rank] for key in node.tokens.keys()]
+                need_to_move = prior_rank != new_rank and not prior_rank_witnesses.intersection(new_rank_witnesses)
+                if need_to_move:
+                    scheduler.create_and_execute_task("move node from prior rank to rank with best match",
+                                                      move_node_from_prior_rank_to_rank, prior_node, prior_rank,
+                                                      new_rank, ranking)
     return rank
 
 
@@ -72,7 +78,6 @@ def create_near_match_table(prior_node, prior_rank, ranking):
 
 
 def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
-    # if (right_min, -right_max_count) < (left_min, -left_max_count):
     # move the entire node from prior_rank to (current) rank
     ranking.byRank[prior_rank].remove(prior_node)
     ranking.byRank[rank].append(prior_node)
