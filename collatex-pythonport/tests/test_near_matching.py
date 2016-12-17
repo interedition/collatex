@@ -139,6 +139,48 @@ class Test(unittest.TestCase):
 +---+------+------+------+------+------+"""
         self.assertEqual(expected, alignment_table)
 
+        def test_near_matching_clash(self):
+            # If the previous rank has a vertex with more than one witness, where at least
+            # one witness is a candidate for being moved, don't move it if any of the
+            # witnesses has a node at the new rank.
+            #
+            # If there were only A and B, we'd move cce away from bbb to align with cce.
+            # Witness C should prevent this.
+            self.maxDiff = None
+            collation = Collation()
+            collation.add_plain_witness("A", "aaa bbb ccc ddd")
+            collation.add_plain_witness("B", "aaa cce ddd")
+            collation.add_plain_witness("C", "aaa cce ccc ddd")
+            alignment_table = str(collate(collation, near_match=True, segmentation=False))
+            expected = """\
+    +---+-----+-----+-----+-----+
+    | A | aaa | bbb | ccc | ddd |
+    | B | aaa | cce | -   | ddd |
+    | C | aaa | cce | ccc | ddd |
+    +---+-----+-----+-----+-----+"""
+            self.assertEqual(expected, alignment_table)
+
+    def test_near_matching_nonclash(self):
+        # If the previous rank has a vertex with more than one witness, where at least
+        # one witness is a candidate for being moved, don't move it if any of the
+        # witnesses has a node at the new rank.
+        #
+        # If there were only A and B, we'd move cce away from bbb to align with cce.
+        # Witness C should prevent this.
+        self.maxDiff = None
+        collation = Collation()
+        collation.add_plain_witness("A", "aaa bbb ccc ddd")
+        collation.add_plain_witness("B", "aaa cce ddd")
+        collation.add_plain_witness("C", "aaa cce ddd")
+        alignment_table = str(collate(collation, near_match=True, segmentation=False))
+        expected = """\
++---+-----+-----+-----+-----+
+| A | aaa | bbb | ccc | ddd |
+| B | aaa | -   | cce | ddd |
+| C | aaa | -   | cce | ddd |
++---+-----+-----+-----+-----+"""
+        self.assertEqual(expected, alignment_table)
+
     def test_near_matching_three_witnesses(self):
         self.maxDiff = None
         scheduler = Scheduler()
