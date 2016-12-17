@@ -64,8 +64,8 @@ def process_rank(scheduler, rank, collation, ranking, witness_count):
                 new_rank = min(candidate_ranks,
                                key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
                 prior_rank_witnesses = set(prior_node.tokens.keys())
-                rank_witnesses = [key for node in ranking.byRank[rank] for key in node.tokens.keys()]
-                need_to_move = prior_rank != new_rank and not prior_rank_witnesses.intersection(rank_witnesses)
+                new_rank_witnesses = [key for node in ranking.byRank[new_rank] for key in node.tokens.keys()]
+                need_to_move = prior_rank != new_rank and not prior_rank_witnesses.intersection(new_rank_witnesses)
                 if need_to_move:
                     scheduler.create_and_execute_task("move node from prior rank to rank with best match",
                                                       move_node_from_prior_rank_to_rank, prior_node, prior_rank,
@@ -79,11 +79,6 @@ def create_near_match_table(prior_node, prior_rank, ranking):
 
 def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
     # move the entire node from prior_rank to (current) rank
-    if len(prior_node.tokens) != 1:
-        prior_rank_witnesses = set(prior_node.tokens.keys())
-        rank_witnesses = [key for node in ranking.byRank[rank] for key in node.tokens.keys()]
-        if prior_rank_witnesses.intersection(rank_witnesses):
-            raise Exception('Moving prior node would collide with value at new rank' + str(prior_node.tokens))
     ranking.byRank[prior_rank].remove(prior_node)
     ranking.byRank[rank].append(prior_node)
     ranking.byVertex[prior_node] = rank
