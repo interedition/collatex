@@ -3,6 +3,12 @@
 History
 -------
 
+2.1.1 (2016-12-17)
+++++++++++++++++++
+* Bug fix release
+* Fixed a bug in the new near match functionality that would cause tokens to go missing in the alignment table.
+* Thanks to Torsten Hiltmann for reporting it and providing a test case.
+
 2.1.0 (2016-11-01)
 ++++++++++++++++++
 * Official release for the Dixit code and collation workshop in Amsterdam
