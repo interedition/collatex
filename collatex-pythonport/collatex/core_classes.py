@@ -206,6 +206,9 @@ class Witness(object):
     def tokens(self):
         return self._tokens
 
+    def __str__(self):
+        return "witness "+self.sigil+" with "+str(len(self._tokens))+" tokens"
+
 
 class VariantGraphVertex(object):
     def __init__(self, token=None, sigil=None):

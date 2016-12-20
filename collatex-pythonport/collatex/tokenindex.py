@@ -1,5 +1,7 @@
+from typing import Set, List
+
 from ClusterShell.RangeSet import RangeSet
-from collatex.core_classes import Token
+from collatex.core_classes import Token, Witness
 from collatex.linsuffarr import SuffixArray
 from collatex.linsuffarr import UNIT_BYTE
 
@@ -49,8 +51,8 @@ class TokenIndex(object):
             # remember get tokens twice
             self.token_array.extend(witness.tokens())
 
-    def get_range_for_witness(self, witness_sigil):
-        if not witness_sigil in self.witness_ranges:
+    def get_range_for_witness(self, witness_sigil: str):
+        if witness_sigil not in self.witness_ranges:
             raise Exception("Witness "+witness_sigil+" is not added to the collation!")
         return self.witness_ranges[witness_sigil]
 
@@ -71,7 +73,7 @@ class TokenIndex(object):
         return sa._LCP_values
 
     # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend. 4) descend, ascend
-    def split_lcp_array_into_intervals(self):
+    def split_lcp_array_into_intervals(self) -> List["LCPInterval"]:
         closed_intervals = []
         previous_lcp_value = 0
         open_intervals = Stack()
@@ -114,7 +116,7 @@ class TokenIndex(object):
 # block_occurrences: the ranges within the suffix array that this block spans
 class LCPInterval(object):
 
-    def __init__(self, token_index, start, end, length, number_of_siblings):
+    def __init__(self, token_index: TokenIndex, start, end, length, number_of_siblings):
         self.token_index = token_index
         self.start = start
         self.end = end
@@ -149,6 +151,17 @@ class LCPInterval(object):
             range.add_range(occurrence, occurrence + self.minimum_block_length)
         return range
 
+    # return the witnesses that are involved in this range
+    @property
+    def witnesses(self) -> Set[Witness]:
+        range = self._as_range()
+        witnesses = set()
+        for witness, witness_range in self.token_index.witness_ranges.items():
+            if witness_range.intersection(range):
+                witnesses.add(witness)
+        return witnesses
+
+    # this method can be rewritten in such a way that it uses the witnesses method
     @property
     def number_of_witnesses(self):
         range = self._as_range()
@@ -181,5 +194,6 @@ class LCPInterval(object):
 
     # start (suffix), length, depth, frequency
     def __repr__(self):
-        return "LCPivl: "+str(self.start)+","+str(self.minimum_block_length)+","+str(self.number_of_witnesses)+","+str(self.number_of_occurrences)
+        return str(self)
+        #return "LCPivl: "+str(self.start)+","+str(self.minimum_block_length)+","+str(self.number_of_witnesses)+","+str(self.number_of_occurrences)
 
