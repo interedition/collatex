@@ -20,7 +20,9 @@ class ExperimentalAligner(object):
         # witness1 = self.witnesses[0]
         witness2 = self.witnesses[1]
         print(witness2)
-        print(self._internal_method_to_get_all_block_occurrences(witness2))
+        occurrences = self._internal_method_to_get_all_block_occurrences(witness2)
+        print(occurrences)
+        self._group_block_occurrences_by_start_token_position(occurrences)
         pass
 
     def _internal_method_to_get_all_block_occurrences(self, witness: Witness):
@@ -38,6 +40,15 @@ class ExperimentalAligner(object):
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=attrgetter('lower_end'))
         return sorted_o
+
+    # There are at most two block occurrences per token start position
+    def _group_block_occurrences_by_start_token_position(self, occurrences: List[Occurrence]):
+        occurrences_per_position = defaultdict(list)
+        for o in occurrences:
+            occurrences_per_position[o.token_range[0]].append(o)
+        print(occurrences_per_position)
+        pass
+
 
 
 class Test(unittest.TestCase):
