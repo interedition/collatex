@@ -22,8 +22,10 @@ class ExperimentalAligner(object):
         print(witness2)
         occurrences = self._internal_method_to_get_all_block_occurrences(witness2)
         print(occurrences)
-        self._group_block_occurrences_by_start_token_position(occurrences)
-        pass
+        groups = self._group_block_occurrences_by_start_token_position(occurrences)
+        histo = self._calculate_histogram_based_on_occurrences(groups, witness2)
+        print(histo)
+        return histo
 
     def _internal_method_to_get_all_block_occurrences(self, witness: Witness):
         blocks = self.witness_to_intervals[witness.sigil]
@@ -47,8 +49,33 @@ class ExperimentalAligner(object):
         for o in occurrences:
             occurrences_per_position[o.token_range[0]].append(o)
         print(occurrences_per_position)
-        pass
+        return occurrences_per_position
 
+    # The hope is we can calculate the heuristic value based on this
+    # This is a heuristic, it is optimistic
+    def _calculate_histogram_based_on_occurrences(self, groups: Mapping[int, List[Occurrence]], witness: Witness):
+        # we calculate the histogram based on the range of the witness
+        histogram = defaultdict(lambda: 0)
+        range_witness = self.token_index.get_range_for_witness(witness.sigil)
+        for idx in range_witness:
+            options = groups[idx]
+            # options can have zero (no matching block), 1 matching block or 2 matching blocks
+            if len(options) == 0:
+                print("position "+str(idx)+" does not have any blocks!")
+                pass
+            elif len(options) == 1:
+                histogram[options[0].block.number_of_witnesses] += 1
+            elif len(options) == 2:
+                # TODO: remove ugly duplication
+                max_depth = max(options[0].block.number_of_witnesses, options[1].block.number_of_witnesses)
+                if options[0].block.number_of_witnesses == max_depth:
+                    histogram[options[0].block.number_of_witnesses] += 1
+                if options[1].block.number_of_witnesses == max_depth:
+                    histogram[options[1].block.number_of_witnesses] += 1
+            else:
+                # TODO: more is possible, we don't do that for now!
+                raise Exception("Don't deal with it now")
+        return histogram
 
 
 class Test(unittest.TestCase):
@@ -85,12 +112,6 @@ class Test(unittest.TestCase):
                 witness_to_intervals[witness].append(interval)
 
         aligner = ExperimentalAligner(collation.witnesses, witness_to_intervals, token_index)
-        aligner.align()
-        self.fail()
-
-        pass
-    
-
-
-    
-    pass
+        histogram = aligner.align()
+        self.assertEqual(histogram[2], 1)
+        self.assertEqual(histogram[3], 13)
