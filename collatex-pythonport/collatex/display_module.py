@@ -75,7 +75,6 @@ def display_variant_graph_as_SVG(graph,svg_output):
 
         a = nx.drawing.nx_agraph.to_agraph(graph.graph)
         a.graph_attr['rankdir'] = 'LR'
-        print([node.name for node in a.nodes()])
         # Create labels for nodes
         for n in graph.graph.nodes():
             for key, value in n.tokens.items():
