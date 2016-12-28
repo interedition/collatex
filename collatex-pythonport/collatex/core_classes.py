@@ -86,7 +86,7 @@ class AlignmentTable(object):
         else:
             ranking = VariantGraphRanking.of(self.graph)
         vertices_per_rank = ranking.byRank
-        # construct columns        
+        # construct columns
         for rank in vertices_per_rank:
             column = None
             vertices = vertices_per_rank[rank]
@@ -208,8 +208,8 @@ class Witness(object):
 
 
 class VariantGraphVertex(object):
-    def __init__(self, token=None, sigil=None):
-        self.label = token.token_string if token else ''
+    def __init__(self, token=None, sigil=None, label=None):
+        self.label = label if label else token.token_string if token else ''
         self.tokens = {sigil: [token]} if sigil else {}
 
     def add_token(self, sigil, token):
@@ -229,11 +229,11 @@ class VariantGraph(object):
     def __init__(self):
         self.graph = nx.DiGraph()
         # Start and end are the only nodes without sigil or tokens
-        self.start = self.add_vertex(None, None)
-        self.end = self.add_vertex(None, None)
+        self.start = self.add_vertex(None, None, label='start')
+        self.end = self.add_vertex(None, None, label='end')
 
-    def add_vertex(self, token, sigil):
-        newVertex = VariantGraphVertex(token, sigil)
+    def add_vertex(self, token, sigil, label=None):
+        newVertex = VariantGraphVertex(token, sigil, label)
         self.graph.add_node(newVertex)
         # Returned to aligner, which tracks relationship of tokens and vertices
         return newVertex
@@ -312,7 +312,7 @@ class CollationAlgorithm(object):
  This function joins the variant graph in place.
  This function is a straight port of the Java version of CollateX.
     :type graph: VariantGraph
- TODO: add transposition support!   
+ TODO: add transposition support!
 '''
 
 
