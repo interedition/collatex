@@ -75,14 +75,6 @@ def display_variant_graph_as_SVG(graph,svg_output):
         # else:
         #     svg = dot.render()
 
-        # a = nx.drawing.nx_agraph.to_agraph(graph.graph)
-        # a.graph_attr['rankdir'] = 'LR'
-        # # Create labels for nodes
-        # for n in graph.graph.nodes():
-        #     for key, value in n.tokens.items():
-        #         print(key, value)
-        #         print([item.token_data['t'] for item in value])
-
         a = pygraphviz.AGraph(directed=True, rankdir='LR')
         counter = 0
         mapping = {}
@@ -104,6 +96,6 @@ def display_variant_graph_as_SVG(graph,svg_output):
             a.add_edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
         for key, value in ranking.byRank.items():
             a.add_subgraph([mapping[item] for item in value], rank='same')
-        svg = a.draw(prog='dot', format='svg')
         # display using the IPython SVG module
+        svg = a.draw(prog='dot', format='svg')
         return display(SVG(svg))
