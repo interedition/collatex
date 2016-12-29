@@ -6,7 +6,8 @@ Created on Nov 13, 2014
 from collections import defaultdict
 from textwrap import fill
 from collatex.HTML import Table, TableRow, TableCell
-from collatex.core_classes import create_table_visualization
+from collatex.core_classes import create_table_visualization, VariantGraphRanking
+import pygraphviz
 import networkx as nx
 
 # optionally load the IPython dependencies
@@ -73,13 +74,37 @@ def display_variant_graph_as_SVG(graph,svg_output):
         # else:
         #     svg = dot.render()
 
-        a = nx.drawing.nx_agraph.to_agraph(graph.graph)
-        a.graph_attr['rankdir'] = 'LR'
-        # Create labels for nodes
+        # a = nx.drawing.nx_agraph.to_agraph(graph.graph)
+        # a.graph_attr['rankdir'] = 'LR'
+        # # Create labels for nodes
+        # for n in graph.graph.nodes():
+        #     for key, value in n.tokens.items():
+        #         print(key, value)
+        #         print([item.token_data['t'] for item in value])
+
+        a = pygraphviz.AGraph(directed=True, rankdir='LR')
+        counter = 0
+        mapping = {}
+        ranking = VariantGraphRanking.of(graph)
         for n in graph.graph.nodes():
-            for key, value in n.tokens.items():
-                print(key, value)
-                print([item.token_data['t'] for item in value])
+            counter += 1
+            mapping[n] = counter
+            rank = ranking.byVertex[n]
+            readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(rank) + "</TD></TR>"]
+            reverseDict = defaultdict(list)
+            for key,value in n.tokens.items():
+                reverseDict["".join(item.token_data["t"] for item in value)].append(key)
+            for key,value in sorted(reverseDict.items()):
+                reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
+                readings.append(reading)
+            a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
+        # add edges
+        for u,v,edgedata in graph.graph.edges_iter(data=True):
+            a.add_edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
+        # add rank=same instructions
+        # a.add_subgraph([2,4],rank='same')
+        for key, value in ranking.byRank.items():
+            print(key, value)
         svg = a.draw(prog='dot', format='svg')
         # display using the IPython SVG module
         return display(SVG(svg))
