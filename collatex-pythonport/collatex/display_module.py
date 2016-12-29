@@ -8,6 +8,7 @@ from textwrap import fill
 from collatex.HTML import Table, TableRow, TableCell
 from collatex.core_classes import create_table_visualization, VariantGraphRanking
 import pygraphviz
+import re
 import networkx as nx
 
 # optionally load the IPython dependencies
@@ -93,7 +94,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
             readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(rank) + "</TD></TR>"]
             reverseDict = defaultdict(list)
             for key,value in n.tokens.items():
-                reverseDict["".join(item.token_data["t"] for item in value)].append(key)
+                reverseDict["".join(re.sub(r'>',r'&gt;',re.sub(r'<',r'&lt;',item.token_data["t"]))  for item in value)].append(key)
             for key,value in sorted(reverseDict.items()):
                 reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
                 readings.append(reading)
@@ -101,39 +102,8 @@ def display_variant_graph_as_SVG(graph,svg_output):
         # add edges
         for u,v,edgedata in graph.graph.edges_iter(data=True):
             a.add_edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
-        # add rank=same instructions
-        # a.add_subgraph([2,4],rank='same')
         for key, value in ranking.byRank.items():
-            print(key, value)
+            a.add_subgraph([mapping[item] for item in value], rank='same')
         svg = a.draw(prog='dot', format='svg')
         # display using the IPython SVG module
         return display(SVG(svg))
-
-
-# def in_ipython():
-#     try:
-#         get_ipython().config  # @UndefinedVariable
-# #         print('Called by IPython.')
-#         return True
-#     except:
-#         return False
-
-
-
-
-
-# display alignment table 
-#     if in_ipython():
-#         return display(JSON(json))
-#     if in_ipython():
-#         print(json)
-#         return
-
-
-# DISPLAY PART OF THE VARIANT_GRAPH IN SVG!
-#     and in_ipython:
-#         # visualize the variant graph into SVG format
-#         from networkx.drawing.nx_agraph import to_agraph
-#         agraph = to_agraph(graph.graph)
-#         svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
-#         return display(SVG(svg)) 
