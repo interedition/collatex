@@ -48,54 +48,30 @@ def display_alignment_table_as_HTML(at):
 # visualize the variant graph into SVG format
 # from networkx.drawing.nx_agraph import to_agraph
 def display_variant_graph_as_SVG(graph,svg_output):
-        # # create new Digraph
-        # dot = Digraph(format="svg", graph_attr={'rankdir': 'LR'})
-        # # add nodes
-        # counter = 0
-        # mapping = {}
-        # for n in graph.graph.nodes():
-        #     counter += 1
-        #     mapping[n] = str(counter)
-        #     # dot.node(str(n), nodedata["label"])
-        #     readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'><B>Sigla</B></TD></TR>"]
-        #     reverseDict = defaultdict(list)
-        #     for key,value in n.tokens.items():
-        #         reverseDict["".join(item.token_data["t"] for item in value)].append(key)
-        #     for key,value in sorted(reverseDict.items()):
-        #         reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
-        #         readings.append(reading)
-        #     dot.node(mapping[n], '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>',{'shape': 'box'})
-        # # add edges
-        # for u,v,edgedata in graph.graph.edges_iter(data=True):
-        #     dot.edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
-        # # render the dot graph to SVG
-        # # Note: this creates a file
-        # if svg_output:
-        #     svg = dot.render(svg_output,'svg_output')
-        # else:
-        #     svg = dot.render()
-
-        a = pygraphviz.AGraph(directed=True, rankdir='LR')
-        counter = 0
-        mapping = {}
-        ranking = VariantGraphRanking.of(graph)
-        for n in graph.graph.nodes():
-            counter += 1
-            mapping[n] = counter
-            rank = ranking.byVertex[n]
-            readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(rank) + "</TD></TR>"]
-            reverseDict = defaultdict(list)
-            for key,value in n.tokens.items():
-                reverseDict["".join(re.sub(r'>',r'&gt;',re.sub(r'<',r'&lt;',item.token_data["t"]))  for item in value)].append(key)
-            for key,value in sorted(reverseDict.items()):
-                reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
-                readings.append(reading)
-            a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
-        # add edges
-        for u,v,edgedata in graph.graph.edges_iter(data=True):
-            a.add_edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
-        for key, value in ranking.byRank.items():
-            a.add_subgraph([mapping[item] for item in value], rank='same')
-        # display using the IPython SVG module
-        svg = a.draw(prog='dot', format='svg')
-        return display(SVG(svg))
+    a = pygraphviz.AGraph(directed=True, rankdir='LR')
+    counter = 0
+    mapping = {}
+    ranking = VariantGraphRanking.of(graph)
+    for n in graph.graph.nodes():
+        counter += 1
+        mapping[n] = counter
+        rank = ranking.byVertex[n]
+        readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(rank) + "</TD></TR>"]
+        reverseDict = defaultdict(list)
+        for key,value in n.tokens.items():
+            reverseDict["".join(re.sub(r'>',r'&gt;',re.sub(r'<',r'&lt;',item.token_data["t"]))  for item in value)].append(key)
+        for key,value in sorted(reverseDict.items()):
+            reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
+            readings.append(reading)
+        a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
+    # add edges
+    for u,v,edgedata in graph.graph.edges_iter(data=True):
+        print(u, v, edgedata)
+        edge_witnesses = edgedata['label'] if 'label' in edgedata else '[non-witness edge]'
+        label = str('{:3.2f}'.format(edgedata['weight'])) if 'weight' in edgedata else edge_witnesses
+        a.add_edge(str(mapping[u]), str(mapping[v]), style='dashed' if 'type' in edgedata else 'solid', label=label)
+    for key, value in ranking.byRank.items():
+        a.add_subgraph([mapping[item] for item in value], rank='same')
+    # display using the IPython SVG module
+    svg = a.draw(prog='dot', format='svg')
+    return display(SVG(svg))

@@ -73,7 +73,6 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
                     vertices_to_compare.remove(move_candidate)
                     for vertex_to_compare in vertices_to_compare:
                         ratio = Levenshtein.ratio(str(move_candidate), str(vertex_to_compare))
-                        print(ratio)
                         graph.connect_near(vertex_to_compare, move_candidate, ratio)
         # Create new ranking table (passed along to creation of alignment table)
         ranking = VariantGraphRanking.of(graph)

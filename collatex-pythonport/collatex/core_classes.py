@@ -249,11 +249,7 @@ class VariantGraph(object):
         :type source: integer
         :type target: integer
         """
-        # print("Adding Edge: "+source+":"+target)
-        if self.graph.has_edge(source, target):
-            self.graph[source][target]["label"] += ", " + str(weight)
-        else:
-            self.graph.add_edge(source, target, label=str(weight))
+        self.graph.add_edge(source, target, weight = weight, type='near')
 
     def remove_edge(self, source, target):
         self.graph.remove_edge(source, target)
