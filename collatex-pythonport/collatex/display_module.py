@@ -56,7 +56,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
         counter += 1
         mapping[n] = counter
         rank = ranking.byVertex[n]
-        readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(rank) + "</TD></TR>"]
+        readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>rank: " + str(rank) + "</TD></TR>"]
         reverseDict = defaultdict(list)
         for key,value in n.tokens.items():
             reverseDict["".join(re.sub(r'>',r'&gt;',re.sub(r'<',r'&lt;',item.token_data["t"]))  for item in value)].append(key)
@@ -67,7 +67,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
     # add edges
     for u,v,edgedata in graph.graph.edges_iter(data=True):
         print(u, v, edgedata)
-        edge_witnesses = edgedata['label'] if 'label' in edgedata else '[non-witness edge]'
+        edge_witnesses = edgedata['label'] if 'label' in edgedata else 'FIXME'
         label = str('{:3.2f}'.format(edgedata['weight'])) if 'weight' in edgedata else edge_witnesses
         a.add_edge(str(mapping[u]), str(mapping[v]), style='dashed' if 'type' in edgedata else 'solid', label=label)
     for key, value in ranking.byRank.items():
