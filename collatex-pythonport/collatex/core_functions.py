@@ -12,7 +12,6 @@ import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
-from collatex.near_matching import process_rank, Scheduler
 
 
 # Valid options for output are:
@@ -28,7 +27,7 @@ from collatex.near_matching import process_rank, Scheduler
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
-            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False, scheduler=Scheduler()):
+            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -50,23 +49,6 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         # Segmentation not supported for near matching; raise exception if necessary
         if segmentation:
             raise SegmentationError('segmentation must be set to False for near matching')
-
-        highestRank = ranking.byVertex[graph.end]
-        witnessCount = len(collation.witnesses)
-
-        # do-while loop to avoid looping through ranking while modifying it
-        rank = highestRank - 1
-        condition = True
-        while condition:
-            rank = process_rank(scheduler, rank, collation, ranking, witnessCount)
-            rank -= 1
-            condition = rank > 0
-
-        # # Verify that nodes have been moved
-        # print("\nLabels at each rank at end of processing: ")
-        # for rank in ranking.byRank:
-        #     print("\nRank: " + str(rank))
-        #     print([node.label for node in ranking.byRank[rank]])
 
     # join parallel segments
     if segmentation:
