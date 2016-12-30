@@ -244,6 +244,17 @@ class VariantGraph(object):
         else:
             self.graph.add_edge(source, target, label=witnesses)
 
+    def connect_near(self, source, target, weight):
+        """
+        :type source: integer
+        :type target: integer
+        """
+        # print("Adding Edge: "+source+":"+target)
+        if self.graph.has_edge(source, target):
+            self.graph[source][target]["label"] += ", " + str(weight)
+        else:
+            self.graph.add_edge(source, target, label=str(weight))
+
     def remove_edge(self, source, target):
         self.graph.remove_edge(source, target)
 

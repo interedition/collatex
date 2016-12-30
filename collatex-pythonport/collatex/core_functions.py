@@ -12,6 +12,13 @@ import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
 from collatex.display_module import display_variant_graph_as_SVG
+import Levenshtein
+from networkx.algorithms.dag import topological_sort
+
+
+# Flatten a list of lists (goes only one level down)
+def flatten(in_list):
+    return [item for sublist in in_list for item in sublist]
 
 
 # Valid options for output are:
@@ -26,6 +33,7 @@ from collatex.display_module import display_variant_graph_as_SVG
 #   Wrapper element is always <p>
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
+## From core_functions.py
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
             detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
@@ -47,8 +55,28 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     ranking = VariantGraphRanking.of(graph)
     if near_match:
         # Segmentation not supported for near matching; raise exception if necessary
+        # There is already a graph ('graph', without near-match edges) and ranking ('ranking')
         if segmentation:
             raise SegmentationError('segmentation must be set to False for near matching')
+        # Walk ranking table in reverse order and add near-match edges to graph
+        reverse_topological_sorted_vertices = topological_sort(graph.graph, reverse=True)
+        for v in reverse_topological_sorted_vertices:
+            target_rank = ranking.byVertex[v]
+            in_edges = graph.in_edges(v)
+            if len(in_edges) > 1:
+                move_candidates = [in_edge[0] for in_edge in in_edges \
+                                   if target_rank > ranking.byVertex[in_edge[0]] + 1]
+                for move_candidate in move_candidates:
+                    min_rank = ranking.byVertex[move_candidate]
+                    max_rank = target_rank - 1
+                    vertices_to_compare = flatten([ranking.byRank[r] for r in range(min_rank, max_rank + 1)])
+                    vertices_to_compare.remove(move_candidate)
+                    for vertex_to_compare in vertices_to_compare:
+                        ratio = Levenshtein.ratio(str(move_candidate), str(vertex_to_compare))
+                        print(ratio)
+                        graph.connect_near(vertex_to_compare, move_candidate, ratio)
+        # Create new ranking table (passed along to creation of alignment table)
+        ranking = VariantGraphRanking.of(graph)
 
     # join parallel segments
     if segmentation:
