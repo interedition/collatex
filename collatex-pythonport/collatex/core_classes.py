@@ -96,14 +96,9 @@ class AlignmentTable(object):
                 if not column:
                     column = Column()
                     self.columns.append(column)
-                # find incoming edges for this vertex and check their labels
-                edges = self.graph.in_edges(vertex, data=True)
-                for (_, _, attrs) in edges:
-                    sigli = attrs["label"]
-                    for sigil in sigli.split(", "):
-                        token = vertex.tokens[sigil]
-                        column.put(sigil, token)
-                # set status: is a column variant or invariant
+                for (sigil, token) in vertex.tokens.items():
+                    column.put(sigil, token)
+               # set status: is a column variant or invariant
                 column.variant = len(vertices) > 1 or len(column.tokens_per_witness) != len(self.collation.witnesses)
 
         # construct rows
