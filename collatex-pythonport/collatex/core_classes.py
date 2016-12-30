@@ -378,8 +378,9 @@ class VariantGraphRanking(object):
         topological_sorted_vertices = topological_sort(graph.graph)
         for v in topological_sorted_vertices:
             rank = -1
-            for (source, _) in graph.in_edges(v):
-                rank = max(rank, variant_graph_ranking.byVertex[source])
+            for (source, _, data) in graph.in_edges(v, data=True):
+                if not 'type' in data:
+                    rank = max(rank, variant_graph_ranking.byVertex[source])
             rank += 1
             variant_graph_ranking.byVertex[v] = rank
             variant_graph_ranking.byRank.setdefault(rank, []).append(v)

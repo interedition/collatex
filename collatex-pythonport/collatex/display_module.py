@@ -66,7 +66,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
         a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
     # add edges
     for u,v,edgedata in graph.graph.edges_iter(data=True):
-        print(u, v, edgedata)
+        # print(u, v, edgedata)
         edge_witnesses = edgedata['label'] if 'label' in edgedata else 'FIXME'
         label = str('{:3.2f}'.format(edgedata['weight'])) if 'weight' in edgedata else edge_witnesses
         a.add_edge(str(mapping[u]), str(mapping[v]), style='dashed' if 'type' in edgedata else 'solid', label=label)
