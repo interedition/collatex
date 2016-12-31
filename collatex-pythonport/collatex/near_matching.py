@@ -15,23 +15,29 @@ def perform_near_match(graph, ranking):
     # Walk ranking table in reverse order and add near-match edges to graph
     reverse_topological_sorted_vertices = topological_sort(graph.graph, reverse=True)
     for v in reverse_topological_sorted_vertices:
-        target_rank = ranking.byVertex[v]
-        in_edges = graph.in_edges(v)
+        target_rank = ranking.byVertex[v] # get the rank of a vertex
+        in_edges = graph.in_edges(v) # if it has more than one in_edge, perhaps something before it can be moved
         if len(in_edges) > 1:
+            # candidates for movement are the sources of in edges more than one rank earlir
             move_candidates = [in_edge[0] for in_edge in in_edges \
                                if target_rank > ranking.byVertex[in_edge[0]] + 1]
             for move_candidate in move_candidates:
-                move_candidate_witnesses = set(move_candidate.tokens)
-                min_rank = ranking.byVertex[move_candidate]
-                max_rank = target_rank - 1
+                move_candidate_witnesses = set(move_candidate.tokens) # prepare to get intersection later
+                min_rank = ranking.byVertex[move_candidate] # lowest possible rank is current position
+                max_rank = target_rank - 1 # highest possible rank is one more before the target
                 vertices_to_compare = flatten([ranking.byRank[r] for r in range(min_rank, max_rank + 1)])
-                vertices_to_compare.remove(move_candidate)
-                # TODO: don't draw a near-match edge if both comparands include any of the same witnesses
+                vertices_to_compare.remove(move_candidate) # don't compare it to itself
+                print('comparing ', move_candidate, ' to ', vertices_to_compare)
+                ratio_dict = {} # ratio:vertex_to_compare
                 for vertex_to_compare in vertices_to_compare:
+                    # don't move if there's already a vertex there with any of the same witnesses
                     if not move_candidate_witnesses.intersection(vertex_to_compare.tokens):
                         print('now comparing move candidate ', move_candidate, ' (witnesses ', move_candidate_witnesses,\
                               ') with ', vertex_to_compare, ' (witnesses ', vertex_to_compare.tokens, ')')
                         ratio = Levenshtein.ratio(str(move_candidate), str(vertex_to_compare))
-                        graph.connect_near(vertex_to_compare, move_candidate, ratio)
+                        ratio_dict[ratio] = vertex_to_compare
+                # Create only winning edge; losing edges can create later cycles
+                graph.connect_near(ratio_dict[max(ratio_dict)], move_candidate, ratio)
+                print('connected ', move_candidate, ' to ', ratio_dict[max(ratio_dict)], ' with ratio ', max(ratio_dict))
     # Create new ranking table (passed along to creation of alignment table)
     return VariantGraphRanking.of(graph)
