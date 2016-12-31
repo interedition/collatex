@@ -223,6 +223,7 @@ class VariantGraphVertex(object):
 class VariantGraph(object):
     def __init__(self):
         self.graph = nx.DiGraph()
+        self.near_graph = nx.DiGraph()
         # Start and end are the only nodes without sigil or tokens
         self.start = self.add_vertex(None, None, label='start')
         self.end = self.add_vertex(None, None, label='end')
@@ -230,6 +231,7 @@ class VariantGraph(object):
     def add_vertex(self, token, sigil, label=None):
         newVertex = VariantGraphVertex(token, sigil, label)
         self.graph.add_node(newVertex)
+        self.near_graph.add_node(newVertex)
         # Returned to aligner, which tracks relationship of tokens and vertices
         return newVertex
 
@@ -245,11 +247,13 @@ class VariantGraph(object):
             self.graph.add_edge(source, target, label=witnesses)
 
     def connect_near(self, source, target, weight):
+        # Near edges are added to self.near_graph, not self.graph, to avoid cycles
         """
         :type source: integer
         :type target: integer
         """
-        self.graph.add_edge(source, target, weight = weight, type='near')
+        self.near_graph.add_edge(source, target, weight = weight, type='near')
+        print('added near edge: ' + ' : '.join((str(source),str(target),str(weight))))
 
     def remove_edge(self, source, target):
         self.graph.remove_edge(source, target)
@@ -378,9 +382,8 @@ class VariantGraphRanking(object):
         topological_sorted_vertices = topological_sort(graph.graph)
         for v in topological_sorted_vertices:
             rank = -1
-            for (source, _, data) in graph.in_edges(v, data=True):
-                if not 'type' in data:
-                    rank = max(rank, variant_graph_ranking.byVertex[source])
+            for (source, _) in graph.in_edges(v):
+                rank = max(rank, variant_graph_ranking.byVertex[source])
             rank += 1
             variant_graph_ranking.byVertex[v] = rank
             variant_graph_ranking.byRank.setdefault(rank, []).append(v)

@@ -58,6 +58,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         # There is already a graph ('graph', without near-match edges) and ranking ('ranking')
         if segmentation:
             raise SegmentationError('segmentation must be set to False for near matching')
+
         # Walk ranking table in reverse order and add near-match edges to graph
         reverse_topological_sorted_vertices = topological_sort(graph.graph, reverse=True)
         for v in reverse_topological_sorted_vertices:
