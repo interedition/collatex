@@ -396,8 +396,6 @@ class VariantGraphRanking(object):
         for v in reverse_topological_sorted_vertices:
             incoming_edges = graph.in_near_edges(v, data=True)
             if incoming_edges:
-                print('Processing near-match edges for vertex ', v)
-                print(incoming_edges)
                 weight_dict = defaultdict(list)
                 for (u, v, edgedata) in incoming_edges:
                     weight_dict[edgedata['weight']].append(u)
