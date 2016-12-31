@@ -392,13 +392,13 @@ class VariantGraphRanking(object):
             rank += 1
             variant_graph_ranking.byVertex[v] = rank
             variant_graph_ranking.byRank.setdefault(rank, []).append(v)
-        reverse_topological_sorted_vertices = topological_sort(graph.near_graph)
-        for v in reverse_topological_sorted_vertices:
-            incoming_edges = graph.in_near_edges(v, data=True)
-            if incoming_edges:
-                weight_dict = defaultdict(list)
-                for (u, v, edgedata) in incoming_edges:
-                    weight_dict[edgedata['weight']].append(u)
-                winner = variant_graph_ranking.byVertex[weight_dict[max(weight_dict)][0]]
-                variant_graph_ranking.byVertex[v] = winner
+        # reverse_topological_sorted_vertices = topological_sort(graph.near_graph)
+        # for v in reverse_topological_sorted_vertices:
+        #     incoming_edges = graph.in_near_edges(v, data=True)
+        #     if incoming_edges:
+        #         weight_dict = defaultdict(list)
+        #         for (u, v, edgedata) in incoming_edges:
+        #             weight_dict[edgedata['weight']].append(u)
+        #         winner = variant_graph_ranking.byVertex[weight_dict[max(weight_dict)][0]]
+        #         # variant_graph_ranking.byVertex[v] = winner
         return variant_graph_ranking
