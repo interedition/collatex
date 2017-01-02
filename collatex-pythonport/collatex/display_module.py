@@ -101,7 +101,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
             a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
         # add edges
         for u,v,edgedata in graph.graph.edges_iter(data=True):
-            a.add_edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
+            a.add_edge(mapping[u], mapping[v], edgedata["label"])
         for key, value in ranking.byRank.items():
             a.add_subgraph([mapping[item] for item in value], rank='same')
         svg = a.draw(prog='dot', format='svg')
