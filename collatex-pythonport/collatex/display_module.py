@@ -68,13 +68,13 @@ def display_variant_graph_as_SVG(graph,svg_output):
     for u,v,edgedata in graph.graph.edges_iter(data=True):
         # print('regular edges ', u, v, edgedata)
         label = edgedata['label']
-        a.add_edge(str(mapping[u]), str(mapping[v]), label=label)
+        a.add_edge(mapping[u], mapping[v], label=label)
     # add near-match edges
     # TODO: Show all near edges (currently), or just the top one?
     for u,v,edgedata in graph.near_graph.edges_iter(data=True):
         # print('near-match edges ', u, v, edgedata)
         label = str('{:3.2f}'.format(edgedata['weight']))
-        a.add_edge(str(mapping[u]), str(mapping[v]), style='dashed', label=label)
+        a.add_edge(mapping[u], mapping[v], style='dashed', label=label)
     # Add rank='same' information
     for key, value in ranking.byRank.items():
         # print(key, value)
