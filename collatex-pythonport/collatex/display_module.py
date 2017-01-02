@@ -88,6 +88,7 @@ def display_variant_graph_as_SVG(graph,svg_output):
         mapping = {}
         ranking = VariantGraphRanking.of(graph)
         for n in graph.graph.nodes():
+            print(n)
             counter += 1
             mapping[n] = counter
             rank = ranking.byVertex[n]
@@ -105,5 +106,8 @@ def display_variant_graph_as_SVG(graph,svg_output):
         for key, value in ranking.byRank.items():
             a.add_subgraph([mapping[item] for item in value], rank='same')
         svg = a.draw(prog='dot', format='svg')
+        # diagnostic, not for production
+        dot = a.draw(prog='dot')
+        print(dot.decode(encoding='utf-8'))
         # display using the IPython SVG module
         return display(SVG(svg))
