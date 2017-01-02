@@ -70,21 +70,21 @@ def perform_near_match(graph, ranking):
                 max_rank = ranking.byVertex[v]
                 match_candidates = [item for item in flatten([ranking.byRank[rank] \
                                             for rank in range(min_rank, max_rank)]) if item is not source]
-                print(match_candidates)
+                # print(match_candidates)
                 levenshtein_dict = defaultdict(list)
                 for match_candidate in match_candidates:
                     ratio = Levenshtein.ratio(str(source), str(match_candidate))
-                    print(source, match_candidate, ratio)
+                    # print(source, match_candidate, ratio)
                     levenshtein_dict[ratio].append(match_candidate)
                 weight = max(levenshtein_dict)
                 winner = levenshtein_dict[max(levenshtein_dict)][0]
-                print('weight:',weight,'source:',winner)
+                # print('weight:',weight,'source:',winner)
                 graph.connect_near(winner,source,weight)
-                print('before: byRank',str(ranking.byRank))
-                print('before: byVertex',str(ranking.byVertex))
+                # print('before: byRank',str(ranking.byRank))
+                # print('before: byVertex',str(ranking.byVertex))
                 # update ranking table for next pass through loop and verify
                 ranking = VariantGraphRanking.of(graph)
-                print('after: byRank',str(ranking.byRank))
-                print('after: byVertex',str(ranking.byVertex))
+                # print('after: byRank',str(ranking.byRank))
+                # print('after: byVertex',str(ranking.byVertex))
     # Create new ranking table (passed along to creation of alignment table)
     return VariantGraphRanking.of(graph)
