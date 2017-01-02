@@ -82,8 +82,8 @@ def display_variant_graph_as_SVG(graph,svg_output):
         # print(key, set(value), len(set(value)))
         a.add_subgraph([mapping[item] for item in value], rank='same')
     # diagnostic, not for production
-    # dot = a.draw(prog='dot')
-    # print(dot.decode(encoding='utf-8'))
+    dot = a.draw(prog='dot')
+    print(dot.decode(encoding='utf-8'))
     # # display using the IPython SVG module
     svg = a.draw(prog='dot', format='svg')
     return display(SVG(svg))
