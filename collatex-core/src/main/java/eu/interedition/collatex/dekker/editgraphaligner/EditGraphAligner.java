@@ -4,6 +4,7 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.island.Coordinate;
 import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
@@ -13,6 +14,7 @@ import eu.interedition.collatex.util.VariantGraphRanking;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -23,12 +25,16 @@ import java.util.stream.StreamSupport;
  * But then it uses the TokenIndexToMatches 3d matches (cube) between the variant graph and the next witness,
  * using the token index.
  *
+ * For the Edit graph table and scorer code is used from the CSA branch (which is meant to deal with multiple
+ * textual layers within one witness). The edit graph table and scorer were previously used in the Python version.
+ *
  */
 public class EditGraphAligner extends CollationAlgorithm.Base {
     public TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
     protected VariantGraph.Vertex[] vertex_array;
     private final Comparator<Token> comparator;
+    Score[][] cells;
 
     public EditGraphAligner() {
         this(new EqualityTokenComparator());
@@ -79,16 +85,25 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
 
             Set<Island> allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertex_array, graph, tokens);
-            // print all the possible islands as separate matches...
-                for (Island i : allPossibleIslands) {
-                    for (Coordinate c : i) {
-                        System.out.println(c);
-                    }
-                }
                 // apparently there are doubles in the coordinates
 
-                // now we can create the space for the edit graph.. using arrays and stuff
 
+            // convert the ste of Island into a map of matches with as
+            Map<MatchCoordinate, Match> matches = new HashMap<>();
+            for (Island i : allPossibleIslands) {
+                for (Coordinate c : i) {
+
+
+                    // print all the possible islands as separate matches...
+                    System.out.println(c);
+
+                    //TODO: more work!
+                }
+            }
+
+
+
+            // now we can create the space for the edit graph.. using arrays and stuff
             // the vertical size is the number of vertices in the graph minus the start and end vertices
             // NOTE: THe token index to matches already does a graph ranking!
             VariantGraphRanking variantGraphRanking = VariantGraphRanking.of(graph);
@@ -117,7 +132,40 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             System.out.println("vertical (next witness): "+tokensAsIndexList);
 
+            // code below is partly taken from the CSA branch.
+            // init cells and scorer
+            this.cells = new Score[tokensAsIndexList.size() ][verticesAsRankList.size() ];
+            Scorer scorer = new Scorer();
 
+            // init 0,0
+            this.cells[0][0] = new Score(Score.Type.empty, 0, 0, null, 0);
+
+            // fill the first row with gaps
+            IntStream.range(1, verticesAsRankList.size()).forEach(x -> {
+                int previousX = x - 1;
+                this.cells[0][x] = scorer.gap(x, 0, this.cells[0][previousX]);
+            });
+
+            // fill the first column with gaps
+            IntStream.range(1, tokensAsIndexList.size()).forEach(y -> {
+                int previousY = y - 1;
+                this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
+            });
+
+            for (int y = 0; y < tokensAsIndexList.size() ; y++) {
+                for (int x = 0; x < verticesAsRankList.size()  ; x++) {
+                    Score cell = cells[y][x];
+                    String value;
+                    if (cell == null) {
+                        value = "unscored";
+                    } else {
+                        value = ""+cell.getGlobalScore();
+                    }
+                    System.out.print(value+"|");
+                }
+                System.out.println();
+                System.out.println("----");
+            }
             // TODO: remove this break!
             break;
         }
@@ -137,5 +185,97 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     public void collate(VariantGraph against, Iterable<Token> witness) {
 
+    }
+
+    public static class Score {
+
+        public Type type;
+        public Score parent;
+        public int globalScore = 0;
+        int x;
+        int y;
+        int previousX;
+        int previousY;
+        public Score(Type type, int x, int y, Score parent, int i) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.parent = parent;
+            this.previousX = parent == null ? 0 : parent.x;
+            this.previousY = parent == null ? 0 : parent.y;
+            this.globalScore = i;
+        }
+
+        public Score(Type type, int x, int y, Score parent) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.parent = parent;
+            this.previousX = parent.x;
+            this.previousY = parent.y;
+            this.globalScore = parent.globalScore;
+        }
+
+        public int getGlobalScore() {
+            return this.globalScore;
+        }
+
+        public void setGlobalScore(int globalScore) {
+            this.globalScore = globalScore;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + this.y + "," + this.x + "]:" + this.globalScore;
+        }
+
+        public static enum Type {
+            match, mismatch, addition, deletion, empty
+        }
+
+    }
+
+    class Scorer {
+        public Score gap(int x, int y, Score parent) {
+            Score.Type type = determineType(x, y, parent);
+            return new Score(type, x, y, parent, parent.globalScore - 1);
+        }
+
+        public Score score(int x, int y, Score parent, Token tokenB, Token tokenA) {
+            if (tokensMatch(tokenB, tokenA)) {
+                return new Score(Score.Type.match, x, y, parent);
+            }
+
+            return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
+        }
+
+        private boolean tokensMatch(Token tokenB, Token tokenA) {
+            throw new RuntimeException("Not implemented yet! Use the islands and coordinates!");
+//            return normalized(tokenB).equals(normalized(tokenA));
+        }
+
+//        private String normalized(Token tokenB) {
+//            return tokenB.text.data.toLowerCase().trim();
+//        }
+
+        private Score.Type determineType(int x, int y, Score parent) {
+            if (x == parent.x) {
+                return Score.Type.addition;
+            }
+            if (y == parent.y) {
+                return Score.Type.deletion;
+            }
+            return Score.Type.empty;
+        }
+    }
+
+    class MatchCoordinate {
+        protected final int tokenIndex; // position in witness, starting from zero
+        protected final int rankInVG; // rank in the variant graph
+
+        public MatchCoordinate(int tokenIndex, int rankInVG) {
+            this.tokenIndex = tokenIndex;
+            this.rankInVG = rankInVG;
+        }
     }
 }
