@@ -179,6 +179,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             while (scores.hasNext()) {
                 Score score = scores.next();
                 if (score.type== Score.Type.match) {
+                    //TODO: This needs adjusting for rank! Rank and coordinate are not mapped 1 to 1!
                     Match match = cube.getMatch(score.y-1, score.x-1);
                     aligned.put(match.token, match.vertex);
                 }
@@ -186,8 +187,12 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             merge(graph, tokens, aligned);
 
-            // TODO: remove this break!
-            break;
+            updateTokenToVertexArray(tokens, witness);
+
+//            // TODO: remove this break!
+//            break;
+
+
         }
 
     }
@@ -289,10 +294,10 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         }
 
         public Score score(int x, int y, Score parent) {
+            //TODO: this needs to be mapped for rank! Coordinate and rank are not mapped one to one!
             if (this.matchCube.hasMatch(y-1, x-1)) {
                 return new Score(Score.Type.match, x, y, parent);
             }
-
             return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
         }
 
