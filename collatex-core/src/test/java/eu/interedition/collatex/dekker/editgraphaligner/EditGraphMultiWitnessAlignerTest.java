@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
+import static org.junit.Assert.assertThat;
+
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
  */
@@ -19,11 +22,12 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     public void testMWADavidBirnbaum() {
         final SimpleWitness[] w = createWitnesses("aaaa bbbb cccc dddd eeee ffff", "aaaa bbbb eeex ffff");
         EditGraphAligner aligner = new EditGraphAligner();
-        VariantGraph graph = new VariantGraph();
+        VariantGraph g = new VariantGraph();
         List<SimpleWitness> witnesses = new ArrayList<>();
         witnesses.addAll(Arrays.asList(w));
-        aligner.collate(graph, witnesses);
-
+        aligner.collate(g, witnesses);
+        assertThat(g, graph(w[0]).aligned("aaaa bbbb").non_aligned("cccc dddd eeee").aligned("ffff"));
+        assertThat(g, graph(w[1]).aligned("aaaa bbbb").non_aligned("eeex").aligned("ffff"));
     }
 
 //    collation = Collation()

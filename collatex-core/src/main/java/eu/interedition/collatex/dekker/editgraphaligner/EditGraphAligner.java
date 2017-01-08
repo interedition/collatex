@@ -168,30 +168,49 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 });
             });
 
+            // debug only
+            printScoringTable(verticesAsRankList, tokensAsIndexList);
 
-
-            // print the scoring table for debugging reasons
-            for (int y = 0; y < tokensAsIndexList.size() ; y++) {
-                for (int x = 0; x < verticesAsRankList.size()  ; x++) {
-                    Score cell = cells[y][x];
-                    String value;
-                    if (cell == null) {
-                        value = "unscored";
-                    } else {
-                        value = ""+cell.getGlobalScore();
-                        if (cell.type== Score.Type.match) {
-                            value += "M";
-                        }
-                    }
-                    System.out.print(value+"|");
+            // using the score iterator..
+            // find all the matches
+            // later for the transposition detection, we also want to keep track of all the additions, omissions, and replacements
+            Map<Token, VariantGraph.Vertex> aligned = new HashMap<>();
+            ScoreIterator scores = new ScoreIterator(this.cells);
+            while (scores.hasNext()) {
+                Score score = scores.next();
+                if (score.type== Score.Type.match) {
+                    Match match = cube.getMatch(score.y-1, score.x-1);
+                    aligned.put(match.token, match.vertex);
                 }
-                System.out.println();
-                System.out.println("----");
             }
+
+            merge(graph, tokens, aligned);
+
             // TODO: remove this break!
             break;
         }
 
+    }
+
+    private void printScoringTable(List<Integer> verticesAsRankList, List<Integer> tokensAsIndexList) {
+        // print the scoring table for debugging reasons
+        for (int y = 0; y < tokensAsIndexList.size() ; y++) {
+            for (int x = 0; x < verticesAsRankList.size()  ; x++) {
+                Score cell = cells[y][x];
+                String value;
+                if (cell == null) {
+                    value = "unscored";
+                } else {
+                    value = ""+cell.getGlobalScore();
+                    if (cell.type== Score.Type.match) {
+                        value += "M";
+                    }
+                }
+                System.out.print(value+"|");
+            }
+            System.out.println();
+            System.out.println("----");
+        }
     }
 
     private void updateTokenToVertexArray(Iterable<Token> tokens, Witness witness) {
@@ -285,6 +304,31 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 return Score.Type.deletion;
             }
             return Score.Type.empty;
+        }
+    }
+
+    private static class ScoreIterator implements Iterator<Score> {
+        Integer y;
+        Integer x;
+        private Score[][] matrix;
+
+        ScoreIterator(Score[][] matrix) {
+            this.matrix = matrix;
+            this.x = matrix[0].length - 1;
+            this.y = matrix.length - 1;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !(this.x == 0 && this.y == 0);
+        }
+
+        @Override
+        public Score next() {
+            Score currentScore = this.matrix[this.y][this.x];
+            this.x = currentScore.previousX;
+            this.y = currentScore.previousY;
+            return currentScore;
         }
     }
 }

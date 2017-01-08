@@ -47,6 +47,11 @@ public class MatchCube {
         return matches.containsKey(c);
     }
 
+    public Match getMatch(int y, int x) {
+        MatchCoordinate c = new MatchCoordinate(y, x);
+        return matches.get(c);
+    }
+
     class MatchCoordinate {
         protected final int tokenIndex; // position in witness, starting from zero
         protected final int rankInVG; // rank in the variant graph
