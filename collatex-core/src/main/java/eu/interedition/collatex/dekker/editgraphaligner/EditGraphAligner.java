@@ -28,6 +28,22 @@ import java.util.stream.StreamSupport;
  * For the Edit graph table and scorer code is used from the CSA branch (which is meant to deal with multiple
  * textual layers within one witness). The edit graph table and scorer were previously used in the Python version.
  *
+ *
+ *
+ *
+ * 1. Build a token index to find repeating patterns. Algorithm: Suffix Array, LCP array, LCP Intervals.
+ *    Present in the Java version of CX and in the Python version of CX. Class: TokenIndex
+ * 2. Given a Variant Graph and the next witness to align, build a cube of matches.
+ *    Present in the Java version of CX. Class: TokenIndexToMatches.
+ *    a. Needs to be improved a bit to not return legacy classes Island and Coordinate.
+ *    b. Duplicates need to be removed (horizontal (first match only) en vertical (multiple vertices)).
+ *    c. Needs to be ported to Python version.
+ * 3. A matrix/table for the edit operations needs to be created (work in progress).
+ * 4. A need scorer needs to be created that prefers depth over size, and as much higher depth nodes as possible.
+ *    Think: histogram experiment. The current Java and Python version are suboptimal.
+ *    Java version does not have a Scorer. The Python one does, but filters the blocks too soon (on a global level).
+ * 5. Analysis: transposition detection
+ *
  */
 public class EditGraphAligner extends CollationAlgorithm.Base {
     public TokenIndex tokenIndex;
@@ -84,22 +100,8 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 LOG.log(Level.FINE, "{0} + {1}: Gather matches between variant graph and witness from token index", new Object[]{graph, witness});
             }
 
-            Set<Island> allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertex_array, graph, tokens);
-                // apparently there are doubles in the coordinates
+            MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
 
-
-            // convert the ste of Island into a map of matches with as
-            Map<MatchCoordinate, Match> matches = new HashMap<>();
-            for (Island i : allPossibleIslands) {
-                for (Coordinate c : i) {
-
-
-                    // print all the possible islands as separate matches...
-                    System.out.println(c);
-
-                    //TODO: more work!
-                }
-            }
 
 
 
@@ -135,7 +137,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // code below is partly taken from the CSA branch.
             // init cells and scorer
             this.cells = new Score[tokensAsIndexList.size() ][verticesAsRankList.size() ];
-            Scorer scorer = new Scorer();
+            Scorer scorer = new Scorer(cube);
 
             // init 0,0
             this.cells[0][0] = new Score(Score.Type.empty, 0, 0, null, 0);
@@ -152,6 +154,23 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
             });
 
+            // fill the remaining cells
+            // fill the rest of the cells in a  y by x fashion
+            IntStream.range(1, tokensAsIndexList.size()).forEach(y -> {
+                IntStream.range(1, verticesAsRankList.size()).forEach(x -> {
+                    int previousY = y-1;
+                    int previousX = x-1;
+                    Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
+                    Score left = scorer.gap(x, y, this.cells[y][previousX]);
+                    Score upper = scorer.gap(x, y, this.cells[previousY][x]);
+                    Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
+                    this.cells[y][x] = max;
+                });
+            });
+
+
+
+            // print the scoring table for debugging reasons
             for (int y = 0; y < tokensAsIndexList.size() ; y++) {
                 for (int x = 0; x < verticesAsRankList.size()  ; x++) {
                     Score cell = cells[y][x];
@@ -160,6 +179,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                         value = "unscored";
                     } else {
                         value = ""+cell.getGlobalScore();
+                        if (cell.type== Score.Type.match) {
+                            value += "M";
+                        }
                     }
                     System.out.print(value+"|");
                 }
@@ -232,31 +254,28 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         public static enum Type {
             match, mismatch, addition, deletion, empty
         }
-
     }
 
     class Scorer {
+
+        private final MatchCube matchCube;
+
+        public Scorer(MatchCube matchCube) {
+            this.matchCube = matchCube;
+        }
+
         public Score gap(int x, int y, Score parent) {
             Score.Type type = determineType(x, y, parent);
             return new Score(type, x, y, parent, parent.globalScore - 1);
         }
 
-        public Score score(int x, int y, Score parent, Token tokenB, Token tokenA) {
-            if (tokensMatch(tokenB, tokenA)) {
+        public Score score(int x, int y, Score parent) {
+            if (this.matchCube.hasMatch(y-1, x-1)) {
                 return new Score(Score.Type.match, x, y, parent);
             }
 
             return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
         }
-
-        private boolean tokensMatch(Token tokenB, Token tokenA) {
-            throw new RuntimeException("Not implemented yet! Use the islands and coordinates!");
-//            return normalized(tokenB).equals(normalized(tokenA));
-        }
-
-//        private String normalized(Token tokenB) {
-//            return tokenB.text.data.toLowerCase().trim();
-//        }
 
         private Score.Type determineType(int x, int y, Score parent) {
             if (x == parent.x) {
@@ -266,16 +285,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 return Score.Type.deletion;
             }
             return Score.Type.empty;
-        }
-    }
-
-    class MatchCoordinate {
-        protected final int tokenIndex; // position in witness, starting from zero
-        protected final int rankInVG; // rank in the variant graph
-
-        public MatchCoordinate(int tokenIndex, int rankInVG) {
-            this.tokenIndex = tokenIndex;
-            this.rankInVG = rankInVG;
         }
     }
 }
