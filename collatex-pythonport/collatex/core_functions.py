@@ -73,8 +73,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         join(graph)
         ranking = VariantGraphRanking.of(graph)
     # check which output format is requested: graph or table
-    if output == "svg":
-        return display_variant_graph_as_SVG(graph, svg_output)
+    if output == "svg" or output == "svg_simple":
+        return display_variant_graph_as_SVG(graph, svg_output, output)
     if output == "graph":
         return graph
     # create alignment table
