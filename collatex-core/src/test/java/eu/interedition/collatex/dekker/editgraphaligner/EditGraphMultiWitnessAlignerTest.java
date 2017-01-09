@@ -45,6 +45,22 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
 
     }
 
+    @Test
+    public void testMWADavidBirnbaum4Witnesses() {
+        final SimpleWitness[] w = createWitnesses("aaaa bbbb cccc dddd eeee ffff", "aaaa bbbb eeex ffff",
+            "aaaa bbbb cccc eeee ffff", "aaaa bbbb eeex dddd ffff");
+        EditGraphAligner aligner = new EditGraphAligner();
+        VariantGraph g = new VariantGraph();
+        List<SimpleWitness> witnesses = new ArrayList<>();
+        witnesses.addAll(Arrays.asList(w));
+        aligner.collate(g, witnesses);
+        assertThat(g, graph(w[0]).aligned("aaaa bbbb cccc dddd eeee ffff"));
+        assertThat(g, graph(w[1]).aligned("aaaa bbbb eeex ffff"));
+        assertThat(g, graph(w[2]).aligned("aaaa bbbb cccc eeee ffff"));
+        assertThat(g, graph(w[3]).aligned("aaaa bbbb eeex dddd ffff"));
+    }
+
+
 //    collation = Collation()
 //        collation.add_plain_witness("A", "aaaa bbbb cccc dddd eeee ffff")
 //            collation.add_plain_witness("B", "aaaa bbbb eeex ffff") # Near-match gap
