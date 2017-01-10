@@ -3,6 +3,14 @@
 History
 -------
 
+2.1.2 (2017-01-10)
+++++++++++++++++++
+* Added the ability to use output="svg_simple" next to output="svg". The "svg_simple" option gets you the n-property
+* based graph, so just the normalized version of the tokens, which will hide any variation in the t-property.
+* Thanks to Joris van Zundert for the patch.
+* Changed the colour scheme of the "html2" output option, to aid those with Red/Green colour-blindness.
+* Thanks to Melodee H. Beals for the patch.
+
 2.1.1 (2016-12-17)
 ++++++++++++++++++
 * Bug fix release
