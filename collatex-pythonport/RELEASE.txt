@@ -1,2 +1,6 @@
-sudo setup.py sdist bdist_egg upload
+# change history.rst, version in setup.py and collatex/__init__.py
+# in collatex-pythonport directory
+python setup.py sdist bdist_egg upload
+# update documentation on pypi
+# python setup.py register
 

@@ -5,7 +5,7 @@ Created on Aug 4, 2014
 '''
 import unittest
 from tests import unit_disabled
-from collatex.core_functions import VariantGraph
+from collatex.core_functions import VariantGraph, collate
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex import Collation
 
@@ -38,6 +38,18 @@ class Test(unittest.TestCase):
             for x in range(aligner.length_witness_a+1):
                 print (y, x), table[y][x]
 
+
+
+    def test_superbase_generation_multiple_short_witnesses(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "a")
+        collation.add_plain_witness("B", "b")
+        collation.add_plain_witness("C", "c")
+        aligner = EditGraphAligner(collation)
+        graph = VariantGraph()
+        aligner.collate(graph, collation)
+        superbase = aligner.new_superbase
+        self.assertSuperbaseEquals("a b c", superbase)
 
     # we need to introduce a gap here
     def testOmission(self):

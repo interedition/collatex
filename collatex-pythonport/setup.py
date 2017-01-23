@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='collatex',
-    version='2.0.0rc20',
+    version='2.1.2',
     description='CollateX is a collation tool.',
     long_description=readme + '\n\n' + history,
     author='Ronald Haentjens Dekker',
@@ -37,7 +37,8 @@ setup(
     zip_safe=False,
     keywords='CollateX',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',

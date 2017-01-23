@@ -3,6 +3,44 @@
 History
 -------
 
+2.1.2 (2017-01-10)
+++++++++++++++++++
+* Added the ability to use output="svg_simple" next to output="svg". The "svg_simple" option gets you the n-property
+* based graph, so just the normalized version of the tokens, which will hide any variation in the t-property.
+* Thanks to Joris van Zundert for the patch.
+* Changed the colour scheme of the "html2" output option, to aid those with Red/Green colour-blindness.
+* Thanks to Melodee H. Beals for the patch.
+
+2.1.1 (2016-12-17)
+++++++++++++++++++
+* Bug fix release
+* Fixed a bug in the new near match functionality that would cause tokens to go missing in the alignment table.
+* Thanks to Torsten Hiltmann for reporting it and providing a test case.
+
+2.1.0 (2016-11-01)
+++++++++++++++++++
+* Official release for the Dixit code and collation workshop in Amsterdam
+* This release contains the new near match functionality implemented as a post process after alignment. Same as RC1.
+* It also contains the multiple short witnesses bugfix done in 2.0.1
+
+2.0.1 (2016-10-30)
+++++++++++++++++++
+* Bug fix release for the Dixit code and collation workshop in Amsterdam
+* Fixed index out of range bug when multiple very short witnesses (= one token) were collated
+* Disabled debug statements for near matching
+
+2.1.0rc1 (2016-10-16)
++++++++++++++++++++++
+* New near match functionality, implemented as a post process after alignment.
+
+2.0.0 (2016-10-15)
+++++++++++++++++++
+* First official release for the Dixit code and collation workshop in Amsterdam
+* Added XML as an output format
+* Added TEI parallel segmentation as an output format
+* Tokenizer: retain whitespace in the t-property of preceding token
+* Witness: added normalization: strips whitespace
+
 2.0.0rc20 (2016-07-18)
 ++++++++++++++++++++++
 * Merged old collate_pretokenized_json() function into collate() function
@@ -21,27 +59,27 @@ History
 * Renamed TokenIndex.py module to tokenindex.py to follow conventions.
 
 2.0.0rc17 (2015-11-25)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Moved all the block and suffix, LCP interval code to new class TokenIndex.
 
 2.0.0rc16 (2015-06-28)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Added output option 'html2' for colored alignment table rendering.
 
 2.0.0rc15 (2015-06-28)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Fix a bug that was caused by the fact that a dash was stored in empty cells of the AlignmentTable. Now None is stored (this resolved a TODO). Plain text and HTML rendering of the table render a dash for empty cells. JSON output now returns null for empty cells. Fixes bug when a token with a dash in the content was screwing the rendering of the alignment table (caused of by one errors).
 
 2.0.0rc14 (2015-06-27)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Further improved blockification of witnesses.
 
 2.0.0rc13 (2015-06-21)
-+++++++++++++++++++++++
+++++++++++++++++++++++
 
 * Added properties_filter option to enable users to influence matching based on properties of tokens.
 * Improved blockification of witnesses.

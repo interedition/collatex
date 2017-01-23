@@ -35,7 +35,7 @@ How to install:
 ---------------
 
 Mac/Linux:
-sudo pip3 install --pre collatex
+sudo pip3 install collatex
 
 if you don't have pip installed, install it first with:
 sudo easy_install3 pip
