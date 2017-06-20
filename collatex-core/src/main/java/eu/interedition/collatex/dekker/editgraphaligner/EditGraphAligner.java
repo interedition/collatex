@@ -5,10 +5,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.dekker.island.Coordinate;
-import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
-import eu.interedition.collatex.dekker.token_index.TokenIndexToMatches;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
@@ -17,33 +14,36 @@ import java.util.logging.Level;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.*;
+import static java.util.Comparator.*;
+
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
- *
- * This class tries to combine idea's of the Java version of cox with the Python version of cx
+ * <p>
+ * This class tries to combine ideas of the Java version of cox with the Python version of cx
  * It uses the TokenIndex (suffix array, lcp array, lcp intervals) that was first pioneered in the python version
  * But then it uses the TokenIndexToMatches 3d matches (cube) between the variant graph and the next witness,
  * using the token index.
- *
+ * <p>
  * For the Edit graph table and scorer code is used from the CSA branch (which is meant to deal with multiple
  * textual layers within one witness). The edit graph table and scorer were previously used in the Python version.
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * 1. Build a token index to find repeating patterns. Algorithm: Suffix Array, LCP array, LCP Intervals.
- *    Present in the Java version of CX and in the Python version of CX. Class: TokenIndex
+ * Present in the Java version of CX and in the Python version of CX. Class: TokenIndex
  * 2. Given a Variant Graph and the next witness to align, build a cube of matches.
- *    Present in the Java version of CX. Class: TokenIndexToMatches.
- *    a. Needs to be improved a bit to not return legacy classes Island and Coordinate.
- *    b. Duplicates need to be removed (horizontal (first match only) en vertical (multiple vertices)).
- *    c. Needs to be ported to Python version.
+ * Present in the Java version of CX. Class: TokenIndexToMatches.
+ * a. Needs to be improved a bit to not return legacy classes Island and Coordinate.
+ * b. Duplicates need to be removed (horizontal (first match only) en vertical (multiple vertices)).
+ * c. Needs to be ported to Python version.
  * 3. A matrix/table for the edit operations needs to be created (work in progress).
  * 4. A need scorer needs to be created that prefers depth over size, and as much higher depth nodes as possible.
- *    Think: histogram experiment. The current Java and Python version are suboptimal.
- *    Java version does not have a Scorer. The Python one does, but filters the blocks too soon (on a global level).
+ * Think: histogram experiment. The current Java and Python version are suboptimal.
+ * Java version does not have a Scorer. The Python one does, but filters the blocks too soon (on a global level).
  * 5. Analysis: transposition detection
- *
  */
 public class EditGraphAligner extends CollationAlgorithm.Base {
     public TokenIndex tokenIndex;
@@ -59,7 +59,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
     public EditGraphAligner(Comparator<Token> comparator) {
         this.comparator = comparator;
     }
-
 
 
     @Override
@@ -84,7 +83,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             // first witness has a fast path
             if (firstWitness) {
-                super.merge(graph, tokens, Collections.emptyMap());
+                super.merge(graph, tokens, emptyMap());
                 updateTokenToVertexArray(tokens, witness);
                 firstWitness = false;
                 continue;
@@ -103,13 +102,11 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
 
 
-
-
             // now we can create the space for the edit graph.. using arrays and stuff
             // the vertical size is the number of vertices in the graph minus the start and end vertices
             // NOTE: THe token index to matches already does a graph ranking!
             VariantGraphRanking variantGraphRanking = VariantGraphRanking.of(graph);
-                // oh wait there are more methods on the java variant graph ranking!
+            // oh wait there are more methods on the java variant graph ranking!
             List<Integer> verticesAsRankList = new ArrayList<>();
             for (VariantGraph.Vertex vertex : graph.vertices()) {
                 int rank = variantGraphRanking.getByVertex().get(vertex);
@@ -117,9 +114,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             // we leave the start vertex in (that is an extra position that is needed in the edit graph)
             // we remove the end vertex though
-            verticesAsRankList.remove(verticesAsRankList.size()-1);
+            verticesAsRankList.remove(verticesAsRankList.size() - 1);
 
-            System.out.println("horizontal (graph): "+ verticesAsRankList);
+            System.out.println("horizontal (graph): " + verticesAsRankList);
 
             // now the vertical stuff
             List<Token> witnessTokens = new ArrayList<>();
@@ -132,11 +129,11 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             for (Token t : tokens) {
                 tokensAsIndexList.add(counter++);
             }
-            System.out.println("vertical (next witness): "+tokensAsIndexList);
+            System.out.println("vertical (next witness): " + tokensAsIndexList);
 
             // code below is partly taken from the CSA branch.
             // init cells and scorer
-            this.cells = new Score[tokensAsIndexList.size() ][verticesAsRankList.size() ];
+            this.cells = new Score[tokensAsIndexList.size()][verticesAsRankList.size()];
             Scorer scorer = new Scorer(cube);
 
             // init 0,0
@@ -156,17 +153,17 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             // fill the remaining cells
             // fill the rest of the cells in a  y by x fashion
-            IntStream.range(1, tokensAsIndexList.size()).forEach(y -> {
-                IntStream.range(1, verticesAsRankList.size()).forEach(x -> {
-                    int previousY = y-1;
-                    int previousX = x-1;
-                    Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
-                    Score left = scorer.gap(x, y, this.cells[y][previousX]);
-                    Score upper = scorer.gap(x, y, this.cells[previousY][x]);
-                    Score max = Collections.max(Arrays.asList(upperLeft, left, upper), (score, other) -> score.globalScore - other.globalScore);
-                    this.cells[y][x] = max;
-                });
-            });
+            IntStream.range(1, tokensAsIndexList.size()).forEach(//
+                y -> IntStream.range(1, verticesAsRankList.size()).forEach(
+                    x -> {
+                        int previousY = y - 1;
+                        int previousX = x - 1;
+                        Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
+                        Score left = scorer.gap(x, y, this.cells[y][previousX]);
+                        Score upper = scorer.gap(x, y, this.cells[previousY][x]);
+                        Score max = max(asList(upperLeft, left, upper), comparingInt(score -> score.globalScore));
+                        this.cells[y][x] = max;
+                    }));
 
             // debug only
             printScoringTable(verticesAsRankList, tokensAsIndexList);
@@ -178,9 +175,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             ScoreIterator scores = new ScoreIterator(this.cells);
             while (scores.hasNext()) {
                 Score score = scores.next();
-                if (score.type== Score.Type.match) {
+                if (score.type == Score.Type.match) {
                     //TODO: This needs adjusting for rank! Rank and coordinate are not mapped 1 to 1!
-                    Match match = cube.getMatch(score.y-1, score.x-1);
+                    Match match = cube.getMatch(score.y - 1, score.x - 1);
                     aligned.put(match.token, match.vertex);
                 }
             }
@@ -199,19 +196,19 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     private void printScoringTable(List<Integer> verticesAsRankList, List<Integer> tokensAsIndexList) {
         // print the scoring table for debugging reasons
-        for (int y = 0; y < tokensAsIndexList.size() ; y++) {
-            for (int x = 0; x < verticesAsRankList.size()  ; x++) {
+        for (int y = 0; y < tokensAsIndexList.size(); y++) {
+            for (int x = 0; x < verticesAsRankList.size(); x++) {
                 Score cell = cells[y][x];
                 String value;
                 if (cell == null) {
                     value = "unscored";
                 } else {
-                    value = ""+cell.getGlobalScore();
-                    if (cell.type== Score.Type.match) {
+                    value = "" + cell.getGlobalScore();
+                    if (cell.type == Score.Type.match) {
                         value += "M";
                     }
                 }
-                System.out.print(value+"|");
+                System.out.print(value + "|");
             }
             System.out.println();
             System.out.println("----");
@@ -242,6 +239,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         int y;
         int previousX;
         int previousY;
+
         public Score(Type type, int x, int y, Score parent, int i) {
             this.type = type;
             this.x = x;
@@ -295,7 +293,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
         public Score score(int x, int y, Score parent) {
             //TODO: this needs to be mapped for rank! Coordinate and rank are not mapped one to one!
-            if (this.matchCube.hasMatch(y-1, x-1)) {
+            if (this.matchCube.hasMatch(y - 1, x - 1)) {
                 return new Score(Score.Type.match, x, y, parent);
             }
             return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
