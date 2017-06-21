@@ -19,6 +19,10 @@
 
 package eu.interedition.collatex;
 
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
 import eu.interedition.collatex.dekker.Match;
@@ -27,27 +31,15 @@ import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VariantGraphTraversal;
-import org.junit.Assert;
-import org.junit.Before;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.Assert;
+import org.junit.Before;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -119,7 +111,12 @@ public abstract class AbstractTest {
     }
 
     protected static void assertGraphEdges(VariantGraph graph, int edges) {
-        assertEquals(edges, StreamSupport.stream(graph.vertices().spliterator(), false).map(VariantGraph.Vertex::outgoing).map(Map::keySet).flatMap(Set::stream).count());
+        assertEquals(edges,
+                StreamSupport.stream(graph.vertices().spliterator(), false)//
+                        .map(VariantGraph.Vertex::outgoing)//
+                        .map(Map::keySet)//
+                        .mapToLong(Set::size)//
+                        .sum());
     }
 
     protected static void assetGraphSize(VariantGraph graph, int vertices, int edges) {
