@@ -19,25 +19,33 @@
 
 package eu.interedition.collatex.http;
 
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.simple.SimpleCollation;
-import eu.interedition.collatex.simple.SimpleToken;
-import eu.interedition.collatex.simple.SimpleWitness;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.stream.Collectors;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+
+import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.simple.SimpleCollation;
+import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleWitness;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
