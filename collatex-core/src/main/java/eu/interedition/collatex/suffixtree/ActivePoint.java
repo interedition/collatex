@@ -44,7 +44,8 @@ class ActivePoint<T, S extends Iterable<T>> {
     /**
      * Sets the active edge.
      *
-     * @param edge The edge to which we set the active edge.
+     * @param edge
+     *            The edge to which we set the active edge.
      */
     void setEdge(Edge<T, S> edge) {
         activeEdge = edge;
@@ -71,8 +72,7 @@ class ActivePoint<T, S extends Iterable<T>> {
      * @return True if the active point is the root node. False if not.
      */
     boolean isRootNode() {
-        return activeNode.equals(root) && activeEdge == null
-            && activeLength == 0;
+        return activeNode.equals(root) && activeEdge == null && activeLength == 0;
     }
 
     /**
@@ -119,7 +119,8 @@ class ActivePoint<T, S extends Iterable<T>> {
     /**
      * Resets the active point after an insert.
      *
-     * @param suffix The remaining suffix to be inserted.
+     * @param suffix
+     *            The remaining suffix to be inserted.
      */
     public void updateAfterInsert(Suffix<T, S> suffix) {
         if (activeNode == root && suffix.isEmpty()) {
@@ -180,20 +181,18 @@ class ActivePoint<T, S extends Iterable<T>> {
      * @return true if reset occurs false otherwise.
      */
     private boolean resetActivePointToTerminal() {
-        if (activeEdge != null && activeEdge.getLength() == activeLength
-            && activeEdge.isTerminating()) {
+        if (activeEdge != null && activeEdge.getLength() == activeLength && activeEdge.isTerminating()) {
             activeNode = activeEdge.getTerminal();
             activeEdge = null;
             activeLength = 0;
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 
     @Override
     public String toString() {
-        return "{" + activeNode.toString() + ", " + activeEdge + ", "
-            + activeLength + "}";
+        return "{" + activeNode.toString() + ", " + activeEdge + ", " + activeLength + "}";
     }
 }

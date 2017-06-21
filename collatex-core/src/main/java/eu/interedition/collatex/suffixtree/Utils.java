@@ -21,7 +21,7 @@ public class Utils {
     static <I, S extends Iterable<I>> Object[] addTerminalToSequence(S sequence,
                                                                      SequenceTerminal<S> terminatingObject) {
 
-        ArrayList<Object> list = new ArrayList<Object>();
+        ArrayList<Object> list = new ArrayList<>();
         for (I item : sequence)
             list.add(item);
 

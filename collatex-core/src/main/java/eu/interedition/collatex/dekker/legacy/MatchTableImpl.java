@@ -143,7 +143,7 @@ public class MatchTableImpl implements MatchTable {
         int rowIndex = 0;
         for (Token t : witness) {
             if (unique.contains(t) || ambiguous.contains(t)) {
-                List<VariantGraph.Vertex> matchingVertices = matches.allMatches.getOrDefault(t, Collections.<VariantGraph.Vertex>emptyList());
+                List<VariantGraph.Vertex> matchingVertices = matches.allMatches.getOrDefault(t, Collections.emptyList());
                 for (VariantGraph.Vertex vgv : matchingVertices) {
                     set(rowIndex, ranking.apply(vgv) - 1, t, vgv);
                 }

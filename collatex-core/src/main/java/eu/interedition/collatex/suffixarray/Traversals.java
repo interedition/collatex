@@ -23,7 +23,7 @@ public final class Traversals {
          * @param length The node label's length (number of symbols).
          * @param leaf   <code>true</code> if this node is a leaf.
          */
-        public void visitNode(int start, int length, boolean leaf);
+        void visitNode(int start, int length, boolean leaf);
     }
 
     /**
@@ -35,7 +35,7 @@ public final class Traversals {
          * Aggregate two values into the result. The aggregation function should be
          * symmetric, that is: <code>value1 + value2 = value2 + value1</code>.
          */
-        public E aggregate(E value1, E value2);
+        E aggregate(E value1, E value2);
 
         /**
          * Compute the initial value for a leaf node.
@@ -45,7 +45,7 @@ public final class Traversals {
          * @param length      The node label's length (number of symbols).
          * @return Returns the initial function value for the leaf node.
          */
-        public E leafValue(int saIndex, int symbolIndex, int length);
+        E leafValue(int saIndex, int symbolIndex, int length);
 
         /**
          * Visits a node in the (virtual) suffix tree, labeled with <code>length</code>
@@ -56,7 +56,7 @@ public final class Traversals {
          * @param leaf   <code>true</code> if this node is a leaf.
          * @param value  Aggregated value for all sub-nodes of the given node.
          */
-        public void visitNode(int start, int length, boolean leaf, E value);
+        void visitNode(int start, int length, boolean leaf, E value);
     }
 
     /**
@@ -79,7 +79,7 @@ public final class Traversals {
                                  IPostOrderVisitor visitor) {
         assert sequenceLength <= sa.length && sequenceLength <= lcp.length : "Input sequence length larger than suffix array or the LCP.";
 
-        final Deque<Integer> stack = new ArrayDeque<Integer>();
+        final Deque<Integer> stack = new ArrayDeque<>();
 
         // Push the stack bottom marker (sentinel).
         stack.push(-1);
@@ -137,8 +137,8 @@ public final class Traversals {
                                      E epsilon, IPostOrderComputingVisitor<E> visitor) {
         assert sequenceLength <= sa.length && sequenceLength <= lcp.length : "Input sequence length larger than suffix array or the LCP.";
 
-        final Deque<Integer> stack = new ArrayDeque<Integer>();
-        final ArrayList<E> values = new ArrayList<E>();
+        final Deque<Integer> stack = new ArrayDeque<>();
+        final ArrayList<E> values = new ArrayList<>();
 
         // Push the stack bottom marker (sentinel).
         stack.push(-1);

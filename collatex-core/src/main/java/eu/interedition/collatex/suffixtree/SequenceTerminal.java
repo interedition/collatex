@@ -16,9 +16,7 @@ class SequenceTerminal<S> {
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
-        if (o == null || o.getClass() != this.getClass())
-            return false;
-        return ((SequenceTerminal<S>) o).sequence.equals(this.sequence);
+      return !(o == null || o.getClass() != this.getClass()) && ((SequenceTerminal<S>) o).sequence.equals(this.sequence);
     }
 
     public int hashCode() {

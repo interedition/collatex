@@ -59,7 +59,7 @@ public abstract class VertexMatch implements Comparable<VertexMatch> {
     }
 
     public static <T extends VertexMatch> Comparator<SortedSet<T>> setComparator() {
-        return (o1, o2) -> o1.first().compareTo(o2.first());
+        return Comparator.comparing(SortedSet::first);
     }
 
     /**

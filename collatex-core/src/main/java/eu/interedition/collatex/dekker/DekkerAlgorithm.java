@@ -190,9 +190,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
                 }
             }
 
-            for (List<Match> transposition : falseTranspositions) {
-                transpositions.remove(transposition);
-            }
+          transpositions.removeAll(falseTranspositions);
 
             // merge transpositions
             if (mergeTranspositions) {

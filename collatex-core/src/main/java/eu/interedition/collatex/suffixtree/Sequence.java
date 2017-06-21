@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 /**
  * Represents a sequence of items. This plays the part of the string in a non
  * generic suffix tree implementation. This object automatically appends a
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class Sequence<I, S extends Iterable<I>> implements Iterable<Object> {
 
-    private List<Object> masterSequence = new ArrayList<Object>();
+    private List<Object> masterSequence = new ArrayList<>();
 
     Sequence() {
     }
@@ -28,7 +27,7 @@ public class Sequence<I, S extends Iterable<I>> implements Iterable<Object> {
     Sequence(S sequence) {
         for (Object item : sequence)
             masterSequence.add(item);
-        SequenceTerminal<S> sequenceTerminal = new SequenceTerminal<S>(sequence);
+        SequenceTerminal<S> sequenceTerminal = new SequenceTerminal<>(sequence);
         masterSequence.add(sequenceTerminal);
     }
 
@@ -51,33 +50,34 @@ public class Sequence<I, S extends Iterable<I>> implements Iterable<Object> {
         for (I item : sequence) {
             masterSequence.add(item);
         }
-        SequenceTerminal<S> terminal = new SequenceTerminal<S>(sequence);
+        SequenceTerminal<S> terminal = new SequenceTerminal<>(sequence);
         masterSequence.add(terminal);
     }
 
     /**
      * Retrieves an iterator for the sequence.
      */
+    @Override
     public Iterator<Object> iterator() {
         return new Iterator<Object>() {
 
             int currentPosition = 0;
 
+            @Override
             public boolean hasNext() {
                 return masterSequence.size() > currentPosition;
             }
 
+            @Override
             public Object next() {
                 if (currentPosition <= masterSequence.size())
                     return masterSequence.get(currentPosition++);
-                else {
-                    return null;
-                }
+                return null;
             }
 
+            @Override
             public void remove() {
-                throw new UnsupportedOperationException(
-                    "Remove is not supported.");
+                throw new UnsupportedOperationException("Remove is not supported.");
 
             }
 
@@ -88,6 +88,7 @@ public class Sequence<I, S extends Iterable<I>> implements Iterable<Object> {
         return masterSequence.size();
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Sequence = [");
         for (Object i : masterSequence) {

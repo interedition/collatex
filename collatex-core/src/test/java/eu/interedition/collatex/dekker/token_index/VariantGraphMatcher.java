@@ -132,7 +132,7 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
             if (v.tokens().size()>0) { // skip end token
                 SimpleToken t = (SimpleToken) v.tokens().iterator().next();
                 if (v.tokens().size()>1) {
-                    if (previousAligned==null||previousAligned==false) {
+                    if (previousAligned==null|| !previousAligned) {
                         if (previousAligned!=null){
                             description.appendText(", ");
                         }
@@ -140,7 +140,7 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
                         previousAligned=true;
                     }
                 } else {
-                    if (previousAligned==null||previousAligned==true) {
+                    if (previousAligned==null|| previousAligned) {
                         if (previousAligned!=null){
                             description.appendText(", ");
                         }
@@ -148,7 +148,7 @@ public class VariantGraphMatcher extends BaseMatcher<VariantGraph> {
                         previousAligned = false;
                     }
                 }
-                description.appendText(t.getNormalized().toString()+" ");
+                description.appendText(t.getNormalized() +" ");
             }
         }
     }

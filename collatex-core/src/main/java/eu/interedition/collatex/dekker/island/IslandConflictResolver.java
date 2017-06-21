@@ -99,15 +99,17 @@ public class IslandConflictResolver {
         // First select competing islands that are on the ideal line
         LOG.fine("addBestOfCompeting with competingIslandsOnIdealLine");
         makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIslandAndOnIdealIine, Collections.emptyList()))
-            .values().stream()
-            .flatMap(List::stream).filter(ci1 -> selection.isIslandPossibleCandidate(ci1))
+            .values().stream()//
+            .flatMap(List::stream)//
+            .filter(selection::isIslandPossibleCandidate)//
             .forEach(selection::addIsland);
 
         // Second select other competing islands
         LOG.fine("addBestOfCompeting with otherCompetingIslands");
         makeDistanceMap(islandConflictMap.getOrDefault(IslandCompetition.CompetingIsland, Collections.emptyList()))
-            .values().stream()
-            .flatMap(List::stream).filter(ci -> selection.isIslandPossibleCandidate(ci))
+            .values().stream()//
+            .flatMap(List::stream)//
+            .filter(selection::isIslandPossibleCandidate)//
             .forEach(selection::addIsland);
 
         // Third select non competing islands

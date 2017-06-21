@@ -113,11 +113,8 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
                     }
 
                     if (matchLength >= maxMatchLength) {
-                        List<Match> theMatches = matchesByLength.get(matchLength);
-                        if (theMatches == null) {
-                            matchesByLength.put(matchLength, theMatches = new ArrayList<>());
-                        }
-                        theMatches.add(new Match(lc, rc));
+                      List<Match> theMatches = matchesByLength.computeIfAbsent(matchLength, k -> new ArrayList<>());
+                      theMatches.add(new Match(lc, rc));
                     }
 
                     if (matchLength > maxMatchLength) {
@@ -126,7 +123,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
                 }
             }
 
-            for (Match match : matchesByLength.getOrDefault(maxMatchLength, Collections.<Match>emptyList())) {
+            for (Match match : matchesByLength.getOrDefault(maxMatchLength, Collections.emptyList())) {
                 boolean occluded = false;
 
                 for (int tc = 0; tc < maxMatchLength; tc++) {
@@ -150,7 +147,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
         return matches;
     }
 
-    public static interface Equality<A, B> {
+    public interface Equality<A, B> {
         boolean isEqual(A a, B b);
     }
 

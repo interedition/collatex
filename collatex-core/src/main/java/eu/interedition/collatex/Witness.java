@@ -30,5 +30,5 @@ public interface Witness {
 
     String getSigil();
 
-    final Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
+    Comparator<Witness> SIGIL_COMPARATOR = Comparator.comparing(Witness::getSigil);
 }

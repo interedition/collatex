@@ -158,7 +158,7 @@ public interface CollationAlgorithm {
         }
     }
 
-    static class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
+    class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
 
         private final int maxWitnessLength;
 

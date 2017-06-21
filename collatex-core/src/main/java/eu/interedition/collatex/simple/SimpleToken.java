@@ -54,7 +54,7 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
 
     @Override
     public String toString() {
-        return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
+        return witness.toString() + ":" + witness.getTokens().indexOf(this) + ":'" + normalized + "'";
     }
 
     public static String toString(Iterable<? extends Token> tokens) {

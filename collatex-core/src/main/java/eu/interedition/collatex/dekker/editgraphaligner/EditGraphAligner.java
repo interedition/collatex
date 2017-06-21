@@ -273,7 +273,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             return "[" + this.y + "," + this.x + "]:" + this.globalScore;
         }
 
-        public static enum Type {
+        public enum Type {
             match, mismatch, addition, deletion, empty
         }
     }

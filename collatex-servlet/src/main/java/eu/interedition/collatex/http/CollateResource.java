@@ -55,14 +55,11 @@ public class CollateResource {
     public CollateResource(String staticPath, int maxParallelCollations, int maxCollationSize) {
         this.staticPath = staticPath == null || "".equals(staticPath) ? null : new File(staticPath);
         this.maxCollationSize = maxCollationSize;
-        this.executor = Executors.newFixedThreadPool(maxParallelCollations, new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                final Thread t = new Thread(r, CollateResource.class.getName());
-                t.setDaemon(true);
-                t.setPriority(Thread.MIN_PRIORITY);
-                return t;
-            }
+        this.executor = Executors.newFixedThreadPool(maxParallelCollations, r -> {
+            final Thread t = new Thread(r, CollateResource.class.getName());
+            t.setDaemon(true);
+            t.setPriority(Thread.MIN_PRIORITY);
+            return t;
         });
     }
 
@@ -96,8 +93,7 @@ public class CollateResource {
         if (maxCollationSize > 0) {
             for (SimpleWitness witness : collation.getWitnesses()) {
                 final int witnessLength = witness.getTokens().stream()
-                    .filter(t -> t instanceof SimpleToken).map(t -> (SimpleToken) t)
-                    .collect(Collectors.summingInt(t -> t.getContent().length()));
+                        .filter(t -> t instanceof SimpleToken).map(t -> (SimpleToken) t).mapToInt(t -> t.getContent().length()).sum();
                 if (witnessLength > maxCollationSize) {
                     return Response.status(new Response.StatusType() {
                         @Override
@@ -119,12 +115,9 @@ public class CollateResource {
             }
         }
 
-        return corsSupport(hh, Response.ok(executor.submit(new Callable<VariantGraph>() {
-            @Override
-            public VariantGraph call() throws Exception {
-                final VariantGraph graph = new VariantGraph();
-                return (collation == null ? graph : collation.collate(graph));
-            }
+        return corsSupport(hh, Response.ok(executor.submit(() -> {
+            final VariantGraph graph = new VariantGraph();
+            return (collation == null ? graph : collation.collate(graph));
         }).get())).build();
     }
 
@@ -163,7 +156,7 @@ public class CollateResource {
             if (preconditions != null) {
                 try {
                     stream.close();
-                } catch(IOException e) { }
+                } catch(IOException ignored) { }
                 throw new WebApplicationException(preconditions.build());
             }
         }

@@ -24,6 +24,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,21 +67,22 @@ public class SimpleWitnessTeiBuilder {
         // Do what you need to do with the start element, e.g. initialize
         // data structures
         // System.out.println("W tag is triggered here!");
-        StringBuffer textBuffer = new StringBuffer();
+        StringBuilder textBuffer = new StringBuilder();
         while ((event = reader.peek()) != null) {
             if (event.isEndElement() && event.asEndElement().getName().equals(w)) {
                 // Do what you need to do at the end, e.g. add data
                 // collected from sub elements, etc.
                 event = reader.nextEvent();
                 break;
-            } else {
-                // Do what you need to do for start or child elements, e.g.
-                // dispatch to another handler function
-                event = reader.nextEvent();
-                textBuffer.append(event.toString());
-                // System.out.println("Text :"+event.toString());
             }
+
+            // Do what you need to do for start or child elements, e.g.
+            // dispatch to another handler function
+            event = reader.nextEvent();
+            textBuffer.append(event.toString());
+            // System.out.println("Text :"+event.toString());
         }
+
         return textBuffer.toString();
     }
 
@@ -89,21 +91,22 @@ public class SimpleWitnessTeiBuilder {
         // Do what you need to do with the start element, e.g. initialize
         // data structures
         // System.out.println("Seg tag is triggered here!");
-        StringBuffer textBuffer = new StringBuffer();
+        StringBuilder textBuffer = new StringBuilder();
         while ((event = reader.peek()) != null) {
             if (event.isEndElement() && event.asEndElement().getName().equals(seg)) {
                 // Do what you need to do at the end, e.g. add data
                 // collected from sub elements, etc.
                 event = reader.nextEvent();
                 break;
-            } else {
-                // Do what you need to do for start or child elements, e.g.
-                // dispatch to another handler function
-                event = reader.nextEvent();
-                if (event.getEventType() == XMLEvent.CHARACTERS) {
-                    textBuffer.append(event.toString().trim());
-                }
             }
+
+            // Do what you need to do for start or child elements, e.g.
+            // dispatch to another handler function
+            event = reader.nextEvent();
+            if (event.getEventType() == XMLEvent.CHARACTERS) {
+                textBuffer.append(event.toString().trim());
+            }
+
         }
         return textBuffer.toString();
     }

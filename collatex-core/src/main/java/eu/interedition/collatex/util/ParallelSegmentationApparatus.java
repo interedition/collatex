@@ -23,16 +23,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -53,46 +44,45 @@ public class ParallelSegmentationApparatus {
         callback.start();
 
         final Set<Witness> allWitnesses = ranking.witnesses();
-        for (Iterator<Map.Entry<Integer, Set<VariantGraph.Vertex>>> rowIt = ranking.getByRank().entrySet().iterator(); rowIt.hasNext(); ) {
-            final Map.Entry<Integer, Set<VariantGraph.Vertex>> row = rowIt.next();
-            final int rank = row.getKey();
-            final Collection<VariantGraph.Vertex> verticesOfRank = row.getValue();
+      for (final Map.Entry<Integer, Set<VariantGraph.Vertex>> row : ranking.getByRank().entrySet()) {
+        final int rank = row.getKey();
+        final Collection<VariantGraph.Vertex> verticesOfRank = row.getValue();
 
 
-            if (verticesOfRank.size() == 1 && verticesOfRank.stream().findFirst().map(VariantGraph.Vertex::tokens).map(Set::isEmpty).orElse(false)) {
-                // skip start and end vertex
-                continue;
-            }
-
-            // spreading vertices with same rank according to their registered transpositions
-            final SortedMap<Integer, List<VariantGraph.Vertex>> verticesByTranspositionRank = new TreeMap<>();
-            for (VariantGraph.Vertex v : verticesOfRank) {
-                int transpositionRank = 0;
-                for (Set<VariantGraph.Vertex> transposition : v.transpositions()) {
-                    for (VariantGraph.Vertex tv : transposition) {
-                        transpositionRank += (ranking.apply(tv).intValue() - rank);
-                    }
-                }
-                verticesByTranspositionRank.computeIfAbsent(transpositionRank, r -> new LinkedList<>()).add(v);
-            }
-
-            // render segments
-            verticesByTranspositionRank.values().forEach(vertices -> {
-                final Map<Witness, List<Token>> tokensByWitness = new HashMap<>();
-                for (VariantGraph.Vertex v : vertices) {
-                    for (Token token : v.tokens()) {
-                        tokensByWitness.computeIfAbsent(token.getWitness(), w -> new LinkedList<>()).add(token);
-                    }
-                }
-
-                final SortedMap<Witness, Iterable<Token>> cellContents = new TreeMap<>(Witness.SIGIL_COMPARATOR);
-                for (Witness witness : allWitnesses) {
-                    cellContents.put(witness, Collections.unmodifiableCollection(tokensByWitness.getOrDefault(witness, Collections.emptyList())));
-                }
-
-                callback.segment(cellContents);
-            });
+        if (verticesOfRank.size() == 1 && verticesOfRank.stream().findFirst().map(VariantGraph.Vertex::tokens).map(Set::isEmpty).orElse(false)) {
+          // skip start and end vertex
+          continue;
         }
+
+        // spreading vertices with same rank according to their registered transpositions
+        final SortedMap<Integer, List<VariantGraph.Vertex>> verticesByTranspositionRank = new TreeMap<>();
+        for (VariantGraph.Vertex v : verticesOfRank) {
+          int transpositionRank = 0;
+          for (Set<VariantGraph.Vertex> transposition : v.transpositions()) {
+            for (VariantGraph.Vertex tv : transposition) {
+              transpositionRank += (ranking.apply(tv) - rank);
+            }
+          }
+          verticesByTranspositionRank.computeIfAbsent(transpositionRank, r -> new LinkedList<>()).add(v);
+        }
+
+        // render segments
+        verticesByTranspositionRank.values().forEach(vertices -> {
+          final Map<Witness, List<Token>> tokensByWitness = new HashMap<>();
+          for (VariantGraph.Vertex v : vertices) {
+            for (Token token : v.tokens()) {
+              tokensByWitness.computeIfAbsent(token.getWitness(), w -> new LinkedList<>()).add(token);
+            }
+          }
+
+          final SortedMap<Witness, Iterable<Token>> cellContents = new TreeMap<>(Witness.SIGIL_COMPARATOR);
+          for (Witness witness : allWitnesses) {
+            cellContents.put(witness, Collections.unmodifiableCollection(tokensByWitness.getOrDefault(witness, Collections.emptyList())));
+          }
+
+          callback.segment(cellContents);
+        });
+      }
 
         callback.end();
     }

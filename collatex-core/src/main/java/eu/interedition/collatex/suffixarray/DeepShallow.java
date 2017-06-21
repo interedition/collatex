@@ -143,9 +143,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
             text = new int[length + OVERSHOOT];
             System.arraycopy(input, start, text, 0, length);
         } else {
-            Tools.assertAlways(input.length >= start + length + OVERSHOOT,
-                "Input array length must have a trailing space of at least " + OVERSHOOT
-                    + " bytes.");
+            Tools.assertAlways(input.length >= start + length + OVERSHOOT, "Input array length must have a trailing space of at least " + OVERSHOOT + " bytes.");
             text = input;
         }
 
@@ -179,7 +177,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
         for (i = 0; i < 66049; i++)
             ftab[i] = 0;
 
-        c1 = text[this.start + 0];
+        c1 = text[this.start];
         for (i = 1; i <= textSize; i++) {
             c2 = text[this.start + i];
             ftab[(c1 << 8) + c2]++;
@@ -189,7 +187,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
             ftab[i] += ftab[i - 1];
 
         // -------- sort suffixes considering only the first two chars
-        c1 = text[this.start + 0];
+        c1 = text[this.start];
         for (i = 0; i < textSize; i++) {
             c2 = text[this.start + i + 1];
             j = (c1 << 8) + c2;
@@ -198,26 +196,26 @@ public class DeepShallow implements ISuffixArrayBuilder {
             suffixArray[ftab[j]] = i;
         }
 
-		/* decide on the running order */
+        /* decide on the running order */
         calculateRunningOrder();
         for (i = 0; i < 257; i++) {
             bigDone[i] = false;
         }
 
-		/* Really do the suffix sorting */
+        /* Really do the suffix sorting */
         for (i = 0; i <= 256; i++) {
 
-			/*--
+            /*--
               Process big buckets, starting with the least full.
-			  --*/
+              --*/
             ss = runningOrder[i];
-			/*--
-			Complete the big bucket [ss] by sorting
-			any unsorted small buckets [ss, j].  Hopefully
-			previous pointer-scanning phases have already
-			completed many of the small buckets [ss, j], so
-			we don't have to sort them at all.
-			--*/
+            /*--
+            Complete the big bucket [ss] by sorting
+            any unsorted small buckets [ss, j].  Hopefully
+            previous pointer-scanning phases have already
+            completed many of the small buckets [ss, j], so
+            we don't have to sort them at all.
+            --*/
             for (j = 0; j <= 256; j++) {
                 if (j != ss) {
                     sb = (ss << 8) + j;
@@ -264,7 +262,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
             for (j = 0; j <= 256; j++)
                 ftab[(j << 8) + ss] |= SETMASK;
             bigDone[ss] = true;
-        }// endfor
+        } // endfor
 
         return suffixArray;
     }
@@ -319,7 +317,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
             pa = pb = a + 1;
             pc = pd = a + n - 1;
             // -------- partition -----------------
-            for (; ; ) {
+            for (;;) {
                 while (pb <= pc && (val = ptr2char32(pb, text_depth)) <= partval) {
                     if (val == partval) {
                         swap2(pa, pb);
@@ -345,10 +343,10 @@ public class DeepShallow implements ISuffixArrayBuilder {
                 if ((next_depth = text_depth + 4) >= SHALLOW_LIMIT) {
                     helpedSort(a, n, next_depth);
                     return;
-                } else {
-                    text_depth = next_depth;
-                    repeatFlag = true;
                 }
+                text_depth = next_depth;
+                repeatFlag = true;
+
             }
 
         }
@@ -412,8 +410,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
 
                 // ------ compare ai with a[j-1] --------
                 cmpLeft = cmp_from_limit - lcpi;
-                r = cmpUnrolledShallowLcp(lcpi + suffixArray[a + j1] + text_depth, lcpi
-                    + text_depth_ai);
+                r = cmpUnrolledShallowLcp(lcpi + suffixArray[a + j1] + text_depth, lcpi + text_depth_ai);
                 lcp_new = cmp_from_limit - cmpLeft; // lcp between ai and a[j1]
                 assert (r != 0 || lcp_new >= cmp_from_limit);
 
@@ -442,7 +439,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
             suffixArray[a + j] = ai;
             lcpAux[lcp + j] = lcpi;
         } // end for(i=1 ...
-        // ----- done with insertion sort. now sort groups of equal strings
+          // ----- done with insertion sort. now sort groups of equal strings
         for (i = 0; i < n - 1; i = j + 1) {
             for (j = i; j < n; j++)
                 if (lcpAux[lcp + j] < cmp_from_limit)
@@ -750,8 +747,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
                 anchor_rank = anchorRank[best_forw_anchor_buc];
 
                 // establish how many suffixes can be sorted using anchor_sort()
-                SplitGroupResult res = splitGroup(a, n, depth, min_forw_offset_buc,
-                    forw_anchor_index_buc, lower);
+                SplitGroupResult res = splitGroup(a, n, depth, min_forw_offset_buc, forw_anchor_index_buc, lower);
                 equal = res.equal;
                 lower = res.lower;
                 if (equal == n) {
@@ -762,8 +758,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
                     // printf("Warning! lo=%d eq=%d up=%d a=%x\n",lower,equal,upper,(int)a);
                     // sort the equal group
                     if (equal > 1)
-                        generalAnchorSort(a + lower, equal, anchor_pos, anchor_rank,
-                            min_forw_offset_buc);
+                        generalAnchorSort(a + lower, equal, anchor_pos, anchor_rank, min_forw_offset_buc);
 
                     // sort upper and lower groups using deep_sort
                     if (lower > 1)
@@ -822,7 +817,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
             // ----- partition ------------
             pb = pa_old = pa;
             pc = pd_old = pd;
-            for (; ; ) {
+            for (;;) {
                 while (pb <= pc && (r = ptr2char(pb, text_depth) - partval) <= 0) {
                     if (r == 0) {
                         swap2(pa, pb);
@@ -895,7 +890,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
         int ris;
         // void *ris;
 
-		/* ---------- get bucket of anchor ---------- */
+        /* ---------- get bucket of anchor ---------- */
         sb = getSmallBucket(anchor_pos);
         lo = bucketFirst(sb);
         hi = bucketLast(sb);
@@ -912,7 +907,7 @@ public class DeepShallow implements ISuffixArrayBuilder {
 
         mark(curr_lo);
         // scan suffixes preceeding and following the anchor
-        for (to_be_found = n - 1; to_be_found > 0; ) {
+        for (to_be_found = n - 1; to_be_found > 0;) {
             // invariant: the next positions to check are curr_lo-1 and curr_hi+1
             assert (curr_lo > lo || curr_hi < hi);
             while (curr_lo > lo) {
@@ -1080,10 +1075,10 @@ public class DeepShallow implements ISuffixArrayBuilder {
                 continue;
             }
 
-			/*
-			 * Random partitioning. Guidance for the magic constants 7621 and 32768 is
-			 * taken from Sedgewick's algorithms book, chapter 35.
-			 */
+            /*
+             * Random partitioning. Guidance for the magic constants 7621 and 32768 is
+             * taken from Sedgewick's algorithms book, chapter 35.
+             */
             r = ((r * 7621) + 1) % 32768;
             r3 = r % 3;
             if (r3 == 0)
@@ -1452,7 +1447,6 @@ public class DeepShallow implements ISuffixArrayBuilder {
         p.right = pp;
         pp = p;
         p.downInt = suf;
-        return;
 
     }
 
@@ -1768,19 +1762,18 @@ public class DeepShallow implements ISuffixArrayBuilder {
     }
 
     /*
-   * #define ptr2char32(i) (getword32(*(i) + text_depth))
-   */
+     * #define ptr2char32(i) (getword32(*(i) + text_depth))
+     */
     private int ptr2char32(int a, int depth) {
         return getword32(suffixArray[a] + depth);
     }
 
     /*
-   * #define getword32(s) ((unsigned)( (*(s) << 24) | ((*((s)+1)) << 16) \ | ((*((s)+2))
-   * << 8) | (*((s)+3)) ))
-   */
+     * #define getword32(s) ((unsigned)( (*(s) << 24) | ((*((s)+1)) << 16) \ | ((*((s)+2))
+     * << 8) | (*((s)+3)) ))
+     */
     private int getword32(int s) {
-        return text[this.start + s] << 24 | text[this.start + s + 1] << 16
-            | text[this.start + s + 2] << 8 | text[this.start + s + 3];
+        return text[this.start + s] << 24 | text[this.start + s + 1] << 16 | text[this.start + s + 2] << 8 | text[this.start + s + 3];
     }
 
     private int ptr2char(int i, int text_depth) {

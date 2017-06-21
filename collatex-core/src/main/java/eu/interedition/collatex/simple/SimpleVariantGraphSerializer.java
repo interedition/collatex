@@ -170,7 +170,7 @@ public class SimpleVariantGraphSerializer {
                 public void segment(SortedMap<Witness, Iterable<Token>> contents) {
                     try {
                         for (Iterator<Witness> witnessIt = contents.keySet().iterator(); witnessIt.hasNext(); ) {
-                            out.write(escapeCsvField(tokensToString.apply(contents.getOrDefault(witnessIt.next(), Collections.<Token>emptySet()))));
+                            out.write(escapeCsvField(tokensToString.apply(contents.getOrDefault(witnessIt.next(), Collections.emptySet()))));
                             if (witnessIt.hasNext()) {
                                 out.write(",");
                             }
@@ -247,12 +247,8 @@ public class SimpleVariantGraphSerializer {
     }
 
     private int numericId(VariantGraph.Vertex vertex) {
-        Integer id = vertexIds.get(vertex);
-        if (id == null) {
-            id = vertexIds.size();
-            vertexIds.put(vertex, id);
-        }
-        return id;
+      Integer id = vertexIds.computeIfAbsent(vertex, k -> vertexIds.size());
+      return id;
     }
 
     String toDotLabel(Set<Witness> e) {
@@ -405,7 +401,7 @@ public class SimpleVariantGraphSerializer {
         private String forElement;
         private String type;
 
-        private GraphMLProperty(String forElement, String name, String type) {
+        GraphMLProperty(String forElement, String name, String type) {
             this.name = name;
             this.forElement = forElement;
             this.type = type;

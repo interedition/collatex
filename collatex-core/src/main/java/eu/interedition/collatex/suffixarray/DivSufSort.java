@@ -182,7 +182,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Constructs the suffix array by using the sorted order of type B* suffixes.
      */
-    private final void constructSuffixArray(int[] bucket_A, int[] bucket_B, int n, int m) {
+    private void constructSuffixArray(int[] bucket_A, int[] bucket_B, int n, int m) {
         int i, j, k; // ptr
         int s, c0, c1, c2;
         // (_c1)])
@@ -251,7 +251,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final int sortTypeBstar(int[] bucket_A, int[] bucket_B, int n) {
+    private int sortTypeBstar(int[] bucket_A, int[] bucket_B, int n) {
         int PAb, ISAb, buf;
 
         int i, j, k, t, m, bufsize;
@@ -387,8 +387,8 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void ssSort(final int PA, int first, int last, int buf, int bufsize,
-                              int depth, int n, boolean lastsuffix) {
+    private void ssSort(final int PA, int first, int last, int buf, int bufsize,
+                        int depth, int n, boolean lastsuffix) {
         int a, b, middle, curbuf;// SA pointer
 
         int j, k, curbufsize, limit;
@@ -450,7 +450,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
      * special version of ss_compare for handling
      * <code>ss_compare(T, &(PAi[0]), PA + *a, depth)</code> situation.
      */
-    private final int ssCompare(int pa, int pb, int p2, int depth) {
+    private int ssCompare(int pa, int pb, int p2, int depth) {
         int U1, U2, U1n, U2n;// pointers to T
 
         for (U1 = depth + pa, U2 = depth + SA[p2], U1n = pb + 2, U2n = SA[p2 + 1] + 2; (U1 < U1n)
@@ -464,7 +464,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final int ssCompare(int p1, int p2, int depth) {
+    private int ssCompare(int p1, int p2, int depth) {
         int U1, U2, U1n, U2n;// pointers to T
 
         for (U1 = depth + SA[p1], U2 = depth + SA[p2], U1n = SA[p1 + 1] + 2, U2n = SA[p2 + 1] + 2; (U1 < U1n)
@@ -479,7 +479,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void ssInplaceMerge(int PA, int first, int middle, int last, int depth) {
+    private void ssInplaceMerge(int PA, int first, int middle, int last, int depth) {
         // PA, middle, first, last are pointers to SA
         int p, a, b;// pointer to SA
         int len, half;
@@ -531,7 +531,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void ssRotate(int first, int middle, int last) {
+    private void ssRotate(int first, int middle, int last) {
         // first, middle, last are pointers in SA
         int a, b, t;// pointers in SA
         int l, r;
@@ -587,7 +587,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void ssBlockSwap(int a, int b, int n) {
+    private void ssBlockSwap(int a, int b, int n) {
         // a, b -- pointer to SA
         int t;
         for (; 0 < n; --n, ++a, ++b) {
@@ -597,19 +597,19 @@ public final class DivSufSort implements ISuffixArrayBuilder {
         }
     }
 
-    private final static int getIDX(int a) {
+    private static int getIDX(int a) {
         return (0 <= (a)) ? (a) : (~(a));
     }
 
-    private final static int min(int a, int b) {
+    private static int min(int a, int b) {
         return a < b ? a : b;
     }
 
     /**
      * D&C based merge.
      */
-    private final void ssSwapMerge(int PA, int first, int middle, int last, int buf,
-                                   int bufsize, int depth) {
+    private void ssSwapMerge(int PA, int first, int middle, int last, int buf,
+                             int bufsize, int depth) {
         // Pa, first, middle, last and buf - pointers in SA array
 
         final int STACK_SIZE = SS_SMERGE_STACKSIZE;
@@ -756,8 +756,8 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Merge-forward with internal buffer.
      */
-    private final void ssMergeForward(int PA, int first, int middle, int last, int buf,
-                                      int depth) {
+    private void ssMergeForward(int PA, int first, int middle, int last, int buf,
+                                int depth) {
         // PA, first, middle, last, buf are pointers to SA
         int a, b, c, bufend;// pointers to SA
         int t, r;
@@ -826,8 +826,8 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Merge-backward with internal buffer.
      */
-    private final void ssMergeBackward(int PA, int first, int middle, int last, int buf,
-                                       int depth) {
+    private void ssMergeBackward(int PA, int first, int middle, int last, int buf,
+                                 int depth) {
         // PA, first, middle, last, buf are pointers in SA
         int p1, p2;// pointers in SA
         int a, b, c, bufend;// pointers in SA
@@ -951,7 +951,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Insertionsort for small size groups
      */
-    private final void ssInsertionSort(int PA, int first, int last, int depth) {
+    private void ssInsertionSort(int PA, int first, int last, int depth) {
         // PA, first, last are pointers in SA
         int i, j;// pointers in SA
         int t, r;
@@ -977,7 +977,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final static int ssIsqrt(int x) {
+    private static int ssIsqrt(int x) {
         int y, e;
 
         if (x >= (SS_BLOCKSIZE * SS_BLOCKSIZE)) {
@@ -986,7 +986,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
         e = ((x & 0xffff0000) != 0) ? (((x & 0xff000000) != 0) ? 24 + lg_table[(x >> 24) & 0xff]
             : 16 + lg_table[(x >> 16) & 0xff])
             : (((x & 0x0000ff00) != 0) ? 8 + lg_table[(x >> 8) & 0xff]
-            : 0 + lg_table[(x >> 0) & 0xff]);
+            : lg_table[(x) & 0xff]);
 
         if (e >= 16) {
             y = sqq_table[x >> ((e - 6) - (e & 1))] << ((e >> 1) - 7);
@@ -1004,7 +1004,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     }
 
     /* Multikey introsort for medium size groups. */
-    private final void ssMintroSort(int PA, int first, int last, int depth) {
+    private void ssMintroSort(int PA, int first, int last, int depth) {
         final int STACK_SIZE = SS_MISORT_STACKSIZE;
         StackElement[] stack = new StackElement[STACK_SIZE];
         int Td;// T ptr
@@ -1193,7 +1193,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Returns the pivot element.
      */
-    private final int ssPivot(int Td, int PA, int first, int last) {
+    private int ssPivot(int Td, int PA, int first, int last) {
         int middle;// SA pointer
         int t = last - first;
         middle = first + t / 2;
@@ -1216,7 +1216,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Returns the median of five elements
      */
-    private final int ssMedian5(int Td, int PA, int v1, int v2, int v3, int v4, int v5) {
+    private int ssMedian5(int Td, int PA, int v1, int v2, int v3, int v4, int v5) {
         int t;
         if (T[start + Td + SA[PA + SA[v2]]] > T[start + Td + SA[PA + SA[v3]]]) {
             t = v2;
@@ -1259,7 +1259,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Returns the median of three elements.
      */
-    private final int ssMedian3(int Td, int PA, int v1, int v2, int v3) {
+    private int ssMedian3(int Td, int PA, int v1, int v2, int v3) {
         if (T[start + Td + SA[PA + SA[v1]]] > T[start + Td + SA[PA + SA[v2]]]) {
             int t = v1;
             v1 = v2;
@@ -1278,7 +1278,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Binary partition for substrings.
      */
-    private final int ssPartition(int PA, int first, int last, int depth) {
+    private int ssPartition(int PA, int first, int last, int depth) {
         int a, b;// SA pointer
         int t;
         for (a = first - 1, b = last; ; ) {
@@ -1303,7 +1303,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Simple top-down heapsort.
      */
-    private final void ssHeapSort(int Td, int PA, int sa, int size) {
+    private void ssHeapSort(int Td, int PA, int sa, int size) {
         int i, m, t;
 
         m = size;
@@ -1334,7 +1334,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void ssFixDown(int Td, int PA, int sa, int i, int size) {
+    private void ssFixDown(int Td, int PA, int sa, int i, int size) {
         int j, k;
         int v;
         int c, d, e;
@@ -1357,16 +1357,16 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final static int ssIlg(int n) {
+    private static int ssIlg(int n) {
 
         return ((n & 0xff00) != 0) ? 8 + lg_table[(n >> 8) & 0xff]
-            : 0 + lg_table[(n >> 0) & 0xff];
+            : lg_table[(n) & 0xff];
     }
 
     /**
      *
      */
-    private final void swapInSA(int a, int b) {
+    private void swapInSA(int a, int b) {
         int tmp = SA[a];
         SA[a] = SA[b];
         SA[b] = tmp;
@@ -1375,7 +1375,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Tandem repeat sort
      */
-    private final void trSort(int ISA, int n, int depth) {
+    private void trSort(int ISA, int n, int depth) {
         TRBudget budget = new TRBudget(trIlg(n) * 2 / 3, n);
         int ISAd;
         int first, last;// SA pointers
@@ -1421,8 +1421,8 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final TRPartitionResult trPartition(int ISAd, int first, int middle,
-                                                int last, int pa, int pb, int v) {
+    private TRPartitionResult trPartition(int ISAd, int first, int middle,
+                                          int last, int pa, int pb, int v) {
         int a, b, c, d, e, f;// ptr
         int t, s, x = 0;
 
@@ -1482,7 +1482,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
         return new TRPartitionResult(first, last);
     }
 
-    private final void trIntroSort(int ISA, int ISAd, int first, int last, TRBudget budget) {
+    private void trIntroSort(int ISA, int ISAd, int first, int last, TRBudget budget) {
         final int STACK_SIZE = TR_STACKSIZE;
         StackElement[] stack = new StackElement[STACK_SIZE];
         int a = 0, b = 0, c;// pointers
@@ -1865,7 +1865,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Returns the pivot element.
      */
-    private final int trPivot(int ISAd, int first, int last) {
+    private int trPivot(int ISAd, int first, int last) {
         int middle;
         int t;
 
@@ -1890,7 +1890,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Returns the median of five elements.
      */
-    private final int trMedian5(int ISAd, int v1, int v2, int v3, int v4, int v5) {
+    private int trMedian5(int ISAd, int v1, int v2, int v3, int v4, int v5) {
         int t;
         if (SA[ISAd + SA[v2]] > SA[ISAd + SA[v3]]) {
             t = v2;
@@ -1932,7 +1932,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      * Returns the median of three elements.
      */
-    private final int trMedian3(int ISAd, int v1, int v2, int v3) {
+    private int trMedian3(int ISAd, int v1, int v2, int v3) {
         if (SA[ISAd + SA[v1]] > SA[ISAd + SA[v2]]) {
             int t = v1;
             v1 = v2;
@@ -1951,7 +1951,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void trHeapSort(int ISAd, int sa, int size) {
+    private void trHeapSort(int ISAd, int sa, int size) {
         int i, m, t;
 
         m = size;
@@ -1981,7 +1981,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final void trFixDown(int ISAd, int sa, int i, int size) {
+    private void trFixDown(int ISAd, int sa, int i, int size) {
         int j, k;
         int v;
         int c, d, e;
@@ -2003,7 +2003,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
 
     /**
      */
-    private final void trInsertionSort(int ISAd, int first, int last) {
+    private void trInsertionSort(int ISAd, int first, int last) {
         int a, b;// SA ptr
         int t, r;
 
@@ -2027,7 +2027,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
 
     /**
      */
-    private final void trPartialCopy(int ISA, int first, int a, int b, int last, int depth) {
+    private void trPartialCopy(int ISA, int first, int a, int b, int last, int depth) {
         int c, d, e;// ptr
         int s, v;
         int rank, lastrank, newrank = -1;
@@ -2077,7 +2077,7 @@ public final class DivSufSort implements ISuffixArrayBuilder {
      * sort suffixes of middle partition by using sorted order of suffixes of left and
      * right partition.
      */
-    private final void trCopy(int ISA, int first, int a, int b, int last, int depth) {
+    private void trCopy(int ISA, int first, int a, int b, int last, int depth) {
         int c, d, e;// ptr
         int s, v;
 
@@ -2101,11 +2101,11 @@ public final class DivSufSort implements ISuffixArrayBuilder {
     /**
      *
      */
-    private final static int trIlg(int n) {
+    private static int trIlg(int n) {
         return ((n & 0xffff0000) != 0) ? (((n & 0xff000000) != 0) ? 24 + lg_table[(n >> 24) & 0xff]
             : 16 + lg_table[(n >> 16) & 0xff])
             : (((n & 0x0000ff00) != 0) ? 8 + lg_table[(n >> 8) & 0xff]
-            : 0 + lg_table[(n >> 0) & 0xff]);
+            : lg_table[(n) & 0xff]);
     }
 
 }

@@ -51,7 +51,7 @@ public enum Algorithm {
     /*
      *
      */
-    private Algorithm(String name) {
+    Algorithm(String name) {
         this.name = name;
     }
 

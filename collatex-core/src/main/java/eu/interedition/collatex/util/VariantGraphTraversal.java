@@ -67,7 +67,7 @@ public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
             public VariantGraph.Vertex next() {
                 final VariantGraph.Vertex next = this.next.get();
                 for (Map.Entry<VariantGraph.Vertex, Set<Witness>> edge : next.outgoing().entrySet()) {
-                    if (witnesses != null && !edge.getValue().stream().anyMatch(witnesses::contains)) {
+                    if (witnesses != null && edge.getValue().stream().noneMatch(witnesses::contains)) {
                         continue;
                     }
                     final VariantGraph.Vertex end = edge.getKey();

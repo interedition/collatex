@@ -23,14 +23,14 @@ public final class Skew implements ISuffixArrayBuilder {
     /**
      * Lexicographic order for pairs.
      */
-    private final static boolean leq(int a1, int a2, int b1, int b2) {
+    private static boolean leq(int a1, int a2, int b1, int b2) {
         return (a1 < b1 || (a1 == b1 && a2 <= b2));
     }
 
     /**
      * Lexicographic order for triples.
      */
-    private final static boolean leq(int a1, int a2, int a3, int b1, int b2, int b3) {
+    private static boolean leq(int a1, int a2, int a3, int b1, int b2, int b3) {
         return (a1 < b1 || (a1 == b1 && leq(a2, a3, b2, b3)));
     }
 
@@ -38,8 +38,8 @@ public final class Skew implements ISuffixArrayBuilder {
      * Stably sort indexes from src[0..n-1] to dst[0..n-1] with values in 0..K from v. A
      * constant offset of <code>vi</code> is added to indexes from src.
      */
-    private final static void radixPass(int[] src, int[] dst, int[] v, int vi,
-                                        final int n, final int K, int start, int[] cnt) {
+    private static void radixPass(int[] src, int[] dst, int[] v, int vi,
+                                  final int n, final int K, int start, int[] cnt) {
         // check counter array's size.
         assert cnt.length >= K + 1;
         Arrays.fill(cnt, 0, K + 1, 0);
@@ -64,7 +64,7 @@ public final class Skew implements ISuffixArrayBuilder {
      * Find the suffix array SA of s[0..n-1] in {1..K}^n. require s[n] = s[n+1] = s[n+2] =
      * 0, n >= 2.
      */
-    static final int[] suffixArray(int[] s, int[] SA, int n, final int K, int start, int[] cnt) {
+    static int[] suffixArray(int[] s, int[] SA, int n, final int K, int start, int[] cnt) {
         final int n0 = (n + 2) / 3, n1 = (n + 1) / 3, n2 = n / 3, n02 = n0 + n2;
 
         final int[] s12 = new int[n02 + 3];
@@ -160,7 +160,7 @@ public final class Skew implements ISuffixArrayBuilder {
     /**
      * Ensure array is large enough or reallocate (no copying).
      */
-    private static final int[] ensureSize(int[] tab, int length) {
+    private static int[] ensureSize(int[] tab, int length) {
         if (tab.length < length) {
             tab = null;
             tab = new int[length];
