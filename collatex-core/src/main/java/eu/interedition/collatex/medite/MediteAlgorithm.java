@@ -22,6 +22,7 @@ package eu.interedition.collatex.medite;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VertexMatch;
 
@@ -31,7 +32,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -49,7 +49,7 @@ public class MediteAlgorithm extends CollationAlgorithm.Base {
     @Override
     public void collate(VariantGraph graph, Iterable<Token> witness) {
         final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
-        final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
+        final Token[] tokens = StreamUtil.stream(witness).toArray(Token[]::new);
 
         final SuffixTree<Token> suffixTree = SuffixTree.build(comparator, tokens);
         final MatchEvaluatorWrapper matchEvaluator = new MatchEvaluatorWrapper(this.matchEvaluator, tokens);

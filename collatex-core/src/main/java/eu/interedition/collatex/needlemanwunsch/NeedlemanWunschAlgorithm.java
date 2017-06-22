@@ -22,14 +22,10 @@ package eu.interedition.collatex.needlemanwunsch;
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.StreamSupport;
+import java.util.*;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -57,7 +53,7 @@ public class NeedlemanWunschAlgorithm extends CollationAlgorithm.Base {
     @Override
     public void collate(VariantGraph against, Iterable<Token> witness) {
         final VariantGraph.Vertex[][] ranks = VariantGraphRanking.of(against).asArray();
-        final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
+        final Token[] tokens = StreamUtil.stream(witness).toArray(Token[]::new);
 
         final Map<Token, VariantGraph.Vertex> alignments = new HashMap<>();
         for (Map.Entry<VariantGraph.Vertex[], Token> alignment : align(ranks, tokens, scorer).entrySet()) {

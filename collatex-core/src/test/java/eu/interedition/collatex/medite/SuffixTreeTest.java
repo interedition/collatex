@@ -20,13 +20,12 @@
 package eu.interedition.collatex.medite;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.util.StreamUtil;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.junit.Test;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -38,7 +37,7 @@ public class SuffixTreeTest extends AbstractTest {
         final SuffixTree<String> st = SuffixTree.build(Comparator.comparing(String::toLowerCase), "S", "P", "O", "a", "s", "p", "o");
 
         LOG.fine(st::toString);
-        LOG.fine(() -> StreamSupport.stream(st.match(Arrays.asList("s", "p", "o", "a")).spliterator(), false)//
+        LOG.fine(() -> StreamUtil.stream(st.match(Arrays.asList("s", "p", "o", "a")))//
                 .map(Object::toString)//
                 .collect(Collectors.joining(", ")));
     }

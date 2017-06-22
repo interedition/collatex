@@ -21,19 +21,12 @@ package eu.interedition.collatex.matching;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.util.StreamUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class Matches {
 
@@ -46,40 +39,40 @@ public class Matches {
 
         final Map<Token, List<VariantGraph.Vertex>> allMatches = new HashMap<>();
 
-        StreamSupport.stream(vertices.spliterator(), false).forEach(vertex ->
-            vertex.tokens().stream().findFirst().ifPresent(baseToken ->
-                StreamSupport.stream(witnessTokens.spliterator(), false)
-                    .filter(witnessToken -> comparator.compare(baseToken, witnessToken) == 0)
-                    .forEach(matchingToken -> allMatches.computeIfAbsent(matchingToken, t -> new ArrayList<>()).add(vertex))));
+        StreamUtil.stream(vertices).forEach(vertex ->
+                vertex.tokens().stream().findFirst().ifPresent(baseToken ->
+                        StreamUtil.stream(witnessTokens)
+                                .filter(witnessToken -> comparator.compare(baseToken, witnessToken) == 0)
+                                .forEach(matchingToken -> allMatches.computeIfAbsent(matchingToken, t -> new ArrayList<>()).add(vertex))));
 
-        final Set<Token> unmatchedInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
-            .filter(t -> !allMatches.containsKey(t))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+        final Set<Token> unmatchedInWitness = StreamUtil.stream(witnessTokens)
+                .filter(t -> !allMatches.containsKey(t))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         final Set<VariantGraph.Vertex> ambiguousInBase = allMatches.values().stream()
-            .flatMap(List::stream)
-            .collect(Collectors.toMap(Function.identity(), v -> 1, (a, b) -> a + b))
-            .entrySet()
-            .stream()
-            .filter(v -> v.getValue() > 1)
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(Function.identity(), v -> 1, (a, b) -> a + b))
+                .entrySet()
+                .stream()
+                .filter(v -> v.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         // (have to check: base -> witness, and witness -> base)
         final Set<Token> ambiguousInWitness = Stream.concat(
-            StreamSupport.stream(witnessTokens.spliterator(), false)
-                .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() > 1),
+                StreamUtil.stream(witnessTokens)
+                        .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() > 1),
 
-            allMatches.entrySet().stream()
-                .filter(match -> match.getValue().stream().anyMatch(ambiguousInBase::contains))
-                .map(Map.Entry::getKey)
+                allMatches.entrySet().stream()
+                        .filter(match -> match.getValue().stream().anyMatch(ambiguousInBase::contains))
+                        .map(Map.Entry::getKey)
         ).collect(Collectors.toCollection(LinkedHashSet::new));
 
         // sure tokens
         // have to check unsure tokens because of (base -> witness && witness -> base)
-        final Set<Token> uniqueInWitness = StreamSupport.stream(witnessTokens.spliterator(), false)
-            .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() == 1 && !ambiguousInWitness.contains(t))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+        final Set<Token> uniqueInWitness = StreamUtil.stream(witnessTokens)
+                .filter(t -> allMatches.getOrDefault(t, Collections.emptyList()).size() == 1 && !ambiguousInWitness.contains(t))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         return new Matches(allMatches, unmatchedInWitness, ambiguousInWitness, uniqueInWitness);
     }

@@ -21,7 +21,9 @@ package eu.interedition.collatex;
 
 import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphTraversal;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import java.io.StringWriter;
@@ -29,9 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.junit.Assert.assertEquals;
 
 public class VariantGraphTest extends AbstractTest {
 
@@ -46,7 +45,7 @@ public class VariantGraphTest extends AbstractTest {
     public void getTokens() {
         final SimpleWitness[] w = createWitnesses("a b c d");
         final VariantGraph graph = collate(w);
-        final List<VariantGraph.Vertex> vertices = StreamSupport.stream(VariantGraphTraversal.of(graph).spliterator(), false).collect(Collectors.toList());
+        final List<VariantGraph.Vertex> vertices = StreamUtil.stream(VariantGraphTraversal.of(graph)).collect(Collectors.toList());
         assertEquals(6, vertices.size());
         assertEquals(graph.getStart(), vertices.get(0));
         assertVertexEquals("a", vertices.get(1));
@@ -77,7 +76,8 @@ public class VariantGraphTest extends AbstractTest {
     public void getPathForWitness() {
         final SimpleWitness[] w = createWitnesses("a b c d e f ", "x y z d e", "a b x y z");
         final VariantGraph graph = collate(w);
-        final List<VariantGraph.Vertex> path = StreamSupport.stream(VariantGraphTraversal.of(graph, Collections.singleton(w[0])).spliterator(), false).collect(Collectors.toList());
+        final List<VariantGraph.Vertex> path = StreamUtil.stream(VariantGraphTraversal.of(graph, Collections.singleton(w[0])))//
+                .collect(Collectors.toList());
 
         assertEquals(8, path.size());
         assertEquals(graph.getStart(), path.get(0));

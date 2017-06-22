@@ -7,16 +7,17 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.max;
+import static java.util.Comparator.comparingInt;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.*;
-import static java.util.Comparator.*;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -76,10 +77,10 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         boolean firstWitness = true;
 
         for (Iterable<Token> tokens : witnesses) {
-            final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
-                .findFirst()
-                .map(Token::getWitness)
-                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+            final Witness witness = StreamUtil.stream(tokens)
+                    .findFirst()
+                    .map(Token::getWitness)
+                    .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
             // first witness has a fast path
             if (firstWitness) {
@@ -104,14 +105,18 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             // now we can create the space for the edit graph.. using arrays and stuff
             // the vertical size is the number of vertices in the graph minus the start and end vertices
-            // NOTE: THe token index to matches already does a graph ranking!
+            // NOTE: The TokenIndexToMatches already does a graph ranking!
             VariantGraphRanking variantGraphRanking = VariantGraphRanking.of(graph);
-            // oh wait there are more methods on the java variant graph ranking!
-            List<Integer> verticesAsRankList = new ArrayList<>();
-            for (VariantGraph.Vertex vertex : graph.vertices()) {
-                int rank = variantGraphRanking.getByVertex().get(vertex);
-                verticesAsRankList.add(rank);
-            }
+            // oh wait there are more methods on the java VariantGraphRanking!
+            Map<VariantGraph.Vertex, Integer> byVertex = variantGraphRanking.getByVertex();
+            List<Integer> verticesAsRankList = StreamUtil.stream(graph.vertices())//
+                    .map(v -> byVertex.get(v))//
+                    .collect(Collectors.toList());
+//            List<Integer> verticesAsRankList = new ArrayList<>();
+//            for (VariantGraph.Vertex vertex : graph.vertices()) {
+//                int rank = variantGraphRanking.getByVertex().get(vertex);
+//                verticesAsRankList.add(rank);
+//            }
             // we leave the start vertex in (that is an extra position that is needed in the edit graph)
             // we remove the end vertex though
             verticesAsRankList.remove(verticesAsRankList.size() - 1);
@@ -154,16 +159,16 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // fill the remaining cells
             // fill the rest of the cells in a  y by x fashion
             IntStream.range(1, tokensAsIndexList.size()).forEach(//
-                y -> IntStream.range(1, verticesAsRankList.size()).forEach(
-                    x -> {
-                        int previousY = y - 1;
-                        int previousX = x - 1;
-                        Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
-                        Score left = scorer.gap(x, y, this.cells[y][previousX]);
-                        Score upper = scorer.gap(x, y, this.cells[previousY][x]);
-                        Score max = max(asList(upperLeft, left, upper), comparingInt(score -> score.globalScore));
-                        this.cells[y][x] = max;
-                    }));
+                    y -> IntStream.range(1, verticesAsRankList.size()).forEach(
+                            x -> {
+                                int previousY = y - 1;
+                                int previousX = x - 1;
+                                Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
+                                Score left = scorer.gap(x, y, this.cells[y][previousX]);
+                                Score upper = scorer.gap(x, y, this.cells[previousY][x]);
+                                Score max = max(asList(upperLeft, left, upper), comparingInt(score -> score.globalScore));
+                                this.cells[y][x] = max;
+                            }));
 
             // debug only
             printScoringTable(verticesAsRankList, tokensAsIndexList);
@@ -226,6 +231,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         }
     }
 
+    @Override
     public void collate(VariantGraph against, Iterable<Token> witness) {
 
     }

@@ -5,9 +5,9 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
+import eu.interedition.collatex.util.StreamUtil;
 
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by ronald on 4/20/15.
@@ -59,10 +59,10 @@ public class TokenIndex {
         witnessToStartToken = new HashMap<>();
         witnessToEndToken = new HashMap<>();
         for (Iterable<Token> tokens : w) {
-            final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
-                .findFirst()
-                .map(Token::getWitness)
-                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+            final Witness witness = StreamUtil.stream(tokens)
+                    .findFirst()
+                    .map(Token::getWitness)
+                    .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
             witnessToStartToken.put(witness, counter);
             for (Token t : tokens) {
@@ -85,7 +85,7 @@ public class TokenIndex {
 
         @Override
         public String toString() {
-            return "$"+witnessIdentifier;
+            return "$" + witnessIdentifier;
         }
 
         @Override
