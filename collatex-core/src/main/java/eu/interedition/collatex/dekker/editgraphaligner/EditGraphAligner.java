@@ -110,7 +110,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // oh wait there are more methods on the java VariantGraphRanking!
             Map<VariantGraph.Vertex, Integer> byVertex = variantGraphRanking.getByVertex();
             List<Integer> verticesAsRankList = StreamUtil.stream(graph.vertices())//
-                    .map(v -> byVertex.get(v))//
+                    .map(byVertex::get)//
                     .collect(Collectors.toList());
 //            List<Integer> verticesAsRankList = new ArrayList<>();
 //            for (VariantGraph.Vertex vertex : graph.vertices()) {
