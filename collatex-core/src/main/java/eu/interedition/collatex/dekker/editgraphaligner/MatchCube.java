@@ -22,7 +22,6 @@ import java.util.Set;
  */
 public class MatchCube {
 
-
     private final Map<MatchCoordinate, Match> matches;
 
     public MatchCube(TokenIndex tokenIndex, VariantGraph.Vertex[] vertexArray, VariantGraph graph, Iterable<Token> tokens) {

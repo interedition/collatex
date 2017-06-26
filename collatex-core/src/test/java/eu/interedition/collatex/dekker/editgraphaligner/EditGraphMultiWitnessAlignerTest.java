@@ -1,15 +1,16 @@
 package eu.interedition.collatex.dekker.editgraphaligner;
 
 import eu.interedition.collatex.AbstractTest;
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
 import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
 import eu.interedition.collatex.simple.SimpleWitness;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -62,6 +63,7 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
         List<SimpleWitness> witnesses = new ArrayList<>();
         witnesses.addAll(Arrays.asList(w));
         aligner.collate(g, witnesses);
+        showAlignmentTable(w, g);
         assertThat(g, graph(w[0]).aligned("aaaa bbbb cccc dddd eeee ffff"));
         assertThat(g, graph(w[1]).aligned("aaaa bbbb eeex ffff"));
         assertThat(g, graph(w[2]).aligned("aaaa bbbb cccc eeee ffff"));
@@ -82,11 +84,32 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
         List<SimpleWitness> witnesses = new ArrayList<>();
         witnesses.addAll(Arrays.asList(w));
         aligner.collate(g, witnesses);
+        showAlignmentTable(w, g);
         assertThat(g, graph(w[0]).aligned("aaaa bbbb cccc dddd eeee ffff"));
         assertThat(g, graph(w[1]).aligned("aaaa bbbb eeex ffff"));
         assertThat(g, graph(w[2]).aligned("aaaa bbbb cccc eeee ffff"));
         assertThat(g, graph(w[3]).aligned("aaaa bbbb eeex dddd ffff"));
         assertThat(g, graph(w[4]).non_aligned("aaa aaa aaa aaa aaa"));
+
+//        # check that there are no doubles in the graph
+//        # i have to be careful here
+//        # The vertex is created twice, so that won't be the same object.
+//        results = set()
+//        for v in vg.vertices():
+//        content = v.label
+//        if content in results:
+//        raise Exception("Content "+content+" already in graph!")
+//            else:
+//        results.add(content)
+        Set<String> results = new HashSet<>();
+        g.vertices().forEach(v -> {
+            String content = v.toString();
+//            LOG.info(content);
+            assertThat(results.contains(content), is(false));
+            if (!content.equals("[]")) {
+                results.add(content);
+            }
+        });
     }
 
     @Test
@@ -106,29 +129,14 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
         assertThat(g, graph(w[1]).aligned("bbbb cccc").non_aligned("eeee").aligned("ffff"));
         assertThat(g, graph(w[2]).aligned("bbbb").non_aligned("gggg").aligned("dddd ffff"));
 //        assertThat(g, graph(w[3]).aligned("bbbb cccc dddd ffff"));
+        showAlignmentTable(w, g);
     }
 
-
-//    collation = Collation()
-//        collation.add_plain_witness("A", "aaaa bbbb cccc dddd eeee ffff")
-//            collation.add_plain_witness("B", "aaaa bbbb eeex ffff") # Near-match gap
-//        collation.add_plain_witness("C", "aaaa bbbb cccc eeee ffff")
-//            collation.add_plain_witness("D", "aaaa bbbb eeex dddd ffff") # Transposition
-//        # collation.add_plain_witness("E", "aaa aaa aaa aaa aaa")
-//            # table = collate(collation, segmentation=False, near_match=True)
-//        # table = collate(collation, segmentation=False, near_match=False)
-//        # print(table)
-//    vg = collate(collation, output="graph")
-//
-//        # check that there are no doubles in the graph
-//        # i have to be careful here
-//        # The vertex is created twice, so that won't be the same object.
-//    result = set()
-//        for v in vg.vertices():
-//    content = v.label
-//            if content in result:
-//    raise Exception("Content "+content+" already in graph!")
-//            else:
-//                result.add(content)
+    private void showAlignmentTable(SimpleWitness[] w, VariantGraph g) {
+        List<SortedMap<Witness, Set<Token>>> table = table(g);
+        for (SimpleWitness sw: w) {
+            System.out.println(toString(table, sw));
+        }
+    }
 
 }

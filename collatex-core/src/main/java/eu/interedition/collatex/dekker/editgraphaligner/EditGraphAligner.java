@@ -50,7 +50,7 @@ import java.util.stream.IntStream;
 public class EditGraphAligner extends CollationAlgorithm.Base {
     public TokenIndex tokenIndex;
     // tokens are mapped to vertices by their position in the token array
-    protected VariantGraph.Vertex[] vertex_array;
+    public VariantGraph.Vertex[] vertex_array;
     private final Comparator<Token> comparator;
     Score[][] cells;
 
@@ -102,7 +102,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
 
 
-
             // now we can create the space for the edit graph.. using arrays and stuff
             // the vertical size is the number of vertices in the graph minus the start and end vertices
             // NOTE: The TokenIndexToMatches already does a graph ranking!
@@ -119,6 +118,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             System.out.println("horizontal (graph): " + verticesAsRankList);
 
+
             // now the vertical stuff
             List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
             List<Integer> tokensAsIndexList = new ArrayList<>();
@@ -133,7 +133,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // code below is partly taken from the CSA branch.
             // init cells and scorer
             this.cells = new Score[tokensAsIndexList.size()][verticesAsRankList.size()];
-            Scorer scorer = new Scorer(cube);
+            Scorer scorer = new Scorer(cube, verticesAsRankList);
 
             // init 0,0
             this.cells[0][0] = new Score(Score.Type.empty, 0, 0, null, 0);
@@ -176,7 +176,10 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 Score score = scores.next();
                 if (score.type == Score.Type.match) {
                     //TODO: This needs adjusting for rank! Rank and coordinate are not mapped 1 to 1!
-                    Match match = cube.getMatch(score.y - 1, score.x - 1);
+                    int rank = score.x - 1;
+//                    int rank = verticesAsRankList.get(score.x - 1);
+                    Match match = cube.getMatch(score.y - 1, rank);
+                    System.out.println("match(" + (score.y - 1) + "," + rank + ")=" + match);
                     aligned.put(match.token, match.vertex);
                 }
             }
@@ -184,11 +187,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             merge(graph, tokens, aligned);
 
             updateTokenToVertexArray(tokens, witness);
-
-//            // TODO: remove this break!
-//            break;
-
-
         }
 
     }
@@ -196,6 +194,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
     private void printScoringTable(List<Integer> verticesAsRankList, List<Integer> tokensAsIndexList) {
         // print the scoring table for debugging reasons
         for (int y = 0; y < tokensAsIndexList.size(); y++) {
+            System.out.print("|");
             for (int x = 0; x < verticesAsRankList.size(); x++) {
                 Score cell = cells[y][x];
                 String value;
@@ -205,14 +204,48 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                     value = "" + cell.getGlobalScore();
                     if (cell.type == Score.Type.match) {
                         value += "M";
+                    } else {
+                        value += " ";
+                    }
+                    if (cell.getGlobalScore() > -1) {
+                        value = " " + value;
                     }
                 }
                 System.out.print(value + "|");
             }
             System.out.println();
-            System.out.println("----");
+            System.out.println("-");
         }
+        System.out.println();
     }
+
+    //    private void printScoringTable(List<Integer> verticesAsRankList, List<Integer> tokensAsIndexList) {
+//        // print the scoring table for debugging reasons
+//        for (int y = 0; y < tokensAsIndexList.size(); y++) {
+//            System.out.print("|");
+//            for (int x = 0; x < verticesAsRankList.size(); x++) {
+//                Score cell = cells[y][x];
+//                String value;
+//                if (cell == null) {
+//                    value = "unscored";
+//                } else {
+//                    value = "" + cell.getGlobalScore();
+//                    if (cell.type == Score.Type.match) {
+//                        value += "M";
+//                    } else {
+//                        value += " ";
+//                    }
+//                    if (cell.getGlobalScore() > -1) {
+//                        value = " " + value;
+//                    }
+//                }
+//                System.out.print(value + "|");
+//            }
+//            System.out.println();
+//            System.out.println("-");
+//        }
+//        System.out.println();
+//    }
 
     private void updateTokenToVertexArray(Iterable<Token> tokens, Witness witness) {
         // we need to update the token -> vertex map
@@ -279,11 +312,12 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
     }
 
     class Scorer {
-
         private final MatchCube matchCube;
+        private List<Integer> verticesAsRankList;
 
-        public Scorer(MatchCube matchCube) {
+        public Scorer(MatchCube matchCube, List<Integer> verticesAsRankList) {
             this.matchCube = matchCube;
+            this.verticesAsRankList = verticesAsRankList;
         }
 
         public Score gap(int x, int y, Score parent) {
@@ -292,8 +326,10 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         }
 
         public Score score(int x, int y, Score parent) {
-            //TODO: this needs to be mapped for rank! Coordinate and rank are not mapped one to one!
-            if (this.matchCube.hasMatch(y - 1, x - 1)) {
+//            int rank = verticesAsRankList.get(x - 1);
+            int rank = (x - 1);
+            System.out.println("hasMatch(" + (y - 1) + "," + rank + ")=" + this.matchCube.hasMatch(y - 1, rank));
+            if (this.matchCube.hasMatch(y - 1, rank)) {
                 return new Score(Score.Type.match, x, y, parent);
             }
             return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
