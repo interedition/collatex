@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
  * <p>
- * This class tries to combine ideas of the Java version of cox with the Python version of cx
+ * This class tries to combine ideas of the Java version of cx with the Python version of cx
  * It uses the TokenIndex (suffix array, lcp array, lcp intervals) that was first pioneered in the python version
  * But then it uses the TokenIndexToMatches 3d matches (cube) between the variant graph and the next witness,
  * using the token index.
@@ -30,20 +30,21 @@ import java.util.stream.IntStream;
  * For the Edit graph table and scorer code is used from the CSA branch (which is meant to deal with multiple
  * textual layers within one witness). The edit graph table and scorer were previously used in the Python version.
  * <p>
- * <p>
- * <p>
- * <p>
  * 1. Build a token index to find repeating patterns. Algorithm: Suffix Array, LCP array, LCP Intervals.
  * Present in the Java version of CX and in the Python version of CX. Class: TokenIndex
+ * <p>
  * 2. Given a Variant Graph and the next witness to align, build a cube of matches.
  * Present in the Java version of CX. Class: TokenIndexToMatches.
  * a. Needs to be improved a bit to not return legacy classes Island and Coordinate.
  * b. Duplicates need to be removed (horizontal (first match only) en vertical (multiple vertices)).
  * c. Needs to be ported to Python version.
+ * <p>
  * 3. A matrix/table for the edit operations needs to be created (work in progress).
- * 4. A need scorer needs to be created that prefers depth over size, and as much higher depth nodes as possible.
+ * <p>
+ * 4. A scorer needs to be created that prefers depth over size, and as much higher depth nodes as possible.
  * Think: histogram experiment. The current Java and Python version are suboptimal.
  * Java version does not have a Scorer. The Python one does, but filters the blocks too soon (on a global level).
+ * <p>
  * 5. Analysis: transposition detection
  */
 public class EditGraphAligner extends CollationAlgorithm.Base {
@@ -100,7 +101,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 LOG.log(Level.FINE, "{0} + {1}: Gather matches between variant graph and witness from token index", new Object[]{graph, witness});
             }
 
-            MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
 
 
             // now we can create the space for the edit graph.. using arrays and stuff
@@ -112,11 +112,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             List<Integer> verticesAsRankList = StreamUtil.stream(graph.vertices())//
                     .map(byVertex::get)//
                     .collect(Collectors.toList());
-//            List<Integer> verticesAsRankList = new ArrayList<>();
-//            for (VariantGraph.Vertex vertex : graph.vertices()) {
-//                int rank = variantGraphRanking.getByVertex().get(vertex);
-//                verticesAsRankList.add(rank);
-//            }
+
             // we leave the start vertex in (that is an extra position that is needed in the edit graph)
             // we remove the end vertex though
             verticesAsRankList.remove(verticesAsRankList.size() - 1);
@@ -124,10 +120,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             System.out.println("horizontal (graph): " + verticesAsRankList);
 
             // now the vertical stuff
-            List<Token> witnessTokens = new ArrayList<>();
-            for (Token t : tokens) {
-                witnessTokens.add(t);
-            }
+            List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
             List<Integer> tokensAsIndexList = new ArrayList<>();
             tokensAsIndexList.add(0);
             int counter = 1;
@@ -136,6 +129,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             System.out.println("vertical (next witness): " + tokensAsIndexList);
 
+            MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
             // code below is partly taken from the CSA branch.
             // init cells and scorer
             this.cells = new Score[tokensAsIndexList.size()][verticesAsRankList.size()];
