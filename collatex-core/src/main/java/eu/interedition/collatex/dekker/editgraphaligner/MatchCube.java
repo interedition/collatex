@@ -31,7 +31,7 @@ public class MatchCube {
         // apparently there are doubles in the coordinates This is caused by 1. longer islands -> only take
         // the first match, and 2. duplicate vertices, since one vertex can contain multiple tokens.
 
-        // convert the ste of Island into a map of matches with as
+        // convert the set of Island into a map of matches with as
         matches = new HashMap<>();
         for (Island i : allPossibleIslands) {
             Coordinate c = i.getLeftEnd();

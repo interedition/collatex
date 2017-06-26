@@ -90,7 +90,7 @@ class Scorer(object):
         return gap_penalty
 
     def prepare_witness(self, witness):
-        # this code can probably done more efficient, for now the main goal is to make it work
+        # this code can probably be done more efficiently, for now the main goal is to make it work
         block_witness = self._get_block_witness(witness)
         tokens_to_occurrences = self._build_tokens_to_occurrences(self.token_index, witness, block_witness)
         # NOTE: we do not have to store all tokens from the witness
