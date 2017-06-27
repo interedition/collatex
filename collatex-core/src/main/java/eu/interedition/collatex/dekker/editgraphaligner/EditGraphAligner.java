@@ -9,15 +9,16 @@ import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.max;
-import static java.util.Comparator.comparingInt;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.max;
+import static java.util.Comparator.comparingInt;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -103,20 +104,20 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
 
             // now we can create the space for the edit graph.. using arrays and stuff
-            // the vertical size is the number of vertices in the graph minus the start and end vertices
+            // the horizontal size is the number of ranks in the graph starting from 0
             // NOTE: The TokenIndexToMatches already does a graph ranking!
             VariantGraphRanking variantGraphRanking = VariantGraphRanking.of(graph);
             // oh wait there are more methods on the java VariantGraphRanking!
             Map<VariantGraph.Vertex, Integer> byVertex = variantGraphRanking.getByVertex();
-            List<Integer> verticesAsRankList = StreamUtil.stream(graph.vertices())//
+            List<Integer> variantGraphRanks = StreamUtil.stream(graph.vertices())//
                     .map(byVertex::get)//
+                    .distinct()//
                     .collect(Collectors.toList());
 
-            // we leave the start vertex in (that is an extra position that is needed in the edit graph)
-            // we remove the end vertex though
-            verticesAsRankList.remove(verticesAsRankList.size() - 1);
+            // we leave in the rank of the start vertex, but remove the rank of the end vertex
+            variantGraphRanks.remove(variantGraphRanks.size() - 1);
 
-            System.out.println("horizontal (graph): " + verticesAsRankList);
+            System.out.println("horizontal (graph): " + variantGraphRanks);
 
 
             // now the vertical stuff
@@ -132,14 +133,14 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
             // code below is partly taken from the CSA branch.
             // init cells and scorer
-            this.cells = new Score[tokensAsIndexList.size()][verticesAsRankList.size()];
-            Scorer scorer = new Scorer(cube, verticesAsRankList);
+            this.cells = new Score[tokensAsIndexList.size()][variantGraphRanks.size()];
+            Scorer scorer = new Scorer(cube);
 
             // init 0,0
             this.cells[0][0] = new Score(Score.Type.empty, 0, 0, null, 0);
 
             // fill the first row with gaps
-            IntStream.range(1, verticesAsRankList.size()).forEach(x -> {
+            IntStream.range(1, variantGraphRanks.size()).forEach(x -> {
                 int previousX = x - 1;
                 this.cells[0][x] = scorer.gap(x, 0, this.cells[0][previousX]);
             });
@@ -153,7 +154,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // fill the remaining cells
             // fill the rest of the cells in a  y by x fashion
             IntStream.range(1, tokensAsIndexList.size()).forEach(//
-                    y -> IntStream.range(1, verticesAsRankList.size()).forEach(
+                    y -> IntStream.range(1, variantGraphRanks.size()).forEach(
                             x -> {
                                 int previousY = y - 1;
                                 int previousX = x - 1;
@@ -165,7 +166,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                             }));
 
             // debug only
-            printScoringTable(verticesAsRankList, tokensAsIndexList);
+            printScoringTable(variantGraphRanks, tokensAsIndexList);
 
             // using the score iterator..
             // find all the matches
@@ -175,9 +176,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             while (scores.hasNext()) {
                 Score score = scores.next();
                 if (score.type == Score.Type.match) {
-                    //TODO: This needs adjusting for rank! Rank and coordinate are not mapped 1 to 1!
                     int rank = score.x - 1;
-//                    int rank = verticesAsRankList.get(score.x - 1);
                     Match match = cube.getMatch(score.y - 1, rank);
                     System.out.println("match(" + (score.y - 1) + "," + rank + ")=" + match);
                     aligned.put(match.token, match.vertex);
@@ -313,11 +312,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     class Scorer {
         private final MatchCube matchCube;
-        private List<Integer> verticesAsRankList;
 
-        public Scorer(MatchCube matchCube, List<Integer> verticesAsRankList) {
+        public Scorer(MatchCube matchCube) {
             this.matchCube = matchCube;
-            this.verticesAsRankList = verticesAsRankList;
         }
 
         public Score gap(int x, int y, Score parent) {
@@ -326,7 +323,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         }
 
         public Score score(int x, int y, Score parent) {
-//            int rank = verticesAsRankList.get(x - 1);
             int rank = (x - 1);
             System.out.println("hasMatch(" + (y - 1) + "," + rank + ")=" + this.matchCube.hasMatch(y - 1, rank));
             if (this.matchCube.hasMatch(y - 1, rank)) {
