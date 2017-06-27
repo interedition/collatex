@@ -4,13 +4,14 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
 import eu.interedition.collatex.simple.SimpleWitness;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import java.util.*;
+
+import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -21,8 +22,8 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     @Test
     public void testMWADavidBirnbaum() {
         final SimpleWitness[] w = createWitnesses(
-                "aaaa bbbb cccc dddd eeee ffff",
-                "aaaa bbbb eeex ffff"
+            "aaaa bbbb cccc dddd eeee ffff",
+            "aaaa bbbb eeex ffff"
         );
         EditGraphAligner aligner = new EditGraphAligner();
         VariantGraph g = new VariantGraph();
@@ -36,9 +37,9 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     @Test
     public void testMWADavidBirnbaum3Witnesses() {
         final SimpleWitness[] w = createWitnesses(
-                "aaaa bbbb cccc dddd eeee ffff",
-                "aaaa bbbb eeex ffff",
-                "aaaa bbbb cccc eeee ffff"
+            "aaaa bbbb cccc dddd eeee ffff",
+            "aaaa bbbb eeex ffff",
+            "aaaa bbbb cccc eeee ffff"
         );
         EditGraphAligner aligner = new EditGraphAligner();
         VariantGraph g = new VariantGraph();
@@ -53,10 +54,10 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     @Test
     public void testMWADavidBirnbaum4Witnesses() {
         final SimpleWitness[] w = createWitnesses(
-                "aaaa bbbb cccc dddd eeee ffff",
-                "aaaa bbbb eeex ffff",
-                "aaaa bbbb cccc eeee ffff",
-                "aaaa bbbb eeex dddd ffff"
+            "aaaa bbbb cccc dddd eeee ffff",
+            "aaaa bbbb eeex ffff",
+            "aaaa bbbb cccc eeee ffff",
+            "aaaa bbbb eeex dddd ffff"
         );
         EditGraphAligner aligner = new EditGraphAligner();
         VariantGraph g = new VariantGraph();
@@ -73,11 +74,11 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     @Test
     public void testMWADavidBirnbaum5Witnesses() {
         final SimpleWitness[] w = createWitnesses(
-                "aaaa bbbb cccc dddd eeee ffff",
-                "aaaa bbbb eeex ffff",
-                "aaaa bbbb cccc eeee ffff",
-                "aaaa bbbb eeex dddd ffff",
-                "aaa aaa aaa aaa aaa"
+            "aaaa bbbb cccc dddd eeee ffff",
+            "aaaa bbbb eeex ffff",
+            "aaaa bbbb cccc eeee ffff",
+            "aaaa bbbb eeex dddd ffff",
+            "aaa aaa aaa aaa aaa"
         );
         EditGraphAligner aligner = new EditGraphAligner();
         VariantGraph g = new VariantGraph();
@@ -115,10 +116,10 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     @Test
     public void testRankAdjustment() {
         final SimpleWitness[] w = createWitnesses(
-                "aaaa cccc dddd ffff",
-                "bbbb cccc eeee ffff",
+            "aaaa cccc dddd ffff",
+            "bbbb cccc eeee ffff",
 //                "aaaa cccc eeee ffff",
-                "bbbb gggg dddd ffff"
+            "bbbb gggg dddd ffff"
         );
         EditGraphAligner aligner = new EditGraphAligner();
         VariantGraph g = new VariantGraph();
@@ -132,9 +133,29 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
         showAlignmentTable(w, g);
     }
 
+    @Test
+    public void testDuplicatedTokenInWitness() {
+        final SimpleWitness[] w = createWitnesses(
+            "a",
+            "b",
+            "c",
+            "a a"
+        );
+        EditGraphAligner aligner = new EditGraphAligner();
+        VariantGraph g = new VariantGraph();
+        List<SimpleWitness> witnesses = new ArrayList<>();
+        witnesses.addAll(Arrays.asList(w));
+        aligner.collate(g, witnesses);
+        assertThat(g, graph(w[0]).aligned("a"));
+        assertThat(g, graph(w[1]).non_aligned("b"));
+        assertThat(g, graph(w[2]).non_aligned("c"));
+        assertThat(g, graph(w[3]).non_aligned("a").aligned("a"));
+        showAlignmentTable(w, g);
+    }
+
     private void showAlignmentTable(SimpleWitness[] w, VariantGraph g) {
         List<SortedMap<Witness, Set<Token>>> table = table(g);
-        for (SimpleWitness sw: w) {
+        for (SimpleWitness sw : w) {
             System.out.println(toString(table, sw));
         }
     }
