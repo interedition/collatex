@@ -22,7 +22,6 @@ package eu.interedition.collatex;
 import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.dekker.InspectableCollationAlgorithm;
 import eu.interedition.collatex.dekker.Match;
-import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -30,14 +29,16 @@ import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>

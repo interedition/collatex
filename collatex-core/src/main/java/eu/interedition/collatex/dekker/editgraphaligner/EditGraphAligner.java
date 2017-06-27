@@ -178,7 +178,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 if (score.type == Score.Type.match) {
                     int rank = score.x - 1;
                     Match match = cube.getMatch(score.y - 1, rank);
-                    System.out.println("match(" + (score.y - 1) + "," + rank + ")=" + match);
                     aligned.put(match.token, match.vertex);
                 }
             }
@@ -324,7 +323,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
         public Score score(int x, int y, Score parent) {
             int rank = (x - 1);
-            System.out.println("hasMatch(" + (y - 1) + "," + rank + ")=" + this.matchCube.hasMatch(y - 1, rank));
             if (this.matchCube.hasMatch(y - 1, rank)) {
                 return new Score(Score.Type.match, x, y, parent);
             }
