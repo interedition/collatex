@@ -1,5 +1,10 @@
 package eu.interedition.collatex.dekker.editgraphaligner;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.max;
+import static java.util.Comparator.comparingInt;
+
 import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -14,11 +19,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.max;
-import static java.util.Comparator.comparingInt;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -130,7 +130,8 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             System.out.println("vertical (next witness): " + tokensAsIndexList);
 
-            MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
+            MatchCube cube = new MatchCube(tokens, variantGraphRanking, comparator);
+            // MatchCube0 cube = new MatchCube0(tokens, tokenIndex, vertex_array, graph);
             // code below is partly taken from the CSA branch.
             // init cells and scorer
             this.cells = new Score[tokensAsIndexList.size()][variantGraphRanks.size()];
