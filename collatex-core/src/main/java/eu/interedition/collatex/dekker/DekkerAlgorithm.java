@@ -4,7 +4,9 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.dekker.editgraphaligner.EditGraphAligner;
 import eu.interedition.collatex.dekker.island.Island;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by bramb on 26-6-2017.
@@ -19,25 +21,25 @@ public class DekkerAlgorithm extends EditGraphAligner implements InspectableColl
     }
 
     public Set<Island> getAllPossibleIslands() {
-        return new HashSet<>();
+        throw new UnsupportedOperationException();
     }
 
     public List<Island> getPreferredIslands() {
-        return new ArrayList<>();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<List<Match>> getPhraseMatches() {
-        return new ArrayList<>();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<List<Match>> getTranspositions() {
-        return new ArrayList<>();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setMergeTranspositions(boolean b) {
-
+        throw new UnsupportedOperationException();
     }
 }
