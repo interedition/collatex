@@ -63,7 +63,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         this.comparator = comparator;
     }
 
-
     @Override
     public void collate(VariantGraph graph, List<? extends Iterable<Token>> witnesses) {
         // phase 1: matching phase
@@ -80,9 +79,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
         for (Iterable<Token> tokens : witnesses) {
             final Witness witness = StreamUtil.stream(tokens)
-                    .findFirst()
-                    .map(Token::getWitness)
-                    .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+                .findFirst()
+                .map(Token::getWitness)
+                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
             // first witness has a fast path
             if (firstWitness) {
@@ -110,18 +109,20 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // oh wait there are more methods on the java VariantGraphRanking!
             Map<VariantGraph.Vertex, Integer> byVertex = variantGraphRanking.getByVertex();
             List<Integer> variantGraphRanks = StreamUtil.stream(graph.vertices())//
-                    .map(byVertex::get)//
-                    .distinct()//
-                    .collect(Collectors.toList());
+                .map(byVertex::get)//
+                .distinct()//
+                .collect(Collectors.toList());
 
             // we leave in the rank of the start vertex, but remove the rank of the end vertex
             variantGraphRanks.remove(variantGraphRanks.size() - 1);
 
             System.out.println("horizontal (graph): " + variantGraphRanks);
 
+            Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank = variantGraphRanking.getByRank();
+
 
             // now the vertical stuff
-//            List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
+            List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
             List<Integer> tokensAsIndexList = new ArrayList<>();
             tokensAsIndexList.add(0);
             int counter = 1;
@@ -130,7 +131,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             System.out.println("vertical (next witness): " + tokensAsIndexList);
 
-             MatchCube cube = new MatchCube(tokens, variantGraphRanking, comparator);
+            MatchCube cube = new MatchCube(tokens, variantGraphRanking, comparator);
 //            MatchCube cube = new MatchCube(tokens, tokenIndex, vertex_array, graph);
             // code below is partly taken from the CSA branch.
             // init cells and scorer
@@ -153,18 +154,23 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             });
 
             // fill the remaining cells
-            // fill the rest of the cells in a  y by x fashion
+            // fill the rest of the cells in a y by x fashion
             IntStream.range(1, tokensAsIndexList.size()).forEach(//
-                    y -> IntStream.range(1, variantGraphRanks.size()).forEach(
-                            x -> {
-                                int previousY = y - 1;
-                                int previousX = x - 1;
-                                Score upperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
-                                Score left = scorer.gap(x, y, this.cells[y][previousX]);
-                                Score upper = scorer.gap(x, y, this.cells[previousY][x]);
-                                Score max = max(asList(upperLeft, left, upper), comparingInt(score -> score.globalScore));
-                                this.cells[y][x] = max;
-                            }));
+                y -> IntStream.range(1, variantGraphRanks.size()).forEach(
+                    x -> {
+                        Token witnessToken = witnessTokens.get(y - 1);
+                        int previousY = y - 1;
+                        int previousX = x - 1;
+                        Score fromUpperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
+                        Score fromLeft = scorer.gap(x, y, this.cells[y][previousX]);
+                        Score fromUpper = calculateFromUpper(vertexSetByRank, scorer, y, x, previousY, witnessToken);
+                        Score max = max(asList(fromUpperLeft, fromLeft, fromUpper), comparingInt(score -> score.globalScore));
+                        this.cells[y][x] = max;
+                        if (max.type.equals(Score.Type.match)) {
+                            // remove the matched token from vertexSetByRank so it won't be matched again.
+                            vertexSetByRank.get(x).removeIf(t -> comparator.compare(witnessToken, t.tokens().iterator().next()) == 0);
+                        }
+                    }));
 
             // debug only
             printScoringTable(variantGraphRanks, tokensAsIndexList);
@@ -187,7 +193,19 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             updateTokenToVertexArray(tokens, witness);
         }
+    }
 
+    private Score calculateFromUpper(Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank, Scorer scorer, int y, int x, int previousY, Token witnessToken) {
+        Score fromUpperAsGap = scorer.gap(x, y, this.cells[previousY][x]);
+        boolean canMatch = vertexSetByRank.get(x).stream()//
+            .map(v -> v.tokens().iterator().next())//
+            .anyMatch(t -> comparator.compare(t, witnessToken) == 0);
+        if (canMatch) {
+            Score fromUpperAsScore = scorer.score(x, y, this.cells[previousY][x]);
+            return fromUpperAsScore.type.equals(Score.Type.match) ? fromUpperAsScore : fromUpperAsGap;
+        } else {
+            return fromUpperAsGap;
+        }
     }
 
     private void printScoringTable(List<Integer> verticesAsRankList, List<Integer> tokensAsIndexList) {
@@ -325,7 +343,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         public Score score(int x, int y, Score parent) {
             int rank = (x - 1);
             if (this.matchCube.hasMatch(y - 1, rank)) {
-                return new Score(Score.Type.match, x, y, parent);
+                return new Score(Score.Type.match, x, y, parent, parent.globalScore + 1);
             }
             return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
         }
