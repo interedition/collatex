@@ -121,7 +121,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
 
             // now the vertical stuff
-            List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
+//            List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
             List<Integer> tokensAsIndexList = new ArrayList<>();
             tokensAsIndexList.add(0);
             int counter = 1;

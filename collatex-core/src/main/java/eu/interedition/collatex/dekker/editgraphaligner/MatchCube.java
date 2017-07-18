@@ -25,13 +25,34 @@ public class MatchCube {
     private final Map<MatchCoordinate, Match> matches;
 
     public MatchCube(TokenIndex tokenIndex, VariantGraph.Vertex[] vertexArray, VariantGraph graph, Iterable<Token> tokens) {
+        matches = new HashMap<>();
+        calculateMatches(tokenIndex, vertexArray, graph, tokens);
+//        calculateMatchesLegacy(tokenIndex, vertexArray, graph, tokens);
+    }
+
+    private void calculateMatches(TokenIndex tokenIndex, VariantGraph.Vertex[] vertexArray, VariantGraph graph, Iterable<Token> tokens) {
         // for now we build on the soon to be legacy TokenIndexToMatches class.
         Set<Island> allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertexArray, graph, tokens);
         // apparently there are doubles in the coordinates This is caused by 1. longer islands -> only take
         // the first match, and 2. duplicate vertices, since one vertex can contain multiple tokens.
 
         // convert the set of Island into a map of matches with as
-        matches = new HashMap<>();
+        for (Island i : allPossibleIslands) {
+            Coordinate c = i.getLeftEnd();
+            // System.out.println("y:"+c.row+", x:"+ c.column+":"+c.match.token);
+            // we put the matches in a (y, x) fashion.
+            MatchCoordinate coordinate = new MatchCoordinate(c.row, c.column);
+            matches.put(coordinate, c.match);
+        }
+    }
+
+    private void calculateMatchesLegacy(TokenIndex tokenIndex, VariantGraph.Vertex[] vertexArray, VariantGraph graph, Iterable<Token> tokens) {
+        // for now we build on the soon to be legacy TokenIndexToMatches class.
+        Set<Island> allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertexArray, graph, tokens);
+        // apparently there are doubles in the coordinates This is caused by 1. longer islands -> only take
+        // the first match, and 2. duplicate vertices, since one vertex can contain multiple tokens.
+
+        // convert the set of Island into a map of matches with as
         for (Island i : allPossibleIslands) {
             Coordinate c = i.getLeftEnd();
             // System.out.println("y:"+c.row+", x:"+ c.column+":"+c.match.token);
