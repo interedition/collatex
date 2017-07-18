@@ -130,7 +130,8 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             System.out.println("vertical (next witness): " + tokensAsIndexList);
 
-            MatchCube cube = new MatchCube(tokenIndex, vertex_array, graph, tokens);
+             MatchCube cube = new MatchCube(tokens, variantGraphRanking, comparator);
+//            MatchCube cube = new MatchCube(tokens, tokenIndex, vertex_array, graph);
             // code below is partly taken from the CSA branch.
             // init cells and scorer
             this.cells = new Score[tokensAsIndexList.size()][variantGraphRanks.size()];
