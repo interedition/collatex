@@ -4,13 +4,14 @@ import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
 import eu.interedition.collatex.simple.SimpleWitness;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import java.util.*;
+
+import static eu.interedition.collatex.dekker.token_index.VariantGraphMatcher.graph;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -216,19 +217,51 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     assertThat(g, graph(w[2]).aligned("a b"));
   }
 
-  @Test
-  public void test7() {
-    final SimpleWitness[] w = createWitnesses(
-        "a x",
-        "b y",
-        "a b"
-    );
-    VariantGraph g = new VariantGraph();
-    align(g, w);
-    assertThat(g, graph(w[0]).aligned("a").non_aligned("x"));
-    assertThat(g, graph(w[1]).aligned("b").non_aligned("y"));
-    assertThat(g, graph(w[2]).aligned("a b"));
-  }
+    @Test
+    public void test7() {
+        final SimpleWitness[] w = createWitnesses(
+            "a x",
+            "b y",
+            "a b"
+        );
+        VariantGraph g = new VariantGraph();
+        align(g, w);
+        assertThat(g, graph(w[0]).aligned("a").non_aligned("x"));
+        assertThat(g, graph(w[1]).aligned("b").non_aligned("y"));
+        assertThat(g, graph(w[2]).aligned("a b"));
+    }
+
+    @Test
+    public void test8() {
+        final SimpleWitness[] w = createWitnesses(
+            "a",
+            "b",
+            "c",
+            "a b c"
+        );
+        VariantGraph g = new VariantGraph();
+        align(g, w);
+        assertThat(g, graph(w[0]).aligned("a"));
+        assertThat(g, graph(w[1]).aligned("b"));
+        assertThat(g, graph(w[2]).aligned("c"));
+        assertThat(g, graph(w[3]).aligned("a b c"));
+    }
+
+    @Test
+    public void test9() {
+        final SimpleWitness[] w = createWitnesses(
+            "a",
+            "b",
+            "c",
+            "a b c a b c"
+        );
+        VariantGraph g = new VariantGraph();
+        align(g, w);
+        assertThat(g, graph(w[0]).aligned("a"));
+        assertThat(g, graph(w[1]).aligned("b"));
+        assertThat(g, graph(w[2]).aligned("c"));
+        assertThat(g, graph(w[3]).aligned("a b c").non_aligned("a b c"));
+    }
 
   private void align(VariantGraph g, SimpleWitness[] w) {
     EditGraphAligner aligner = new EditGraphAligner();
