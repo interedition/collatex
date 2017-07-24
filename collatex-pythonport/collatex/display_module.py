@@ -6,7 +6,9 @@ Created on Nov 13, 2014
 from collections import defaultdict
 from textwrap import fill
 from collatex.HTML import Table, TableRow, TableCell
-from collatex.core_classes import create_table_visualization
+from collatex.core_classes import create_table_visualization, VariantGraphRanking
+import pygraphviz
+import re
 
 # optionally load the IPython dependencies
 try:
@@ -42,69 +44,47 @@ def display_alignment_table_as_HTML(at):
     html = prettytable.get_html_string(formatting=True)
     return display(HTML(html))
 
+
 # visualize the variant graph into SVG format
 # from networkx.drawing.nx_agraph import to_agraph
-def display_variant_graph_as_SVG(graph,svg_output,output):
-        # create new Digraph
-        dot = Digraph(format="svg", graph_attr={'rankdir': 'LR'})
-        # add nodes
-        counter = 0
-        mapping = {}
-        for n in graph.graph.nodes():
-            counter += 1
-            mapping[n] = str(counter)
-            # dot.node(str(n), nodedata["label"])
-            if output == "svg_simple":
-                label = n.label
-                if label == '':
-                    label = '#'
-                dot.node( mapping[n], label )
-            else:
-                readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'><B>Sigla</B></TD></TR>"]
-                reverseDict = defaultdict(list)
-                for key,value in n.tokens.items():
-                    reverseDict["".join(item.token_data["t"] for item in value)].append(key)
-                for key,value in sorted(reverseDict.items()):
-                    reading = ("<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(key,', '.join(value))
-                    readings.append(reading)
-                dot.node(mapping[n], '<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>',{'shape': 'box'})
-        # add edges
-        for u,v,edgedata in graph.graph.edges_iter(data=True):
-            dot.edge(str(mapping[u]), str(mapping[v]), edgedata["label"])
-        # render the dot graph to SVG
-        # Note: this creates a file
-        if svg_output:
-            svg = dot.render(svg_output,'svg_output')
+def display_variant_graph_as_svg(graph, output):
+    a = pygraphviz.AGraph(directed=True, rankdir='LR')
+    counter = 0
+    mapping = {}
+    ranking = VariantGraphRanking.of(graph)
+    for n in graph.graph.nodes():
+        print(n)
+        counter += 1
+        mapping[n] = counter
+        if output == "svg_simple":
+            label = n.label
+            if label == '':
+                label = '#'
+            a.add_node(mapping[n], label=label)
         else:
-            svg = dot.render()
-        # display using the IPython SVG module
-        return display(SVG(svg))
+            rank = ranking.byVertex[n]
+            readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(
+                rank) + "</TD></TR>"]
+            reverseDict = defaultdict(list)
+            for key, value in n.tokens.items():
+                reverseDict["".join(
+                    re.sub(r'>', r'&gt;', re.sub(r'<', r'&lt;', item.token_data["t"])) for item in value)].append(
+                    key)
+            for key, value in sorted(reverseDict.items()):
+                reading = (
+                "<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(
+                    key, ', '.join(value))
+                readings.append(reading)
+            a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
 
-
-# def in_ipython():
-#     try:
-#         get_ipython().config  # @UndefinedVariable
-# #         print('Called by IPython.')
-#         return True
-#     except:
-#         return False
-
-
-
-
-
-# display alignment table
-#     if in_ipython():
-#         return display(JSON(json))
-#     if in_ipython():
-#         print(json)
-#         return
-
-
-# DISPLAY PART OF THE VARIANT_GRAPH IN SVG!
-#     and in_ipython:
-#         # visualize the variant graph into SVG format
-#         from networkx.drawing.nx_agraph import to_agraph
-#         agraph = to_agraph(graph.graph)
-#         svg = agraph.draw(format="svg", prog="dot", args="-Grankdir=LR -Gid=VariantGraph")
-#         return display(SVG(svg))
+    # add edges
+    for u,v,edgedata in graph.graph.edges_iter(data=True):
+        a.add_edge(mapping[u], mapping[v], edgedata["label"])
+    for key, value in ranking.byRank.items():
+        a.add_subgraph([mapping[item] for item in value], rank='same')
+    svg = a.draw(prog='dot', format='svg')
+    # diagnostic, not for production
+    dot = a.draw(prog='dot')
+    print(dot.decode(encoding='utf-8'))
+    # display using the IPython SVG module
+    return display(SVG(svg))
