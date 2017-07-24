@@ -3,6 +3,12 @@
 History
 -------
 
+2.1.3rc (2017-07-24)
+++++++++++++++++++++
+* Added the new SVG renderer which uses the pygraphviz bindings instead of the graphviz bindings.
+* Thanks to David J. Birnbaum for the patch.
+* Fixed the CalledProcessError bug that the previous renderer caused when used with Python 3.
+
 2.1.2 (2017-01-10)
 ++++++++++++++++++
 * Added the ability to use output="svg_simple" next to output="svg". The "svg_simple" option gets you the n-property
