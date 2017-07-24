@@ -10,7 +10,7 @@ from collatex.exceptions import SegmentationError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
-from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
+from collatex.display_module import display_alignment_table_as_html, visualize_table_vertically_with_colors
 from collatex.display_module import display_variant_graph_as_svg
 from collatex.near_matching import process_rank, Scheduler
 
@@ -82,9 +82,9 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if output == "json":
         return export_alignment_table_as_json(table)
     if output == "html":
-        return display_alignment_table_as_HTML(table)
+        return display_alignment_table_as_html(table)
     if output == "html2":
-        return visualizeTableVerticallyWithColors(table, collation)
+        return visualize_table_vertically_with_colors(table, collation)
     if output == "table":
         return table
     if output == "xml":
