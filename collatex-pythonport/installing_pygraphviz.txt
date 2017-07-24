@@ -1,0 +1,29 @@
+
+Installing Graphviz and PyGraphviz bindings on MacOs.
+
+Option 1)
+
+At the time of writing:
+Graphviz version 2.38
+PyGraphviz version 1.3.1
+
+$ conda install -c omnia pygraphviz
+
+Option 2)
+
+At the time of writing:
+Graphviz version 2.40.1
+PyGraphviz version 1.3.1
+
+$ brew install graphviz
+
+$ brew info graphviz
+
+$ export CPATH=/usr/local/Cellar/graphviz/2.40.1/include/
+$ export LIBRARY_PATH=/usr/local/Cellar/graphviz/2.40.1/lib
+
+$ pip install pygraphviz
+
+
+
+
