@@ -1,8 +1,12 @@
 var testCollateX = {
+//  "witnesses": [
+//    {"id":"W1", "content":"In windows, a new line is: \\\\r\\\\n:\r\n.Lorem ipsum."},
+//    {"id":"W2", "content":"In linux, a new line is: \\\\n:\n.Lorem ipsum."},
+//    {"id":"W3", "content":"In mac, a new line is: \\\\r:\r.Lorem ipsum."}
+//  ],
   "witnesses": [
-    {"id":"W1", "content":"In windows, a new line is: \\\\r\\\\n:\r\n.Lorem ipsum."},
-    {"id":"W2", "content":"In linux, a new line is: \\\\n:\n.Lorem ipsum."},
-    {"id":"W3", "content":"In mac, a new line is: \\\\r:\r.Lorem ipsum."}
+    {"id":"W1", "content":"This morning the cat observed little birds in the trees."},
+    {"id":"W2", "content":"The cat was observing birds in the little trees this morning, it observed birds for two hours."}
   ],
   "algorithm":"dekker",
   "tokenComparator":
