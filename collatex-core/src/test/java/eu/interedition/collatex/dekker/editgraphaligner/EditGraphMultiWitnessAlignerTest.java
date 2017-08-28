@@ -5,6 +5,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -262,6 +263,18 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
         assertThat(g, graph(w[2]).aligned("c"));
         assertThat(g, graph(w[3]).aligned("a b c").non_aligned("a b c"));
     }
+
+  @Ignore @Test
+  public void test10() {
+    final SimpleWitness[] w = createWitnesses(
+        "a b a b c d a b d",
+        "a b c d"
+    );
+    VariantGraph g = new VariantGraph();
+    align(g, w);
+    assertThat(g, graph(w[0]).non_aligned("a b").aligned("a b c d").non_aligned("a b d"));
+    assertThat(g, graph(w[1]).aligned("a b c d"));
+  }
 
   private void align(VariantGraph g, SimpleWitness[] w) {
     EditGraphAligner aligner = new EditGraphAligner();

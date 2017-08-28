@@ -120,7 +120,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank = variantGraphRanking.getByRank();
 
-
             // now the vertical stuff
             List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
             List<Integer> tokensAsIndexList = new ArrayList<>();
@@ -131,7 +130,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             }
             System.out.println("vertical (next witness): " + tokensAsIndexList);
 
-            MatchCube cube = new MatchCube(tokens, variantGraphRanking, comparator);
+            MatchCube cube = new MatchCube(tokenIndex, tokens, vertex_array, variantGraphRanking);
 //            MatchCube cube = new MatchCube(tokens, tokenIndex, vertex_array, graph);
             // code below is partly taken from the CSA branch.
             // init cells and scorer

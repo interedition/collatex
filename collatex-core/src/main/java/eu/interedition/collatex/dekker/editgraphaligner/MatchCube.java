@@ -1,14 +1,22 @@
 package eu.interedition.collatex.dekker.editgraphaligner;
 
 import eu.interedition.collatex.Token;
+import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Match;
+import eu.interedition.collatex.dekker.island.Coordinate;
+import eu.interedition.collatex.dekker.island.Island;
+import eu.interedition.collatex.dekker.token_index.Block;
+import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static eu.interedition.collatex.util.StreamUtil.parallelStream;
 import static eu.interedition.collatex.util.StreamUtil.stream;
@@ -20,62 +28,47 @@ import static eu.interedition.collatex.util.StreamUtil.stream;
  */
 public class MatchCube {
     private final Map<MatchCoordinate, Match> matches = new HashMap<>();
-    private final Comparator<Token> comparator;
 
-//    @Deprecated
-//    public MatchCube(Iterable<Token> tokens, //
-//            TokenIndex tokenIndex, //
-//            VariantGraph.Vertex[] vertexArray, //
-//            VariantGraph graph) {
-//        comparator = null;
-//
-//        Set<Island> allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertexArray, graph, tokens);
-//        // apparently there are doubles in the coordinates This is caused by 1. longer islands -> only take
-//        // the first match, and 2. duplicate vertices, since one vertex can contain multiple tokens.
-//
-//        // convert the set of Island into a map of matches with as
-//        for (Island i : allPossibleIslands) {
-//            Coordinate c = i.getLeftEnd();
-//            // System.out.println("y:"+c.row+", x:"+ c.column+":"+c.match.token);
-//            // we put the matches in a (y, x) fashion.
-//            MatchCoordinate coordinate = new MatchCoordinate(c.row, c.column);
-//            matches.put(coordinate, c.match);
-//        }
-//    }
+    public MatchCube(TokenIndex tokenIndex, //
+                     Iterable<Token> witnessTokens,//
+                     VariantGraph.Vertex[] vertex_array, //
+                     VariantGraphRanking variantGraphRanking) {
 
-    public MatchCube(Iterable<Token> tokens, //
-                     VariantGraphRanking variantGraphRanking, //
-                     Comparator<Token> comparator) {
-
-        this.comparator = comparator;
-
-        AtomicInteger witnessTokenCounter = new AtomicInteger(0);
-        stream(tokens).forEach(token -> {
-
-            int tokenIndex = witnessTokenCounter.getAndIncrement();
-            AtomicInteger rank = new AtomicInteger(-1);
-            stream(variantGraphRanking).forEach(vertexSet -> {
-
-                int vgRank = rank.getAndIncrement();
-                parallelStream(vertexSet)//
-                    .filter(this::hasTokens)//
-                    .filter(vertex -> matches(vertex, token))//
-                    .forEach(vertex -> {
-                        MatchCoordinate coordinate = new MatchCoordinate(tokenIndex, vgRank);
-                        Match match = new Match(vertex, token);
-                        matches.put(coordinate, match);
-                    });
-            });
-        });
+        Witness witness = witnessTokens.iterator().next().getWitness();
+        int startTokenPositionForWitness = tokenIndex.getStartTokenPositionForWitness(witness);
+        List<Block.Instance> instances = tokenIndex.getBlockInstancesForWitness(witness);
+        for (Block.Instance witnessInstance : instances) {
+            // System.out.println("Debug creating matches for witness block instance: "+witnessInstance);
+            // for every instance of a block in the witness we need to fetch the corresponding graph instances of the block
+            // calculate graph block instances
+            // fetch block
+            Block block = witnessInstance.block;
+            List<Block.Instance> allInstances = block.getAllInstances();
+            List<Block.Instance> graphInstances = allInstances.stream()//
+                .filter(instance -> instance.start_token < startTokenPositionForWitness)//
+                .collect(Collectors.toList());
+            // now for every graph block instance we have to create matches
+            for (Block.Instance graphInstance : graphInstances) {
+                int graph_start_token = graphInstance.start_token;
+                for (int i = 0; i < block.length; i++) {
+                    VariantGraph.Vertex v = vertex_array[graph_start_token + i];
+                    if (v == null) {
+                        throw new RuntimeException("Vertex is null for token \"+graph_start_token+i+\" that is supposed to be mapped to a vertex in the graph!");
+                    }
+                    int column = variantGraphRanking.apply(v) - 1;
+                    int witnessStartToken = witnessInstance.start_token + i;
+                    int row = witnessStartToken - startTokenPositionForWitness;
+                    Token token = tokenIndex.token_array[witnessStartToken];
+                    Match match = new Match(v, token);
+                    MatchCoordinate coordinate = new MatchCoordinate(row, column);
+                    matches.put(coordinate, match);
+                }
+            }
+        }
     }
 
     private boolean hasTokens(Vertex vertex) {
         return !vertex.tokens().isEmpty();
-    }
-
-    private boolean matches(Vertex vertex, Token token) {
-        Token vertexToken = vertex.tokens().iterator().next();
-        return comparator.compare(vertexToken, token) == 0;
     }
 
     public boolean hasMatch(int y, int x) {
