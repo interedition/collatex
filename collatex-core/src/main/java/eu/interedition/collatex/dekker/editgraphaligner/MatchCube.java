@@ -5,25 +5,18 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.VariantGraph.Vertex;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Match;
-import eu.interedition.collatex.dekker.island.Coordinate;
-import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.dekker.token_index.Block;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static eu.interedition.collatex.util.StreamUtil.parallelStream;
-import static eu.interedition.collatex.util.StreamUtil.stream;
 
 /**
  * Created by Ronald Haentjens Dekker on 08/01/17.
- *
+ * <p>
  * This class builds a cube of matches, given a VariantGraphRanking, a TokenComparator and the next witness.
  */
 public class MatchCube {
@@ -53,14 +46,14 @@ public class MatchCube {
                 for (int i = 0; i < block.length; i++) {
                     VariantGraph.Vertex v = vertex_array[graph_start_token + i];
                     if (v == null) {
-                        throw new RuntimeException("Vertex is null for token \"+graph_start_token+i+\" that is supposed to be mapped to a vertex in the graph!");
+                        throw new RuntimeException("Vertex is null for token \"" + graph_start_token + i + "\" that is supposed to be mapped to a vertex in the graph!");
                     }
-                    int column = variantGraphRanking.apply(v) - 1;
+                    int rank = variantGraphRanking.apply(v) - 1;
                     int witnessStartToken = witnessInstance.start_token + i;
                     int row = witnessStartToken - startTokenPositionForWitness;
                     Token token = tokenIndex.token_array[witnessStartToken];
                     Match match = new Match(v, token);
-                    MatchCoordinate coordinate = new MatchCoordinate(row, column);
+                    MatchCoordinate coordinate = new MatchCoordinate(row, rank);
                     matches.put(coordinate, match);
                 }
             }

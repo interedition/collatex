@@ -116,7 +116,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // we leave in the rank of the start vertex, but remove the rank of the end vertex
             variantGraphRanks.remove(variantGraphRanks.size() - 1);
 
-            System.out.println("horizontal (graph): " + variantGraphRanks);
+            System.out.println("horizontal (graph, rank): " + variantGraphRanks);
 
             Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank = variantGraphRanking.getByRank();
 
@@ -128,7 +128,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             for (Token t : tokens) {
                 tokensAsIndexList.add(counter++);
             }
-            System.out.println("vertical (next witness): " + tokensAsIndexList);
+            System.out.println("vertical (next witness, token index): " + tokensAsIndexList);
 
             MatchCube cube = new MatchCube(tokenIndex, tokens, vertex_array, variantGraphRanking);
 //            MatchCube cube = new MatchCube(tokens, tokenIndex, vertex_array, graph);
@@ -162,7 +162,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                         int previousX = x - 1;
                         Score fromUpperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
                         Score fromLeft = scorer.gap(x, y, this.cells[y][previousX]);
-                        Score fromUpper = calculateFromUpper(vertexSetByRank, scorer, y, x, previousY, witnessToken);
+                        Score fromUpper = calculateFromUpper(vertexSetByRank, scorer, y, x, previousY, witnessToken, cube);
                         Score max = max(asList(fromUpperLeft, fromLeft, fromUpper), comparingInt(score -> score.globalScore));
                         this.cells[y][x] = max;
                         if (max.type.equals(Score.Type.match)) {
@@ -194,8 +194,10 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         }
     }
 
-    private Score calculateFromUpper(Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank, Scorer scorer, int y, int x, int previousY, Token witnessToken) {
+    private Score calculateFromUpper(Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank, Scorer scorer, int y, int x, int previousY, Token witnessToken, MatchCube matchCube) {
         Score fromUpperAsGap = scorer.gap(x, y, this.cells[previousY][x]);
+//        boolean canMatch = matchCube.hasMatch(previousY, x);
+
         boolean canMatch = vertexSetByRank.get(x).stream()//
             .map(v -> v.tokens().iterator().next())//
             .anyMatch(t -> comparator.compare(t, witnessToken) == 0);
