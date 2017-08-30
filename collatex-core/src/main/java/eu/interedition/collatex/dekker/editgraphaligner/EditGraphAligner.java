@@ -165,10 +165,10 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                         Score fromUpper = calculateFromUpper(vertexSetByRank, scorer, y, x, previousY, witnessToken, cube);
                         Score max = max(asList(fromUpperLeft, fromLeft, fromUpper), comparingInt(score -> score.globalScore));
                         this.cells[y][x] = max;
-                        if (max.type.equals(Score.Type.match)) {
-                            // remove the matched token from vertexSetByRank so it won't be matched again.
-                            vertexSetByRank.get(x).removeIf(t -> comparator.compare(witnessToken, t.tokens().iterator().next()) == 0);
-                        }
+//                        if (max.type.equals(Score.Type.match)) {
+//                            // remove the matched token from vertexSetByRank so it won't be matched again.
+//                            vertexSetByRank.get(x).removeIf(t -> comparator.compare(witnessToken, t.tokens().iterator().next()) == 0);
+//                        }
                     }));
 
             // debug only
@@ -196,11 +196,14 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     private Score calculateFromUpper(Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank, Scorer scorer, int y, int x, int previousY, Token witnessToken, MatchCube matchCube) {
         Score fromUpperAsGap = scorer.gap(x, y, this.cells[previousY][x]);
-//        boolean canMatch = matchCube.hasMatch(previousY, x);
-
-        boolean canMatch = vertexSetByRank.get(x).stream()//
-            .map(v -> v.tokens().iterator().next())//
-            .anyMatch(t -> comparator.compare(t, witnessToken) == 0);
+        boolean canMatch = matchCube.hasMatch(previousY-1, x-1);
+//
+//        boolean canMatch1 = vertexSetByRank.get(x).stream()//
+//            .map(v -> v.tokens().iterator().next())//
+//            .anyMatch(t -> comparator.compare(t, witnessToken) == 0);
+//        if (canMatch!=canMatch1){
+//            System.err.println("discrepancy for x="+x+", y="+y+", should be "+canMatch1);
+//        }
         if (canMatch) {
             Score fromUpperAsScore = scorer.score(x, y, this.cells[previousY][x]);
             return fromUpperAsScore.type.equals(Score.Type.match) ? fromUpperAsScore : fromUpperAsGap;
