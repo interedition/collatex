@@ -264,7 +264,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     @Override
     public void collate(VariantGraph against, Iterable<Token> witness) {
-
+      collate(against, Arrays.asList(witness));
     }
 
     public static class Score {
