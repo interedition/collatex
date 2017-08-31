@@ -65,14 +65,22 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
     @Override
     public void collate(VariantGraph graph, List<? extends Iterable<Token>> witnesses) {
         // phase 1: matching phase
+        match(witnesses);
+
+        // phase 2: alignment phase
+        align(graph, witnesses);
+    }
+
+    private void match(List<? extends Iterable<Token>> witnesses) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Building token index from the tokens of all witnesses");
         }
 
         this.tokenIndex = new TokenIndex(comparator, witnesses);
         tokenIndex.prepare();
+    }
 
-        // phase 2: alignment phase
+    private void align(VariantGraph graph, List<? extends Iterable<Token>> witnesses) {
         this.vertex_array = new VariantGraph.Vertex[tokenIndex.token_array.length];
         boolean firstWitness = true;
 
@@ -100,12 +108,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
                 LOG.log(Level.FINE, "{0} + {1}: Gather matches between variant graph and witness from token index", new Object[]{graph, witness});
             }
 
-
             // now we can create the space for the edit graph.. using arrays and stuff
             // the horizontal size is the number of ranks in the graph starting from 0
-            // NOTE: The TokenIndexToMatches already does a graph ranking!
             VariantGraphRanking variantGraphRanking = VariantGraphRanking.of(graph);
-            // oh wait there are more methods on the java VariantGraphRanking!
             Map<VariantGraph.Vertex, Integer> byVertex = variantGraphRanking.getByVertex();
             List<Integer> variantGraphRanks = StreamUtil.stream(graph.vertices())//
                 .map(byVertex::get)//
@@ -117,7 +122,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             System.out.println("horizontal (graph, rank): " + variantGraphRanks);
 
-            Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank = variantGraphRanking.getByRank();
+//            Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank = variantGraphRanking.getByRank();
 
             // now the vertical stuff
             List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
@@ -130,67 +135,74 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             System.out.println("vertical (next witness, token index): " + tokensAsIndexList);
 
             MatchCube cube = new MatchCube(tokenIndex, tokens, vertex_array, variantGraphRanking);
-//            MatchCube cube = new MatchCube(tokens, tokenIndex, vertex_array, graph);
-            // code below is partly taken from the CSA branch.
-            // init cells and scorer
-            this.cells = new Score[tokensAsIndexList.size()][variantGraphRanks.size()];
-            Scorer scorer = new Scorer(cube);
-
-            // init 0,0
-            this.cells[0][0] = new Score(Score.Type.empty, 0, 0, null, 0);
-
-            // fill the first row with gaps
-            IntStream.range(1, variantGraphRanks.size()).forEach(x -> {
-                int previousX = x - 1;
-                this.cells[0][x] = scorer.gap(x, 0, this.cells[0][previousX]);
-            });
-
-            // fill the first column with gaps
-            IntStream.range(1, tokensAsIndexList.size()).forEach(y -> {
-                int previousY = y - 1;
-                this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
-            });
-
-            // fill the remaining cells
-            // fill the rest of the cells in a y by x fashion
-            IntStream.range(1, tokensAsIndexList.size()).forEach(//
-                y -> IntStream.range(1, variantGraphRanks.size()).forEach(
-                    x -> {
-                        Token witnessToken = witnessTokens.get(y - 1);
-                        int previousY = y - 1;
-                        int previousX = x - 1;
-                        Score fromUpperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
-                        Score fromLeft = scorer.gap(x, y, this.cells[y][previousX]);
-                        Score fromUpper = calculateFromUpper(scorer, y, x, previousY, witnessToken, cube);
-                        Score max = max(asList(fromUpperLeft, fromLeft, fromUpper), comparingInt(score -> score.globalScore));
-                        this.cells[y][x] = max;
-                    }));
+            fillNeedlemanWunschTable(variantGraphRanks, witnessTokens, tokensAsIndexList, cube);
 
             // debug only
             printScoringTable(variantGraphRanks, tokensAsIndexList);
-
-            // using the score iterator..
-            // find all the matches
-            // later for the transposition detection, we also want to keep track of all the additions, omissions, and replacements
-            Map<Token, VariantGraph.Vertex> aligned = new HashMap<>();
-            ScoreIterator scores = new ScoreIterator(this.cells);
-            Set<VariantGraph.Vertex> matchedVertices = new HashSet<>();
-            while (scores.hasNext()) {
-                Score score = scores.next();
-                if (score.type == Score.Type.match) {
-                    int rank = score.x - 1;
-                    Match match = cube.getMatch(score.y - 1, rank);
-                    if (!matchedVertices.contains(match.vertex)) {
-                        aligned.put(match.token, match.vertex);
-                        matchedVertices.add(match.vertex);
-                    }
-                }
-            }
+            Map<Token, VariantGraph.Vertex> aligned = alignMatchingTokens(cube);
 
             merge(graph, tokens, aligned);
 
             updateTokenToVertexArray(tokens, witness);
         }
+    }
+
+    private void fillNeedlemanWunschTable(List<Integer> variantGraphRanks, List<Token> witnessTokens, List<Integer> tokensAsIndexList, MatchCube cube) {
+        // code below is partly taken from the CSA branch.
+        // init cells and scorer
+        this.cells = new Score[tokensAsIndexList.size()][variantGraphRanks.size()];
+        Scorer scorer = new Scorer(cube);
+
+        // init 0,0
+        this.cells[0][0] = new Score(Score.Type.empty, 0, 0, null, 0);
+
+        // fill the first row with gaps
+        IntStream.range(1, variantGraphRanks.size()).forEach(x -> {
+            int previousX = x - 1;
+            this.cells[0][x] = scorer.gap(x, 0, this.cells[0][previousX]);
+        });
+
+        // fill the first column with gaps
+        IntStream.range(1, tokensAsIndexList.size()).forEach(y -> {
+            int previousY = y - 1;
+            this.cells[y][0] = scorer.gap(0, y, this.cells[previousY][0]);
+        });
+
+        // fill the remaining cells
+        // fill the rest of the cells in a y by x fashion
+        IntStream.range(1, tokensAsIndexList.size()).forEach(//
+            y -> IntStream.range(1, variantGraphRanks.size()).forEach(
+                x -> {
+                    Token witnessToken = witnessTokens.get(y - 1);
+                    int previousY = y - 1;
+                    int previousX = x - 1;
+                    Score fromUpperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
+                    Score fromLeft = scorer.gap(x, y, this.cells[y][previousX]);
+                    Score fromUpper = calculateFromUpper(scorer, y, x, previousY, witnessToken, cube);
+                    Score max = max(asList(fromUpperLeft, fromLeft, fromUpper), comparingInt(score -> score.globalScore));
+                    this.cells[y][x] = max;
+                }));
+    }
+
+    private Map<Token, VariantGraph.Vertex> alignMatchingTokens(MatchCube cube) {
+        // using the score iterator..
+        // find all the matches
+        // later for the transposition detection, we also want to keep track of all the additions, omissions, and replacements
+        Map<Token, VariantGraph.Vertex> aligned = new HashMap<>();
+        ScoreIterator scores = new ScoreIterator(this.cells);
+        Set<VariantGraph.Vertex> matchedVertices = new HashSet<>();
+        while (scores.hasNext()) {
+            Score score = scores.next();
+            if (score.type == Score.Type.match) {
+                int rank = score.x - 1;
+                Match match = cube.getMatch(score.y - 1, rank);
+                if (!matchedVertices.contains(match.vertex)) {
+                    aligned.put(match.token, match.vertex);
+                    matchedVertices.add(match.vertex);
+                }
+            }
+        }
+        return aligned;
     }
 
     private Score calculateFromUpper(Scorer scorer, int y, int x, int previousY, Token witnessToken, MatchCube matchCube) {
