@@ -248,7 +248,7 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
     }
 
     @Test
-    public void test9() {
+    public void testDuplicatedTokenInWitness2() {
         final SimpleWitness[] w = createWitnesses(
             "a",
             "b",
@@ -260,19 +260,28 @@ public class EditGraphMultiWitnessAlignerTest extends AbstractTest {
         assertThat(g, graph(w[0]).aligned("a"));
         assertThat(g, graph(w[1]).aligned("b"));
         assertThat(g, graph(w[2]).aligned("c"));
-        assertThat(g, graph(w[3]).aligned("a b c").non_aligned("a b c"));
+        assertThat(g, graph(w[3]).non_aligned("a b c").aligned("a b c"));
     }
 
   @Test
-  public void test10() {
+  public void testAlignWithLongestMatch() {
     final SimpleWitness[] w = createWitnesses(
-        "a b a b c d a b d",
-        "a b c d"
+        "a g a g c t a g t",
+        "a g c t"
     );
     VariantGraph g = new VariantGraph();
     align(g, w);
-    assertThat(g, graph(w[0]).non_aligned("a b").aligned("a b c d").non_aligned("a b d"));
-    assertThat(g, graph(w[1]).aligned("a b c d"));
+
+    final SimpleWitness[] w2 = createWitnesses(
+        "a g c t",
+        "a g a g c t a g t"
+    );
+    VariantGraph g2 = new VariantGraph();
+    align(g2, w2);
+    assertThat(g2, graph(w2[0]).aligned("a g c t"));
+    assertThat(g2, graph(w2[1]).non_aligned("a g").aligned("a g c t").non_aligned("a g t"));
+    assertThat(g, graph(w[0]).non_aligned("a g").aligned("a g c t").non_aligned("a g t"));
+    assertThat(g, graph(w[1]).aligned("a g c t"));
   }
 
   private void align(VariantGraph g, SimpleWitness[] w) {

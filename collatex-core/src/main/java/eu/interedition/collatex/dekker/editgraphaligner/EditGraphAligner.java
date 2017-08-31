@@ -174,12 +174,16 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // later for the transposition detection, we also want to keep track of all the additions, omissions, and replacements
             Map<Token, VariantGraph.Vertex> aligned = new HashMap<>();
             ScoreIterator scores = new ScoreIterator(this.cells);
+            Set<VariantGraph.Vertex> matchedVertices = new HashSet<>();
             while (scores.hasNext()) {
                 Score score = scores.next();
                 if (score.type == Score.Type.match) {
                     int rank = score.x - 1;
                     Match match = cube.getMatch(score.y - 1, rank);
-                    aligned.put(match.token, match.vertex);
+                    if (!matchedVertices.contains(match.vertex)) {
+                        aligned.put(match.token, match.vertex);
+                        matchedVertices.add(match.vertex);
+                    }
                 }
             }
 
@@ -191,7 +195,8 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     private Score calculateFromUpper(Scorer scorer, int y, int x, int previousY, Token witnessToken, MatchCube matchCube) {
         boolean upperIsMatch = matchCube.hasMatch(previousY - 1, x - 1);
-        return upperIsMatch ? scorer.score(x, y, this.cells[previousY][x])
+        return upperIsMatch //
+            ? scorer.score(x, y, this.cells[previousY][x]) //
             : scorer.gap(x, y, this.cells[previousY][x]);
     }
 
@@ -264,7 +269,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
     @Override
     public void collate(VariantGraph against, Iterable<Token> witness) {
-      collate(against, Arrays.asList(witness));
+        collate(against, Arrays.asList(witness));
     }
 
     public static class Score {
@@ -330,9 +335,11 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         public Score score(int x, int y, Score parent) {
             int rank = (x - 1);
             if (this.matchCube.hasMatch(y - 1, rank)) {
+                Match match = this.matchCube.getMatch(y - 1, rank);
                 return new Score(Score.Type.match, x, y, parent, parent.globalScore + 1);
+//                return new Score(Score.Type.match, x, y, parent, parent.globalScore + Math.round(1 * match.blockMatch));
             }
-            return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 2);
+            return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 1);
         }
 
         private Score.Type determineType(int x, int y, Score parent) {

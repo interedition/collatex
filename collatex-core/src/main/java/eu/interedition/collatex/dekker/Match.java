@@ -76,5 +76,6 @@ public class Match {
         return input -> !input.vertex.equals(graph.getStart()) && !input.vertex.equals(graph.getEnd());
     }
 
-    public static final Function<List<Match>, List<Token>> PHRASE_MATCH_TO_TOKENS = input -> input.stream().map(m -> m.token).collect(Collectors.toList());
+    public static final Function<List<Match>, List<Token>> PHRASE_MATCH_TO_TOKENS =//
+        input -> input.stream().map(m -> m.token).collect(Collectors.toList());
 }
