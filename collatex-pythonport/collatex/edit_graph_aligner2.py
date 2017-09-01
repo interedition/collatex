@@ -5,7 +5,8 @@ Created on Aug 5, 2014
 '''
 from prettytable import PrettyTable
 
-from collatex.core_classes import CollationAlgorithm
+from collatex.core_classes import CollationAlgorithm, VariantGraphRanking, VariantGraph, VariantGraphVertex
+from collatex.extended_suffix_array import Block
 from collatex.suffix_based_scorer import Scorer
 from collatex.tokenindex import TokenIndex
 from collatex.transposition_handling import TranspositionDetection
@@ -28,6 +29,58 @@ class EditGraphNode(object):
     '''
 
 
+class Match(object):
+    def __init__(self, vertex, token):
+        self.vertex = vertex
+        self.token = token
+
+
+class MatchCoordinate():
+    def __init__(self, row, rank):
+        self.index = row  # position in witness, starting from zero
+        self.rank = rank  # rank in the variant graph
+
+    def __eq__(self, other):
+        self.index == other.index & self.rank == other.rank
+
+
+class MatchCube():
+    def __init__(self, token_index, witness, vertex_array, variant_graph_ranking):
+        self.matches = {}
+        start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
+        instances = token_index.block_instances_for_witness(witness)
+        for witness_instance in instances:
+            block = witness_instance.block
+            all_instances = block.all_instances
+            graph_instances = [i for i in all_instances if i.start_token < start_token_position_for_witness]
+            for graph_instance in graph_instances:
+                graph_start_token = graph_instance.start_token
+                for i in range(0, block.length):
+                    # for (int i = 0; i < block.length; i++) {
+                    v = vertex_array[graph_start_token + i]
+                    if v is None:
+                        raise "Vertex is null for token \"" + graph_start_token + i + "\" that is supposed to be mapped to a vertex in the graph!"
+
+                    rank = variant_graph_ranking.apply(v) - 1
+                    witness_start_token = witness_instance.start_token + i
+                    row = witness_start_token - start_token_position_for_witness
+                    token = token_index.token_array[witness_start_token]
+                    match = Match(v, token)
+                    coordinate = MatchCoordinate(row, rank)
+                    self.matches[coordinate] = match
+
+    def has_tokens(vertex):
+        not vertex.tokens().isEmpty()
+
+    def has_match(self, y, x):
+        c = MatchCoordinate(y, x)
+        self.matches.containsKey(c)
+
+    def match(self, y, x):
+        c = MatchCoordinate(y, x)
+        self.matches.get(c)
+
+
 class EditGraphAligner(CollationAlgorithm):
     def __init__(self, collation, near_match=False, debug_scores=False, detect_transpositions=False,
                  properties_filter=None):
@@ -39,11 +92,11 @@ class EditGraphAligner(CollationAlgorithm):
         self.align_function = self._align_table
         self.added_witness = []
         self.omitted_base = []
+        self.vertex_array = []
 
     def collate(self, graph):
         """
         :type graph: VariantGraph
-        :type collation: Collation
         """
         # prepare the token index
         self.token_index.prepare()
@@ -72,7 +125,10 @@ class EditGraphAligner(CollationAlgorithm):
             #             self.table2 = self.table
 
             # alignment = token -> vertex
-            alignment = self.align_function(superbase, next_witness, token_to_vertex)
+
+            variant_graph_ranking = VariantGraphRanking.of(graph)
+            match_cube = MatchCube(self.token_index, tokens, self.vertex_array, variant_graph_ranking);
+            alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
             # merge
             token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), alignment))
@@ -92,7 +148,7 @@ class EditGraphAligner(CollationAlgorithm):
         if self.debug_scores:
             self._debug_edit_graph_table(self.table)
 
-    def _align_table(self, superbase, witness, token_to_vertex):
+    def _align_table(self, superbase, witness, token_to_vertex, match_cube):
         if not superbase:
             raise Exception("Superbase is empty!")
 
