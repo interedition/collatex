@@ -44,7 +44,7 @@ public class Block {
         return depth;
     }
 
-    // frequency = number of times this block of text occurrences in complete witness set
+    // frequency = number of times this block of text occurs in complete witness set
     public int getFrequency() {
         if (end == 0) {
             throw new IllegalStateException("LCP interval is unclosed!");
