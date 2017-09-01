@@ -349,7 +349,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             if (this.matchCube.hasMatch(y - 1, rank)) {
                 Match match = this.matchCube.getMatch(y - 1, rank);
                 return new Score(Score.Type.match, x, y, parent, parent.globalScore + 1);
-//                return new Score(Score.Type.match, x, y, parent, parent.globalScore + Math.round(1 * match.blockMatch));
             }
             return new Score(Score.Type.mismatch, x, y, parent, parent.globalScore - 1);
         }
