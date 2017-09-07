@@ -5,7 +5,6 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class Block {
     // every Block has a token index as a parent
@@ -21,7 +20,7 @@ public class Block {
     private Integer depth;
 
     // For building blocks only
-    public Block(TokenIndex tokenIndex, int suffix_start_position, int length) {
+    Block(TokenIndex tokenIndex, int suffix_start_position, int length) {
         this.tokenIndex = tokenIndex;
         this.start = suffix_start_position;
         this.length = length;
@@ -29,7 +28,7 @@ public class Block {
         this.depth = 0;
     }
 
-    public Block(TokenIndex tokenIndex, int start, int end, int length) {
+    Block(TokenIndex tokenIndex, int start, int end, int length) {
         this.tokenIndex = tokenIndex;
         this.start = start;
         this.end = end;
@@ -45,7 +44,7 @@ public class Block {
     }
 
     // frequency = number of times this block of text occurs in complete witness set
-    public int getFrequency() {
+    int getFrequency() {
         if (end == 0) {
             throw new IllegalStateException("LCP interval is unclosed!");
         }
@@ -61,19 +60,6 @@ public class Block {
             instances.add(instance);
         }
         return instances;
-    }
-
-    // transform lcp interval into int stream range
-    public IntStream getAllOccurrencesAsRanges() {
-        IntStream result = IntStream.empty();
-        // with/or without end
-        for (int i = start; i < end; i++) {
-            // every i is one occurrence
-            int token_position = tokenIndex.suffix_array[i];
-            IntStream range = IntStream.range(token_position, token_position + length);
-            result = IntStream.concat(result, range);
-        }
-        return result;
     }
 
     @Override
@@ -98,17 +84,13 @@ public class Block {
         public final int start_token;
         public final Block block;
 
-        public Instance(int start_token, Block block) {
+        Instance(int start_token, Block block) {
             this.start_token = start_token;
             this.block = block;
         }
 
         public int length() {
             return block.length;
-        }
-
-        public IntStream asRange() {
-            return IntStream.range(start_token, start_token + length());
         }
 
         @Override
@@ -135,6 +117,10 @@ public class Block {
         public Witness getWitness() {
             Token startToken = block.tokenIndex.token_array[start_token];
             return startToken.getWitness();
+        }
+
+        public Block getBlock() {
+            return block;
         }
     }
 }
