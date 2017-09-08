@@ -126,12 +126,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             // now the vertical stuff
             List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
-            List<Integer> tokensAsIndexList = new ArrayList<>();
-            tokensAsIndexList.add(0);
-            int counter = 1;
-            for (Token t : tokens) {
-                tokensAsIndexList.add(counter++);
-            }
+            List<Integer> tokensAsIndexList = asIndexList(tokens);
             System.out.println("vertical (next witness, token index): " + tokensAsIndexList);
 
             MatchCube cube = new MatchCube(tokenIndex, tokens, vertex_array, variantGraphRanking);
@@ -139,12 +134,21 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
 
             // debug only
             printScoringTable(variantGraphRanks, tokensAsIndexList);
+
             Map<Token, VariantGraph.Vertex> aligned = alignMatchingTokens(cube);
-
             merge(graph, tokens, aligned);
-
             updateTokenToVertexArray(tokens, witness);
         }
+    }
+
+    private List<Integer> asIndexList(Iterable<Token> tokens) {
+        List<Integer> tokensAsIndexList = new ArrayList<>();
+        tokensAsIndexList.add(0);
+        int counter = 1;
+        for (Token t : tokens) {
+            tokensAsIndexList.add(counter++);
+        }
+        return tokensAsIndexList;
     }
 
     private void fillNeedlemanWunschTable(List<Integer> variantGraphRanks, List<Token> witnessTokens, List<Integer> tokensAsIndexList, MatchCube cube) {

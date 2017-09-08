@@ -54,6 +54,7 @@ public class MatchCube {
                     Token token = tokenIndex.token_array[witnessStartToken];
                     Match match = new Match(v, token);
                     MatchCoordinate coordinate = new MatchCoordinate(row, rank);
+//                    System.out.println("match:[" + row + "," + rank + "]:" + token);
                     matches.put(coordinate, match);
                 }
             }
