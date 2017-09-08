@@ -6,7 +6,7 @@ Created on Aug 4, 2014
 import unittest
 from tests import unit_disabled
 from collatex.core_functions import VariantGraph, collate
-from collatex.edit_graph_aligner import EditGraphAligner
+from collatex.edit_graph_aligner2 import EditGraphAligner
 from collatex import Collation
 
 
@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
             if actual:
                 actual += " "
             actual += str(token)
-        self.assertEquals(expected, actual)
+        self.assertEqual(expected, actual)
 
     def debugRowSegments(self, cell_data):
         actual = []
@@ -44,7 +44,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("C", "c")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
-        aligner.collate(graph, collation)
+        aligner.collate(graph)
         superbase = aligner.new_superbase
         self.assertSuperbaseEquals("a b c", superbase)
 
@@ -55,7 +55,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "b c")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
-        aligner.collate(graph, collation)
+        aligner.collate(graph)
         table = aligner.table
         #         self.debug_table(aligner, table)
         self.assertEqual(0, table[0][0].g)
@@ -79,7 +79,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "a b c")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
-        aligner.collate(graph, collation)
+        aligner.collate(graph)
         table = aligner.table
 
         self.assertRow([0, -1, -2, -3, -4], table[0])
@@ -93,7 +93,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "a b c Y d e f Y Z g h i X j k")
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
-        aligner.collate(graph, collation)
+        aligner.collate(graph)
         superbase = aligner.new_superbase
         self.assertSuperbaseEquals("X a b c Y d e f X Y Z g h i Y Z X j k", superbase)
 

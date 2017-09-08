@@ -127,7 +127,7 @@ class EditGraphAligner(CollationAlgorithm):
             # alignment = token -> vertex
 
             variant_graph_ranking = VariantGraphRanking.of(graph)
-            match_cube = MatchCube(self.token_index, tokens, self.vertex_array, variant_graph_ranking);
+            match_cube = MatchCube(self.token_index, next_witness, self.vertex_array, variant_graph_ranking);
             alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
             # merge
