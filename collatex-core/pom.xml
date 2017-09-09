@@ -10,4 +10,12 @@
     <version>1.8-SNAPSHOT</version>
     <name>CollateX Core</name>
     <description>A Java library for collating textual sources, for example, to produce an apparatus.</description>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>0.35</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

@@ -6,6 +6,9 @@ import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
+//import static com.google.common.truth.Truth8.assertThat; // for assertions on Java 8 types
 
 /**
  *

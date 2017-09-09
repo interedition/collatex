@@ -1,13 +1,46 @@
 package eu.interedition.collatex.dekker.fusiongraph;
 
+import com.google.common.truth.Correspondence;
 import eu.interedition.collatex.AbstractTest;
-import eu.interedition.collatex.dekker.token_index.Block;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
-import java.util.*;
+import javax.annotation.Nullable;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
+
+class FakeNode {
+    String content;
+
+    FakeNode(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "fa:"+content;
+    }
+}
+
+class FusionNodeCorrespondence extends Correspondence<FusionNode, FakeNode> {
+    @Override
+    public boolean compare(@Nullable FusionNode fusionNode, @Nullable FakeNode fakeNode) {
+        boolean b = fusionNode != null && fakeNode != null;
+        if (!b) return false;
+        //if (equals) System.out.println("Comparing "+fusionNode.tokenA +" and "+fakeNode.content);
+        return ((SimpleToken) fusionNode.tokenA).getNormalized().equals(fakeNode.content);
+    }
+
+    @Override
+    public String toString() {
+        return "DON'T KNOW WHAT TO PUT HERE!";
+    }
+}
+
 
 public class FusionGraphTest extends AbstractTest {
 
@@ -24,51 +57,12 @@ public class FusionGraphTest extends AbstractTest {
         // this prepare method should go!
         tokenIndex.prepare();
 
-        // create an empty fusion graph
-        // FusionGraph fg = new FusionGraph();
+        FusionGraphBuilder builder = new FusionGraphBuilder();
+        FusionGraph graph = builder.createFusionGraph(w, tokenIndex);
+        assertEquals(6, graph.nodes.size());
 
-        // we need an algorithm to convert a token index to nodes positioned in the fusion graph.
-
-        // we need to align all the witnesses to each other.
-        // so that is 1 to 2 (where the 1 is on the y axis and the 2 is on the x axis)
-        // and 1 to 3
-        // and 2 to 3
-
-        // we start with 1 to 2
-
-        // There is a method to get all block instances for a witness
-        // But that is not really what we want..
-        // We want all the blocks that are both in one witness and in the other witness.
-        // we map all the block instances for one witness to a block
-        Map<Block, Block.Instance> map1 = new HashMap<>();
-        List<Block.Instance> instancesForFirstWitness = tokenIndex.getBlockInstancesForWitness(w[0]);
-        for (Block.Instance i : instancesForFirstWitness) {
-            Block block = i.getBlock();
-            map1.put(block, i);
-        }
-
-        Map<Block, Block.Instance> map2 = new HashMap<>();
-        List<Block.Instance> instancesForSecondWitness = tokenIndex.getBlockInstancesForWitness(w[1]);
-        for (Block.Instance i : instancesForSecondWitness) {
-            Block block = i.getBlock();
-            map2.put(block, i);
-        }
-
-        Set<Block> blocksForBothWitnesses = new HashSet<>();
-        blocksForBothWitnesses.addAll(map1.keySet());
-        blocksForBothWitnesses.retainAll(map2.keySet());
-
-        // This will be the nodes, there are some duplicates, because the current token index finds
-        // the largest blocks regarding width and depth.
-        Set<Integer> alreadyDone = new HashSet<>();
-        for (Block b: blocksForBothWitnesses) {
-            Block.Instance instance = map1.get(b);
-            if (!alreadyDone.contains(instance.start_token)) {
-                alreadyDone.add(instance.start_token);
-                Block.Instance instance2 = map2.get(b);
-                System.out.println(instance.getTokens().get(0)+";"+instance2.getTokens().get(0));
-            }
-        }
+        assertThat(graph.nodes)
+            .comparingElementsUsing(new FusionNodeCorrespondence())
+            .containsExactly(new FakeNode("p"), new FakeNode("s"), new FakeNode("f"), new FakeNode("t"), new FakeNode("t"), new FakeNode("y"));
     }
-
 }

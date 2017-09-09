@@ -44,10 +44,20 @@ class FusionGraph {
 // Maybe nodes should also know where they are positioned?
 // Should nodes know their edges? For now I can put the edges on the graph
 class FusionNode {
-    private Token tokenA;
+    Token tokenA;
     private Token tokenB;
     private int x;
     private int y;
+
+    FusionNode(Token tokenA, Token tokenB) {
+        this.tokenA = tokenA;
+        this.tokenB = tokenB;
+    }
+
+    @Override
+    public String toString() {
+        return "fn:"+tokenA.toString();
+    }
 }
 
 class FusionEdge {
