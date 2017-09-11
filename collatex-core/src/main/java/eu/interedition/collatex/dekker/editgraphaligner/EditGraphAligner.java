@@ -120,20 +120,20 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             // we leave in the rank of the start vertex, but remove the rank of the end vertex
             variantGraphRanks.remove(variantGraphRanks.size() - 1);
 
-            System.out.println("horizontal (graph, rank): " + variantGraphRanks);
+            // System.out.println("horizontal (graph, rank): " + variantGraphRanks);
 
 //            Map<Integer, Set<VariantGraph.Vertex>> vertexSetByRank = variantGraphRanking.getByRank();
 
             // now the vertical stuff
             List<Token> witnessTokens = StreamUtil.stream(tokens).collect(Collectors.toList());
             List<Integer> tokensAsIndexList = asIndexList(tokens);
-            System.out.println("vertical (next witness, token index): " + tokensAsIndexList);
+            // System.out.println("vertical (next witness, token index): " + tokensAsIndexList);
 
             MatchCube cube = new MatchCube(tokenIndex, tokens, vertex_array, variantGraphRanking);
             fillNeedlemanWunschTable(variantGraphRanks, witnessTokens, tokensAsIndexList, cube);
 
             // debug only
-            printScoringTable(variantGraphRanks, tokensAsIndexList);
+            // printScoringTable(variantGraphRanks, tokensAsIndexList);
 
             Map<Token, VariantGraph.Vertex> aligned = alignMatchingTokens(cube);
             merge(graph, tokens, aligned);
