@@ -51,7 +51,9 @@ class FusionGraphBuilder {
                 alreadyDone.add(instance.start_token);
                 Block.Instance instance2 = map2.get(b);
                 FusionNode node = new FusionNode(instance.getTokens().get(0), instance2.getTokens().get(0));
-                fusionGraph.nodes.add(node);
+                fusionGraph.addNode(node);
+
+                //fusionGraph.nodes.add(node);
 //                System.out.println(instance.getTokens().get(0)+";"+instance2.getTokens().get(0));
             }
         }
