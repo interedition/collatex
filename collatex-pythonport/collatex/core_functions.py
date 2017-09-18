@@ -44,7 +44,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
     # build graph
     graph = VariantGraph()
-    algorithm.collate(graph, collation)
+    algorithm.collate(graph)
     ranking = VariantGraphRanking.of(graph)
     if near_match:
         # Segmentation not supported for near matching; raise exception if necessary

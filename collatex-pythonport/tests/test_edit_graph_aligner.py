@@ -6,7 +6,7 @@ Created on Aug 4, 2014
 import unittest
 from tests import unit_disabled
 from collatex.core_functions import VariantGraph, collate
-from collatex.edit_graph_aligner2 import EditGraphAligner
+from collatex.edit_graph_aligner import EditGraphAligner
 from collatex import Collation
 
 
@@ -97,8 +97,74 @@ class Test(unittest.TestCase):
         superbase = aligner.new_superbase
         self.assertSuperbaseEquals("X a b c Y d e f X Y Z g h i Y Z X j k", superbase)
 
+    # TODO: add Y to the witness B (to check end modification
 
-        # TODO: add Y to the witness B (to check end modification
+    def test_duplicated_tokens_in_witness(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "a")
+        collation.add_plain_witness("B", "b")
+        collation.add_plain_witness("C", "c")
+        collation.add_plain_witness("D", "a a")
+
+        alignment_table = collate(collation)
+        self.assertEqual(['a', None], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual(['b', None], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual(['c', None], alignment_table.rows[2].to_list_of_strings())
+        self.assertEqual(['a ', 'a'], alignment_table.rows[3].to_list_of_strings())
+
+    def test_duplicated_tokens_in_witness2(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "a")
+        collation.add_plain_witness("B", "b")
+        collation.add_plain_witness("C", "c")
+        collation.add_plain_witness("D", "a b c a b c")
+
+        alignment_table = collate(collation)
+        self.assertEqual(['a', None, None, None], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual([None, 'b', None, None], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual([None, None, 'c', None], alignment_table.rows[2].to_list_of_strings())
+        self.assertEqual(['a ', 'b ', 'c ', 'a b c'], alignment_table.rows[3].to_list_of_strings())
+
+    def test_1(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "a")
+        collation.add_plain_witness("B", "b")
+        collation.add_plain_witness("C", "a b")
+
+        aligner = EditGraphAligner(collation)
+        graph = VariantGraph()
+        aligner.collate(graph)
+        superbase = aligner.new_superbase
+        self.assertSuperbaseEquals("a b", superbase)
+
+        alignment_table = collate(collation)
+        self.assertEqual(['a', None], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual([None, 'b'], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual(['a ', 'b'], alignment_table.rows[2].to_list_of_strings())
+
+    def test_align_with_longest_match(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "a g a g c t a g t")
+        collation.add_plain_witness("B", "a g c t")
+
+        alignment_table = collate(collation)
+        self.assertEqual(['a g ', 'a g c t ', 'a g t'], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual([None, 'a g c t', None], alignment_table.rows[1].to_list_of_strings())
+
+    def test_rank_adjustment(self):
+        collation = Collation()
+        collation.add_plain_witness('A', 'aa bb cc dd ee ff')
+        collation.add_plain_witness('B', 'aa bb ex ff')
+        collation.add_plain_witness('C', 'aa bb cc ee ff')
+        collation.add_plain_witness('D', 'aa bb ex dd ff')
+        collation.add_plain_witness('E', 'aaa aaa aaa aaa aaa')
+
+        alignment_table = collate(collation)
+        self.assertEqual(['aa bb ', 'cc ', 'dd ', 'ee ', 'ff'], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'ex ', None, None, 'ff'], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'cc ', None, 'ee ', 'ff'], alignment_table.rows[2].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'ex ', 'dd ', None, 'ff'], alignment_table.rows[3].to_list_of_strings())
+        self.assertEqual(['aaa aaa aaa aaa aaa', None, None, None, None], alignment_table.rows[4].to_list_of_strings())
 
 
 # def test_path(self):

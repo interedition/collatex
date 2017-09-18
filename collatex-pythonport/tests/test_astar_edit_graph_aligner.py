@@ -5,7 +5,7 @@ Created on Sep 29, 2014
 '''
 import unittest
 from collatex import Collation, collate
-from collatex.edit_graph_aligner import EditGraphAligner
+from collatex.edit_graph_aligner_old import EditGraphAligner
 from collatex.core_classes import VariantGraph
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 
