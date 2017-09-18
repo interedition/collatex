@@ -3,6 +3,8 @@ Created on Aug 5, 2014
 
 @author: Ronald Haentjens Dekker
 '''
+from enum import Enum
+
 from prettytable import PrettyTable
 
 from collatex.core_classes import CollationAlgorithm, VariantGraphRanking, VariantGraph
@@ -80,18 +82,84 @@ class MatchCube():
         self.matches.get(c)
 
 
+class ScoreType(Enum):
+    match = 1
+    mismatch = 2
+    addition = 3
+    deletion = 4
+    empty = 5
+
+
+class Score():
+    def __init__(self, score_type, x, y, parent, global_score=None):
+        self.type = score_type
+        self.x = x
+        self.y = y
+        self.parent = parent
+        self.previous_x = 0 if (parent is None) else parent.x
+        self.previous_y = 0 if (parent is None) else parent.y
+        self.global_score = parent.global_score if global_score is None else global_score
+
+
+class Scorer:
+    def __init__(self, match_cube=None):
+        self.match_cube = match_cube
+
+    def gap(self, x, y, parent):
+        score_type = self.determine_type(x, y, parent)
+        return Score(score_type, x, y, parent, parent.global_score - 1)
+
+    def score(self, x, y, parent):
+        rank = x - 1
+        if self.match_cube.has_match(y - 1, rank):
+            match = self.matchCube.get_match(y - 1, rank)
+            return Score(ScoreType.match, x, y, parent, parent.globalScore + 1)
+        return Score(ScoreType.mismatch, x, y, parent, parent.globalScore - 1)
+
+    @staticmethod
+    def determine_type(x, y, parent):
+        if x == parent.x:
+            return ScoreType.addition
+        if y == parent.y:
+            return ScoreType.deletion
+        return ScoreType.empty
+
+    class ScoreIterator:
+        def __init__(self, score_matrix):
+            self.score_matrix = score_matrix
+            self.x = score_matrix[0].length - 1
+            self.y = score_matrix.length - 1
+
+        def __iter__(self):
+            return self
+
+        def _has_next(self):
+            return not (self.x == 0 and self.y == 0)
+
+        def next(self):
+            if self._has_next():
+                current_score = self.matrix[self.y][self.x]
+                self.x = current_score.previousX
+                self.y = current_score.previousY
+                return current_score
+            else:
+                raise StopIteration()
+
+
 class EditGraphAligner(CollationAlgorithm):
     def __init__(self, collation, near_match=False, debug_scores=False, detect_transpositions=False,
                  properties_filter=None):
+        self.scorer = Scorer()
         self.collation = collation
         self.debug_scores = debug_scores
         self.detect_transpositions = detect_transpositions
         self.token_index = TokenIndex(collation.witnesses)
-        self.scorer = Scorer(self.token_index, near_match=near_match, properties_filter=properties_filter)
+        # self.scorer = Scorer(self.token_index, near_match=near_match, properties_filter=properties_filter)
         self.align_function = self._align_table
         self.added_witness = []
         self.omitted_base = []
         self.vertex_array = []
+        self.cells = [[]]
 
     def collate(self, graph):
         """
@@ -106,9 +174,6 @@ class EditGraphAligner(CollationAlgorithm):
         tokens = first_witness.tokens()
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
 
-        # let the scorer prepare the first witness
-        self.scorer.prepare_witness(first_witness)
-
         # construct superbase
         superbase = tokens
 
@@ -116,17 +181,18 @@ class EditGraphAligner(CollationAlgorithm):
         for x in range(1, len(self.collation.witnesses)):
             next_witness = self.collation.witnesses[x]
 
-            # let the scorer prepare the next witness
-            self.scorer.prepare_witness(next_witness)
-
-            #             # VOOR CONTROLE!
-            #             alignment = self._align_table(superbase, next_witness, token_to_vertex)
-            #             self.table2 = self.table
-
-            # alignment = token -> vertex
-
             variant_graph_ranking = VariantGraphRanking.of(graph)
+            variant_graph_ranks = list(set(map(lambda v: variant_graph_ranking.byVertex.get(v), graph.vertices())))
+            # we leave in the rank of the start vertex, but remove the rank of the end vertex
+            variant_graph_ranks.pop()
+
+            # now the vertical stuff
+            tokens_as_index_list = self.as_index_list(tokens)
+
             match_cube = MatchCube(self.token_index, next_witness, self.vertex_array, variant_graph_ranking);
+            self.fill_needleman_wunsch_table(variant_graph_ranks, next_witness, tokens_as_index_list, match_cube);
+            self.scorer.match_cube = match_cube
+
             alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
             # merge
@@ -289,3 +355,49 @@ class EditGraphAligner(CollationAlgorithm):
         x.align = "l"
         print(x)
         return x
+
+    @staticmethod
+    def as_index_list(tokens):
+        tokens_as_index_list = [0]
+        counter = 1
+        for t in tokens:
+            tokens_as_index_list.append(counter)
+            counter += 1
+        return tokens_as_index_list
+
+    def fill_needleman_wunsch_table(self, variant_graph_ranks, next_witness, tokens_as_index_list, match_cube):
+        # self.cells = [][]
+        scorer = Scorer(match_cube)
+
+        # init 0,0
+        self.cells[0][0] = Score(ScoreType.empty, 0, 0, None, 0)
+
+        # fill the first row with gaps
+        for x in range(1, len(variant_graph_ranks)):
+            previous_x = x - 1
+            self.cells[0][x] = scorer.gap(x, 0, self.cells[0][previous_x])
+
+        # fill the first column with gaps
+        for y in range(1, len(tokens_as_index_list)):
+            previous_y = y - 1
+            self.cells[y][0] = scorer.gap(0, y, self.cells[previous_y][0])
+
+        # fill the remaining cells
+        # fill the rest of the cells in a y by x fashion
+        for y in range(1, len(tokens_as_index_list)):
+            for x in range(1, len(variant_graph_ranks)):
+                witness_token = next_witness.get(y - 1)
+                previous_y = y - 1
+                previous_x = x - 1
+                from_upper_left = scorer.score(x, y, self.cells[previous_y][previous_x])
+                from_left = scorer.gap(x, y, self.cells[y][previous_x])
+                from_upper = self.calculate_from_upper(scorer, y, x, previous_y, witness_token, match_cube)
+                max_score = max(from_upper_left, from_left, from_upper, key=lambda s: s.global_score)
+                self.cells[y][x] = max_score
+
+    def calculate_from_upper(self, scorer, y, x, previous_y, witness_token, match_cube):
+        upper_is_match = match_cube.has_match(previous_y - 1, x - 1);
+        if upper_is_match:
+            return scorer.score(x, y, self.cells[previous_y][x])
+        else:
+            return scorer.gap(x, y, self.cells[previous_y][x]);

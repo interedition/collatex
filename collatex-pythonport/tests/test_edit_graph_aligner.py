@@ -125,6 +125,26 @@ class Test(unittest.TestCase):
         self.assertEqual([None, None, 'c', None], alignment_table.rows[2].to_list_of_strings())
         self.assertEqual(['a ', 'b ', 'c ', 'a b c'], alignment_table.rows[3].to_list_of_strings())
 
+        expected_tei = """<p><app>
+  <rdg wit="#A">a</rdg>
+  <rdg wit="#D">a </rdg>
+</app>
+<app>
+  <rdg wit="#B">b</rdg>
+  <rdg wit="#D">b </rdg>
+</app>
+<app>
+  <rdg wit="#C">c</rdg>
+  <rdg wit="#D">c </rdg>
+</app>
+<app>
+  <rdg wit="#D">a b c</rdg>
+</app>
+</p>"""
+
+        output_tei = collate(collation, output="tei", indent=True)
+        self.assertEqual(expected_tei, output_tei)
+
     def test_1(self):
         collation = Collation()
         collation.add_plain_witness("A", "a")
