@@ -50,7 +50,7 @@ public class TokenIndex {
         this.suffix_array = suffixData.getSuffixArray();
         this.LCP_array = suffixData.getLCP();
         this.blocks = splitLCP_ArrayIntoIntervals();
-        constructWitnessToBlockInstancesMap();
+        constructWitnessToBloc  kInstancesMap();
     }
 
     private Token[] prepareTokenArray() {

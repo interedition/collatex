@@ -9,15 +9,16 @@ import eu.interedition.collatex.dekker.token_index.TokenIndex;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.max;
-import static java.util.Comparator.comparingInt;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.max;
+import static java.util.Comparator.comparingInt;
 
 /**
  * Created by Ronald Haentjens Dekker on 06/01/17.
@@ -177,12 +178,12 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         IntStream.range(1, tokensAsIndexList.size()).forEach(//
             y -> IntStream.range(1, variantGraphRanks.size()).forEach(
                 x -> {
-                    Token witnessToken = witnessTokens.get(y - 1);
+//                    Token witnessToken = witnessTokens.get(y - 1);
                     int previousY = y - 1;
                     int previousX = x - 1;
                     Score fromUpperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
                     Score fromLeft = scorer.gap(x, y, this.cells[y][previousX]);
-                    Score fromUpper = calculateFromUpper(scorer, y, x, previousY, witnessToken, cube);
+                    Score fromUpper = calculateFromUpper(scorer, y, x, previousY, cube);
                     Score max = max(asList(fromUpperLeft, fromLeft, fromUpper), comparingInt(score -> score.globalScore));
                     this.cells[y][x] = max;
                 }));
@@ -209,7 +210,7 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         return aligned;
     }
 
-    private Score calculateFromUpper(Scorer scorer, int y, int x, int previousY, Token witnessToken, MatchCube matchCube) {
+    private Score calculateFromUpper(Scorer scorer, int y, int x, int previousY, MatchCube matchCube) {
         boolean upperIsMatch = matchCube.hasMatch(previousY - 1, x - 1);
         return upperIsMatch //
             ? scorer.score(x, y, this.cells[previousY][x]) //

@@ -45,8 +45,8 @@ class Test(unittest.TestCase):
         aligner = EditGraphAligner(collation)
         graph = VariantGraph()
         aligner.collate(graph)
-        superbase = aligner.new_superbase
-        self.assertSuperbaseEquals("a b c", superbase)
+        # superbase = aligner.new_superbase
+        # self.assertSuperbaseEquals("a b c", superbase)
 
     # we need to introduce a gap here
     def testOmission(self):
@@ -87,15 +87,15 @@ class Test(unittest.TestCase):
         self.assertRow([-2, -1, -2, -1, -2], table[2])
         self.assertRow([-3, -2, -3, -2, -1], table[3])
 
-    def test_superbase(self):
-        collation = Collation()
-        collation.add_plain_witness("A", "X a b c d e f X g h i Y Z j k")
-        collation.add_plain_witness("B", "a b c Y d e f Y Z g h i X j k")
-        aligner = EditGraphAligner(collation)
-        graph = VariantGraph()
-        aligner.collate(graph)
-        superbase = aligner.new_superbase
-        self.assertSuperbaseEquals("X a b c Y d e f X Y Z g h i Y Z X j k", superbase)
+    # def test_superbase(self):
+    #     collation = Collation()
+    #     collation.add_plain_witness("A", "X a b c d e f X g h i Y Z j k")
+    #     collation.add_plain_witness("B", "a b c Y d e f Y Z g h i X j k")
+    #     aligner = EditGraphAligner(collation)
+    #     graph = VariantGraph()
+    #     aligner.collate(graph)
+    #     # superbase = aligner.new_superbase
+    #     # self.assertSuperbaseEquals("X a b c Y d e f X Y Z g h i Y Z X j k", superbase)
 
     # TODO: add Y to the witness B (to check end modification
 

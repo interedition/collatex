@@ -10,8 +10,8 @@ from collatex.exceptions import SegmentationError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
-from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
-from collatex.display_module import display_variant_graph_as_SVG
+# from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
+# from collatex.display_module import display_variant_graph_as_SVG
 from collatex.near_matching import process_rank, Scheduler
 
 
@@ -72,19 +72,19 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if segmentation:
         join(graph)
         ranking = VariantGraphRanking.of(graph)
-    # check which output format is requested: graph or table
-    if output == "svg":
-        return display_variant_graph_as_SVG(graph, svg_output)
+    # # check which output format is requested: graph or table
+    # if output == "svg":
+    #     return display_variant_graph_as_SVG(graph, svg_output)
     if output == "graph":
         return graph
     # create alignment table
     table = AlignmentTable(collation, graph, layout, ranking)
     if output == "json":
         return export_alignment_table_as_json(table)
-    if output == "html":
-        return display_alignment_table_as_HTML(table)
-    if output == "html2":
-        return visualizeTableVerticallyWithColors(table, collation)
+    # if output == "html":
+    #     return display_alignment_table_as_HTML(table)
+    # if output == "html2":
+    #     return visualizeTableVerticallyWithColors(table, collation)
     if output == "table":
         return table
     if output == "xml":
