@@ -67,6 +67,6 @@ public class FusionGraphTest extends AbstractTest {
 
         assertThat(graph.nodes)
             .comparingElementsUsing(new FusionNodeCorrespondence())
-            .containsExactly(new FakeNode("p", 1, 1), new FakeNode("s", 3, 3), new FakeNode("f", 4, 4), new FakeNode("t", 5, 5), new FakeNode("t", 9, 5), new FakeNode("y", 6, 6));
+            .containsExactly(new FakeNode("p", 10, 0), new FakeNode("s", 12, 2), new FakeNode("f", 13, 3), new FakeNode("t", 14, 4), new FakeNode("t", 14, 8), new FakeNode("y", 15, 5));
     }
 }
