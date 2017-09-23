@@ -50,16 +50,18 @@ class FusionNode {
     Token tokenA;
     private Token tokenB;
     private int x;
-    private int y;
+    int y;
 
-    FusionNode(Token tokenA, Token tokenB) {
+    FusionNode(Token tokenA, Token tokenB, int x, int y) {
         this.tokenA = tokenA;
         this.tokenB = tokenB;
+        this.x = x;
+        this.y = y;
     }
 
     @Override
     public String toString() {
-        return "fn:"+tokenA.toString();
+        return "fn:"+tokenA.toString()+" "+x+" "+y;
     }
 }
 

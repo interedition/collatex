@@ -14,10 +14,14 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 
 class FakeNode {
+    private final int expectedX;
+    final int expectedY;
     String content;
 
-    FakeNode(String content) {
+    FakeNode(String content, int expectedX, int expectedY) {
         this.content = content;
+        this.expectedX = expectedX;
+        this.expectedY = expectedY;
     }
 
     @Override
@@ -32,7 +36,7 @@ class FusionNodeCorrespondence extends Correspondence<FusionNode, FakeNode> {
         boolean b = fusionNode != null && fakeNode != null;
         if (!b) return false;
         //if (equals) System.out.println("Comparing "+fusionNode.tokenA +" and "+fakeNode.content);
-        return ((SimpleToken) fusionNode.tokenA).getNormalized().equals(fakeNode.content);
+        return ((SimpleToken) fusionNode.tokenA).getNormalized().equals(fakeNode.content) && fakeNode.expectedY == fusionNode.y;
     }
 
     @Override
@@ -63,6 +67,6 @@ public class FusionGraphTest extends AbstractTest {
 
         assertThat(graph.nodes)
             .comparingElementsUsing(new FusionNodeCorrespondence())
-            .containsExactly(new FakeNode("p"), new FakeNode("s"), new FakeNode("f"), new FakeNode("t"), new FakeNode("t"), new FakeNode("y"));
+            .containsExactly(new FakeNode("p", 1, 1), new FakeNode("s", 3, 3), new FakeNode("f", 4, 4), new FakeNode("t", 5, 5), new FakeNode("t", 9, 5), new FakeNode("y", 6, 6));
     }
 }

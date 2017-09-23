@@ -50,7 +50,7 @@ class FusionGraphBuilder {
             if (!alreadyDone.contains(instance.start_token)) {
                 alreadyDone.add(instance.start_token);
                 Block.Instance instance2 = map2.get(b);
-                FusionNode node = new FusionNode(instance.getTokens().get(0), instance2.getTokens().get(0));
+                FusionNode node = new FusionNode(instance.getTokens().get(0), instance2.getTokens().get(0), instance.start_token, instance2.start_token);
                 fusionGraph.addNode(node);
 
                 //fusionGraph.nodes.add(node);
