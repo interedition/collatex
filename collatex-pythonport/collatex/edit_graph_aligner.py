@@ -52,8 +52,10 @@ class MatchCube():
     def __init__(self, token_index, witness, vertex_array, variant_graph_ranking):
         self.matches = {}
         start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
+        print("start_token_position_for_witness=",start_token_position_for_witness)
         instances = token_index.block_instances_for_witness(witness)
         for witness_instance in instances:
+            print("witness_instance=", witness_instance)
             block = witness_instance.block
             all_instances = block.all_instances
             graph_instances = [i for i in all_instances if i.start_token < start_token_position_for_witness]
@@ -181,6 +183,7 @@ class EditGraphAligner(CollationAlgorithm):
         first_witness = self.collation.witnesses[0]
         tokens = first_witness.tokens()
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
+        # print("token_to_vertex=", token_to_vertex)
         # self.update_token_to_vertex_array(tokens, first_witness)
 
         # align witness 2 - n
@@ -188,6 +191,7 @@ class EditGraphAligner(CollationAlgorithm):
             next_witness = self.collation.witnesses[x]
 
             variant_graph_ranking = VariantGraphRanking.of(graph)
+            print("x=", x, "variant_graph_ranking=", variant_graph_ranking.byRank)
             variant_graph_ranks = list(set(map(lambda v: variant_graph_ranking.byVertex.get(v), graph.vertices())))
             # we leave in the rank of the start vertex, but remove the rank of the end vertex
             variant_graph_ranks.pop()
@@ -196,11 +200,13 @@ class EditGraphAligner(CollationAlgorithm):
             tokens_as_index_list = self.as_index_list(tokens)
 
             match_cube = MatchCube(self.token_index, next_witness, self.vertex_array, variant_graph_ranking)
+            print("match_cube.matches=", match_cube.matches)
             self.fill_needleman_wunsch_table(variant_graph_ranks, tokens, tokens_as_index_list, match_cube)
 
             aligned = self.align_matching_tokens(match_cube)
+            print("aligned=", aligned)
             self.merge(graph, tokens, aligned)
-
+            # print("self.token_index.token_array=", self.token_index.token_array)
             # alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
             # merge
@@ -231,8 +237,8 @@ class EditGraphAligner(CollationAlgorithm):
         return tokens_as_index_list
 
     def fill_needleman_wunsch_table(self, variant_graph_ranks, next_witness, tokens_as_index_list, match_cube):
-        self.cells = [[None for row in range(0, len(tokens_as_index_list))] for col in
-                      range(0, len(variant_graph_ranks))]
+        self.cells = [[None for row in range(0, len(variant_graph_ranks))] for col in
+                      range(0, len(tokens_as_index_list))]
         scorer = Scorer(match_cube)
 
         # init 0,0
@@ -245,7 +251,12 @@ class EditGraphAligner(CollationAlgorithm):
 
         # fill the first column with gaps
         for y in range(1, len(tokens_as_index_list)):
+            # print("\nself.cells.len = ", len(self.cells), " x ", len(self.cells[0]))
+            # print("y=", y)
+            # print("self.cells[y][0]=", self.cells[y][0])
             previous_y = y - 1
+            # print("previous_y=", previous_y)
+            # print("self.cells[previous_y][0]=", self.cells[previous_y][0])
             self.cells[y][0] = scorer.gap(0, y, self.cells[previous_y][0])
 
         _debug_cells(self.cells)
@@ -297,11 +308,11 @@ class EditGraphAligner(CollationAlgorithm):
 
 def _debug_cells(cells):
     y = 0
-    for row in cells:
-        x = 0
-        print()
-        for cell in row:
-            if cell is not None:
-                print(str.format("[{},{}]:{}", x, y, cell))
-            x += 1
-        y += 1
+    # for row in cells:
+    #     x = 0
+    #     print()
+    #     for cell in row:
+    #         if cell is not None:
+    #             print(str.format("[{},{}]:{}", x, y, cell))
+    #         x += 1
+    #     y += 1
