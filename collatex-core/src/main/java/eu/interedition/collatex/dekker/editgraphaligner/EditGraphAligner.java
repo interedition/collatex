@@ -178,7 +178,6 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
         IntStream.range(1, tokensAsIndexList.size()).forEach(//
             y -> IntStream.range(1, variantGraphRanks.size()).forEach(
                 x -> {
-//                    Token witnessToken = witnessTokens.get(y - 1);
                     int previousY = y - 1;
                     int previousX = x - 1;
                     Score fromUpperLeft = scorer.score(x, y, this.cells[previousY][previousX]);
