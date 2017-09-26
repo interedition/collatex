@@ -106,7 +106,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("C", "c")
         collation.add_plain_witness("D", "a a")
 
-        alignment_table = collate(collation)
+        alignment_table = collate(collation, segmentation=False)
         print("alignment_table=\n", alignment_table)
         self.assertEqual(['a', None], alignment_table.rows[0].to_list_of_strings())
         self.assertEqual(['b', None], alignment_table.rows[1].to_list_of_strings())
@@ -146,7 +146,7 @@ class Test(unittest.TestCase):
         # alignment_table = collate(collation)
         # print("alignment_table=\n",alignment_table)
 
-        output_tei = collate(collation, output="tei", indent=True)
+        output_tei = collate(collation, output="tei", indent=True, segmentation=False)
         self.assertEqual(expected_tei, output_tei)
 
     def test_1(self):
@@ -161,7 +161,7 @@ class Test(unittest.TestCase):
         # superbase = aligner.new_superbase
         # self.assertSuperbaseEquals("a b", superbase)
 
-        alignment_table = collate(collation)
+        alignment_table = collate(collation, segmentation=False)
         print("alignment_table=\n", alignment_table)
         self.assertEqual(['a', None], alignment_table.rows[0].to_list_of_strings())
         self.assertEqual([None, 'b'], alignment_table.rows[1].to_list_of_strings())
@@ -175,7 +175,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness('D', 'aa bb ex dd ff')
         collation.add_plain_witness('E', 'aaa aaa aaa aaa aaa')
 
-        alignment_table = collate(collation)
+        alignment_table = collate(collation, segmentation=False)
         print("alignment_table=\n", alignment_table)
         self.assertEqual(['aa bb ', 'cc ', 'dd ', 'ee ', 'ff'], alignment_table.rows[0].to_list_of_strings())
         self.assertEqual(['aa bb ', 'ex ', None, None, 'ff'], alignment_table.rows[1].to_list_of_strings())

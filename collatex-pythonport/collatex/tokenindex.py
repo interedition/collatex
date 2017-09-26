@@ -1,4 +1,5 @@
 from ClusterShell.RangeSet import RangeSet
+from collatex.block import Block
 from collatex.core_classes import Token
 from collatex.linsuffarr import SuffixArray
 from collatex.linsuffarr import UNIT_BYTE
@@ -54,123 +55,117 @@ class TokenIndex(object):
                 # add marker token
                 self.token_array.append(Token({"n": "$" + str(idx - 1)}))
             # remember get tokens twice
+            sigil = witness.sigil
+            for token in witness.tokens():
+                token.token_data['sigil'] = sigil
             self.token_array.extend(witness.tokens())
 
     def _split_lcp_array_into_intervals(self):
-        closedIntervals = []
-        previousLCP_value = 0
-        openIntervals = Stack()
+        closed_intervals = []
+        previous_lcp_value = 0
+        open_intervals = Stack()
         for idx in range(0, len(self.lcp_array)):
             lcp_value = self.lcp_array[idx]
-            if lcp_value > previousLCP_value:
-                openIntervals.append(Block(self, start=idx - 1, length=lcp_value))
-                previousLCP_value = lcp_value
-            elif lcp_value < previousLCP_value:
+            if lcp_value > previous_lcp_value:
+                open_intervals.append(Block(self, start=idx - 1, length=lcp_value))
+                previous_lcp_value = lcp_value
+            elif lcp_value < previous_lcp_value:
                 #         close open intervals that are larger than current LCP value
-                while (not openIntervals.isEmpty() and openIntervals.peek().length > lcp_value):
-                    a = openIntervals.pop()
-                    closedIntervals.add(Block(self, start=a.start, end=idx - 1, length=a.length))
+                while not open_intervals and open_intervals.peek().length > lcp_value:
+                    a = open_intervals.pop()
+                    closed_intervals.append(Block(self, start=a.start, end=idx - 1, length=a.length))
 
                 # then: open a new interval starting with filtered intervals
                 if lcp_value > 0:
-                    start = closedIntervals.get(closedIntervals.size() - 1).start
-                    openIntervals.add(Block(self, start, lcp_value))
+                    start = closed_intervals[len(closed_intervals) - 1].start
+                    open_intervals.append(Block(self, start, lcp_value))
 
-                previousLCP_value = lcp_value
+                previous_lcp_value = lcp_value
 
-        #  add all the open intervals to the result
-        for interval in openIntervals:
+        # add all the open intervals to the result
+        for interval in open_intervals:
             if interval.length > 0:
-                closedIntervals.add(Block(self, interval.start, len(self.lcp_array) - 1, len(interval)))
-        return closedIntervals;
+                closed_intervals.append(Block(self, interval.start, len(self.lcp_array) - 1, interval.length))
+        return closed_intervals
 
+    def get_range_for_witness(self, witness_sigil):
+        if witness_sigil not in self.witness_ranges:
+            raise Exception("Witness " + witness_sigil + " is not added to the collation!")
+        return self.witness_ranges[witness_sigil]
 
-def get_range_for_witness(self, witness_sigil):
-    if not witness_sigil in self.witness_ranges:
-        raise Exception("Witness " + witness_sigil + " is not added to the collation!")
-    return self.witness_ranges[witness_sigil]
+    def get_sa(self):
+        # NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
+        # print("token_array=",self.token_array)
+        # for token in self.token_array:
+        #     print(token,":",type(token))
+        if not self.cached_suffix_array:
+            string_array = [token.token_string for token in self.token_array]
+            # Unit byte is done to skip tokenization in third party library
+            self.cached_suffix_array = SuffixArray(string_array, unit=UNIT_BYTE)
+        return self.cached_suffix_array
 
+    def get_suffix_array(self):
+        sa = self.get_sa()
+        return sa.SA
 
-def get_sa(self):
-    # NOTE: implemented in a lazy manner, since calculation of the Suffix Array and LCP Array takes time
-    # print("token_array=",self.token_array)
-    # for token in self.token_array:
-    #     print(token,":",type(token))
-    if not self.cached_suffix_array:
-        string_array = [token.token_string for token in self.token_array]
-        # Unit byte is done to skip tokenization in third party library
-        self.cached_suffix_array = SuffixArray(string_array, unit=UNIT_BYTE)
-    return self.cached_suffix_array
+    def get_lcp_array(self):
+        sa = self.get_sa()
+        return sa._LCP_values
 
+    def start_token_position_for_witness(self, witness):
+        return list(self.get_range_for_witness(witness.sigil))[0]
 
-def get_suffix_array(self):
-    sa = self.get_sa()
-    return sa.SA
+    def block_instances_for_witness(self, witness):
+        print("self.witness_to_block_instances", self.witness_to_block_instances)
+        return self.witness_to_block_instances.setdefault(witness, [])
 
+    def construct_witness_to_block_instances_map(self):
+        self.witness_to_block_instances = {}
+        print("self.blocks", self.blocks)
+        for interval in self.blocks:
+            for instance in interval.get_all_instances():
+                w = instance.get_witness_sigil()
+                instances = self.witness_to_block_instances.setdefault(w, [])
+                instances.append(instance)
 
-def get_lcp_array(self):
-    sa = self.get_sa()
-    return sa._LCP_values
+    # NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend. 4) descend, ascend
+    def split_lcp_array_into_intervals(self):
+        closed_intervals = []
+        previous_lcp_value = 0
+        open_intervals = Stack()
+        for idx, lcp_value in enumerate(self.lcp_array):
+            #             print(lcp_value)
+            if lcp_value > previous_lcp_value:
+                open_intervals.push((idx - 1, lcp_value))
+                previous_lcp_value = lcp_value
+            if lcp_value < previous_lcp_value:
+                # close open intervals that are larger than current lcp_value
+                while open_intervals and open_intervals.peek()[1] > lcp_value:
+                    #                     print("Peek: "+str(open_intervals.peek()))
+                    (start, length) = open_intervals.pop()
+                    # TODO: FIX NUMBER OF SIBLINGS!
+                    closed_intervals.append(LCPInterval(self, start, idx - 1, length, 0))
+                    #                     print("new: "+repr(closed_intervals[-1]))
+                # then: open a new interval starting with start filter open intervals.
+                if lcp_value > 0:
+                    start = closed_intervals[-1].start
+                    open_intervals.push((start, lcp_value))
+                previous_lcp_value = lcp_value
+        # add all the open intervals to the result
+        #         print("Closing remaining:")
+        for start, length in open_intervals:
+            # TODO: FIX NUMBER OF SIBLINGS!
+            closed_intervals.append(LCPInterval(self, start, len(self.lcp_array) - 1, length, 0))
+            #             print("new: "+repr(closed_intervals[-1]))
+        return closed_intervals
 
-
-def start_token_position_for_witness(self, witness):
-    return list(self.get_range_for_witness(witness.sigil))[0]
-
-
-def block_instances_for_witness(self, witness):
-    print("self.witness_to_block_instances", self.witness_to_block_instances)
-    return self.witness_to_block_instances.setdefault(witness, [])
-
-
-def construct_witness_to_block_instances_map(self):
-    self.witness_to_block_instances = {}
-    print("self.blocks", self.blocks)
-    for interval in self.blocks:
-        for instance in interval.get_all_instances():
-            w = instance.get_witness()
-            instances = self.witness_to_block_instances.setdefault(w, [])
-            instances.add(instance)
-
-
-# NOTE: LCP intervals can 1) ascend or 2) descend or 3) first ascend and then descend. 4) descend, ascend
-def split_lcp_array_into_intervals(self):
-    closed_intervals = []
-    previous_lcp_value = 0
-    open_intervals = Stack()
-    for idx, lcp_value in enumerate(self.lcp_array):
-        #             print(lcp_value)
-        if lcp_value > previous_lcp_value:
-            open_intervals.push((idx - 1, lcp_value))
-            previous_lcp_value = lcp_value
-        if lcp_value < previous_lcp_value:
-            # close open intervals that are larger than current lcp_value
-            while open_intervals and open_intervals.peek()[1] > lcp_value:
-                #                     print("Peek: "+str(open_intervals.peek()))
-                (start, length) = open_intervals.pop()
-                # TODO: FIX NUMBER OF SIBLINGS!
-                closed_intervals.append(LCPInterval(self, start, idx - 1, length, 0))
-                #                     print("new: "+repr(closed_intervals[-1]))
-            # then: open a new interval starting with start filter open intervals.
-            if lcp_value > 0:
-                start = closed_intervals[-1].start
-                open_intervals.push((start, lcp_value))
-            previous_lcp_value = lcp_value
-    # add all the open intervals to the result
-    #         print("Closing remaining:")
-    for start, length in open_intervals:
-        # TODO: FIX NUMBER OF SIBLINGS!
-        closed_intervals.append(LCPInterval(self, start, len(self.lcp_array) - 1, length, 0))
-        #             print("new: "+repr(closed_intervals[-1]))
-    return closed_intervals
-
-
-# factory method for testing purposes only!
-@classmethod
-def for_test(cls, sa_array, lcp_array):
-    token_index = TokenIndex(None)
-    token_index.suffix_array = sa_array
-    token_index.lcp_array = lcp_array
-    return token_index  # parts of the LCP array become potential blocks.
+    # factory method for testing purposes only!
+    @classmethod
+    def for_test(cls, sa_array, lcp_array):
+        token_index = TokenIndex(None)
+        token_index.suffix_array = sa_array
+        token_index.lcp_array = lcp_array
+        return token_index  # parts of the LCP array become potential blocks.
 
 
 # minimum block_length: the number of tokens a single occurrence of this block spans
@@ -206,10 +201,10 @@ class LCPInterval(object):
 
     def _as_range(self):
         # convert interval into range
-        range = RangeSet()
+        range_set = RangeSet()
         for occurrence in self.block_occurrences():
-            range.add_range(occurrence, occurrence + self.minimum_block_length)
-        return range
+            range_set.add_range(occurrence, occurrence + self.minimum_block_length)
+        return range_set
 
     @property
     def number_of_witnesses(self):
