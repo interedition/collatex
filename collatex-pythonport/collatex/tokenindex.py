@@ -51,14 +51,13 @@ class TokenIndex(object):
             # the extra one is for the marker token
             self.counter += len(witness.tokens()) + 1
             self.witness_ranges[witness.sigil] = witness_range
-            if self.token_array:
-                # add marker token
-                self.token_array.append(Token({"n": "$" + str(idx - 1)}))
             # remember get tokens twice
             sigil = witness.sigil
             for token in witness.tokens():
                 token.token_data['sigil'] = sigil
             self.token_array.extend(witness.tokens())
+            # # add marker token
+            self.token_array.append(Token({"n": '$', 'sigil': sigil}))
 
     def _split_lcp_array_into_intervals(self):
         closed_intervals = []
@@ -99,9 +98,9 @@ class TokenIndex(object):
         # for token in self.token_array:
         #     print(token,":",type(token))
         if not self.cached_suffix_array:
-            string_array = [token.token_string for token in self.token_array]
+            string = ''.join([token.token_string for token in self.token_array])
             # Unit byte is done to skip tokenization in third party library
-            self.cached_suffix_array = SuffixArray(string_array, unit=UNIT_BYTE)
+            self.cached_suffix_array = SuffixArray(string, unit=UNIT_BYTE)
         return self.cached_suffix_array
 
     def get_suffix_array(self):
@@ -117,7 +116,7 @@ class TokenIndex(object):
 
     def block_instances_for_witness(self, witness):
         print("self.witness_to_block_instances", self.witness_to_block_instances)
-        return self.witness_to_block_instances.setdefault(witness, [])
+        return self.witness_to_block_instances.setdefault(witness.sigil, [])
 
     def construct_witness_to_block_instances_map(self):
         self.witness_to_block_instances = {}

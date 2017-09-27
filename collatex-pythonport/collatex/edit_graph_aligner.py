@@ -52,20 +52,20 @@ class MatchCube():
     def __init__(self, token_index, witness, vertex_array, variant_graph_ranking):
         self.matches = {}
         start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
-        print("start_token_position_for_witness=",start_token_position_for_witness)
+        print("start_token_position_for_witness=", start_token_position_for_witness)
         instances = token_index.block_instances_for_witness(witness)
         for witness_instance in instances:
             print("witness_instance=", witness_instance)
             block = witness_instance.block
-            all_instances = block.all_instances
+            all_instances = block.get_all_instances()
             graph_instances = [i for i in all_instances if i.start_token < start_token_position_for_witness]
             for graph_instance in graph_instances:
                 graph_start_token = graph_instance.start_token
                 for i in range(0, block.length):
-                    # for (int i = 0; i < block.length; i++) {
                     v = vertex_array[graph_start_token + i]
                     if v is None:
-                        raise "Vertex is null for token \"" + graph_start_token + i + "\" that is supposed to be mapped to a vertex in the graph!"
+                        raise Exception(str.format('Vertex is null for token {} "{}" that is supposed to be mapped to a vertex in'
+                                         ' the graph!', graph_start_token , i))
 
                     rank = variant_graph_ranking.apply(v) - 1
                     witness_start_token = witness_instance.start_token + i
@@ -83,7 +83,7 @@ class MatchCube():
         c = MatchCoordinate(y, x)
         return c in self.matches
 
-    def match(self, y, x):
+    def get_match(self, y, x):
         c = MatchCoordinate(y, x)
         return self.matches[c]
 
@@ -121,7 +121,7 @@ class Scorer:
     def score(self, x, y, parent):
         rank = x - 1
         if self.match_cube.has_match(y - 1, rank):
-            match = self.matchCube.get_match(y - 1, rank)
+            match = self.match_cube.get_match(y - 1, rank)
             return Score(ScoreType.match, x, y, parent, parent.global_score + 1)
         return Score(ScoreType.mismatch, x, y, parent, parent.global_score - 1)
 
@@ -178,13 +178,15 @@ class EditGraphAligner(CollationAlgorithm):
         # prepare the token index
         self.token_index.prepare()
 
+        self.vertex_array = [None] * len(self.token_index.token_array)
+
         # Build the variant graph for the first witness
         # this is easy: generate a vertex for every token
         first_witness = self.collation.witnesses[0]
         tokens = first_witness.tokens()
         token_to_vertex = self.merge(graph, first_witness.sigil, tokens)
         # print("token_to_vertex=", token_to_vertex)
-        # self.update_token_to_vertex_array(tokens, first_witness)
+        self.update_token_to_vertex_array(tokens, first_witness, token_to_vertex)
 
         # align witness 2 - n
         for x in range(1, len(self.collation.witnesses)):
@@ -205,7 +207,7 @@ class EditGraphAligner(CollationAlgorithm):
 
             aligned = self.align_matching_tokens(match_cube)
             print("aligned=", aligned)
-            self.merge(graph, tokens, aligned)
+            self.merge(graph, next_witness.sigil, aligned)
             # print("self.token_index.token_array=", self.token_index.token_array)
             # alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
@@ -296,14 +298,14 @@ class EditGraphAligner(CollationAlgorithm):
                     matched_vertices.append(match.vertex)
         return aligned
 
-        # def update_token_to_vertex_array(self, tokens, witness):
-        #     # we need to update the token -> vertex map
-        #     # that information is stored in protected map
-        #     token_position = self.token_index.start_token_position_for_witness(witness)
-        #     for token in tokens:
-        #         vertex = super.witness_token_vertices[token]
-        #         self.vertex_array[token_position] = vertex
-        #         token_position += 1
+    def update_token_to_vertex_array(self, tokens, witness, token_to_vertex):
+        # we need to update the token -> vertex map
+        # that information is stored in protected map
+        token_position = self.token_index.start_token_position_for_witness(witness)
+        for token in tokens:
+            vertex = token_to_vertex[token]
+            self.vertex_array[token_position] = vertex
+            token_position += 1
 
 
 def _debug_cells(cells):
