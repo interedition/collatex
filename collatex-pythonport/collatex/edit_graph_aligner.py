@@ -45,7 +45,7 @@ class MatchCoordinate():
         self.rank = rank  # rank in the variant graph
 
     def __eq__(self, other):
-        return self.index == other.index & self.rank == other.rank
+        return self.index == other.index and self.rank == other.rank
 
     def __hash__(self):
         return 10 * self.index + self.rank
@@ -224,10 +224,13 @@ class EditGraphAligner(CollationAlgorithm):
             # alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
             # merge
-            witness_token_to_vertex = self.merge(graph, witness.sigil, witness.tokens(), aligned)
-            print("> witness_token_to_vertex =", witness_token_to_vertex)
-            token_to_vertex.update(witness_token_to_vertex)
+            witness_token_to_generated_vertex = self.merge(graph, witness.sigil, witness.tokens(), aligned)
+            print("> witness_token_to_generated_vertex =", witness_token_to_generated_vertex)
+            token_to_vertex.update(witness_token_to_generated_vertex)
             print("> token_to_vertex =", token_to_vertex)
+            witness_token_to_vertex = {}
+            for wt in tokens:
+                witness_token_to_vertex[wt] = token_to_vertex[wt]
             self.update_token_to_vertex_array(tokens, witness, witness_token_to_vertex)
             print("> vertex_array =", self.vertex_array)
 
