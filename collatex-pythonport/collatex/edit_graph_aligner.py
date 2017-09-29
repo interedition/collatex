@@ -35,6 +35,9 @@ class Match(object):
         self.vertex = vertex
         self.token = token
 
+    def __repr__(self):
+        return str.format("Match(vertex={},token={}", self.vertex, self.token)
+
 
 class MatchCoordinate():
     def __init__(self, row, rank):
@@ -47,25 +50,33 @@ class MatchCoordinate():
     def __hash__(self):
         return 10 * self.index + self.rank
 
+    def __repr__(self):
+        return str.format("MatchCoordinate(index = {}, rank = {})", self.index, self.rank)
+
 
 class MatchCube():
     def __init__(self, token_index, witness, vertex_array, variant_graph_ranking):
         self.matches = {}
+        print("> vertex_array =", vertex_array)
         start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
-        print("start_token_position_for_witness=", start_token_position_for_witness)
+        print("> start_token_position_for_witness=", start_token_position_for_witness)
         instances = token_index.block_instances_for_witness(witness)
+        print("> token_index.witness_to_block_instances", token_index.witness_to_block_instances)
+        print("> instances", instances)
         for witness_instance in instances:
-            print("witness_instance=", witness_instance)
+            print("> witness_instance=", witness_instance)
             block = witness_instance.block
             all_instances = block.get_all_instances()
             graph_instances = [i for i in all_instances if i.start_token < start_token_position_for_witness]
             for graph_instance in graph_instances:
                 graph_start_token = graph_instance.start_token
                 for i in range(0, block.length):
+                    print("> graph_start_token + i =", (graph_start_token + i))
                     v = vertex_array[graph_start_token + i]
                     if v is None:
-                        raise Exception(str.format('Vertex is null for token {} "{}" that is supposed to be mapped to a vertex in'
-                                         ' the graph!', graph_start_token , i))
+                        raise Exception(
+                            str.format('Vertex is null for token {} {} that is supposed to be mapped to a vertex in'
+                                       ' the graph!', graph_start_token, i))
 
                     rank = variant_graph_ranking.apply(v) - 1
                     witness_start_token = witness_instance.start_token + i
@@ -190,10 +201,12 @@ class EditGraphAligner(CollationAlgorithm):
 
         # align witness 2 - n
         for x in range(1, len(self.collation.witnesses)):
-            next_witness = self.collation.witnesses[x]
+            witness = self.collation.witnesses[x]
+            tokens = witness.tokens()
+            print("\nwitness", witness.sigil)
 
             variant_graph_ranking = VariantGraphRanking.of(graph)
-            print("x=", x, "variant_graph_ranking=", variant_graph_ranking.byRank)
+            print("> x =", x, ", variant_graph_ranking =", variant_graph_ranking.byRank)
             variant_graph_ranks = list(set(map(lambda v: variant_graph_ranking.byVertex.get(v), graph.vertices())))
             # we leave in the rank of the start vertex, but remove the rank of the end vertex
             variant_graph_ranks.pop()
@@ -201,18 +214,22 @@ class EditGraphAligner(CollationAlgorithm):
             # now the vertical stuff
             tokens_as_index_list = self.as_index_list(tokens)
 
-            match_cube = MatchCube(self.token_index, next_witness, self.vertex_array, variant_graph_ranking)
-            print("match_cube.matches=", match_cube.matches)
+            match_cube = MatchCube(self.token_index, witness, self.vertex_array, variant_graph_ranking)
+            print("> match_cube.matches=", match_cube.matches)
             self.fill_needleman_wunsch_table(variant_graph_ranks, tokens, tokens_as_index_list, match_cube)
 
             aligned = self.align_matching_tokens(match_cube)
-            print("aligned=", aligned)
-            self.merge(graph, next_witness.sigil, aligned)
+            print("> aligned=", aligned)
             # print("self.token_index.token_array=", self.token_index.token_array)
             # alignment = self.align_function(superbase, next_witness, token_to_vertex, match_cube)
 
             # merge
-            token_to_vertex.update(self.merge(graph, next_witness.sigil, next_witness.tokens(), aligned))
+            witness_token_to_vertex = self.merge(graph, witness.sigil, witness.tokens(), aligned)
+            print("> witness_token_to_vertex =", witness_token_to_vertex)
+            token_to_vertex.update(witness_token_to_vertex)
+            print("> token_to_vertex =", token_to_vertex)
+            self.update_token_to_vertex_array(tokens, witness, witness_token_to_vertex)
+            print("> vertex_array =", self.vertex_array)
 
             #             print("actual")
             #             self._debug_edit_graph_table(self.table)
@@ -298,12 +315,24 @@ class EditGraphAligner(CollationAlgorithm):
                     matched_vertices.append(match.vertex)
         return aligned
 
-    def update_token_to_vertex_array(self, tokens, witness, token_to_vertex):
+    def update_token_to_vertex_array(self, tokens, witness, witness_token_to_vertex):
         # we need to update the token -> vertex map
         # that information is stored in protected map
+        print("> witness_token_to_vertex =", witness_token_to_vertex)
+        # t = list(witness_token_to_vertex)[0]
+        # print("> list(witness_token_to_vertex)[0] =", t)
+        # print("> t.token_string =", t.token_string)
+        # print("> t.token_data =", t.token_data)
+        # print("> witness =", witness)
         token_position = self.token_index.start_token_position_for_witness(witness)
-        for token in tokens:
-            vertex = token_to_vertex[token]
+        print("> token_position =", token_position)
+        for token in witness.tokens():
+            print("> token =", token)
+            print("> token.token_string =", token.token_string)
+            print("> token.token_data =", token.token_data)
+            # print("> t.token_data == token.token_data ", t.token_data == token.token_data)
+            # print("> t == token", t == token)
+            vertex = witness_token_to_vertex[token]
             self.vertex_array[token_position] = vertex
             token_position += 1
 

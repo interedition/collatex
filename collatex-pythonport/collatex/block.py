@@ -50,8 +50,8 @@ class Block:
     def __repr__(self):
         if self.end == 0:
             return str.format("Unclosed LCP interval start at: {},  length: {}", self.start, self.length)
-        return str.format("LCP interval start at: {}, depth: {}, length: {}, getFrequency: {}",
-                          self.start, self.get_depth(), self.length, self.get_frequency())
+        return str.format("LCP interval (start,end): ({},{}), length: {}, depth: {}, getFrequency: {}",
+                          self.start, self.end, self.length, self.get_depth(), self.get_frequency())
 
     def _calculate_depth(self):
         # the same block can occur multiple times in one witness

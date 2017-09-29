@@ -145,7 +145,7 @@ public class TokenIndex {
                 // then: open a new interval starting with filtered intervals
                 if (lcp_value > 0) {
                     int start = closedIntervals.get(closedIntervals.size() - 1).start;
-                    openIntervals.add(new Block(this, start, lcp_value));
+                    openIntervals.push(new Block(this, start, lcp_value));
                 }
                 previousLCP_value = lcp_value;
             }
