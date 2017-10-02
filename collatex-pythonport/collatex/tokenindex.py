@@ -28,6 +28,7 @@ class TokenIndex(object):
 
     def prepare(self):
         self._prepare_token_array()
+        #print("> self.token_array=", self.token_array)
         # call third party library here
         self.suffix_array = self.get_suffix_array()
         self.lcp_array = self.get_lcp_array()
@@ -44,6 +45,7 @@ class TokenIndex(object):
         # TODO: the lazy init should move to somewhere else
         # clear the suffix array and LCP array cache
         self.cached_suffix_array = None
+        token_array_position = 0
         for idx, witness in enumerate(self.witnesses):
             # print("witness.tokens",witness.tokens())
             witness_range = RangeSet()
@@ -55,9 +57,12 @@ class TokenIndex(object):
             sigil = witness.sigil
             for token in witness.tokens():
                 token.token_data['sigil'] = sigil
+                token.token_data['token_array_position'] = token_array_position
+                token_array_position += 1
             self.token_array.extend(witness.tokens())
             # # add marker token
             self.token_array.append(Token({"n": '$' + str(idx), 'sigil': sigil}))
+            token_array_position += 1
 
     def _split_lcp_array_into_intervals(self):
         closed_intervals = []
@@ -82,13 +87,13 @@ class TokenIndex(object):
                 previous_lcp_value = lcp_value
 
         # add all the open intervals to the result
-        print("> open_intervals=", open_intervals)
-        print("> closed_intervals=", closed_intervals)
+        #print("> open_intervals=", open_intervals)
+        #print("> closed_intervals=", closed_intervals)
         for interval in open_intervals:
             if interval.length > 0:
                 closed_intervals.append(
                     Block(self, start=interval.start, end=len(self.lcp_array) - 1, length=interval.length))
-        print("> closed_intervals=", closed_intervals)
+        #print("> closed_intervals=", closed_intervals)
         return closed_intervals
 
     def get_range_for_witness(self, witness_sigil):
@@ -105,8 +110,9 @@ class TokenIndex(object):
             # string_array = ''.join([token.token_string for token in self.token_array])
             string_array = [token.token_string for token in self.token_array]
             # Unit byte is done to skip tokenization in third party library
+            ##print("> string_array =", string_array)
             self.cached_suffix_array = SuffixArray(string_array, unit=UNIT_BYTE)
-            print("> suffix_array:\n", self.cached_suffix_array)
+            ##print("> suffix_array:\n", self.cached_suffix_array)
         return self.cached_suffix_array
 
     def get_suffix_array(self):
@@ -125,10 +131,10 @@ class TokenIndex(object):
 
     def construct_witness_to_block_instances_map(self):
         self.witness_to_block_instances = {}
-        print("> self.blocks", self.blocks)
+        ##print("> self.blocks", self.blocks)
         for interval in self.blocks:
             for instance in interval.get_all_instances():
-                print(">instance = ", instance)
+                ##print(">instance = ", instance)
                 w = instance.get_witness_sigil()
                 instances = self.witness_to_block_instances.setdefault(w, [])
                 instances.append(instance)

@@ -179,12 +179,6 @@ class Token(object):
     def __repr__(self):
         return self.token_string
 
-    def __eq__(self, other):
-        return self.token_string == other.token_string
-
-    def __hash__(self):
-        return hash(self.token_string)
-
 
 class Witness(object):
     def __init__(self, witnessdata):
