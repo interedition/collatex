@@ -329,8 +329,8 @@ def join(graph):
                     graph.connect(vertex, neighbor, data["label"])
                 graph.remove_edge(vertex, join_candidate)
                 graph.remove_node(join_candidate)
-                queue.appendleft(vertex);
-                continue;
+                queue.appendleft(vertex)
+                continue
         processed.add(vertex)
         for (_, neighbor) in out_edges:
             # FIXME: Why do we run out of memory in some cases here, if this is not checked?

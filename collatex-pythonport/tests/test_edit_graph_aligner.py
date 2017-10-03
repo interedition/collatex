@@ -106,7 +106,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("C", "c")
         collation.add_plain_witness("D", "a a")
 
-        alignment_table = collate(collation, segmentation=False)
+        alignment_table = collate(collation)
         print("alignment_table=\n", alignment_table)
         self.assertEqual([None, 'a'], alignment_table.rows[0].to_list_of_strings())
         self.assertEqual(['b', None], alignment_table.rows[1].to_list_of_strings())
@@ -127,13 +127,7 @@ class Test(unittest.TestCase):
         # self.assertEqual(['a ', 'b ', 'c ', 'a b c'], alignment_table.rows[3].to_list_of_strings())
 
         expected_tei = """<p><app>
-  <rdg wit="#D">a </rdg>
-</app>
-<app>
-  <rdg wit="#D">b </rdg>
-</app>
-<app>
-  <rdg wit="#D">c </rdg>
+  <rdg wit="#D">a b c </rdg>
 </app>
 <app>
   <rdg wit="#A">a</rdg>
@@ -151,7 +145,7 @@ class Test(unittest.TestCase):
         # alignment_table = collate(collation)
         # print("alignment_table=\n",alignment_table)
 
-        output_tei = collate(collation, output="tei", indent=True, segmentation=False)
+        output_tei = collate(collation, output="tei", indent=True)
         self.assertEqual(expected_tei, output_tei)
 
     def test_1(self):
@@ -166,7 +160,7 @@ class Test(unittest.TestCase):
         # superbase = aligner.new_superbase
         # self.assertSuperbaseEquals("a b", superbase)
 
-        alignment_table = collate(collation, segmentation=False)
+        alignment_table = collate(collation)
         print("alignment_table=\n", alignment_table)
         self.assertEqual(['a', None], alignment_table.rows[0].to_list_of_strings())
         self.assertEqual([None, 'b'], alignment_table.rows[1].to_list_of_strings())
@@ -182,10 +176,10 @@ class Test(unittest.TestCase):
 
         alignment_table = collate(collation)
         print("alignment_table=\n", alignment_table)
-        self.assertEqual(['aa ', 'bb ', 'cc ', 'dd ', 'ee ', 'ff'], alignment_table.rows[0].to_list_of_strings())
-        self.assertEqual(['aa ', 'bb ', 'ex ', None, None, 'ff'], alignment_table.rows[1].to_list_of_strings())
-        self.assertEqual(['aa ', 'bb ', 'cc ', None, 'ee ', 'ff'], alignment_table.rows[2].to_list_of_strings())
-        self.assertEqual(['aa ', 'bb ', 'ex ', 'dd ', None, 'ff'], alignment_table.rows[3].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'cc ', 'dd ', 'ee ', 'ff'], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'ex ', None, None, 'ff'], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'cc ', None, 'ee ', 'ff'], alignment_table.rows[2].to_list_of_strings())
+        self.assertEqual(['aa bb ', 'ex ', 'dd ', None, 'ff'], alignment_table.rows[3].to_list_of_strings())
         self.assertEqual(['aaa aaa aaa aaa aaa', None, None, None, None], alignment_table.rows[4].to_list_of_strings())
 
     @unit_disabled  # like in the java version, this test currently fails
