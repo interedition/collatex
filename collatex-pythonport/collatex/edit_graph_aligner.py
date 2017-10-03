@@ -174,6 +174,7 @@ class EditGraphAligner(CollationAlgorithm):
         self.collation = collation
         self.debug_scores = debug_scores
         self.detect_transpositions = detect_transpositions
+        self.properties_filter = properties_filter
         self.token_index = TokenIndex(collation.witnesses)
         self.token_position_to_vertex = {}
         # self.scorer = Scorer(self.token_index, near_match=near_match, properties_filter=properties_filter)

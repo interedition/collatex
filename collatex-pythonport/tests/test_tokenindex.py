@@ -8,17 +8,17 @@ from collatex.tokenindex import TokenIndex
 
 class Test(unittest.TestCase):
     # helper method to assert LCP intervals
-    def assertLCP_Interval(self, start, length, depth, numberOfTimes, lcp_interval):
-        self.assertEquals(start, lcp_interval.start)
-        self.assertEquals(length, lcp_interval.length)
-        self.assertEquals(depth, lcp_interval.number_of_witnesses)
-        self.assertEquals(numberOfTimes, lcp_interval.number_of_occurrences)
+    def assertLCP_Interval(self, start, length, depth, numberOfTimes, block):
+        self.assertEquals(start, block.start)
+        self.assertEquals(length, block.length)
+        self.assertEquals(depth, block.get_depth())
+        self.assertEquals(numberOfTimes, len(block.get_all_instances()))
 
     # helper method to assert LCP intervals
     def assertIntervalIn(self, start, length, nr_of_occurrences, intervals):
         found = False
         for lcp_interval in intervals:
-            if lcp_interval.token_start_position == start and lcp_interval.minimum_block_length == length and lcp_interval.number_of_occurrences == nr_of_occurrences:
+            if lcp_interval.start == start and lcp_interval.length == length and len(lcp_interval.get_all_instances()) == nr_of_occurrences:
                 found = True
                 break
         if not found:
@@ -133,7 +133,7 @@ class Test(unittest.TestCase):
         token_index.prepare()
         intervals = token_index.split_lcp_array_into_intervals()
         potential_block = intervals[1] # ! q r s t
-        self.assertEqual(3, potential_block.number_of_witnesses)
+        self.assertEqual(3, potential_block.get_depth())
 
     # rename test, test does nothing regarding filtering
     def test_filter_potential_blocks(self):
@@ -142,12 +142,10 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("w2", "a")
         token_index = TokenIndex(collation.witnesses)
         token_index.prepare()
-        intervals = token_index.split_lcp_array_into_intervals()
+        blocks = token_index.split_lcp_array_into_intervals()
         # expectations
         # There is one interval with length 1, number of occurrences 3, number of witnesses: 2
-        a_interval = intervals[0] # a
-        self.assertEqual(2, a_interval.number_of_witnesses)
-        self.assertEqual(1, a_interval.length)
-        self.assertEqual(3, a_interval.number_of_occurrences)
-
-
+        a_block = blocks[0] # a
+        self.assertEqual(2, a_block.get_depth())
+        self.assertEqual(1, a_block.length)
+        self.assertEqual(3, len(a_block.get_all_instances()))

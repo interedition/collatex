@@ -32,7 +32,7 @@ class TokenIndex(object):
         # call third party library here
         self.suffix_array = self.get_suffix_array()
         self.lcp_array = self.get_lcp_array()
-        self.blocks = self._split_lcp_array_into_intervals()
+        self.blocks = self.split_lcp_array_into_intervals()
         self.construct_witness_to_block_instances_map()
 
     @classmethod
@@ -63,8 +63,9 @@ class TokenIndex(object):
             # # add marker token
             self.token_array.append(Token({"n": '$' + str(idx), 'sigil': sigil}))
             token_array_position += 1
+        self.token_array.pop() # remove last marker
 
-    def _split_lcp_array_into_intervals(self):
+    def split_lcp_array_into_intervals(self):
         closed_intervals = []
         previous_lcp_value = 0
         open_intervals = Stack()

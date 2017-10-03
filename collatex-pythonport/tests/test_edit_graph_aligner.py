@@ -154,17 +154,23 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "b")
         collation.add_plain_witness("C", "a b")
 
-        # aligner = EditGraphAligner(collation)
-        # graph = VariantGraph()
-        # aligner.collate(graph)
-        # superbase = aligner.new_superbase
-        # self.assertSuperbaseEquals("a b", superbase)
-
         alignment_table = collate(collation)
         print("alignment_table=\n", alignment_table)
         self.assertEqual(['a', None], alignment_table.rows[0].to_list_of_strings())
         self.assertEqual([None, 'b'], alignment_table.rows[1].to_list_of_strings())
         self.assertEqual(['a ', 'b'], alignment_table.rows[2].to_list_of_strings())
+
+    def test_2(self):
+        collation = Collation()
+        collation.add_plain_witness("W1", "in the in the bleach")
+        collation.add_plain_witness("W2", "in the in the bleach in the")
+        collation.add_plain_witness("W3", "in the in the bleach in the")
+
+        alignment_table = collate(collation)
+        print("alignment_table=\n", alignment_table)
+        self.assertEqual(['in the in the bleach', None], alignment_table.rows[0].to_list_of_strings())
+        self.assertEqual(['in the in the bleach ', 'in the'], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual(['in the in the bleach ', 'in the'], alignment_table.rows[2].to_list_of_strings())
 
     def test_rank_adjustment(self):
         collation = Collation()

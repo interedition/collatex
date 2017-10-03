@@ -35,7 +35,7 @@ class Scorer(object):
             self.match_function = self.near_match
         else:
             self.match_function = self.match
-        
+
     # edit operation:
     #    0 == match/replacement
     #    1 == addition/omission
@@ -97,7 +97,7 @@ class Scorer(object):
         # NOTE: if we split the dict into two: one for next witness and one for superbase
         # NOTE: only the ones that are going to be aligned have to be stored in superbase dict.
         self.global_tokens_to_occurrences.update(tokens_to_occurrences)
-        
+
     # return values:
     # 0 = FULL_MATCH
     # -1 = NO MATCH
@@ -129,12 +129,12 @@ class Scorer(object):
             return 0
         r = ratio(token_a.token_string, token_b.token_string)
         # print(str(token_a)+" "+str(token_b)+" "+str(r))
-        if r > 0.6: 
+        if r > 0.6:
             return 1
         else:
             return -1
         pass
-    
+
     # TODO: it should be possible to do this simpler, faster
     # An occurrence should know its tokens, since it knows its token range
     def _build_tokens_to_occurrences(self, token_index, witness, block_witness):
@@ -159,8 +159,8 @@ class Scorer(object):
         range_witness = self.token_index.get_range_for_witness(sigil_witness)
         # NOTE: to prevent recalculation of blocks
         if not self.blocks:
-            self.blocks = self._get_non_overlapping_repeating_blocks() 
-        blocks = self.blocks 
+            self.blocks = self._get_non_overlapping_repeating_blocks()
+        blocks = self.blocks
         # make a selection of blocks and occurrences of these blocks in the selected witness
         occurrences = []
         for block in blocks:
@@ -169,7 +169,7 @@ class Scorer(object):
             # we need to iterate over every single one
             for block_range in block_ranges_in_witness.contiguous():
                 occurrence = Occurrence(block_range, block)
-                occurrences.append(occurrence) 
+                occurrences.append(occurrence)
         # sort occurrences on position
         sorted_o = sorted(occurrences, key=attrgetter('lower_end'))
         block_witness = BlockWitness(sorted_o, self.token_index.token_array)
