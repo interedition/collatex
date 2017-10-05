@@ -59,7 +59,7 @@ class Scorer(object):
                 # do not change score for now
                 table_node.g = parent_node.g
                 # count segments
-                if parent_node.match == False:
+                if not parent_node.match:
                     table_node.segments = parent_node.segments + 1
                 return
             if match==1:
