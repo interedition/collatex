@@ -125,7 +125,7 @@ class Test(unittest.TestCase):
 |  cat  | kitten. |
 +-------+---------+"""
         plain_text_output = str(collate(json_in, layout="vertical"))
-        self.assertEquals(expected_output, plain_text_output)
+        self.assertEqual(expected_output, plain_text_output)
 
     def testSegmentationPretokenizedJSON(self):
         json_in = {
@@ -152,7 +152,7 @@ class Test(unittest.TestCase):
         # json_expected = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [{"adj": True, "t": "white"}, {"adj": True, "t": "stripy"}], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
         json_expected = {"table": [[[{"ref": 123, "sigil": "A", "t": "A", "token_array_position": 0}], [{"adj": True, "sigil": "A", "t": "black", "token_array_position": 1}], [{"id": "xyz", "sigil": "A", "t": "cat", "token_array_position": 2}]], [[{"sigil": "B", "t": "A", "token_array_position": 4}], [{"adj": True, "sigil": "B", "t": "white", "token_array_position": 5}, {"adj": True, "sigil": "B", "t": "stripy", "token_array_position": 6}], [{"n": "cat", "sigil": "B", "t": "kitten.", "token_array_position": 7}]]], "witnesses": ["A", "B"]}
         json_out = collate(json_in, output="json", segmentation=True)
-        self.assertEquals(json_expected, json.loads(json_out))
+        self.assertEqual(json_expected, json.loads(json_out))
 
 if __name__ == '__main__':
     unittest.main()

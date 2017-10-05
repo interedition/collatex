@@ -8,8 +8,8 @@ class Test(unittest.TestCase):
         contents = "a b c"
         tokenizer = WordPunctuationTokenizer()
         #print contents
-        self.assertEquals(["a ","b ","c"], tokenizer.tokenize(contents))
-    
+        self.assertEqual(["a ","b ","c"], tokenizer.tokenize(contents))
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testSuffix']
     unittest.main()

@@ -9,7 +9,7 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "The quick brown fox jumps over the dog.")
         collation.add_plain_witness("B", "The brown fox jumps over the lazy dog.")
         output = collate(collation, output="xml")
-        self.assertEquals(output_expected, output)
+        self.assertEqual(output_expected, output)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testSuffix']

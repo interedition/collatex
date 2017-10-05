@@ -20,10 +20,10 @@ class Test(unittest.TestCase):
         for lcp_interval in intervals:
             if lcp_interval.token_start_position == start and lcp_interval.minimum_block_length == length and lcp_interval.number_of_occurrences == nr_of_occurrences:
                 found = True
-                break 
+                break
         if not found:
             self.fail("Interval with "+str(start)+" and "+str(length)+" and "+str(nr_of_occurrences)+" not found in "+str(intervals))
-    
+
 # TODO: re-enable test!
     # Note: LCP intervals can overlap
     @unit_disabled
@@ -38,7 +38,7 @@ class Test(unittest.TestCase):
         self.assertIn((7, 10), parent_lcp_intervals)
         self.assertIn((7,8), child_lcp_intervals[7])
         self.assertIn((9,10), child_lcp_intervals[7])
-    
+
 # TODO: re-enable test!
     @unit_disabled
     def test_lcp_child_intervals_darwin(self):
@@ -89,9 +89,9 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         algorithm = Scorer(collation)
         block_witness = algorithm._get_block_witness(collation.witnesses[0])
-        self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
+        self.assertEqual(["a b c d F g h i !", "q r s t"], block_witness.debug())
         block_witness = algorithm._get_block_witness(collation.witnesses[1])
-        self.assertEquals(["a b c d F g h i !", "q r s t"], block_witness.debug())
+        self.assertEqual(["a b c d F g h i !", "q r s t"], block_witness.debug())
 
     @unit_disabled
     def test_block_witnesses_Hermans_case(self):
@@ -101,12 +101,12 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("W3", "a b c d E g h i ! q r s t")
         algorithm = Scorer(collation)
         block_witness1 = algorithm._get_block_witness(collation.witnesses[0])
-        self.assertEquals(["a b c d", "F", "g h i", "! q r s t"], block_witness1.debug())
+        self.assertEqual(["a b c d", "F", "g h i", "! q r s t"], block_witness1.debug())
         block_witness2 = algorithm._get_block_witness(collation.witnesses[1])
-        self.assertEquals(["a b c d", "F", "g h i", "! q r s t"], block_witness2.debug())
+        self.assertEqual(["a b c d", "F", "g h i", "! q r s t"], block_witness2.debug())
         block_witness3 = algorithm._get_block_witness(collation.witnesses[2])
-        self.assertEquals(["a b c d", "g h i", "! q r s t"], block_witness3.debug())
-        
+        self.assertEqual(["a b c d", "g h i", "! q r s t"], block_witness3.debug())
+
     # LCP interval is not ascending nor descending
     @unit_disabled
     def test_split_lcp_intervals_into_smaller_intervals(self):
@@ -119,7 +119,7 @@ class Test(unittest.TestCase):
         self.assertIntervalIn(0, 2, 3, split_intervals) # the cat
         self.assertIntervalIn(1, 1, 3, split_intervals) # cat
         self.assertEqual(2, len(split_intervals), "More items: "+str(split_intervals))
-        
+
     # LCP interval is ascending
     @unit_disabled
     def test_split_lcp_intervals_into_smaller_intervals_2(self):
