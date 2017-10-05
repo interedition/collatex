@@ -10,3 +10,4 @@ Or, if you have virtualenvwrapper installed::
 
     $ mkvirtualenv collatex
     $ pip install collatex
+
