@@ -1,1 +1,2 @@
 wheel==0.22.0
+networkx==1.11

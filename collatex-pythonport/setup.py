@@ -31,7 +31,7 @@ setup(
     package_dir={'collatex':
                  'collatex'},
     include_package_data=True,
-    install_requires=['networkx','prettytable'
+    install_requires=['networkx==1.11','prettytable'
     ],
     license="GPLv3",
     zip_safe=False,
