@@ -237,7 +237,7 @@ class DecisionTree(AStar):
     def __init__(self, aligner):
         self.aligner = aligner
 
-    def create_childnodes(self):
+    def create_childnodes(self, **kwargs):
         #         # check whether a token is a match
         #         token_a = tokens_a[self.state.pointer_a]
         #         token_b = tokens_b[self.state.pointer_b]

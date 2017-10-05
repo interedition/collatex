@@ -16,6 +16,15 @@ class Block:
         #  Note: depth is lazy initialized
         self._depth = None if self.end > 0 else 0
 
+    def __repr__(self):
+        if self.end == 0:
+            return str.format("Unclosed LCP interval start at: {},  length: {}", self.start, self.length)
+        return str.format("LCP interval (start,end): ({},{}), length: {}, depth: {}, getFrequency: {}",
+                          self.start, self.end, self.length, self.get_depth(), self.get_frequency())
+
+    def __lt__(self, other):
+        return (self.start < other.start) and (self.end < other.end)
+
     def get_depth(self):
         if self._depth is None:
             self._depth = self._calculate_depth()
@@ -47,18 +56,15 @@ class Block:
             result.append(token_range)
         return result
 
-    def __repr__(self):
-        if self.end == 0:
-            return str.format("Unclosed LCP interval start at: {},  length: {}", self.start, self.length)
-        return str.format("LCP interval (start,end): ({},{}), length: {}, depth: {}, getFrequency: {}",
-                          self.start, self.end, self.length, self.get_depth(), self.get_frequency())
-
     def _calculate_depth(self):
         # the same block can occur multiple times in one witness
         witness_sigils = set()
         for instance in self.get_all_instances():
             witness_sigils.add(instance.get_witness_sigil())
         return len(witness_sigils)
+
+    def _as_range(self):
+        return range(self.start, self.start + self.length)
 
 
 class Instance:
@@ -79,7 +85,7 @@ class Instance:
     def length(self):
         return self.block.length
 
-    def as_range(self):
+    def _as_range(self):
         return range(self.start_token, self.start_token + self.length())
 
     def get_tokens(self):
@@ -87,5 +93,7 @@ class Instance:
         return tokens
 
     def get_witness_sigil(self):
-        start_token = self.block.token_index.token_array[self.start_token]
-        return start_token.token_data['sigil']
+        if self.block.token_index.token_array:
+            start_token = self.block.token_index.token_array[self.start_token]
+            return start_token.token_data['_sigil']
+        return None
