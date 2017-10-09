@@ -3,8 +3,14 @@
 History
 -------
 
-2.1.3rc (2017-07-24)
-++++++++++++++++++++
+2.1.3rc1 (2017-10-09)
++++++++++++++++++++++
+* New version of the alignment algorithm (which we call the MatchCube approach)
+  to reduce order effects during multiple witness alignment.
+
+
+2.1.3rc0 (2017-07-24)
++++++++++++++++++++++
 * Added the new SVG renderer which uses the pygraphviz bindings instead of the graphviz bindings.
 * Thanks to David J. Birnbaum for the patch.
 * Fixed the CalledProcessError bug that the previous renderer caused when used with Python 3.
