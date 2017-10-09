@@ -67,7 +67,7 @@ public class MatchesTest extends AbstractTest {
         VariantGraph vg = collate(sw[0]);
         final Matches matches = Matches.between(vg.vertices(), sw[1].getTokens(), new EqualityTokenComparator());
         assertMatches(matches, 0, 3, 2);
-        assertEquals(7, matches.allMatches.values().stream().flatMap(List::stream).count());
+        assertEquals(7, matches.allMatches.values().stream().mapToLong(List::size).sum());
     }
 
 

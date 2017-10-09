@@ -34,6 +34,9 @@ public class Coordinate implements Comparable<Coordinate> {
         this.match = null; //TODO: this constructor should be removed
     }
 
+    // row -> position in witness (0+)
+    // column -> rank in variant graph (0+)
+    // match -> combination of witness token and vertex
     public Coordinate(int row, int column, Match match) {
         this.column = column;
         this.row = row;

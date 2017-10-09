@@ -45,12 +45,12 @@ package eu.interedition.collatex.suffixarray;
  * @see "http://yuta.256.googlepages.com/sais"
  */
 public final class SAIS implements ISuffixArrayBuilder {
-    private static interface BaseArray {
-        public int get(int i);
+    private interface BaseArray {
+        int get(int i);
 
-        public void set(int i, int val);
+        void set(int i, int val);
 
-        public int update(int i, int val);
+        int update(int i, int val);
     }
 
     private static final class ByteArray implements BaseArray {
@@ -151,7 +151,7 @@ public final class SAIS implements ISuffixArrayBuilder {
         }
 
         public int get(int i) {
-            return (int) (m_A.charAt(m_pos + i) & 0xffff);
+            return m_A.charAt(m_pos + i) & 0xffff;
         }
 
         public void set(int i, int val) {
@@ -174,7 +174,7 @@ public final class SAIS implements ISuffixArrayBuilder {
 
     private static void getBuckets(BaseArray C, BaseArray B, int k, boolean end) {
         int i, sum = 0;
-        if (end != false) {
+        if (end) {
             for (i = 0; i < k; ++i) {
                 sum += C.get(i);
                 B.set(i, sum);
@@ -263,7 +263,7 @@ public final class SAIS implements ISuffixArrayBuilder {
                     B.set(c1, b);
                     b = B.get(c1 = c0);
                 }
-                SA[--b] = ((0 < j) && (T.get(j - 1) > c1)) ? ~((int) T.get(j - 1)) : j;
+                SA[--b] = ((0 < j) && (T.get(j - 1) > c1)) ? ~T.get(j - 1) : j;
             } else if (j != 0) {
                 SA[i] = ~j;
             } else {
@@ -345,7 +345,7 @@ public final class SAIS implements ISuffixArrayBuilder {
                     diff = false;
                 }
             }
-            if (diff != false) {
+            if (diff) {
                 ++name;
                 q = p;
                 qlen = plen;
@@ -395,7 +395,7 @@ public final class SAIS implements ISuffixArrayBuilder {
             SA[i] = 0;
             SA[B.update(T.get(j), -1)] = j;
         }
-        if (isbwt == false) {
+        if (!isbwt) {
             induceSA(T, SA, C, B, n, k);
         } else {
             pidx = computeBWT(T, SA, C, B, n, k);

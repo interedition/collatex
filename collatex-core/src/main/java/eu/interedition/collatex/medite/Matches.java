@@ -23,20 +23,10 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.util.VertexMatch;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -91,41 +81,38 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
             }
             matches.addAll(threadPhrases);
         });
-        Collections.sort(matches, maximalUniqueMatchOrdering(matchEvaluator));
+        matches.sort(maximalUniqueMatchOrdering(matchEvaluator));
 
         return matches;
     }
 
     private static Comparator<SortedSet<VertexMatch.WithTokenIndex>> maximalUniqueMatchOrdering(final Function<SortedSet<VertexMatch.WithTokenIndex>, Integer> matchEvaluator) {
-        return new Comparator<SortedSet<VertexMatch.WithTokenIndex>>() {
-            @Override
-            public int compare(SortedSet<VertexMatch.WithTokenIndex> o1, SortedSet<VertexMatch.WithTokenIndex> o2) {
-                // 1. reverse ordering by match value
-                int result = matchEvaluator.apply(o2) - matchEvaluator.apply(o1);
-                if (result != 0) {
-                    return result;
-                }
-
-                final VertexMatch.WithTokenIndex firstMatch1 = o1.first();
-                final VertexMatch.WithTokenIndex firstMatch2 = o2.first();
-
-                // 2. ordering by match distance
-                result = (Math.abs(firstMatch1.token - firstMatch1.vertexRank) - Math.abs(firstMatch2.token - firstMatch2.vertexRank));
-                if (result != 0) {
-                    return result;
-                }
-
-
-                // 3. ordering by first vertex ranking
-                result = firstMatch1.vertexRank - firstMatch2.vertexRank;
-                if (result != 0) {
-                    return result;
-                }
-
-                // 3. ordering by first token index
-                return firstMatch1.token - firstMatch2.token;
-
+        return (o1, o2) -> {
+            // 1. reverse ordering by match value
+            int result = matchEvaluator.apply(o2) - matchEvaluator.apply(o1);
+            if (result != 0) {
+                return result;
             }
+
+            final VertexMatch.WithTokenIndex firstMatch1 = o1.first();
+            final VertexMatch.WithTokenIndex firstMatch2 = o2.first();
+
+            // 2. ordering by match distance
+            result = (Math.abs(firstMatch1.token - firstMatch1.vertexRank) - Math.abs(firstMatch2.token - firstMatch2.vertexRank));
+            if (result != 0) {
+                return result;
+            }
+
+
+            // 3. ordering by first vertex ranking
+            result = firstMatch1.vertexRank - firstMatch2.vertexRank;
+            if (result != 0) {
+                return result;
+            }
+
+            // 3. ordering by first token index
+            return firstMatch1.token - firstMatch2.token;
+
         };
     }
 
@@ -211,7 +198,7 @@ public class Matches extends ArrayList<SortedSet<VertexMatch.WithTokenIndex>> {
 
         @Override
         public String toString() {
-            return "[" + Arrays.asList(vertexRank, vertex, cursor.matchedClass()).stream().map(Object::toString).collect(Collectors.joining(", ")) + "]";
+            return "[" + Stream.of(vertexRank, vertex, cursor.matchedClass()).map(Object::toString).collect(Collectors.joining(", ")) + "]";
         }
     }
 }

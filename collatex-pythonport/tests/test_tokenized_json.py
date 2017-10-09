@@ -8,7 +8,7 @@ import unittest
 
 from collatex import collate
 from collatex.exceptions import *
-    
+
 
 class Test(unittest.TestCase):
 
@@ -34,7 +34,8 @@ class Test(unittest.TestCase):
       ]
     }
 
-        expected_json = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [{"adj": True, "t": "white"}], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
+        # expected_json = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [{"adj": True, "t": "white"}], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
+        expected_json = {"table": [[[{"ref": 123, "_sigil": "A", "t": "A", "_token_array_position": 0}], [{"adj": True, "_sigil": "A", "t": "black", "_token_array_position": 1}], [{"id": "xyz", "_sigil": "A", "t": "cat", "_token_array_position": 2}]], [[{"_sigil": "B", "t": "A", "_token_array_position": 4}], [{"adj": True, "_sigil": "B", "t": "white", "_token_array_position": 5}], [{"n": "cat", "_sigil": "B", "t": "kitten.", "_token_array_position": 6}]]], "witnesses": ["A", "B"]}
         json_out = collate(json_in, output="json")
         self.assertEqual(expected_json, json.loads(json_out))
 
@@ -58,7 +59,8 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        expected_json = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], None, [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
+        # expected_json = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], None, [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
+        expected_json = {"table": [[[{"ref": 123, "_sigil": "A", "t": "A", "_token_array_position": 0}], [{"adj": True, "_sigil": "A", "t": "black", "_token_array_position": 1}], [{"id": "xyz", "_sigil": "A", "t": "cat", "_token_array_position": 2}]], [[{"_sigil": "B", "t": "A", "_token_array_position": 4}], None, [{"n": "cat", "_sigil": "B", "t": "kitten.", "_token_array_position": 5}]]], "witnesses": ["A", "B"]}
         json_out = collate(json_in, output="json")
         self.assertEqual(expected_json, json.loads(json_out))
 
@@ -123,7 +125,7 @@ class Test(unittest.TestCase):
 |  cat  | kitten. |
 +-------+---------+"""
         plain_text_output = str(collate(json_in, layout="vertical"))
-        self.assertEquals(expected_output, plain_text_output)
+        self.assertEqual(expected_output, plain_text_output)
 
     def testSegmentationPretokenizedJSON(self):
         json_in = {
@@ -147,10 +149,10 @@ class Test(unittest.TestCase):
         }
       ]
     }
-        json_expected = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [{"adj": True, "t": "white"}, {"adj": True, "t": "stripy"}], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
-
+        # json_expected = {"table": [[[{"ref": 123, "t": "A"}], [{"adj": True, "t": "black"}], [{"id": "xyz", "t": "cat"}]], [[{"t": "A"}], [{"adj": True, "t": "white"}, {"adj": True, "t": "stripy"}], [{"n": "cat", "t": "kitten."}]]], "witnesses": ["A", "B"]}
+        json_expected = {"table": [[[{"ref": 123, "_sigil": "A", "t": "A", "_token_array_position": 0}], [{"adj": True, "_sigil": "A", "t": "black", "_token_array_position": 1}], [{"id": "xyz", "_sigil": "A", "t": "cat", "_token_array_position": 2}]], [[{"_sigil": "B", "t": "A", "_token_array_position": 4}], [{"adj": True, "_sigil": "B", "t": "white", "_token_array_position": 5}, {"adj": True, "_sigil": "B", "t": "stripy", "_token_array_position": 6}], [{"n": "cat", "_sigil": "B", "t": "kitten.", "_token_array_position": 7}]]], "witnesses": ["A", "B"]}
         json_out = collate(json_in, output="json", segmentation=True)
-        self.assertEquals(json_expected, json.loads(json_out))
+        self.assertEqual(json_expected, json.loads(json_out))
 
 if __name__ == '__main__':
     unittest.main()

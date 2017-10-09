@@ -23,17 +23,7 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.StreamSupport;
+import java.util.*;
 
 
 /**
@@ -73,7 +63,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
     @Override
     public void collate(VariantGraph graph, Iterable<Token> witness) {
         final VariantGraph.Vertex[][] vertices = VariantGraphRanking.of(graph).asArray();
-        final Token[] tokens = StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new);
+        final Token[] tokens = StreamUtil.stream(witness).toArray(Token[]::new);
 
         final SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches = new TreeSet<>(VertexMatch.<VertexMatch.WithTokenIndex>setComparator());
         for (Match match : match(vertices, tokens, equality, minimumTileLength)) {
@@ -106,17 +96,14 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
                     int matchLength = 0;
                     for (int tc = 0;
                          (tc + lc) < left.length && (tc + rc) < right.length &&
-                             !markedLeft[lc + tc] && !markedRight[rc + tc] &&
-                             equality.isEqual(left[lc + tc], right[rc + tc]);
+                                 !markedLeft[lc + tc] && !markedRight[rc + tc] &&
+                                 equality.isEqual(left[lc + tc], right[rc + tc]);
                          tc++) {
                         matchLength++;
                     }
 
                     if (matchLength >= maxMatchLength) {
-                        List<Match> theMatches = matchesByLength.get(matchLength);
-                        if (theMatches == null) {
-                            matchesByLength.put(matchLength, theMatches = new ArrayList<>());
-                        }
+                        List<Match> theMatches = matchesByLength.computeIfAbsent(matchLength, k -> new ArrayList<>());
                         theMatches.add(new Match(lc, rc));
                     }
 
@@ -126,7 +113,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
                 }
             }
 
-            for (Match match : matchesByLength.getOrDefault(maxMatchLength, Collections.<Match>emptyList())) {
+            for (Match match : matchesByLength.getOrDefault(maxMatchLength, Collections.emptyList())) {
                 boolean occluded = false;
 
                 for (int tc = 0; tc < maxMatchLength; tc++) {
@@ -150,7 +137,7 @@ public class GreedyStringTilingAlgorithm extends CollationAlgorithm.Base {
         return matches;
     }
 
-    public static interface Equality<A, B> {
+    public interface Equality<A, B> {
         boolean isEqual(A a, B b);
     }
 

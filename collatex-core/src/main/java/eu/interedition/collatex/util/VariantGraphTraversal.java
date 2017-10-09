@@ -22,70 +22,66 @@ package eu.interedition.collatex.util;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
  */
 public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
-    private final VariantGraph graph;
-    private final Set<Witness> witnesses;
+  private final VariantGraph graph;
+  private final Set<Witness> witnesses;
 
-    private VariantGraphTraversal(VariantGraph graph, Set<Witness> witnesses) {
-        this.graph = graph;
-        this.witnesses = witnesses;
-    }
+  private VariantGraphTraversal(VariantGraph graph, Set<Witness> witnesses) {
+    this.graph = graph;
+    this.witnesses = witnesses;
+  }
 
-    public static VariantGraphTraversal of(VariantGraph graph, Set<Witness> witnesses) {
-        return new VariantGraphTraversal(graph, witnesses);
-    }
+  public static VariantGraphTraversal of(VariantGraph graph, Set<Witness> witnesses) {
+    return new VariantGraphTraversal(graph, witnesses);
+  }
 
-    public static VariantGraphTraversal of(VariantGraph graph) {
-        return new VariantGraphTraversal(graph, null);
-    }
+  public static VariantGraphTraversal of(VariantGraph graph) {
+    return new VariantGraphTraversal(graph, null);
+  }
 
-    @Override
-    public Iterator<VariantGraph.Vertex> iterator() {
-        return new Iterator<VariantGraph.Vertex>() {
+  @Override
+  public Iterator<VariantGraph.Vertex> iterator() {
+    return new Iterator<VariantGraph.Vertex>() {
 
-            private final Map<VariantGraph.Vertex, Long> encountered = new HashMap<>();
-            private final Queue<VariantGraph.Vertex> queue = new ArrayDeque<>();
-            private Optional<VariantGraph.Vertex> next = Optional.of(graph.getStart());
+      private final Map<VariantGraph.Vertex, Long> encountered = new HashMap<>();
+      private final Queue<VariantGraph.Vertex> queue = new ArrayDeque<>();
+      private Optional<VariantGraph.Vertex> next = Optional.of(graph.getStart());
 
-            @Override
-            public boolean hasNext() {
-                return next.isPresent();
-            }
+      @Override
+      public boolean hasNext() {
+        return next.isPresent();
+      }
 
-            @Override
-            public VariantGraph.Vertex next() {
-                final VariantGraph.Vertex next = this.next.get();
-                for (Map.Entry<VariantGraph.Vertex, Set<Witness>> edge : next.outgoing().entrySet()) {
-                    if (witnesses != null && !edge.getValue().stream().anyMatch(witnesses::contains)) {
-                        continue;
-                    }
-                    final VariantGraph.Vertex end = edge.getKey();
+      @Override
+      public VariantGraph.Vertex next() {
+        final VariantGraph.Vertex next = this.next.get();
+        for (Map.Entry<VariantGraph.Vertex, Set<Witness>> edge : next.outgoing().entrySet()) {
+          if (witnesses != null && edge.getValue().stream().noneMatch(witnesses::contains)) {
+            continue;
+          }
+          final VariantGraph.Vertex end = edge.getKey();
 
-                    final long endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0L);
-                    final long endIncoming = end.incoming().entrySet().stream().filter(e -> witnesses == null || e.getValue().stream().anyMatch(witnesses::contains)).count();
+          final long endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0L);
+          final long endIncoming = end.incoming().entrySet().stream()//
+              .filter(e -> witnesses == null || e.getValue().stream().anyMatch(witnesses::contains))//
+              .count();
 
-                    if (endIncoming == endEncountered) {
-                        throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
-                    } else if ((endIncoming - endEncountered) == 1) {
-                        queue.add(end);
-                    }
+          if (endIncoming == endEncountered) {
+            throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
+          } else if ((endIncoming - endEncountered) == 1) {
+            queue.add(end);
+          }
 
-                    encountered.put(end, endEncountered + 1);
-                }
-                this.next = Optional.ofNullable(queue.poll());
-                return next;
-            }
-        };
-    }
+          encountered.put(end, endEncountered + 1);
+        }
+        this.next = Optional.ofNullable(queue.poll());
+        return next;
+      }
+    };
+  }
 }

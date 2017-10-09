@@ -24,6 +24,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.dekker.Tuple;
 import eu.interedition.collatex.util.ParallelSegmentationApparatus;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import javax.xml.stream.XMLStreamException;
@@ -31,23 +32,10 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -170,7 +158,7 @@ public class SimpleVariantGraphSerializer {
                 public void segment(SortedMap<Witness, Iterable<Token>> contents) {
                     try {
                         for (Iterator<Witness> witnessIt = contents.keySet().iterator(); witnessIt.hasNext(); ) {
-                            out.write(escapeCsvField(tokensToString.apply(contents.getOrDefault(witnessIt.next(), Collections.<Token>emptySet()))));
+                            out.write(escapeCsvField(tokensToString.apply(contents.getOrDefault(witnessIt.next(), Collections.emptySet()))));
                             if (witnessIt.hasNext()) {
                                 out.write(",");
                             }
@@ -247,11 +235,7 @@ public class SimpleVariantGraphSerializer {
     }
 
     private int numericId(VariantGraph.Vertex vertex) {
-        Integer id = vertexIds.get(vertex);
-        if (id == null) {
-            id = vertexIds.size();
-            vertexIds.put(vertex, id);
-        }
+        Integer id = vertexIds.computeIfAbsent(vertex, k -> vertexIds.size());
         return id;
     }
 
@@ -405,7 +389,7 @@ public class SimpleVariantGraphSerializer {
         private String forElement;
         private String type;
 
-        private GraphMLProperty(String forElement, String name, String type) {
+        GraphMLProperty(String forElement, String name, String type) {
             this.name = name;
             this.forElement = forElement;
             this.type = type;
@@ -431,15 +415,15 @@ public class SimpleVariantGraphSerializer {
         @Override
         public String apply(VariantGraph.Vertex input) {
             return input.witnesses().stream().findFirst()
-                .map(witness -> tokensToString.apply(Arrays.asList(input.tokens().stream().filter(t -> witness.equals(t.getWitness())).toArray(Token[]::new))))
-                .orElse("");
+                    .map(witness -> tokensToString.apply(Arrays.asList(input.tokens().stream().filter(t -> witness.equals(t.getWitness())).toArray(Token[]::new))))
+                    .orElse("");
         }
     };
 
-    static final Function<Iterable<Token>, String> SIMPLE_TOKEN_TO_STRING = input -> StreamSupport.stream(input.spliterator(), false)
-        .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
-        .map(t -> (SimpleToken) t)
-        .sorted()
-        .map(SimpleToken::getContent)
-        .collect(Collectors.joining());
+    static final Function<Iterable<Token>, String> SIMPLE_TOKEN_TO_STRING = input -> StreamUtil.stream(input)
+            .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
+            .map(t -> (SimpleToken) t)
+            .sorted()
+            .map(SimpleToken::getContent)
+            .collect(Collectors.joining());
 }

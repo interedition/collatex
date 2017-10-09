@@ -1,15 +1,6 @@
 package eu.interedition.collatex.dekker.astar;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-
-import eu.interedition.collatex.CollationAlgorithm;
+import java.util.*;
 
 
 /*
@@ -36,13 +27,8 @@ public abstract class AstarAlgorithm<N, C extends Cost<C>> {
     fScore.put(startNode, gScore.get(startNode).plus(heuristicCostEstimate(startNode)));
 
     // The set of tentative nodes to be evaluated, initially containing the start node
-    Comparator<N> comp = new Comparator<N>() {
-      @Override
-      public int compare(N node0, N node1) {
-        return fScore.get(node0).compareTo(fScore.get(node1));
-      }
-    };
-    PriorityQueue<N> open = new PriorityQueue<N>(10, comp);
+    Comparator<N> comp = Comparator.comparing(fScore::get);
+    PriorityQueue<N> open = new PriorityQueue<>(10, comp);
     open.add(startNode);
 
     while(!open.isEmpty()) {

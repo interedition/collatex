@@ -8,17 +8,17 @@ from collatex.tokenindex import TokenIndex
 
 class Test(unittest.TestCase):
     # helper method to assert LCP intervals
-    def assertLCP_Interval(self, start, length, depth, numberOfTimes, lcp_interval):
-        self.assertEquals(start, lcp_interval.start)
-        self.assertEquals(length, lcp_interval.length)
-        self.assertEquals(depth, lcp_interval.number_of_witnesses)
-        self.assertEquals(numberOfTimes, lcp_interval.number_of_occurrences)
+    def assertLCP_Interval(self, start, length, depth, numberOfTimes, block):
+        self.assertEqual(start, block.start)
+        self.assertEqual(length, block.length)
+        self.assertEqual(depth, block.get_depth())
+        self.assertEqual(numberOfTimes, len(block.get_all_instances()))
 
     # helper method to assert LCP intervals
     def assertIntervalIn(self, start, length, nr_of_occurrences, intervals):
         found = False
         for lcp_interval in intervals:
-            if lcp_interval.token_start_position == start and lcp_interval.minimum_block_length == length and lcp_interval.number_of_occurrences == nr_of_occurrences:
+            if lcp_interval.start == start and lcp_interval.length == length and len(lcp_interval.get_all_instances()) == nr_of_occurrences:
                 found = True
                 break
         if not found:
@@ -27,7 +27,7 @@ class Test(unittest.TestCase):
 
 
     def assertTokenArray(self, expected, token_index):
-        self.assertEquals(expected, " ".join(str(token) for token in token_index.token_array))
+        self.assertEqual(expected, " ".join(str(token) for token in token_index.token_array))
 
 
     def test_token_array_hermans_case(self):
@@ -55,8 +55,8 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("W2", "a b c d F g h i ! q r s t")
         token_index = TokenIndex(collation.witnesses)
         token_index.prepare()
-        self.assertEquals(RangeSet("0-14"), token_index.get_range_for_witness("W1"))
-        self.assertEquals(RangeSet("16-28"), token_index.get_range_for_witness("W2"))
+        self.assertEqual(RangeSet("0-14"), token_index.get_range_for_witness("W1"))
+        self.assertEqual(RangeSet("16-28"), token_index.get_range_for_witness("W2"))
 
     # TODO: add suffix array test by asserting that the tokens are sorted correctly
     # can't asserts the numbers due to randomness
@@ -71,7 +71,7 @@ class Test(unittest.TestCase):
         # Note: the suffix array can have multiple forms
         # outcome of sorting is not guaranteed
         # however the LCP array is fixed we can assert that
-        self.assertEquals(array('i', [0, 0, 0, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 1]), token_index.get_lcp_array())
+        self.assertEqual(array('i', [0, 0, 0, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 1]), token_index.get_lcp_array())
 
     def testCaseDanielStoeklLCPIntervals(self):
         collation = Collation()
@@ -86,7 +86,7 @@ class Test(unittest.TestCase):
         self.assertLCP_Interval(7, 2, 2, 2, blocks[2])  # c d
         self.assertLCP_Interval(9, 1, 3, 3, blocks[3])  # d
         self.assertLCP_Interval(12, 1, 2, 2, blocks[4])  # e
-        self.assertEquals(5, len(blocks))
+        self.assertEqual(5, len(blocks))
 
     def test_split_lcp_intervals_ascending_descending_ascending(self):
         lcp_array = array('i', [0, 4, 143, 87, 1, 1, 12, 93, 93, 37])
@@ -133,7 +133,7 @@ class Test(unittest.TestCase):
         token_index.prepare()
         intervals = token_index.split_lcp_array_into_intervals()
         potential_block = intervals[1] # ! q r s t
-        self.assertEqual(3, potential_block.number_of_witnesses)
+        self.assertEqual(3, potential_block.get_depth())
 
     # rename test, test does nothing regarding filtering
     def test_filter_potential_blocks(self):
@@ -142,12 +142,10 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("w2", "a")
         token_index = TokenIndex(collation.witnesses)
         token_index.prepare()
-        intervals = token_index.split_lcp_array_into_intervals()
+        blocks = token_index.split_lcp_array_into_intervals()
         # expectations
         # There is one interval with length 1, number of occurrences 3, number of witnesses: 2
-        a_interval = intervals[0] # a
-        self.assertEqual(2, a_interval.number_of_witnesses)
-        self.assertEqual(1, a_interval.length)
-        self.assertEqual(3, a_interval.number_of_occurrences)
-
-
+        a_block = blocks[0] # a
+        self.assertEqual(2, a_block.get_depth())
+        self.assertEqual(1, a_block.length)
+        self.assertEqual(3, len(a_block.get_all_instances()))

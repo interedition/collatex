@@ -18,8 +18,8 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "the cat is black")
         collation.add_plain_witness("B", "black is the cat")
         alignment_table = collate(collation)
-        self.assertEquals(["the cat", "is", "black"], alignment_table.rows[0].to_list())
-        self.assertEquals(["black", "is", "the cat"], alignment_table.rows[1].to_list())
+        self.assertEqual(["the cat", "is", "black"], alignment_table.rows[0].to_list())
+        self.assertEqual(["black", "is", "the cat"], alignment_table.rows[1].to_list())
 
     @unit_disabled
     def testDoubleTransposition2(self):
@@ -29,14 +29,14 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "b a")
         alignment_table = collate(collation)
         witness_a_list = alignment_table.rows[0].to_list()
-        self.assertEquals(len(witness_a_list), 3)
+        self.assertEqual(len(witness_a_list), 3)
         witness_b_list = alignment_table.rows[1].to_list()
-        self.assertEquals(len(witness_b_list), 3)
+        self.assertEqual(len(witness_b_list), 3)
         matching_tokens = []
         for idx in range(3):
             if witness_a_list[idx] == witness_b_list[idx]:
                 matching_tokens.append(witness_a_list[idx])
-        self.assertEquals(len(matching_tokens), 1)
+        self.assertEqual(len(matching_tokens), 1)
 
     @unit_disabled
     def testDoubleTransposition3(self):
@@ -49,14 +49,14 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("B", "b a c")
         alignment_table = collate(collation)
         witness_a_list = alignment_table.rows[0].to_list()
-        self.assertEquals(len(witness_a_list), 4)
+        self.assertEqual(len(witness_a_list), 4)
         witness_b_list = alignment_table.rows[1].to_list()
-        self.assertEquals(len(witness_b_list), 4)
+        self.assertEqual(len(witness_b_list), 4)
         matching_tokens = []
         for idx in range(4):
             if witness_a_list[idx] == witness_b_list[idx]:
                 matching_tokens.append(witness_a_list[idx])
-        self.assertEquals(len(matching_tokens), 2)
+        self.assertEqual(len(matching_tokens), 2)
         self.assertIn("c", matching_tokens)
 
     @unit_disabled

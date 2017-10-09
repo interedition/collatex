@@ -22,22 +22,13 @@ package eu.interedition.collatex;
 import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschAlgorithm;
 import eu.interedition.collatex.needlemanwunsch.NeedlemanWunschScorer;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VertexMatch;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
@@ -64,8 +55,8 @@ public interface CollationAlgorithm {
             for (Iterable<Token> witness : witnesses) {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "heap space: {0}/{1}", new Object[]{
-                        Runtime.getRuntime().totalMemory(),
-                        Runtime.getRuntime().maxMemory()
+                            Runtime.getRuntime().totalMemory(),
+                            Runtime.getRuntime().maxMemory()
                     });
                 }
                 collate(against, witness);
@@ -73,10 +64,10 @@ public interface CollationAlgorithm {
         }
 
         protected void merge(VariantGraph into, Iterable<Token> witnessTokens, Map<Token, VariantGraph.Vertex> alignments) {
-            final Witness witness = StreamSupport.stream(witnessTokens.spliterator(), false)
-                .findFirst()
-                .map(Token::getWitness)
-                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+            final Witness witness = StreamUtil.stream(witnessTokens)
+                    .findFirst()
+                    .map(Token::getWitness)
+                    .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Merge comparand into graph", new Object[]{into, witness});
@@ -131,34 +122,33 @@ public interface CollationAlgorithm {
         }
 
         protected void merge(VariantGraph graph, VariantGraph.Vertex[][] vertices, Token[] tokens, SortedSet<SortedSet<VertexMatch.WithTokenIndex>> matches) {
-            @SuppressWarnings("unchecked")
-            final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = matches.toArray(new SortedSet[matches.size()]);
+            @SuppressWarnings("unchecked") final SortedSet<VertexMatch.WithTokenIndex>[] matchesVertexOrder = matches.toArray(new SortedSet[matches.size()]);
             final SortedSet<VertexMatch.WithTokenIndex>[] matchesTokenOrder = Arrays.copyOf(matchesVertexOrder, matchesVertexOrder.length);
 
             Arrays.sort(matchesTokenOrder, Comparator.comparing(m -> m.first().token));
 
             final Set<SortedSet<VertexMatch.WithTokenIndex>> alignedMatches = NeedlemanWunschAlgorithm.align(
-                matchesVertexOrder,
-                matchesTokenOrder,
-                new MatchPhraseAlignmentScorer(Math.max(tokens.length, vertices.length))
+                    matchesVertexOrder,
+                    matchesTokenOrder,
+                    new MatchPhraseAlignmentScorer(Math.max(tokens.length, vertices.length))
             ).keySet();
 
             final Map<Token, VariantGraph.Vertex> alignments = matches.stream()
-                .filter(alignedMatches::contains)
-                .flatMap(Set::stream)
-                .collect(Collectors.toMap(m -> tokens[m.token], m -> m.vertex));
+                    .filter(alignedMatches::contains)
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toMap(m -> tokens[m.token], m -> m.vertex));
 
             final List<SortedSet<VertexMatch.WithToken>> transpositions = matches.stream()
-                .filter(m -> !alignedMatches.contains(m))
-                .map(t -> t.stream().map(m -> new VertexMatch.WithToken(m.vertex, m.vertexRank, tokens[m.token])).collect(Collectors.toCollection(TreeSet::new)))
-                .collect(Collectors.toList());
+                    .filter(m -> !alignedMatches.contains(m))
+                    .map(t -> t.stream().map(m -> new VertexMatch.WithToken(m.vertex, m.vertexRank, tokens[m.token])).collect(Collectors.toCollection(TreeSet::new)))
+                    .collect(Collectors.toList());
 
             merge(graph, Arrays.asList(tokens), alignments);
             mergeTranspositions(graph, transpositions);
         }
     }
 
-    static class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
+    class MatchPhraseAlignmentScorer implements NeedlemanWunschScorer<SortedSet<VertexMatch.WithTokenIndex>, SortedSet<VertexMatch.WithTokenIndex>> {
 
         private final int maxWitnessLength;
 

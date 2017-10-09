@@ -8,7 +8,9 @@ import eu.interedition.collatex.dekker.island.Coordinate;
 import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +36,9 @@ public class TokenIndexToMatches {
             // fetch block
             Block block = witnessInstance.block;
             List<Block.Instance> allInstances = block.getAllInstances();
-            List<Block.Instance> graphInstances = allInstances.stream().filter(instance -> instance.start_token < startTokenPositionForWitness).collect(Collectors.toList());
+            List<Block.Instance> graphInstances = allInstances.stream()//
+                    .filter(instance -> instance.start_token < startTokenPositionForWitness)//
+                    .collect(Collectors.toList());
             // now for every graph block instance we have to create matches
             // for backwards compatibility reasons we do that with the Island and Coordinates classes
             for (Block.Instance graphInstance : graphInstances) {
@@ -45,11 +49,11 @@ public class TokenIndexToMatches {
                 // set the tokens and vertices on the table
                 int graph_start_token = graphInstance.start_token;
                 for (int i = 0; i < block.length; i++) {
-                    VariantGraph.Vertex v = vertex_array[graph_start_token+i];
-                    if (v==null) {
+                    VariantGraph.Vertex v = vertex_array[graph_start_token + i];
+                    if (v == null) {
                         throw new RuntimeException("Vertex is null for token \"+graph_start_token+i+\" that is supposed to be mapped to a vertex in the graph!");
                     }
-                    int column = ranking.apply(v)-1;
+                    int column = ranking.apply(v) - 1;
                     int witnessStartToken = witnessInstance.start_token + i;
                     int row = witnessStartToken - startTokenPositionForWitness;
                     // create coordinate and at it to the Island for the combination of graph block instance and witness block instance

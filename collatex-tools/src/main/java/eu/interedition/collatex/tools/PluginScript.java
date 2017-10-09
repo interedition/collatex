@@ -81,71 +81,62 @@ public class PluginScript {
     }
 
     Function<String, Stream<String>> tokenizer() {
-        return (tokenizer ? new Function<String, Stream<String>>() {
-            @Override
-            public Stream<String> apply(String input) {
-                final Object result = invoke(TOKENIZER_FUNCTION, input);
-                if (!(result instanceof Iterable)) {
-                    throw new PluginScriptExecutionException("Wrong result type of " +
-                        TOKENIZER_FUNCTION + "(); expected an iterable type, found " +
-                        result.getClass());
-                }
-                final List<String> tokens = new LinkedList<>();
-                for (Object token : (Iterable<?>) result) {
-                    if (token == null) {
-                        throw new PluginScriptExecutionException(TOKENIZER_FUNCTION + "() returned null token");
-                    }
-                    if (!(token instanceof String)) {
-                        throw new PluginScriptExecutionException("Wrong result type of " +
-                            TOKENIZER_FUNCTION + "(); expected tokens of type string, found " +
-                            token.getClass());
-                    }
-                    tokens.add((String) token);
-                }
-
-                return tokens.stream();
+        return (tokenizer ? input -> {
+            final Object result = invoke(TOKENIZER_FUNCTION, input);
+            if (!(result instanceof Iterable)) {
+                throw new PluginScriptExecutionException("Wrong result type of " +
+                    TOKENIZER_FUNCTION + "(); expected an iterable type, found " +
+                    result.getClass());
             }
+            final List<String> tokens = new LinkedList<>();
+            for (Object token : (Iterable<?>) result) {
+                if (token == null) {
+                    throw new PluginScriptExecutionException(TOKENIZER_FUNCTION + "() returned null token");
+                }
+                if (!(token instanceof String)) {
+                    throw new PluginScriptExecutionException("Wrong result type of " +
+                        TOKENIZER_FUNCTION + "(); expected tokens of type string, found " +
+                        token.getClass());
+                }
+                tokens.add((String) token);
+            }
+
+            return tokens.stream();
         } : null);
     }
 
     Function<String, String> normalizer() {
-        return (normalizer ? new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                final Object result = invoke(NORMALIZER_FUNCTION, input);
-                if (!(result instanceof String)) {
-                    throw new PluginScriptExecutionException("Wrong result type of " +
-                        NORMALIZER_FUNCTION + "(); expected a string, found " +
-                        result.getClass());
-                }
-                return (String) result;
+        return (normalizer ? input -> {
+            final Object result = invoke(NORMALIZER_FUNCTION, input);
+            if (!(result instanceof String)) {
+                throw new PluginScriptExecutionException("Wrong result type of " +
+                    NORMALIZER_FUNCTION + "(); expected a string, found " +
+                    result.getClass());
             }
+            return (String) result;
         } : null);
     }
 
     Comparator<Token> comparator() {
-        return (comparator ? new Comparator<Token>() {
-            @Override
-            public int compare(Token o1, Token o2) {
-                if (!(o1 instanceof SimpleToken)) {
-                    throw new PluginScriptExecutionException(COMPARATOR_FUNCTION + "() called with wrong token type '" + o1.getClass());
-                }
-                if (!(o2 instanceof SimpleToken)) {
-                    throw new PluginScriptExecutionException(COMPARATOR_FUNCTION + "() called with wrong token type '" + o2.getClass());
-                }
-
-                final Object result = invoke(COMPARATOR_FUNCTION, ((SimpleToken) o1).getNormalized(), ((SimpleToken) o2).getNormalized());
-                if (result instanceof Number) {
-                    return ((Number) result).intValue();
-                }
-                if (result instanceof Boolean) {
-                    return (((Boolean) result) ? 0 : 1);
-                }
-
-                throw new PluginScriptExecutionException("Wrong result type of " +
-                    COMPARATOR_FUNCTION + "(); expected a number or boolean type, found " +
-                    result.getClass());
+        return (comparator ? (o1, o2) -> {
+            if (!(o1 instanceof SimpleToken)) {
+                throw new PluginScriptExecutionException(COMPARATOR_FUNCTION + "() called with wrong token type '" + o1.getClass());
             }
+            if (!(o2 instanceof SimpleToken)) {
+                throw new PluginScriptExecutionException(COMPARATOR_FUNCTION + "() called with wrong token type '" + o2.getClass());
+            }
+
+            final Object result = invoke(COMPARATOR_FUNCTION, ((SimpleToken) o1).getNormalized(), ((SimpleToken) o2).getNormalized());
+            if (result instanceof Number) {
+                return ((Number) result).intValue();
+            }
+            if (result instanceof Boolean) {
+                return (((Boolean) result) ? 0 : 1);
+            }
+
+            throw new PluginScriptExecutionException("Wrong result type of " +
+                COMPARATOR_FUNCTION + "(); expected a number or boolean type, found " +
+                result.getClass());
         } : null);
     }
 

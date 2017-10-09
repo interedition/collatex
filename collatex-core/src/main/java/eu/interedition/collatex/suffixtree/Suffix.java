@@ -119,8 +119,8 @@ class Suffix<T, S extends Iterable<T>> {
     int getRemaining() {
         if (isEmpty())
             return 0;
-        else
-            return (end - start);
+
+        return (end - start);
     }
 
     /**

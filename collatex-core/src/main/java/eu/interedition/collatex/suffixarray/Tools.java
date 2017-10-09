@@ -15,7 +15,7 @@ final class Tools {
      * Check if all symbols in the given range are greater than 0, return
      * <code>true</code> if so, <code>false</code> otherwise.
      */
-    static final boolean allPositive(int[] input, int start, int length) {
+    static boolean allPositive(int[] input, int start, int length) {
         for (int i = length - 1, index = start; i >= 0; i--, index++) {
             if (input[index] <= 0) {
                 return false;
@@ -28,7 +28,7 @@ final class Tools {
     /**
      * Determine the maximum value in a slice of an array.
      */
-    static final int max(int[] input, int start, int length) {
+    static int max(int[] input, int start, int length) {
         assert length >= 1;
 
         int max = input[start];
@@ -45,7 +45,7 @@ final class Tools {
     /**
      * Determine the minimum value in a slice of an array.
      */
-    static final int min(int[] input, int start, int length) {
+    static int min(int[] input, int start, int length) {
         assert length >= 1;
 
         int min = input[start];
@@ -85,7 +85,7 @@ final class Tools {
      * <code>assert</code> keyword so that such assertions can be disabled at run-time (for
      * performance reasons).
      */
-    static final void assertAlways(boolean condition, String msg) {
+    static void assertAlways(boolean condition, String msg) {
         if (!condition) {
             throw new AssertionError(msg);
         }

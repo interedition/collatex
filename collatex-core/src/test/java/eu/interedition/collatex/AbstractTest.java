@@ -25,25 +25,16 @@ import eu.interedition.collatex.dekker.Match;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 import eu.interedition.collatex.util.VariantGraphTraversal;
 import org.junit.Assert;
 import org.junit.Before;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static eu.interedition.collatex.dekker.Match.PHRASE_MATCH_TO_TOKENS;
 import static org.junit.Assert.assertEquals;
@@ -101,25 +92,30 @@ public abstract class AbstractTest {
     protected static String toString(VariantGraph.Vertex vertex, Witness... witnesses) {
         final Set<Witness> witnessSet = new HashSet<>(Arrays.asList(witnesses));
         return vertex.tokens().stream()
-            .filter(t -> witnessSet.contains(t.getWitness()))
-            .collect(Collectors.groupingBy(Token::getWitness)).entrySet().stream()
-            .sorted(Comparator.comparing(e -> e.getKey().getSigil()))
-            .map(Map.Entry::getValue)
-            .flatMap(tokens -> tokens.stream()
-                    .filter(t -> t instanceof SimpleToken)
-                    .map(t -> (SimpleToken) t)
-                    .sorted()
-                    .map(SimpleToken::getNormalized)
-            )
-            .collect(Collectors.joining(" "));
+                .filter(t -> witnessSet.contains(t.getWitness()))
+                .collect(Collectors.groupingBy(Token::getWitness)).entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey().getSigil()))
+                .map(Map.Entry::getValue)
+                .flatMap(tokens -> tokens.stream()
+                        .filter(t -> t instanceof SimpleToken)
+                        .map(t -> (SimpleToken) t)
+                        .sorted()
+                        .map(SimpleToken::getNormalized)
+                )
+                .collect(Collectors.joining(" "));
     }
 
     protected static void assertGraphVertices(VariantGraph graph, int vertices) {
-        assertEquals(vertices, StreamSupport.stream(graph.vertices().spliterator(), false).count());
+        assertEquals(vertices, StreamUtil.stream(graph.vertices()).count());
     }
 
     protected static void assertGraphEdges(VariantGraph graph, int edges) {
-        assertEquals(edges, StreamSupport.stream(graph.vertices().spliterator(), false).map(VariantGraph.Vertex::outgoing).map(Map::keySet).flatMap(Set::stream).count());
+        assertEquals(edges,
+                StreamUtil.stream(graph.vertices())//
+                        .map(VariantGraph.Vertex::outgoing)//
+                        .map(Map::keySet)//
+                        .mapToLong(Set::size)//
+                        .sum());
     }
 
     protected static void assetGraphSize(VariantGraph graph, int vertices, int edges) {
@@ -161,30 +157,30 @@ public abstract class AbstractTest {
 
     protected static Stream<Witness> witnesses(List<SortedMap<Witness, Set<Token>>> table) {
         return table.stream()
-            .map(SortedMap::keySet)
-            .flatMap(Set::stream)
-            .distinct();
+                .map(SortedMap::keySet)
+                .flatMap(Set::stream)
+                .distinct();
     }
 
     protected static String toString(List<SortedMap<Witness, Set<Token>>> table) {
         return witnesses(table)
-            .sorted(Witness.SIGIL_COMPARATOR)
-            .map(witness -> String.format("%s: %s\n", witness.getSigil(), toString(table, witness)))
-            .collect(Collectors.joining());
+                .sorted(Witness.SIGIL_COMPARATOR)
+                .map(witness -> String.format("%s: %s\n", witness.getSigil(), toString(table, witness)))
+                .collect(Collectors.joining());
     }
 
     protected static String toString(List<SortedMap<Witness, Set<Token>>> table, Witness witness) {
         return String.format("|%s|", table.stream()
-            .map(r -> r.getOrDefault(witness, Collections.emptySet()))
-            .map(tokens -> tokens.stream()
-                    .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
-                    .map(t -> (SimpleToken) t)
-                    .sorted()
-                    .map(SimpleToken::getNormalized)
-                    .collect(Collectors.joining(" "))
-            )
-            .map(cell -> cell.isEmpty() ? " " : cell)
-            .collect(Collectors.joining("|")));
+                .map(r -> r.getOrDefault(witness, Collections.emptySet()))
+                .map(tokens -> tokens.stream()
+                        .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
+                        .map(t -> (SimpleToken) t)
+                        .sorted()
+                        .map(SimpleToken::getNormalized)
+                        .collect(Collectors.joining(" "))
+                )
+                .map(cell -> cell.isEmpty() ? " " : cell)
+                .collect(Collectors.joining("|")));
     }
 
     protected void assertPhraseMatches(String... expectedPhrases) {

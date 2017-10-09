@@ -13,9 +13,9 @@ import java.util.Set;
  * @author <a href="https://github.com/maxgarfinkel/suffixTree">Max Garfinkel</a>
  */
 class Node<T, S extends Iterable<T>> implements Iterable<Edge<T, S>> {
-    private final Map<T, Edge<T, S>> edges = new HashMap<T, Edge<T, S>>();
+    private final Map<T, Edge<T, S>> edges = new HashMap<>();
     private final Edge<T, S> incomingEdge;
-    private Set<SequenceTerminal<S>> sequenceTerminals = new HashSet<SequenceTerminal<S>>();
+    private Set<SequenceTerminal<S>> sequenceTerminals = new HashSet<>();
     private final Sequence<T, S> sequence;
     private final SuffixTree<T, S> tree;
     private Node<T, S> link = null;
@@ -50,8 +50,8 @@ class Node<T, S extends Iterable<T>> implements Iterable<Edge<T, S>> {
             activePoint.incrementLength();
         } else {
             saveSequenceTerminal(item);
-            Edge<T, S> newEdge = new Edge<T, S>(suffix.getEndPosition() - 1, this,
-                sequence, tree);
+            Edge<T, S> newEdge = new Edge<>(suffix.getEndPosition() - 1, this,
+                    sequence, tree);
             edges.put((T) suffix.getEndItem(), newEdge);
             suffix.decrement();
             activePoint.updateAfterInsert(suffix);
@@ -59,8 +59,8 @@ class Node<T, S extends Iterable<T>> implements Iterable<Edge<T, S>> {
             if (tree.isNotFirstInsert() && !this.equals(tree.getRoot())) {
                 tree.getLastNodeInserted().setSuffixLink(this);
             }
-            if (suffix.isEmpty())
-                return;
+            if (suffix.isEmpty()) {
+            }
             else
                 tree.insert(suffix);
         }

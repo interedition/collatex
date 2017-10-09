@@ -139,16 +139,16 @@ public class Island implements Iterable<Coordinate> {
     @Override
     public String toString() {
         List<Token> instance = getBlockInstance().getTokens();
-        String normalized = "";
+        StringBuilder normalized = new StringBuilder();
         for (int i = 0; i < this.size(); i++) {
             Token t = instance.get(i);
             SimpleToken st = (SimpleToken) t;
-            if (!normalized.isEmpty()) {
-                normalized += " ";
+            if (normalized.length() > 0) {
+                normalized.append(" ");
             }
-            normalized += st.getNormalized();
+            normalized.append(st.getNormalized());
         }
-        return normalized;
+        return normalized.toString();
 
 //        if (islandCoordinates.isEmpty()) {
 //            //throw new RuntimeException("Unexpected situation: island coordinates empty!");

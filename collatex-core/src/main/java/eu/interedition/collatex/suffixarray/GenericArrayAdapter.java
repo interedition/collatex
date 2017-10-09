@@ -1,7 +1,6 @@
 package eu.interedition.collatex.suffixarray;
 
 import java.util.Comparator;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
@@ -45,7 +44,7 @@ class GenericArrayAdapter<T> {
          * We associate every token to an id, all `equal´ tokens to the same id.
          * The suffix array is built using only the the ids.
          */
-        tokIDs = new TreeMap<T, Integer>(comparator);
+        tokIDs = new TreeMap<>(comparator);
 
         for (int i = 0; i < length; i++) {
             tokIDs.putIfAbsent(tokens[i], i);

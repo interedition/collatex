@@ -66,7 +66,7 @@ public class VariantGraphJSONMessageBodyWriter implements MessageBodyWriter<Vari
             @Override
             public void segment(SortedMap<Witness, Iterable<eu.interedition.collatex.Token>> contents) {
                 jgen.writeStartArray();
-                contents.values().stream().forEach(tokens -> {
+                contents.values().forEach(tokens -> {
                     jgen.writeStartArray();
                     StreamSupport.stream(Spliterators.spliteratorUnknownSize(tokens.iterator(), Spliterator.NONNULL | Spliterator.IMMUTABLE), false)
                         .filter(t -> t instanceof SimpleToken)

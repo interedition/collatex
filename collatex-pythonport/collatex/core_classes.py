@@ -18,7 +18,6 @@ from collatex.exceptions import TokenError
 
 
 class Collation(object):
-
     @classmethod
     def create_from_dict(cls, data, limit=None):
         witnesses = data["witnesses"]
@@ -43,7 +42,7 @@ class Collation(object):
         self.witnesses.append(witness)
 
     def add_plain_witness(self, sigil, content):
-        return self.add_witness({'id':sigil, 'content':content})
+        return self.add_witness({'id': sigil, 'content': content})
 
 
 class Row(object):
@@ -71,7 +70,7 @@ class Column(object):
 
 
 class AlignmentTable(object):
-    def __init__(self, collation, graph=None, layout="horizontal",ranks=None):
+    def __init__(self, collation, graph=None, layout="horizontal", ranks=None):
         self.collation = collation
         self.graph = graph
         self.layout = layout
@@ -80,7 +79,7 @@ class AlignmentTable(object):
         if graph:
             self._construct_table(ranks)
 
-    def _construct_table(self,ranks):
+    def _construct_table(self, ranks):
         if ranks:
             ranking = ranks
         else:
@@ -98,7 +97,7 @@ class AlignmentTable(object):
                     self.columns.append(column)
                 for (sigil, token) in vertex.tokens.items():
                     column.put(sigil, token)
-               # set status: is a column variant or invariant
+                    # set status: is a column variant or invariant
                 column.variant = len(vertices) > 1 or len(column.tokens_per_witness) != len(self.collation.witnesses)
 
         # construct rows
@@ -136,7 +135,7 @@ def visualizeTableHorizontal(table):
     for row in table.rows:
         cells = [row.header]
         t_list = [(token.token_data["t"] for token in cell) if cell else ["-"] for cell in row.cells]
-        cells.extend([re.sub('\s+$','',"".join(cell)) for cell in t_list])
+        cells.extend([re.sub('\s+$', '', "".join(cell)) for cell in t_list])
         x.add_row(cells)
     # alignment can only be set after the field names are known.
     # since add_row sets the field names, it has to be set after x.add_row(cells)
@@ -330,8 +329,8 @@ def join(graph):
                     graph.connect(vertex, neighbor, data["label"])
                 graph.remove_edge(vertex, join_candidate)
                 graph.remove_node(join_candidate)
-                queue.appendleft(vertex);
-                continue;
+                queue.appendleft(vertex)
+                continue
         processed.add(vertex)
         for (_, neighbor) in out_edges:
             # FIXME: Why do we run out of memory in some cases here, if this is not checked?
