@@ -227,7 +227,7 @@ class EditGraphAligner(CollationAlgorithm):
             match_cube = MatchCube(self.token_index, witness, self.vertex_array, variant_graph_ranking,
                                    self.properties_filter)
             # print("> match_cube.matches=", match_cube.matches)
-            self.fill_needleman_wunsch_table(variant_graph_ranks, tokens, tokens_as_index_list, match_cube)
+            self.fill_needleman_wunsch_table(variant_graph_ranks, tokens_as_index_list, match_cube)
 
             aligned = self.align_matching_tokens(match_cube)
             # print("> aligned=", aligned)
@@ -271,7 +271,7 @@ class EditGraphAligner(CollationAlgorithm):
             counter += 1
         return tokens_as_index_list
 
-    def fill_needleman_wunsch_table(self, variant_graph_ranks, next_witness, tokens_as_index_list, match_cube):
+    def fill_needleman_wunsch_table(self, variant_graph_ranks, tokens_as_index_list, match_cube):
         self.cells = [[None for row in range(0, len(variant_graph_ranks))] for col in
                       range(0, len(tokens_as_index_list))]
         scorer = Scorer(match_cube)
