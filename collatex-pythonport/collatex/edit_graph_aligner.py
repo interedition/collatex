@@ -5,9 +5,7 @@ Created on Aug 5, 2014
 '''
 from enum import Enum
 
-from prettytable import PrettyTable
-
-from collatex.core_classes import CollationAlgorithm, VariantGraphRanking, VariantGraph, Token
+from collatex.core_classes import CollationAlgorithm, VariantGraphRanking, VariantGraph
 from collatex.suffix_based_scorer import Scorer
 from collatex.tokenindex import TokenIndex
 from collatex.transposition_handling import TranspositionDetection
@@ -146,7 +144,6 @@ class Scorer():
     def score(self, x, y, parent):
         rank = x - 1
         if self.match_cube.has_match(y - 1, rank):
-            match = self.match_cube.get_match(y - 1, rank)
             return Score(ScoreType.match, x, y, parent, parent.global_score + 1)
         return Score(ScoreType.mismatch, x, y, parent, parent.global_score - 1)
 
