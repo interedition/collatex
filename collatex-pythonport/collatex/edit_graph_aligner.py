@@ -6,7 +6,6 @@ Created on Aug 5, 2014
 from enum import Enum
 
 from collatex.core_classes import CollationAlgorithm, VariantGraphRanking, VariantGraph
-from collatex.suffix_based_scorer import Scorer
 from collatex.tokenindex import TokenIndex
 from collatex.transposition_handling import TranspositionDetection
 
@@ -188,8 +187,6 @@ class EditGraphAligner(CollationAlgorithm):
         self.properties_filter = properties_filter
         self.token_index = TokenIndex(collation.witnesses)
         self.token_position_to_vertex = {}
-        # self.scorer = Scorer(self.token_index, near_match=near_match, properties_filter=properties_filter)
-        # self.align_function = self._align_table
         self.added_witness = []
         self.omitted_base = []
         self.vertex_array = []
