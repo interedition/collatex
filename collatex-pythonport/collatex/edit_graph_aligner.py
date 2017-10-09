@@ -213,7 +213,7 @@ class EditGraphAligner(CollationAlgorithm):
         for x in range(1, len(self.collation.witnesses)):
             witness = self.collation.witnesses[x]
             tokens = witness.tokens()
-            print("\nwitness", witness.sigil)
+            # print("\nwitness", witness.sigil)
 
             variant_graph_ranking = VariantGraphRanking.of(graph)
             # print("> x =", x, ", variant_graph_ranking =", variant_graph_ranking.byRank)
@@ -318,7 +318,8 @@ class EditGraphAligner(CollationAlgorithm):
     def align_matching_tokens(self, cube):
         #  using the score iterator..
         #  find all the matches
-        #  later for the transposition detection, we also want to keep track of all the additions, omissions, and replacements
+        #  later for the transposition detection, we also want to keep track of all the additions,
+        #  omissions, and replacements
         aligned = {}
         scores = ScoreIterator(self.cells)
         matched_vertices = []
