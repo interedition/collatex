@@ -3,7 +3,8 @@
 
 __author__ = 'Ronald Haentjens Dekker'
 __email__ = 'ronald.dekker@huygens.knaw.nl'
-__version__ = '2.1.0'
+__version__ = '2.1.3rc1'
+
 
 from collatex.core_classes import Collation
 from collatex.core_functions import collate

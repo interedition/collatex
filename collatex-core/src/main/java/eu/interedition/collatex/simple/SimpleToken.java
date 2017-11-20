@@ -21,12 +21,12 @@ package eu.interedition.collatex.simple;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VertexMatch;
 
 import java.util.SortedSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class SimpleToken implements Token, Comparable<SimpleToken> {
     private final SimpleWitness witness;
@@ -54,16 +54,16 @@ public class SimpleToken implements Token, Comparable<SimpleToken> {
 
     @Override
     public String toString() {
-        return new StringBuilder(witness.toString()).append(":").append(witness.getTokens().indexOf(this)).append(":'").append(normalized).append("'").toString();
+        return witness.toString() + ":" + witness.getTokens().indexOf(this) + ":'" + normalized + "'";
     }
 
     public static String toString(Iterable<? extends Token> tokens) {
-        return StreamSupport.stream(tokens.spliterator(), false)
-            .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
-            .map(t -> (SimpleToken) t)
-            .map(SimpleToken::getContent)
-            .collect(Collectors.joining())
-            .trim();
+        return StreamUtil.stream(tokens)
+                .filter(t -> SimpleToken.class.isAssignableFrom(t.getClass()))
+                .map(t -> (SimpleToken) t)
+                .map(SimpleToken::getContent)
+                .collect(Collectors.joining())
+                .trim();
     }
 
     @Override

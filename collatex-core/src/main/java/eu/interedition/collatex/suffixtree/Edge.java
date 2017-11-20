@@ -60,8 +60,8 @@ class Edge<T, S extends Iterable<T>> implements Iterable<T> {
             suffix.decrement();
             activePoint.updateAfterInsert(suffix);
 
-            if (suffix.isEmpty())
-                return;
+            if (suffix.isEmpty()) {
+            }
             else
                 tree.insert(suffix);
         }
@@ -75,12 +75,12 @@ class Edge<T, S extends Iterable<T>> implements Iterable<T> {
      * @param activePoint The active point to insert it at.
      */
     private void split(Suffix<T, S> suffix, ActivePoint<T, S> activePoint) {
-        Node<T, S> breakNode = new Node<T, S>(this, sequence, tree);
-        Edge<T, S> newEdge = new Edge<T, S>(suffix.getEndPosition() - 1, breakNode,
-            sequence, tree);
+        Node<T, S> breakNode = new Node<>(this, sequence, tree);
+        Edge<T, S> newEdge = new Edge<>(suffix.getEndPosition() - 1, breakNode,
+                sequence, tree);
         breakNode.insert(newEdge);
-        Edge<T, S> oldEdge = new Edge<T, S>(start + activePoint.getLength(),
-            breakNode, sequence, tree);
+        Edge<T, S> oldEdge = new Edge<>(start + activePoint.getLength(),
+                breakNode, sequence, tree);
         oldEdge.end = end;
         oldEdge.terminal = this.terminal;
         breakNode.insert(oldEdge);

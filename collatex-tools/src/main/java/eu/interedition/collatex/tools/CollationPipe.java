@@ -203,7 +203,7 @@ public class CollationPipe {
         }
     }
 
-    private static InputStream argumentToInputStream(String arg) throws MalformedURLException, IOException {
+    private static InputStream argumentToInputStream(String arg) throws IOException {
         if ("-".equals(arg)) {
 	    return System.in;
         }

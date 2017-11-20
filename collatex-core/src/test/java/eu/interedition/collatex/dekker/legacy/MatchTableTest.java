@@ -19,6 +19,10 @@
 
 package eu.interedition.collatex.dekker.legacy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import eu.interedition.collatex.AbstractTest;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -26,15 +30,11 @@ import eu.interedition.collatex.dekker.island.Coordinate;
 import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.simple.SimpleWitness;
-import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class MatchTableTest extends AbstractTest {
 
@@ -175,7 +175,7 @@ public class MatchTableTest extends AbstractTest {
         MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         List<Island> islands = new ArrayList<>(table.getIslands());
         assertEquals(2, islands.size());
-        Collections.sort(islands, new IslandPositionComparator());
+        islands.sort(new IslandPositionComparator());
         Island island = islands.get(1);
         assertIslandEquals(0, 2, 2, 4, island);
     }
@@ -187,7 +187,7 @@ public class MatchTableTest extends AbstractTest {
         MatchTable table = MatchTableImpl.create(graph, witnesses[1]);
         List<Island> islands = new ArrayList<>(table.getIslands());
         assertEquals(3, islands.size());
-        Collections.sort(islands, new IslandPositionComparator());
+        islands.sort(new IslandPositionComparator());
         Island island = islands.get(0);
         assertIslandEquals(0, 0, 0, 0, island);
     }
@@ -198,7 +198,7 @@ public class MatchTableTest extends AbstractTest {
         VariantGraph graph = collate(w[0]);
         MatchTable table = MatchTableImpl.create(graph, w[1], new EqualityTokenComparator());
         List<Island> islands = new ArrayList<>(table.getIslands());
-        Collections.sort(islands, new IslandPositionComparator());
+        islands.sort(new IslandPositionComparator());
         assertEquals(4, islands.size());
         assertVectorEquals(0, 0, 1, islands.get(0));
         assertVectorEquals(3, 0, 2, islands.get(1));

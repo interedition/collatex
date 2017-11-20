@@ -10,9 +10,10 @@ from collatex.exceptions import SegmentationError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
 import json
 from collatex.edit_graph_aligner import EditGraphAligner
-from collatex.display_module import display_alignment_table_as_HTML, visualizeTableVerticallyWithColors
-from collatex.display_module import display_variant_graph_as_SVG
+from collatex.display_module import display_alignment_table_as_html, visualize_table_vertically_with_colors
+from collatex.display_module import display_variant_graph_as_svg
 from collatex.near_matching import perform_near_match
+
 
 # Valid options for output are:
 # "table" for the alignment table (default)
@@ -26,9 +27,8 @@ from collatex.near_matching import perform_near_match
 #   Wrapper element is always <p>
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
-## From core_functions.py
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
-            detect_transpositions=False, debug_scores=False, properties_filter=None, svg_output=None, indent=False):
+            detect_transpositions=False, debug_scores=False, properties_filter=None, indent=False):
     # collation may be collation or json; if it's the latter, use it to build a real collation
     if isinstance(collation, dict):
         json_collation = Collation()
@@ -44,7 +44,7 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
     # build graph
     graph = VariantGraph()
-    algorithm.collate(graph, collation)
+    algorithm.collate(graph)
     ranking = VariantGraphRanking.of(graph)
     if near_match:
         # Segmentation not supported for near matching; raise exception if necessary
@@ -58,8 +58,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         join(graph)
         ranking = VariantGraphRanking.of(graph)
     # check which output format is requested: graph or table
-    if output == "svg":
-        return display_variant_graph_as_SVG(graph, svg_output)
+    if output == "svg" or output == "svg_simple":
+        return display_variant_graph_as_svg(graph, output)
     if output == "graph":
         return graph
     # create alignment table
@@ -67,9 +67,9 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     if output == "json":
         return export_alignment_table_as_json(table)
     if output == "html":
-        return display_alignment_table_as_HTML(table)
+        return display_alignment_table_as_html(table)
     if output == "html2":
-        return visualizeTableVerticallyWithColors(table, collation)
+        return visualize_table_vertically_with_colors(table, collation)
     if output == "table":
         return table
     if output == "xml":

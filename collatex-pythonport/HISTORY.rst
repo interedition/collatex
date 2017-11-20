@@ -3,6 +3,32 @@
 History
 -------
 
+2.1.3rc1 (2017-10-09)
++++++++++++++++++++++
+* New version of the alignment algorithm (which we call the MatchCube approach)
+  to reduce order effects during multiple witness alignment.
+
+
+2.1.3rc0 (2017-07-24)
++++++++++++++++++++++
+* Added the new SVG renderer which uses the pygraphviz bindings instead of the graphviz bindings.
+* Thanks to David J. Birnbaum for the patch.
+* Fixed the CalledProcessError bug that the previous renderer caused when used with Python 3.
+
+2.1.2 (2017-01-10)
+++++++++++++++++++
+* Added the ability to use output="svg_simple" next to output="svg". The "svg_simple" option gets you the n-property
+* based graph, so just the normalized version of the tokens, which will hide any variation in the t-property.
+* Thanks to Joris van Zundert for the patch.
+* Changed the colour scheme of the "html2" output option, to aid those with Red/Green colour-blindness.
+* Thanks to Melodee H. Beals for the patch.
+
+2.1.1 (2016-12-17)
+++++++++++++++++++
+* Bug fix release
+* Fixed a bug in the new near match functionality that would cause tokens to go missing in the alignment table.
+* Thanks to Torsten Hiltmann for reporting it and providing a test case.
+
 2.1.0 (2016-11-01)
 ++++++++++++++++++
 * Official release for the Dixit code and collation workshop in Amsterdam

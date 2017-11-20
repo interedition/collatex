@@ -66,7 +66,7 @@ public class CollateXLaboratory extends JFrame {
 
     private final JTable matchMatrixTable = new JTable();
 
-    private final JComboBox algorithm;
+    private final JComboBox<String> algorithm;
     private final JTabbedPane tabbedPane;
 
     public CollateXLaboratory() {

@@ -24,9 +24,9 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("A", "I bought this glass , because it matches those dinner plates")
         collation.add_plain_witness("B", "I bought those glasses")
         alignment_table = collate(collation)
-        self.assertEquals(["I bought ", "this glass , because it matches ", "those ", "dinner plates"],
+        self.assertEqual(["I bought ", "this glass , because it matches ", "those ", "dinner plates"],
                           alignment_table.rows[0].to_list_of_strings())
-        self.assertEquals(["I bought ", None, "those ", "glasses"], alignment_table.rows[1].to_list_of_strings())
+        self.assertEqual(["I bought ", None, "those ", "glasses"], alignment_table.rows[1].to_list_of_strings())
 
     def test_near_matching(self):
         collation = Collation()
@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
 | A | over | this | -     | dog |
 | B | over | that | there | dog |
 +---+------+------+-------+-----+"""
-        self.assertEquals(expected, alignment_table)
+        self.assertEqual(expected, alignment_table)
 
     def test_near_matching_accidentally_incorrect_short(self):
         collation = Collation()
@@ -57,7 +57,7 @@ class Test(unittest.TestCase):
 | A | over | -     | this | dog |
 | B | over | there | that | dog |
 +---+------+-------+------+-----+"""
-        self.assertEquals(expected, alignment_table)
+        self.assertEqual(expected, alignment_table)
 
     def test_near_matching_accidentally_correct_long(self):
         collation = Collation()
@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
 | A | The | brown | fox | jumps | over | this | -     | dog | . |
 | B | The | brown | fox | jumps | over | that | there | dog | . |
 +---+-----+-------+-----+-------+------+------+-------+-----+---+"""
-        self.assertEquals(expected, alignment_table)
+        self.assertEqual(expected, alignment_table)
 
     def test_near_matching_accidentally_incorrect_long(self):
         self.maxDiff = None
@@ -83,13 +83,13 @@ class Test(unittest.TestCase):
         self.assertTask("move node from prior rank to rank with best match", ["this", "6", "7"], scheduler[2])
         self.assertTask("build column for rank", ["over", "5"], scheduler[3])
         self.assertTask("build column for rank", ["over", "6"], scheduler[4])
-        self.assertEquals(5, len(scheduler))
+        self.assertEqual(5, len(scheduler))
         expected = """\
 +---+-----+-------+-----+-------+------+-------+------+-----+---+
 | A | The | brown | fox | jumps | over | -     | this | dog | . |
 | B | The | brown | fox | jumps | over | there | that | dog | . |
 +---+-----+-------+-----+-------+------+-------+------+-----+---+"""
-        self.assertEquals(expected, alignment_table)
+        self.assertEqual(expected, alignment_table)
 
     def test_near_matching_rank_0(self):
         # find_prior_node() should check ranks back through 0, not 1
@@ -131,7 +131,7 @@ class Test(unittest.TestCase):
         self.assertTask("build column for rank", ["abcd", "2"], scheduler[5])
         # Don't move it because it's closer to current location
         # No more gaps at rank 2, non gaps at rank 1, no more ranks
-        self.assertEquals(6, len(scheduler))
+        self.assertEqual(6, len(scheduler))
         expected = """\
 +---+------+------+------+------+------+
 | A | abcd | -    | 0123 | -    | efgh |
@@ -242,7 +242,7 @@ class Test(unittest.TestCase):
         self.assertTask("build column for rank", ["abcd", "2"], scheduler[23])
         # Exact match at rank 1, so don't move it
         # No more gaps at rank 2, no gaps at rank 1
-        self.assertEquals(24, len(scheduler))
+        self.assertEqual(24, len(scheduler))
         expected = """\
 +---+------+--------+--------+--------+--------+--------+------+
 | A | abcd | -      | -      | 012345 | -      | -      | efgh |

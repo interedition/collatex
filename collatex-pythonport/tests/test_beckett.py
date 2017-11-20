@@ -16,9 +16,9 @@ class Test(unittest.TestCase):
         collation.add_plain_witness("1", "The same clock as when for example Magee once died.")
         collation.add_plain_witness("2", "The same as when for example Magee once died.")
         table = collate(collation)
-        self.assertEquals(["The same ", "clock ", "as when for example Magee once died."], table.rows[0].to_list_of_strings())
-        self.assertEquals(["The same ", None, "as when for example Magee once died."], table.rows[1].to_list_of_strings())
-        
+        self.assertEqual(["The same ", "clock ", "as when for example Magee once died."], table.rows[0].to_list_of_strings())
+        self.assertEqual(["The same ", None, "as when for example Magee once died."], table.rows[1].to_list_of_strings())
+
 #         table.print_plain_text()
 #         "The same as when for example McKee once died .",//
 #         "The same as when among others Darly once died & left him.",//

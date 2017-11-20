@@ -1,1 +1,5 @@
+networkx==1.11
+prettytable>=0.7.2
 wheel==0.22.0
+#decorator>=4.0.10
+python-levenshtein

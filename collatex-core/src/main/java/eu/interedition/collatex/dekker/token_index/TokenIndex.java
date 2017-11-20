@@ -5,15 +5,15 @@ import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.suffixarray.SAIS;
 import eu.interedition.collatex.suffixarray.SuffixArrays;
 import eu.interedition.collatex.suffixarray.SuffixData;
+import eu.interedition.collatex.util.StreamUtil;
 
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by ronald on 4/20/15.
  */
 public class TokenIndex {
-    private final List<? extends Iterable<Token>> w;
+    private final List<? extends Iterable<Token>> witnesses;
     private final Comparator<Token> comparator;
     //TODO: not sure this functionality should be in this class or in a separate class
     private Map<Witness, Integer> witnessToStartToken;
@@ -26,13 +26,13 @@ public class TokenIndex {
     private Map<Witness, List<Block.Instance>> witnessToBlockInstances;
 
 
-    public TokenIndex(Comparator<Token> comparator, Iterable<Token>... tokens) {
-        this(comparator, Arrays.asList(tokens));
+    public TokenIndex(Comparator<Token> comparator, Iterable<Token>... witness) {
+        this(comparator, Arrays.asList(witness));
     }
 
-    public TokenIndex(Comparator<Token> comparator, List<? extends Iterable<Token>> w) {
-        this.w = w;
-        this.comparator = new MarkerTokenComparatorWrapper(comparator);
+    public TokenIndex(Comparator<Token> comparator, List<? extends Iterable<Token>> witnesses) {
+        this.witnesses = witnesses;
+        this.comparator = new MarkerTokenComparator(comparator);
     }
 
     public int getStartTokenPositionForWitness(Witness witness) {
@@ -43,7 +43,7 @@ public class TokenIndex {
     // 2. derive the suffix array
     // 3. derive LCP array
     // 4. derive LCP intervals
-    // TODO: we do not have to store w!
+    // TODO: we do not have to store witnesses!
     public void prepare() {
         this.token_array = this.prepareTokenArray();
         SuffixData suffixData = SuffixArrays.createWithLCP(token_array, new SAIS(), comparator);
@@ -58,11 +58,11 @@ public class TokenIndex {
         int counter = 0;
         witnessToStartToken = new HashMap<>();
         witnessToEndToken = new HashMap<>();
-        for (Iterable<Token> tokens : w) {
-            final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
-                .findFirst()
-                .map(Token::getWitness)
-                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+        for (Iterable<Token> tokens : witnesses) {
+            final Witness witness = StreamUtil.stream(tokens)
+                    .findFirst()
+                    .map(Token::getWitness)
+                    .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
             witnessToStartToken.put(witness, counter);
             for (Token t : tokens) {
@@ -76,7 +76,7 @@ public class TokenIndex {
         return tempTokenList.toArray(new Token[tempTokenList.size()]);
     }
 
-    private class MarkerToken implements Token {
+    protected static class MarkerToken implements Token {
         private final int witnessIdentifier;
 
         public MarkerToken(int size) {
@@ -85,7 +85,7 @@ public class TokenIndex {
 
         @Override
         public String toString() {
-            return "$"+witnessIdentifier;
+            return "$" + witnessIdentifier;
         }
 
         @Override
@@ -94,10 +94,10 @@ public class TokenIndex {
         }
     }
 
-    static class MarkerTokenComparatorWrapper implements Comparator<Token> {
+    static class MarkerTokenComparator implements Comparator<Token> {
         private Comparator<Token> delegate;
 
-        public MarkerTokenComparatorWrapper(Comparator<Token> delegate) {
+        public MarkerTokenComparator(Comparator<Token> delegate) {
             this.delegate = delegate;
         }
 
@@ -145,7 +145,7 @@ public class TokenIndex {
                 // then: open a new interval starting with filtered intervals
                 if (lcp_value > 0) {
                     int start = closedIntervals.get(closedIntervals.size() - 1).start;
-                    openIntervals.add(new Block(this, start, lcp_value));
+                    openIntervals.push(new Block(this, start, lcp_value));
                 }
                 previousLCP_value = lcp_value;
             }

@@ -22,16 +22,19 @@ import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
-import eu.interedition.collatex.dekker.token_index.TokenIndexToMatches;
+import eu.interedition.collatex.dekker.island.Coordinate;
+import eu.interedition.collatex.dekker.island.Island;
+import eu.interedition.collatex.dekker.island.IslandCollection;
+import eu.interedition.collatex.dekker.island.IslandConflictResolver;
 import eu.interedition.collatex.dekker.token_index.TokenIndex;
-import eu.interedition.collatex.dekker.island.*;
+import eu.interedition.collatex.dekker.token_index.TokenIndexToMatches;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class DekkerAlgorithm extends CollationAlgorithm.Base implements InspectableCollationAlgorithm {
     public TokenIndex tokenIndex;
@@ -78,10 +81,10 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
         boolean firstWitness = true;
 
         for (Iterable<Token> tokens : witnesses) {
-            final Witness witness = StreamSupport.stream(tokens.spliterator(), false)
-                .findFirst()
-                .map(Token::getWitness)
-                .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
+            final Witness witness = StreamUtil.stream(tokens)
+                    .findFirst()
+                    .map(Token::getWitness)
+                    .orElseThrow(() -> new IllegalArgumentException("Empty witness"));
 
             // first witness has a fast path
             if (firstWitness) {
@@ -190,9 +193,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
                 }
             }
 
-            for (List<Match> transposition : falseTranspositions) {
-                transpositions.remove(transposition);
-            }
+            transpositions.removeAll(falseTranspositions);
 
             // merge transpositions
             if (mergeTranspositions) {
@@ -202,7 +203,7 @@ public class DekkerAlgorithm extends CollationAlgorithm.Base implements Inspecta
             updateTokenToVertexArray(tokens, witness);
 
             if (LOG.isLoggable(Level.FINER)) {
-                LOG.log(Level.FINER, "!{0}: {1}", new Object[]{graph, StreamSupport.stream(graph.vertices().spliterator(), false).map(Object::toString).collect(Collectors.joining(", "))});
+                LOG.log(Level.FINER, "!{0}: {1}", new Object[]{graph, StreamUtil.stream(graph.vertices()).map(Object::toString).collect(Collectors.joining(", "))});
             }
         }
     }

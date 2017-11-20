@@ -5,12 +5,14 @@ from collatex.extended_suffix_array import Block
 from collatex.core_functions import collate
 from collatex.suffix_based_scorer import Scorer
 from collatex.tokenindex import TokenIndex
+from tests import unit_disabled
 
 __author__ = 'ronalddekker'
 
 
 class Test(unittest.TestCase):
 
+    @unit_disabled
     def test_non_overlapping_blocks_Hermans(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -20,6 +22,7 @@ class Test(unittest.TestCase):
         self.assertIn(Block(RangeSet("0-8, 16-24")), blocks) # a b c d F g h i !
         self.assertIn(Block(RangeSet("11-14, 25-28")), blocks) # q r s t
 
+    @unit_disabled
     def test_blocks_Hermans_case_three_witnesses(self):
         collation = Collation()
         collation.add_plain_witness("W1", "a b c d F g h i ! K ! q r s t")
@@ -32,6 +35,7 @@ class Test(unittest.TestCase):
         self.assertIn(Block(RangeSet("10-14, 24-28, 38-42")), blocks) # ! q r s t
         self.assertIn(Block(RangeSet("4, 20")), blocks) # F
 
+    @unit_disabled
     def test_non_overlapping_blocks_overlap_case(self):
         collation = Collation()
         collation.add_plain_witness("W1", "in the in the bleach")
@@ -40,6 +44,7 @@ class Test(unittest.TestCase):
         blocks = algorithm._get_non_overlapping_repeating_blocks()
         self.assertIn(Block(RangeSet("0-4, 6-10")), blocks) # in the in the bleach
 
+    @unit_disabled
     def test_2(self):
         collation = Collation()
         collation.add_plain_witness("W1", "in the in the bleach")
@@ -74,17 +79,30 @@ class Test(unittest.TestCase):
           ]
         }
 
-        expected_output = """+---+---------+-------+---------+
+        expected_output = """\
++---+---------+-------+---------+
 | A | filler1 | token | -       |
 | B | -       | token | filler2 |
 +---+---------+-------+---------+"""
         alignment_table = collate(json_in, segmentation=False)
+        print(str(alignment_table))
         self.assertEqual(expected_output, str(alignment_table))
 
-        expected_output = """+---+---------+---------+
+        expected_output = """\
++---+---------+---------+
 | A | filler1 | token   |
 | B | token   | filler2 |
 +---+---------+---------+"""
         alignment_table = collate(json_in, properties_filter=self.match_properties, segmentation=False)
+        print(str(alignment_table))
         self.assertEqual(expected_output, str(alignment_table))
 
+        del json_in["witnesses"][1]["tokens"][0]["rend"] # so the 2 tokens have the same user-defined token_data
+        expected_output = """\
++---+---------+-------+---------+
+| A | filler1 | token | -       |
+| B | -       | token | filler2 |
++---+---------+-------+---------+"""
+        alignment_table = collate(json_in, properties_filter=self.match_properties, segmentation=False)
+        print(str(alignment_table))
+        self.assertEqual(expected_output, str(alignment_table))

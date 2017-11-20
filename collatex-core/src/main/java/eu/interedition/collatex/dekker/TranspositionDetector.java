@@ -22,15 +22,7 @@ import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Ronald Haentjens Dekker
@@ -66,7 +58,7 @@ public class TranspositionDetector {
         };
 
         List<List<Match>> phraseMatchesGraphOrder = new ArrayList<>(phraseMatches);
-        Collections.sort(phraseMatchesGraphOrder, comp);
+        phraseMatchesGraphOrder.sort(comp);
 
         // Map 1
         phraseMatchToIndex = new HashMap<>();
@@ -133,7 +125,7 @@ public class TranspositionDetector {
             };
 
             List<List<Match>> sortedPhraseMatches = new ArrayList<>(nonTransposedPhraseMatches);
-            Collections.sort(sortedPhraseMatches, comp2);
+            sortedPhraseMatches.sort(comp2);
 
             List<Match> transposedPhrase = sortedPhraseMatches.remove(0);
 
@@ -145,7 +137,7 @@ public class TranspositionDetector {
             addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase);
 
             Integer distance = phraseMatchToDistanceMap.get(transposedPhrase);
-            if (distance == phraseMatchToDistanceMap.get(linkedTransposedPhrase) && distance > 1) {
+            if (Objects.equals(distance, phraseMatchToDistanceMap.get(linkedTransposedPhrase)) && distance > 1) {
                 addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase);
             }
         }

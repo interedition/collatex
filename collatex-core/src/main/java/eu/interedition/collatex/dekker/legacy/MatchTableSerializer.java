@@ -113,7 +113,7 @@ public class MatchTableSerializer {
     }
 
     public ArrayList<String> rowLabels() {
-        ArrayList<String> labels = new ArrayList<String>();
+        ArrayList<String> labels = new ArrayList<>();
         for (Token vgv : sparseMatrix.rowList()) {
             String token = vgv.toString();
             int pos = token.indexOf(":'");
@@ -125,7 +125,7 @@ public class MatchTableSerializer {
     }
 
     public ArrayList<String> columnLabels() {
-        ArrayList<String> labels = new ArrayList<String>();
+        ArrayList<String> labels = new ArrayList<>();
         for (Integer t : sparseMatrix.columnList()) {
             String token = t.toString();
             int pos = token.indexOf(":'");

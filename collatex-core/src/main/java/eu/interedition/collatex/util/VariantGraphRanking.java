@@ -107,7 +107,9 @@ public class VariantGraphRanking implements Iterable<Set<VariantGraph.Vertex>>, 
             .filter(rank -> rank.stream().anyMatch(v -> !v.tokens().isEmpty()))
             .map(vertices -> {
                 final SortedMap<Witness, Set<Token>> row = new TreeMap<>(Witness.SIGIL_COMPARATOR);
-                vertices.stream().flatMap(v -> v.tokens().stream()).forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
+                vertices.stream()//
+                    .flatMap(v -> v.tokens().stream())//
+                    .forEach(token -> row.computeIfAbsent(token.getWitness(), w -> new HashSet<>()).add(token));
                 return row;
             })
             .collect(Collectors.toList());

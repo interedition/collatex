@@ -26,21 +26,12 @@ import eu.interedition.collatex.dekker.island.Coordinate;
 import eu.interedition.collatex.dekker.island.Island;
 import eu.interedition.collatex.matching.EqualityTokenComparator;
 import eu.interedition.collatex.matching.Matches;
+import eu.interedition.collatex.util.StreamUtil;
 import eu.interedition.collatex.util.VariantGraphRanking;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
 /* @author: Ronald Haentjens Dekker
 *
@@ -130,8 +121,8 @@ public class MatchTableImpl implements MatchTable {
     private static MatchTableImpl createEmptyTable(VariantGraphRanking ranking, VariantGraph graph, Iterable<Token> witness) {
         // -2 === ignore the start and the end vertex
         return new MatchTableImpl(
-            StreamSupport.stream(witness.spliterator(), false).toArray(Token[]::new),
-            IntStream.range(0, Math.max(0, ranking.apply(graph.getEnd()) - 1)).toArray()
+                StreamUtil.stream(witness).toArray(Token[]::new),
+                IntStream.range(0, Math.max(0, ranking.apply(graph.getEnd()) - 1)).toArray()
         );
     }
 
@@ -143,7 +134,7 @@ public class MatchTableImpl implements MatchTable {
         int rowIndex = 0;
         for (Token t : witness) {
             if (unique.contains(t) || ambiguous.contains(t)) {
-                List<VariantGraph.Vertex> matchingVertices = matches.allMatches.getOrDefault(t, Collections.<VariantGraph.Vertex>emptyList());
+                List<VariantGraph.Vertex> matchingVertices = matches.allMatches.getOrDefault(t, Collections.emptyList());
                 for (VariantGraph.Vertex vgv : matchingVertices) {
                     set(rowIndex, ranking.apply(vgv) - 1, t, vgv);
                 }

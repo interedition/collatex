@@ -29,9 +29,8 @@ public final class DensePositiveDecorator implements ISuffixArrayBuilder {
         final ISymbolMapper mapper;
         if (minmax.range() > 0x10000) {
             throw new RuntimeException("Large symbol space not implemented yet.");
-        } else {
-            mapper = new DensePositiveMapper(input, start, length);
         }
+        mapper = new DensePositiveMapper(input, start, length);
 
         mapper.map(input, start, length);
         try {

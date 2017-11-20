@@ -50,23 +50,23 @@ class Test(unittest.TestCase):
     @unit_disabled
     def test_near_matching(self):
         result = collate(self.json_in, near_match=True, segmentation=False)
-        self.assertEquals(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
+        self.assertEqual(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
                           result.rows[0].to_list_of_strings())
-        self.assertEquals(["I", "bought", "those", "glasses", None, None, None, None, None, None, None, "."], result.rows[1].to_list_of_strings())
+        self.assertEqual(["I", "bought", "those", "glasses", None, None, None, None, None, None, None, "."], result.rows[1].to_list_of_strings())
 
     def test_near_matching(self):
         result = collate(self.json_in, near_match=True, segmentation=False)
-        self.assertEquals(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
+        self.assertEqual(["I", "bought", "this", "glass", ",", "because", "it", "matches", "those", "dinner", "plates", "."],
                           result.rows[0].to_list_of_strings())
-        self.assertEquals(["I", "bought", None, None, None, None, None, None, "those", None, "glasses", "."], result.rows[1].to_list_of_strings())
+        self.assertEqual(["I", "bought", None, None, None, None, None, None, "those", None, "glasses", "."], result.rows[1].to_list_of_strings())
 
     # Re-enable this one if segmented output is ever supported on tokenized collation
     @unit_disabled
     def test_near_matching_segmented(self):
         result = collate(self.json_in, near_match=True, segmentation=True)
-        self.assertEquals(["I bought", "this glass, because it matches those dinner plates."],
+        self.assertEqual(["I bought", "this glass, because it matches those dinner plates."],
                           result.rows[0].to_list_of_strings())
-        self.assertEquals(["I bought", "those glasses."], result.rows[1].to_list_of_strings())
+        self.assertEqual(["I bought", "those glasses."], result.rows[1].to_list_of_strings())
 
 
 if __name__ == "__main__":

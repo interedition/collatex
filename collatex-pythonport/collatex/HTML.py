@@ -131,7 +131,7 @@ class TableCell (object):
         self.valign  = valign
         self.style   = style
         self.attribs = attribs
-        if attribs==None:
+        if attribs is None:
             self.attribs = {}
 
     def __str__(self):
@@ -186,7 +186,7 @@ class TableRow (object):
         self.col_charoff = col_charoff
         self.col_styles  = col_styles
         self.attribs     = attribs
-        if attribs==None:
+        if attribs is None:
             self.attribs = {}
 
     def __str__(self):
@@ -201,16 +201,16 @@ class TableRow (object):
             if not isinstance(cell, TableCell):
                 cell = TableCell(cell, header=self.header)
             # apply column alignment if specified:
-            if self.col_align and cell.align==None:
+            if self.col_align and cell.align is None:
                 cell.align = self.col_align[col]
-            if self.col_char and cell.char==None:
+            if self.col_char and cell.char is None:
                 cell.char = self.col_char[col]
-            if self.col_charoff and cell.charoff==None:
+            if self.col_charoff and cell.charoff is None:
                 cell.charoff = self.col_charoff[col]
-            if self.col_valign and cell.valign==None:
+            if self.col_valign and cell.valign is None:
                 cell.valign = self.col_valign[col]
             # apply column style if specified:
-            if self.col_styles and cell.style==None:
+            if self.col_styles and cell.style is None:
                 cell.style = self.col_styles[col]
             result += str(cell)
         result += ' </TR>\n'
@@ -248,7 +248,7 @@ class Table (object):
         self.border = border
         self.style = style
         # style for thin borders by default
-        if style == None: self.style = TABLE_STYLE_THINBORDER
+        if style is None: self.style = TABLE_STYLE_THINBORDER
         self.width       = width
         self.cellspacing = cellspacing
         self.cellpadding = cellpadding

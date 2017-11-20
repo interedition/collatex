@@ -119,7 +119,7 @@ class ExperimentalAstarAligner(CollationAlgorithm):
         for element in path:
 #             print(element.y, element.x)
 
-            if element.match == True:
+            if element.match:
                 # process segments
                 self.newer_add_to_superbase(self.tokens_witness_a, self.tokens_witness_b, element.x, element.y)
                 self.last_x = element.x
@@ -237,7 +237,7 @@ class DecisionTree(AStar):
     def __init__(self, aligner):
         self.aligner = aligner
 
-    def create_childnodes(self):
+    def create_childnodes(self, **kwargs):
         #         # check whether a token is a match
         #         token_a = tokens_a[self.state.pointer_a]
         #         token_b = tokens_b[self.state.pointer_b]
@@ -254,7 +254,7 @@ class DecisionTree(AStar):
 class Aligner(object):
     '''
     Decision Tree based aligner
-    This is a prototype: 
+    This is a prototype:
     There are limitations
     At first it only works with just two witnesses
     It works with two pointers.
@@ -280,7 +280,7 @@ class Aligner(object):
         2) Move pointer witness b --> addition
         3) Move pointer of both witness a/b  --> match
         Note: a replacement is omission followed by an addition or the other way around
-        
+
         Choice 1 and 2 are only possible if token a and b are not a match OR when tokens are repeated.
         For now I ignore token repetition..
         '''

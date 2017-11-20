@@ -4,10 +4,7 @@ import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Block {
@@ -47,7 +44,7 @@ public class Block {
         return depth;
     }
 
-    // frequency = number of times this block of text occurrences in complete witness set
+    // frequency = number of times this block of text occurs in complete witness set
     public int getFrequency() {
         if (end == 0) {
             throw new IllegalStateException("LCP interval is unclosed!");
@@ -117,23 +114,21 @@ public class Block {
         @Override
         public String toString() {
             List<Token> tokens = getTokens();
-            String normalized = "";
+            StringBuilder normalized = new StringBuilder();
             for (Token t : tokens) {
                 SimpleToken st = (SimpleToken) t;
-                if (!normalized.isEmpty()) {
-                    normalized += " ";
+                if (normalized.length() > 0) {
+                    normalized.append(" ");
                 }
-                normalized += st.getNormalized();
+                normalized.append(st.getNormalized());
             }
-            return normalized;
+            return normalized.toString();
         }
 
         public List<Token> getTokens() {
             List<Token> tokens = new ArrayList<>();
-            for (int i = 0; i < this.length(); i++) {
-                Token t = block.tokenIndex.token_array[start_token + i];
-                tokens.add(t);
-            }
+            tokens.addAll(Arrays.asList(block.tokenIndex.token_array)//
+                    .subList(start_token, start_token + this.length() ));
             return tokens;
         }
 

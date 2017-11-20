@@ -76,15 +76,15 @@ public class Archipelago {
 
     @Override
     public String toString() {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Island island : getIslands()) {
-            if (result.isEmpty())
-                result = "[ " + island;
+            if (result.length() == 0)
+                result = new StringBuilder("[ " + island);
             else
-                result += ", " + island;
+                result.append(", ").append(island);
         }
-        result += " ]";
-        return result;
+        result.append(" ]");
+        return result.toString();
     }
 
     @Override

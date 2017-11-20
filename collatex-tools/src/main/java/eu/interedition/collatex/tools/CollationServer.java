@@ -133,8 +133,7 @@ public class CollationServer {
         if (maxCollationSize > 0) {
             for (SimpleWitness witness : collation.getWitnesses()) {
                 final int witnessLength = witness.getTokens().stream()
-                    .filter(t -> t instanceof SimpleToken).map(t -> (SimpleToken) t)
-                    .collect(Collectors.summingInt(t -> t.getContent().length()));
+                        .filter(t -> t instanceof SimpleToken).map(t -> (SimpleToken) t).mapToInt(t -> t.getContent().length()).sum();
                 if (witnessLength > maxCollationSize) {
                     response.sendError(413, "Request Entity Too Large");
                     return;
