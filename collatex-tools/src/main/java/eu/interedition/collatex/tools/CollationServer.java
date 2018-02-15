@@ -243,7 +243,10 @@ public class CollationServer {
                             }, processThreads),
                             CompletableFuture.runAsync(() -> {
                                 try {
-                                    if (dotProc.waitFor() != 0) {
+                                    if (!dotProc.waitFor(60,TimeUnit.SECONDS)) {
+                                        throw new CompletionException(new RuntimeException("dot processing took longer than 60 seconds, process was timed out."));
+                                    }
+                                    if (dotProc.exitValue() != 0) {
                                         throw new CompletionException(new IllegalStateException(errors.toString()));
                                     }
                                 } catch (InterruptedException e) {
