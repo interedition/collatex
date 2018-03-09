@@ -20,7 +20,23 @@ public class Experiment {
 
         SimpleWitness w1 = new SimpleWitness("1", "a b c d e");
         SimpleWitness w2 = new SimpleWitness("2", "a e c d");
+        SimpleWitness w3 = new SimpleWitness("3", "a d b");
 
+        Set<VariantGraph.Vertex> alignedVerticesP1 = alignTwoWitnessesAndReturnAlignedVertices(w1, w2);
+        System.out.println(alignedVerticesP1);
+
+        Set<VariantGraph.Vertex> alignedVerticesP2 = alignTwoWitnessesAndReturnAlignedVertices(w1, w3);
+        System.out.println(alignedVerticesP2);
+
+        // Actually there are two possible outcomes here:
+        // a -> a, d -> d
+        // of
+        // a -> a, b -> b
+
+
+    }
+
+    private static Set<VariantGraph.Vertex> alignTwoWitnessesAndReturnAlignedVertices(SimpleWitness w1, SimpleWitness w2) {
         List<SimpleWitness> witnesses = new ArrayList<>();
         witnesses.add(w1);
         witnesses.add(w2);
@@ -31,7 +47,7 @@ public class Experiment {
         EditGraphAligner aligner = new EditGraphAligner();
         aligner.collate(graph, witnesses);
 
-       // Nu willen we de vertices van alignment omzetten naar twee vertices in de merge graph
+        // Nu willen we de vertices van alignment omzetten naar twee vertices in de merge graph
         Iterable<VariantGraph.Vertex> vertices = graph.vertices();
         Iterator<VariantGraph.Vertex> vertexIterator  = vertices.iterator();
 
@@ -43,7 +59,7 @@ public class Experiment {
                 alignedVertices.add(v);
             }
         }
-        System.out.println(alignedVertices);
+        return alignedVertices;
     }
 
 }
