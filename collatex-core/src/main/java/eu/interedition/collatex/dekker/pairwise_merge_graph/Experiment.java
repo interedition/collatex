@@ -1,5 +1,6 @@
 package eu.interedition.collatex.dekker.pairwise_merge_graph;
 
+import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.dekker.editgraphaligner.EditGraphAligner;
 import eu.interedition.collatex.simple.SimpleWitness;
@@ -33,6 +34,12 @@ public class Experiment {
         // of
         // a -> a, b -> b
 
+        AlignmentMergeGraph<Token> alignmentMergeGraph = new AlignmentMergeGraph<>();
+        for (VariantGraph.Vertex v : alignedVerticesP1) {
+            for (Token t : v.tokens()) {
+                alignmentMergeGraph.addVertex(t);
+            }
+        }
 
     }
 
