@@ -48,6 +48,14 @@ sudo pip3 install python-levenshtein
 
 Windows users need a precompiled binary distribution of this library if they want to use near matching.
 
+Problem with newer version of CollateX:
+AttributeError: 'DiGraph' object has no attribute 'edges_iter'
+
+CollateX Python at the moment only works with networkx version 1.X.
+Check the current version of networkx with 'pip show networkx'
+If NetworkX version > 1.xx:
+First uninstall the current networkx version by typing ‘pip uninstall networkx’ (without the quotes) and then install the working version by typing 'pip install -Iv networkx==1.11'without the qoutes.
+
 
 Simple example:
 ---------------

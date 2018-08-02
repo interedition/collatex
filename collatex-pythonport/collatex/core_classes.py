@@ -320,7 +320,7 @@ def join(graph):
         vertex = queue.popleft()
         out_edges = graph.out_edges(vertex)
         if len(out_edges) is 1:
-            (_, join_candidate) = out_edges[0]
+            (_, join_candidate) = next(iter(out_edges))
             can_join = join_candidate != end and len(graph.in_edges(join_candidate)) == 1
             if can_join:
                 join_vertex_and_join_candidate(graph, join_candidate, vertex)
