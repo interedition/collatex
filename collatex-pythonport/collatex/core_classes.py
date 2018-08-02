@@ -324,7 +324,7 @@ def join(graph):
             can_join = join_candidate != end and len(graph.in_edges(join_candidate)) == 1
             if can_join:
                 join_vertex_and_join_candidate(graph, join_candidate, vertex)
-                for (_, neighbor, data) in graph.out_edges(join_candidate, data=True):
+                for (_, neighbor, data) in list(graph.out_edges(join_candidate, data=True)):
                     graph.remove_edge(join_candidate, neighbor)
                     graph.connect(vertex, neighbor, data["label"])
                 graph.remove_edge(vertex, join_candidate)
