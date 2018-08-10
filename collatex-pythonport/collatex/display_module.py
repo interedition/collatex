@@ -16,7 +16,7 @@ try:
     from IPython.display import SVG
     from IPython.core.display import display
     # import graphviz python bindings
-    import pygraphviz
+    import graphviz
 except:
     pass
 
@@ -47,7 +47,7 @@ def display_alignment_table_as_html(at):
 
 # visualize the variant graph into SVG format
 def display_variant_graph_as_svg(graph, output):
-    a = pygraphviz.AGraph(directed=True, rankdir='LR')
+    a = graphviz.Digraph(format="svg", graph_attr={'rankdir': 'LR'})
     counter = 0
     mapping = {}
     ranking = VariantGraphRanking.of(graph)
@@ -60,7 +60,7 @@ def display_variant_graph_as_svg(graph, output):
             label = n.label
             if label == '':
                 label = '#'
-            a.add_node(mapping[n], label=label)
+            a.node(mapping[n], label=label)
         else:
             rank = ranking.byVertex[n]
             readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(
@@ -75,29 +75,32 @@ def display_variant_graph_as_svg(graph, output):
                     "<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(
                     key, ', '.join(value))
                 readings.append(reading)
-            a.add_node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
+            a.node(str(mapping[n]), label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
 
     # add regular (token sequence) edges
     for u,v,edgedata in graph.graph.edges_iter(data=True):
         # print('regular edges ', u, v, edgedata)
         label = edgedata['label']
-        a.add_edge(mapping[u], mapping[v], label=label)
+        a.edge(str(mapping[u]), str(mapping[v]), label=label)
 
     # add near-match edges
     # TODO: Show all near edges (currently), or just the top one?
     for u,v,edgedata in graph.near_graph.edges_iter(data=True):
         # print('near-match edges ', u, v, edgedata)
         label = str('{:3.2f}'.format(edgedata['weight']))
-        a.add_edge(mapping[u], mapping[v], style='dashed', label=label)
+        a.edge(str(mapping[u]), str(mapping[v]), style='dashed', label=label)
     # Add rank='same' information
     for key, value in ranking.byRank.items():
         # print(key, value)
         # print(key, value, len(value))
         # print(key, set(value), len(set(value)))
-        a.add_subgraph([mapping[item] for item in value], rank='same')
+        tmp = graphviz.Digraph(graph_attr={'rank': 'same'})
+        for n in [mapping[item] for item in value]:
+            tmp.node(str(n))
+        a.subgraph(tmp)
     # diagnostic, not for production
     # dot = a.draw(prog='dot')
     # print(dot.decode(encoding='utf-8'))
     # # display using the IPython SVG module
-    svg = a.draw(prog='dot', format='svg')
+    svg = a.render()
     return display(SVG(svg))
