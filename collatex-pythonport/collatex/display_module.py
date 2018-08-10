@@ -78,14 +78,14 @@ def display_variant_graph_as_svg(graph, output):
             a.node(str(mapping[n]), label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
 
     # add regular (token sequence) edges
-    for u,v,edgedata in graph.graph.edges_iter(data=True):
+    for u,v,edgedata in graph.graph.edges(data=True):
         # print('regular edges ', u, v, edgedata)
         label = edgedata['label']
         a.edge(str(mapping[u]), str(mapping[v]), label=label)
 
     # add near-match edges
     # TODO: Show all near edges (currently), or just the top one?
-    for u,v,edgedata in graph.near_graph.edges_iter(data=True):
+    for u,v,edgedata in graph.near_graph.edges(data=True):
         # print('near-match edges ', u, v, edgedata)
         label = str('{:3.2f}'.format(edgedata['weight']))
         a.edge(str(mapping[u]), str(mapping[v]), style='dashed', label=label)
