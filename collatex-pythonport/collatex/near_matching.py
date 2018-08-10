@@ -28,7 +28,7 @@ def witnesses_on_path(ranking, min_rank, max_rank):
 
 def perform_near_match(graph, ranking):
     # Walk ranking table in reverse order and add near-match edges to graph
-    reverse_topological_sorted_vertices = topological_sort(graph.graph, reverse=True)
+    reverse_topological_sorted_vertices = reversed(list(topological_sort(graph.graph)))
     for v in reverse_topological_sorted_vertices:
         ##### Doesn't work:
         #         target_rank = ranking.byVertex[v] # get the rank of a vertex
