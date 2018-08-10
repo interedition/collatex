@@ -6,6 +6,7 @@ target
 *.iws
 *.ipynb
 *.egg-info
+Digraph.gv*
 
 .classpath
 .eggs
