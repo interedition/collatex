@@ -15,6 +15,7 @@ import re
 from prettytable import PrettyTable
 from textwrap import fill
 from collatex.exceptions import TokenError
+from collections import defaultdict
 
 
 class Collation(object):
@@ -222,6 +223,7 @@ class VariantGraphVertex(object):
 class VariantGraph(object):
     def __init__(self):
         self.graph = nx.DiGraph()
+        self.near_graph = nx.DiGraph()
         # Start and end are the only nodes without sigil or tokens
         self.start = self.add_vertex(None, None, label='start')
         self.end = self.add_vertex(None, None, label='end')
@@ -229,6 +231,7 @@ class VariantGraph(object):
     def add_vertex(self, token, sigil, label=None):
         newVertex = VariantGraphVertex(token, sigil, label)
         self.graph.add_node(newVertex)
+        self.near_graph.add_node(newVertex)
         # Returned to aligner, which tracks relationship of tokens and vertices
         return newVertex
 
@@ -242,6 +245,15 @@ class VariantGraph(object):
             self.graph[source][target]["label"] += ", " + str(witnesses)
         else:
             self.graph.add_edge(source, target, label=witnesses)
+
+    def connect_near(self, source, target, weight):
+        # Near edges are added to self.near_graph, not self.graph, to avoid cycles
+        """
+        :type source: integer
+        :type target: integer
+        """
+        self.near_graph.add_edge(source, target, weight = weight, type='near')
+        # print('added near edge: ' + ' : '.join((str(source),str(target),str(weight))))
 
     def remove_edge(self, source, target):
         self.graph.remove_edge(source, target)
@@ -261,6 +273,9 @@ class VariantGraph(object):
 
     def in_edges(self, node, data=False):
         return self.graph.in_edges(nbunch=node, data=data)
+
+    def in_near_edges(self, node, data=True):
+        return self.near_graph.in_edges(nbunch=node, data=data)
 
     def out_edges(self, node, data=False):
         return self.graph.out_edges(nbunch=node, data=data)
@@ -366,6 +381,7 @@ class VariantGraphRanking(object):
 
     @classmethod
     def of(cls, graph):
+        # first determine rank by incoming sequence edges, ignoring near matching
         variant_graph_ranking = VariantGraphRanking()
         topological_sorted_vertices = topological_sort(graph.graph)
         for v in topological_sorted_vertices:
@@ -375,4 +391,18 @@ class VariantGraphRanking(object):
             rank += 1
             variant_graph_ranking.byVertex[v] = rank
             variant_graph_ranking.byRank.setdefault(rank, []).append(v)
+        reverse_topological_sorted_vertices = topological_sort(graph.graph, reverse=True)
+        for v in reverse_topological_sorted_vertices:
+            incoming_edges = graph.in_near_edges(v, data=True)
+            if incoming_edges:
+                for (u, v, edgedata) in incoming_edges:
+                    # u is at new rank; v is being moved to that same rank
+                    u_rank = variant_graph_ranking.byVertex[u]
+                    old_v_rank = variant_graph_ranking.byVertex[v]
+                    # byVertex: change rank of v
+                    variant_graph_ranking.byVertex[v] = u_rank
+                    # byRank 1: remove v from old rank
+                    variant_graph_ranking.byRank[old_v_rank].remove(v)
+                    # byRank 2: add v to new rank (u_rank)
+                    variant_graph_ranking.byRank[u_rank].append(v)
         return variant_graph_ranking

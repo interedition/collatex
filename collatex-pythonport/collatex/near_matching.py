@@ -1,120 +1,90 @@
 """Functions and objects for near matching
     Called by: collate() (in core_functions.py) with near_match=True, segmentation=False
 """
-from Levenshtein import distance
+from collatex.core_classes import VariantGraphRanking
+import Levenshtein
+from networkx.algorithms.dag import topological_sort
+from collections import defaultdict
 
 
-class Scheduler(object):
-    def __init__(self):
-        self.tasks = []
-
-    def create_and_execute_task(self, description, funct, *args):
-        task = Task(description, funct, args)
-        self.tasks.append(task)
-        return task.execute()
-
-    def __getitem__(self, item):
-        return self.tasks[item]
-
-    def __len__(self):
-        return len(self.tasks)
-
-    def debug_tasks(self):
-        for task in self.tasks:
-            print(task)
+# Flatten a list of lists (goes only one level down)
+def flatten(in_list):
+    return [item for sublist in in_list for item in sublist]
 
 
-class Task(object):
-    def __init__(self, name, func, args):
-        self.name = name
-        self.func = func
-        self.args = args
+# Returns set of witnesses on verticies at range of ranks
+# ranking: VariantGraphRanking()
+# min_rank: current rank of vertex being considered for movement (compare to other verticies at that rank)
+# max_rank: ceiling _above_ maximum possible new rank
+def witnesses_on_path(ranking, min_rank, max_rank):
+    path_witnesses = set([])
+    for rank in range(min_rank + 1, max_rank):
+        # print(rank)
+        for item in ranking.byRank[rank]:
+            keys = (item.tokens.keys())
+            for key in keys:
+                path_witnesses.add(key)
+    return path_witnesses
 
-    def execute(self):
-        return self.func(*self.args)
-
-    def __repr__(self):
-        return "Task: " + self.name + ", " + str(self.args)
-
-
-def process_rank(scheduler, rank, collation, ranking, witness_count):
-    nodes_at_rank = ranking.byRank[rank]
-    witnesses_at_rank = []
-    for this_node in nodes_at_rank:
-        for key in this_node.tokens:
-            witnesses_at_rank.append(str(key))
-    witnesses_at_rank_count = sum([len(thisNode.tokens) for thisNode in nodes_at_rank])
-    if witnesses_at_rank_count == witness_count:
-        # print('no variation in witnesses at rank ' + str(rank))
-        pass
-    else:
-        # print('variation found at rank ' + str(rank))
-        missing_witnesses = set([witness.sigil for witness in collation.witnesses]) - set(witnesses_at_rank)
-        # print('missing witnesses: ' + str(missing_witnesses))
-        for missingWitness in sorted(missing_witnesses):  # alphabetize witnesses for testing consistency
-            (prior_rank, prior_node) = find_prior_node(missingWitness, rank, ranking)
-            # print('prior node: ' + str(prior_node) + ' with rank ' + str(prior_rank))
-            if prior_rank:
-                candidate_ranks = {}  # keys are ranks, values are distances
-                for candidate_rank in range(prior_rank, rank + 1):
-                    candidate_ranks[candidate_rank] = scheduler.create_and_execute_task("build column for rank",
-                                                                                        create_near_match_table,
-                                                                                        prior_node, candidate_rank,
-                                                                                        ranking)
-                new_rank = min(candidate_ranks,
-                               key=candidate_ranks.get)  # returns key (rank number) of min (closest) prior node
-                prior_rank_witnesses = set(prior_node.tokens.keys())
-                new_rank_witnesses = [key for node in ranking.byRank[new_rank] for key in node.tokens.keys()]
-                need_to_move = prior_rank != new_rank and not prior_rank_witnesses.intersection(new_rank_witnesses)
-                if need_to_move:
-                    scheduler.create_and_execute_task("move node from prior rank to rank with best match",
-                                                      move_node_from_prior_rank_to_rank, prior_node, prior_rank,
-                                                      new_rank, ranking)
-    return rank
-
-
-def create_near_match_table(prior_node, prior_rank, ranking):
-    return NearMatchTable(ranking, prior_rank, prior_node).return_values
-
-
-def move_node_from_prior_rank_to_rank(prior_node, prior_rank, rank, ranking):
-    # move the entire node from prior_rank to (current) rank
-    ranking.byRank[prior_rank].remove(prior_node)
-    ranking.byRank[rank].append(prior_node)
-    ranking.byVertex[prior_node] = rank
-
-
-def find_prior_node(witness, current_rank, ranking):
-    for rank in range(current_rank - 1, 0, -1):
-        nodes_at_rank = ranking.byRank[rank]
-        for this_node in nodes_at_rank:
-            for key in this_node.tokens:
-                # print('looking for key ' + key + ' in prior node')
-                if witness == key:  # Worst case: will be found at start if not on a real node
-                    # print('find_prior_node returns: ' + str(this_node))
-                    return rank, this_node
-    # The start node has no witnesses, so return a special value to indicate nothing found
-    return None, None
-
-
-class NearMatchTable(object):
-    def __init__(self, ranking, rank, prior_node):
-        self.table = {}
-        self._construct_table(ranking, rank, prior_node)
-
-    def _construct_table(self, ranking, rank, prior_node):
-        for current_node in ranking.byRank[rank]:
-            if current_node != prior_node:
-                self.table[current_node.label] = distance(current_node.label, prior_node.label), len(
-                    current_node.tokens)
-
-    def __str__(self):
-        return str(self.table.items())
-
-    @property
-    def return_values(self):
-        min_distance = min((value[0] for value in self.table.values())) if self.table else 0
-        # TODO: Replace the arbitrarily high value with witness count + 1
-        max_witness_count = max((value[1] for value in self.table.values())) if self.table else 100
-        # If distances are the same, break the tie according to number of witnesses with that reading
-        return min_distance, -max_witness_count
+def perform_near_match(graph, ranking):
+    # Walk ranking table in reverse order and add near-match edges to graph
+    reverse_topological_sorted_vertices = topological_sort(graph.graph, reverse=True)
+    for v in reverse_topological_sorted_vertices:
+        ##### Doesn't work:
+        #         target_rank = ranking.byVertex[v] # get the rank of a vertex
+        #
+        # in_edges = graph.in_edges(v) # if it has more than one in_edge, perhaps something before it can be moved
+        # if len(in_edges) > 1:
+        #     # candidates for movement are the sources of in edges more than one rank earlir
+        #     move_candidates = [in_edge[0] for in_edge in in_edges \
+        #                        if target_rank > ranking.byVertex[in_edge[0]] + 1]
+        #     for move_candidate in move_candidates:
+        #         move_candidate_witnesses = set(move_candidate.tokens) # prepare to get intersection later
+        #         min_rank = ranking.byVertex[move_candidate] # lowest possible rank is current position
+        #         max_rank = target_rank - 1 # highest possible rank is one more before the target
+        #         vertices_to_compare = flatten([ranking.byRank[r] for r in range(min_rank, max_rank + 1)])
+        #         vertices_to_compare.remove(move_candidate) # don't compare it to itself
+        #         print('comparing ', move_candidate, ' to ', vertices_to_compare)
+        #         ratio_dict = {} # ratio:vertex_to_compare
+        #         for vertex_to_compare in vertices_to_compare:
+        #             # don't move if there's already a vertex there with any of the same witnesses
+        #             if not move_candidate_witnesses.intersection(vertex_to_compare.tokens):
+        #                 print('now comparing move candidate ', move_candidate, \
+        #                       ' (witnesses ', move_candidate_witnesses,\
+        #                       ') with ', vertex_to_compare, ' (witnesses ', vertex_to_compare.tokens, ')')
+        #                 ratio = Levenshtein.ratio(str(move_candidate), str(vertex_to_compare))
+        #                 ratio_dict[ratio] = vertex_to_compare
+        #         # Create only winning edge; losing edges can create later cycles
+        #         graph.connect_near(ratio_dict[max(ratio_dict)], move_candidate, ratio)
+        #         print('connected ', move_candidate, ' to ', ratio_dict[max(ratio_dict)], \
+        #               ' with ratio ', max(ratio_dict))
+        ######
+        in_edges = graph.in_edges(v, data=True)
+        for source, target, edgedata in in_edges:
+            # can only move if two conditions are both true:
+            # 1) rank of source differs from v by more than 1; max target rank will be rank of v - 1
+            # 2) out_edges from source must have no target at exactly one rank higher than source
+            if ranking.byVertex[v] - ranking.byVertex[source] > 1 and \
+                    1 not in [ranking.byVertex[v] - ranking.byVertex[u] for (u,v) in graph.out_edges(source)]:
+                min_rank = ranking.byVertex[source]
+                max_rank = ranking.byVertex[v]
+                match_candidates = [item for item in flatten([ranking.byRank[rank] \
+                                            for rank in range(min_rank, max_rank)]) if item is not source]
+                # print(match_candidates)
+                levenshtein_dict = defaultdict(list)
+                for match_candidate in match_candidates:
+                    ratio = Levenshtein.ratio(str(source), str(match_candidate))
+                    # print(source, match_candidate, ratio)
+                    levenshtein_dict[ratio].append(match_candidate)
+                weight = max(levenshtein_dict)
+                winner = levenshtein_dict[max(levenshtein_dict)][0]
+                # print('weight:',weight,'source:',winner)
+                graph.connect_near(winner,source,weight)
+                # print('before: byRank',str(ranking.byRank))
+                # print('before: byVertex',str(ranking.byVertex))
+                # update ranking table for next pass through loop and verify
+                ranking = VariantGraphRanking.of(graph)
+                # print('after: byRank',str(ranking.byRank))
+                # print('after: byVertex',str(ranking.byVertex))
+    # Create new ranking table (passed along to creation of alignment table)
+    return VariantGraphRanking.of(graph)
