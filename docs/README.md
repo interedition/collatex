@@ -4,16 +4,16 @@
 
 This page documents the _API_ for CollateX Python 2.1.3rc2, with particular attention to the _input_ and _output formats_. 
 
-Information about the _Gothenburg model of textual variation_, the _variant graph_ data model, and _alignment algorithms_ is available at the main CollateX site at <https://collatex.net>.
+Information about the _Gothenburg model of textual variation_ and the _variant graph_ data model is available at the main CollateX site at <https://collatex.net>.
 
 Tutorial information about using CollateX Python is available at <https://github.com/DiXiT-eu/collatex-tutorial>. These materials were written for an earlier release of CollateX Python, and may be superseded in part by the present page.
 
 The latest _stable_ version of CollateX can be installed under Python 3 with `pip install --upgrade collatex` (see below for additional installation information). The latest _development_ version can be installed with `pip install --upgrade --pre collatex`. The CollateX source is available at <https://github.com/interedition/collatex>, where CollateX Python is in the `collatex-pythonport` subdirectory. Instructions for running CollateX from within a Docker container are available at <https://github.com/djbpitt/collatex-docker>.
 ## Installation
 
-Basic installation instructions for CollateX Python are available at <https://github.com/DiXiT-eu/collatex-tutorial/blob/master/unit1/Installation.ipynb>. 
+Basic installation instructions for CollateX Python are available at <https://github.com/DiXiT-eu/collatex-tutorial/blob/master/unit1/Installation.ipynb>.
 
-In order render variant graphs in the Jupyter Notebook interface (which is optional), you must intall both the Graphviz stand-alone program and the graphviz Python package. Graphviz (the stand-alone program) installation has been simplified since the time the basic installation instructions were written; use the newer method at <https://graphviz.gitlab.io/download/>. Install the graphviz Python package as described above, with `pip install graphviz`.
+In order to render variant graphs in the Jupyter Notebook interface (which is optional), you must intall both the Graphviz stand-alone program and the `graphviz` Python package. Graphviz (the stand-alone program) installation has been simplified since the time the basic installation instructions were written; use the newer method at <https://graphviz.gitlab.io/download/>. Install the `graphviz` Python package with `pip install graphviz`.
 
 ## Getting started
 
@@ -36,7 +36,7 @@ The first argument to the `collate()` function is the name of the `Collation` ob
 
 ### The `segmentation` parameter
 
-The `segmentation` determines whether each token is output separately (`False`) or whether adjacent tokens that agree in whether they include variation or not are merged into the same output node or cell (`True`). The default is `True`, so `collate(collation)`, using the sample input above, produces output like:
+The `segmentation` parameter determines whether each token is output separately (`False`) or whether adjacent tokens that agree in whether they include variation or not are merged into the same output node or cell (`True`). The default is `True`, so `collate(collation)`, using the sample input above, produces output like:
 
 ```
 +---+-----+-------+--------------------------+------+------+
@@ -54,7 +54,7 @@ while `collate(collation, segmentation=False)` produces:
 +---+-----+-------+-------+-----+-------+------+-----+------+-----+---+
 ```
 
-### The `near_match` paramater
+### The `near_match` parameter
 
 Understanding _near matching_ (also called _fuzzy matching_) requires understanding how CollateX Python performs alignment. By default, CollateX aligns only tokens that are string-equal (after normalization). Additionally, some non-matching tokens may wind up aligned because they are sandwiched between matching tokens; we call this a _forced_ match. For example:
 
@@ -100,7 +100,7 @@ which outputs
 
 Because “gray” and “grey” are not string-equal, CollateX Python does not know to align them, which means that it does not know whether “grey” in Witness B should be aligned with “big” or with “gray” in witness A. In situations like this, CollateX Python always chooses the leftmost option, which means that in this case it aligns “grey” with “big”, rather than with “gray”.
 
-Turning on near matching instructs CollateX Python to scrutinize, after performing basic alignment (that is, as part of the [Analysis step in the Gothenburg model](https://collatex.net/doc/#analysis-feedback)), situations where the placement of a token is uncertain because 1) it is adjacent to a gap, and 2) it is not string-equal with any value in any of the columns in which it might be placed. In these situations, turning on near matching with `near_match=True` will cause CollateX Python to abandon its default rule to place tokens in the leftmost position. Instead, CollateX Python adjusts the placement of that token according to the closest match, so that, for example, changing the collation instruction above to `collate(collation, near_match=True, segmentation=False)` produces:
+Turning on near matching instructs CollateX Python to scrutinize, after performing basic alignment (that is, as part of the [Analysis step in the Gothenburg model](https://collatex.net/doc/#analysis-feedback)), situations where the placement of a token is uncertain because 1) it is adjacent to a gap, and 2) it is not string-equal with any value in any of the columns in which it might be placed. In these situations, turning on near matching with `near_match=True` will cause CollateX Python to abandon its default rule to place tokens in the leftmost position. Instead, CollateX Python will adjust the placement of such tokens according to the closest match, so that, for example, changing the collation instruction above to `collate(collation, near_match=True, segmentation=False)` produces:
 
 ```
 +---+-----+-----+------+-------+
@@ -109,9 +109,9 @@ Turning on near matching instructs CollateX Python to scrutinize, after performi
 +---+-----+-----+------+-------+
 ```
 
-The definition of _closest match_ is complicated because, in the case of multiple witnesses, a token may be closer to some readings in one column than to others. CollateX Python uses the closest match in each column, where “closest” is determined by the [Levenshtein.ratio() function](https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html#Levenshtein-ratio).
+The definition of _closest match_ is complicated because, in the case of multiple witnesses, a token may be closer to some readings in one column than to others. CollateX Python uses the closest match in each column, where “closest” is determined by the [Levenshtein.ratio() function](https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html#Levenshtein-ratio). This is not guaranteed to correct all initial misalignments that could be improved by identifying a nearest match_.
 
-Because near matching operates on individual tokens, `segmentation` must be set to `False` whenever near matching is used. Failure to specify `segmentation=False` while performing near matching will raise an error.
+Because near matching operates on individual tokens, `segmentation` must be set to `False` whenever near matching is used. Failure to specify `segmentation=False` when performing near matching will raise an error.
 
 ## Input 
 
@@ -123,12 +123,99 @@ Plain text input is illustrated above. The witnesses are added to the `Collation
 
 ### Pretokenized JSON input
 
-In the following example, a JSON object has been assigned to the variable `json_input`, which can then be passed directly as the first argument to the `collate()` function. Python does not tolerate white space for human legibility, so the JSON object in this example is written (awkwardly) entirely on one line. The structure CollateX requires for JSON input is described and illustrated at <https://collatex.net/doc/>.
+In the following example, a JSON object has been assigned to the variable `json_input`, which can then be passed directly as the first argument to the `collate()` function. The structure CollateX requires for JSON input is described and illustrated at <https://collatex.net/doc/>.
 
 ```python
+import json
 from collatex import *
-json_input = {"witnesses" : [ {"id": "A", "tokens" : [{"t": "The ", "n": "The"}, {"t": "quick ", "n" :"quick"}, {"t": "brown ", "n": "brown"}, {"t": "fox ", "n": "fox"}, {"t": "jumps ", "n": "jumps"}, {"t": "over ", "n": "over"}, {"t": "the ", "n": "the"}, {"t": "dog", "n": "dog"}, {"t": ".", "n": "."}]},  {"id" : "B", "tokens" : [{"t": "The ", "n": "The"}, {"t": "brown ", "n": "brown"}, {"t": "fox ", "n": "fox"}, {"t": "jumps ", "n" :"jumps"}, {"t": "over ", "n": "over"}, {"t": "the ", "n": "the"}, {"t": "lazy ", "n": "lazy"}, {"t": "dog", "n": "dog"}, {"t": ".", "n": "."}]}]}
-print(collate(json_input))
+collation = Collation()
+json_input = """{
+    "witnesses": [
+        {
+            "id": "A",
+            "tokens": [
+                {
+                    "t": "The ",
+                    "n": "The"
+                },
+                {
+                    "t": "quick ",
+                    "n": "quick"
+                },
+                {
+                    "t": "brown ",
+                    "n": "brown"
+                },
+                {
+                    "t": "fox ",
+                    "n": "fox"
+                },
+                {
+                    "t": "jumps ",
+                    "n": "jumps"
+                },
+                {
+                    "t": "over ",
+                    "n": "over"
+                },
+                {
+                    "t": "the ",
+                    "n": "the"
+                },
+                {
+                    "t": "dog",
+                    "n": "dog"
+                },
+                {
+                    "t": ".",
+                    "n": "."
+                }
+            ]
+        },
+        {
+            "id": "B",
+            "tokens": [
+                {
+                    "t": "The ",
+                    "n": "The"
+                },
+                {
+                    "t": "brown ",
+                    "n": "brown"
+                },
+                {
+                    "t": "fox ",
+                    "n": "fox"
+                },
+                {
+                    "t": "jumps ",
+                    "n": "jumps"
+                },
+                {
+                    "t": "over ",
+                    "n": "over"
+                },
+                {
+                    "t": "the ",
+                    "n": "the"
+                },
+                {
+                    "t": "lazy ",
+                    "n": "lazy"
+                },
+                {
+                    "t": "dog",
+                    "n": "dog"
+                },
+                {
+                    "t": ".",
+                    "n": "."
+                }
+            ]
+        }
+    ]
+}"""
+print(collate(json.loads(json_input)))
 ```
 
 The output is
@@ -144,7 +231,7 @@ The output is
 
 ### Overview
 
-CollateX Python supports the following output formats: ASCII table, HTML table (default and colorized, only in the Jupyter Notebook interface), SVG variant graph (default and simple, only in Jupyter Notebook interface; requires Graphviz executable and Python `graphviz` package), generic XML, and TEI-XML. Output support is planned for CSV, TSV, and GraphML; support is also planned for saving HTML and SVG output for reuse outside the Jupyter Notebook interface).
+CollateX Python supports the following output formats: ASCII table, HTML table (default and colorized, both only in the Jupyter Notebook interface), SVG variant graph (default and simple, both only in Jupyter Notebook interface; SVG output requires the Graphviz executable and Python `graphviz` package), generic XML, and TEI-XML. Output support is planned for CSV, TSV, and GraphML; support is also planned for saving HTML and SVG output for reuse outside the Jupyter Notebook interface.
 
 ### Output formats
 
@@ -209,9 +296,9 @@ The `html2` method produces only vertical output (the `layout` parameter is igno
 
 #### SVG variant graph
 
-Two types of SVG output are support, `svg_simple` and `svg`. 
+Two types of SVG output are supported for visualizing the variant graph, `svg_simple` and `svg`. 
 
-The `svg` output method outputs a two-column table. The upper left cell contains the `n` (normalized) value of the token and the upper right cell contains the number of witnesses that share that `n` value. Subsequent rows contains the `t` (textual, that is, diplomatic) value in the left column and the witness sigla that attest that `t` value in the right column. The following code
+The `svg` output method outputs a two-column table for each node in the variant graph. The upper left cell contains the `n` (normalized) value of the token and the upper right cell contains the number of witnesses that share that `n` value. Subsequent rows contains the `t` (textual, that is, diplomatic) value in the left column and the witness sigla that attest that `t` value in the right column. For example, the following code
 
 ```python
 from collatex import *
@@ -316,17 +403,27 @@ String values are the `t` properties; the `n` properties are not exported. The s
 1. All output is wrapped in `<app>` elements, even where there is no variation.
 2. Each witness is a separate `<rdg>` element, even where it agrees with other witnesses.
 
-It is intended that users who require a specific type of XML output and do not want to postprocess this generic XML with XSLT or other means according to their requirements.
+It is intended that users who require a specific type of XML output will postprocess this generic XML with XSLT or other means.
 
 #### TEI-XML
 
 **[TEI-XML output is currently under revision]**
 
+### Supplementary output parameters
+
+#### layout
+
+The `layout` parameter controls whether table output is “horizontal” (which is the default) or “vertical”. It is relevant only for output types `table` and `html`; otherwise it is ignored. `html2` output is always vertical, and the other output types are not tabular.
+
+#### indent
+
+The `indent` parameter controls whether TEI-XML output is pretty-printed. The default is to serialize the entire XML output in a single line; setting `indent` to any value other than `None` will cause the output to be pretty-printed instead. As with the `@indent` attribute on `<xsl:output>`, pretty-printing inserts whitespace that may impinge on the quality of the output. The `indent` parameter is ignored for all methods except `tei`.
+
 ### Summary of output types
 
 In the following table, possible values of the `output` parameter are listed in the left column, and their ability to combine with the `segmentation`, `layout`, and `indent` parameters is indicated (“yes” ~ “no”) in the other columns.
 
-Method | `segmentation` | `layout` | `indent`
+`output` | `segmentation` | `layout` | `indent`
 ----|----|----|----
 **table** | yes | yes | no
 **html** | yes | yes | no
