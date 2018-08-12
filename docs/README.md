@@ -283,15 +283,48 @@ The SVG output creates `start` and `end` nodes that mark the beginnings and ends
 
 Separate information about `n` and `t` values is most important in cases involving complex custom normalization. For simpler output, the `svg_simple` type produces:
 
+<img src="images/svg_simple_output.png" alt="sample svg output"/>
 
+This version outputs only the `n` values.
 
 #### Generic XML
 
+Using `collate(collation, output="xml")` creates the following string result (as a single long line; the pretty-printing in this example has been introduced manually):
+
+```xml
+<root>
+    <app>
+        <rdg wit="#A">The </rdg>
+        <rdg wit="#B">The </rdg>
+        <rdg wit="#C">The </rdg>
+    </app>
+    <app>
+        <rdg wit="#A">gray </rdg>
+        <rdg wit="#B">grey </rdg>
+        <rdg wit="#C">brown </rdg>
+    </app>
+    <app>
+        <rdg wit="#A">koala</rdg>
+        <rdg wit="#B">koala</rdg>
+        <rdg wit="#C">koala</rdg>
+    </app>
+</root>
+```
+
+String values are the `t` properties; the `n` properties are not exported. The schema is based on TEI parallel segmentation, except that:
+
+1. All output is wrapped in `<app>` elements, even where there is no variation.
+2. Each witness is a separate `<rdg>` element, even where it agrees with other witnesses.
+
+It is intended that users who require a specific type of XML output and do not want to postprocess this generic XML with XSLT or other means according to their requirements.
+
 #### TEI-XML
+
+**[TEI-XML output is currently under revision]**
 
 ### Summary of output types
 
-In the following table, possible values of the `output` parameter are listed in the left column, and their ability to combine with the `segmentation`, `layout`, and `iindent` parameters is indicated (“yes” ~ “no”) in the other columns.
+In the following table, possible values of the `output` parameter are listed in the left column, and their ability to combine with the `segmentation`, `layout`, and `indent` parameters is indicated (“yes” ~ “no”) in the other columns.
 
 Method | `segmentation` | `layout` | `indent`
 ----|----|----|----
@@ -300,5 +333,5 @@ Method | `segmentation` | `layout` | `indent`
 **html2** | yes | no | no
 **svg_simple** | yes | no | no
 **svg** | yes | no | no
-**xml** | yes | no | yes
+**xml** | yes | no | no
 **tei** | yes | no | yes
