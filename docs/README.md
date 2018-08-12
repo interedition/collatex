@@ -1,4 +1,4 @@
-{% include header.ext %}
+<!--{% include header.ext %}-->
 
 # CollateX Python documentation main page
 
