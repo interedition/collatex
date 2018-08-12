@@ -1,14 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+import os
+import sys
+
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist upload')
+    sys.exit()
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='collatex',
-    version='2.1.3rc2',
+    version='2.1.3rc1',
     description='CollateX is a collation tool.',
     long_description=readme + '\n\n' + history,
     author='Ronald Haentjens Dekker',
@@ -20,7 +31,7 @@ setup(
     package_dir={'collatex':
                  'collatex'},
     include_package_data=True,
-    install_requires=['networkx','prettytable'
+    install_requires=['networkx==1.11','prettytable'
     ],
     license="GPLv3",
     zip_safe=False,
