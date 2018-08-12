@@ -55,7 +55,7 @@ def display_variant_graph_as_svg(graph, output):
     # add nodes
     for n in graph.graph.nodes():
         counter += 1
-        mapping[n] = str(counter)
+        mapping[n] = counter
         if output == "svg_simple":
             label = n.label
             if label == '':
@@ -75,20 +75,20 @@ def display_variant_graph_as_svg(graph, output):
                     "<TR><TD ALIGN='LEFT'><FONT FACE='Bukyvede'>{}</FONT></TD><TD ALIGN='LEFT'>{}</TD></TR>").format(
                     key, ', '.join(value))
                 readings.append(reading)
-            a.node(mapping[n], label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
+            a.node(str(mapping[n]), label='<<TABLE CELLSPACING="0">' + "".join(readings) + '</TABLE>>')
 
     # add regular (token sequence) edges
     for u,v,edgedata in graph.graph.edges(data=True):
         # print('regular edges ', u, v, edgedata)
         label = edgedata['label']
-        a.edge(mapping[u], mapping[v], label=label)
+        a.edge(str(mapping[u]), str(mapping[v]), label=label)
 
     # add near-match edges
     # TODO: Show all near edges (currently), or just the top one?
     for u,v,edgedata in graph.near_graph.edges(data=True):
         # print('near-match edges ', u, v, edgedata)
         label = str('{:3.2f}'.format(edgedata['weight']))
-        a.edge(mapping[u], mapping[v], style='dashed', label=label)
+        a.edge(str(mapping[u]), str(mapping[v]), style='dashed', label=label)
     # Add rank='same' information
     for key, value in ranking.byRank.items():
         # print(key, value)
@@ -96,7 +96,7 @@ def display_variant_graph_as_svg(graph, output):
         # print(key, set(value), len(set(value)))
         tmp = graphviz.Digraph(graph_attr={'rank': 'same'})
         for n in [mapping[item] for item in value]:
-            tmp.node(n)
+            tmp.node(str(n))
         a.subgraph(tmp)
     # diagnostic, not for production
     # dot = a.draw(prog='dot')
