@@ -60,7 +60,7 @@ def display_variant_graph_as_svg(graph, output):
             label = n.label
             if label == '':
                 label = '#'
-            a.node(mapping[n], label=label)
+            a.node(str(mapping[n]), label=label)
         else:
             rank = ranking.byVertex[n]
             readings = ["<TR><TD ALIGN='LEFT'><B>" + n.label + "</B></TD><TD ALIGN='LEFT'>exact: " + str(
