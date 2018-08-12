@@ -1,3 +1,1 @@
-markdown : kramdown
-production_url : https://djbpitt.github.io/collatex
-BASE_PATH : https://djbpitt.github.io/collatex
+theme: jekyll-theme-merlot
