@@ -12,6 +12,7 @@ import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_html, visualize_table_vertically_with_colors
 from collatex.display_module import display_variant_graph_as_svg
+from collatex.display_module import display_alignment_table_as_csv
 from collatex.near_matching import perform_near_match
 
 
@@ -76,6 +77,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return export_alignment_table_as_xml(table)
     if output == "tei":
         return export_alignment_table_as_tei(table, indent)
+    if output == "csv":
+        return display_alignment_table_as_csv(table)
     else:
         raise Exception("Unknown output type: " + output)
 
