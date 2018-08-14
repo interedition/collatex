@@ -48,7 +48,7 @@ def display_alignment_table_as_html(at):
     return display(HTML(html))
 
 
-# export alignment table as CSV
+# export alignment table as CSV (or TSV)
 def display_alignment_table_as_csv(at, output):
     # http://2017.compciv.org/guide/topics/python-standard-library/csv.html
     # https://stackoverflow.com/questions/9157623/unexpected-behavior-of-universal-newline-mode-with-stringio-and-csv-modules
