@@ -1,5 +1,76 @@
----
+/*---
 ---
 
 @import "{{ site.theme }}";
-body {background-color: pink;}
+*/
+body {
+    background-color: #f4eee2;
+    color: black;
+    margin: 1em;
+    font-family: cambria, "palatino linotype", times, serif;
+    line-height: 1.2em;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: Verdana, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", "Verdana Ref", sans-serif;
+    color: #351408;
+    line-height: 1.4em;
+    page-break-after: avoid;
+    position: relative;
+}
+pre {
+    font-family: "Andale Mono", "Courier New", monospace;
+    font-size: 95%;
+    line-height: 1.1em;
+    border: 1px dashed #990000;
+    background-color: #D3C8B4;
+    color: black;
+    margin: 1em;
+    padding: 1em;
+}
+code {
+    font-family: "Andale Mono", "Courier New", monospace;
+    /*color : #870429;*/
+    color: #D7301F;
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+sub,
+sup {
+    line-height: 0em;
+}
+ol li ol {
+    list-style-type: lower-alpha;
+}
+a {
+    text-decoration: none; /* don't underline links */
+}
+a:link:hover,
+a:visited:hover {
+    text-decoration: underline;
+}
+li > p {
+    /* paragraphs are okay within list items, but:
+        need to suppress usual vertical spacing to avoid spacing between list items
+        need to tab non-initial paragraphs to make up for lack of vertical spacing */
+    margin: 0px;
+    padding: 0px;
+}
+li > p + p {
+    text-indent: 1.5em;
+}
+table {
+    border-collapse: collapse;
+}
+table,
+th,
+td {
+    border-color: gray;
+    border-style: solid;
+    border-width: 1px;
+    padding: 5px;
+}
