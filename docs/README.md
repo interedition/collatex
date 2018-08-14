@@ -374,9 +374,17 @@ Separate information about `n` and `t` values is most important in cases involvi
 
 #### CSV and TSV
 
-THe output methods `csv` and `tsv` produce comma-separated value (CSV) and tab-separated value (TSV) output, respectively. For example:
+THe output methods `csv` and `tsv` produce comma-separated value (CSV) and tab-separated value (TSV) output, respectively. For example, with the JSON input above, `collate(json.loads(json_input), output="csv")`, produces
 
+```
+'A,The ,gray ,koala\nB,The ,grey ,koala\nC,The ,brown ,koala\n'
+```
 
+and `collate(json.loads(json_input), output="tsv")` produces
+
+```
+
+```
 
 #### Generic XML
 
