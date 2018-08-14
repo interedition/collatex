@@ -75,5 +75,5 @@ td {
 img {
     width: 95%;
     display: block;
-    margin-left, margin-right: auto;
+    margin: auto;
 }
