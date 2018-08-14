@@ -72,3 +72,7 @@ td {
     border-width: 1px;
     padding: 5px;
 }
+img {
+    width: 95%;
+    margin-left, margin-right: auto;
+}
