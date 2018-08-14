@@ -5,6 +5,8 @@ Created on May 3, 2014
 """
 import re
 from xml.etree import ElementTree as etree
+from xml.dom.minidom import Document
+from collections import defaultdict
 from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable, VariantGraphRanking
 from collatex.exceptions import SegmentationError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
@@ -111,41 +113,73 @@ def export_alignment_table_as_xml(table):
     return "<root>" + "".join(readings) + "</root>"
 
 
+# def export_alignment_table_as_tei(table, indent=None):
+#     # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
+#     # TODO: To fix pretty printing indirectly, fix tokenization
+#     p = etree.Element('p')
+#     app = None
+#     for column in table.columns:
+#         if not column.variant:  # no variation
+#             text_node = "".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
+#             if not (len(p)):  # Result starts with non-varying reading
+#                 p.text = re.sub('\s+$','',text_node) + "\n" if indent else text_node
+#             else:  # Non-varying reading after some <app>
+#                 app.tail = "\n" + re.sub('\s+$','',text_node) + "\n" if indent else text_node
+#         else:
+#             app = etree.Element('app')
+#             preceding = None  # If preceding is None, we're processing the first <rdg> child
+#             app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
+#             value_dict = {}  # keys are readings, values are an unsorted lists of sigla
+#             for key, value in column.tokens_per_witness.items():
+#                 group = value_dict.setdefault("".join([item.token_data["t"] for item in value]), [])
+#                 group.append(key)
+#             rdg_dict = {}  # keys are sorted lists of sigla, with "#" prepended; values are readings
+#             for key, value in value_dict.items():
+#                 rdg_dict[" ".join("#" + item for item in sorted(value))] = key
+#             for key, value in sorted(rdg_dict.items()):  # sort <rdg> elements by @wit values
+#                 if preceding is not None and indent:  # Change tail of preceding <rdg> to indent current one
+#                     preceding.tail = "\n  "
+#                 child = etree.Element('rdg')
+#                 child.attrib['wit'] = key
+#                 child.text = value
+#                 app.append(child)
+#                 child.tail = "\n" if indent else None
+#                 # If preceding is not None on an iteration, use its tail indent non-initial current <rdg>
+#                 preceding = child
+#             p.append(app)
+#             app.tail = "\n" if indent else None
+#     # Without the encoding specification, outputs bytes instead of a string
+#     result = etree.tostring(p, encoding="unicode")
+#     return result
+
 def export_alignment_table_as_tei(table, indent=None):
-    # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
-    # TODO: To fix pretty printing indirectly, fix tokenization
-    p = etree.Element('p')
-    app = None
+    d = Document()
+    root = d.createElement("p")
+    d.appendChild(root)
     for column in table.columns:
-        if not column.variant:  # no variation
-            text_node = "".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
-            if not (len(p)):  # Result starts with non-varying reading
-                p.text = re.sub('\s+$','',text_node) + "\n" if indent else text_node
-            else:  # Non-varying reading after some <app>
-                app.tail = "\n" + re.sub('\s+$','',text_node) + "\n" if indent else text_node
+        value_dict = defaultdict(list)
+        for key, value in sorted(column.tokens_per_witness.items()):
+            # key is reading, value is list of witnesses
+            value_dict["".join(str(item.token_data["t"]) for item in value)].append(key)
+        if len(value_dict) == 1 and len(next(iter(value_dict.values()))) == len(table.rows):
+            # len(table.rows) is total number of witnesses; guards against nulls, which aren't in table
+            key, value = value_dict.popitem() # there's just one item
+            text_node = d.createTextNode(key)
+            root.appendChild(text_node)
         else:
-            app = etree.Element('app')
-            preceding = None  # If preceding is None, we're processing the first <rdg> child
-            app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
-            value_dict = {}  # keys are readings, values are an unsorted lists of sigla
-            for key, value in column.tokens_per_witness.items():
-                group = value_dict.setdefault("".join([item.token_data["t"] for item in value]), [])
-                group.append(key)
-            rdg_dict = {}  # keys are sorted lists of sigla, with "#" prepended; values are readings
-            for key, value in value_dict.items():
-                rdg_dict[" ".join("#" + item for item in sorted(value))] = key
-            for key, value in sorted(rdg_dict.items()):  # sort <rdg> elements by @wit values
-                if preceding is not None and indent:  # Change tail of preceding <rdg> to indent current one
-                    preceding.tail = "\n  "
-                child = etree.Element('rdg')
-                child.attrib['wit'] = key
-                child.text = value
-                app.append(child)
-                child.tail = "\n" if indent else None
-                # If preceding is not None on an iteration, use its tail indent non-initial current <rdg>
-                preceding = child
-            p.append(app)
-            app.tail = "\n" if indent else None
-    # Without the encoding specification, outputs bytes instead of a string
-    result = etree.tostring(p, encoding="unicode")
+            # variation is either more than one reading, or one reading plus nulls
+            app = d.createElement("app")
+            root.appendChild(app)
+            for key,value in value_dict.items():
+                # key is reading, value is list of witnesses
+                rdg = d.createElement("rdg")
+                rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
+                text_node = d.createTextNode(key)
+                rdg.appendChild(text_node)
+                app.appendChild(rdg)
+
+    if indent:
+        result = d.toprettyxml()
+    else:
+        result = d.toxml()
     return result
