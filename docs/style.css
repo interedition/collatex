@@ -34,6 +34,9 @@ code {
     background-color: rgba(0, 0, 0, 0.1);
     font-weight: bold;
 }
+pre > code {
+    background-color: #D3C8B4;
+}
 sub,
 sup {
     line-height: 0em;
