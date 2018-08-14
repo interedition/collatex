@@ -377,13 +377,13 @@ Separate information about `n` and `t` values is most important in cases involvi
 THe output methods `csv` and `tsv` produce comma-separated value (CSV) and tab-separated value (TSV) output, respectively. For example, with the JSON input above, `collate(json.loads(json_input), output="csv")`, produces
 
 ```
-'A,The ,gray ,koala\nB,The ,grey ,koala\nC,The ,brown ,koala\n'
+A,The ,gray ,koala\nB,The ,grey ,koala\nC,The ,brown ,koala\n
 ```
 
 and `collate(json.loads(json_input), output="tsv")` produces
 
 ```
-
+A\tThe \tgray \tkoala\nB\tThe \tgrey \tkoala\nC\tThe \tbrown \tkoala\n
 ```
 
 #### Generic XML
@@ -423,11 +423,11 @@ It is intended that users who require a specific type of XML output will postpro
 
 ### Supplementary output parameters
 
-#### layout
+#### The `layout` parameter
 
-The `layout` parameter controls whether table output is “horizontal” (which is the default) or “vertical”. It is relevant only for output types `table` and `html`; otherwise it is ignored. `html2` output is always vertical, and the other output types are not tabular.
+The `layout` parameter controls whether table output is “horizontal” (which is the default) or “vertical”. It is relevant only for output types `table` and `html`. Otherwise it is ignored: `html2` output is always vertical, and the other output types are not tabular.
 
-#### indent
+#### The `indent` parameter
 
 The `indent` parameter controls whether TEI-XML output is pretty-printed. The default is to serialize the entire XML output in a single line; setting `indent` to any value other than `None` will cause the output to be pretty-printed instead. As with the `@indent` attribute on `<xsl:output>`, pretty-printing inserts whitespace that may impinge on the quality of the output. The `indent` parameter is ignored for all methods except `tei`.
 
@@ -435,12 +435,14 @@ The `indent` parameter controls whether TEI-XML output is pretty-printed. The de
 
 In the following table, possible values of the `output` parameter are listed in the left column, and their ability to combine with the `segmentation`, `layout`, and `indent` parameters is indicated (“yes” ~ “no”) in the other columns.
 
-`output` | `segmentation` | `layout` | `indent`
-----|----|----|----
-**table** | yes | yes | no
-**html** | yes | yes | no
-**html2** | yes | no | no
-**svg_simple** | yes | no | no
-**svg** | yes | no | no
-**xml** | yes | no | no
-**tei** | yes | no | yes
+`output` | `segmentation` | `near_match` | `layout` | `indent`
+----|----|----|----|----
+**table** | yes | yes | yes | no
+**html** | yes | yes | yes | no
+**html2** | yes | yes | no | no
+**svg_simple** | yes | yes | no | no
+**svg** | yes | yes | no | no
+**xml** | yes | yes | no | no
+**tei** | yes | yes | no | yes
+
+Recall that near matching is incompatible with segmentation, so `near_match=True` requires `segmentation=False`.
