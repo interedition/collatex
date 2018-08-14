@@ -77,8 +77,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return export_alignment_table_as_xml(table)
     if output == "tei":
         return export_alignment_table_as_tei(table, indent)
-    if output == "csv":
-        return display_alignment_table_as_csv(table)
+    if output == "csv" or output == "tsv":
+        return display_alignment_table_as_csv(table, output)
     else:
         raise Exception("Unknown output type: " + output)
 

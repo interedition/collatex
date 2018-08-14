@@ -49,11 +49,14 @@ def display_alignment_table_as_html(at):
 
 
 # export alignment table as CSV
-def display_alignment_table_as_csv(at):
+def display_alignment_table_as_csv(at, output):
     # http://2017.compciv.org/guide/topics/python-standard-library/csv.html
     # https://stackoverflow.com/questions/9157623/unexpected-behavior-of-universal-newline-mode-with-stringio-and-csv-modules
     data = io.StringIO(newline=None)
-    writer = csv.writer(data)
+    if output == "tsv":
+        writer = csv.writer(data, dialect="excel-tab")
+    else:
+        writer = csv.writer(data)
     for row in at.rows:
         row_list = row.to_list_of_strings()
         row_list.insert(0, row.header)
