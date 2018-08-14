@@ -372,6 +372,12 @@ Separate information about `n` and `t` values is most important in cases involvi
 
 <img src="images/svg_simple_output.png" alt="sample svg output"/>
 
+#### CSV and TSV
+
+THe output methods `csv` and `tsv` produce comma-separated value (CSV) and tab-separated value (TSV) output, respectively. For example:
+
+
+
 #### Generic XML
 
 Using `collate(collation, output="xml")` creates the following string result (as a single long line; the pretty-printing in this example has been introduced manually):
