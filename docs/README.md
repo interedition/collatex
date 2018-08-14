@@ -6,9 +6,9 @@ This page documents the _API_ for CollateX Python 2.1.3rc2, with particular atte
 
 Information about the _Gothenburg model of textual variation_ and the _variant graph_ data model is available at the main CollateX site at <https://collatex.net>.
 
-Tutorial information about using CollateX Python is available at <https://github.com/DiXiT-eu/collatex-tutorial>. These materials were written for an earlier release of CollateX Python, and may be superseded in part by the present page.
+Tutorial information about using CollateX Python is available at <https://github.com/DiXiT-eu/collatex-tutorial>. Those materials were written for an earlier release of CollateX Python, and may be superseded in part by the present page.
 
-The latest _stable_ version of CollateX can be installed under Python 3 with `pip install --upgrade collatex` (see below for additional installation information). The latest _development_ version can be installed with `pip install --upgrade --pre collatex`. The CollateX source is available at <https://github.com/interedition/collatex>, where CollateX Python is in the `collatex-pythonport` subdirectory. Instructions for running CollateX from within a Docker container are available at <https://github.com/djbpitt/collatex-docker>.
+The latest _stable_ version of CollateX can be installed under Python 3 with `pip install --upgrade collatex` (see below for additional installation information). The latest _development_ version can be installed with `pip install --upgrade --pre collatex`. The CollateX source is available at <https://github.com/interedition/collatex>, where CollateX Python is in the `collatex-pythonport` subdirectory. Instructions for running CollateX Python from within a Docker container are available at <https://github.com/djbpitt/collatex-docker>.
 ## Installation
 
 Basic installation instructions for CollateX Python are available at <https://github.com/DiXiT-eu/collatex-tutorial/blob/master/unit1/Installation.ipynb>.
@@ -100,7 +100,7 @@ which outputs
 
 Because “gray” and “grey” are not string-equal, CollateX Python does not know to align them, which means that it does not know whether “grey” in Witness B should be aligned with “big” or with “gray” in witness A. In situations like this, CollateX Python always chooses the leftmost option, which means that in this case it aligns “grey” with “big”, rather than with “gray”.
 
-Turning on near matching instructs CollateX Python to scrutinize, after performing basic alignment (that is, as part of the [Analysis step in the Gothenburg model](https://collatex.net/doc/#analysis-feedback)), situations where the placement of a token is uncertain because 1) it is adjacent to a gap, and 2) it is not string-equal with any value in any of the columns in which it might be placed. In these situations, turning on near matching with `near_match=True` will cause CollateX Python to abandon its default rule to place tokens in the leftmost position. Instead, CollateX Python will adjust the placement of such tokens according to the closest match, so that, for example, changing the collation instruction above to `collate(collation, near_match=True, segmentation=False)` produces:
+Turning on near matching instructs CollateX Python to scrutinize, after performing basic alignment (that is, as part of the [Analysis step in the Gothenburg model](https://collatex.net/doc/#analysis-feedback)), situations where the placement of a token is uncertain because 1) it is adjacent to a gap, and 2) it is not string-equal with any value in any of the columns in which it might be placed. In these situations, turning on near matching with `near_match=True` will cause CollateX Python to abandon its default rule to place tokens in the leftmost position. Instead, CollateX Python will adjust the placement of such tokens according to the closest match. As a result, changing the collation instruction above to `collate(collation, near_match=True, segmentation=False)` produces:
 
 ```
 +---+-----+-----+------+-------+
@@ -231,7 +231,7 @@ The output is
 
 ### Overview
 
-CollateX Python supports the following output formats: ASCII table, HTML table (default and colorized, both only in the Jupyter Notebook interface), SVG variant graph (default and simple, both only in Jupyter Notebook interface; SVG output requires the Graphviz executable and Python `graphviz` package), generic XML, and TEI-XML. Output support is planned for CSV, TSV, and GraphML; support is also planned for saving HTML and SVG output for reuse outside the Jupyter Notebook interface.
+CollateX Python supports the following output formats: ASCII table, HTML table (default and colorized, both only in the Jupyter Notebook interface), SVG variant graph (default and simple, both only in the Jupyter Notebook interface; SVG output requires the Graphviz executable and Python `graphviz` package), CSV, TSV, generic XML, and TEI-XML. Output support is planned for GraphML; support is also planned for saving HTML and SVG output for reuse outside the Jupyter Notebook interface.
 
 ### Output formats
 
@@ -296,9 +296,9 @@ The `html2` method produces only vertical output (the `layout` parameter is igno
 
 #### SVG variant graph
 
-Two types of SVG output are supported for visualizing the variant graph, `svg_simple` and `svg`. 
+Two types of SVG output are supported for visualizing the variant graph, `svg_simple` and `svg`. SVG output, like HTML output and unlike ASCII table output, is rendered automatically by the `collate()` function inside the Jupyter Notebook interface. The two SVG output formats are intended for use only inside Jupyter Notebook, and CollateX Python currently does not expose a method to save them for use elsewhere. (However, CollateX currently writes the SVG file to disk with the filename `Digraph.gv.svg` in the current working directory before rendering it inside Jupyter Notebook. This behavior is a side-effect and is not guaranteed to be supported in future releases.)
 
-The `svg` output method outputs a two-column table for each node in the variant graph. The upper left cell contains the `n` (normalized) value of the token and the upper right cell contains the number of witnesses that share that `n` value. Subsequent rows contains the `t` (textual, that is, diplomatic) value in the left column and the witness sigla that attest that `t` value in the right column. For example, the following code
+The `svg` output method outputs a two-column table for each node in the variant graph. The upper left cell contains the `n` (normalized) value of the token and the upper right cell contains the number of witnesses that share that `n` value. Subsequent rows contains the `t` (textual, that is, diplomatic) value in the left column and the sigla of witnesses that attest that `t` value in the right column. For example, the following code
 
 ```python
 from collatex import *
@@ -368,11 +368,9 @@ produces this output
 
 The SVG output creates `start` and `end` nodes that mark the beginnings and ends of all witnesses. All three witnesses attest the same readings for “The” and “koala”. The readings diverge with respect to the color: Witness C attests “brown” and Witnesses A and B share an `n` value of “gray”, but with different `t` values (“gray” for Witness A and “grey” for Witness B). The edges are labeled accordings to the witnesses; the complete reading of any witness can be reconstructed by following the labeled edges for that witness.
 
-Separate information about `n` and `t` values is most important in cases involving complex custom normalization. For simpler output, the `svg_simple` type produces:
+Separate information about `n` and `t` values is most important in cases involving complex custom normalization. For simpler output, the `svg_simple` type outputs only the `n` values, and produces:
 
 <img src="images/svg_simple_output.png" alt="sample svg output"/>
-
-This version outputs only the `n` values.
 
 #### Generic XML
 
