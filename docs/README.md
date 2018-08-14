@@ -292,7 +292,7 @@ collate(collation, output="html", layout="vertical")
 
 The `html2` method produces only vertical output (the `layout` parameter is ignored) and the output is colorized, which makes it easier to distinguish zones with variation (red background) and those without (cyan). The following is the beginning of the result of collating the six editions of Charles Darwin’s _On the origin of species_ published in the author’s lifetime:
 
-<img src="images/html2_output.png" alt="sample html2 output"/>
+<img width="90%" src="images/html2_output.png" alt="sample html2 output"/>
 
 #### SVG variant graph
 
@@ -364,13 +364,13 @@ collate(json.loads(json_input), output="svg")
 
 produces this output
 
-<img src="images/svg_output.png" alt="sample svg output"/>
+<img width="90%" src="images/svg_output.png" alt="sample svg output"/>
 
 The SVG output creates `start` and `end` nodes that mark the beginnings and ends of all witnesses. All three witnesses attest the same readings for “The” and “koala”. The readings diverge with respect to the color: Witness C attests “brown” and Witnesses A and B share an `n` value of “gray”, but with different `t` values (“gray” for Witness A and “grey” for Witness B). The edges are labeled accordings to the witnesses; the complete reading of any witness can be reconstructed by following the labeled edges for that witness.
 
 Separate information about `n` and `t` values is most important in cases involving complex custom normalization. For simpler output, the `svg_simple` type produces:
 
-<img src="images/svg_simple_output.png" alt="sample svg output"/>
+<img width="90%" src="images/svg_simple_output.png" alt="sample svg output"/>
 
 This version outputs only the `n` values.
 
