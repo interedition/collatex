@@ -170,18 +170,21 @@ def export_alignment_table_as_tei(table, indent=None):
             root.appendChild(text_node)
         else:
             # variation is either more than one reading, or one reading plus nulls
+            ws_flag = None # add space after <app> if any <rdg> ends in whitespace
             app = d.createElementNS("http://www.tei-c.org/ns/1.0", "app")
             root.appendChild(app)
             for key,value in value_dict.items():
                 # key is reading, value is list of witnesses
                 rdg = d.createElementNS("http://www.tei-c.org/ns/1.0", "rdg")
                 rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
-                if indent:
-                    text_node = d.createTextNode(key.strip())
-                else:
-                    text_node = d.createTextNode(key)
+                if key.endswith((" ", r"\u0009", r"\u000a")): # space, tab, linefeed
+                    ws_flag = True
+                text_node = d.createTextNode(key.strip())
                 rdg.appendChild(text_node)
                 app.appendChild(rdg)
+            if ws_flag:
+                text_node = d.createTextNode(" ")
+                root.appendChild(text_node)
     if indent:
         result = d.toprettyxml()
     else:
