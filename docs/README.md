@@ -419,7 +419,7 @@ It is intended that users who require a specific type of XML output will postpro
 
 #### TEI-XML
 
-The following example shows different patterns of agreement and variation in ASCII table output:
+The following example illustrates different patterns of agreement and variation:
 
 ```python
 from collatex import *
@@ -448,7 +448,7 @@ tei = collate(collation, output="tei", segmentation=False, near_match=True)
 print(tei)
 ```
 
-it produces the following output, _except that the actual output is all in a single line._ In the transcription below line breaks have been introduced manually to improve legibility, but _in the actual output the entire output is a single line_.
+it produces the following output, _except that the actual output is all in a single line._ In the transcription below line breaks have been introduced manually to improve legibility, but _in the actual output the entire result is a single line_.
 
 ```xml
 <?xml version="1.0" ?>
