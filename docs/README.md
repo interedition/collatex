@@ -424,9 +424,9 @@ The following example illustrates different patterns of agreement and variation:
 ```python
 from collatex import *
 collation = Collation()
-collation.add_plain_witness("A", "The big gray fuzzy koala")
-collation.add_plain_witness("B","The old big gray koala")
-collation.add_plain_witness("C","Grey fuzzy koala")
+collation.add_plain_witness("A", "The big, gray fuzzy koala.")
+collation.add_plain_witness("B","The big, old, gray koala:")
+collation.add_plain_witness("C","The big, gray fuzzy wombat.")
 table = collate(collation, segmentation=False, near_match=True)
 print(table)
 ```
@@ -434,11 +434,11 @@ print(table)
 Segmentation has been turned off so that we can use near matching to recognize that “Grey” in Witness C should be matched to “gray” in Witnesses A and B. The ASCII table output looks like:
 
 ```
-+---+-----+-----+-----+------+-------+-------+
-| A | The | -   | big | gray | fuzzy | koala |
-| B | The | old | big | gray | -     | koala |
-| C | -   | -   | -   | Grey | fuzzy | koala |
-+---+-----+-----+-----+------+-------+-------+
++---+-----+-----+---+-----+---+------+-------+--------+---+
+| A | The | big | - | -   | , | gray | fuzzy | koala  | . |
+| B | The | big | , | old | , | gray | -     | koala  | : |
+| C | The | big | - | -   | , | gray | fuzzy | wombat | . |
++---+-----+-----+---+-----+---+------+-------+--------+---+
 ```
 
 TEI output can be specified with `collate(collation, output="tei")`. When we apply the following to the same input:
@@ -448,53 +448,60 @@ tei = collate(collation, output="tei", segmentation=False, near_match=True)
 print(tei)
 ```
 
-it produces the following output, _except that the actual output is all in a single line._ In the transcription below line breaks have been introduced manually to improve legibility, but _in the actual output the entire result is a single line_.
+it produces the following output _as a single line_. The line breaks below were introduced manually for ease of reading; they are inside tags to avoid deforming the whitespace handling inside text nodes.
 
 ```xml
-<?xml version="1.0" ?>
-<cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
-<app><rdg wit="#A #B">The </rdg></app>
-<app><rdg wit="#B">old </rdg></app>
-<app><rdg wit="#A #B">big </rdg></app>
-<app><rdg wit="#A #B">gray </rdg><rdg wit="#C">Grey </rdg></app>
-<app><rdg wit="#A #C">fuzzy </rdg></app>koala</cx:apparatus>
+<?xml version="1.0" ?><cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:cx="http://interedition.eu/collatex/ns/1.0">The big<app><rdg 
+wit="#B">,</rdg></app> <app><rdg wit="#B">old</rdg></app>, gray <app><rdg 
+wit="#A #C">fuzzy</rdg></app> <app><rdg wit="#A #B">koala</rdg><rdg 
+wit="#C">wombat</rdg></app><app><rdg wit="#A #C">.</rdg><rdg 
+wit="#B">:</rdg></app></cx:apparatus>
 ```
+
+CollateX combines information about trailing whitespace with the preceding token inside the `t` value, and in the TEI output those spaces are moved from inside the `<rdg>` to after the `<app>`. This is usually what users expect, except that information about whitespace differences in the input (e.g., the same word followed by a space character in one witness but not in another, or by a space vs two spaces, or by a space vs a newline) is not preserved in the TEI output. 
 
 CollateX Python TEI output wraps the collation information in a `<cx:apparatus>` element in a CollateX namespace (`http://interedition.eu/collatex/ns/1.0`) that is bound to the prefix `cx:`. The wrapper also creates a default namespace declaration for the TEI namespace, which means that all `<app>` and `<rdg>` elements are in the TEI namespace.
 
-CollateX default tokenization keeps trailing whitespace with the preceding token, which is why “The ” has a space after it and there is no whitespace between the `<app>` that contains “The” and the one that contains “old ” (the line break has been added manually in the example above; in the actual output the `</app>` end-tag is followed immediately, without space or newline, by the next `<app>` start-tag).
-
-More natural whitespace handling is available by setting the `indent` parameter to `True`. Indented output inserts whitespace between `<app>` elements and also removes trailing whitespace inside `<rdg>` elements. For example:
+More legible output available by setting the `indent` parameter to `True`, in which case running:
 
 ```python
 tei = collate(collation, output="tei", segmentation=False, near_match=True, indent=True)
 print(tei)
 ```
 
-outputs
+on the same input produces:
 
 ```xml
 <?xml version="1.0" ?>
 <cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
+	The 
+	big
 	<app>
-		<rdg wit="#A #B">The</rdg>
+		<rdg wit="#B">,</rdg>
 	</app>
+	 
 	<app>
 		<rdg wit="#B">old</rdg>
 	</app>
-	<app>
-		<rdg wit="#A #B">big</rdg>
-	</app>
-	<app>
-		<rdg wit="#A #B">gray</rdg>
-		<rdg wit="#C">Grey</rdg>
-	</app>
+	, 
+	gray 
 	<app>
 		<rdg wit="#A #C">fuzzy</rdg>
 	</app>
-	koala
+	 
+	<app>
+		<rdg wit="#A #B">koala</rdg>
+		<rdg wit="#C">wombat</rdg>
+	</app>
+	<app>
+		<rdg wit="#A #C">.</rdg>
+		<rdg wit="#B">:</rdg>
+	</app>
 </cx:apparatus>
 ```
+
+Pretty-printing should be used only for examination, and not for subsequent processing, since it incorrectly inserts XML-significant whitespace inside and around text nodes.
 
 ### Supplementary output parameters
 
