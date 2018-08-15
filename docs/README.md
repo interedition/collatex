@@ -419,7 +419,7 @@ It is intended that users who require a specific type of XML output will postpro
 
 #### TEI-XML
 
-The following example shows different patterns of variation in ASCII table output:
+The following example shows different patterns of agreement and variation in ASCII table output:
 
 ```python
 from collatex import *
@@ -441,30 +441,30 @@ Segmentation has been turned off so that we can use near matching to recognize t
 +---+-----+-----+-----+------+-------+-------+
 ```
 
-TEI output can be specified with `collate(collation, output="tei")`. When we apply the following to the same input
+TEI output can be specified with `collate(collation, output="tei")`. When we apply the following to the same input:
 
 ```python
 tei = collate(collation, output="tei", segmentation=False, near_match=True)
 print(tei)
 ```
 
-it produces the following output, _except that the actual output is all in a single line._ In the transcription below line breaks have been introduced manually before or between `<app>` elements for legibility, but in the actual output there is no whitespace (neither new lines now space characters) in those positions.
+it produces the following output, _except that the actual output is all in a single line._ In the transcription below line breaks have been introduced manually to improve legibility, but _in the actual output the entire output is a single line_.
 
 ```xml
+<?xml version="1.0" ?>
 <cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
 <app><rdg wit="#A #B">The </rdg></app>
 <app><rdg wit="#B">old </rdg></app>
 <app><rdg wit="#A #B">big </rdg></app>
 <app><rdg wit="#A #B">gray </rdg><rdg wit="#C">Grey </rdg></app>
-<app><rdg wit="#A #C">fuzzy </rdg></app>koala
-</cx:apparatus>
+<app><rdg wit="#A #C">fuzzy </rdg></app>koala</cx:apparatus>
 ```
 
-CollateX Python TEI output wraps the collation information in a `<cx:apparatus>` element in a CollateX namespace (`http://interedition.eu/collatex/ns/1.0`). The wrapper also creates a default namespace declaration for the TEI namespace, which means that `<app>` and `<rdg>` elements are in the TEI namespace.
+CollateX Python TEI output wraps the collation information in a `<cx:apparatus>` element in a CollateX namespace (`http://interedition.eu/collatex/ns/1.0`) that is bound to the prefix `cx:`. The wrapper also creates a default namespace declaration for the TEI namespace, which means that all `<app>` and `<rdg>` elements are in the TEI namespace.
 
-CollateX default tokenization keeps trailing whitespace with the preceding token, which is probably not what you want. With respect to the TEI structure, there should be no whitespace at ends of the tokens inside `<rdg>` elements (e.g., “gray ” or “Grey ”), and there should be whitespace between `<app>` elements. If you care about the exact location of original whitespace, you will want to specify your own, alternative tokenization, as described at <https://github.com/DiXiT-eu/collatex-tutorial/blob/master/unit6/Tokenization.ipynb>.
+CollateX default tokenization keeps trailing whitespace with the preceding token, which is why “The ” has a space after it and there is no whitespace between the `<app>` that contains “The” and the one that contains “old ” (the line break has been added manually in the example above; in the actual output the `</app>` end-tag is followed immediately, without space or newline, by the next `<app>` start-tag).
 
-CollateX TEI output also supports pretty-printing, which is obtained by setting the `indent` parameter to `True`. For example:
+More natural whitespace handling is available by setting the `indent` parameter to `True`. Indented output inserts whitespace between `<app>` elements and also removes trailing whitespace inside `<rdg>` elements. For example:
 
 ```python
 tei = collate(collation, output="tei", segmentation=False, near_match=True, indent=True)
@@ -477,26 +477,24 @@ outputs
 <?xml version="1.0" ?>
 <cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
 	<app>
-		<rdg wit="#A #B">The </rdg>
+		<rdg wit="#A #B">The</rdg>
 	</app>
 	<app>
-		<rdg wit="#B">old </rdg>
+		<rdg wit="#B">old</rdg>
 	</app>
 	<app>
-		<rdg wit="#A #B">big </rdg>
+		<rdg wit="#A #B">big</rdg>
 	</app>
 	<app>
-		<rdg wit="#A #B">gray </rdg>
-		<rdg wit="#C">Grey </rdg>
+		<rdg wit="#A #B">gray</rdg>
+		<rdg wit="#C">Grey</rdg>
 	</app>
 	<app>
-		<rdg wit="#A #C">fuzzy </rdg>
+		<rdg wit="#A #C">fuzzy</rdg>
 	</app>
 	koala
 </cx:apparatus>
 ```
-
-Note that pretty-printing works by inserting space and newline characters that are not present in the input, which may or may not be what you want. 
 
 ### Supplementary output parameters
 
