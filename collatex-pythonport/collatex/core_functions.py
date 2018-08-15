@@ -154,7 +154,9 @@ def export_alignment_table_as_xml(table):
 
 def export_alignment_table_as_tei(table, indent=None):
     d = Document()
-    root = d.createElement("p")
+    root = d.createElement("cx:apparatus") # fake namespace declarations
+    root.setAttribute("xmlns:cx","http://interedition.eu/collatex/ns/1.0")
+    root.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0")
     d.appendChild(root)
     for column in table.columns:
         value_dict = defaultdict(list)
