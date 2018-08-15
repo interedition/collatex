@@ -154,7 +154,7 @@ def export_alignment_table_as_xml(table):
 
 def export_alignment_table_as_tei(table, indent=None):
     d = Document()
-    root = d.createElement("cx:apparatus") # fake namespace declarations
+    root = d.createElementNS("http://interedition.eu/collatex/ns/1.0", "cx:apparatus") # fake namespace declarations
     root.setAttribute("xmlns:cx","http://interedition.eu/collatex/ns/1.0")
     root.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0")
     d.appendChild(root)
@@ -170,16 +170,18 @@ def export_alignment_table_as_tei(table, indent=None):
             root.appendChild(text_node)
         else:
             # variation is either more than one reading, or one reading plus nulls
-            app = d.createElement("app")
+            app = d.createElementNS("http://www.tei-c.org/ns/1.0", "app")
             root.appendChild(app)
             for key,value in value_dict.items():
                 # key is reading, value is list of witnesses
-                rdg = d.createElement("rdg")
+                rdg = d.createElementNS("http://www.tei-c.org/ns/1.0", "rdg")
                 rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
-                text_node = d.createTextNode(key)
+                if indent:
+                    text_node = d.createTextNode(key.strip())
+                else:
+                    text_node = d.createTextNode(key)
                 rdg.appendChild(text_node)
                 app.appendChild(rdg)
-
     if indent:
         result = d.toprettyxml()
     else:
