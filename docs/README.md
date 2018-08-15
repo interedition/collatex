@@ -419,7 +419,78 @@ It is intended that users who require a specific type of XML output will postpro
 
 #### TEI-XML
 
-**[TEI-XML output is currently under revision]**
+The following example shows different patterns of variation in ASCII table output:
+
+```python
+from collatex import *
+collation = Collation()
+collation.add_plain_witness("A", "The big gray fuzzy koala")
+collation.add_plain_witness("B","The old big gray koala")
+collation.add_plain_witness("C","Grey fuzzy koala")
+table = collate(collation, segmentation=False, near_match=True)
+print(table)
+```
+
+Segmentation has been turned off so that we can use near matching to recognize that “Grey” in Witness C should be matched to “gray” in Witnesses A and B. The ASCII table output looks like:
+
+```
++---+-----+-----+-----+------+-------+-------+
+| A | The | -   | big | gray | fuzzy | koala |
+| B | The | old | big | gray | -     | koala |
+| C | -   | -   | -   | Grey | fuzzy | koala |
++---+-----+-----+-----+------+-------+-------+
+```
+
+TEI output can be specified with `collate(collation, output="tei")`. When we apply the following to the same input
+
+```python
+tei = collate(collation, output="tei", segmentation=False, near_match=True)
+print(tei)
+```
+
+it produces the following output, _except that the actual output is all in a single line._ In the transcription below line breaks have been introduced manually between `<app>` elements for legibility, but in the actual output there is no whitespace (neither new lines now space characters) between `<app>` elements.
+
+```xml
+<p><app><rdg wit="#A #B">The </rdg></app>
+<app><rdg wit="#B">old </rdg></app>
+<app><rdg wit="#A #B">big </rdg></app>
+<app><rdg wit="#A #B">gray </rdg><rdg wit="#C">Grey </rdg></app>
+<app><rdg wit="#A #C">fuzzy </rdg></app>koala</p>
+```
+
+Note that default tokenization keeps trailing whitespace with the preceding token, which is probably not what you want. With respect to the TEI structure, there should be no whitespace at ends of the tokens inside `<rdg>` elements (e.g., “gray ” or “Grey ”), and there should be whitespace between `<app>` elements. This is correct default tokenization, which is designed with continuous plain text in mind; if you care about the exact location of original whitespace, you will want to specify your own, alternative tokenization, as described at <https://github.com/DiXiT-eu/collatex-tutorial/blob/master/unit6/Tokenization.ipynb>.
+
+CollateX TEI output also supports pretty-printing, which is obtained by setting the `indent` parameter to any value other than `None`. For example:
+
+```python
+tei = collate(collation, output="tei", segmentation=False, near_match=True, indent=True)
+print(tei)
+```
+
+outputs
+
+```xml
+<p><app>
+  <rdg wit="#A #B">The </rdg>
+</app>
+<app>
+  <rdg wit="#B">old </rdg>
+</app>
+<app>
+  <rdg wit="#A #B">big </rdg>
+</app>
+<app>
+  <rdg wit="#A #B">gray </rdg>
+  <rdg wit="#C">Grey </rdg>
+</app>
+<app>
+  <rdg wit="#A #C">fuzzy </rdg>
+</app>
+koala
+</p>
+```
+
+Note that pretty-printing works by inserting space and newline characters that are not present in the input, which may or may not be what you want. 
 
 ### Supplementary output parameters
 
