@@ -9,6 +9,9 @@ from textwrap import fill
 from collatex.HTML import Table, TableRow, TableCell
 from collatex.core_classes import create_table_visualization, VariantGraphRanking
 import re
+import csv
+import io
+
 
 # optionally load the IPython dependencies
 try:
@@ -43,6 +46,22 @@ def display_alignment_table_as_html(at):
     pretty_table = create_table_visualization(at)
     html = pretty_table.get_html_string(formatting=True)
     return display(HTML(html))
+
+
+# export alignment table as CSV (or TSV)
+def display_alignment_table_as_csv(at, output):
+    # http://2017.compciv.org/guide/topics/python-standard-library/csv.html
+    # https://stackoverflow.com/questions/9157623/unexpected-behavior-of-universal-newline-mode-with-stringio-and-csv-modules
+    data = io.StringIO(newline=None)
+    if output == "tsv":
+        writer = csv.writer(data, dialect="excel-tab")
+    else:
+        writer = csv.writer(data)
+    for row in at.rows:
+        row_list = row.to_list_of_strings()
+        row_list.insert(0, row.header)
+        writer.writerow(row_list)
+    return data.getvalue()
 
 
 # visualize the variant graph into SVG format
