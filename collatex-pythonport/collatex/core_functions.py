@@ -112,6 +112,7 @@ def export_alignment_table_as_xml(table):
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
 
+# REVIEW: [RHD] remove all this remarked code!
 
 # def export_alignment_table_as_tei(table, indent=None):
 #     # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
@@ -163,6 +164,9 @@ def export_alignment_table_as_tei(table, indent=None):
         for key, value in sorted(column.tokens_per_witness.items()):
             # key is reading, value is list of witnesses
             value_dict["".join(str(item.token_data["t"]) for item in value)].append(key)
+
+        # REVIEW [RHD]: Isn't there a method on table that can be used instead of this len(next(iter() etc?
+        # otherwise I think there should be. Not sure what len(next(iter(etc))) represents.
         if len(value_dict) == 1 and len(next(iter(value_dict.values()))) == len(table.rows):
             # len(table.rows) is total number of witnesses; guards against nulls, which aren't in table
             key, value = value_dict.popitem() # there's just one item
@@ -170,6 +174,7 @@ def export_alignment_table_as_tei(table, indent=None):
             root.appendChild(text_node)
         else:
             # variation is either more than one reading, or one reading plus nulls
+            # REVIEW [RHD]: Why not ws_flag = False ?
             ws_flag = None # add space after <app> if any <rdg> ends in whitespace
             app = d.createElementNS("http://www.tei-c.org/ns/1.0", "app")
             root.appendChild(app)
@@ -177,6 +182,7 @@ def export_alignment_table_as_tei(table, indent=None):
                 # key is reading, value is list of witnesses
                 rdg = d.createElementNS("http://www.tei-c.org/ns/1.0", "rdg")
                 rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
+                # REVIEW [RHD]: There is no need to do this expensive check if ws_flag is already true! So check for that first.
                 if key.endswith((" ", r"\u0009", r"\u000a")): # space, tab, linefeed
                     ws_flag = True
                 text_node = d.createTextNode(key.strip())
