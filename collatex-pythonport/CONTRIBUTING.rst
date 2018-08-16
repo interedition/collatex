@@ -65,7 +65,7 @@ Ready to contribute? Here's how to set up `collatex` for local development.
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
     $ mkvirtualenv collatex
-    $ cd collatex/
+    $ cd collatex/collatex-pythonport
     $ python setup.py develop
 
 4. Create a branch for local development::
