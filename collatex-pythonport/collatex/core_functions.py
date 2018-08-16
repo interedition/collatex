@@ -112,6 +112,7 @@ def export_alignment_table_as_xml(table):
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
 
+# REVIEW: [RHD] remove all this remarked code!
 
 def export_alignment_table_as_tei(table, indent=None):
     d = Document()
@@ -124,6 +125,9 @@ def export_alignment_table_as_tei(table, indent=None):
         for key, value in sorted(column.tokens_per_witness.items()):
             # key is reading, value is list of witnesses
             value_dict["".join(str(item.token_data["t"]) for item in value)].append(key)
+
+        # REVIEW [RHD]: Isn't there a method on table that can be used instead of this len(next(iter() etc?
+        # otherwise I think there should be. Not sure what len(next(iter(etc))) represents.
         if len(value_dict) == 1 and len(next(iter(value_dict.values()))) == len(table.rows):
             # len(table.rows) is total number of witnesses; guards against nulls, which aren't in table
             key, value = value_dict.popitem() # there's just one item
