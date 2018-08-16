@@ -21,12 +21,13 @@ from collatex.near_matching import perform_near_match
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
+# "csv", "tsv" for CSV and TSV output
 # "xml" for the alignment table as pseudo-TEI XML
 #   All columns are output as <app> elements, regardless of whether they have variation
 #   Each witness is in a separate <rdg> element with the siglum in a @wit attribute
 #       (i.e, witnesses with identical readings are nonetheless in separate <rdg> elements)
 # "tei" for the alignment table as TEI XML parallel segmentation (but in no namespace)
-#   Wrapper element is always <p>
+#   Wrapper element is always <cx:apparatus> in the CollateX namespace
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
@@ -112,8 +113,6 @@ def export_alignment_table_as_xml(table):
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
 
-# REVIEW: [RHD] remove all this remarked code!
-
 def export_alignment_table_as_tei(table, indent=None):
     d = Document()
     root = d.createElementNS("http://interedition.eu/collatex/ns/1.0", "cx:apparatus") # fake namespace declarations
@@ -128,6 +127,11 @@ def export_alignment_table_as_tei(table, indent=None):
 
         # REVIEW [RHD]: Isn't there a method on table that can be used instead of this len(next(iter() etc?
         # otherwise I think there should be. Not sure what len(next(iter(etc))) represents.
+        #
+        # See https://stackoverflow.com/questions/4002874/non-destructive-version-of-pop-for-a-dictionary
+        # It returns the number of witnesses that attest the one reading in the dictionary, that is, it peeks
+        #   nondestructively at the value of the single dictionary item, which is a list, and counts the members
+        #   of the list
         if len(value_dict) == 1 and len(next(iter(value_dict.values()))) == len(table.rows):
             # len(table.rows) is total number of witnesses; guards against nulls, which aren't in table
             key, value = value_dict.popitem() # there's just one item
