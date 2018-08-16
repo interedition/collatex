@@ -296,7 +296,7 @@ By default the `html` method, like the ASCII table method, creates a horizontal 
 collate(collation, output="html", layout="vertical")
 ```
 
-The `html2` method produces only vertical output (the `layout` parameter is ignored) and the output is colorized, which makes it easier to distinguish zones with variation (red background) and those without (cyan). The following is the beginning of the result of collating the six editions of Charles Darwin’s _On the origin of species_ published in the author’s lifetime:
+The `html2` method produces only vertical output (the `layout` parameter is ignored) and the output is colorized, which makes it easier to distinguish zones with variation (red background) and those without (cyan). The following is the beginning of the html2 output of a collation of the six editions of Charles Darwin’s _On the origin of species_ published in the author’s lifetime:
 
 <img src="images/html2_output.png" alt="sample html2 output"/>
 
@@ -374,7 +374,7 @@ produces this output:
 
 The SVG output creates `start` and `end` nodes that mark the beginnings and ends of all witnesses. All three witnesses attest the same readings for “The” and “koala”. The readings diverge with respect to the color: Witness C attests “brown” and Witnesses A and B share an `n` value of “gray”, but with different `t` values (“gray” for Witness A and “grey” for Witness B). The edges are labeled accordings to the witnesses; the complete reading of any witness can be reconstructed by following the labeled edges for that witness.
 
-Separate information about `n` and `t` values is most important in cases involving complex custom normalization. For simpler output, the `svg_simple` type outputs only the `n` values, and produces:
+Separate information about `n` and `t` values is most important in cases involving complex custom normalization. For simpler output, the `svg_simple` type renders only the `n` values, and produces:
 
 <img src="images/svg_simple_output.png" alt="sample svg output"/>
 
@@ -430,9 +430,9 @@ The following example illustrates different patterns of agreement and variation:
 ```python
 from collatex import *
 collation = Collation()
-collation.add_plain_witness("A", "The big, gray, fuzzy koala.")
-collation.add_plain_witness("B","The big, old, gray koala:")
-collation.add_plain_witness("C","The big, gray, fuzzy wombat.")
+collation.add_plain_witness("A","The big old gray koala:")
+collation.add_plain_witness("B", "The big gray fuzzy koala.")
+collation.add_plain_witness("C","The grey fuzzy wombat!")
 table = collate(collation, segmentation=False, near_match=True)
 print(table)
 ```
@@ -440,11 +440,11 @@ print(table)
 The ASCII table output looks like:
 
 ```
-+---+-----+-----+---+-----+---+------+-------+--------+---+
-| A | The | big | - | -   | , | gray | fuzzy | koala  | . |
-| B | The | big | , | old | , | gray | -     | koala  | : |
-| C | The | big | - | -   | , | gray | fuzzy | wombat | . |
-+---+-----+-----+---+-----+---+------+-------+--------+---+
++---+-----+-----+-----+------+-------+--------+---+
+| A | The | big | old | gray | -     | koala  | : |
+| B | The | big | -   | gray | fuzzy | koala  | . |
+| C | The | -   | -   | grey | fuzzy | wombat | ! |
++---+-----+-----+-----+------+-------+--------+---+
 ```
 
 TEI output can be specified with `collate(collation, output="tei")`. When we apply the following to the same input:
@@ -458,12 +458,11 @@ it produces the following output _as a single line_. The line breaks below were 
 
 ```xml
 <?xml version="1.0" ?><cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" 
-xmlns:cx="http://interedition.eu/collatex/ns/1.0"><app><rdg 
-wit="#A #B">The</rdg></app> <app><rdg 
+xmlns:cx="http://interedition.eu/collatex/ns/1.0">The <app><rdg 
 wit="#A #B">big</rdg></app> <app><rdg 
 wit="#A">old</rdg></app> <app><rdg 
 wit="#A #B">gray</rdg><rdg 
-wit="#C">Gray</rdg></app> <app><rdg 
+wit="#C">grey</rdg></app> <app><rdg 
 wit="#B #C">fuzzy</rdg></app> <app><rdg 
 wit="#A #B">koala</rdg><rdg 
 wit="#C">wombat</rdg></app><app><rdg 
@@ -488,10 +487,7 @@ on the same input produces:
 ```xml
 <?xml version="1.0" ?>
 <cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
-	<app>
-		<rdg wit="#A #B">The</rdg>
-	</app>
-	 
+	The 
 	<app>
 		<rdg wit="#A #B">big</rdg>
 	</app>
@@ -502,7 +498,7 @@ on the same input produces:
 	 
 	<app>
 		<rdg wit="#A #B">gray</rdg>
-		<rdg wit="#C">Gray</rdg>
+		<rdg wit="#C">grey</rdg>
 	</app>
 	 
 	<app>
@@ -521,7 +517,7 @@ on the same input produces:
 </cx:apparatus>
 ```
 
-Pretty-printing should be used only for examination, and not for subsequent processing, since it incorrectly inserts XML-significant whitespace inside and around text nodes.
+Pretty-printing should be used only for examination, and not for subsequent processing, since it incorrectly inserts XML-significant whitespace inside and around text nodes (see “The ”, near the beginning of the output).
 
 ### Supplementary output parameters
 
