@@ -13,7 +13,7 @@ The latest _stable_ version of CollateX can be installed under Python 3 with `pi
 
 Basic installation instructions for CollateX Python are available at <https://github.com/DiXiT-eu/collatex-tutorial/blob/master/unit1/Installation.ipynb>.
 
-In order to render variant graphs in the Jupyter Notebook interface (which is optional), you must intall both the Graphviz stand-alone program and the `graphviz` Python package. Graphviz (the stand-alone program) installation has been simplified since the time the basic installation instructions were written; use the newer method at <https://graphviz.gitlab.io/download/>. Install the `graphviz` Python package with `pip install graphviz`.
+If you want to be able to render variant graphs in the Jupyter Notebook interface (which is optional), you must install both the Graphviz stand-alone program and the `graphviz` Python package. Graphviz (the stand-alone program) installation has been simplified since the time the basic installation instructions were written; use the newer method at <https://graphviz.gitlab.io/download/>. Install the `graphviz` Python package with `pip install graphviz`.
 
 ## Getting started
 
@@ -36,7 +36,7 @@ The first argument to the `collate()` function is the name of the `Collation` ob
 
 ### The `segmentation` parameter
 
-The `segmentation` parameter determines whether each token is output separately (`False`) or whether adjacent tokens that agree in whether they include variation or not are merged into the same output node or cell (`True`). The default is `True`, so `collate(collation)`, using the sample input above, produces output like:
+The `segmentation` parameter determines whether each token is output separately (`False`) or whether adjacent tokens that agree in whether they include variation or not are merged into the same output node or cell (`True`). The default is `True`, so `collate(collation)`, using the sample input above, produces:
 
 ```
 +---+-----+-------+--------------------------+------+------+
@@ -67,7 +67,7 @@ alignment_table = collate(collation)
 print(alignment_table)
 ```
 
-outputs
+outputs:
 
 ```
 +---+-----+-------+-------+
@@ -78,7 +78,7 @@ outputs
 
 Although “gray” and “brown” are not string-equal, they are forced into alignment because they are sandwiched between exact matches at “The” (before) and “koala” (after). 
 
-The `near_match` parameter controls the behavior of CollateX Python in some situations where no exact alignment is possible. Consider:
+The `near_match` parameter controls the behavior of CollateX Python in some situations where no exact alignment is possible because there is neither string-equality nor a forced-match environment. Consider:
 
 ```python
 from collatex import *
@@ -89,7 +89,7 @@ alignment_table = collate(collation, segmentation=False)
 print(alignment_table)
 ```
 
-which outputs
+which outputs:
 
 ```
 +---+-----+------+------+-------+
@@ -100,7 +100,13 @@ which outputs
 
 Because “gray” and “grey” are not string-equal, CollateX Python does not know to align them, which means that it does not know whether “grey” in Witness B should be aligned with “big” or with “gray” in witness A. In situations like this, CollateX Python always chooses the leftmost option, which means that in this case it aligns “grey” with “big”, rather than with “gray”.
 
-Turning on near matching instructs CollateX Python to scrutinize, after performing basic alignment (that is, as part of the [Analysis step in the Gothenburg model](https://collatex.net/doc/#analysis-feedback)), situations where the placement of a token is uncertain because 1) it is adjacent to a gap, and 2) it is not string-equal with any value in any of the columns in which it might be placed. In these situations, turning on near matching with `near_match=True` will cause CollateX Python to abandon its default rule to place tokens in the leftmost position. Instead, CollateX Python will adjust the placement of such tokens according to the closest match. As a result, changing the collation instruction above to `collate(collation, near_match=True, segmentation=False)` produces:
+Turning on near matching instructs CollateX Python to scrutinize, after performing basic alignment (that is, as part of the [Analysis step in the Gothenburg model](https://collatex.net/doc/#analysis-feedback)), situations where the placement of a token is uncertain because 1) it is adjacent to a gap, and 2) it is not string-equal to any value in any of the columns in which it might be placed. In these situations, turning on near matching with `near_match=True` will cause CollateX Python to abandon its default rule to place tokens in the leftmost position. Instead, CollateX Python will adjust the placement of such tokens according to the closest match. As a result, changing the collation instruction above to:
+
+```python
+collate(collation, near_match=True, segmentation=False)
+``` 
+
+produces:
 
 ```
 +---+-----+-----+------+-------+
@@ -109,7 +115,7 @@ Turning on near matching instructs CollateX Python to scrutinize, after performi
 +---+-----+-----+------+-------+
 ```
 
-The definition of _closest match_ is complicated because, in the case of multiple witnesses, a token may be closer to some readings in one column than to others. CollateX Python uses the closest match in each column, where “closest” is determined by the [Levenshtein.ratio() function](https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html#Levenshtein-ratio). This is not guaranteed to correct all initial misalignments that could be improved by identifying a nearest match_.
+The definition of _closest match_ is complicated because, in the case of multiple witnesses, a token may be closer to some readings in one column than to others. CollateX Python uses the closest match in each column, where “closest” is determined by the [Levenshtein.ratio() function](https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html#Levenshtein-ratio). This is not guaranteed to correct all initial misalignments that could be improved by identifying a nearest match.
 
 Because near matching operates on individual tokens, `segmentation` must be set to `False` whenever near matching is used. Failure to specify `segmentation=False` when performing near matching will raise an error.
 
@@ -119,7 +125,7 @@ CollateX Python accepts input as either _plain text_ or _pretokenized JSON_. In 
 
 ### Plain text input
 
-Plain text input is illustrated above. The witnesses are added to the `Collation` object, which can then be passed as the first argument to the `collate()` function. Plain text input uses default tokenization (split on white space, treat punctuation as separate tokens) and normalization (strip trailing white space). If you want to perform custom tokenization or normalization, you must create pretokenized JSON input.
+Plain text input is illustrated above. The witnesses are added to the `Collation` object, which can then be passed as the first argument to the `collate()` function. Plain text input uses default tokenization (split on whitespace, treat punctuation as separate tokens) and default normalization (strip trailing whitespace). If you want to perform custom tokenization or normalization, you must create pretokenized JSON input.
 
 ### Pretokenized JSON input
 
@@ -296,9 +302,9 @@ The `html2` method produces only vertical output (the `layout` parameter is igno
 
 #### SVG variant graph
 
-Two types of SVG output are supported for visualizing the variant graph, `svg_simple` and `svg`. SVG output, like HTML output and unlike ASCII table output, is rendered automatically by the `collate()` function inside the Jupyter Notebook interface. The two SVG output formats are intended for use only inside Jupyter Notebook, and CollateX Python currently does not expose a method to save them for use elsewhere. (However, CollateX currently writes the SVG file to disk with the filename `Digraph.gv.svg` in the current working directory before rendering it inside Jupyter Notebook. This behavior is a side-effect and is not guaranteed to be supported in future releases.)
+Two types of SVG output are supported for visualizing the variant graph, `svg_simple` and `svg`. SVG output, like HTML output and unlike ASCII table output, is rendered automatically by the `collate()` function inside the Jupyter Notebook interface. The two SVG output formats are intended for use only inside Jupyter Notebook, and CollateX Python currently does not expose a method to save them for use elsewhere. (CollateX Python currently writes the SVG file to disk with the filename `Digraph.gv.svg` in the current working directory before rendering it inside Jupyter Notebook. This behavior is a side-effect and is not guaranteed to be supported in future releases.)
 
-The `svg` output method outputs a two-column table for each node in the variant graph. The upper left cell contains the `n` (normalized) value of the token and the upper right cell contains the number of witnesses that share that `n` value. Subsequent rows contains the `t` (textual, that is, diplomatic) value in the left column and the sigla of witnesses that attest that `t` value in the right column. For example, the following code
+The `svg` output method outputs a two-column table for each node in the variant graph. The upper left cell contains the `n` (normalized) value of the token and the upper right cell contains the number of witnesses that share that `n` value. Subsequent rows contains the `t` (textual, that is, diplomatic) value in the left column and the sigla of witnesses that attest that `t` value in the right column. For example, the following code:
 
 ```python
 from collatex import *
@@ -362,7 +368,7 @@ json_input = """{
 collate(json.loads(json_input), output="svg")
 ```
 
-produces this output
+produces this output:
 
 <img src="images/svg_output.png" alt="sample svg output"/>
 
@@ -374,13 +380,13 @@ Separate information about `n` and `t` values is most important in cases involvi
 
 #### CSV and TSV
 
-THe output methods `csv` and `tsv` produce comma-separated value (CSV) and tab-separated value (TSV) output, respectively. For example, with the JSON input above, `collate(json.loads(json_input), output="csv")`, produces
+The output methods `csv` and `tsv` produce comma-separated-value (CSV) and tab-separated-value (TSV) output, respectively, following the layout of the basic ASCII table, where each row corresponds to a witness. For example, with the JSON input above, `collate(json.loads(json_input), output="csv")`, produces:
 
 ```
 A,The ,gray ,koala\nB,The ,grey ,koala\nC,The ,brown ,koala\n
 ```
 
-and `collate(json.loads(json_input), output="tsv")` produces
+and `collate(json.loads(json_input), output="tsv")` produces:
 
 ```
 A\tThe \tgray \tkoala\nB\tThe \tgrey \tkoala\nC\tThe \tbrown \tkoala\n
@@ -424,14 +430,14 @@ The following example illustrates different patterns of agreement and variation:
 ```python
 from collatex import *
 collation = Collation()
-collation.add_plain_witness("A", "The big, gray fuzzy koala.")
+collation.add_plain_witness("A", "The big, gray, fuzzy koala.")
 collation.add_plain_witness("B","The big, old, gray koala:")
-collation.add_plain_witness("C","The big, gray fuzzy wombat.")
+collation.add_plain_witness("C","The big, gray, fuzzy wombat.")
 table = collate(collation, segmentation=False, near_match=True)
 print(table)
 ```
 
-Segmentation has been turned off so that we can use near matching to recognize that “Grey” in Witness C should be matched to “gray” in Witnesses A and B. The ASCII table output looks like:
+The ASCII table output looks like:
 
 ```
 +---+-----+-----+---+-----+---+------+-------+--------+---+
