@@ -458,11 +458,18 @@ it produces the following output _as a single line_. The line breaks below were 
 
 ```xml
 <?xml version="1.0" ?><cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" 
-xmlns:cx="http://interedition.eu/collatex/ns/1.0">The big<app><rdg 
-wit="#B">,</rdg></app> <app><rdg wit="#B">old</rdg></app>, gray <app><rdg 
-wit="#A #C">fuzzy</rdg></app> <app><rdg wit="#A #B">koala</rdg><rdg 
-wit="#C">wombat</rdg></app><app><rdg wit="#A #C">.</rdg><rdg 
-wit="#B">:</rdg></app></cx:apparatus>
+xmlns:cx="http://interedition.eu/collatex/ns/1.0"><app><rdg 
+wit="#A #B">The</rdg></app> <app><rdg 
+wit="#A #B">big</rdg></app> <app><rdg 
+wit="#A">old</rdg></app> <app><rdg 
+wit="#A #B">gray</rdg><rdg 
+wit="#C">Gray</rdg></app> <app><rdg 
+wit="#B #C">fuzzy</rdg></app> <app><rdg 
+wit="#A #B">koala</rdg><rdg 
+wit="#C">wombat</rdg></app><app><rdg 
+wit="#A">:</rdg><rdg 
+wit="#B">.</rdg><rdg 
+wit="#C">!</rdg></app></cx:apparatus>
 ```
 
 CollateX combines information about trailing whitespace with the preceding token inside the `t` value, and in the TEI output those spaces are moved from inside the `<rdg>` to after the `<app>`. This is usually what users expect, except that information about whitespace differences in the input (e.g., the same word followed by a space character in one witness but not in another, or by a space vs two spaces, or by a space vs a newline) is not preserved in the TEI output. 
@@ -481,19 +488,25 @@ on the same input produces:
 ```xml
 <?xml version="1.0" ?>
 <cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
-	The 
-	big
 	<app>
-		<rdg wit="#B">,</rdg>
+		<rdg wit="#A #B">The</rdg>
 	</app>
 	 
 	<app>
-		<rdg wit="#B">old</rdg>
+		<rdg wit="#A #B">big</rdg>
 	</app>
-	, 
-	gray 
+	 
 	<app>
-		<rdg wit="#A #C">fuzzy</rdg>
+		<rdg wit="#A">old</rdg>
+	</app>
+	 
+	<app>
+		<rdg wit="#A #B">gray</rdg>
+		<rdg wit="#C">Gray</rdg>
+	</app>
+	 
+	<app>
+		<rdg wit="#B #C">fuzzy</rdg>
 	</app>
 	 
 	<app>
@@ -501,8 +514,9 @@ on the same input produces:
 		<rdg wit="#C">wombat</rdg>
 	</app>
 	<app>
-		<rdg wit="#A #C">.</rdg>
-		<rdg wit="#B">:</rdg>
+		<rdg wit="#A">:</rdg>
+		<rdg wit="#B">.</rdg>
+		<rdg wit="#C">!</rdg>
 	</app>
 </cx:apparatus>
 ```
