@@ -1,6 +1,6 @@
-# change history.rst, version in setup.py and collatex/__init__.py
+# change HISTORY.rst, version in setup.py and collatex/__init__.py
 # in collatex-pythonport directory
-python setup.py sdist bdist_egg upload
-# update documentation on pypi
-# python setup.py register
-
+pip install --upgrade  setuptools
+pip install --upgrade twine
+python setup.py sdist bdist_wheel
+twine upload dist/*
