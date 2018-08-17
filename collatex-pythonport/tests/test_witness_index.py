@@ -9,6 +9,8 @@
 # Witness are going to be arrays of strings for now
 # In reality witnesses and tokens are more complex
 import unittest
+from collections import Counter
+
 
 class Test(unittest.TestCase):
 
@@ -16,17 +18,34 @@ class Test(unittest.TestCase):
         # we add the start and end symbol for now
         w1 = ["#", "a", "b", "c", "d", "e", "#"]
         w2 = ["#", "a", "e", "c", "d", "#"]
+        w3 = ["#", "a", "d", "b", "#"]
 
         # We import NLTK to calculate the biskipgrams for us.
         from nltk.util import skipgrams
         a = list(skipgrams(w1, 2, 3))
         b = list(skipgrams(w2, 2, 3))
+        c = list(skipgrams(w3, 2, 3))
         print(a)
         print(b)
+        print(c)
         #   print(type(a[0]))
 
-        c = list(set(a).intersection(b))
-        print(sorted(c))
+        ca = Counter(a)
+        ca.update(b)
+        ca.update(c)
+        print(ca)
+
+        # cc = Counter()
+        # #a, b, c)
+        # cc.fromkeys(a)
+
+        # # Only show what is in all three!
+        # z = list(set(a).intersection(b, c))
+        # print(sorted(z))
+        #
+        # # deze intersectie aanpak werkt niet voor drie witnesses, daar moet je eerst optellen..
+        # # en dan pas aan het einde dingen weghalen...
+
 
 
 
