@@ -2,7 +2,7 @@
 
 ## Overview
 
-This page documents the _API_ for CollateX Python 2.1.3rc2, with particular attention to the _input_ and _output formats_. 
+This page documents the _API_ for CollateX Python 2.2, with particular attention to the _input_ and _output formats_. 
 
 Information about the _Gothenburg model of textual variation_ and the _variant graph_ data model is available at the main CollateX site at <https://collatex.net>.
 
