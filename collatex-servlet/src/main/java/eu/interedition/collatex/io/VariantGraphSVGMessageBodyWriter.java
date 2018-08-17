@@ -85,7 +85,10 @@ public class VariantGraphSVGMessageBodyWriter implements MessageBodyWriter<Varia
                     }, processThreads),
                     CompletableFuture.runAsync(() -> {
                         try {
-                            if (dotProc.waitFor() != 0) {
+                            if (!dotProc.waitFor(1,TimeUnit.HOURS)) {
+                                throw new CompletionException(new RuntimeException("dot processing took longer than 1 hour, process was timed out."));
+                            }
+                            if (dotProc.exitValue() != 0) {
                                 throw new CompletionException(new IllegalStateException(errors.toString()));
                             }
                         } catch (InterruptedException e) {
