@@ -3,7 +3,6 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
-import re
 from xml.etree import ElementTree as etree
 from xml.dom.minidom import Document
 from collections import defaultdict
@@ -42,7 +41,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
     # assume collation is collation (by now); no error trapping
     if not astar:
-        algorithm = EditGraphAligner(collation, near_match=False, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
+        algorithm = EditGraphAligner(collation, near_match=False, detect_transpositions=detect_transpositions,
+                                     debug_scores=debug_scores, properties_filter=properties_filter)
     else:
         algorithm = ExperimentalAstarAligner(collation, near_match=False, debug_scores=debug_scores)
 
@@ -116,10 +116,11 @@ def export_alignment_table_as_xml(table):
         readings.append(result)
     return "<root>" + "".join(readings) + "</root>"
 
+
 def export_alignment_table_as_tei(table, indent=None):
     d = Document()
     root = d.createElementNS("http://interedition.eu/collatex/ns/1.0", "cx:apparatus") # fake namespace declarations
-    root.setAttribute("xmlns:cx","http://interedition.eu/collatex/ns/1.0")
+    root.setAttribute("xmlns:cx", "http://interedition.eu/collatex/ns/1.0")
     root.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0")
     d.appendChild(root)
     for column in table.columns:
@@ -145,7 +146,7 @@ def export_alignment_table_as_tei(table, indent=None):
             ws_flag = False # add space after <app> if any <rdg> ends in whitespace
             app = d.createElementNS("http://www.tei-c.org/ns/1.0", "app")
             root.appendChild(app)
-            for key,value in value_dict.items():
+            for key, value in value_dict.items():
                 # key is reading, value is list of witnesses
                 rdg = d.createElementNS("http://www.tei-c.org/ns/1.0", "rdg")
                 rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
