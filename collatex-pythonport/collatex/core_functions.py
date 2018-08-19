@@ -125,9 +125,13 @@ def export_alignment_table_as_tei(table, indent=None):
     d.appendChild(root)
     for column in table.columns:
         value_dict = defaultdict(list)
+        ws_flag = False
         for key, value in sorted(column.tokens_per_witness.items()):
-            # key is reading, value is list of witnesses
-            value_dict["".join(str(item.token_data["t"]) for item in value)].append(key)
+            # value_dict key is reading, value is list of witnesses
+            t_readings = "".join(item.token_data["t"] for item in value)
+            if ws_flag == False and t_readings.endswith((" ", r"\u0009", r"\000a")): # space, tab, lf
+                ws_flag = True
+            value_dict[t_readings.strip()].append(key)
 
         # REVIEW [RHD]: Isn't there a method on table that can be used instead of this len(next(iter() etc?
         # otherwise I think there should be. Not sure what len(next(iter(etc))) represents.
@@ -143,21 +147,18 @@ def export_alignment_table_as_tei(table, indent=None):
             root.appendChild(text_node)
         else:
             # variation is either more than one reading, or one reading plus nulls
-            ws_flag = False # add space after <app> if any <rdg> ends in whitespace
             app = d.createElementNS("http://www.tei-c.org/ns/1.0", "app")
             root.appendChild(app)
             for key, value in value_dict.items():
-                # key is reading, value is list of witnesses
+                # key is reading (with trailing whitespace stripped), value is list of witnesses
                 rdg = d.createElementNS("http://www.tei-c.org/ns/1.0", "rdg")
                 rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
-                if ws_flag == False and key.endswith((" ", r"\u0009", r"\u000a")): # space, tab, linefeed
-                    ws_flag = True
-                text_node = d.createTextNode(key.strip())
+                text_node = d.createTextNode(key)
                 rdg.appendChild(text_node)
                 app.appendChild(rdg)
-            if ws_flag:
-                text_node = d.createTextNode(" ")
-                root.appendChild(text_node)
+        if ws_flag:
+            text_node = d.createTextNode(" ")
+            root.appendChild(text_node)
     if indent:
         result = d.toprettyxml()
     else:
