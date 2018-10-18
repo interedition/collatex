@@ -2,6 +2,7 @@ package eu.interedition.collatex.skipgrams;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class SkipGramMWATest {
      * We tokenize one witness
      * Then we create b-grams out of them
      */
+    @Ignore
     @Test
     public void testNGramsOneWitness() {
         String firstWitness = "a b c d e ";
@@ -30,4 +32,15 @@ public class SkipGramMWATest {
         ArrayList<List<Token>> ngrams = c.create(tokens, 2);
         System.out.println(ngrams);
     }
+
+    @Test
+    public void testSkipGramsOneWitness() {
+        SimpleWitness w1 = new SimpleWitness("w1", "a b c d e");
+        List<Token> tokens = w1.getTokens();
+        System.out.println(tokens);
+        SkipgramKerasStyle c = new SkipgramKerasStyle();
+        List<List<Token>> skipgrams = c.create(tokens, 2);
+        System.out.println(skipgrams);
+
+}
 }
