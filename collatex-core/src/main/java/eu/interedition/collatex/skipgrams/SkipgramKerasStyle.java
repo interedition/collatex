@@ -15,10 +15,16 @@ public class SkipgramKerasStyle {
 
     public List<List<Token>> create(List<Token> sequence, int windowSize) {
         List<List<Token>> skipgrams = new ArrayList<>();
-        // ik kan hier gebruik maken van de sublist methode.
+        // ik kan hier gebruik maken van de sublist methode, oh nee toch niet... want dan heb je geen gap.
         for (int start = 0; start < sequence.size(); start++) {
             for (int skip = start+1; skip < Math.min(start+1+windowSize, sequence.size()); skip++) {
-                System.out.println(start+";"+skip);
+//                System.out.println(start+";"+skip);
+                Token skipgramHead = sequence.get(start);
+                Token skipgramTail = sequence.get(skip);
+                List<Token> skipgram = new ArrayList<>();
+                skipgram.add(skipgramHead);
+                skipgram.add(skipgramTail);
+                skipgrams.add(skipgram);
             }
         }
 
