@@ -39,7 +39,7 @@ public class SkipGramMWATest {
         SimpleWitness w1 = new SimpleWitness("w1", "a b c d e");
         List<Token> tokens = w1.getTokens();
         System.out.println(tokens);
-        SkipgramCreatorKerasStyle c = new SkipgramCreatorKerasStyle();
+        SkipgramCreator c = new SkipgramCreator();
         List<Skipgram> skipgrams = c.create(tokens, 2);
         System.out.println(skipgrams);
 

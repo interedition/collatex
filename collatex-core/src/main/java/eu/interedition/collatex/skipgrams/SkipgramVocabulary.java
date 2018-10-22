@@ -33,8 +33,8 @@ public class SkipgramVocabulary {
 
     public void addWitness(List<Token> tokens) {
         // create skipgrams
-        SkipgramCreatorKerasStyle skipgramCreatorKerasStyle = new SkipgramCreatorKerasStyle();
-        List<Skipgram> skipgramsWitness = skipgramCreatorKerasStyle.create(tokens, 2);
+        SkipgramCreator skipgramCreatorKerasStyle = new SkipgramCreator();
+        List<Skipgram> skipgramsWitness = skipgramCreatorKerasStyle.create(tokens, 3);
         // normalize them!
         List<NormalizedSkipgram> normalizedSkipgrams = skipgramsWitness.stream().map(sg -> new NormalizedSkipgram(((SimpleToken) sg.head).getNormalized(), ((SimpleToken) sg.tail).getNormalized())).collect(Collectors.toList());
         this.addSkipgrammedWitness(normalizedSkipgrams);
