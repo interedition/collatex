@@ -17,14 +17,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SkipgramVocabulary {
-    private SortedSet<NormalizedSkipgram> index;
+    private SortedMap<NormalizedSkipgram, Integer> index;
 
     public SkipgramVocabulary() {
-        this.index = new TreeSet<>(new NormalizedSkipgramComparator());
+        this.index = new TreeMap<>(new NormalizedSkipgramComparator());
     }
 
     public void addSkipgrammedWitness(List<NormalizedSkipgram> skipgramList) {
-        index.addAll(skipgramList);
+        // hoog de count een op voor elke normalized skipgram entry
+        for (NormalizedSkipgram nskgr : skipgramList) {
+            index.merge(nskgr, 1, (oldValue, one) -> oldValue + one);
+        }
     }
 
 
@@ -34,7 +37,6 @@ public class SkipgramVocabulary {
         List<Skipgram> skipgramsWitness = skipgramCreatorKerasStyle.create(tokens, 2);
         // normalize them!
         List<NormalizedSkipgram> normalizedSkipgrams = skipgramsWitness.stream().map(sg -> new NormalizedSkipgram(((SimpleToken) sg.head).getNormalized(), ((SimpleToken) sg.tail).getNormalized())).collect(Collectors.toList());
-        System.out.println(normalizedSkipgrams);
         this.addSkipgrammedWitness(normalizedSkipgrams);
     }
 
