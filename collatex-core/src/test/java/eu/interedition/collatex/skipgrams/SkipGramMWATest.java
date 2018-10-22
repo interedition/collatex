@@ -46,26 +46,17 @@ public class SkipGramMWATest {
     }
 
     @Test
-    public void testSkipgramsTwoWitnessesVocabulary() {
+    public void testSkipgramsThreeWitnessesVocabulary() {
         SimpleWitness w1 = new SimpleWitness("w1", "a b c d e");
-        List<Token> tokens = w1.getTokens();
         SimpleWitness w2 = new SimpleWitness("w2", "a e c d");
-        List<Token> tokens2 = w2.getTokens();
+        SimpleWitness w3 = new SimpleWitness("w3", "a d b");
 
         SkipgramVocabulary skipgramVocabulary = new SkipgramVocabulary();
-        skipgramVocabulary.addWitness(tokens);
-        skipgramVocabulary.addWitness(tokens2);
-
-        assertEquals(10, skipgramVocabulary.size());
-
-        SimpleWitness w3 = new SimpleWitness("w3", "a d b");
-        List<Token> tokens3 = w3.getTokens();
-        skipgramVocabulary.addWitness(tokens3);
-
+        skipgramVocabulary.addWitness(w1.getTokens());
+        skipgramVocabulary.addWitness(w2.getTokens());
+        assertEquals(12, skipgramVocabulary.size());
+        skipgramVocabulary.addWitness(w3.getTokens());
         System.out.println(skipgramVocabulary.toString());
-
-
-        throw new RuntimeException("!!");
     }
 
 

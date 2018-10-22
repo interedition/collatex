@@ -17,7 +17,7 @@ public class SkipgramCreatorKerasStyle {
         List<Skipgram> skipgrams = new ArrayList<>();
         // ik kan hier gebruik maken van de sublist methode, oh nee toch niet... want dan heb je geen gap.
         for (int start = 0; start < sequence.size(); start++) {
-            for (int skip = start+1; skip < Math.min(start+1+windowSize, sequence.size()); skip++) {
+            for (int skip = start+1; skip < Math.min(skip+windowSize+1, sequence.size()); skip++) {
 //                System.out.println(start+";"+skip);
                 Token skipgramHead = sequence.get(start);
                 Token skipgramTail = sequence.get(skip);
