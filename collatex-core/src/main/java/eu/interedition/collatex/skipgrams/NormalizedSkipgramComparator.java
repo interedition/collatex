@@ -16,7 +16,7 @@ public class NormalizedSkipgramComparator implements Comparator<NormalizedSkipgr
     @Override
     public int compare(NormalizedSkipgram o1, NormalizedSkipgram o2) {
         // We first compare token 1 of skipgram 1 and skipgram 2 with each other
-        // if they are different we can immedialyu report it...
+        // if they are different we can immediately report it...
         // if not, we compare the second token of skipgram 1 and skipgram 2
         int compare = o1.head.compareTo(o2.head);
         if (compare != 0) return compare;

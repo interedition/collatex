@@ -1,13 +1,13 @@
 package eu.interedition.collatex.skipgrams;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.simple.SimpleToken;
 import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 /*
  16-10-2018
@@ -46,12 +46,25 @@ public class SkipGramMWATest {
     }
 
     @Test
-    public void testSkipgramsTwoWitnesses() {
+    public void testSkipgramsTwoWitnessesVocabulary() {
         SimpleWitness w1 = new SimpleWitness("w1", "a b c d e");
         List<Token> tokens = w1.getTokens();
         SimpleWitness w2 = new SimpleWitness("w2", "a e c d");
         List<Token> tokens2 = w2.getTokens();
-        defineVectorspace(tokens, tokens2);
+
+        SkipgramVocabulary skipgramVocabulary = new SkipgramVocabulary();
+        skipgramVocabulary.addWitness(tokens);
+        skipgramVocabulary.addWitness(tokens2);
+
+        assertEquals(10, skipgramVocabulary.size());
+
+        SimpleWitness w3 = new SimpleWitness("w3", "a d b");
+        List<Token> tokens3 = w3.getTokens();
+        skipgramVocabulary.addWitness(tokens3);
+
+        System.out.println(skipgramVocabulary.toString());
+
+
         throw new RuntimeException("!!");
     }
 
@@ -90,30 +103,14 @@ public class SkipGramMWATest {
         // nu gebeurt dat niet in het voorbeeld waar ik nu mee werk, dus laat maar even..
 
 
-        // we creeren skipgrams van witness 1 en witness 2
-        SkipgramCreatorKerasStyle skipgramCreatorKerasStyle = new SkipgramCreatorKerasStyle();
-        List<Skipgram> skipgramsWitness1 = skipgramCreatorKerasStyle.create(witness1, 2);
-        List<Skipgram> skipgramsWitness2 = skipgramCreatorKerasStyle.create(witness2, 2);
-
-        // we normalized de twee lijsten...
-        List<NormalizedSkipgram> normalizedSkipgrams = skipgramsWitness1.stream().map(sg -> new NormalizedSkipgram(((SimpleToken) sg.head).getNormalized(), ((SimpleToken) sg.tail).getNormalized())).collect(Collectors.toList());
-        List<NormalizedSkipgram> normalizedSkipgrams2 = skipgramsWitness2.stream().map(sg -> new NormalizedSkipgram(((SimpleToken) sg.head).getNormalized(), ((SimpleToken) sg.tail).getNormalized())).collect(Collectors.toList());
-
-        System.out.println(normalizedSkipgrams);
-        System.out.println(normalizedSkipgrams2);
-
-        // eerst het vocabulair bouwen
-        Set<NormalizedSkipgram> vocabulary = new HashSet<>();
-        vocabulary.addAll(normalizedSkipgrams);
-        vocabulary.addAll(normalizedSkipgrams2);
-        System.out.println(vocabulary);
-        System.out.println(normalizedSkipgrams.size()+normalizedSkipgrams2.size());
-        System.out.println(vocabulary.size());
 
 //        // Het zou eigenlijk een georderde set moeten zijn...
-        SortedSet<NormalizedSkipgram> orderedVoca = new TreeSet<>(new NormalizedSkipgramComparator());
-        orderedVoca.addAll(vocabulary);
-        System.out.println(orderedVoca);
+//        SortedSet<NormalizedSkipgram> orderedVoca = new TreeSet<>(new NormalizedSkipgramComparator());
+//        orderedVoca.addAll(vocabulary);
+//        System.out.println(orderedVoca);
+
+        // Nu maken van de vocabulary een counter of bag of multiset of hoe we het ook noemen willen..
+
 
         // Onderstaande code is voor als we willen counten hoe vaak elk item voorkomt..
 //        SkipgramComparator myComparator = new SkipgramComparator(new StrictEqualityTokenComparator());
