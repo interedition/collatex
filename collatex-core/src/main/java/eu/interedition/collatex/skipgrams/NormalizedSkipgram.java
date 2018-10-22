@@ -1,7 +1,5 @@
 package eu.interedition.collatex.skipgrams;
 
-import eu.interedition.collatex.Token;
-
 /*
  * Author: Ronald Haentjens Dekker
  * Date: 22-10-2018
@@ -13,7 +11,7 @@ public class NormalizedSkipgram {
     String head;
     String tail;
 
-    public NormalizedSkipgram(String head, String tail) {
+    NormalizedSkipgram(String head, String tail) {
         this.head = head;
         this.tail = tail;
     }
@@ -35,7 +33,7 @@ public class NormalizedSkipgram {
     }
 
     public String toString() {
-        return "N"+head+","+tail;
+        return "("+head+","+tail+")";
     }
 
 }

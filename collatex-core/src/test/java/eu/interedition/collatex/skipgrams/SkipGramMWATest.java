@@ -102,6 +102,7 @@ public class SkipGramMWATest {
         System.out.println(normalizedSkipgrams);
         System.out.println(normalizedSkipgrams2);
 
+        // eerst het vocabulair bouwen
         Set<NormalizedSkipgram> vocabulary = new HashSet<>();
         vocabulary.addAll(normalizedSkipgrams);
         vocabulary.addAll(normalizedSkipgrams2);
@@ -109,10 +110,12 @@ public class SkipGramMWATest {
         System.out.println(normalizedSkipgrams.size()+normalizedSkipgrams2.size());
         System.out.println(vocabulary.size());
 
-
-
-//        // eerst het vocabulair bouwen
 //        // Het zou eigenlijk een georderde set moeten zijn...
+        SortedSet<NormalizedSkipgram> orderedVoca = new TreeSet<>(new NormalizedSkipgramComparator());
+        orderedVoca.addAll(vocabulary);
+        System.out.println(orderedVoca);
+
+        // Onderstaande code is voor als we willen counten hoe vaak elk item voorkomt..
 //        SkipgramComparator myComparator = new SkipgramComparator(new StrictEqualityTokenComparator());
 //        Map<Skipgram, Integer> vocabulary = new TreeMap<>(myComparator);
 //        vocabulary.compute()

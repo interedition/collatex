@@ -24,7 +24,7 @@ public class SkipgramComparator implements Comparator<Skipgram> {
         // if not, we compare the second token of skipgram 1 and skipgram 2
         int compare = tokenComparator.compare(o1.head, o2.head);
         if (compare != 0) return compare;
-        compare = tokenComparator.compare(o2.tail, o2.tail);
+        compare = tokenComparator.compare(o1.tail, o2.tail);
         return compare;
     }
 
