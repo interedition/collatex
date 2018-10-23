@@ -49,4 +49,15 @@ public class SkipgramVocabulary {
     public int size() {
         return index.size();
     }
+
+    //NOTE: Ik zou er ook een priority queue van kunnen maken..
+    public NormalizedSkipgram selectHighestCount() {
+        System.out.println(index);
+        // Ga alle map entries af, bewaar de hoogste max value.
+        Optional<Map.Entry<NormalizedSkipgram, Integer>> max = index.entrySet().stream().max((e1, e2) -> e1.getValue().compareTo(e2.getValue()));
+        if (!max.isPresent()) {
+            throw new RuntimeException("what happened here?");
+        }
+        return max.get().getKey();
+    }
 }
