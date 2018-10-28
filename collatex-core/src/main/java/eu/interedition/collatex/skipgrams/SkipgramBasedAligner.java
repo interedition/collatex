@@ -33,7 +33,7 @@ public class SkipgramBasedAligner {
         witnessSet.put("w2", witness2);
         witnessSet.put("w3", witness3);
         select(normalizedSkipgram);
-        System.out.println(variantGraphCreator.variantgraph.vertices());
+        System.out.println(variantGraphCreator.toString());
     }
 
     public void select(NormalizedSkipgram xxx) {
@@ -45,15 +45,13 @@ public class SkipgramBasedAligner {
         // nu maak ik een variant graph creator aan en geef die skupgram mee...
         // ik wil natuurlijk nit steeds een nieuwe aanmaken
         // I create new vertex for every token in a normalized skipgram.sinc skiograms can ovrlap  This is obviously wrong..
-        VariantGraph.Vertex vertexForHead = variantGraphCreator.createVertexForToken();
-        VariantGraph.Vertex vertexForTail = variantGraphCreator.createVertexForToken();
         List<String> witnesses = Arrays.asList("w1", "w2", "w3");
         for (String witnessid : witnesses) {
             List<Token> witness1 = witnessSet.get(witnessid);
             // nu create ik die skipgrams opnieuw van een witness
             // en dan pak ik de normalized versoin
             Skipgram skipgram = findSkipgramForNormalizedFormInWitness(xxx, witness1);
-            variantGraphCreator.selectSkipgram(witnessid, skipgram, vertexForHead, vertexForTail);
+            variantGraphCreator.selectSkipgram(skipgram);
             // nu gaan we door de naar de volgende witness en zo verder
             // in de toekomst kunnen hierbij transpostions op treden.
             // dan moet we dus iets van een score gaan bijhouden van hoe elk vna deze variant graphs in wording is.
