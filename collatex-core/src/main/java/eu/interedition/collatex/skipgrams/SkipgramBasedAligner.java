@@ -1,7 +1,6 @@
 package eu.interedition.collatex.skipgrams;
 
 import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.*;
@@ -55,7 +54,6 @@ public class SkipgramBasedAligner {
             // nu gaan we door de naar de volgende witness en zo verder
             // in de toekomst kunnen hierbij transpostions op treden.
             // dan moet we dus iets van een score gaan bijhouden van hoe elk vna deze variant graphs in wording is.
-            break;
         }
 
 
@@ -64,7 +62,7 @@ public class SkipgramBasedAligner {
     private Skipgram findSkipgramForNormalizedFormInWitness(NormalizedSkipgram xxx, List<Token> witness1) {
         SkipgramCreator skc = new SkipgramCreator();
         List<Skipgram> skipgrams = skc.create(witness1, 3);
-        // we gaan alle skupgrams af op zoek naar een skipgram die voldoet aan die normalzed version
+        // we gaan alle skipgrams af op zoek naar een skipgram die voldoet aan die normalzed version
         Skipgram result = null;
         for (Skipgram skipgram : skipgrams) {
             SimpleToken sthead = (SimpleToken) skipgram.head;

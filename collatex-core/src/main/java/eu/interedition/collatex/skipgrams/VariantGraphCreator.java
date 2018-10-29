@@ -70,7 +70,7 @@ public class VariantGraphCreator {
         // maybe use optional?
         VariantGraph.Vertex higher = null;
         for (VariantGraph.Vertex v : verticesListInTopologicalOrder) {
-            // If V does not contain the witnss that w are looking for then ski[
+            // start and end vertices are special
             if (v == start) {
                 continue;
             }
@@ -79,10 +79,17 @@ public class VariantGraphCreator {
                 higher = v;
                 break;
             }
-            // Do the actual token comparison
-            String witnessId = token.getWitness().getSigil();
+
             // search the other token
-            SimpleToken theOtherToken = (SimpleToken) v.tokens().stream().filter(p -> p.getWitness().getSigil().equals(witnessId)).findFirst().get();
+            String witnessId = token.getWitness().getSigil();
+            Optional<Token> optionalTokenForThisWitness = v.tokens().stream().filter(p -> p.getWitness().getSigil().equals(witnessId)).findFirst();
+            // If V does not contain the witness that we are looking for then skip
+            if (!optionalTokenForThisWitness.isPresent()) {
+                continue;
+            }
+            SimpleToken theOtherToken = (SimpleToken) optionalTokenForThisWitness.get();
+
+            // Do the actual token comparison
             System.out.println("Comparing other "+ theOtherToken+" and "+token+"!");
             int bla = theOtherToken.compareTo(token);
             System.out.println("outcome:"+bla);
