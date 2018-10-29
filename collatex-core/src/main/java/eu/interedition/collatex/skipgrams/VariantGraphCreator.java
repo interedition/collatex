@@ -21,8 +21,10 @@ import java.util.*;
  * and the token of has a normalized form.
  *
  * Algorithmic steps:
- * 1. Filter the nodes pf the list on the witness identifier..
- * 2. Navigate the existing nodes using a comparator, not an identifier but on position
+ * 1. Filter the nodes of the list on the witness identifier..
+ * 1b NOTE: that the start and the end vertices are always a special code (everything is higher than the start
+ *    vertex and everything is lower than the end vertex).
+ * 2. Navigate the existing nodes using a comparator, not on the identifier but on token position
  * 3. Find the node a bit lower and the node a bit higher
  * 4. Look at the nodes in between the lower and the higher using the normalized form.
  * 5. If not a normalized form match.. insert a new node
@@ -33,17 +35,13 @@ import java.util.*;
 
 public class VariantGraphCreator {
     private VariantGraph variantGraph;
-    private VariantGraph.Vertex start;
-    private VariantGraph.Vertex end;
     private List<VariantGraph.Vertex> verticesListInTopologicalOrder;
 
-    public VariantGraphCreator() {
+    VariantGraphCreator() {
         this.variantGraph = new VariantGraph();
-        this.start = new VariantGraph.Vertex(this.variantGraph);
-        this.end = new VariantGraph.Vertex(this.variantGraph);
         this.verticesListInTopologicalOrder = new ArrayList<>();
-        this.verticesListInTopologicalOrder.add(start);
-        this.verticesListInTopologicalOrder.add(end);
+        this.verticesListInTopologicalOrder.add(variantGraph.getStart());
+        this.verticesListInTopologicalOrder.add(variantGraph.getEnd());
     }
 
 
@@ -52,7 +50,7 @@ public class VariantGraphCreator {
 
 
 
-    public void selectSkipgram(Skipgram skipgram) {
+    void selectSkipgram(Skipgram skipgram) {
         SimpleToken head = (SimpleToken) skipgram.head;
         SimpleToken tail = (SimpleToken) skipgram.tail;
 
@@ -63,18 +61,18 @@ public class VariantGraphCreator {
         insertTokenInVariantGraph(tail);
     }
 
-    public void insertTokenInVariantGraph(SimpleToken token) {
+    private void insertTokenInVariantGraph(SimpleToken token) {
         // This method should return two vertices: one that is higher than the one we want to insert
         // and one that is lower.
-        VariantGraph.Vertex lower = start;
+        VariantGraph.Vertex lower = variantGraph.getStart();
         // maybe use optional?
         VariantGraph.Vertex higher = null;
         for (VariantGraph.Vertex v : verticesListInTopologicalOrder) {
-            // start and end vertices are special
-            if (v == start) {
+            // rule 1b: start and end vertices are special
+            if (v == variantGraph.getStart()) {
                 continue;
             }
-            if (v == end) {
+            if (v == variantGraph.getEnd()) {
                 System.out.println("The end node is higher than "+token.toString());
                 higher = v;
                 break;
@@ -83,7 +81,7 @@ public class VariantGraphCreator {
             // search the other token
             String witnessId = token.getWitness().getSigil();
             Optional<Token> optionalTokenForThisWitness = v.tokens().stream().filter(p -> p.getWitness().getSigil().equals(witnessId)).findFirst();
-            // If V does not contain the witness that we are looking for then skip
+            // Rule 1: If V does not contain the witness that we are looking for then skip
             if (!optionalTokenForThisWitness.isPresent()) {
                 continue;
             }
