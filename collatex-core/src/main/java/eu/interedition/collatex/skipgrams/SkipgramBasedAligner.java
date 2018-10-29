@@ -55,6 +55,7 @@ public class SkipgramBasedAligner {
             // nu gaan we door de naar de volgende witness en zo verder
             // in de toekomst kunnen hierbij transpostions op treden.
             // dan moet we dus iets van een score gaan bijhouden van hoe elk vna deze variant graphs in wording is.
+            break;
         }
 
 
