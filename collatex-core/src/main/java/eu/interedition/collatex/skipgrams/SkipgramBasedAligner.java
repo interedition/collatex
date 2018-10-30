@@ -31,9 +31,9 @@ public class SkipgramBasedAligner {
         vocabulary.addWitness(witness2);
         vocabulary.addWitness(witness3);
 
-        // we do a fixed number of iteratiros
+        // we do a fixed number of iterations
         // aligning the highest priority each time.
-        for (int i=0; i<2; i++) {
+        for (int i=0; i<4; i++) {
             alignTheHighestPriority(vocabulary);
         }
     }

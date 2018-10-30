@@ -65,8 +65,7 @@ public class VariantGraphCreator {
         // This method should return two vertices: one that is higher than the one we want to insert
         // and one that is lower.
         VariantGraph.Vertex lower = variantGraph.getStart();
-        // maybe use optional?
-        VariantGraph.Vertex higher = null;
+        VariantGraph.Vertex higher = variantGraph.getEnd();
         for (VariantGraph.Vertex v : verticesListInTopologicalOrder) {
             // rule 1b: start and end vertices are special
             if (v == variantGraph.getStart()) {
@@ -74,7 +73,6 @@ public class VariantGraphCreator {
             }
             if (v == variantGraph.getEnd()) {
 //                System.out.println("The end node is higher than "+token.toString());
-                higher = v;
                 break;
             }
 
@@ -98,7 +96,7 @@ public class VariantGraphCreator {
                 continue;
             }
             if (bla > 0) {
-                //TODO!
+//                System.out.println("token "+token+" is lower than "+theOtherToken);
                 higher = v;
                 break;
             }
@@ -107,7 +105,7 @@ public class VariantGraphCreator {
         // we search in between the lower and the upper bound to see whether there is a vertex
         // that has the same
         // integer position of lower berekenen.
-        System.out.println("Token: "+token+" ; Lower: "+lower+" ; higher: "+higher);
+//        System.out.println("Token: "+token+" ; Lower: "+lower+" ; higher: "+higher);
         int i = verticesListInTopologicalOrder.indexOf(lower);
         int j = verticesListInTopologicalOrder.indexOf(higher);
         if (j-i == 1) {
@@ -134,8 +132,15 @@ public class VariantGraphCreator {
             }
         }
 
+        // This happens when there is a node at a rank that is between lower and higher
+        // but is not a normalized form match.
+        // This will lead to a column with variation in the alignment table
+        // Or to multiple nodes on the same rank un the variant graph.
+        // So there already is a rank in the graph or a column in the tale
+        // And need to add it to that.
+
         if (result==null) {
-            throw new RuntimeException("While trying to place "+token+" \n We searched for a normalized form match within the window "+i+"-"+j+", but could not find anything!");
+            throw new RuntimeException("While trying to place "+token+" \n We searched for a normalized form match within the window "+(i+1)+"-"+(j-1)+", but could not find anything!");
         }
 
         // We searched within the window of potential normalized matches and we did find a normalized match.
@@ -146,7 +151,7 @@ public class VariantGraphCreator {
 
 
     /*
-      This metod takrs the topoligcal sort list of vertices and adds all the edges where
+      This method takrs the topoligcal sort list of vertices and adds all the edges where
       needed
 
       This is of couse used for the final graph
@@ -154,7 +159,7 @@ public class VariantGraphCreator {
 
      */
     public void addEdges() {
-        /* We traverse over the topoigcla order list
+        /* We traverse over the topoligcal order list
         * POf course skip the start node
         * then for every node...
          */
