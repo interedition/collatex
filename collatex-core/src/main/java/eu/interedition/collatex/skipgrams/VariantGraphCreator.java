@@ -100,12 +100,14 @@ public class VariantGraphCreator {
             if (bla > 0) {
                 //TODO!
                 higher = v;
+                break;
             }
         }
         // we need to decide whether we need to create a new vertex or not
         // we search in between the lower and the upper bound to see whether there is a vertex
         // that has the same
         // integer position of lower berekenen.
+        System.out.println("Token: "+token+" ; Lower: "+lower+" ; higher: "+higher);
         int i = verticesListInTopologicalOrder.indexOf(lower);
         int j = verticesListInTopologicalOrder.indexOf(higher);
         if (j-i == 1) {
@@ -133,7 +135,7 @@ public class VariantGraphCreator {
         }
 
         if (result==null) {
-            throw new RuntimeException("We searched for a normalized form match within the window, but could not find anything!");
+            throw new RuntimeException("While trying to place "+token+" \n We searched for a normalized form match within the window "+i+"-"+j+", but could not find anything!");
         }
 
         // We searched within the window of potential normalized matches and we did find a normalized match.

@@ -18,6 +18,13 @@ public class SkipgramBasedAligner {
     private VariantGraphCreator variantGraphCreator = new VariantGraphCreator();
 
     public void align(List<Token> witness1, List<Token> witness2, List<Token> witness3) {
+        // ik gebruik een map om de witnesss set in op te slaan.
+        // ik doe dat nu even hardcoded
+        witnessSet = new HashMap<>();
+        witnessSet.put("w1", witness1);
+        witnessSet.put("w2", witness2);
+        witnessSet.put("w3", witness3);
+
         // We build a skipgram vocabulary based on the three witnesses.
         SkipgramVocabulary vocabulary = new SkipgramVocabulary();
         vocabulary.addWitness(witness1);
@@ -34,12 +41,6 @@ public class SkipgramBasedAligner {
     private void alignTheHighestPriority(List<Token> witness1, List<Token> witness2, List<Token> witness3, SkipgramVocabulary vocabulary) {
         NormalizedSkipgram normalizedSkipgram = vocabulary.selectHighestCount();
         System.out.println("We start/continue with: "+normalizedSkipgram);
-        // ik gebruik een map om de witnesss set in op te slaan.
-        // ik doe dat nu even hardcoded
-        witnessSet = new HashMap<>();
-        witnessSet.put("w1", witness1);
-        witnessSet.put("w2", witness2);
-        witnessSet.put("w3", witness3);
         select(normalizedSkipgram);
         System.out.println(variantGraphCreator.toString());
         // remove it and move on
