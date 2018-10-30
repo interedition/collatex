@@ -49,7 +49,8 @@ public class VariantGraphCreator {
 
 
 
-
+    //TODO: maybe this method should move to the skipgram based aligner
+    // THIS class is just a iteraive token varinat graph builder
     void selectSkipgram(Skipgram skipgram) {
         SimpleToken head = (SimpleToken) skipgram.head;
         SimpleToken tail = (SimpleToken) skipgram.tail;
@@ -68,6 +69,8 @@ public class VariantGraphCreator {
         VariantGraph.Vertex higher = variantGraph.getEnd();
         for (VariantGraph.Vertex v : verticesListInTopologicalOrder) {
             // rule 1b: start and end vertices are special
+            // Although this is more of a fast path; if we remove this two conditions
+            // it should still work
             if (v == variantGraph.getStart()) {
                 continue;
             }
@@ -111,9 +114,7 @@ public class VariantGraphCreator {
         if (j-i == 1) {
             // lower and higher tokens are right next to each other.
             // We have to add a new node in the variant graph
-            VariantGraph.Vertex vertex = new VariantGraph.Vertex(variantGraph);
-            vertex.tokens().add(token);
-            verticesListInTopologicalOrder.add(i+1, vertex);
+            createVertexForToken(token, i);
             return;
         }
 
@@ -138,9 +139,13 @@ public class VariantGraphCreator {
         // Or to multiple nodes on the same rank un the variant graph.
         // So there already is a rank in the graph or a column in the tale
         // And need to add it to that.
+        // TODO: replace this exception with useful commentary.
+        // throw new RuntimeException("While trying to place "+token+" \n We searched for a normalized form match within the window "+(i+1)+"-"+(j-1)+", but could not find anything!");
+
 
         if (result==null) {
-            throw new RuntimeException("While trying to place "+token+" \n We searched for a normalized form match within the window "+(i+1)+"-"+(j-1)+", but could not find anything!");
+            createVertexForToken(token, i);
+            return;
         }
 
         // We searched within the window of potential normalized matches and we did find a normalized match.
@@ -149,17 +154,33 @@ public class VariantGraphCreator {
 
     }
 
+    /*
+     * creates a new vertex for a token
+     * and inserts it in the topological prdered list of the vertices
+     * where i stands for the position in the list
+     * NOTE: we could at a method for when the i is not known
+     * but I don't think that will happen often.
+     * NOTE2: pay attention to +1.
+     * This maybe confusing to callers of this method
+     * Although of course this is a private method.
+     */
+    private void createVertexForToken(SimpleToken token, int i) {
+        VariantGraph.Vertex vertex = new VariantGraph.Vertex(variantGraph);
+        vertex.tokens().add(token);
+        verticesListInTopologicalOrder.add(i+1, vertex);
+    }
+
 
     /*
-      This method takrs the topoligcal sort list of vertices and adds all the edges where
+      This method takes the topological sort list of vertices and adds all the edges where
       needed
 
-      This is of couse used for the final graph
-      But also to visualize the intermediate grpahs.
+      This is of course used for the final graph
+      But also to visualize the intermediate graphs.
 
      */
     public void addEdges() {
-        /* We traverse over the topoligcal order list
+        /* We traverse over the topological order list
         * POf course skip the start node
         * then for every node...
          */
@@ -208,7 +229,7 @@ public class VariantGraphCreator {
 
 
 //    /*
-//    * We need a a key object that is comparable that si a compsoite of a witness id and a comparble token
+//    * We need a a key object that is comparable that is a composite of a witness id and a comparable token
 //    * so we create an object for it..
 //    * Not a key any more just a list..
 //    */
