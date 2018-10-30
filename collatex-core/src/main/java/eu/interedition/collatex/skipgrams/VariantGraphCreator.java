@@ -2,6 +2,7 @@ package eu.interedition.collatex.skipgrams;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
+import eu.interedition.collatex.Witness;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.*;
@@ -41,7 +42,7 @@ import java.util.*;
  */
 
 public class VariantGraphCreator {
-    private VariantGraph variantGraph;
+    VariantGraph variantGraph;
     private List<VariantGraph.Vertex> verticesListInTopologicalOrder;
 
     VariantGraphCreator() {
@@ -170,10 +171,60 @@ public class VariantGraphCreator {
      */
     public void addEdges() {
         /* We traverse over the topological order list
-        * POf course skip the start node
+        * Of course skip the start node
         * then for every node...
+        *
+        * We should maybe first clear the incoming and outgoing edges when we first visit a node
+        * That way we can use this code to visualize multiple partial variant graphs.
+         */
+        /*
+         * The clearing out we do later on...
          */
 
+        // we find a vertex
+        // the vertex contains tokens for one or more witnesses
+        // now each of these witnesses need to have a valid path
+        // from the previous vertex of that witness to the current vertex.
+        // so we create a map that contains the last seen vertex for eahc witness
+        // at th start that is of course the start vertex.
+        Map<String, VariantGraph.Vertex> witnessToLastVertexMap = new HashMap<>();
+        //TODO: hardcoded for now
+        List<String> witnesses = Arrays.asList("w1", "w2", "w3");
+        // here we need to know the complete witness set..
+        // oh wait that is no problem we can get that info from the start vertex of the graph
+        // What kind of token is on there?
+        // oh there are no tokens on there; then it won't work
+        for (String witnessId : witnesses) {
+            witnessToLastVertexMap.put(witnessId, variantGraph.getStart());
+        }
+
+
+//        Iterator<VariantGraph.Vertex> nodeIterator = verticesListInTopologicalOrder.iterator();
+        for (VariantGraph.Vertex v : verticesListInTopologicalOrder) {
+            // skip the start vertex
+            if (v == variantGraph.getStart()) {
+                continue;
+            }
+            // NOTE: oh the end vertex has no tokens
+            if (v == variantGraph.getEnd()) {
+                for (Map.Entry<String,VariantGraph.Vertex> witnessIdToPreviousVertexEntry : witnessToLastVertexMap.entrySet()) {
+                    VariantGraph.Vertex pre = witnessIdToPreviousVertexEntry.getValue();
+                    Witness witness = pre.tokens().stream().findFirst().get().getWitness();
+                    variantGraph.connect(pre, v, Collections.singleton(witness));
+                }
+            }
+
+            // nu moet ik alle tokens van een vertex af gaan om te kijken welke witnesses er allemaal
+            // op stana.
+            for (Token t: v.tokens()) {
+                VariantGraph.Vertex previous = witnessToLastVertexMap.get(t.getWitness().getSigil());
+                // NOTE: does connect work if it is called for the same vertex multiple times?
+                // I guess so?
+                variantGraph.connect(previous, v, Collections.singleton(t.getWitness()));
+                // nu moet ik natuurlijk die map bijwerken
+                witnessToLastVertexMap.put(t.getWitness().getSigil(), v);
+            }
+        }
     }
 
 

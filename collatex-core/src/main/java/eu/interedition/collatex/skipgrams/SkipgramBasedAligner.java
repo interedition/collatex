@@ -2,7 +2,9 @@ package eu.interedition.collatex.skipgrams;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 
+import java.io.StringWriter;
 import java.util.*;
 
 /*
@@ -36,6 +38,16 @@ public class SkipgramBasedAligner {
         for (int i=0; i<4; i++) {
             alignTheHighestPriority(vocabulary);
         }
+
+        // After alignment we add all the edges to the graph
+        variantGraphCreator.addEdges();
+
+        // now we need some way to show that it actually works
+        // VG visualizer output?
+        SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraphCreator.variantGraph);
+        StringWriter b = new StringWriter();
+        serializer.toDot(b);
+        System.out.println(b.toString());
     }
 
     private void alignTheHighestPriority(SkipgramVocabulary vocabulary) {
@@ -92,7 +104,7 @@ public class SkipgramBasedAligner {
         return result;
     }
 
-    void selectSkipgram(Skipgram skipgram) {
+    private void selectSkipgram(Skipgram skipgram) {
         SimpleToken head = (SimpleToken) skipgram.head;
         SimpleToken tail = (SimpleToken) skipgram.tail;
 
