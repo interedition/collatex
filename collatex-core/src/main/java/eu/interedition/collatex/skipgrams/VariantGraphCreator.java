@@ -57,7 +57,7 @@ public class VariantGraphCreator {
         // we must look for the location where to insert the vertex
         // this method has to be called twice. Once for each token in the skipgram
         insertTokenInVariantGraph(head);
-        System.out.println(this.toString());
+//        System.out.println(this.toString());
         insertTokenInVariantGraph(tail);
     }
 
@@ -73,7 +73,7 @@ public class VariantGraphCreator {
                 continue;
             }
             if (v == variantGraph.getEnd()) {
-                System.out.println("The end node is higher than "+token.toString());
+//                System.out.println("The end node is higher than "+token.toString());
                 higher = v;
                 break;
             }
@@ -88,12 +88,12 @@ public class VariantGraphCreator {
             SimpleToken theOtherToken = (SimpleToken) optionalTokenForThisWitness.get();
 
             // Do the actual token comparison
-            System.out.println("Comparing other "+ theOtherToken+" and "+token+"!");
+//            System.out.println("Comparing other "+ theOtherToken+" and "+token+"!");
             int bla = theOtherToken.compareTo(token);
-            System.out.println("outcome:"+bla);
+//            System.out.println("outcome:"+bla);
 
             if (bla < 0) {
-                System.out.println("token "+token+" is higher than "+theOtherToken);
+//                System.out.println("token "+token+" is higher than "+theOtherToken);
                 lower = v;
                 continue;
             }
@@ -142,6 +142,22 @@ public class VariantGraphCreator {
 
     }
 
+
+    /*
+      This metod takrs the topoligcal sort list of vertices and adds all the edges where
+      needed
+
+      This is of couse used for the final graph
+      But also to visualize the intermediate grpahs.
+
+     */
+    public void addEdges() {
+        /* We traverse over the topoigcla order list
+        * POf course skip the start node
+        * then for every node...
+         */
+
+    }
 
 
 

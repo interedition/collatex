@@ -41,6 +41,15 @@ public class SkipgramVocabulary {
     }
 
 
+    /*
+     * I am not sure you always want to do things like this
+     * There could be multiple instances of a normalized skipgram.
+     */
+    public void removeNormalizedSkipgram(NormalizedSkipgram normalizedSkipgram) {
+        index.remove(normalizedSkipgram);
+    }
+
+
 
     public String toString() {
         return index.toString();
