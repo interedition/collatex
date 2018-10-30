@@ -63,7 +63,7 @@ public class SkipgramBasedAligner {
             // en dan pak ik de normalized versoin
             Optional<Skipgram> skipgram = findSkipgramForNormalizedFormInWitness(xxx, witness1);
             if (skipgram.isPresent()) {
-                variantGraphCreator.selectSkipgram(skipgram.get());
+                selectSkipgram(skipgram.get());
             }
             // nu gaan we door de naar de volgende witness en zo verder
             // in de toekomst kunnen hierbij transpostions op treden.
@@ -91,5 +91,17 @@ public class SkipgramBasedAligner {
         }
         return result;
     }
+
+    void selectSkipgram(Skipgram skipgram) {
+        SimpleToken head = (SimpleToken) skipgram.head;
+        SimpleToken tail = (SimpleToken) skipgram.tail;
+
+        // we must look for the location where to insert the vertex
+        // this method has to be called twice. Once for each token in the skipgram
+        variantGraphCreator.insertTokenInVariantGraph(head);
+//        System.out.println(variantGraphCreator.variantgraph.toString());
+        variantGraphCreator.insertTokenInVariantGraph(tail);
+    }
+
 
 }

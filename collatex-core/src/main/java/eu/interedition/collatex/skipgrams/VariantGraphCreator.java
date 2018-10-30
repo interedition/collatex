@@ -6,9 +6,16 @@ import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.*;
 
-/*
+/* <name of class here>
+ *
  * @author: Ronald Haentjens Dekker
  * Date: 25-10-2018
+ *
+ * This class is an iterative variant graph builder
+ * The order in which tokens are supplied to this builder
+ * determines whether tokens are grouped together in a node or not.
+ * The order of tokens within a witness is maintained at all times.
+ *
  */
 
 
@@ -44,25 +51,7 @@ public class VariantGraphCreator {
         this.verticesListInTopologicalOrder.add(variantGraph.getEnd());
     }
 
-
-
-
-
-
-    //TODO: maybe this method should move to the skipgram based aligner
-    // THIS class is just a iteraive token varinat graph builder
-    void selectSkipgram(Skipgram skipgram) {
-        SimpleToken head = (SimpleToken) skipgram.head;
-        SimpleToken tail = (SimpleToken) skipgram.tail;
-
-        // we must look for the location where to insert the vertex
-        // this method has to be called twice. Once for each token in the skipgram
-        insertTokenInVariantGraph(head);
-//        System.out.println(this.toString());
-        insertTokenInVariantGraph(tail);
-    }
-
-    private void insertTokenInVariantGraph(SimpleToken token) {
+    void insertTokenInVariantGraph(SimpleToken token) {
         // This method should return two vertices: one that is higher than the one we want to insert
         // and one that is lower.
         VariantGraph.Vertex lower = variantGraph.getStart();
