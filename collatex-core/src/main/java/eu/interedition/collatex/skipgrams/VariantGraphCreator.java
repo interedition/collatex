@@ -102,14 +102,44 @@ public class VariantGraphCreator {
                 higher = v;
             }
         }
-        // for now we always create a new vertex per token.
-        // This is of course wrong.
-        // TODO: search to see whether we need to create a new vertex or not
-        VariantGraph.Vertex vertex = new VariantGraph.Vertex(variantGraph);
-        vertex.tokens().add(token);
+        // we need to decide whether we need to create a new vertex or not
+        // we search in between the lower and the upper bound to see whether there is a vertex
+        // that has the same
         // integer position of lower berekenen.
         int i = verticesListInTopologicalOrder.indexOf(lower);
-        verticesListInTopologicalOrder.add(i+1, vertex);
+        int j = verticesListInTopologicalOrder.indexOf(higher);
+        if (j-i == 1) {
+            // lower and higher tokens are right next to each other.
+            // We have to add a new node in the variant graph
+            VariantGraph.Vertex vertex = new VariantGraph.Vertex(variantGraph);
+            vertex.tokens().add(token);
+            verticesListInTopologicalOrder.add(i+1, vertex);
+            return;
+        }
+
+
+        // Search to see whether we need to create a new vertex or not
+        VariantGraph.Vertex result = null;
+        for (int x=i+1; x < j; x++) {
+            VariantGraph.Vertex n = verticesListInTopologicalOrder.get(x);
+            // all the tokens at one vertex have the same normalized form
+            // so get the first token on the node....
+
+            SimpleToken t = (SimpleToken) n.tokens().stream().findFirst().get();
+            if (t.getNormalized().equals(token.getNormalized())) {
+                result = n;
+                break;
+            }
+        }
+
+        if (result==null) {
+            throw new RuntimeException("We searched for a normalized form match within the window, but could not find anything!");
+        }
+
+        // We searched within the window of potential normalized matches and we did find a normalized match.
+        // Add this token to the existing vertex.
+        result.tokens().add(token);
+
     }
 
 
