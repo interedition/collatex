@@ -42,19 +42,19 @@ public class SkipgramBasedAligner {
         // After alignment we add all the edges to the graph
         variantGraphCreator.addEdges();
 
-        // now we need some way to show that it actually works
-        // VG visualizer output?
-        SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraphCreator.variantGraph);
-        StringWriter b = new StringWriter();
-        serializer.toDot(b);
-        System.out.println(b.toString());
+//        // now we need some way to show that it actually works
+//        // VG visualizer output?
+//        SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraphCreator.variantGraph);
+//        StringWriter b = new StringWriter();
+//        serializer.toDot(b);
+//        System.out.println(b.toString());
     }
 
     private void alignTheHighestPriority(SkipgramVocabulary vocabulary) {
         NormalizedSkipgram normalizedSkipgram = vocabulary.selectHighestCount();
-        System.out.println("We start/continue with: "+normalizedSkipgram);
+//        System.out.println("We start/continue with: "+normalizedSkipgram);
         select(normalizedSkipgram);
-        System.out.println(variantGraphCreator.toString());
+//        System.out.println(variantGraphCreator.toString());
         // remove it and move on
         vocabulary.removeNormalizedSkipgram(normalizedSkipgram);
     }
@@ -116,4 +116,7 @@ public class SkipgramBasedAligner {
     }
 
 
+    List getVerticesInTopologicalOrder() {
+        return variantGraphCreator.verticesListInTopologicalOrder;
+    }
 }

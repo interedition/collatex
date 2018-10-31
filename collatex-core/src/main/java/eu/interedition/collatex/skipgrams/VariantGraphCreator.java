@@ -43,7 +43,7 @@ import java.util.*;
 
 public class VariantGraphCreator {
     VariantGraph variantGraph;
-    private List<VariantGraph.Vertex> verticesListInTopologicalOrder;
+    List<VariantGraph.Vertex> verticesListInTopologicalOrder;
 
     VariantGraphCreator() {
         this.variantGraph = new VariantGraph();
