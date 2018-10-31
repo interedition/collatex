@@ -23,14 +23,29 @@ public class SkipgramBasedAlignerTest {
         aligner.align(w1.getTokens(), w2.getTokens(), w3.getTokens());
         System.out.println(aligner.getVerticesInTopologicalOrder());
 
-        // scenario 1: 1, 3, 2
+        // scenario 2: 1, 3, 2
         aligner = new SkipgramBasedAligner();
         aligner.align(w1.getTokens(), w3.getTokens(), w2.getTokens());
         System.out.println(aligner.getVerticesInTopologicalOrder());
 
-        // scenario 1: 2, 1, 3
+        // scenario 3: 2, 1, 3
         aligner = new SkipgramBasedAligner();
         aligner.align(w2.getTokens(), w1.getTokens(), w3.getTokens());
+        System.out.println(aligner.getVerticesInTopologicalOrder());
+
+        // scenario 4: 2, 3, 1
+        aligner = new SkipgramBasedAligner();
+        aligner.align(w2.getTokens(), w3.getTokens(), w1.getTokens());
+        System.out.println(aligner.getVerticesInTopologicalOrder());
+
+        // scenario 5: 3, 1, 2
+        aligner = new SkipgramBasedAligner();
+        aligner.align(w3.getTokens(), w1.getTokens(), w2.getTokens());
+        System.out.println(aligner.getVerticesInTopologicalOrder());
+
+        // scenario 6: 3, 2, 1
+        aligner = new SkipgramBasedAligner();
+        aligner.align(w3.getTokens(), w2.getTokens(), w1.getTokens());
         System.out.println(aligner.getVerticesInTopologicalOrder());
 
     }
