@@ -104,6 +104,7 @@ public class VariantGraphCreator {
         if (j-i == 1) {
             // lower and higher tokens are right next to each other.
             // We have to add a new node in the variant graph
+            // NOTE: here there is no difference between inserting before the upper and after the lower bound!
             createVertexForToken(token, i);
             return;
         }
@@ -132,9 +133,9 @@ public class VariantGraphCreator {
         // TODO: replace this exception with useful commentary.
         // throw new RuntimeException("While trying to place "+token+" \n We searched for a normalized form match within the window "+(i+1)+"-"+(j-1)+", but could not find anything!");
 
-
+        // NOTE: We do an insert before upper bound here!
         if (result==null) {
-            createVertexForToken(token, i);
+            createVertexForTokenInsertBefore(token, j);
             return;
         }
 
@@ -160,6 +161,12 @@ public class VariantGraphCreator {
         verticesListInTopologicalOrder.add(i+1, vertex);
     }
 
+
+    private void createVertexForTokenInsertBefore(SimpleToken token, int upper) {
+        VariantGraph.Vertex vertex = new VariantGraph.Vertex(variantGraph);
+        vertex.tokens().add(token);
+        verticesListInTopologicalOrder.add(upper, vertex);
+    }
 
     /*
       This method takes the topological sort list of vertices and adds all the edges where
