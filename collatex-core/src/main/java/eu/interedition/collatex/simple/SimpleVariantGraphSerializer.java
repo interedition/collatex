@@ -198,6 +198,8 @@ public class SimpleVariantGraphSerializer {
         final String connector = " -> ";
 
         out.println("digraph G {");
+        out.println("rankdir=LR");
+        out.println("Gid=VariantGraph");
 
         for (VariantGraph.Vertex v : graph.vertices()) {
             out.print(indent + id(v));
