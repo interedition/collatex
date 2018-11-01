@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class SkipgramBasedAligner {
     private Map<String, List<Token>> witnessSet;
-    private VariantGraphCreator variantGraphCreator = new VariantGraphCreator();
+    VariantGraphCreator variantGraphCreator = new VariantGraphCreator();
 
     public void align(List<Token> witness1, List<Token> witness2, List<Token> witness3) {
         // ik gebruik een map om de witnesss set in op te slaan.
@@ -42,12 +42,6 @@ public class SkipgramBasedAligner {
         // After alignment we add all the edges to the graph
         variantGraphCreator.addEdges();
 
-//        // now we need some way to show that it actually works
-//        // VG visualizer output?
-//        SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraphCreator.variantGraph);
-//        StringWriter b = new StringWriter();
-//        serializer.toDot(b);
-//        System.out.println(b.toString());
     }
 
     private void alignTheHighestPriority(SkipgramVocabulary vocabulary) {

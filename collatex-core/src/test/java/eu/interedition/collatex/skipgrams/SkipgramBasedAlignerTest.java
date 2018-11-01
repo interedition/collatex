@@ -1,7 +1,11 @@
 package eu.interedition.collatex.skipgrams;
 
+import eu.interedition.collatex.simple.SimpleVariantGraphSerializer;
 import eu.interedition.collatex.simple.SimpleWitness;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.StringWriter;
 
 /*
  * 23-10-2018
@@ -48,5 +52,24 @@ public class SkipgramBasedAlignerTest {
         aligner.align(w3.getTokens(), w2.getTokens(), w1.getTokens());
         System.out.println(aligner.getVerticesInTopologicalOrder());
 
+    }
+
+    @Test
+    public void testEdges() {
+        SimpleWitness w1 = new SimpleWitness("w1", "a b c d e");
+        SimpleWitness w2 = new SimpleWitness("w2", "a e c d");
+        SimpleWitness w3 = new SimpleWitness("w3", "a d b");
+        SkipgramBasedAligner aligner;
+
+        aligner = new SkipgramBasedAligner();
+        aligner.align(w1.getTokens(), w2.getTokens(), w3.getTokens());
+        System.out.println(aligner.getVerticesInTopologicalOrder());
+
+        // now we need some way to show that it actually works
+        // VG visualizer output?
+        SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(aligner.variantGraphCreator.variantGraph);
+        StringWriter b = new StringWriter();
+        serializer.toDot(b);
+        System.out.println(b.toString());
     }
 }
