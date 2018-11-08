@@ -176,6 +176,15 @@ public class VariantGraphCreator {
       But also to visualize the intermediate graphs.
 
      */
+    // About the edges
+    // First point:
+    // Since the graph is only partially build one might think that it is not possible to
+    // add edges, but turns out to be not a problem because the nodes are sorted in topological order and
+    // for each witness we know the previous node.
+    // Second point: the edges need to be reconnected the second and third times.
+    // It seems that the implementation of the variant graph connect method already takes care of this.
+    // But only partly. To fix this we clear each vertex before adding relations to it.
+
     public void addEdges() {
         /* We traverse over the topological order list
         * Of course skip the start node

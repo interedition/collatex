@@ -37,11 +37,21 @@ public class SkipgramBasedAligner {
         // aligning the highest priority each time.
         for (int i=0; i<4; i++) {
             alignTheHighestPriority(vocabulary);
+            //visualizeThePartiallyBuildVariantGraph(i);
         }
 
         // After alignment we add all the edges to the graph
         variantGraphCreator.addEdges();
 
+    }
+
+    // we visualize each of the steps using the dot export format..
+    private void visualizeThePartiallyBuildVariantGraph(int i) {
+        variantGraphCreator.addEdges();
+        SimpleVariantGraphSerializer serializer = new SimpleVariantGraphSerializer(variantGraphCreator.variantGraph);
+        StringWriter sw = new StringWriter();
+        serializer.toDot(sw);
+        System.out.print("Step: "+ i+1 + "\n"+sw.toString());
     }
 
     private void alignTheHighestPriority(SkipgramVocabulary vocabulary) {
