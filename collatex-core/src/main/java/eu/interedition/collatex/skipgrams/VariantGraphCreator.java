@@ -208,7 +208,11 @@ public class VariantGraphCreator {
                     VariantGraph.Vertex pre = witnessIdToPreviousVertexEntry.getValue();
                     variantGraph.connect(pre, v, Collections.singleton(witness));
                 }
+               break;
             }
+
+            // remove all the existing relations on this vertex.
+            v.clear();
 
             // nu moet ik alle tokens van een vertex af gaan om te kijken welke witnesses er allemaal
             // op staan.

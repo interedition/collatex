@@ -150,6 +150,11 @@ public class VariantGraph {
             tokens.forEach(this.tokens::add);
         }
 
+        public void clear() {
+            outgoing.clear();
+            incoming.clear();
+        }
+
         public VariantGraph graph() {
             return graph;
         }
