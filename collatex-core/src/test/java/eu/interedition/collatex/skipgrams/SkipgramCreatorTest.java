@@ -6,6 +6,7 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 /*
  * We want to test the more complex skipgrams ..
@@ -31,6 +32,8 @@ public class SkipgramCreatorTest {
         StaticsCollector collector = new StaticsCollector();
         collector.gather(skipgrams);
 
+        List<Map.Entry<String, Integer>> result = collector.getAllTheNormalizedSkipgramsThatOccurMoreThanOnce();
+        System.out.println(result);
 
     }
 
