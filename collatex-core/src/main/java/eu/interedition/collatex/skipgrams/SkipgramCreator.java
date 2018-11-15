@@ -32,4 +32,17 @@ public class SkipgramCreator {
 
         return skipgrams;
     }
+
+    public List<NewSkipgram> secondCreate(List<Token> sequence, int n, int s) {
+        // the window size is n + s
+        int windowSize = n + s;
+        List<NewSkipgram> skipgrams = new ArrayList<>();
+        for (int start = 0; start < sequence.size() - windowSize; start++) {
+            List<Token> skipgramHead = sequence.subList(start, start + windowSize);
+            NewSkipgram skipgram = new NewSkipgram(skipgramHead);
+            skipgrams.add(skipgram);
+        }
+        return skipgrams;
+
+    }
 }

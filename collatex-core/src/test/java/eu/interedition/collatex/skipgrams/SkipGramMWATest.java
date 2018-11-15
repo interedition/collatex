@@ -5,9 +5,12 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /*
  16-10-2018
@@ -57,6 +60,7 @@ public class SkipGramMWATest {
         assertEquals(12, skipgramVocabulary.size());
         skipgramVocabulary.addWitness(w3.getTokens());
         System.out.println(skipgramVocabulary.toString());
+        fail();
     }
 
 
