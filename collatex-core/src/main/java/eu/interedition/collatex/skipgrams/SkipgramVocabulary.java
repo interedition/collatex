@@ -10,6 +10,7 @@ package eu.interedition.collatex.skipgrams;
  *
  */
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -17,12 +18,32 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SkipgramVocabulary {
+    // the old index
     private SortedMap<NormalizedSkipgram, Integer> index;
+
+    // the new index
+    // maps a normalized version to the actual skipgrams in the witnesses
+    private SortedMap<NormalizedSkipgram, List<NewSkipgram>> newIndex;
+
 
     public SkipgramVocabulary() {
         this.index = new TreeMap<>(new NormalizedSkipgramComparator());
+        this.newIndex = new TreeMap<>(new NormalizedSkipgramComparator());
     }
 
+    // er zijn meerdere entries in the value
+    // dus moet werken met compute if absent
+    // verder kan het tellen in de oude index dan gewoon met een size method call on the list
+    public void addSkipgrammedWitnessNewStyle(List<NewSkipgram> skipgramList) {
+        List<NormalizedSkipgram> normalizedSkipgrams = skipgramList.stream().map(sg -> new NormalizedSkipgram(sg.getTokensNormalized(), "")).collect(Collectors.toList());
+        for (int i = 0; i< normalizedSkipgrams.size(); i++) {
+            NormalizedSkipgram normalizedSkipgram = normalizedSkipgrams.get(i);
+            NewSkipgram newSkipgram = skipgramList.get(i);
+            this.newIndex.computeIfAbsent(normalizedSkipgram, e -> new ArrayList<>()).add(newSkipgram);
+        }
+    }
+
+    // oud
     public void addSkipgrammedWitness(List<NormalizedSkipgram> skipgramList) {
         // hoog de count een op voor elke normalized skipgram entry
         for (NormalizedSkipgram nskgr : skipgramList) {
@@ -31,6 +52,7 @@ public class SkipgramVocabulary {
     }
 
 
+    // oud
     public void addWitness(List<Token> tokens) {
         // create skipgrams
         SkipgramCreator skipgramCreatorKerasStyle = new SkipgramCreator();
@@ -52,10 +74,16 @@ public class SkipgramVocabulary {
 
 
     public String toString() {
+        if (this.index.isEmpty()) {
+            return this.newIndex.toString();
+        }
         return index.toString();
     }
 
     public int size() {
+        if (this.index.isEmpty()) {
+            return this.newIndex.size();
+        }
         return index.size();
     }
 
