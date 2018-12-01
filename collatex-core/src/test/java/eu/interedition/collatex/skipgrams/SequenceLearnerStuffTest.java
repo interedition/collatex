@@ -25,6 +25,15 @@ public class SequenceLearnerStuffTest {
 
         SequenceLearnerStuff sequenceLearnerStuff = new SequenceLearnerStuff();
         sequenceLearnerStuff.addWitness(tokens);
+
+
+        // identify which tokens are uniquely identified now
+        // then we go to bigrams for the one that are not uniquely identified.
+        // most likely we need skips to make it work over multiple witnesses..
+
+        // we need to create a token array if we want to do this efficiently
+        // for now we can create map?
+
 //        sequenceLearnerStuff.createMapWithAllTheUniqlyIdentifiedTokens();
 
 

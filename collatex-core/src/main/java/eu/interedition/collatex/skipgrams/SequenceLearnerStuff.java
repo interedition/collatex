@@ -21,11 +21,15 @@ public class SequenceLearnerStuff {
 
     public void addWitness(List<Token> witnessTokens) {
         SkipgramCreator creator = new SkipgramCreator();
-        // start with unigrams and no skip
-        List<NewSkipgram> newSkipgrams = creator.secondCreate(witnessTokens, 1, 0);
-        SkipgramVocabulary vocabulary = new SkipgramVocabulary();
-        vocabulary.addSkipgrammedWitnessNewStyle(newSkipgrams);
-        System.out.println(vocabulary.toString());
+        // start with bigrams and trigrams with variable skip
+        List<NewSkipgram> newSkipgrams = creator.thirdCreate(witnessTokens, 1, 5);
+        System.out.println(newSkipgrams);
+
+
+
+//        SkipgramVocabulary vocabulary = new SkipgramVocabulary();
+//        vocabulary.addSkipgrammedWitnessNewStyle(newSkipgrams);
+//        System.out.println(vocabulary.toString());
 
 
 

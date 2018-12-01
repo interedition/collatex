@@ -33,16 +33,45 @@ public class SkipgramCreator {
         return skipgrams;
     }
 
-    public List<NewSkipgram> secondCreate(List<Token> sequence, int n, int s) {
-        // the window size is n + s
-        int windowSize = n + s;
+    /*
+     * This skipgram creation function creates skipgrams of n tokens... with one or more skips
+     * n is the amount of tokens needed for a sequence
+     * In the first approach we do not make this flexible
+     * s is the maximum amount of skips...
+     * This method is simply brute force, and generates all possible combinations..
+     */
+    public List<NewSkipgram> thirdCreate(List<Token> sequence, int n, int s) {
+        // WE IGNORE N FOR NOW! and hard code it..
+        // most left token // end maybe must be -1? if we want bigrams...
         List<NewSkipgram> skipgrams = new ArrayList<>();
-        for (int start = 0; start < sequence.size() - windowSize; start++) {
-            List<Token> skipgramHead = sequence.subList(start, start + windowSize);
-            NewSkipgram skipgram = new NewSkipgram(skipgramHead);
-            skipgrams.add(skipgram);
+        for (int start_left = 0; start_left < sequence.size(); start_left++) {
+            Token left = sequence.get(start_left);
+            // could emit unigrams here... if we want to...
+            for (int start_middle = start_left+1; start_middle < Math.min(start_left+1+s, sequence.size()); start_middle++) {
+                // we emit bigram here...
+                Token middle = sequence.get(start_middle);
+                // we put all the tokens in the skipgram head.
+                // the tail idea was not so good
+                List<Token> skipgramHead = new ArrayList<>();
+                skipgramHead.add(left);
+                skipgramHead.add(middle);
+                NewSkipgram skipgram = new NewSkipgram(skipgramHead);
+                skipgrams.add(skipgram);
+                for (int start_end = start_middle+1; start_end < Math.min(start_middle+1+s, sequence.size()); start_end++) {
+                    // we emit trigram here...
+                    Token end = sequence.get(start_end);
+                    // we put all the tokens in the skipgram head.
+                    // the tail idea was not so good
+                    skipgramHead = new ArrayList<>();
+                    skipgramHead.add(left);
+                    skipgramHead.add(middle);
+                    skipgramHead.add(end);
+                    skipgram = new NewSkipgram(skipgramHead);
+                    skipgrams.add(skipgram);
+                }
+            }
         }
-        return skipgrams;
-
+        return  skipgrams;
     }
 }
+

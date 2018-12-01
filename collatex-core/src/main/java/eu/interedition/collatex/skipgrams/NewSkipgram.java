@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
  */
 public class NewSkipgram {
     List<Token> head;
-    List<Token> tail;
 
 
     // andere mogelijkheden: is om met een start positie te werken
@@ -27,13 +26,12 @@ public class NewSkipgram {
 
     public NewSkipgram(List<Token> head) {
         this.head = head;
-        this.tail = Collections.EMPTY_LIST;
     }
 
     //Since this class is a value object it needs a hashcode!
     @Override
     public int hashCode() {
-        return head.hashCode() + 7* tail.hashCode();
+        return head.hashCode() ;
     }
 
     // and equals() and otherwise things go very wrong
@@ -43,11 +41,11 @@ public class NewSkipgram {
             return false;
         }
         NewSkipgram other = (NewSkipgram) obj;
-        return other.head.equals(this.head) && other.tail.equals(this.tail);
+        return other.head.equals(this.head) ;
     }
 
     public String toString() {
-        return head.toString()+" _ "+tail.toString();
+        return head.toString();
     }
 
 
