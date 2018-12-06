@@ -2,12 +2,13 @@ package eu.interedition.collatex.dekker.token_index;
 
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.dekker.scs.IndexEntry;
 import eu.interedition.collatex.simple.SimpleToken;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class Block {
+public class Block implements IndexEntry {
     // every Block has a token index as a parent
     private final TokenIndex tokenIndex;
     // length = number of tokens in this block of text
@@ -37,6 +38,7 @@ public class Block {
         this.depth = null;
     }
 
+    @Override
     public int getDepth() {
         if (depth == null) {
             depth = calculateDepth();
@@ -45,6 +47,7 @@ public class Block {
     }
 
     // frequency = number of times this block of text occurs in complete witness set
+    @Override
     public int getFrequency() {
         if (end == 0) {
             throw new IllegalStateException("LCP interval is unclosed!");
@@ -52,6 +55,12 @@ public class Block {
         return this.end - this.start + 1;
     }
 
+    @Override
+    public int getLength() {
+        return length;
+    }
+
+    @Override
     public List<Block.Instance> getAllInstances() {
         List<Block.Instance> instances = new ArrayList<>();
         for (int i = start; i <= end; i++) {
@@ -61,6 +70,11 @@ public class Block {
             instances.add(instance);
         }
         return instances;
+    }
+
+    @Override
+    public String getNormalized() {
+        return getAllInstances().get(0).toString();
     }
 
     // transform lcp interval into int stream range

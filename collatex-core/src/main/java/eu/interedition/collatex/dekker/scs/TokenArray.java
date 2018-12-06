@@ -52,7 +52,29 @@ public class TokenArray {
         return tempTokenList.toArray(new Token[tempTokenList.size()]);
     }
 
-    protected static class MarkerToken implements Token {
+//    public int numberOfWitnesses() {
+//        return witnessToStartToken.size();
+//    }
+//
+//    // note this is in random order; this should not matter for the rest of the code.
+//    public Set<Witness> witnesses() {
+//        return witnessToStartToken.keySet();
+//    }
+//
+//    public Iterator<Token> iteratorForWitness(Witness w) {
+//        int startIndex = witnessToStartToken.get(w);
+//        int endIndex = witnessToEndToken.get(w);
+//
+//        //TODO: this can be done much more efficiently
+//        Token[] tokens = Arrays.copyOfRange(token_array, startIndex, endIndex);
+//        return Arrays.asList(tokens).iterator();
+//    }
+//
+//    public int startIndexForWitness(Witness w) {
+//        return witnessToStartToken.get(w);
+//    }
+
+    public static class MarkerToken implements Token {
         private final int witnessIdentifier;
 
         public MarkerToken(int size) {
@@ -103,4 +125,19 @@ public class TokenArray {
         }
     }
 
+//    // a skipgram is a token vector
+//    // but then a special one, where a couple of vectors are masked out
+//
+//
+//    static class TokenVector {
+//        private final TokenArray array;
+//        private final int start;
+//        private final int length;
+//
+//        TokenVector(TokenArray array, int start, int length) {
+//            this.array = array;
+//            this.start = start;
+//            this.length = length;
+//        }
+//    }
 }

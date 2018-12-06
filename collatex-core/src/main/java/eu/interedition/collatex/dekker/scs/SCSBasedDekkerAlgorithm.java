@@ -29,6 +29,10 @@ public class SCSBasedDekkerAlgorithm extends CollationAlgorithm.Base  {
 
         // The Token Array preparation code is part of the token index ...
         // Lets factor it out...
+        TokenArray tokenArray = new TokenArray();
+        Token[] token_Array = tokenArray.prepareTokenArray(witnesses);
+
+        // now we want to find subsequences based on this token array
 
     }
 }
