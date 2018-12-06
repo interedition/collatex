@@ -1,5 +1,10 @@
 package eu.interedition.collatex.skipgrams;
 
+import eu.interedition.collatex.dekker.scs.IndexEntry;
+import eu.interedition.collatex.dekker.token_index.Block;
+
+import java.util.List;
+
 /*
  * Author: Ronald Haentjens Dekker
  * Date: 22-10-2018
@@ -7,11 +12,11 @@ package eu.interedition.collatex.skipgrams;
  * Simple tuple that represents a normalized skipgram.
  * Value object
  */
-public class NormalizedSkipgram {
+public class NormalizedSkipgram implements IndexEntry {
     String head;
     String tail;
 
-    NormalizedSkipgram(String head, String tail) {
+    public NormalizedSkipgram(String head, String tail) {
         this.head = head;
         this.tail = tail;
     }
@@ -33,7 +38,32 @@ public class NormalizedSkipgram {
     }
 
     public String toString() {
-        return "("+head+","+tail+")";
+        return head;
+    }
+
+    @Override
+    public int getDepth() {
+        return 0;
+    }
+
+    @Override
+    public int getFrequency() {
+        return 0;
+    }
+
+    @Override
+    public int getLength() {
+        return 0;
+    }
+
+    @Override
+    public List<Block.Instance> getAllInstances() {
+        return null;
+    }
+
+    @Override
+    public String getNormalized() {
+        return head;
     }
 
 }

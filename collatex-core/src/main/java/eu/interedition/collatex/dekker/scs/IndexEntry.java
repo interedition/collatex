@@ -16,9 +16,11 @@ import java.util.List;
  *
  */
 public interface IndexEntry {
+    // TODO: maybe move method to sequence index?
     // the number of witnesses in which this index entry occurs
     int getDepth();
 
+    // TODO: maybe move method to sequence index?
     // frequency = number of times this block of text occurs in complete witness set
     int getFrequency();
 

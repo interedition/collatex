@@ -10,7 +10,6 @@ package eu.interedition.collatex.skipgrams;
  *
  */
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.simple.SimpleToken;
 
@@ -31,17 +30,6 @@ public class SkipgramVocabulary {
         this.newIndex = new TreeMap<>(new NormalizedSkipgramComparator());
     }
 
-    // er zijn meerdere entries in the value
-    // dus moet werken met compute if absent
-    // verder kan het tellen in de oude index dan gewoon met een size method call on the list
-    public void addSkipgrammedWitnessNewStyle(List<NewSkipgram> skipgramList) {
-        List<NormalizedSkipgram> normalizedSkipgrams = skipgramList.stream().map(sg -> new NormalizedSkipgram(sg.getTokensNormalized(), "")).collect(Collectors.toList());
-        for (int i = 0; i< normalizedSkipgrams.size(); i++) {
-            NormalizedSkipgram normalizedSkipgram = normalizedSkipgrams.get(i);
-            NewSkipgram newSkipgram = skipgramList.get(i);
-            this.newIndex.computeIfAbsent(normalizedSkipgram, e -> new ArrayList<>()).add(newSkipgram);
-        }
-    }
 
     // oud
     public void addSkipgrammedWitness(List<NormalizedSkipgram> skipgramList) {
@@ -97,4 +85,11 @@ public class SkipgramVocabulary {
         }
         return max.get().getKey();
     }
+
+    public List<Map.Entry<NormalizedSkipgram, List<NewSkipgram>>> getAllTheNormalizedSkipgramsThatOccurMoreThanOnce() {
+        List<Map.Entry<NormalizedSkipgram,List<NewSkipgram>>> theOnesWeNeed = newIndex.entrySet().stream().filter(e -> e.getValue().size() > 1).collect(Collectors.toList());
+//        System.out.println(theOnesWeNeed);
+        return theOnesWeNeed;
+    }
+
 }

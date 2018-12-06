@@ -25,11 +25,15 @@ public class SequenceLearnerStuff {
         List<NewSkipgram> newSkipgrams = creator.thirdCreate(witnessTokens, 1, 5);
         System.out.println(newSkipgrams);
 
-
-
 //        SkipgramVocabulary vocabulary = new SkipgramVocabulary();
 //        vocabulary.addSkipgrammedWitnessNewStyle(newSkipgrams);
-//        System.out.println(vocabulary.toString());
+//        System.out.println(vocabulary.getAllTheNormalizedSkipgramsThatOccurMoreThanOnce());
+
+        /*
+         * instead of figuring out how often a certain pattern occurs...
+         * what we really want to know is how many patterns are associated with each token...
+         * esspecoia;l;y of we delete the patterns that occur multiple times in a witness and thus are not uniqly identifiedable.
+         */
 
 
 
