@@ -3,8 +3,9 @@ Created on May 3, 2014
 
 @author: Ronald Haentjens Dekker
 """
-import re
 from xml.etree import ElementTree as etree
+from xml.dom.minidom import Document
+from collections import defaultdict
 from collatex.core_classes import Collation, VariantGraph, join, AlignmentTable, VariantGraphRanking
 from collatex.exceptions import SegmentationError
 from collatex.experimental_astar_aligner import ExperimentalAstarAligner
@@ -12,6 +13,7 @@ import json
 from collatex.edit_graph_aligner import EditGraphAligner
 from collatex.display_module import display_alignment_table_as_html, visualize_table_vertically_with_colors
 from collatex.display_module import display_variant_graph_as_svg
+from collatex.display_module import display_alignment_table_as_csv
 from collatex.near_matching import perform_near_match
 
 
@@ -19,12 +21,13 @@ from collatex.near_matching import perform_near_match
 # "table" for the alignment table (default)
 # "graph" for the variant graph
 # "json" for the alignment table exported as JSON
+# "csv", "tsv" for CSV and TSV output
 # "xml" for the alignment table as pseudo-TEI XML
 #   All columns are output as <app> elements, regardless of whether they have variation
 #   Each witness is in a separate <rdg> element with the siglum in a @wit attribute
 #       (i.e, witnesses with identical readings are nonetheless in separate <rdg> elements)
 # "tei" for the alignment table as TEI XML parallel segmentation (but in no namespace)
-#   Wrapper element is always <p>
+#   Wrapper element is always <cx:apparatus> in the CollateX namespace
 #   indent=True pretty-prints the output
 #       (for proofreading convenience only; does not observe proper white-space behavior)
 def collate(collation, output="table", layout="horizontal", segmentation=True, near_match=False, astar=False,
@@ -38,7 +41,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
 
     # assume collation is collation (by now); no error trapping
     if not astar:
-        algorithm = EditGraphAligner(collation, near_match=False, detect_transpositions=detect_transpositions, debug_scores=debug_scores, properties_filter=properties_filter)
+        algorithm = EditGraphAligner(collation, near_match=False, detect_transpositions=detect_transpositions,
+                                     debug_scores=debug_scores, properties_filter=properties_filter)
     else:
         algorithm = ExperimentalAstarAligner(collation, near_match=False, debug_scores=debug_scores)
 
@@ -76,6 +80,8 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return export_alignment_table_as_xml(table)
     if output == "tei":
         return export_alignment_table_as_tei(table, indent)
+    if output == "csv" or output == "tsv":
+        return display_alignment_table_as_csv(table, output)
     else:
         raise Exception("Unknown output type: " + output)
 
@@ -112,40 +118,49 @@ def export_alignment_table_as_xml(table):
 
 
 def export_alignment_table_as_tei(table, indent=None):
-    # TODO: Pretty printing makes fragile (= likely to be incorrect) assumptions about white space
-    # TODO: To fix pretty printing indirectly, fix tokenization
-    p = etree.Element('p')
-    app = None
+    d = Document()
+    root = d.createElementNS("http://interedition.eu/collatex/ns/1.0", "cx:apparatus") # fake namespace declarations
+    root.setAttribute("xmlns:cx", "http://interedition.eu/collatex/ns/1.0")
+    root.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0")
+    d.appendChild(root)
     for column in table.columns:
-        if not column.variant:  # no variation
-            text_node = "".join(item.token_data["t"] for item in next(iter(column.tokens_per_witness.values())))
-            if not (len(p)):  # Result starts with non-varying reading
-                p.text = re.sub('\s+$','',text_node) + "\n" if indent else text_node
-            else:  # Non-varying reading after some <app>
-                app.tail = "\n" + re.sub('\s+$','',text_node) + "\n" if indent else text_node
+        value_dict = defaultdict(list)
+        ws_flag = False
+        for key, value in sorted(column.tokens_per_witness.items()):
+            # value_dict key is reading, value is list of witnesses
+            t_readings = "".join(item.token_data["t"] for item in value)
+            if ws_flag == False and t_readings.endswith((" ", r"\u0009", r"\000a")): # space, tab, lf
+                ws_flag = True
+            value_dict[t_readings.strip()].append(key)
+
+        # REVIEW [RHD]: Isn't there a method on table that can be used instead of this len(next(iter() etc?
+        # otherwise I think there should be. Not sure what len(next(iter(etc))) represents.
+        #
+        # See https://stackoverflow.com/questions/4002874/non-destructive-version-of-pop-for-a-dictionary
+        # It returns the number of witnesses that attest the one reading in the dictionary, that is, it peeks
+        #   nondestructively at the value of the single dictionary item, which is a list, and counts the members
+        #   of the list
+        if len(value_dict) == 1 and len(next(iter(value_dict.values()))) == len(table.rows):
+            # len(table.rows) is total number of witnesses; guards against nulls, which aren't in table
+            key, value = value_dict.popitem() # there's just one item
+            text_node = d.createTextNode(key)
+            root.appendChild(text_node)
         else:
-            app = etree.Element('app')
-            preceding = None  # If preceding is None, we're processing the first <rdg> child
-            app.text = "\n  " if indent else None  # Indent first <rdg> if pretty-printing
-            value_dict = {}  # keys are readings, values are an unsorted lists of sigla
-            for key, value in column.tokens_per_witness.items():
-                group = value_dict.setdefault("".join([item.token_data["t"] for item in value]), [])
-                group.append(key)
-            rdg_dict = {}  # keys are sorted lists of sigla, with "#" prepended; values are readings
+            # variation is either more than one reading, or one reading plus nulls
+            app = d.createElementNS("http://www.tei-c.org/ns/1.0", "app")
+            root.appendChild(app)
             for key, value in value_dict.items():
-                rdg_dict[" ".join("#" + item for item in sorted(value))] = key
-            for key, value in sorted(rdg_dict.items()):  # sort <rdg> elements by @wit values
-                if preceding is not None and indent:  # Change tail of preceding <rdg> to indent current one
-                    preceding.tail = "\n  "
-                child = etree.Element('rdg')
-                child.attrib['wit'] = key
-                child.text = value
-                app.append(child)
-                child.tail = "\n" if indent else None
-                # If preceding is not None on an iteration, use its tail indent non-initial current <rdg>
-                preceding = child
-            p.append(app)
-            app.tail = "\n" if indent else None
-    # Without the encoding specification, outputs bytes instead of a string
-    result = etree.tostring(p, encoding="unicode")
+                # key is reading (with trailing whitespace stripped), value is list of witnesses
+                rdg = d.createElementNS("http://www.tei-c.org/ns/1.0", "rdg")
+                rdg.setAttribute("wit", " ".join(["#" + item for item in value_dict[key]]))
+                text_node = d.createTextNode(key)
+                rdg.appendChild(text_node)
+                app.appendChild(rdg)
+        if ws_flag:
+            text_node = d.createTextNode(" ")
+            root.appendChild(text_node)
+    if indent:
+        result = d.toprettyxml()
+    else:
+        result = d.toxml()
     return result

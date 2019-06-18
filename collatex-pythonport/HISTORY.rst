@@ -3,6 +3,15 @@
 History
 -------
 
+2.2 (2018-08-16)
+++++++++++++++++
+* Create documentation for CollateX Python
+* TEI output writes "t" values instead of "n" values
+* TEI output uses minidom instead of etree
+* TEI output uses same namespaces and wrapper as CollateX Java
+* Add "csv" and "tsv" output options
+* Use graphviz Python bindings instead of PyGraphviz for Windows compatibility
+
 2.1.3rc2 (2018-08-10)
 +++++++++++++++++++++
 * Update networkx compatibility from 1.11 to 2.1

@@ -19,7 +19,7 @@ CollateX is a software to
 - output the alignment results in a variety of formats for further processing, for instance to support the production of a critical apparatus or the stemmatic analysis of a text's genesis.
 
 * Free software: GPLv3 license
-* Documentation: http://collatex.obdurodon.org/
+* Documentation: http://interedition.github.io/collatex/pythonport.html
 
 Features
 --------

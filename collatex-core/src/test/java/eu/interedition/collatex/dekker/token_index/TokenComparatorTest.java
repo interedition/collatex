@@ -8,7 +8,6 @@ import eu.interedition.collatex.simple.SimpleWitness;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TokenComparatorTest extends AbstractTest {
@@ -35,7 +34,7 @@ public class TokenComparatorTest extends AbstractTest {
         tokens.add(markerToken3);
 
         System.out.println(tokens);
-        Collections.sort(tokens, comparator);
+        tokens.sort(comparator);
         System.out.println(tokens);
         assert(tokens.get(0).equals(markerToken1));
         assert(tokens.get(1).equals(markerToken2));
