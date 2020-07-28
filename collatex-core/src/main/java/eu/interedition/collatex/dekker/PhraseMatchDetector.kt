@@ -16,61 +16,55 @@
  * You should have received a copy of the GNU General Public License
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.interedition.collatex.dekker;
+package eu.interedition.collatex.dekker
 
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import eu.interedition.collatex.Token
+import eu.interedition.collatex.VariantGraph
+import java.util.*
 
 /**
  * @author Ronald Haentjens Dekker
  * @author Bram Buitendijk
  */
-public class PhraseMatchDetector {
-
-    public List<List<Match>> detect(Map<Token, VariantGraph.Vertex> linkedTokens, VariantGraph base, Iterable<Token> tokens) {
-        List<List<Match>> phraseMatches = new ArrayList<>();
-        List<VariantGraph.Vertex> basePhrase = new ArrayList<>();
-        List<Token> witnessPhrase = new ArrayList<>();
-        VariantGraph.Vertex previous = base.getStart();
-
-        for (Token token : tokens) {
+class PhraseMatchDetector {
+    fun detect(linkedTokens: Map<Token, VariantGraph.Vertex>, base: VariantGraph, tokens: Iterable<Token>): List<List<Match>> {
+        val phraseMatches: MutableList<List<Match>> = ArrayList()
+        val basePhrase: MutableList<VariantGraph.Vertex?> = ArrayList()
+        val witnessPhrase: MutableList<Token> = ArrayList()
+        var previous = base.start
+        for (token in tokens) {
             if (!linkedTokens.containsKey(token)) {
-                addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
-                continue;
+                addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase)
+                continue
             }
-            VariantGraph.Vertex baseVertex = linkedTokens.get(token);
+            val baseVertex = linkedTokens[token]
             // requirements:
             // - previous and base vertex should have the same witnesses
             // - previous and base vertex should either be in the same transposition(s) or both aren't in any transpositions
             // - there should be a directed edge between previous and base vertex
             // - there may not be a longer path between previous and base vertex
-            boolean sameTranspositions = new HashSet<>(previous.transpositions()).equals(new HashSet<>(baseVertex.transpositions()));
-            boolean sameWitnesses = previous.witnesses().equals(baseVertex.witnesses());
-            boolean directedEdge = previous.outgoing().containsKey(baseVertex);
-            boolean isNear = sameTranspositions && sameWitnesses && directedEdge && (previous.outgoing().size() == 1 || baseVertex.incoming().size() == 1);
+            val sameTranspositions = HashSet(previous!!.transpositions()) == HashSet(baseVertex!!.transpositions())
+            val sameWitnesses = previous.witnesses() == baseVertex.witnesses()
+            val directedEdge = previous.outgoing().containsKey(baseVertex)
+            val isNear = sameTranspositions && sameWitnesses && directedEdge && (previous.outgoing().size == 1 || baseVertex.incoming().size == 1)
             if (!isNear) {
-                addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase);
+                addNewPhraseMatchAndClearBuffer(phraseMatches, basePhrase, witnessPhrase)
             }
-            basePhrase.add(baseVertex);
-            witnessPhrase.add(token);
-            previous = baseVertex;
+            basePhrase.add(baseVertex)
+            witnessPhrase.add(token)
+            previous = baseVertex
         }
         if (!basePhrase.isEmpty()) {
-            phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
+            phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase))
         }
-        return phraseMatches;
+        return phraseMatches
     }
 
-    private void addNewPhraseMatchAndClearBuffer(List<List<Match>> phraseMatches, List<VariantGraph.Vertex> basePhrase, List<Token> witnessPhrase) {
+    private fun addNewPhraseMatchAndClearBuffer(phraseMatches: MutableList<List<Match>>, basePhrase: MutableList<VariantGraph.Vertex?>, witnessPhrase: MutableList<Token>) {
         if (!basePhrase.isEmpty()) {
-            phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase));
-            basePhrase.clear();
-            witnessPhrase.clear();
+            phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase))
+            basePhrase.clear()
+            witnessPhrase.clear()
         }
     }
 }
