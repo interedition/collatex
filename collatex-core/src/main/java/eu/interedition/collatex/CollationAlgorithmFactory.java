@@ -36,10 +36,12 @@ import java.util.function.Function;
  */
 public class CollationAlgorithmFactory {
 
+    /* TODO: THIS SHOULD NOT BE THE DEFAULT! */
     public static CollationAlgorithm dekker(Comparator<Token> comparator) {
         return new EditGraphAligner(comparator);
     }
 
+    /* TODO: THIS SHOULD BE THE DEFAULT! */
     public static CollationAlgorithm legacyDekker(Comparator<Token> comparator) {
         return new DekkerAlgorithm(comparator);
     }
