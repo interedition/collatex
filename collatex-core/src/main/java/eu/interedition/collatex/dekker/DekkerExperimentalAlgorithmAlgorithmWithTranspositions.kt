@@ -3,10 +3,10 @@ package eu.interedition.collatex.dekker
 import eu.interedition.collatex.Token
 import eu.interedition.collatex.VariantGraph
 import eu.interedition.collatex.dekker.token_index.TokenIndex
+import eu.interedition.collatex.dekker.token_index.TokenIndexToMatches
 import eu.interedition.collatex.matching.EqualityTokenComparator
 import eu.interedition.collatex.simple.SimpleWitness
 import eu.interedition.collatex.util.StreamUtil
-import java.util.logging.Level
 
 /*
  *
@@ -17,11 +17,11 @@ import java.util.logging.Level
 // functions to create witnesses
 val SIGLA: CharArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()
 
-fun createWitnesses(vararg contents: String): Array<SimpleWitness> {
+fun createWitnesses(vararg contents: String): List<SimpleWitness> {
 //    org.junit.Assert.assertTrue("Not enough sigla", contents.size <= SIGLA.size)
-    val witnesses = arrayOf<SimpleWitness>()
+    val witnesses = arrayListOf<SimpleWitness>()
     for (wc in 0 until contents.size) {
-        witnesses[wc] = SimpleWitness(Character.toString(SIGLA.get(wc)), contents[wc])
+        witnesses.add(SimpleWitness(Character.toString(SIGLA.get(wc)), contents[wc]))
     }
     return witnesses
 }
@@ -58,6 +58,24 @@ fun merge(into: VariantGraph, witnessTokens: Iterable<Token>, alignments: Map<To
     return witnessTokenVertices
 }
 
+/*
+ * Returns a token -> vertex mapping as an array in the order of the token array
+ */
+private fun updateTokenToVertexArray(tokens: Iterable<Token>, witnessTokenVertices: Map<Token, VariantGraph.Vertex>): Array<VariantGraph.Vertex?> {
+    // we need to update the token -> vertex map
+    // that information is stored in protected map
+    val vertexArray = arrayOfNulls<VariantGraph.Vertex>(witnessTokenVertices.size)
+    var tokenPosition = 0
+    for (token in tokens) {
+        val vertex = witnessTokenVertices[token]
+        vertexArray[tokenPosition] = vertex
+        tokenPosition++
+    }
+    return vertexArray
+}
+
+
+
 
 /*
  * We need test a lot of simple combinations
@@ -68,10 +86,10 @@ fun merge(into: VariantGraph, witnessTokens: Iterable<Token>, alignments: Map<To
 
 fun testNewAlgorithm() {
     // val w: Array<SimpleWitness> = createWitnesses("The same stuff", "The same stuff")
-    val w2: Array<SimpleWitness> = createWitnesses("The black cat and the red cat", "the red cat")
+    val w2: List<SimpleWitness> = createWitnesses("The black cat and the red cat", "the red cat")
 
     // Create the TokenIndex of the witnesses
-    val index: TokenIndex = TokenIndex(EqualityTokenComparator(), w2[0], w2[1])
+    val index = TokenIndex(EqualityTokenComparator(), w2[0], w2[1])
     index.prepare()
 
     // the first witness is different...
@@ -80,9 +98,17 @@ fun testNewAlgorithm() {
     val tokens = w2[0] // first witness
 
     // merge in the first witness in the variant graph with an "empty" alignment.
-    merge(graph, tokens, emptyMap())
-    // updateTokenToVertexArray(tokens, witness)
+    val tokenToVertexMapping = merge(graph, tokens, emptyMap())
+    val vertexArray = updateTokenToVertexArray(tokens, tokenToVertexMapping)
 
+    // After aligning the first witness we continue with the second witness.
+    // We first determine all the potential matches. We use the token Index for this.
+    val islands = TokenIndexToMatches.createMatches(index, vertexArray, graph, w2[1])
+    println("$islands")
 
-    // val islands = TokenIndexToMatches.createMatches(index, )
+    // var tokenPosition = tokenIndex!!.getStartTokenPositionForWitness(witness)
+}
+
+fun main() {
+    return testNewAlgorithm()
 }
