@@ -65,7 +65,7 @@ class DekkerAlgorithm @JvmOverloads constructor(private val comparator: Comparat
         tokenIndex!!.prepare()
 
         // phase 2: alignment phase
-        vertex_array = arrayOfNulls(tokenIndex!!.token_array.size)
+        vertex_array = arrayOfNulls(tokenIndex!!.token_array!!.size)
         var firstWitness = true
         for (tokens in witnesses) {
             val witness = StreamUtil.stream(tokens)

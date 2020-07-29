@@ -51,7 +51,7 @@ object TokenIndexToMatches {
                     val row = witnessStartToken - startTokenPositionForWitness
                     // create coordinate and at it to the Island for the combination of graph block instance and witness block instance
                     // /*if (i == 0)*/ System.out.println("We go "+row + " "+column +" "+witnessStartToken);
-                    val token = tokenIndex.token_array[witnessStartToken]
+                    val token = tokenIndex.token_array!![witnessStartToken]
                     val match = Match(v, token)
                     val coordinate = Coordinate(row, column, match)
                     island.add(coordinate)
