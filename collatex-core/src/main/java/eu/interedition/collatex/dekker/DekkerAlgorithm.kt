@@ -90,7 +90,7 @@ class DekkerAlgorithm @JvmOverloads constructor(private val comparator: Comparat
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Gather matches between variant graph and witness from token index", arrayOf(graph, witness))
             }
-            allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex, vertex_array, graph, tokens)
+            allPossibleIslands = TokenIndexToMatches.createMatches(tokenIndex!!, vertex_array!!, graph, tokens)
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "{0} + {1}: Aligning witness and graph", arrayOf(graph, witness))
             }
