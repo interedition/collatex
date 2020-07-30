@@ -29,7 +29,7 @@ import java.util.*
 class PhraseMatchDetector {
     fun detect(linkedTokens: Map<Token, VariantGraph.Vertex>, base: VariantGraph, tokens: Iterable<Token>): List<List<Match>> {
         val phraseMatches: MutableList<List<Match>> = ArrayList()
-        val basePhrase: MutableList<VariantGraph.Vertex?> = ArrayList()
+        val basePhrase: MutableList<VariantGraph.Vertex> = ArrayList()
         val witnessPhrase: MutableList<Token> = ArrayList()
         var previous = base.start
         for (token in tokens) {
@@ -60,7 +60,7 @@ class PhraseMatchDetector {
         return phraseMatches
     }
 
-    private fun addNewPhraseMatchAndClearBuffer(phraseMatches: MutableList<List<Match>>, basePhrase: MutableList<VariantGraph.Vertex?>, witnessPhrase: MutableList<Token>) {
+    private fun addNewPhraseMatchAndClearBuffer(phraseMatches: MutableList<List<Match>>, basePhrase: MutableList<VariantGraph.Vertex>, witnessPhrase: MutableList<Token>) {
         if (!basePhrase.isEmpty()) {
             phraseMatches.add(Match.createPhraseMatch(basePhrase, witnessPhrase))
             basePhrase.clear()

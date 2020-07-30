@@ -114,8 +114,8 @@ public interface CollationAlgorithm {
                 }
                 final Set<VariantGraph.Vertex> transposed = new HashSet<>();
                 for (Match match : transposedPhrase) {
-                    transposed.add(witnessTokenVertices.get(match.token));
-                    transposed.add(match.vertex);
+                    transposed.add(witnessTokenVertices.get(match.getToken()));
+                    transposed.add(match.getVertex());
                 }
                 into.transpose(transposed);
             }

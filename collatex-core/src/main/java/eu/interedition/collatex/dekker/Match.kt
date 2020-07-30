@@ -16,66 +16,53 @@
  * You should have received a copy of the GNU General Public License
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
+package eu.interedition.collatex.dekker
 
-package eu.interedition.collatex.dekker;
-
-import eu.interedition.collatex.Token;
-import eu.interedition.collatex.VariantGraph;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import eu.interedition.collatex.Token
+import eu.interedition.collatex.VariantGraph
+import java.util.*
+import java.util.function.Function
+import java.util.function.Predicate
+import java.util.stream.Collectors
 
 /**
- * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+ * @author [Gregor Middell](http://gregor.middell.net/)
  */
-public class Match {
-    public final VariantGraph.Vertex vertex;
-    public final Token token;
+class Match(val vertex: VariantGraph.Vertex, val token: Token?) {
 
-    public Match(VariantGraph.Vertex vertex, Token token) {
-        this.vertex = vertex;
-        this.token = token;
+    override fun hashCode(): Int {
+        return Objects.hash(vertex, token)
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(vertex, token);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj != null && obj instanceof Match) {
-            Match other = (Match) obj;
-            return vertex.equals(other.vertex) && token.equals(other.token);
+    override fun equals(obj: Any?): Boolean {
+        if (obj != null && obj is Match) {
+            val other = obj
+            return vertex == other.vertex && token == other.token
         }
-        return super.equals(obj);
+        return super.equals(obj)
     }
 
-    @Override
-    public String toString() {
-        return "{" + vertex + "; " + token + "}";
+    override fun toString(): String {
+        return "{$vertex; $token}"
     }
 
-    public static List<Match> createPhraseMatch(List<VariantGraph.Vertex> vertices, List<Token> tokens) {
-        final List<Match> phraseMatch = new ArrayList<>(vertices.size());
-        final Iterator<VariantGraph.Vertex> vertexIt = vertices.iterator();
-        final Iterator<Token> tokenIt = tokens.iterator();
-        while (vertexIt.hasNext() && tokenIt.hasNext()) {
-            phraseMatch.add(new Match(vertexIt.next(), tokenIt.next()));
+    companion object {
+        fun createPhraseMatch(vertices: List<VariantGraph.Vertex>, tokens: List<Token>): List<Match> {
+            val phraseMatch: MutableList<Match> = ArrayList(vertices.size)
+            val vertexIt = vertices.iterator()
+            val tokenIt = tokens.iterator()
+            while (vertexIt.hasNext() && tokenIt.hasNext()) {
+                phraseMatch.add(Match(vertexIt.next(), tokenIt.next()))
+            }
+            return phraseMatch
         }
-        return phraseMatch;
+
+        fun createNoBoundaryMatchPredicate(graph: VariantGraph): Predicate<Match> {
+            return Predicate { input: Match -> input.vertex != graph.start && input.vertex != graph.end }
+        }
+
+        @JvmField
+        val PHRASE_MATCH_TO_TOKENS =  //
+            Function { input: List<Match> -> input.stream().map { m: Match -> m.token }.collect(Collectors.toList()) }
     }
-
-
-    public static Predicate<Match> createNoBoundaryMatchPredicate(final VariantGraph graph) {
-        return input -> !input.vertex.equals(graph.getStart()) && !input.vertex.equals(graph.getEnd());
-    }
-
-    public static final Function<List<Match>, List<Token>> PHRASE_MATCH_TO_TOKENS =//
-        input -> input.stream().map(m -> m.token).collect(Collectors.toList());
 }
