@@ -103,7 +103,7 @@ class DekkerAlgorithm @JvmOverloads constructor(private val comparator: Comparat
             val alignments: MutableMap<Token, VariantGraph.Vertex> = HashMap()
             for (island in preferredIslands!!.listIterator()) {
                 for (c in island) {
-                    alignments[c.match.token] = c.match.vertex
+                    alignments[c.match.token!!] = c.match.vertex
                 }
             }
             if (LOG.isLoggable(Level.FINER)) {

@@ -35,21 +35,21 @@ public class MatchCube {
             // for every instance of a block in the witness we need to fetch the corresponding graph instances of the block
             // calculate graph block instances
             // fetch block
-            Block block = witnessInstance.block;
+            Block block = witnessInstance.getBlock();
             List<Block.Instance> allInstances = block.getAllInstances();
             List<Block.Instance> graphInstances = allInstances.stream()//
-                .filter(instance -> instance.start_token < startTokenPositionForWitness)//
+                .filter(instance -> instance.getStart_token() < startTokenPositionForWitness)//
                 .collect(Collectors.toList());
             // now for every graph block instance we have to create matches
             for (Block.Instance graphInstance : graphInstances) {
-                int graph_start_token = graphInstance.start_token;
+                int graph_start_token = graphInstance.getStart_token();
                 for (int i = 0; i < block.length; i++) {
                     VariantGraph.Vertex v = vertex_array[graph_start_token + i];
                     if (v == null) {
                         throw new RuntimeException("Vertex is null for token \"" + graph_start_token + i + "\" that is supposed to be mapped to a vertex in the graph!");
                     }
                     int rank = variantGraphRanking.apply(v) - 1;
-                    int witnessStartToken = witnessInstance.start_token + i;
+                    int witnessStartToken = witnessInstance.getStart_token() + i;
                     int row = witnessStartToken - startTokenPositionForWitness;
                     Token token = tokenIndex.token_array[witnessStartToken];
                     Match match = new Match(v, token);

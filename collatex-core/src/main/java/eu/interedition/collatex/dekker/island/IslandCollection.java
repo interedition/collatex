@@ -52,7 +52,7 @@ public class IslandCollection implements IslandSelection {
      */
     @Override
     public boolean doesCoordinateOverlapWithCommittedCoordinate(Coordinate coordinate) {
-        return fixedRows.get(coordinate.row) || fixedVertices.contains(coordinate.match.vertex);
+        return fixedRows.get(coordinate.row) || fixedVertices.contains(coordinate.match.getVertex());
     }
 
     /*
@@ -77,7 +77,7 @@ public class IslandCollection implements IslandSelection {
         }
         for (Coordinate coordinate : isl) {
             fixedRows.set(coordinate.row);
-            fixedVertices.add(coordinate.match.vertex);
+            fixedVertices.add(coordinate.match.getVertex());
         }
         fixedIslands.add(isl);
     }

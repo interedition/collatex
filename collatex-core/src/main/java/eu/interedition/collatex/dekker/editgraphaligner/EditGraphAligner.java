@@ -200,9 +200,9 @@ public class EditGraphAligner extends CollationAlgorithm.Base {
             if (score.type == Score.Type.match) {
                 int rank = score.x - 1;
                 Match match = cube.getMatch(score.y - 1, rank);
-                if (!matchedVertices.contains(match.vertex)) {
-                    aligned.put(match.token, match.vertex);
-                    matchedVertices.add(match.vertex);
+                if (!matchedVertices.contains(match.getVertex())) {
+                    aligned.put(match.getToken(), match.getVertex());
+                    matchedVertices.add(match.getVertex());
                 }
             }
         }
