@@ -133,7 +133,7 @@ public class Island implements Iterable<Coordinate> {
     }
 
     public int getDepth() {
-        return getBlockInstance().block.getDepth();
+        return getBlockInstance().getBlock().getDepth();
     }
 
     @Override
