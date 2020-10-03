@@ -8,7 +8,7 @@ from typing import List
 
 import pandas as pd
 
-from collatex import Collation, collate
+from collatex import Collation
 from collatex.collation_with_transposition import collate_with_transposition
 
 
@@ -28,21 +28,23 @@ class Test(unittest.TestCase):
 
     blocks_as_list: List[List] = []
     for block in token_index.blocks:
-        blocks_as_list.append([repr(block.get_all_instances()[0]), block.get_frequency(), block.length, block.get_depth()])
+        blocks_as_list.append([repr(block.get_all_instances()[0]), block.get_frequency(), block.length,
+                               block.get_depth()])
         pass
 
-    print(blocks_as_list)
+    # print(blocks_as_list)
 
-    df = pd.DataFrame([[4, 7, 10], [5, 8, 11],
-                       [6, 9, 12]],
-                      index=[1, 2, 3], columns=['a', 'b', 'c'])
+    df = pd.DataFrame(blocks_as_list,
+                      index=[1, 2, 3, 4, 5, 6, 7], columns=['tokens', 'frequency', 'length', 'nr. of witnesses'])
 
     print(df)
+
+    # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
+    # Larger continuous blocks are more rare.
 
     # This calls the traditional NeedlemannWunsch based alignment.
     # alignment_table = collate(collation)
     # print(alignment_table)
-
 
     pass
 
