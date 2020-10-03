@@ -5,6 +5,8 @@ Created on Oct 3, 2020
 """
 import unittest
 
+import pandas as pd
+
 from collatex import Collation, collate
 from collatex.collation_with_transposition import collate_with_transposition
 
@@ -17,6 +19,13 @@ class Test(unittest.TestCase):
     collation.add_plain_witness("w2", "the black and the red cat")
     token_index = collate_with_transposition(collation)
     print(token_index.blocks)
+
+    df = pd.DataFrame(
+        {"a": [4, 5, 6],
+         "b": [7, 8, 9],
+         "c": [10, 11, 12]}, index=[1, 2, 3])
+
+    print(df)
 
     # This calls the traditional NeedlemannWunsch based alignment.
     # alignment_table = collate(collation)

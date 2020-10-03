@@ -3,3 +3,7 @@ prettytable>=0.7.2
 wheel==0.22.0
 #decorator>=4.0.10
 python-levenshtein
+
+tests~=0.7
+setuptools~=50.3.0
+pandas~=1.1.2
