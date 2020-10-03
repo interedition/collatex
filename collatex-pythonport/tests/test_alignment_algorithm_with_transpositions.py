@@ -4,6 +4,7 @@ Created on Oct 3, 2020
 @author: Ronald Haentjens Dekker
 """
 import unittest
+from typing import List
 
 import pandas as pd
 
@@ -18,12 +19,23 @@ class Test(unittest.TestCase):
     collation.add_plain_witness("w1", "the red and the black cat")
     collation.add_plain_witness("w2", "the black and the red cat")
     token_index = collate_with_transposition(collation)
-    print(token_index.blocks)
+    # print(token_index.blocks)
 
-    df = pd.DataFrame(
-        {"a": [4, 5, 6],
-         "b": [7, 8, 9],
-         "c": [10, 11, 12]}, index=[1, 2, 3])
+    # a token index has blocks.
+    # blocks have frequency etc.
+    # a block has instances.
+    # instances have tokens.
+
+    blocks_as_list: List[List] = []
+    for block in token_index.blocks:
+        blocks_as_list.append([repr(block.get_all_instances()[0]), block.get_frequency(), block.length, block.get_depth()])
+        pass
+
+    print(blocks_as_list)
+
+    df = pd.DataFrame([[4, 7, 10], [5, 8, 11],
+                       [6, 9, 12]],
+                      index=[1, 2, 3], columns=['a', 'b', 'c'])
 
     print(df)
 

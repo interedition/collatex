@@ -1,3 +1,6 @@
+from typing import List
+
+
 class Block:
     def __init__(self, token_index, start=0, end=0, length=0):
         # every Block has a token index as a parent
@@ -36,7 +39,8 @@ class Block:
             raise Exception("LCP interval is unclosed!")
         return self.end - self.start + 1
 
-    def get_all_instances(self):
+    # QUESTION: why does List[Instance] as return type hint not work?
+    def get_all_instances(self) -> List:
         instances = []
         for i in range(self.start, self.end + 1):
             # every i is one occurrence

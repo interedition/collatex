@@ -1,3 +1,5 @@
+from typing import List
+
 from ClusterShell.RangeSet import RangeSet
 from collatex.block import Block
 from collatex.core_classes import Token
@@ -24,7 +26,7 @@ class TokenIndex(object):
         self.witness_to_block_instances = {}
         self.suffix_array = []
         self.lcp_array = []
-        self.blocks = []
+        self.blocks: List[Block] = []
 
     def prepare(self):
         self._prepare_token_array()
