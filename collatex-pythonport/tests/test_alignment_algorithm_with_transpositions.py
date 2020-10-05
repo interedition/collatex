@@ -29,13 +29,14 @@ class Test(unittest.TestCase):
     blocks_as_list: List[List] = []
     for block in token_index.blocks:
         blocks_as_list.append([repr(block.get_all_instances()[0]), block.get_frequency(), block.length,
-                               block.get_depth()])
+                               block.get_depth(), block.get_depth()/block.get_frequency()*block.length])
         pass
 
     # print(blocks_as_list)
 
     df = pd.DataFrame(blocks_as_list,
-                      index=[1, 2, 3, 4, 5, 6, 7], columns=['tokens', 'frequency', 'length', 'nr. of witnesses'])
+                      index=[1, 2, 3, 4, 5, 6, 7], columns=['tokens', 'frequency', 'length', 'nr. of witnesses',
+                                                            'uniqueness'])
 
     print(df)
 
