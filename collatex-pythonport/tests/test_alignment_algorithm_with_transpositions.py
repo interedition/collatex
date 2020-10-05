@@ -39,7 +39,9 @@ class Test(unittest.TestCase):
                                                             'uniqueness'])
 
     print(df)
-    print(df['uniqueness'].max())
+    max = df['uniqueness'].max()
+    print(max)
+    print(df.loc[df['uniqueness'] == max])
 
     # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
     # Larger continuous blocks are more rare.
