@@ -52,6 +52,11 @@ class Test(unittest.TestCase):
     # and a given witness into a set of matches.
     # That code is in the Match Cube class in the Edit_graph_aligner file.
     # A match is currently defined as a (vertex, token) combination.
+    # the vertex array is a token array -> vertex mapping for easy access into the variant graph.
+    # the vertex ranking is a number assigned to each vertex. This can change after an addition to the graph.
+
+    # after that we have to sort the matches twice, once by witness a order, tie -> witness b order.
+    # and once by witness b order, tie -> witness a order.
 
     # This calls the traditional NeedlemannWunsch based alignment.
     # alignment_table = collate(collation)
