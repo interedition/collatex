@@ -39,6 +39,7 @@ class Test(unittest.TestCase):
                                                             'uniqueness'])
 
     print(df)
+    print(df['uniqueness'].max())
 
     # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
     # Larger continuous blocks are more rare.
