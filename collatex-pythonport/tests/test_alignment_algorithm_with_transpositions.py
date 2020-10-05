@@ -39,12 +39,19 @@ class Test(unittest.TestCase):
                                                             'uniqueness'])
 
     print(df)
+
+    # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
+    # Larger continuous blocks are more rare.
     max = df['uniqueness'].max()
     print(max)
     print(df.loc[df['uniqueness'] == max])
 
-    # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
-    # Larger continuous blocks are more rare.
+    # we need to convert the intervals into matches
+    # Then do the transposition detection
+    # I already have code in the Java and the Python version to convert a variant graph, a token index
+    # and a given witness into a set of matches.
+    # That code is in the Match Cube class in the Edit_graph_aligner file.
+    # A match is currently defined as a (vertex, token) combination.
 
     # This calls the traditional NeedlemannWunsch based alignment.
     # alignment_table = collate(collation)
