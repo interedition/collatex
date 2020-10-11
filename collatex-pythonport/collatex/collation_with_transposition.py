@@ -25,13 +25,20 @@ class VertexToTokenPositionMatch(object):
 
 # returns matches as (vertex -> index in the token array mapping)
 def potential_vertex_token_matches(token_index, witness, token_to_vertex_array):
-    matches = []
-    # print("> vertex_array =", vertex_array)
-    start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
-    # print("> start_token_position_for_witness=", start_token_position_for_witness)
     instances = token_index.block_instances_for_witness(witness)
     # print("> token_index.witness_to_block_instances", token_index.witness_to_block_instances)
     # print("> instances", instances)
+    start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
+    # print("> start_token_position_for_witness=", start_token_position_for_witness)
+    return potential_vertex_token_matches_for_specific_instances(instances, start_token_position_for_witness,
+                                                                 token_to_vertex_array)
+    pass
+
+
+def potential_vertex_token_matches_for_specific_instances(instances, start_token_position_for_witness,
+                                                          token_to_vertex_array):
+    matches = []
+    # print("> vertex_array =", vertex_array)
     for witness_instance in instances:
         # print("> witness_instance=", witness_instance)
         block = witness_instance.block
@@ -49,5 +56,4 @@ def potential_vertex_token_matches(token_index, witness, token_to_vertex_array):
                 witness_start_token = witness_instance.start_token + i
                 matches.append(VertexToTokenPositionMatch(v, witness_start_token))
     return matches
-    pass
 
