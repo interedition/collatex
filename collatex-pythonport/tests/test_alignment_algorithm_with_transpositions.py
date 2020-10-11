@@ -62,6 +62,13 @@ class Test(unittest.TestCase):
     # alignment_table = collate(collation)
     # print(alignment_table)
 
+    # There is this annying cross between going witness by witness and working with the most unique blocks first.
+    # workaround
+    # We need to convert the blocks to instances in the second witness
+    # We take the most prominent blocks
+    # and take the witness 2 instances
+    # We also need to create the token to vertex array
+    # By creating a VG and merging the first witness in.
     pass
 
 
