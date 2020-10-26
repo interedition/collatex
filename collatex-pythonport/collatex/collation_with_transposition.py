@@ -50,7 +50,7 @@ class TokenToTokenMatch(object):
         self.token_position2 = token_position2
 
     def __repr__(self):
-        return str.format("Match(token1={},token2={}", self.token_position1, self.token_position2)
+        return str.format("Match(token1={},token2={})", self.token_position1, self.token_position2)
 
 
 
