@@ -48,6 +48,15 @@ class Test(unittest.TestCase):
 
     # we need to convert the intervals into matches
     # Then do the transposition detection
+    # hmm I need the block index in that dataframe.
+    pass
+
+
+if __name__ == "__main__":
+    # import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
+
+    # NOTES:
     # I already have code in the Java and the Python version to convert a variant graph, a token index
     # and a given witness into a set of matches.
     # That code is in the Match Cube class in the Edit_graph_aligner file.
@@ -69,9 +78,3 @@ class Test(unittest.TestCase):
     # and take the witness 2 instances
     # We also need to create the token to vertex array
     # By creating a VG and merging the first witness in.
-    pass
-
-
-if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

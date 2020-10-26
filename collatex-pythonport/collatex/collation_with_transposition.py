@@ -14,31 +14,20 @@ def collate_with_transposition(collation):
     pass
 
 
-class VertexToTokenPositionMatch(object):
-    def __init__(self, vertex, token):
-        self.vertex = vertex
-        self.token = token
-
-    def __repr__(self):
-        return str.format("Match(vertex={},token={}", self.vertex, self.token)
-
-
-# returns matches as (vertex -> index in the token array mapping)
-def potential_vertex_token_matches(token_index, witness, token_to_vertex_array):
+# returns matches as (index -> index in the token array mapping)
+def potential_token_to_token_matches(token_index, witness):
     instances = token_index.block_instances_for_witness(witness)
     # print("> token_index.witness_to_block_instances", token_index.witness_to_block_instances)
     # print("> instances", instances)
     start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
     # print("> start_token_position_for_witness=", start_token_position_for_witness)
-    return potential_vertex_token_matches_for_specific_instances(instances, start_token_position_for_witness,
-                                                                 token_to_vertex_array)
+    return potential_token_to_token_matches_for_specific_instances(instances, start_token_position_for_witness)
     pass
 
 
-def potential_vertex_token_matches_for_specific_instances(instances, start_token_position_for_witness,
-                                                          token_to_vertex_array):
+def potential_token_to_token_matches_for_specific_instances(instances, start_token_position_for_witness):
+    # array of token to token matches. Ints map to tokens in token array.
     matches = []
-    # print("> vertex_array =", vertex_array)
     for witness_instance in instances:
         # print("> witness_instance=", witness_instance)
         block = witness_instance.block
@@ -48,12 +37,22 @@ def potential_vertex_token_matches_for_specific_instances(instances, start_token
             graph_start_token = instance_in_graph.start_token
             for i in range(0, block.length):
                 # print("> graph_start_token + i =", (graph_start_token + i))
-                v = token_to_vertex_array[graph_start_token + i]
-                if v is None:
-                    raise Exception(
-                        str.format('Vertex is null for token {} {} that is supposed to be mapped to a vertex in'
-                                   ' the graph!', graph_start_token, i))
                 witness_start_token = witness_instance.start_token + i
-                matches.append(VertexToTokenPositionMatch(v, witness_start_token))
+                match = TokenToTokenMatch(graph_start_token + i, witness_start_token)
+                matches.append(match)
     return matches
+
+
+# Note: uses the positions in the token array to address the tokens
+class TokenToTokenMatch(object):
+    def __init__(self, token_position1, token_position2):
+        self.token_position1 = token_position1
+        self.token_position2 = token_position2
+
+    def __repr__(self):
+        return str.format("Match(token1={},token2={}", self.token_position1, self.token_position2)
+
+
+
+
 
