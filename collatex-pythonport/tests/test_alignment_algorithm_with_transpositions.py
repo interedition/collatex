@@ -27,15 +27,16 @@ class Test(unittest.TestCase):
     # instances have tokens.
 
     blocks_as_list: List[List] = []
-    for block in token_index.blocks:
-        blocks_as_list.append([repr(block.get_all_instances()[0]), block.get_frequency(), block.length,
+    for idx, block in enumerate(token_index.blocks):
+        blocks_as_list.append([idx, repr(block.get_all_instances()[0]), block.get_frequency(), block.length,
                                block.get_depth(), block.get_depth()/block.get_frequency()*block.length])
         pass
 
     # print(blocks_as_list)
 
     df = pd.DataFrame(blocks_as_list,
-                      index=[1, 2, 3, 4, 5, 6, 7], columns=['tokens', 'frequency', 'length', 'nr. of witnesses',
+                      index=[1, 2, 3, 4, 5, 6, 7], columns=['block_id', 'tokens', 'frequency', 'length',
+                                                            'nr. of witnesses',
                                                             'uniqueness'])
 
     print(df)
@@ -49,6 +50,8 @@ class Test(unittest.TestCase):
     # we need to convert the intervals into matches
     # Then do the transposition detection
     # hmm I need the block index in that dataframe.
+    # We need to get all the instances for a witness.
+    # Then we filter so that we only take them if they are part of the important blocks.
     pass
 
 
