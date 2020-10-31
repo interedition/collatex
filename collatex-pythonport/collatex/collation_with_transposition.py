@@ -3,6 +3,8 @@ Created on: 3 October 2020
 @author: Ronald Haentjens Dekker
 
 """
+from typing import List
+import pandas as pd
 from collatex.tokenindex import TokenIndex
 
 
@@ -11,6 +13,35 @@ def collate_with_transposition(collation):
     token_index.prepare()
     # print(token_index)
     return token_index
+
+
+# a token index has blocks.
+# blocks have frequency etc.
+# a block has instances.
+# instances have tokens.
+def find_most_unique_blocks_(token_index):
+    blocks_as_list: List[List] = []
+    for idx, block in enumerate(token_index.blocks):
+        blocks_as_list.append([idx, repr(block.get_all_instances()[0]), block.get_frequency(), block.length,
+                               block.get_depth(), block.get_depth()/block.get_frequency()*block.length])
+        pass
+
+    # print(blocks_as_list)
+
+    df = pd.DataFrame(blocks_as_list,
+                      index=[1, 2, 3, 4, 5, 6, 7], columns=['block_id', 'tokens', 'frequency', 'length',
+                                                            'nr. of witnesses',
+                                                            'uniqueness'])
+
+    print(df)
+
+    # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
+    # Larger continuous blocks are more rare.
+    max = df['uniqueness'].max()
+    most_unique_blocks = df.loc[df['uniqueness'] == max]
+    print(max)
+    print(most_unique_blocks)
+    return most_unique_blocks
 
 
 # returns matches as (instance -> instance from the token_index)
