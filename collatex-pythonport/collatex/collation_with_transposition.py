@@ -11,9 +11,41 @@ def collate_with_transposition(collation):
     token_index.prepare()
     # print(token_index)
     return token_index
-    pass
 
 
+# returns matches as (instance -> instance from the token_index)
+def potential_instance_to_instance_matches(token_index, witness):
+    instances = token_index.block_instances_for_witness(witness)
+    # print("> token_index.witness_to_block_instances", token_index.witness_to_block_instances)
+    # print("> instances", instances)
+    start_token_position_for_witness = token_index.start_token_position_for_witness(witness)
+    # print("> start_token_position_for_witness=", start_token_position_for_witness)
+    return potential_instance_to_instance_matches_for_specific_instances(instances, start_token_position_for_witness)
+
+
+def potential_instance_to_instance_matches_for_specific_instances(instances, start_token_position_for_witness):
+    matches = []
+    for instance_in_witness in instances:
+        # print("> witness_instance=", instance_in_witness)
+        block = instance_in_witness.block
+        all_instances = block.get_all_instances()
+        instances_in_graph = [i for i in all_instances if i.start_token < start_token_position_for_witness]
+        for instance_in_graph in instances_in_graph:
+            match = BlockInstanceToBlockInstanceMatch(instance_in_graph, instance_in_witness)
+            matches.append(match)
+    return matches
+
+
+class BlockInstanceToBlockInstanceMatch(object):
+    def __init__(self, block_instance1, block_instance2):
+        self.block_instance1 = block_instance1
+        self.block_instance2 = block_instance2
+
+    def __repr__(self):
+        return str.format("Match(instance1={},instance2={})", self.block_instance1, self.block_instance2)
+
+
+# old token to token matches
 # returns matches as (index -> index in the token array mapping)
 def potential_token_to_token_matches(token_index, witness):
     instances = token_index.block_instances_for_witness(witness)
@@ -25,6 +57,7 @@ def potential_token_to_token_matches(token_index, witness):
     pass
 
 
+# This could be written as a function of potential_instance to instances etc.
 def potential_token_to_token_matches_for_specific_instances(instances, start_token_position_for_witness):
     # array of token to token matches. Ints map to tokens in token array.
     matches = []
@@ -51,8 +84,6 @@ class TokenToTokenMatch(object):
 
     def __repr__(self):
         return str.format("Match(token1={},token2={})", self.token_position1, self.token_position2)
-
-
 
 
 

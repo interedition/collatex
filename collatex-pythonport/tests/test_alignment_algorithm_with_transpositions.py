@@ -9,7 +9,8 @@ from typing import List
 import pandas as pd
 
 from collatex import Collation
-from collatex.collation_with_transposition import collate_with_transposition, potential_token_to_token_matches
+from collatex.collation_with_transposition import collate_with_transposition, \
+    potential_instance_to_instance_matches
 
 
 class Test(unittest.TestCase):
@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
     # Then we filter so that we only take them if they are part of the important blocks.
 
     # We ask for all the potential matches (warning this is a lot)
-    x = potential_token_to_token_matches(token_index, collation.witnesses[1])
+    x = potential_instance_to_instance_matches(token_index, collation.witnesses[1])
     print(x)
     pass
 
