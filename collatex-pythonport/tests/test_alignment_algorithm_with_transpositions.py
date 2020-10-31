@@ -37,10 +37,10 @@ class Test(unittest.TestCase):
         matches_to_look_at = [item for item in x if item.block_instance1.block in most_unique_blocks]
         print(matches_to_look_at)
 
-        # We need to see whether any of the potential mathces to consider are transposed.
+        # We need to see whether any of the potential matches to consider are transposed.
         # sort on token position instance 1, if tie, than sort on token position Instance 2
-        a = sorted(matches_to_look_at,key=lambda item: item.block_instance1.start_token)
-        b = sorted(matches_to_look_at,key=lambda item: item.block_instance2.start_token)
+        a = sorted(matches_to_look_at,key=lambda item: (item.block_instance1.start_token, item.block_instance2.start_token))
+        b = sorted(matches_to_look_at,key=lambda item: (item.block_instance2.start_token, item.block_instance1.start_token))
         print(a)
         print(b)
         pass
