@@ -19,7 +19,7 @@ def collate_with_transposition(collation):
 # blocks have frequency etc.
 # a block has instances.
 # instances have tokens.
-def find_most_unique_blocks_(token_index):
+def find_most_unique_blocks(token_index):
     blocks_as_list: List[List] = []
     for idx, block in enumerate(token_index.blocks):
         blocks_as_list.append([idx, repr(block.get_all_instances()[0]), block.get_frequency(), block.length,
@@ -33,15 +33,17 @@ def find_most_unique_blocks_(token_index):
                                                             'nr. of witnesses',
                                                             'uniqueness'])
 
-    print(df)
+#    print(df)
 
     # We need to sort based on rarity. So lowest frequency (only occurs once in each witness) and the largest length.
     # Larger continuous blocks are more rare.
     max = df['uniqueness'].max()
     most_unique_blocks = df.loc[df['uniqueness'] == max]
-    print(max)
-    print(most_unique_blocks)
-    return most_unique_blocks
+    # print(max)
+    # print(most_unique_blocks)
+    block_ids = most_unique_blocks['block_id'].to_list()
+    blocks = [token_index.blocks[block_id] for block_id in block_ids]
+    return blocks
 
 
 # returns matches as (instance -> instance from the token_index)

@@ -8,28 +8,35 @@ import unittest
 
 from collatex import Collation
 from collatex.collation_with_transposition import collate_with_transposition, \
-    potential_instance_to_instance_matches
+    potential_instance_to_instance_matches, find_most_unique_blocks
 
 
 class Test(unittest.TestCase):
-    # w1: the red and the black cat
-    # w2: the black and the red cat
-    collation = Collation()
-    collation.add_plain_witness("w1", "the red and the black cat")
-    collation.add_plain_witness("w2", "the black and the red cat")
-    token_index = collate_with_transposition(collation)
-    # print(token_index.blocks)
+    def test1(self):
+        # w1: the red and the black cat
+        # w2: the black and the red cat
+        collation = Collation()
+        collation.add_plain_witness("w1", "the red and the black cat")
+        collation.add_plain_witness("w2", "the black and the red cat")
+        token_index = collate_with_transposition(collation)
+        # print(token_index.blocks)
 
-    # we need to convert the intervals into matches
-    # Then do the transposition detection
-    # hmm I need the block index in that dataframe.
-    # We need to get all the instances for a witness.
-    # Then we filter so that we only take them if they are part of the important blocks.
+        # we need to convert the intervals into matches
+        # Then do the transposition detection
+        # hmm I need the block index in that dataframe.
+        # We need to get all the instances for a witness.
+        # Then we filter so that we only take them if they are part of the important blocks.
 
-    # We ask for all the potential matches (warning this is a lot)
-    x = potential_instance_to_instance_matches(token_index, collation.witnesses[1])
-    print(x)
-    pass
+        # We ask for all the potential matches (warning this is a lot)
+        x = potential_instance_to_instance_matches(token_index, collation.witnesses[1])
+        print(x)
+
+        most_unique_blocks = find_most_unique_blocks(token_index)
+        print(most_unique_blocks)
+        # filter the potential matches on the most unique blocks.
+        matches_to_look_at = [item for item in x if item.block_instance1.block in most_unique_blocks]
+        print(matches_to_look_at)
+        pass
 
 
 if __name__ == "__main__":
