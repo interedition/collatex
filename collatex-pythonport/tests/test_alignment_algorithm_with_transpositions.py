@@ -43,6 +43,17 @@ class Test(unittest.TestCase):
         b = sorted(matches_to_look_at,key=lambda item: (item.block_instance2.start_token, item.block_instance1.start_token))
         print(a)
         print(b)
+
+        # The Java code (transposition creates two maps. 1 phrasematch -> index in graph; 2 phrasematch -> index
+        # in witness.
+
+        # We create a list with a counter for the witness order..
+        # This list is just 1, 2, 3, .. , n phrase matches
+        # So we take the witness order to be the natural order
+        # Note phrase match === block instance
+        # Note graph === base
+        phraseMatchWitnessIndex = [item for item in range(len(b))]
+        print(phraseMatchWitnessIndex)
         pass
 
 
