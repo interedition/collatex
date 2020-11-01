@@ -34,10 +34,10 @@ import kotlin.math.abs
  */
 class TranspositionDetector {
 
-    fun detect(phraseMatches: List<List<Match>>?, base: VariantGraph): MutableList<List<Match>> {
+    fun detect(phraseMatchesWitnessOrder: List<List<Match>>?, base: VariantGraph): MutableList<List<Match>> {
         // if there are no phrase matches it is not possible
         // to detect transpositions, return an empty list
-        if (phraseMatches!!.isEmpty()) {
+        if (phraseMatchesWitnessOrder!!.isEmpty()) {
             return ArrayList()
         }
 
@@ -47,7 +47,7 @@ class TranspositionDetector {
          * for two phrase matches, the witness order is used
          * to differentiate.
          */
-        val ranking = rankTheGraph(phraseMatches, base)
+        val ranking = rankTheGraph(phraseMatchesWitnessOrder, base)
 
         val comp = Comparator { pm1:List<Match>, pm2: List<Match> ->
             val rank1 = ranking.apply(pm1[0].vertex)
@@ -56,32 +56,32 @@ class TranspositionDetector {
             when {
                 difference != 0 -> difference
                 else -> {
-                    val index1 = phraseMatches.indexOf(pm1)
-                    val index2 = phraseMatches.indexOf(pm2)
+                    val index1 = phraseMatchesWitnessOrder.indexOf(pm1)
+                    val index2 = phraseMatchesWitnessOrder.indexOf(pm2)
                     index1 - index2
                 }
             }
         }
 
-        val phraseMatchesGraphOrder: List<List<Match>> = phraseMatches.sortedWith(comp)
+        val phraseMatchesGraphOrder: List<List<Match>> = phraseMatchesWitnessOrder.sortedWith(comp)
 
         // Map 1
-        val phraseMatchToIndex: MutableMap<List<Match>, Int> = HashMap()
+        val phraseMatchToGraphIndex: MutableMap<List<Match>, Int> = HashMap()
         for (i in phraseMatchesGraphOrder.indices) {
-            phraseMatchToIndex[phraseMatchesGraphOrder[i]] = i
+            phraseMatchToGraphIndex[phraseMatchesGraphOrder[i]] = i
         }
 
         /*
          * We calculate the index for all the phrase matches
          * First in witness order, then in graph order
          */
-        val phraseMatchesGraphIndex: MutableList<Int?> = ArrayList()
         val phraseMatchesWitnessIndex: MutableList<Int?> = ArrayList()
-        for (i in phraseMatches.indices) {
-            phraseMatchesGraphIndex.add(i)
+        val phraseMatchesGraphIndex: MutableList<Int?> = ArrayList()
+        for (i in phraseMatchesWitnessOrder.indices) {
+            phraseMatchesWitnessIndex.add(i)
         }
-        for (phraseMatch in phraseMatches) {
-            phraseMatchesWitnessIndex.add(phraseMatchToIndex[phraseMatch])
+        for (phraseMatch in phraseMatchesWitnessOrder) {
+            phraseMatchesGraphIndex.add(phraseMatchToGraphIndex[phraseMatch])
         }
 
         // DEBUG
@@ -91,7 +91,7 @@ class TranspositionDetector {
         /*
          * Initialize result variables
          */
-        val nonTransposedPhraseMatches: MutableList<List<Match>> = ArrayList(phraseMatches)
+        val nonTransposedPhraseMatches: MutableList<List<Match>> = ArrayList(phraseMatchesWitnessOrder)
         val transpositions: MutableList<List<Match>> = ArrayList()
 
         /*
@@ -130,14 +130,14 @@ class TranspositionDetector {
             }
             val sortedPhraseMatches: MutableList<List<Match>> = ArrayList(nonTransposedPhraseMatches.sortedWith(comp2))
             val transposedPhrase: List<Match> = sortedPhraseMatches.removeAt(0)
-            val transposedIndex = phraseMatchToIndex[transposedPhrase]
+            val transposedIndex = phraseMatchToGraphIndex[transposedPhrase]
             val graphIndex = phraseMatchesGraphIndex.indexOf(transposedIndex)
             val transposedWithIndex = phraseMatchesWitnessIndex[graphIndex]
             val linkedTransposedPhrase = phraseMatchesGraphOrder[transposedWithIndex!!]
-            addTransposition(phraseMatchToIndex, phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase)
+            addTransposition(phraseMatchToGraphIndex, phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase)
             val distance = phraseMatchToDistanceMap[transposedPhrase]
             if (distance == phraseMatchToDistanceMap[linkedTransposedPhrase] && distance!! > 1) {
-                addTransposition(phraseMatchToIndex, phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase)
+                addTransposition(phraseMatchToGraphIndex, phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase)
             }
         }
         return transpositions
