@@ -27,12 +27,12 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.LinkedHashMap
+import kotlin.math.abs
 
 /**
  * @author Ronald Haentjens Dekker
  */
 class TranspositionDetector {
-    private var phraseMatchToIndex: MutableMap<List<Match>, Int>? = null
 
     fun detect(phraseMatches: List<List<Match>>?, base: VariantGraph): MutableList<List<Match>> {
         // if there are no phrase matches it is not possible
@@ -66,9 +66,9 @@ class TranspositionDetector {
         val phraseMatchesGraphOrder: List<List<Match>> = phraseMatches.sortedWith(comp)
 
         // Map 1
-        phraseMatchToIndex = HashMap()
+        val phraseMatchToIndex: MutableMap<List<Match>, Int> = HashMap()
         for (i in phraseMatchesGraphOrder.indices) {
-            (phraseMatchToIndex as HashMap<List<Match>, Int>)[phraseMatchesGraphOrder[i]] = i
+            phraseMatchToIndex[phraseMatchesGraphOrder[i]] = i
         }
 
         /*
@@ -81,7 +81,7 @@ class TranspositionDetector {
             phraseMatchesGraphIndex.add(i)
         }
         for (phraseMatch in phraseMatches) {
-            phraseMatchesWitnessIndex.add((phraseMatchToIndex as HashMap<List<Match>, Int>)[phraseMatch])
+            phraseMatchesWitnessIndex.add(phraseMatchToIndex[phraseMatch])
         }
 
         // DEBUG
@@ -103,7 +103,7 @@ class TranspositionDetector {
             for (i in nonTransposedPhraseMatches.indices) {
                 val graphIndex = phraseMatchesGraphIndex[i]
                 val witnessIndex = phraseMatchesWitnessIndex[i]
-                val distance = Math.abs(graphIndex!! - witnessIndex!!)
+                val distance = abs(graphIndex!! - witnessIndex!!)
                 val phraseMatch = nonTransposedPhraseMatches[i]
                 phraseMatchToDistanceMap[phraseMatch] = distance
             }
@@ -130,21 +130,21 @@ class TranspositionDetector {
             }
             val sortedPhraseMatches: MutableList<List<Match>> = ArrayList(nonTransposedPhraseMatches.sortedWith(comp2))
             val transposedPhrase: List<Match> = sortedPhraseMatches.removeAt(0)
-            val transposedIndex = (phraseMatchToIndex as HashMap<List<Match>, Int>).get(transposedPhrase)
+            val transposedIndex = phraseMatchToIndex[transposedPhrase]
             val graphIndex = phraseMatchesGraphIndex.indexOf(transposedIndex)
             val transposedWithIndex = phraseMatchesWitnessIndex[graphIndex]
             val linkedTransposedPhrase = phraseMatchesGraphOrder[transposedWithIndex!!]
-            addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase)
+            addTransposition(phraseMatchToIndex, phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, transposedPhrase)
             val distance = phraseMatchToDistanceMap[transposedPhrase]
             if (distance == phraseMatchToDistanceMap[linkedTransposedPhrase] && distance!! > 1) {
-                addTransposition(phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase)
+                addTransposition(phraseMatchToIndex, phraseMatchesWitnessIndex, phraseMatchesGraphIndex, nonTransposedPhraseMatches, transpositions, linkedTransposedPhrase)
             }
         }
         return transpositions
     }
 
-    private fun addTransposition(phraseWitnessRanks: MutableList<Int?>, phraseGraphRanks: MutableList<Int?>, nonTransposedPhraseMatches: MutableList<List<Match>>, transpositions: MutableList<List<Match>>, transposedPhrase: List<Match>) {
-        val indexToRemove = phraseMatchToIndex!![transposedPhrase]
+    private fun addTransposition(phraseMatchToIndex: Map<List<Match>, Int>, phraseWitnessRanks: MutableList<Int?>, phraseGraphRanks: MutableList<Int?>, nonTransposedPhraseMatches: MutableList<List<Match>>, transpositions: MutableList<List<Match>>, transposedPhrase: List<Match>) {
+        val indexToRemove = phraseMatchToIndex[transposedPhrase]
         nonTransposedPhraseMatches.remove(transposedPhrase)
         transpositions.add(transposedPhrase)
         phraseGraphRanks.remove(indexToRemove)
