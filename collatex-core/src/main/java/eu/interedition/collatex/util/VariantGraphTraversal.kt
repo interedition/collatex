@@ -16,72 +16,62 @@
  * You should have received a copy of the GNU General Public License
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
+package eu.interedition.collatex.util
 
-package eu.interedition.collatex.util;
-
-import eu.interedition.collatex.VariantGraph;
-import eu.interedition.collatex.Witness;
-
-import java.util.*;
+import eu.interedition.collatex.VariantGraph
+import eu.interedition.collatex.Witness
+import java.util.*
 
 /**
- * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+ * @author [Gregor Middell](http://gregor.middell.net/)
  */
-public class VariantGraphTraversal implements Iterable<VariantGraph.Vertex> {
-  private final VariantGraph graph;
-  private final Set<Witness> witnesses;
+class VariantGraphTraversal private constructor(private val graph: VariantGraph, private val witnesses: Set<Witness?>?) : Iterable<VariantGraph.Vertex?> {
+    override fun iterator(): Iterator<VariantGraph.Vertex?> {
+        return object : Iterator<VariantGraph.Vertex?> {
+            private val encountered: MutableMap<VariantGraph.Vertex, Long> = HashMap()
+            private val queue: Queue<VariantGraph.Vertex> = ArrayDeque()
+            private var next = Optional.of(graph.start)
+//            private var counter = 0
+            override fun hasNext(): Boolean {
+                return next.isPresent
+            }
 
-  private VariantGraphTraversal(VariantGraph graph, Set<Witness> witnesses) {
-    this.graph = graph;
-    this.witnesses = witnesses;
-  }
-
-  public static VariantGraphTraversal of(VariantGraph graph, Set<Witness> witnesses) {
-    return new VariantGraphTraversal(graph, witnesses);
-  }
-
-  public static VariantGraphTraversal of(VariantGraph graph) {
-    return new VariantGraphTraversal(graph, null);
-  }
-
-  @Override
-  public Iterator<VariantGraph.Vertex> iterator() {
-    return new Iterator<VariantGraph.Vertex>() {
-
-      private final Map<VariantGraph.Vertex, Long> encountered = new HashMap<>();
-      private final Queue<VariantGraph.Vertex> queue = new ArrayDeque<>();
-      private Optional<VariantGraph.Vertex> next = Optional.of(graph.getStart());
-
-      @Override
-      public boolean hasNext() {
-        return next.isPresent();
-      }
-
-      @Override
-      public VariantGraph.Vertex next() {
-        final VariantGraph.Vertex next = this.next.get();
-        for (Map.Entry<VariantGraph.Vertex, Set<Witness>> edge : next.outgoing().entrySet()) {
-          if (witnesses != null && edge.getValue().stream().noneMatch(witnesses::contains)) {
-            continue;
-          }
-          final VariantGraph.Vertex end = edge.getKey();
-
-          final long endEncountered = Optional.ofNullable(encountered.get(end)).orElse(0L);
-          final long endIncoming = end.incoming().entrySet().stream()//
-              .filter(e -> witnesses == null || e.getValue().stream().anyMatch(witnesses::contains))//
-              .count();
-
-          if (endIncoming == endEncountered) {
-            throw new IllegalStateException(String.format("Encountered cycle traversing %s to %s", edge, end));
-          } else if ((endIncoming - endEncountered) == 1) {
-            queue.add(end);
-          }
-
-          encountered.put(end, endEncountered + 1);
+            override fun next(): VariantGraph.Vertex {
+//                counter++
+                val next = next.get()
+                for (edge in next.outgoing().entries) {
+                    if (witnesses != null && edge.value.stream().noneMatch { o: Witness? -> witnesses.contains(o) }) {
+                        continue
+                    }
+                    val end = edge.key
+                    val endEncountered = Optional.ofNullable(encountered[end]).orElse(0L)
+                    val endIncoming = end.incoming().entries.stream() //
+                        .filter { e: Map.Entry<VariantGraph.Vertex?, Set<Witness?>> -> witnesses == null || e.value.stream().anyMatch { o: Witness? -> witnesses.contains(o) } } //
+                        .count()
+                    check(endIncoming != endEncountered) { String.format("Encountered cycle traversing %s to %s", edge, end) }
+                    if (endIncoming - endEncountered == 1L) {
+                        queue.add(end)
+                    }
+                    encountered[end] = endEncountered + 1
+                }
+                this.next = Optional.ofNullable(queue.poll())
+//                if (!this.next.isPresent) {
+//                    println(counter)
+//                }
+                return next
+            }
         }
-        this.next = Optional.ofNullable(queue.poll());
-        return next;
-      }
-    };
-  }
+    }
+
+    companion object {
+        @JvmStatic
+        fun of(graph: VariantGraph, witnesses: Set<Witness>): VariantGraphTraversal {
+            return VariantGraphTraversal(graph, witnesses)
+        }
+
+        @JvmStatic
+        fun of(graph: VariantGraph): VariantGraphTraversal {
+            return VariantGraphTraversal(graph, null)
+        }
+       }
 }
