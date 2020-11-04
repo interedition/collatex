@@ -43,7 +43,7 @@ public class BeckettTest extends AbstractTest {
     public void testBeckettStrangeTransposition() {
         SimpleWitness[] w = createWitnesses("People with things, people without things, things without people, what does it matter. I'm confident I can soon scatter them.", "People with things, people without things, things without people, what does it matter, it will not take me long to scatter them.", "People with things, people without things, things without people, what does it matter, I flatter myself it will not take me long to scatter them, whenever I choose, to the winds.");
         final VariantGraph graph = new VariantGraph();
-        InspectableCollationAlgorithm algo = (InspectableCollationAlgorithm) CollationAlgorithmFactory.legacyDekker(new EqualityTokenComparator());
+        InspectableCollationAlgorithm algo = (InspectableCollationAlgorithm) CollationAlgorithmFactory.dekker(new EqualityTokenComparator());
         algo.collate(graph, w);
 //    List<List<Match>> phraseMatches = algo.getPhraseMatches();
 //    for (List<Match> phraseMatch: phraseMatches) {

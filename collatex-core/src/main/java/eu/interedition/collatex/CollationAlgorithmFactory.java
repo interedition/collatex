@@ -36,14 +36,16 @@ import java.util.function.Function;
  */
 public class CollationAlgorithmFactory {
 
-    /* TODO: THIS SHOULD NOT BE THE DEFAULT! */
+    /* TODO: THIS SHOULD BE THE DEFAULT! */
     public static CollationAlgorithm dekker(Comparator<Token> comparator) {
-        return new EditGraphAligner(comparator);
+        return new DekkerAlgorithm(comparator);
     }
 
-    /* TODO: THIS SHOULD BE THE DEFAULT! */
-    public static CollationAlgorithm legacyDekker(Comparator<Token> comparator) {
-        return new DekkerAlgorithm(comparator);
+    /* TODO: THIS SHOULD NOT BE THE DEFAULT! */
+    // THIS WAS INSPIRED BY THE PYTHON VERSION OF COLLATEX
+    // HOWEVER IT DOES NOT HAVE TRANSPOSITION DETECTION!
+    public static CollationAlgorithm editGraphDekker(Comparator<Token> comparator) {
+        return new EditGraphAligner(comparator);
     }
 
     public static CollationAlgorithm needlemanWunsch(Comparator<Token> comparator) {
