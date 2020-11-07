@@ -21,20 +21,13 @@ package eu.interedition.collatex;
 
 import eu.interedition.collatex.util.VariantGraphTraversal;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+ * @author: Ronald Haentjens Dekker
  */
 public class VariantGraph {
     final VariantGraph.Vertex start;
@@ -46,8 +39,9 @@ public class VariantGraph {
         this.start = new VariantGraph.Vertex(this);
         this.end = new VariantGraph.Vertex(this);
 
-        this.start.outgoing.put(this.end, Collections.emptySet());
-        this.end.incoming.put(this.start, Collections.emptySet());
+        Edge edge = new Edge();
+        this.start.outgoing.put(this.end, edge);
+        this.end.incoming.put(this.start, edge);
     }
 
     public Vertex getStart() {
@@ -77,11 +71,12 @@ public class VariantGraph {
             throw new IllegalArgumentException();
         }
 
-        witnesses = new HashSet<>(witnesses);
-        Optional.ofNullable(from.outgoing.remove(to)).ifPresent(witnesses::addAll);
-
-        from.outgoing.put(to, witnesses);
-        to.incoming.put(from, witnesses);
+        // First get existing edge or create new one
+        // Outgoing and incoming edge is the same
+        VariantGraph.Edge edge = from.outgoingEdges().getOrDefault(to, new Edge());
+        edge.sigla.addAll(witnesses);
+        from.outgoingEdges().put(to, edge);
+        to.incomingEdges().put(from, edge);
 
         start.outgoing.remove(end);
         end.incoming.remove(start);
@@ -115,22 +110,33 @@ public class VariantGraph {
 
     /**
      * @author <a href="http://gregor.middell.net/">Gregor Middell</a>
+     * @author: Ronald Haentjens Dekker
      */
     public static class Vertex {
         private final VariantGraph graph;
         private final Set<Token> tokens = new HashSet<>();
-        private final Map<Vertex, Set<Witness>> outgoing = new HashMap<>();
-        private final Map<Vertex, Set<Witness>> incoming = new HashMap<>();
+        private final Map<VariantGraph.Vertex, VariantGraph.Edge> outgoing = new HashMap<>();
+        private final Map<VariantGraph.Vertex, VariantGraph.Edge> incoming = new HashMap<>();
 
         public Vertex(VariantGraph graph) {
             this.graph = graph;
         }
 
+        //NOTE: legacy method!
         public Map<Vertex, Set<Witness>> incoming() {
+            return incoming.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().sigla));
+        }
+
+        //NOTE: legacy method!
+        public Map<Vertex, Set<Witness>> outgoing() {
+            return outgoing.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, edge -> edge.getValue().sigla));
+        }
+
+        public Map<VariantGraph.Vertex, VariantGraph.Edge> incomingEdges() {
             return incoming;
         }
 
-        public Map<Vertex, Set<Witness>> outgoing() {
+        public Map<VariantGraph.Vertex, VariantGraph.Edge> outgoingEdges() {
             return outgoing;
         }
 
@@ -156,6 +162,18 @@ public class VariantGraph {
 
         public String toString() {
             return tokens.toString();
+        }
+    }
+
+    /**
+     * @author: Ronald Haentjens Dekker
+     * Note: not a value object
+     */
+    public class Edge {
+        public final Set<Witness> sigla;
+
+        public Edge() {
+            this.sigla = new HashSet<>();
         }
     }
 
