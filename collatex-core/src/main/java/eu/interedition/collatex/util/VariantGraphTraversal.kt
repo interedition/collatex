@@ -20,47 +20,42 @@ package eu.interedition.collatex.util
 
 import eu.interedition.collatex.VariantGraph
 import eu.interedition.collatex.Witness
-import java.util.*
 
 /**
  * @author [Gregor Middell](http://gregor.middell.net/)
+ * @author Ronald Haentjens Dekker
  */
 class VariantGraphTraversal private constructor(private val graph: VariantGraph, private val witnesses: Set<Witness?>?) : Iterable<VariantGraph.Vertex?> {
-    override fun iterator(): Iterator<VariantGraph.Vertex?> {
-        return object : Iterator<VariantGraph.Vertex?> {
-            private val encountered: MutableMap<VariantGraph.Vertex, Long> = HashMap()
-            private val queue: Queue<VariantGraph.Vertex> = ArrayDeque()
-            private var next = Optional.of(graph.start)
-//            private var counter = 0
-            override fun hasNext(): Boolean {
-                return next.isPresent
-            }
 
-            override fun next(): VariantGraph.Vertex {
-//                counter++
-                val next = next.get()
-                for (edge in next.outgoing().entries) {
-                    if (witnesses != null && edge.value.stream().noneMatch { o: Witness? -> witnesses.contains(o) }) {
-                        continue
+    fun topologicallySortedTextNodes(graph: VariantGraph): List<VariantGraph.Vertex> {
+        // https://en.wikipedia.org/wiki/Topological_sorting
+        // Kahn's algorithm
+        val sorted: MutableList<VariantGraph.Vertex> = mutableListOf()
+        val todo: MutableSet<VariantGraph.Vertex> = mutableSetOf(graph.start)
+        val handledEdges: MutableSet<VariantGraph.Edge> = mutableSetOf()
+        while (todo.isNotEmpty()) {
+            val node = todo.iterator().next()
+            todo.remove(node)
+            sorted += node
+            for ((targetNode, e) in node.outgoingEdges()) {
+                if (e !in handledEdges) {
+                    handledEdges += e
+                    if (handledEdges.containsAll(targetNode.incomingEdges().values)) {
+                        todo += targetNode
                     }
-                    val end = edge.key
-                    val endEncountered = Optional.ofNullable(encountered[end]).orElse(0L)
-                    val endIncoming = end.incoming().entries.stream() //
-                        .filter { e: Map.Entry<VariantGraph.Vertex?, Set<Witness?>> -> witnesses == null || e.value.stream().anyMatch { o: Witness? -> witnesses.contains(o) } } //
-                        .count()
-                    check(endIncoming != endEncountered) { String.format("Encountered cycle traversing %s to %s", edge, end) }
-                    if (endIncoming - endEncountered == 1L) {
-                        queue.add(end)
-                    }
-                    encountered[end] = endEncountered + 1
                 }
-                this.next = Optional.ofNullable(queue.poll())
-//                if (!this.next.isPresent) {
-//                    println(counter)
-//                }
-                return next
             }
         }
+        return if (witnesses==null) {
+            sorted
+        } else {
+            sorted.filter { vertex -> vertex === graph.start || vertex.witnesses().containsAll(witnesses) }
+        }
+    }
+
+    override fun iterator(): Iterator<VariantGraph.Vertex?> {
+        val topologicallySortedTextNodes = topologicallySortedTextNodes(graph)
+        return topologicallySortedTextNodes.iterator()
     }
 
     companion object {
@@ -73,5 +68,5 @@ class VariantGraphTraversal private constructor(private val graph: VariantGraph,
         fun of(graph: VariantGraph): VariantGraphTraversal {
             return VariantGraphTraversal(graph, null)
         }
-       }
+    }
 }
