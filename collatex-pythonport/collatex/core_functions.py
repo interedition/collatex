@@ -106,6 +106,8 @@ def export_alignment_table_as_xml(table):
     readings = []
     for column in table.columns:
         app = etree.Element('app')
+        if not column.variant:
+            app.set("type", "invariant")
         for key, value in sorted(column.tokens_per_witness.items()):
             child = etree.Element('rdg')
             child.attrib['wit'] = "#" + key
