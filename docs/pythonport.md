@@ -519,6 +519,164 @@ on the same input produces:
 
 Pretty-printing should be used only for examination, and not for subsequent processing, since it incorrectly inserts XML-significant whitespace inside and around text nodes (see “The ”, near the beginning of the output).
 
+#### JSON
+
+Setting the `output` value to `"json"` produces JSON output. This is the most complete output format, and therefore a common choice for subsequent preprocessing.
+
+##### Script
+
+```python
+from collatex import *
+collation = Collation()
+collation.add_plain_witness("A", "The quick brown fox jumps over the dog.")
+collation.add_plain_witness("B", "The brown fox jumps over the lazy dog.")
+alignment_table = collate(collation, output="json")
+print(alignment_table)
+```
+
+##### Output
+
+```json
+{
+  "table": [
+    [
+      [
+        {
+          "_sigil": "A",
+          "_token_array_position": 0,
+          "n": "The",
+          "t": "The "
+        }
+      ],
+      [
+        {
+          "_sigil": "A",
+          "_token_array_position": 1,
+          "n": "quick",
+          "t": "quick "
+        }
+      ],
+      [
+        {
+          "_sigil": "A",
+          "_token_array_position": 2,
+          "n": "brown",
+          "t": "brown "
+        },
+        {
+          "_sigil": "A",
+          "_token_array_position": 3,
+          "n": "fox",
+          "t": "fox "
+        },
+        {
+          "_sigil": "A",
+          "_token_array_position": 4,
+          "n": "jumps",
+          "t": "jumps "
+        },
+        {
+          "_sigil": "A",
+          "_token_array_position": 5,
+          "n": "over",
+          "t": "over "
+        },
+        {
+          "_sigil": "A",
+          "_token_array_position": 6,
+          "n": "the",
+          "t": "the "
+        }
+      ],
+      null,
+      [
+        {
+          "_sigil": "A",
+          "_token_array_position": 7,
+          "n": "dog",
+          "t": "dog"
+        },
+        {
+          "_sigil": "A",
+          "_token_array_position": 8,
+          "n": ".",
+          "t": "."
+        }
+      ]
+    ],
+    [
+      [
+        {
+          "_sigil": "B",
+          "_token_array_position": 10,
+          "n": "The",
+          "t": "The "
+        }
+      ],
+      null,
+      [
+        {
+          "_sigil": "B",
+          "_token_array_position": 11,
+          "n": "brown",
+          "t": "brown "
+        },
+        {
+          "_sigil": "B",
+          "_token_array_position": 12,
+          "n": "fox",
+          "t": "fox "
+        },
+        {
+          "_sigil": "B",
+          "_token_array_position": 13,
+          "n": "jumps",
+          "t": "jumps "
+        },
+        {
+          "_sigil": "B",
+          "_token_array_position": 14,
+          "n": "over",
+          "t": "over "
+        },
+        {
+          "_sigil": "B",
+          "_token_array_position": 15,
+          "n": "the",
+          "t": "the "
+        }
+      ],
+      [
+        {
+          "_sigil": "B",
+          "_token_array_position": 16,
+          "n": "lazy",
+          "t": "lazy "
+        }
+      ],
+      [
+        {
+          "_sigil": "B",
+          "_token_array_position": 17,
+          "n": "dog",
+          "t": "dog"
+        },
+        {
+          "_sigil": "B",
+          "_token_array_position": 18,
+          "n": ".",
+          "t": "."
+        }
+      ]
+    ]
+  ],
+  "witnesses": [
+    "A",
+    "B"
+  ]
+}
+```
+
 ### Supplementary output parameters
 
 #### The `layout` parameter
@@ -542,5 +700,6 @@ In the following table, possible values of the `output` parameter are listed in 
 **svg** | yes | yes | no | no
 **xml** | yes | yes | no | no
 **tei** | yes | yes | no | yes
+**json** | yes | yes | no | no
 
 Recall that near matching is incompatible with segmentation, so `near_match=True` requires `segmentation=False`.
