@@ -2,5 +2,6 @@
 # in collatex-pythonport directory
 pip install --upgrade  setuptools
 pip install --upgrade twine
-python setup.py sdist bdist_wheel
-twine upload dist/*
+# WAS: python setup.py sdist bdist_wheel
+python setup.py sdist bdist
+itwine upload dist/*
