@@ -3,6 +3,10 @@
 History
 -------
 
+2.3 (2023-09-08)
+++++++++++++++++
+* Compatability fix for Python 3.10+
+
 2.2 (2018-08-16)
 ++++++++++++++++
 * Create documentation for CollateX Python
