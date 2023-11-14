@@ -4,4 +4,5 @@ pip install --upgrade  setuptools
 pip install --upgrade twine
 # WAS: python setup.py sdist bdist_wheel
 python setup.py sdist bdist
-itwine upload dist/*
+# change for current version
+twine upload dist/collatex-2.3.tar.gz
