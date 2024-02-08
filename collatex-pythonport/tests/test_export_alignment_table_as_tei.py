@@ -17,18 +17,20 @@ class Test(unittest.TestCase):
         output_expected = """<?xml version="1.0" ?>
 <cx:apparatus xmlns:cx="http://interedition.eu/collatex/ns/1.0" xmlns="http://www.tei-c.org/ns/1.0">
 	The
-
+	 
 	<app>
 		<rdg wit="#A">quick</rdg>
 	</app>
 	 
-	brown 
+	brown
+	 
 	<app>
 		<rdg wit="#A">wombat</rdg>
 		<rdg wit="#B #C">koala</rdg>
 	</app>
 	 
-	jumps over the 
+	jumps over the
+	 
 	<app>
 		<rdg wit="#A #C">industrious</rdg>
 		<rdg wit="#B">lazy</rdg>
