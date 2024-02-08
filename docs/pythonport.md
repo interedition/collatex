@@ -522,6 +522,8 @@ Pretty-printing should be used only for examination, and not for subsequent proc
 #### JSON
 
 Setting the `output` value to `"json"` produces JSON output. This is the most complete output format, and therefore a common choice for subsequent preprocessing.
+By default the output produces is equivalent to the horizontal alignment tables above. If the layout option is set to `vertical` then the export will be equivalent to the vertical alignment tables above. The latter produces a format which is structurally the same as the `json` output option from the Java
+microservices version of collateX. The only difference between the two is that in the Python export `None` is used for empty cells and in the Java microservices an empty array is used.
 
 ##### Script
 
@@ -681,7 +683,7 @@ print(alignment_table)
 
 #### The `layout` parameter
 
-The `layout` parameter controls whether table output is “horizontal” (which is the default) or “vertical”. It is relevant only for output types `table` and `html`. Otherwise it is ignored: `html2` output is always vertical, and the other output types are not tabular.
+The `layout` parameter controls whether table output is “horizontal” (which is the default) or “vertical”. It is relevant only for output types `table`, `html` and `json`. Otherwise it is ignored: `html2` output is always vertical, and the other output types are not tabular.
 
 #### The `indent` parameter
 
@@ -700,6 +702,6 @@ In the following table, possible values of the `output` parameter are listed in 
 **svg** | yes | yes | no | no
 **xml** | yes | yes | no | no
 **tei** | yes | yes | no | yes
-**json** | yes | yes | no | no
+**json** | yes | yes | yes | no
 
 Recall that near matching is incompatible with segmentation, so `near_match=True` requires `segmentation=False`.
