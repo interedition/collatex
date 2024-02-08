@@ -69,7 +69,10 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
     # create alignment table
     table = AlignmentTable(collation, graph, layout, ranking)
     if output == "json":
-        return export_alignment_table_as_json(table)
+        if layout == "vertical":
+            return export_alignment_table_as_vertical_json(table, collation)
+        else:
+            return export_alignment_table_as_json(table)
     if output == "html":
         return display_alignment_table_as_html(table)
     if output == "html2":
@@ -84,6 +87,23 @@ def collate(collation, output="table", layout="horizontal", segmentation=True, n
         return display_alignment_table_as_csv(table, output)
     else:
         raise Exception("Unknown output type: " + output)
+
+
+def export_alignment_table_as_vertical_json(table, collation, indent=None):
+    # print the table vertically
+    # switch columns and rows
+    json_output = {"table": []}
+    sigli = []
+    for column in table.columns:
+        row = []
+        for witness in collation.witnesses:
+            if witness.sigil not in sigli:
+                sigli.append(witness.sigil)
+            cell = column.tokens_per_witness.get(witness.sigil)
+            row.append([listItem.token_data for listItem in cell] if cell else None)
+        json_output["table"].append(row)
+    json_output["witnesses"] = sigli
+    return json.dumps(json_output, sort_keys=True, indent=indent, ensure_ascii=False)
 
 
 def export_alignment_table_as_json(table, indent=None, status=False):
