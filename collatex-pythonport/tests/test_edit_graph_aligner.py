@@ -127,19 +127,17 @@ class Test(unittest.TestCase):
         # self.assertEqual(['a ', 'b ', 'c ', 'a b c'], alignment_table.rows[3].to_list_of_strings())
 
         expected_tei = """<?xml version="1.0" ?>
-<cx:apparatus xmlns="http://www.tei-c.org/ns/1.0" xmlns:cx="http://interedition.eu/collatex/ns/1.0">
+<cx:apparatus xmlns:cx="http://interedition.eu/collatex/ns/1.0" xmlns="http://www.tei-c.org/ns/1.0">
 	<app>
 		<rdg wit="#D">a b c</rdg>
 	</app>
 	 
 	<app>
-		<rdg wit="#A">a</rdg>
-		<rdg wit="#D">a</rdg>
+		<rdg wit="#A #D">a</rdg>
 	</app>
 	 
 	<app>
-		<rdg wit="#B">b</rdg>
-		<rdg wit="#D">b</rdg>
+		<rdg wit="#B #D">b</rdg>
 	</app>
 	 
 	<app>
