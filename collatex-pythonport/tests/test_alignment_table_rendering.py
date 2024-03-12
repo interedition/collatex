@@ -143,6 +143,37 @@ class Test(unittest.TestCase):
         json_out = collate(collation, output="json", segmentation=False)
         self.assertEqual(expected_output, json.loads(json_out))
 
+    def testJSONAlignmentTableRenderingNoSegmentationVertical(self):
+        collation = Collation()
+        collation.add_plain_witness("A", "This very quick very quick brown wombat")
+        collation.add_plain_witness("B", "That very quick brown koala")
+        collation.add_plain_witness("C", "That very quick brown kangaroo")
+        expected_output = {"table": [[[{"_sigil": "A", "_token_array_position": 0, "n": "This", "t": "This "}],
+                                      [{"_sigil": "B", "_token_array_position": 8, "n": "That", "t": "That "}],
+                                      [{"_sigil": "C", "_token_array_position": 14, "n": "That", "t": "That "}]],
+                                     [[{"_sigil": "A", "_token_array_position": 1, "n": "very", "t": "very "}],
+                                      None,
+                                      None],
+                                     [[{"_sigil": "A", "_token_array_position": 2, "n": "quick", "t": "quick "}],
+                                      None,
+                                      None],
+                                     [[{"_sigil": "A", "_token_array_position": 3, "n": "very", "t": "very "}],
+                                      [{"_sigil": "B", "_token_array_position": 9, "n": "very", "t": "very "}],
+                                      [{"_sigil": "C", "_token_array_position": 15, "n": "very", "t": "very "}]],
+                                     [[{"_sigil": "A", "_token_array_position": 4, "n": "quick", "t": "quick "}],
+                                      [{"_sigil": "B", "_token_array_position": 10, "n": "quick", "t": "quick "}],
+                                      [{"_sigil": "C", "_token_array_position": 16, "n": "quick", "t": "quick "}]],
+                                     [[{"_sigil": "A", "_token_array_position": 5, "n": "brown", "t": "brown "}],
+                                      [{"_sigil": "B", "_token_array_position": 11, "n": "brown", "t": "brown "}],
+                                      [{"_sigil": "C", "_token_array_position": 17, "n": "brown", "t": "brown "}]],
+                                     [[{"_sigil": "A", "_token_array_position": 6, "n": "wombat", "t": "wombat"}],
+                                      [{"_sigil": "B", "_token_array_position": 12, "n": "koala", "t": "koala"}],
+                                      [{"_sigil": "C", "_token_array_position": 18, "n": "kangaroo", "t": "kangaroo"}]]
+                                      ],
+                           "witnesses": ["A", "B", "C"]}
+        json_out = collate(collation, output="json", layout="vertical", segmentation=False)
+        self.assertEqual(expected_output, json.loads(json_out))
+
     def testColumnStatusInAlignmentTable(self):
         collation = Collation()
         collation.add_plain_witness("A", "The quick brown fox jumps over the dog.")
